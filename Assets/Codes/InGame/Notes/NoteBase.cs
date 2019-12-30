@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-public class NoteBase : MonoBehaviour
+public abstract class NoteBase : MonoBehaviour
 {
     public int lane;
     public int time;
@@ -23,7 +23,7 @@ public class NoteBase : MonoBehaviour
         transform.localScale = new Vector3(NoteUtility.NOTE_SCALE, NoteUtility.NOTE_SCALE, 1) * LiveSetting.noteSize;
 
         sprite = gameObject.AddComponent<SpriteRenderer>();
-        sprite.sprite = Resources.Load<Sprite>("TestAssets/note_single_default");
+        sprite.sortingLayerID = SortingLayer.NameToID("Note");
 
         OnNoteUpdate();
     }

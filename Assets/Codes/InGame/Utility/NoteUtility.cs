@@ -5,9 +5,10 @@ public enum GameNoteType
     None = -1,
     Normal = 0,
     Flick = 1,
-    Slide = 2,
-    SlideEnd = 3,
-    SlideEndFlick = 4
+    SlideStart = 2,
+    SlideTick = 3,
+    SlideEnd = 4,
+    SlideEndFlick = 5
 }
 
 public enum JudgeResult
@@ -40,5 +41,13 @@ public static class NoteUtility
     public static Vector3 GetInitPos(int lane)
     {
         return new Vector3((lane - 3) * LANE_WIDTH, NOTE_Y_POS, NOTE_START_POS);
+    }
+
+    public static bool IsSlide(GameNoteType type)
+    {
+        return type == GameNoteType.SlideStart ||
+            type == GameNoteType.SlideTick ||
+            type == GameNoteType.SlideEnd ||
+            type == GameNoteType.SlideEndFlick;
     }
 }
