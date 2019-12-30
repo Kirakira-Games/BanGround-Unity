@@ -26,10 +26,16 @@ public class SlideEnd : SlideNoteBase
         sprite.sprite = Resources.Load<Sprite>("V2Assets/note_long_default");
     }
 
-    public override void Judge(int audioTime, JudgeResult result, Touch? touch)
+    public override void OnNoteUpdate()
     {
-        judgeTime = audioTime;
-        GetComponentInParent<Slide>().Judge(gameObject, result, touch);
-        Destroy(gameObject);
+        int audioTime = (int)(Time.time * 1000);
+        UpdatePosition(audioTime);
+
+        if (audioTime > time + (IsTilt ?
+            NoteUtility.TAP_JUDGE_RANGE:
+            NoteUtility.SLIDE_END_JUDGE_RANGE)[(int)JudgeResult.Bad])
+        {
+            Judge(audioTime, JudgeResult.Miss, null);
+        }
     }
 }

@@ -20,7 +20,9 @@ public abstract class SlideNoteBase : NoteBase
 
     public override void Judge(int audioTime, JudgeResult result, Touch? touch)
     {
-        judgeTime = audioTime;
-        GetComponentInParent<Slide>().Judge(gameObject, result, touch);
+        if (GetComponentInParent<Slide>().Judge(gameObject, result, touch))
+        {
+            judgeTime = audioTime;
+        }
     }
 }

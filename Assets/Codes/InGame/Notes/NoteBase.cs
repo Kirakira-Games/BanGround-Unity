@@ -4,7 +4,7 @@ public abstract class NoteBase : MonoBehaviour
     public int lane;
     public int time;
     public int judgeTime;
-    protected int touchId;
+    public int touchId;
 
     public GameNoteType type;
 

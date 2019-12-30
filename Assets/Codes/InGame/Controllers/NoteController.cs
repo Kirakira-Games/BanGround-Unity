@@ -120,6 +120,19 @@ public class NoteController : MonoBehaviour
         slideTable.Remove(tickStack);
     }
 
+    public static int GetLaneByTouchPosition(Vector2 position)
+    {
+        Collider2D[] cols = Physics2D.OverlapPointAll(Camera.main.ScreenToWorldPoint(position));
+        foreach (Collider2D col in cols)
+        {
+            if (col.CompareTag("JudgeArea"))
+            {
+                return col.name[0] - '0';
+            }
+        }
+        return -1;
+    }
+
     private void UpdateTouch()
     {
         int audioTime = (int)(Time.time * 1000);
@@ -144,17 +157,17 @@ public class NoteController : MonoBehaviour
         {
             if (touchTable.Contains(touch.fingerId))
             {
-                (touchTable[touch.fingerId] as GameObject).GetComponent<NoteBase>()?.TraceTouch(audioTime, touch);
+                GameObject obj = touchTable[touch.fingerId] as GameObject;
+                if (obj.GetComponent<NoteBase>() != null)
+                    obj.GetComponent<NoteBase>().TraceTouch(audioTime, touch);
+                if (obj.GetComponent<Slide>() != null)
+                    obj.GetComponent<Slide>().TraceTouch(audioTime, touch);
                 continue;
             }
-            Collider2D[] cols = Physics2D.OverlapPointAll(Camera.main.ScreenToWorldPoint(touch.position));
-            foreach (Collider2D col in cols)
+            int lane = GetLaneByTouchPosition(touch.position);
+            if (lane != -1)
             {
-                if (col.CompareTag("JudgeArea"))
-                {
-                    OnTouch(audioTime, int.Parse(col.name), touch);
-                    break;
-                }
+                OnTouch(audioTime, lane, touch);
             }
         }
     }

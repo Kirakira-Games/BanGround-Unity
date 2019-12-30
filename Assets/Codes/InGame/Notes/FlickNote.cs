@@ -16,11 +16,11 @@ public class FlickNote : NoteBase
         Vector2 dist = touch.position - touchPosition;
         if (dist.magnitude * 2.54F >= Screen.dpi * NoteUtility.FLICK_JUDGE_DIST)
         {
-            base.Judge(audioTime, TranslateTimeToJudge(NoteUtility.TAP_JUDGE_RANGE, judgeTime), null);
+            base.Judge(audioTime, TranslateTimeToJudge(NoteUtility.TAP_JUDGE_RANGE, judgeTime), touch);
         }
         else if (touch.phase == TouchPhase.Ended)
         {
-            base.Judge(audioTime, JudgeResult.Miss, null);
+            base.Judge(audioTime, JudgeResult.Miss, touch);
         }
     }
 
@@ -50,6 +50,5 @@ public class FlickNote : NoteBase
         NoteController.controller.RegisterTouch(touchId, gameObject);
         touchPosition = touch.Value.position;
         judgeTime = audioTime;
-        return;
     }
 }
