@@ -5,7 +5,7 @@ using UnityEngine;
 public class NoteController : MonoBehaviour
 {
     public static NoteController controller;
-    private float lastGenerateTime = -114514f;
+    private float lastGenerateTime = -1f;
     private Queue<GameObject>[] laneQueue;
     private Hashtable touchTable;
 
