@@ -22,10 +22,12 @@ public class NoteController : MonoBehaviour
     // For debugging purpose only, simulate touch event from mouse event
     static private Touch[] SimulateMouseTouch(TouchPhase phase)
     {
-        Touch touch = new Touch();
-        touch.position = Input.mousePosition;
-        touch.fingerId = NoteUtility.MOUSE_TOUCH_ID;
-        touch.phase = phase;
+        Touch touch = new Touch
+        {
+            position = Input.mousePosition,
+            fingerId = NoteUtility.MOUSE_TOUCH_ID,
+            phase = phase
+        };
         return new Touch[] { touch };
     }
 
@@ -123,7 +125,7 @@ public class NoteController : MonoBehaviour
             Collider2D[] cols = Physics2D.OverlapPointAll(Camera.main.ScreenToWorldPoint(touch.position));
             foreach (Collider2D col in cols)
             {
-                if (col.tag == "JudgeArea")
+                if (col.CompareTag("JudgeArea"))
                 {
                     OnTouch(audioTime, int.Parse(col.name), touch);
                 }
