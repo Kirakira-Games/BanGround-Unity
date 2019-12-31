@@ -12,11 +12,11 @@ public class SlideEnd : SlideNoteBase
         }
         if (IsTilt)
         {
-            return TranslateTimeToJudge(NoteUtility.TAP_JUDGE_RANGE, audioTime);
+            return TranslateTimeToJudge(NoteUtility.SLIDE_END_JUDGE_RANGE, audioTime);
         }
         else
         {
-            return TranslateTimeToJudge(NoteUtility.SLIDE_END_JUDGE_RANGE, audioTime);
+            return TranslateTimeToJudge(NoteUtility.TAP_JUDGE_RANGE, audioTime);
         }
     }
 
@@ -29,8 +29,8 @@ public class SlideEnd : SlideNoteBase
     protected override void OnNoteUpdateJudge(int audioTime)
     {
         if (audioTime > time + (IsTilt ?
-            NoteUtility.TAP_JUDGE_RANGE:
-            NoteUtility.SLIDE_END_JUDGE_RANGE)[(int)JudgeResult.Bad])
+            NoteUtility.SLIDE_END_JUDGE_RANGE :
+            NoteUtility.TAP_JUDGE_RANGE)[(int)JudgeResult.Bad])
         {
             RealJudge(audioTime, JudgeResult.Miss, null);
         }

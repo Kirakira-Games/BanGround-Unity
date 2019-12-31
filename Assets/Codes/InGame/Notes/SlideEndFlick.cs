@@ -50,8 +50,8 @@ public class SlideEndFlick : SlideNoteBase
     protected override void OnNoteUpdateJudge(int audioTime)
     {
         int judgeEndTime = time + (IsTilt ?
-            NoteUtility.SLIDE_END_JUDGE_RANGE[(int)JudgeResult.Bad] :
-            NoteUtility.SLIDE_END_FLICK_JUDGE_RANGE);
+            NoteUtility.SLIDE_END_FLICK_JUDGE_RANGE :
+            NoteUtility.SLIDE_END_JUDGE_RANGE[(int)JudgeResult.Bad]);
 
         if (audioTime > judgeEndTime)
         {
