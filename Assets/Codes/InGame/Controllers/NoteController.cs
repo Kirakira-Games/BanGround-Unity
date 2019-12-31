@@ -238,6 +238,7 @@ public class NoteController : MonoBehaviour
         GameObject[] notes =
         {
             CreateNote(GameNoteType.SlideStart, 3000, 0),
+            CreateNote(GameNoteType.SlideTick, 3500, 2),
             CreateNote(GameNoteType.SlideEndFlick, 4000, 0)
         };
         foreach (GameObject note in notes)

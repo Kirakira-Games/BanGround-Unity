@@ -55,7 +55,8 @@ public class Slide : MonoBehaviour
     {
         int audioTime = (int)(Time.time * 1000);
         while (displayHead < notes.Count &&
-            (audioTime >= (notes[displayHead] as NoteBase).time))
+            (audioTime >= (notes[displayHead] as NoteBase).time ||
+             (notes[displayHead] as NoteBase).judgeResult != JudgeResult.None))
         {
             displayHead++;
         }
@@ -129,7 +130,9 @@ public class Slide : MonoBehaviour
                 Vector3 prevPos = prev.judgePos;
                 Vector3 nextPos = next.judgePos;
                 noteHead.transform.position = (nextPos - prevPos) * percentage + prevPos;
-                noteHead.GetComponentInChildren<NoteMesh>().afterNoteTrans = next.transform;
+                NoteMesh mesh = noteHead.GetComponentInChildren<NoteMesh>();
+                mesh.afterNoteTrans = next.transform;
+                mesh.GetComponent<MeshRenderer>().enabled = displayHead == 1 || !prev.gameObject.activeSelf;
             }
             noteHead.gameObject.SetActive(touchId != -1 || LiveSetting.autoPlayEnabled);
         }
