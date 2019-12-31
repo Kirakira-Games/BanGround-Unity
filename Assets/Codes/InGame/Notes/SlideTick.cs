@@ -19,15 +19,11 @@ public class SlideTick : SlideNoteBase
 
     public override void Judge(int audioTime, JudgeResult result, Touch? touch)
     {
-        base.Judge(audioTime, result, touch);
-        Destroy(gameObject);
+        RealJudge(audioTime, result, touch);
     }
 
-    public override void OnNoteUpdate()
+    protected override void OnNoteUpdateJudge(int audioTime)
     {
-        int audioTime = (int)(Time.time * 1000);
-        UpdatePosition(audioTime);
-
         if (audioTime > time + NoteUtility.SLIDE_TICK_JUDGE_RANGE)
         {
             Judge(audioTime, JudgeResult.Miss, null);

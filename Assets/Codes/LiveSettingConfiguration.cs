@@ -16,6 +16,7 @@ public static class LiveSetting
 
     public static bool syncLineEnabled = true;
     public static bool laneEffectEnabled = true;
+    public static bool autoPlayEnabled = true;
 
     private static float cachedSpeed = 0;
     private static int cachedScreenTime = 0;

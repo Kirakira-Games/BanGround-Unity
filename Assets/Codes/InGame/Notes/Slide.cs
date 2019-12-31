@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Slide : MonoBehaviour
 {
+    public int tickStack;
     private ArrayList notes;
     private int judgeHead;
     private int displayHead;
@@ -19,23 +20,32 @@ public class Slide : MonoBehaviour
     {
         if (touchId != -1)
         {
-            NoteController.controller.UnregisterTouch(touchId);
+            NoteController.controller.UnregisterTouch(touchId, gameObject);
             touchId = -1;
         }
+        NoteController.controller.EndSlide(tickStack);
     }
 
-    public void InitSlide()
+    public void InitSlide(int tickStack)
     {
         notes = new ArrayList();
         touchId = -1;
         judgeHead = 0;
         displayHead = 1;
+        this.tickStack = tickStack;
+    }
+
+    private void Start()
+    {
+        noteHead.IsTilt = (notes[1] as NoteBase).lane != noteHead.lane;
+        SlideNoteBase lastNote = notes[notes.Count - 1] as SlideNoteBase;
+        lastNote.IsTilt = (notes[notes.Count - 2] as NoteBase).lane != lastNote.lane;
     }
 
     private void UpdateHead()
     {
         while (judgeHead < notes.Count && (notes[judgeHead] == null ||
-            (notes[judgeHead] as NoteBase).judgeTime != -1))
+            (notes[judgeHead] as NoteBase).judgeResult != JudgeResult.None))
         {
             judgeHead++;
         }
@@ -63,31 +73,43 @@ public class Slide : MonoBehaviour
         else
         {
             int lane = NoteController.GetLaneByTouchPosition(touch.position);
-            if (lane == -1) return;
-            JudgeResult result = note.TryJudge(audioTime, touch);
-            if (result != JudgeResult.None)
+            if (Mathf.Abs(lane - note.lane) <= 1)
             {
-                note.Judge(audioTime, result, touch);
+                JudgeResult result = note.TryJudge(audioTime, touch);
+                if (result != JudgeResult.None)
+                {
+                    note.Judge(audioTime, result, touch);
+                }
             }
-            else if (touch.phase == TouchPhase.Ended)
+        }
+        if (touch.phase == TouchPhase.Ended)
+        {
+            UpdateHead();
+            if (judgeHead < notes.Count)
             {
                 NoteController.controller.Judge(note.gameObject, JudgeResult.Miss, touch);
                 judgeHead++;
             }
+            NoteController.controller.UnregisterTouch(touchId, gameObject);
+            touchId = -1;
         }
     }
 
     public void OnSlideUpdate()
     {
         // Update ticks
-        NoteBase[] childNotes = GetComponentsInChildren<NoteBase>();
-        foreach (NoteBase note in childNotes)
+        foreach (NoteBase note in GetComponentsInChildren<NoteBase>())
         {
             note.OnNoteUpdate();
         }
         // Update head
         UpdateHead();
         UpdateDisplayHead();
+        if (judgeHead >= notes.Count)
+        {
+            Destroy(gameObject);
+            return;
+        }
         // Update position of noteHead
         int audioTime = (int)(Time.time * 1000);
         if (noteHead.judgeTime != -1)
@@ -95,7 +117,7 @@ public class Slide : MonoBehaviour
             if (displayHead >= notes.Count)
             {
                 NoteBase lastNote = notes[notes.Count - 1] as NoteBase;
-                noteHead.transform.position = NoteUtility.GetInitPos(lastNote.lane);
+                noteHead.transform.position = NoteUtility.GetJudgePos(lastNote.lane);
                 noteHead.GetComponentInChildren<NoteMesh>().afterNoteTrans = lastNote.transform;
             }
             else
@@ -104,14 +126,15 @@ public class Slide : MonoBehaviour
                 NoteBase prev = notes[displayHead - 1] as NoteBase;
                 float percentage = (float)(audioTime - prev.time) / (next.time - prev.time);
                 percentage = Mathf.Max(0, percentage);
-                Vector3 prevPos = prev.initPos;
-                Vector3 nextPos = next.initPos;
+                Vector3 prevPos = prev.judgePos;
+                Vector3 nextPos = next.judgePos;
                 noteHead.transform.position = (nextPos - prevPos) * percentage + prevPos;
                 noteHead.GetComponentInChildren<NoteMesh>().afterNoteTrans = next.transform;
             }
+            noteHead.gameObject.SetActive(touchId != -1 || LiveSetting.autoPlayEnabled);
         }
         // Update mesh
-        foreach (NoteBase note in childNotes)
+        foreach (NoteBase note in GetComponentsInChildren<NoteBase>())
         {
             note.GetComponentInChildren<NoteMesh>()?.OnUpdate();
         }
@@ -131,6 +154,13 @@ public class Slide : MonoBehaviour
         notes.Add(note);
     }
 
+    private void BindTouch(Touch? touch)
+    {
+        if (LiveSetting.autoPlayEnabled || !touch.HasValue) return;
+        touchId = touch.Value.fingerId;
+        NoteController.controller.RegisterTouch(touchId, gameObject);
+    }
+
     public bool Judge(GameObject note, JudgeResult result, Touch? touch)
     {
         // Must judge head
@@ -138,22 +168,17 @@ public class Slide : MonoBehaviour
         {
             if (notes.IndexOf(note.GetComponent<NoteBase>()) < judgeHead)
             {
-                if (touch.HasValue)
-                {
-                    touchId = touch.Value.fingerId;
-                }
-                Destroy(note);
+                note.gameObject.SetActive(false);
+                BindTouch(touch);
+                return true;
             }
             return false;
         }
-        if (touch.HasValue)
-        {
-            touchId = touch.Value.fingerId;
-        }
+        BindTouch(touch);
         NoteController.controller.Judge(note, result, touch);
         if (judgeHead > 0)
         {
-            Destroy(note);
+            note.gameObject.SetActive(false);
         }
         judgeHead++;
         return true;

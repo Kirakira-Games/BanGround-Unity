@@ -11,7 +11,7 @@ public class NoteMesh : MonoBehaviour
     private Vector3[] meshVertices;
 
     public Transform afterNoteTrans;
-    public const float BODY_WIDTH = 0.6f;
+    public const float BODY_WIDTH = 1.2f;
 
     public static NoteMesh Create(Transform start, Transform after)
     {
@@ -49,6 +49,9 @@ public class NoteMesh : MonoBehaviour
     public void OnUpdate()
     {
         Vector3 delta = afterNoteTrans.position - transform.parent.position;
+        delta.x /= transform.parent.localScale.x;
+        delta.y /= transform.parent.localScale.y;
+        delta.z /= transform.parent.localScale.z;
         Vector3[] vertices =
         {
             new Vector3(-BODY_WIDTH, 0, 0),
@@ -56,12 +59,6 @@ public class NoteMesh : MonoBehaviour
             new Vector3(delta.x - BODY_WIDTH, 0, delta.z),
             new Vector3(delta.x + BODY_WIDTH, 0, delta.z)
         };
-        for (int i = 0; i < vertices.Length; i++)
-        {
-            vertices[i].x /= transform.parent.localScale.x;
-            vertices[i].y /= transform.parent.localScale.y;
-            vertices[i].z /= transform.parent.localScale.z;
-        }
         meshFilter.mesh.vertices = vertices;
         meshFilter.mesh.RecalculateBounds();
     }
@@ -92,7 +89,7 @@ public class NoteMesh : MonoBehaviour
 
         meshFilter.mesh = mesh;
         Material material = Resources.Load<Material>("TestAssets/Materials/note_body");
-        material.mainTexture = Resources.Load<Texture2D>("V2Assets/long_note_line");
+        material.mainTexture = Resources.Load<Texture2D>("V2Assets/long_note_mask");
         meshRenderer.material = material;
     }
 }

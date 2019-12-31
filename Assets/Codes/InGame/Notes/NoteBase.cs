@@ -7,18 +7,22 @@ public abstract class NoteBase : MonoBehaviour
     public int touchId;
 
     public GameNoteType type;
+    public JudgeResult judgeResult;
 
     private NoteSyncLine syncLine;
     protected SpriteRenderer sprite;
 
     private Vector3 _cachedInitPos = Vector3.zero;
+    private Vector3 _cachedJudgePos = Vector3.zero;
 
     public Vector3 initPos { get { return _cachedInitPos == Vector3.zero ? _cachedInitPos = NoteUtility.GetInitPos(lane) : _cachedInitPos; } }
+    public Vector3 judgePos { get { return _cachedJudgePos == Vector3.zero ? _cachedJudgePos = NoteUtility.GetJudgePos(lane) : _cachedJudgePos; } }
 
     protected virtual void Start()
     {
         touchId = -1;
         judgeTime = -1;
+        judgeResult = JudgeResult.None;
         transform.position = initPos;
         transform.localScale = new Vector3(NoteUtility.NOTE_SCALE, NoteUtility.NOTE_SCALE, 1) * LiveSetting.noteSize;
 
@@ -37,22 +41,40 @@ public abstract class NoteBase : MonoBehaviour
         transform.position = newPos;
     }
 
-    private void OnDestroy()
+    protected virtual void OnDestroy()
     {
         if (touchId != -1)
         {
-            NoteController.controller.UnregisterTouch(touchId);
+            NoteController.controller.UnregisterTouch(touchId, gameObject);
         }
     }
 
-    public virtual void OnNoteUpdate()
+    protected virtual void OnNoteUpdateJudge(int audioTime)
+    {
+        if (audioTime > time + NoteUtility.TAP_JUDGE_RANGE[(int)JudgeResult.Bad])
+        {
+            RealJudge(audioTime, JudgeResult.Miss, null);
+        }
+    }
+
+    // This method should not be overriden
+    public void OnNoteUpdate()
     {
         int audioTime = (int)(Time.time * 1000);
-        UpdatePosition(audioTime);
-
-        if(audioTime > time + NoteUtility.TAP_JUDGE_RANGE[(int)JudgeResult.Bad])
+        if (judgeResult == JudgeResult.None)
         {
-            Judge(audioTime, JudgeResult.Miss, null);
+            UpdatePosition(audioTime);
+        }
+        if (LiveSetting.autoPlayEnabled)
+        {
+            if (audioTime >= time - NoteUtility.AUTO_JUDGE_RANGE)
+            {
+                RealJudge(audioTime, JudgeResult.Perfect, new Touch());
+            }
+        }
+        else
+        {
+            OnNoteUpdateJudge(audioTime);
         }
     }
 
@@ -80,10 +102,17 @@ public abstract class NoteBase : MonoBehaviour
 
     public virtual void TraceTouch(int audioTime, Touch touch) { }
 
-    public virtual void Judge(int audioTime, JudgeResult result, Touch? touch)
+    public virtual void RealJudge(int audioTime, JudgeResult result, Touch? touch)
     {
+        if (judgeResult != JudgeResult.None) return;
         judgeTime = audioTime;
+        judgeResult = result;
         NoteController.controller.Judge(gameObject, result, touch);
         Destroy(gameObject);
+    }
+
+    public virtual void Judge(int audioTime, JudgeResult result, Touch? touch)
+    {
+        RealJudge(audioTime, result, touch);
     }
 }

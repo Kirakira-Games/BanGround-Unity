@@ -16,31 +16,28 @@ public class FlickNote : NoteBase
         Vector2 dist = touch.position - touchPosition;
         if (dist.magnitude * 2.54F >= Screen.dpi * NoteUtility.FLICK_JUDGE_DIST)
         {
-            base.Judge(audioTime, TranslateTimeToJudge(NoteUtility.TAP_JUDGE_RANGE, judgeTime), touch);
+            RealJudge(audioTime, TranslateTimeToJudge(NoteUtility.TAP_JUDGE_RANGE, judgeTime), touch);
         }
         else if (touch.phase == TouchPhase.Ended)
         {
-            base.Judge(audioTime, JudgeResult.Miss, touch);
+            RealJudge(audioTime, JudgeResult.Miss, touch);
         }
     }
 
-    public override void OnNoteUpdate()
+    protected override void OnNoteUpdateJudge(int audioTime)
     {
-        int audioTime = (int)(Time.time * 1000);
-        UpdatePosition(audioTime);
-
         if (judgeTime == -1)
         {
             if (audioTime > time + NoteUtility.TAP_JUDGE_RANGE[(int)JudgeResult.Bad])
             {
-                base.Judge(audioTime, JudgeResult.Miss, null);
+                RealJudge(audioTime, JudgeResult.Miss, null);
             }
         }
         else if (audioTime >
             Mathf.Max(time + NoteUtility.TAP_JUDGE_RANGE[(int)JudgeResult.Bad],
                       judgeTime + NoteUtility.SLIDE_END_FLICK_JUDGE_RANGE))
         {
-            base.Judge(audioTime, JudgeResult.Miss, null);
+            RealJudge(audioTime, JudgeResult.Miss, null);
         }
     }
 
