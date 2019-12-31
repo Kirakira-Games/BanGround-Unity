@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 // 绿条
 public class NoteMesh : MonoBehaviour
@@ -9,9 +10,19 @@ public class NoteMesh : MonoBehaviour
     private MeshFilter meshFilter;
     private Vector3[] meshVertices;
 
-    public Material material;
-    public Transform frontNoteTrans;
     public Transform afterNoteTrans;
+    public const float BODY_WIDTH = 1.2f;
+
+    public static NoteMesh Create(Transform start, Transform after)
+    {
+        GameObject slideMesh = new GameObject("SlideBody");
+        NoteMesh mesh = slideMesh.AddComponent<NoteMesh>();
+        mesh.transform.SetParent(start);
+        mesh.transform.localPosition = new Vector3(0f, -0.01f);
+        mesh.afterNoteTrans = after;
+        slideMesh.AddComponent<SortingGroup>().sortingLayerID = SortingLayer.NameToID("SlideBody");
+        return mesh;
+    }
 
     readonly Vector2[] uv =
     {
@@ -37,7 +48,19 @@ public class NoteMesh : MonoBehaviour
 
     public void OnUpdate()
     {
-
+        Vector3 delta = afterNoteTrans.position - transform.parent.position;
+        delta.x /= transform.parent.localScale.x;
+        delta.y /= transform.parent.localScale.y;
+        delta.z /= transform.parent.localScale.z;
+        Vector3[] vertices =
+        {
+            new Vector3(-BODY_WIDTH, 0, 0),
+            new Vector3(BODY_WIDTH, 0, 0),
+            new Vector3(delta.x - BODY_WIDTH, 0, delta.z),
+            new Vector3(delta.x + BODY_WIDTH, 0, delta.z)
+        };
+        meshFilter.mesh.vertices = vertices;
+        meshFilter.mesh.RecalculateBounds();
     }
 
     public void InitMesh()
@@ -55,14 +78,18 @@ public class NoteMesh : MonoBehaviour
 
         int[] indices = { 0, 2, 1, 2, 3, 1 };
 
-        Mesh mesh = new Mesh();
-        mesh.vertices = meshVertices;
-        mesh.normals = normals;
-        mesh.uv = uv;
-        mesh.triangles = indices;
+        Mesh mesh = new Mesh
+        {
+            vertices = meshVertices,
+            normals = normals,
+            uv = uv,
+            triangles = indices
+        };
         mesh.RecalculateBounds();
 
         meshFilter.mesh = mesh;
+        Material material = Resources.Load<Material>("TestAssets/Materials/note_body");
+        material.mainTexture = Resources.Load<Texture2D>("V2Assets/long_note_mask");
         meshRenderer.material = material;
     }
 }

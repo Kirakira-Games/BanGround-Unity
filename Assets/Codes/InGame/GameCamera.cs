@@ -8,7 +8,7 @@ public class GameCamera : MonoBehaviour
     {
 
         float aspectRatio = (float)Screen.width / (float)Screen.height;
-        float size = aspectRatio >= 16/9 ? 5 : (-3.9375f * aspectRatio + 12f);
+        float size = aspectRatio >= 16f/9 ? 5 : (-3.9375f * aspectRatio + 12f);
 
         GetComponent<Camera>().orthographicSize = size;
     }

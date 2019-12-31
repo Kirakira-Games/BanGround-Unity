@@ -8,15 +8,23 @@ public class NoteController : MonoBehaviour
     private float lastGenerateTime = -1f;
     private Queue<GameObject>[] laneQueue;
     private Hashtable touchTable;
+    private Hashtable slideTable;
 
     public void RegisterTouch(int id, Object obj)
     {
         touchTable[id] = obj;
     }
 
-    public void UnregisterTouch(int id)
+    public void UnregisterTouch(int id, Object obj)
     {
-        touchTable.Remove(id);
+        if (ReferenceEquals(touchTable[id], obj))
+        {
+            touchTable.Remove(id);
+        }
+        else
+        {
+            Debug.LogWarning("Invalid removal from touchTable: " + id);
+        }
     }
 
     // For debugging purpose only, simulate touch event from mouse event
@@ -70,21 +78,36 @@ public class NoteController : MonoBehaviour
             }
         }
         // A note to judge is found
-        noteToJudge?.Judge(audioTime, noteToJudge.TryJudge(audioTime, touch), touch);
+        if (noteToJudge != null)
+        {
+            noteToJudge.Judge(audioTime, noteToJudge.TryJudge(audioTime, touch), touch);
+        }
     }
 
-    private GameObject CreateNote(NoteType type, int time, int lane)
+    private GameObject CreateNote(GameNoteType type, int time, int lane)
     {
-        var noteObj = new GameObject();
+        var noteObj = new GameObject("Note");
         noteObj.transform.SetParent(transform);
         NoteBase note;
         switch (type)
         {
-            case NoteType.Single:
-                note = noteObj.AddComponent<NoteBase>();
+            case GameNoteType.Normal:
+                note = noteObj.AddComponent<TapNote>();
                 break;
-            case NoteType.Flick:
+            case GameNoteType.Flick:
                 note = noteObj.AddComponent<FlickNote>();
+                break;
+            case GameNoteType.SlideStart:
+                note = noteObj.AddComponent<SlideStart>();
+                break;
+            case GameNoteType.SlideTick:
+                note = noteObj.AddComponent<SlideTick>();
+                break;
+            case GameNoteType.SlideEnd:
+                note = noteObj.AddComponent<SlideEnd>();
+                break;
+            case GameNoteType.SlideEndFlick:
+                note = noteObj.AddComponent<SlideEndFlick>();
                 break;
             default:
                 Debug.LogWarning("Cannot create noteType: " + type.ToString());
@@ -92,8 +115,41 @@ public class NoteController : MonoBehaviour
         }
         note.time = time;
         note.lane = lane;
+        note.type = type;
         laneQueue[note.lane].Enqueue(noteObj);
         return noteObj;
+    }
+
+    public GameObject CreateSlide(int tickStack)
+    {
+        GameObject obj = new GameObject("Slide");
+        obj.transform.SetParent(transform);
+        obj.AddComponent<Slide>().InitSlide(tickStack);
+        slideTable[tickStack] = obj;
+        return obj;
+    }
+
+    public Slide GetSlide(int tickStack)
+    {   
+        return (slideTable[tickStack] as GameObject).GetComponent<Slide>();
+    }
+
+    public void EndSlide(int tickStack)
+    {
+        slideTable.Remove(tickStack);
+    }
+
+    public static int GetLaneByTouchPosition(Vector2 position)
+    {
+        Collider2D[] cols = Physics2D.OverlapPointAll(Camera.main.ScreenToWorldPoint(position));
+        foreach (Collider2D col in cols)
+        {
+            if (col.CompareTag("JudgeArea"))
+            {
+                return col.name[0] - '0';
+            }
+        }
+        return -1;
     }
 
     private void UpdateTouch()
@@ -102,6 +158,7 @@ public class NoteController : MonoBehaviour
         Touch[] touches = Input.touches;
         if (Input.touchCount == 0)
         {
+            // Simulate touches with mouse
             if (Input.GetMouseButtonDown(0))
             {
                 touches = SimulateMouseTouch(TouchPhase.Began);
@@ -119,16 +176,17 @@ public class NoteController : MonoBehaviour
         {
             if (touchTable.Contains(touch.fingerId))
             {
-                (touchTable[touch.fingerId] as GameObject).GetComponent<NoteBase>()?.TraceTouch(audioTime, touch);
+                GameObject obj = touchTable[touch.fingerId] as GameObject;
+                if (obj.GetComponent<NoteBase>() != null)
+                    obj.GetComponent<NoteBase>().TraceTouch(audioTime, touch);
+                if (obj.GetComponent<Slide>() != null)
+                    obj.GetComponent<Slide>().TraceTouch(audioTime, touch);
                 continue;
             }
-            Collider2D[] cols = Physics2D.OverlapPointAll(Camera.main.ScreenToWorldPoint(touch.position));
-            foreach (Collider2D col in cols)
+            int lane = GetLaneByTouchPosition(touch.position);
+            if (lane != -1)
             {
-                if (col.CompareTag("JudgeArea"))
-                {
-                    OnTouch(audioTime, int.Parse(col.name), touch);
-                }
+                OnTouch(audioTime, lane, touch);
             }
         }
     }
@@ -136,7 +194,8 @@ public class NoteController : MonoBehaviour
     void Start()
     {
         touchTable = new Hashtable();
-        LiveSetting.noteSpeed = 10f;
+        slideTable = new Hashtable();
+        LiveSetting.noteSpeed = 2f;
         Application.targetFrameRate = 120;
         laneQueue = new Queue<GameObject>[NoteUtility.LANE_COUNT];
         for (int i = 0; i < NoteUtility.LANE_COUNT; i++)
@@ -144,33 +203,76 @@ public class NoteController : MonoBehaviour
             laneQueue[i] = new Queue<GameObject>();
         }
         controller = this;
+
+        
+        List<int> order = new List<int>();
+        for (int i = 0; i < 7; i++)
+        {
+            order.Add(i);
+            CreateSlide(i);
+        }
+        for (int i = 0; i < 20; i++)
+        {
+            NoteUtility.Shuffle(order);
+            for (int j = 0; j < 7; j++)
+            {
+                GameObject note;
+                if (i == 0)
+                {
+                    note = CreateNote(GameNoteType.SlideStart, 3000 + i * 200, order[j]);
+                }
+                else if (i == 19)
+                {
+                    note = CreateNote(GameNoteType.SlideEndFlick, 3000 + i * 200, order[j]);
+                }
+                else
+                {
+                    note = CreateNote(GameNoteType.SlideTick, 3000 + i * 200, order[j]);
+                }
+                GetSlide(j).AddNote(note.GetComponent<NoteBase>());
+            }
+        }
+        
+        /*
+        CreateSlide(1);
+        GameObject[] notes =
+        {
+            CreateNote(GameNoteType.SlideStart, 3000, 0),
+            CreateNote(GameNoteType.SlideEndFlick, 4000, 0)
+        };
+        foreach (GameObject note in notes)
+        {
+            GetSlide(1).AddNote(note.GetComponent<NoteBase>());
+        }
+        */
     }
 
     void Update()
     {
+        // Trigger touch event
+        UpdateTouch();
         // Update each note child
         foreach (Transform child in transform)
         {
             child.GetComponent<NoteBase>()?.OnNoteUpdate();
+            child.GetComponent<Slide>()?.OnSlideUpdate();
         }
-
+        /*
         if (Time.time - lastGenerateTime > 0.5f)
         {
             lastGenerateTime = Time.time;
             int time = (int)((Time.time + 3f) * 1000);
             int lane = Random.Range(0, NoteUtility.LANE_COUNT);
-            switch (Random.Range(1, 2))
+            switch (Random.Range(0, 2))
             {
                 case 0:
-                    CreateNote(NoteType.Single, time, lane);
+                    CreateNote(GameNoteType.Normal, time, lane);
                     break;
                 case 1:
-                    CreateNote(NoteType.Flick, time, lane);
+                    CreateNote(GameNoteType.Flick, time, lane);
                     break;
             }
         }
-
-        // Trigger touch event
-        UpdateTouch();
+        */
     }
 }
