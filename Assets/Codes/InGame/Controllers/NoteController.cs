@@ -5,7 +5,7 @@ using UnityEngine;
 public class NoteController : MonoBehaviour
 {
     public static NoteController controller;
-    private float lastGenerateTime = -114514f;
+    private float lastGenerateTime = -1f;
     private Queue<GameObject>[] laneQueue;
     private Hashtable touchTable;
     private Hashtable slideTable;
@@ -238,6 +238,7 @@ public class NoteController : MonoBehaviour
         GameObject[] notes =
         {
             CreateNote(GameNoteType.SlideStart, 3000, 0),
+            CreateNote(GameNoteType.SlideTick, 3500, 2),
             CreateNote(GameNoteType.SlideEndFlick, 4000, 0)
         };
         foreach (GameObject note in notes)

@@ -7,7 +7,7 @@ public static class LiveSetting
     public static float offset = .0f;
 
     public static float noteSpeed = 5.0f;
-    public static float noteSize = 1.0f;
+    public static float noteSize = 1.5f;
     public static float meshSize = .75f;
     public static float meshOpacity = .6f;
 

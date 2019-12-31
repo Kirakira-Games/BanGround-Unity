@@ -7,7 +7,7 @@ public class FPSCounter : MonoBehaviour
 {
     Text text;
     int frameInSec = 0;
-    float lastClearTime = -114514;
+    float lastClearTime = -1;
 
     void Awake()
     {

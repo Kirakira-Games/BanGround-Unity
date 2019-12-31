@@ -60,7 +60,7 @@ class AudioManager : MonoBehaviour
     {
         Sound sound;
 
-        var result = System.createSound(path, MODE._2D | MODE.OPENMEMORY, out sound);
+        var result = System.createSound(path, MODE._2D, out sound);
 
         LoadedSound.Add(sound);
 

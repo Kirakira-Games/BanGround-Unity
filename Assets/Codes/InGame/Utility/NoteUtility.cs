@@ -39,7 +39,7 @@ public static class NoteUtility
     public const int AUTO_JUDGE_RANGE = 10;
     public const float FLICK_JUDGE_DIST = 0.5f;
 
-    public const int MOUSE_TOUCH_ID = 1919810;
+    public const int MOUSE_TOUCH_ID = -16;
 
     public static Vector3 GetInitPos(int lane)
     {
