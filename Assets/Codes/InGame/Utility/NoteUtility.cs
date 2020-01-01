@@ -69,4 +69,9 @@ public static class NoteUtility
             input[i] = temp;
         }
     }
+
+    public static T LoadResource<T>(string name) where T: Object
+    {
+        return Resources.Load<T>(LiveSetting.assetDirectory + "/" + name);
+    }
 }

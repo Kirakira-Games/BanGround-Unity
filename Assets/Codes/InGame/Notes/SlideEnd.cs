@@ -23,7 +23,7 @@ public class SlideEnd : SlideNoteBase
     protected override void Start()
     {
         base.Start();
-        sprite.sprite = Resources.Load<Sprite>("V2Assets/note_long_default");
+        sprite.sprite = NoteUtility.LoadResource<Sprite>("note_long_default");
     }
 
     protected override void OnNoteUpdateJudge(int audioTime)

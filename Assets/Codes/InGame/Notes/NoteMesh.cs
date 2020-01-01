@@ -89,7 +89,7 @@ public class NoteMesh : MonoBehaviour
 
         meshFilter.mesh = mesh;
         Material material = Resources.Load<Material>("TestAssets/Materials/note_body");
-        material.mainTexture = Resources.Load<Texture2D>("V2Assets/long_note_mask");
+        material.mainTexture = NoteUtility.LoadResource<Texture2D>("long_note_mask");
         meshRenderer.material = material;
     }
 }

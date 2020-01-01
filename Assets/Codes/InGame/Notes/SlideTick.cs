@@ -14,7 +14,7 @@ public class SlideTick : SlideNoteBase
     protected override void Start()
     {
         base.Start();
-        sprite.sprite = Resources.Load<Sprite>("V2Assets/note_tick_default");
+        sprite.sprite = NoteUtility.LoadResource<Sprite>("note_tick_default");
     }
 
     public override void Judge(int audioTime, JudgeResult result, Touch? touch)

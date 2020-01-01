@@ -47,7 +47,8 @@ public class NoteController : MonoBehaviour
             Debug.LogWarning("'None' cannot be final judge result. Recognized as 'Miss'.");
             result = JudgeResult.Miss;
         }
-        print(result.ToString());
+        print(result);
+        JudgeResultController.controller.DisplayJudgeResult(result);
     }
 
     private void OnTouch(int audioTime, int lane, Touch touch)
@@ -242,11 +243,17 @@ public class NoteController : MonoBehaviour
         CreateSlide(1);
         GameObject[] notes =
         {
-            CreateNote(GameNoteType.SlideStart, 3000, 0),
+            CreateNote(GameNoteType.SlideStart, 2000, 0),
+            CreateNote(GameNoteType.SlideTick, 2500, 2),
+            CreateNote(GameNoteType.SlideTick, 3200, 0),
+            CreateNote(GameNoteType.SlideTick, 3300, 2),
+            CreateNote(GameNoteType.SlideTick, 3400, 0),
             CreateNote(GameNoteType.SlideTick, 3500, 2),
-            CreateNote(GameNoteType.SlideTick, 4000, 0),
-            CreateNote(GameNoteType.SlideTick, 4500, 2),
-            CreateNote(GameNoteType.SlideEndFlick, 5000, 0)
+            CreateNote(GameNoteType.SlideTick, 3600, 0),
+            CreateNote(GameNoteType.SlideTick, 3700, 2),
+            CreateNote(GameNoteType.SlideTick, 3800, 0),
+            CreateNote(GameNoteType.SlideTick, 3900, 2),
+            CreateNote(GameNoteType.SlideEndFlick, 4000, 0)
         };
         foreach (GameObject note in notes)
         {

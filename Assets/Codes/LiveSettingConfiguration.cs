@@ -18,6 +18,8 @@ public static class LiveSetting
     public static bool laneEffectEnabled = true;
     public static bool autoPlayEnabled = false;
 
+    public static string assetDirectory = "V2Assets";
+
     private static float cachedSpeed = 0;
     private static int cachedScreenTime = 0;
     
