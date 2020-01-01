@@ -42,6 +42,11 @@ public class NoteController : MonoBehaviour
     // Judge a note as result
     public void Judge(GameObject note, JudgeResult result, Touch? touch)
     {
+        if (result == JudgeResult.None)
+        {
+            Debug.LogWarning("'None' cannot be final judge result. Recognized as 'Miss'.");
+            result = JudgeResult.Miss;
+        }
         print(result.ToString());
     }
 
@@ -204,7 +209,7 @@ public class NoteController : MonoBehaviour
         }
         controller = this;
 
-        
+        /*
         List<int> order = new List<int>();
         for (int i = 0; i < 7; i++)
         {
@@ -232,20 +237,22 @@ public class NoteController : MonoBehaviour
                 GetSlide(j).AddNote(note.GetComponent<NoteBase>());
             }
         }
+        */
         
-        /*
         CreateSlide(1);
         GameObject[] notes =
         {
             CreateNote(GameNoteType.SlideStart, 3000, 0),
             CreateNote(GameNoteType.SlideTick, 3500, 2),
-            CreateNote(GameNoteType.SlideEndFlick, 4000, 0)
+            CreateNote(GameNoteType.SlideTick, 4000, 0),
+            CreateNote(GameNoteType.SlideTick, 4500, 2),
+            CreateNote(GameNoteType.SlideEndFlick, 5000, 0)
         };
         foreach (GameObject note in notes)
         {
             GetSlide(1).AddNote(note.GetComponent<NoteBase>());
         }
-        */
+        
     }
 
     void Update()

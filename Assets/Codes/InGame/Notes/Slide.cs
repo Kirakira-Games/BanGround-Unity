@@ -91,8 +91,7 @@ public class Slide : MonoBehaviour
                 NoteController.controller.Judge(note.gameObject, JudgeResult.Miss, touch);
                 judgeHead++;
             }
-            NoteController.controller.UnregisterTouch(touchId, gameObject);
-            touchId = -1;
+            UnbindTouch();
         }
     }
 
@@ -164,6 +163,13 @@ public class Slide : MonoBehaviour
         NoteController.controller.RegisterTouch(touchId, gameObject);
     }
 
+    private void UnbindTouch()
+    {
+        if (touchId == -1) return;
+        NoteController.controller.UnregisterTouch(touchId, gameObject);
+        touchId = -1;
+    }
+
     public bool Judge(GameObject note, JudgeResult result, Touch? touch)
     {
         // Must judge head
@@ -177,7 +183,14 @@ public class Slide : MonoBehaviour
             }
             return false;
         }
-        BindTouch(touch);
+        if (result == JudgeResult.Miss)
+        {
+            UnbindTouch();
+        }
+        else
+        {
+            BindTouch(touch);
+        }
         NoteController.controller.Judge(note, result, touch);
         if (judgeHead > 0)
         {
