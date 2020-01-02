@@ -13,6 +13,11 @@ public enum GameNoteType
     SlideEndFlick = 5
 }
 
+public class GameNoteData
+{
+
+}
+
 public enum JudgeResult
 {
     None = -1,

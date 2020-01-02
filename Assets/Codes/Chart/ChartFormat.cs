@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 public enum Difficulty
 {
@@ -22,24 +19,24 @@ public enum NoteType
 	SlideTickEnd,
 };
 
+[Serializable]
 public class Note
 {
-    public NoteType Type;
-    public int[] Beat;
-    public int Lane;
-    public int TickStack;
-    public float Value;
+    public NoteType type;
+    public int[] beat;
+    public int lane;
+    public int tickStack;
+    public float value;
 };
 
 public class Chart
 {
-    public string Author;
-    public string AuthorUnicode;
-    public string BackgroundFile;
-    public Difficulty Difficulty;
-    public byte Level;
-    public int NumNotes;
-    public List<Note> Notes;
+    public string author;
+    public string authorUnicode;
+    public string backgroundFile;
+    public Difficulty difficulty;
+    public byte level;
+    public List<Note> notes;
 };
 
 public class Header

@@ -210,7 +210,10 @@ public class NoteController : MonoBehaviour
         }
         controller = this;
 
-        //print(ChartLoader.LoadHeaderFromFile("TestCharts/5542_converted"));
+        Chart chart = ChartLoader.LoadChartFromFile("TestCharts/0");
+        print(chart.authorUnicode);
+        print(chart.difficulty);
+        print(chart.notes[0].beat[2]);
 
         /*
         List<int> order = new List<int>();
