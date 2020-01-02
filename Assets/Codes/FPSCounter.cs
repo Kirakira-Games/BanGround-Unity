@@ -17,7 +17,7 @@ public class FPSCounter : MonoBehaviour
     {
         if(Time.time - lastClearTime > 1)
         {
-            text.text = $"{frameInSec} fps\n{Mathf.Round(Time.deltaTime * 1000)} ms";
+            text.text = $"{frameInSec} FPS\n{Mathf.Round(Time.deltaTime * 1000)}  ms";
             frameInSec = 0;
             lastClearTime = Time.time;
         }
