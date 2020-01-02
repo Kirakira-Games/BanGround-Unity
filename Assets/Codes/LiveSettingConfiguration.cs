@@ -18,10 +18,14 @@ public static class LiveSetting
     public static bool laneEffectEnabled = true;
     public static bool autoPlayEnabled = false;
 
+    public static float bgBrightness = .8f;
+    public static float laneBrightness = 0.9f;
+
     public static string assetDirectory = "V2Assets";
 
     private static float cachedSpeed = 0;
     private static int cachedScreenTime = 0;
+
     
     public static int NoteScreenTime
     {
