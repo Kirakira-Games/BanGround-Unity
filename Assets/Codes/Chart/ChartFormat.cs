@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-enum Difficulty
+public enum Difficulty
 {
 	Easy = 0,
 	Normal,
@@ -13,7 +13,7 @@ enum Difficulty
 	Special
 };
 
-enum NoteType
+public enum NoteType
 {
 	BPM = 0,
 	Single,
@@ -22,45 +22,36 @@ enum NoteType
 	SlideTickEnd,
 };
 
-class Beat
+public class Note
 {
-	int Number;
-	int Numerator;
-	int Denominator;
-}
-
-class Note
-{
-	NoteType Type;
-	Beat Beat;
-	int Lane;
-	int TickStack;
-	float Value;
+    public NoteType Type;
+    public int[] Beat;
+    public int Lane;
+    public int TickStack;
+    public float Value;
 };
 
-class Chart
+public class Chart
 {
-	Difficulty Difficulty;
-	byte Level;
-	int NumNotes;
-	List<Note> Notes;
+    public string Author;
+    public string AuthorUnicode;
+    public string BackgroundFile;
+    public Difficulty Difficulty;
+    public byte Level;
+    public int NumNotes;
+    public List<Note> Notes;
 };
 
-class Header
+public class Header
 {
-	string Title;
-	string Artist;
-	string ChartAuthor;
+    public string Title;
+    public string Artist;
 
-	string TitleUnicode;
-	string ArtistUnicode;
-	string ChartAuthorUnicode;
+    public string TitleUnicode;
+    public string ArtistUnicode;
 
-	bool BackgroundIsVideo;
+    public float PreviewStart;
+    public float PreviewEnd;
 
-	float PreviewStart;
-	float PreviewEnd;
-
-	short NumCharts;
-	List<Chart> Charts;
+    public short NumCharts;
 };

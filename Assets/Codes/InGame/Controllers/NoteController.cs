@@ -210,6 +210,8 @@ public class NoteController : MonoBehaviour
         }
         controller = this;
 
+        //print(ChartLoader.LoadHeaderFromFile("TestCharts/5542_converted"));
+
         /*
         List<int> order = new List<int>();
         for (int i = 0; i < 7; i++)
