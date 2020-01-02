@@ -83,7 +83,7 @@ public class Slide : MonoBehaviour
                 }
             }
         }
-        if (touch.phase == TouchPhase.Ended)
+        if (NoteUtility.IsTouchEnd(touch))
         {
             UpdateHead();
             if (judgeHead < notes.Count)

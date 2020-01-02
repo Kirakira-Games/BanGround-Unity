@@ -41,7 +41,7 @@ public class SlideEndFlick : SlideNoteBase
                 JudgeResult.Perfect :
                 TranslateTimeToJudge(NoteUtility.SLIDE_END_JUDGE_RANGE, audioTime), touch);
         }
-        else if (touch.phase == TouchPhase.Ended)
+        else if (NoteUtility.IsTouchEnd(touch))
         {
             RealJudge(audioTime, JudgeResult.Miss, null);
         }

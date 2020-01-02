@@ -18,7 +18,7 @@ public class FlickNote : NoteBase
         {
             RealJudge(audioTime, TranslateTimeToJudge(NoteUtility.TAP_JUDGE_RANGE, judgeTime), touch);
         }
-        else if (touch.phase == TouchPhase.Ended)
+        else if (NoteUtility.IsTouchEnd(touch))
         {
             RealJudge(audioTime, JudgeResult.Miss, touch);
         }

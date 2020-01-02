@@ -74,4 +74,14 @@ public static class NoteUtility
     {
         return Resources.Load<T>(LiveSetting.assetDirectory + "/" + name);
     }
+
+    public static bool IsTouchContinuing(Touch touch)
+    {
+        return touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Stationary;
+    }
+
+    public static bool IsTouchEnd(Touch touch)
+    {
+        return touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled;
+    }
 }

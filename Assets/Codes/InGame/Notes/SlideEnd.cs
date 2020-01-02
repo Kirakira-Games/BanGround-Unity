@@ -6,7 +6,7 @@ public class SlideEnd : SlideNoteBase
 {
     protected override JudgeResult TrySlideJudge(int audioTime, Touch touch)
     {
-        if (touch.phase != TouchPhase.Ended)
+        if (!NoteUtility.IsTouchEnd(touch))
         {
             return JudgeResult.None;
         }
