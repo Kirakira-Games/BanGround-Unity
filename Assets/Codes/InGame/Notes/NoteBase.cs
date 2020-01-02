@@ -3,13 +3,14 @@ public abstract class NoteBase : MonoBehaviour
 {
     public int lane;
     public int time;
-    public int judgeTime;
-    public int touchId;
+    public int judgeTime = -1;
+    public int touchId = -1;
+    public int syncLane;
+    public bool isGray;
 
     public GameNoteType type;
-    public JudgeResult judgeResult;
+    public JudgeResult judgeResult = JudgeResult.None;
 
-    private NoteSyncLine syncLine;
     protected SpriteRenderer sprite;
 
     private Vector3 _cachedInitPos = Vector3.zero;
@@ -28,6 +29,11 @@ public abstract class NoteBase : MonoBehaviour
 
         sprite = gameObject.AddComponent<SpriteRenderer>();
         sprite.sortingLayerID = SortingLayer.NameToID("Note");
+
+        if (syncLane != -1)
+        {
+            NoteSyncLine.Create(transform, syncLane - lane);
+        }
 
         OnNoteUpdate();
     }

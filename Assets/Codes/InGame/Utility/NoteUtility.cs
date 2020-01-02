@@ -15,7 +15,12 @@ public enum GameNoteType
 
 public class GameNoteData
 {
-
+    public int time;
+    public int lane;
+    public int syncLane = -1;
+    public GameNoteType type;
+    public bool isGray;
+    public List<GameNoteData> seg;
 }
 
 public enum JudgeResult
@@ -46,6 +51,8 @@ public static class NoteUtility
 
     public const int MOUSE_TOUCH_ID = -16;
 
+    public const float EPS = 1e-4f;
+
     public static Vector3 GetInitPos(int lane)
     {
         return new Vector3((lane - 3) * LANE_WIDTH, NOTE_Y_POS, NOTE_START_POS);
@@ -60,7 +67,12 @@ public static class NoteUtility
     {
         return type == GameNoteType.SlideStart ||
             type == GameNoteType.SlideTick ||
-            type == GameNoteType.SlideEnd ||
+            IsSlideEnd(type);
+    }
+
+    public static bool IsSlideEnd(GameNoteType type)
+    {
+        return type == GameNoteType.SlideEnd ||
             type == GameNoteType.SlideEndFlick;
     }
 

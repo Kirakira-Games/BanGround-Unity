@@ -16,6 +16,7 @@ public static class LiveSetting
 
     public static bool syncLineEnabled = true;
     public static bool laneEffectEnabled = true;
+    public static bool grayNoteEnabled = true;
     public static bool autoPlayEnabled = false;
 
     public static string assetDirectory = "V2Assets";

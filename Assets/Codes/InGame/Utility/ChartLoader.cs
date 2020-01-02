@@ -1,17 +1,174 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Newtonsoft.Json;
+
+class NoteComparer : Comparer<Note>
+{
+    public override int Compare(Note a, Note b)
+    {
+        float t1 = ChartLoader.GetFloatingPointBeat(a.beat);
+        float t2 = ChartLoader.GetFloatingPointBeat(b.beat);
+        if (Mathf.Abs(t1-t2) <= NoteUtility.EPS)
+        {
+            return (int)a.type - (int)b.type;
+        }
+        return t1 < t2 ? -1: 1;
+    }
+}
 
 public static class ChartLoader
 {
+    public static int Gcd(int a, int b)
+    {
+        return a == 0 ? b : Gcd(b % a, a);
+    }
+    public static void NormalizeBeat(int[] beat)
+    {
+        int gcd = Gcd(beat[1], beat[2]);
+        beat[1] /= gcd;
+        beat[2] /= gcd;
+        beat[1] += beat[0] * beat[2];
+        beat[0] = 0;
+    }
+    public static GameNoteType TranslateNoteType(Note note)
+    {
+        if (note.tickStack == -1)
+        {
+            if (note.type == NoteType.Single)
+            {
+                return GameNoteType.Normal;
+            }
+            if (note.type == NoteType.Flick)
+            {
+                return GameNoteType.Flick;
+            }
+            Debug.LogWarning("Cannot recognize NoteType " + note.type + " on single notes.");
+            return GameNoteType.None;
+        }
+        if (note.type == NoteType.Single)
+        {
+            return GameNoteType.SlideStart;
+        }
+        if (note.type == NoteType.SlideTick)
+        {
+            return GameNoteType.SlideTick;
+        }
+        if (note.type == NoteType.SlideTickEnd)
+        {
+            return GameNoteType.SlideEnd;
+        }
+        if (note.type == NoteType.Flick)
+        {
+            return GameNoteType.SlideEndFlick;
+        }
+        return GameNoteType.None;
+    }
     public static Header LoadHeaderFromFile(string path)
     {
         TextAsset headerText = Resources.Load<TextAsset>(path);
-        return JsonUtility.FromJson<Header>(headerText.text);
+        return JsonConvert.DeserializeObject<Header>(headerText.text);
     }
+
     public static Chart LoadChartFromFile(string path)
     {
         TextAsset chartText = Resources.Load<TextAsset>(path);
-        return JsonUtility.FromJson<Chart>(chartText.text);
+        return JsonConvert.DeserializeObject<Chart>(chartText.text);
+    }
+
+    public static float GetFloatingPointBeat(int[] beat)
+    {
+        return beat[0] + (float)beat[1] / beat[2];
+    }
+
+    public static List<GameNoteData> LoadNotesFromFile(string path)
+    {
+        Chart chart = LoadChartFromFile(path);
+        List<Note> notes = chart.notes;
+        List<GameNoteData> gameNotes = new List<GameNoteData>();
+        notes.Sort(new NoteComparer());
+        var syncMaxTable = new Dictionary<(int, int), int>();
+        var syncMinTable = new Dictionary<(int, int), int>();
+        var tickStackTable = new Dictionary<int, GameNoteData>();
+
+        // Compute actual time of each note
+        float currentBpm = 120;
+        float startDash = 0;
+        float startTime = chart.offset * 1000;
+        // Create sync table
+        foreach (Note note in notes)
+        {
+            NormalizeBeat(note.beat);
+            if (note.type == NoteType.SlideTick || note.type == NoteType.BPM) continue;
+            (int, int) syncEntry = (note.beat[1], note.beat[2]);
+            if (!syncMinTable.ContainsKey(syncEntry))
+            {
+                syncMinTable.Add(syncEntry, note.lane);
+                syncMaxTable.Add(syncEntry, note.lane);
+            }
+            syncMinTable[syncEntry] = Mathf.Min(syncMinTable[syncEntry], note.lane);
+            syncMaxTable[syncEntry] = Mathf.Max(syncMaxTable[syncEntry], note.lane);
+        }
+        // Create game notes
+        foreach (Note note in notes)
+        {
+            float beat = GetFloatingPointBeat(note.beat);
+            if (note.type == NoteType.BPM)
+            {
+                // Note is a timing point
+                float beatDuration = 60 / note.value;
+                startTime += (beat - startDash) * beatDuration;
+                startDash = GetFloatingPointBeat(note.beat);
+                currentBpm = note.value;
+                continue;
+            }
+            // Create game note
+            float time = startTime + (beat - startDash) * (60 / currentBpm);
+            GameNoteType type = TranslateNoteType(note);
+            GameNoteData gameNote = new GameNoteData
+            {
+                time = (int)(time * 1000),
+                lane = note.lane,
+                type = type,
+                isGray = type == GameNoteType.Normal && note.beat[2] <= 2
+            };
+            // Update sync table
+            if (note.type != NoteType.SlideTick)
+            {
+                (int, int) syncEntry = (note.beat[1], note.beat[2]);
+                int minLane = syncMinTable[syncEntry];
+                int maxLane = syncMaxTable[syncEntry];
+                if (minLane == note.lane && maxLane > note.lane)
+                {
+                    gameNote.syncLane = maxLane;
+                }
+            }
+            if (note.tickStack == -1)
+            {
+                // Note is a single note or flick
+                gameNotes.Add(gameNote);
+                continue;
+            }
+            // Note is part of a slide
+            if (!tickStackTable.ContainsKey(note.tickStack))
+            {
+                tickStackTable[note.tickStack] = new GameNoteData
+                {
+                    time = (int)(time * 1000),
+                    type = GameNoteType.SlideStart,
+                    seg = new List<GameNoteData>()
+                };
+                type = GameNoteType.SlideStart;
+                gameNote.type = type;
+            }
+            GameNoteData tickStack = tickStackTable[note.tickStack] as GameNoteData;
+            tickStack.seg.Add(gameNote);
+            if (NoteUtility.IsSlideEnd(type))
+            {
+                gameNotes.Add(tickStack);
+                tickStackTable.Remove(note.tickStack);
+            }
+        }
+        return gameNotes;
     }
 }

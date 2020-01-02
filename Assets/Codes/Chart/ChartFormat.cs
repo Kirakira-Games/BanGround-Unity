@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
+[JsonConverter(typeof(StringEnumConverter))]
 public enum Difficulty
 {
 	Easy = 0,
@@ -10,6 +13,7 @@ public enum Difficulty
 	Special
 };
 
+[JsonConverter(typeof(StringEnumConverter))]
 public enum NoteType
 {
 	BPM = 0,
@@ -25,7 +29,7 @@ public class Note
     public NoteType type;
     public int[] beat;
     public int lane;
-    public int tickStack;
+    public int tickStack = -1;
     public float value;
 };
 
@@ -36,6 +40,7 @@ public class Chart
     public string backgroundFile;
     public Difficulty difficulty;
     public byte level;
+    public int offset = 0;
     public List<Note> notes;
 };
 

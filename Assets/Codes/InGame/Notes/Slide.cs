@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Slide : MonoBehaviour
 {
-    public int tickStack;
     private ArrayList notes;
     private int judgeHead;
     private int displayHead;
@@ -23,16 +22,14 @@ public class Slide : MonoBehaviour
             NoteController.controller.UnregisterTouch(touchId, gameObject);
             touchId = -1;
         }
-        NoteController.controller.EndSlide(tickStack);
     }
 
-    public void InitSlide(int tickStack)
+    public void InitSlide()
     {
         notes = new ArrayList();
         touchId = -1;
         judgeHead = 0;
         displayHead = 1;
-        this.tickStack = tickStack;
     }
 
     private void Start()

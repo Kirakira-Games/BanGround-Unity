@@ -5,17 +5,17 @@ using UnityEngine;
 public class NoteController : MonoBehaviour
 {
     public static NoteController controller;
-    private float lastGenerateTime = -1f;
     private Queue<GameObject>[] laneQueue;
-    private Hashtable touchTable;
-    private Hashtable slideTable;
+    private Dictionary<int, GameObject> touchTable;
+    private List<GameNoteData> notes;
+    private int noteHead;
 
-    public void RegisterTouch(int id, Object obj)
+    public void RegisterTouch(int id, GameObject obj)
     {
         touchTable[id] = obj;
     }
 
-    public void UnregisterTouch(int id, Object obj)
+    public void UnregisterTouch(int id, GameObject obj)
     {
         if (ReferenceEquals(touchTable[id], obj))
         {
@@ -90,12 +90,12 @@ public class NoteController : MonoBehaviour
         }
     }
 
-    private GameObject CreateNote(GameNoteType type, int time, int lane)
+    private GameObject CreateNote(GameNoteData gameNote)
     {
         var noteObj = new GameObject("Note");
         noteObj.transform.SetParent(transform);
         NoteBase note;
-        switch (type)
+        switch (gameNote.type)
         {
             case GameNoteType.Normal:
                 note = noteObj.AddComponent<TapNote>();
@@ -116,33 +116,29 @@ public class NoteController : MonoBehaviour
                 note = noteObj.AddComponent<SlideEndFlick>();
                 break;
             default:
-                Debug.LogWarning("Cannot create noteType: " + type.ToString());
+                Debug.LogWarning("Cannot create GameNoteType: " + gameNote.type.ToString());
                 return null;
         }
-        note.time = time;
-        note.lane = lane;
-        note.type = type;
+        note.time = gameNote.time;
+        note.lane = gameNote.lane;
+        note.type = gameNote.type;
+        note.syncLane = LiveSetting.syncLineEnabled ? gameNote.syncLane : -1;
+        note.isGray = LiveSetting.grayNoteEnabled ? gameNote.isGray : false;
         laneQueue[note.lane].Enqueue(noteObj);
         return noteObj;
     }
 
-    public GameObject CreateSlide(int tickStack)
+    public GameObject CreateSlide(List<GameNoteData> notes)
     {
         GameObject obj = new GameObject("Slide");
         obj.transform.SetParent(transform);
-        obj.AddComponent<Slide>().InitSlide(tickStack);
-        slideTable[tickStack] = obj;
+        Slide slide = obj.AddComponent<Slide>();
+        slide.InitSlide();
+        foreach (GameNoteData note in notes)
+        {
+            slide.AddNote(CreateNote(note).GetComponent<NoteBase>());
+        }
         return obj;
-    }
-
-    public Slide GetSlide(int tickStack)
-    {   
-        return (slideTable[tickStack] as GameObject).GetComponent<Slide>();
-    }
-
-    public void EndSlide(int tickStack)
-    {
-        slideTable.Remove(tickStack);
     }
 
     public static int GetLaneByTouchPosition(Vector2 position)
@@ -180,7 +176,7 @@ public class NoteController : MonoBehaviour
         }
         foreach (Touch touch in touches)
         {
-            if (touchTable.Contains(touch.fingerId))
+            if (touchTable.ContainsKey(touch.fingerId))
             {
                 GameObject obj = touchTable[touch.fingerId] as GameObject;
                 if (obj.GetComponent<NoteBase>() != null)
@@ -197,10 +193,29 @@ public class NoteController : MonoBehaviour
         }
     }
 
+    private void UpdateNotes()
+    {
+        int audioTime = (int)(Time.time * 1000);
+        while (noteHead < notes.Count)
+        {
+            GameNoteData note = notes[noteHead];
+            int appearTime = note.time - LiveSetting.NoteScreenTime;
+            if (audioTime <= appearTime) break;
+            if (note.type == GameNoteType.SlideStart)
+            {
+                CreateSlide(note.seg);
+            }
+            else
+            {
+                CreateNote(note);
+            }
+            noteHead++;
+        }
+    }
+
     void Start()
     {
-        touchTable = new Hashtable();
-        slideTable = new Hashtable();
+        touchTable = new Dictionary<int, GameObject>();
         LiveSetting.noteSpeed = 2f;
         Application.targetFrameRate = 120;
         laneQueue = new Queue<GameObject>[NoteUtility.LANE_COUNT];
@@ -210,65 +225,14 @@ public class NoteController : MonoBehaviour
         }
         controller = this;
 
-        Chart chart = ChartLoader.LoadChartFromFile("TestCharts/0");
-        print(chart.authorUnicode);
-        print(chart.difficulty);
-        print(chart.notes[0].beat[2]);
-
-        /*
-        List<int> order = new List<int>();
-        for (int i = 0; i < 7; i++)
-        {
-            order.Add(i);
-            CreateSlide(i);
-        }
-        for (int i = 0; i < 20; i++)
-        {
-            NoteUtility.Shuffle(order);
-            for (int j = 0; j < 7; j++)
-            {
-                GameObject note;
-                if (i == 0)
-                {
-                    note = CreateNote(GameNoteType.SlideStart, 3000 + i * 200, order[j]);
-                }
-                else if (i == 19)
-                {
-                    note = CreateNote(GameNoteType.SlideEndFlick, 3000 + i * 200, order[j]);
-                }
-                else
-                {
-                    note = CreateNote(GameNoteType.SlideTick, 3000 + i * 200, order[j]);
-                }
-                GetSlide(j).AddNote(note.GetComponent<NoteBase>());
-            }
-        }
-        */
-        
-        CreateSlide(1);
-        GameObject[] notes =
-        {
-            CreateNote(GameNoteType.SlideStart, 2000, 0),
-            CreateNote(GameNoteType.SlideTick, 2500, 2),
-            CreateNote(GameNoteType.SlideTick, 3200, 0),
-            CreateNote(GameNoteType.SlideTick, 3300, 2),
-            CreateNote(GameNoteType.SlideTick, 3400, 0),
-            CreateNote(GameNoteType.SlideTick, 3500, 2),
-            CreateNote(GameNoteType.SlideTick, 3600, 0),
-            CreateNote(GameNoteType.SlideTick, 3700, 2),
-            CreateNote(GameNoteType.SlideTick, 3800, 0),
-            CreateNote(GameNoteType.SlideTick, 3900, 2),
-            CreateNote(GameNoteType.SlideEndFlick, 4000, 0)
-        };
-        foreach (GameObject note in notes)
-        {
-            GetSlide(1).AddNote(note.GetComponent<NoteBase>());
-        }
-        
+        notes = ChartLoader.LoadNotesFromFile("TestCharts/0");
+        noteHead = 0;
     }
 
     void Update()
     {
+        // Create notes
+        UpdateNotes();
         // Trigger touch event
         UpdateTouch();
         // Update each note child
@@ -277,22 +241,5 @@ public class NoteController : MonoBehaviour
             child.GetComponent<NoteBase>()?.OnNoteUpdate();
             child.GetComponent<Slide>()?.OnSlideUpdate();
         }
-        /*
-        if (Time.time - lastGenerateTime > 0.5f)
-        {
-            lastGenerateTime = Time.time;
-            int time = (int)((Time.time + 3f) * 1000);
-            int lane = Random.Range(0, NoteUtility.LANE_COUNT);
-            switch (Random.Range(0, 2))
-            {
-                case 0:
-                    CreateNote(GameNoteType.Normal, time, lane);
-                    break;
-                case 1:
-                    CreateNote(GameNoteType.Flick, time, lane);
-                    break;
-            }
-        }
-        */
     }
 }
