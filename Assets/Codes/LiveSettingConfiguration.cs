@@ -17,7 +17,7 @@ public static class LiveSetting
     public static bool syncLineEnabled = true;
     public static bool laneEffectEnabled = true;
     public static bool grayNoteEnabled = true;
-    public static bool autoPlayEnabled = true;
+    public static bool autoPlayEnabled = false;
 
     public static float bgBrightness = .8f;
     public static float laneBrightness = 0.9f;

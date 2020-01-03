@@ -74,16 +74,18 @@ public class NoteController : MonoBehaviour
             effect += "_great";
         else if (result == JudgeResult.Good)
             effect += "_good";
+        else if (result == JudgeResult.Miss)
+            return;
 
-        if(effect == "Effects/effect_tap")
+        if (effect == "Effects/effect_tap")
             audioMgr.PlaySE(SE_CLICK);
-        else if(effect == "Effects/effect_tap_swipe")
+        if (effect == "Effects/effect_tap_swipe")
             audioMgr.PlaySE(SE_FLICK);
-        else if(effect == "Effects/effect_tap_perfect")
+        else if (effect == "Effects/effect_tap_perfect")
             audioMgr.PlaySE(SE_PERFECT);
-        else if(effect == "Effects/effect_tap_great")
+        else if (effect == "Effects/effect_tap_great")
             audioMgr.PlaySE(SE_GREAT);
-        else if(effect == "Effects/effect_tap_good")
+        else if (effect == "Effects/effect_tap_good")
             audioMgr.PlaySE(SE_GOOD);
 
         var fx = Instantiate(Resources.Load(effect), pos, Quaternion.identity) as GameObject;
@@ -145,7 +147,12 @@ public class NoteController : MonoBehaviour
             }
         }
         // A note to judge is found
-        if (noteToJudge != null)
+        if (noteToJudge == null)
+        {
+            if (touch.phase == TouchPhase.Began)
+                EmitEffect(NoteUtility.GetJudgePos(lane), JudgeResult.None, GameNoteType.Normal);
+        }
+        else
         {
             noteToJudge.Judge(audioTime, noteToJudge.TryJudge(audioTime, touch), touch);
         }
