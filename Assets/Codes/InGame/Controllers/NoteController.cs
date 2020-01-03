@@ -64,7 +64,10 @@ public class NoteController : MonoBehaviour
         var effect = "Effects/effect_tap";
 
         if (NoteUtility.IsFlick(type))
-            effect += "_swipe";
+        {
+            if (result <= JudgeResult.Good)
+                effect += "_swipe";
+        }
         else if (result == JudgeResult.Perfect)
             effect += "_perfect";
         else if (result == JudgeResult.Great)
@@ -83,7 +86,7 @@ public class NoteController : MonoBehaviour
         else if(effect == "Effects/effect_tap_good")
             audioMgr.PlaySE(SE_GOOD);
 
-        var fx = UnityEngine.Object.Instantiate(Resources.Load(effect), pos, Quaternion.identity) as GameObject;
+        var fx = Instantiate(Resources.Load(effect), pos, Quaternion.identity) as GameObject;
         StartCoroutine(KillFX(fx, 0.5f));
     }
 

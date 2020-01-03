@@ -152,22 +152,34 @@ public static class ChartLoader
             // Note is part of a slide
             if (!tickStackTable.ContainsKey(note.tickStack))
             {
-                tickStackTable[note.tickStack] = new GameNoteData
+                GameNoteData tmp = new GameNoteData
                 {
                     time = (int)(time * 1000),
                     type = GameNoteType.SlideStart,
                     seg = new List<GameNoteData>()
                 };
+                tickStackTable[note.tickStack] = tmp;
                 type = GameNoteType.SlideStart;
                 gameNote.type = type;
+                gameNotes.Add(tmp);
             }
             GameNoteData tickStack = tickStackTable[note.tickStack] as GameNoteData;
             tickStack.seg.Add(gameNote);
             if (NoteUtility.IsSlideEnd(type))
             {
-                gameNotes.Add(tickStack);
                 tickStackTable.Remove(note.tickStack);
             }
+        }
+        foreach (GameNoteData note in gameNotes)
+        {
+            if (note.type == GameNoteType.SlideStart)
+            {
+                Debug.Assert(note.time == note.seg[0].time);
+            }
+        }
+        for (int i = 1; i < gameNotes.Count; i++)
+        {
+            Debug.Assert(gameNotes[i].time >= gameNotes[i - 1].time);
         }
         return gameNotes;
     }
