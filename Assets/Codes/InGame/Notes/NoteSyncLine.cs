@@ -11,7 +11,7 @@ public class NoteSyncLine
         dist.x /= start.localScale.x;
         LineRenderer lineRenderer = start.gameObject.AddComponent<LineRenderer>();
         lineRenderer.useWorldSpace = false;
-        //lineRenderer.material = start.GetComponent<SpriteRenderer>().material;
+        lineRenderer.material = Resources.Load<Material>("TestAssets/Materials/sync_line");
         lineRenderer.startWidth = 0.1f;
         lineRenderer.endWidth = 0.1f;
         lineRenderer.startColor = Color.white;
