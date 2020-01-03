@@ -60,6 +60,7 @@ public class NoteController : MonoBehaviour
 
     public void EmitEffect(Vector3 position, JudgeResult result, GameNoteType type)
     {
+        if (result == JudgeResult.Miss) return;
         var pos = new Vector3(position.x * 1.444f, -2.97f, 4);
         var effect = "Effects/effect_tap";
 
@@ -74,8 +75,6 @@ public class NoteController : MonoBehaviour
             effect += "_great";
         else if (result == JudgeResult.Good)
             effect += "_good";
-        else if (result == JudgeResult.Miss)
-            return;
 
         if (effect == "Effects/effect_tap")
             audioMgr.PlaySE(SE_CLICK);
