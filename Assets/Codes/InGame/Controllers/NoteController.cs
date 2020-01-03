@@ -9,6 +9,17 @@ public class NoteController : MonoBehaviour
     private Dictionary<int, GameObject> touchTable;
     private List<GameNoteData> notes;
     private int noteHead;
+    private GradeColorChange scoreDisplay;
+    private int maxScore;
+    private int score;
+    private float normalizedScore
+    {
+        get
+        {
+            if (maxScore == 0) return 0;
+            return (float)score / maxScore;
+        }
+    }
 
     public void RegisterTouch(int id, GameObject obj)
     {
@@ -47,8 +58,10 @@ public class NoteController : MonoBehaviour
             Debug.LogWarning("'None' cannot be final judge result. Recognized as 'Miss'.");
             result = JudgeResult.Miss;
         }
-        print(result);
+        score += (int)JudgeResult.Miss - (int)result;
+
         JudgeResultController.controller.DisplayJudgeResult(result);
+        scoreDisplay.SetScore(normalizedScore);
     }
 
     private void OnTouch(int audioTime, int lane, Touch touch)
@@ -156,6 +169,7 @@ public class NoteController : MonoBehaviour
 
     private void UpdateTouch()
     {
+        if (LiveSetting.autoPlayEnabled) return;
         int audioTime = (int)(Time.time * 1000);
         Touch[] touches = Input.touches;
         if (Input.touchCount == 0)
@@ -218,15 +232,29 @@ public class NoteController : MonoBehaviour
         touchTable = new Dictionary<int, GameObject>();
         LiveSetting.noteSpeed = 2f;
         Application.targetFrameRate = 120;
+        scoreDisplay = GameObject.Find("Grades").GetComponent<GradeColorChange>();
         laneQueue = new Queue<GameObject>[NoteUtility.LANE_COUNT];
         for (int i = 0; i < NoteUtility.LANE_COUNT; i++)
         {
             laneQueue[i] = new Queue<GameObject>();
         }
         controller = this;
-
+        // Load chart
         notes = ChartLoader.LoadNotesFromFile("TestCharts/0");
         noteHead = 0;
+        // Compute score
+        maxScore = 0;
+        score = 0;
+        foreach (GameNoteData note in notes)
+        {
+            if (note.type == GameNoteType.SlideStart)
+            {
+                maxScore += (int)JudgeResult.Miss * note.seg.Count;
+            } else
+            {
+                maxScore += (int)JudgeResult.Miss;
+            }
+        }
     }
 
     void Update()

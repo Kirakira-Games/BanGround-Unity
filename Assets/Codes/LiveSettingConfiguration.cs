@@ -26,7 +26,6 @@ public static class LiveSetting
 
     private static float cachedSpeed = 0;
     private static int cachedScreenTime = 0;
-
     
     public static int NoteScreenTime
     {

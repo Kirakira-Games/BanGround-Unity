@@ -21,6 +21,7 @@ public class GradeColorChange : MonoBehaviour
     float score;
     private void Start()
     {
+        score = 0;
         sld = GameObject.Find("GradeSlider").GetComponent<Slider>();
         fill = GameObject.Find("GradeFill").GetComponent<Image>();
         txt = GameObject.Find("GradeText").GetComponent<Text>();
@@ -47,13 +48,10 @@ public class GradeColorChange : MonoBehaviour
     float displayScore;
     void ScoreAddAnimation() {
         if (displayScore < score)
-            displayScore+= (score-displayScore)*0.5f;
+            displayScore += (score-displayScore)*0.5f;
         scoreTxt.text = string.Format("{0:0000000}" ,displayScore*1000000);
     }
-    void FixedUpdate()
-    {
-        SetScore(0.5f);
-    }
+
     private void Update()
     {
         ScoreAddAnimation();
