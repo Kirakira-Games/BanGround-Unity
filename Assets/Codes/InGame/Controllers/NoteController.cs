@@ -12,6 +12,14 @@ public class NoteController : MonoBehaviour
     private GradeColorChange scoreDisplay;
     private int maxScore;
     private int score;
+    private AudioManager audioMgr;
+    private FMOD.Sound SE_PERFECT;
+    private FMOD.Sound SE_GREAT;
+    private FMOD.Sound SE_GOOD;
+    private FMOD.Sound SE_CLICK;
+    private FMOD.Sound SE_FLICK;
+
+
     private float normalizedScore
     {
         get
@@ -50,6 +58,41 @@ public class NoteController : MonoBehaviour
         return new Touch[] { touch };
     }
 
+    public void EmitEffect(Vector3 position, JudgeResult result, GameNoteType type)
+    {
+        var pos = new Vector3(position.x * 1.444f, -2.97f, 4);
+        var effect = "Effects/effect_tap";
+
+        if (type == GameNoteType.Flick)
+            effect += "_swipe";
+        else if (result == JudgeResult.Perfect)
+            effect += "_perfect";
+        else if (result == JudgeResult.Great)
+            effect += "_great";
+        else if (result == JudgeResult.Good)
+            effect += "_good";
+
+        if(effect == "Effects/effect_tap")
+            audioMgr.PlaySE(SE_CLICK);
+        else if(effect == "Effects/effect_tap_swipe")
+            audioMgr.PlaySE(SE_FLICK);
+        else if(effect == "Effects/effect_tap_perfect")
+            audioMgr.PlaySE(SE_PERFECT);
+        else if(effect == "Effects/effect_tap_great")
+            audioMgr.PlaySE(SE_GREAT);
+        else if(effect == "Effects/effect_tap_good")
+            audioMgr.PlaySE(SE_GOOD);
+
+        var fx = UnityEngine.Object.Instantiate(Resources.Load(effect), pos, Quaternion.identity) as GameObject;
+        KillFX(fx, 0.5f);
+    }
+
+    public static IEnumerator KillFX(GameObject fx, float delaySeconds)
+    {
+        yield return new WaitForSeconds(delaySeconds);
+        Destroy(fx);
+    }
+
     // Judge a note as result
     public void Judge(GameObject note, JudgeResult result, Touch? touch)
     {
@@ -59,6 +102,8 @@ public class NoteController : MonoBehaviour
             result = JudgeResult.Miss;
         }
         score += (int)JudgeResult.Miss - (int)result;
+
+        EmitEffect(note.transform.position, result, note.GetComponent<NoteBase>().type);
 
         JudgeResultController.controller.DisplayJudgeResult(result);
         scoreDisplay.SetScore(normalizedScore);
@@ -209,7 +254,7 @@ public class NoteController : MonoBehaviour
 
     private void UpdateNotes()
     {
-        int audioTime = (int)(Time.time * 1000);
+        int audioTime = audioMgr.GetBGMPlaybackTime();//(int)(Time.time * 1000);
         while (noteHead < notes.Count)
         {
             GameNoteData note = notes[noteHead];
@@ -230,8 +275,8 @@ public class NoteController : MonoBehaviour
     void Start()
     {
         touchTable = new Dictionary<int, GameObject>();
-        LiveSetting.noteSpeed = 2f;
         Application.targetFrameRate = 120;
+        
         scoreDisplay = GameObject.Find("Grades").GetComponent<GradeColorChange>();
         laneQueue = new Queue<GameObject>[NoteUtility.LANE_COUNT];
         for (int i = 0; i < NoteUtility.LANE_COUNT; i++)
@@ -255,6 +300,17 @@ public class NoteController : MonoBehaviour
                 maxScore += (int)JudgeResult.Miss;
             }
         }
+
+        audioMgr = GetComponent<AudioManager>();
+
+        SE_PERFECT = audioMgr.PrecacheSound(Resources.Load<TextAsset>("TestAssets/SoundEffects/note_perfect.mp3"));
+        SE_GREAT = audioMgr.PrecacheSound(Resources.Load<TextAsset>("TestAssets/SoundEffects/note_great.mp3"));
+        SE_GOOD = audioMgr.PrecacheSound(Resources.Load<TextAsset>("TestAssets/SoundEffects/note_good.mp3"));
+        SE_FLICK = audioMgr.PrecacheSound(Resources.Load<TextAsset>("TestAssets/SoundEffects/note_flick.mp3"));
+        SE_CLICK = audioMgr.PrecacheSound(Resources.Load<TextAsset>("TestAssets/SoundEffects/game_button.mp3"));
+
+        var BGM = audioMgr.PrecacheSound(Resources.Load<TextAsset>("TestCharts/0.mp3"));
+        audioMgr.PlayBGM(BGM);
     }
 
     void Update()

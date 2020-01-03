@@ -40,7 +40,8 @@ public class Chart
     public string backgroundFile;
     public Difficulty difficulty;
     public byte level;
-    public int offset = 0;
+    // TODO: Fix this delay
+    public int offset = -150;
     public List<Note> notes;
 };
 
