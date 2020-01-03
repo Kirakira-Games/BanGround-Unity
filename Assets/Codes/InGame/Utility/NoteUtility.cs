@@ -63,6 +63,12 @@ public static class NoteUtility
         return new Vector3((lane - 3) * LANE_WIDTH, NOTE_Y_POS, NOTE_JUDGE_POS);
     }
 
+    public static bool IsFlick(GameNoteType type)
+    {
+        return type == GameNoteType.Flick ||
+            type == GameNoteType.SlideEndFlick;
+    }
+
     public static bool IsSlide(GameNoteType type)
     {
         return type == GameNoteType.SlideStart ||

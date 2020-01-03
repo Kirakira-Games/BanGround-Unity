@@ -33,8 +33,6 @@ public abstract class NoteBase : MonoBehaviour
         {
             NoteSyncLine.Create(transform, syncLane - lane);
         }
-
-        OnNoteUpdate();
     }
 
     public virtual void UpdatePosition(int audioTime)
@@ -63,9 +61,8 @@ public abstract class NoteBase : MonoBehaviour
     }
 
     // This method should not be overriden
-    public void OnNoteUpdate()
+    public void OnNoteUpdate(int audioTime)
     {
-        int audioTime = (int)(Time.time * 1000);
         if (judgeResult == JudgeResult.None)
         {
             UpdatePosition(audioTime);
