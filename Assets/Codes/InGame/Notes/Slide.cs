@@ -48,9 +48,8 @@ public class Slide : MonoBehaviour
         }
     }
 
-    private void UpdateDisplayHead()
+    private void UpdateDisplayHead(int audioTime)
     {
-        int audioTime = (int)(Time.time * 1000);
         while (displayHead < notes.Count &&
             (audioTime >= (notes[displayHead] as NoteBase).time ||
              (notes[displayHead] as NoteBase).judgeResult != JudgeResult.None))
@@ -92,23 +91,22 @@ public class Slide : MonoBehaviour
         }
     }
 
-    public void OnSlideUpdate()
+    public void OnSlideUpdate(int audioTime)
     {
         // Update ticks
         foreach (NoteBase note in GetComponentsInChildren<NoteBase>())
         {
-            note.OnNoteUpdate();
+            note.OnNoteUpdate(audioTime);
         }
         // Update head
         UpdateHead();
-        UpdateDisplayHead();
+        UpdateDisplayHead(audioTime);
         if (judgeHead >= notes.Count)
         {
             Destroy(gameObject);
             return;
         }
         // Update position of noteHead
-        int audioTime = (int)(Time.time * 1000);
         if (noteHead.judgeTime != -1)
         {
             if (displayHead >= notes.Count)

@@ -63,7 +63,7 @@ public class NoteController : MonoBehaviour
         var pos = new Vector3(position.x * 1.444f, -2.97f, 4);
         var effect = "Effects/effect_tap";
 
-        if (type == GameNoteType.Flick)
+        if (NoteUtility.IsFlick(type))
             effect += "_swipe";
         else if (result == JudgeResult.Perfect)
             effect += "_perfect";
@@ -212,10 +212,9 @@ public class NoteController : MonoBehaviour
         return -1;
     }
 
-    private void UpdateTouch()
+    private void UpdateTouch(int audioTime)
     {
         if (LiveSetting.autoPlayEnabled) return;
-        int audioTime = (int)(Time.time * 1000);
         Touch[] touches = Input.touches;
         if (Input.touchCount == 0)
         {
@@ -252,9 +251,8 @@ public class NoteController : MonoBehaviour
         }
     }
 
-    private void UpdateNotes()
+    private void UpdateNotes(int audioTime)
     {
-        int audioTime = audioMgr.GetBGMPlaybackTime();//(int)(Time.time * 1000);
         while (noteHead < notes.Count)
         {
             GameNoteData note = notes[noteHead];
@@ -315,15 +313,16 @@ public class NoteController : MonoBehaviour
 
     void Update()
     {
+        int audioTime = audioMgr.GetBGMPlaybackTime();
         // Create notes
-        UpdateNotes();
+        UpdateNotes(audioTime);
         // Trigger touch event
-        UpdateTouch();
+        UpdateTouch(audioTime);
         // Update each note child
         foreach (Transform child in transform)
         {
-            child.GetComponent<NoteBase>()?.OnNoteUpdate();
-            child.GetComponent<Slide>()?.OnSlideUpdate();
+            child.GetComponent<NoteBase>()?.OnNoteUpdate(audioTime);
+            child.GetComponent<Slide>()?.OnSlideUpdate(audioTime);
         }
     }
 }
