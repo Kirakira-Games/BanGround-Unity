@@ -84,7 +84,7 @@ public class NoteController : MonoBehaviour
             audioMgr.PlaySE(SE_GOOD);
 
         var fx = UnityEngine.Object.Instantiate(Resources.Load(effect), pos, Quaternion.identity) as GameObject;
-        KillFX(fx, 0.5f);
+        StartCoroutine(KillFX(fx, 0.5f));
     }
 
     public static IEnumerator KillFX(GameObject fx, float delaySeconds)
