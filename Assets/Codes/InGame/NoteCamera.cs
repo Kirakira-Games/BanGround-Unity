@@ -9,7 +9,7 @@ public class NoteCamera : MonoBehaviour
     void Awake()
     {
         renderTarget = GetComponent<Camera>().targetTexture;
-        int size = Screen.height > Screen.width ? Screen.height : Screen.width;
+        int size = Screen.height < Screen.width ? Screen.height : Screen.width;
 
         // Find nearest power of 2
         size--;
