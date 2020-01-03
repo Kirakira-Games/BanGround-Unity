@@ -12,19 +12,26 @@ class AudioManager : MonoBehaviour
     ChannelGroup SEChannelGroup;
     ChannelGroup BGMChannelGroup;
 
+    Channel CurrentBGMChannel;
+
     List<Sound> LoadedSound = new List<Sound>();
 
     void Awake()
     {
         Factory.System_Create(out System);
-        var result = System.init(64, INITFLAGS.NORMAL, IntPtr.Zero);
+        var result = System.init(1024, INITFLAGS.NORMAL, IntPtr.Zero);
 
         result = System.createChannelGroup("SoundEffects", out SEChannelGroup);
 
         result = System.createChannelGroup("BackgroundMuisc", out BGMChannelGroup);
     }
 
-    Sound PrecacheSound(TextAsset asset)
+    void Update()
+    {
+        System.update();
+    }
+
+    public Sound PrecacheSound(TextAsset asset)
     {
         var bytes = asset.bytes;
 
@@ -41,7 +48,7 @@ class AudioManager : MonoBehaviour
         return sound;
     }
 
-    Sound PrecacheSound(byte[] bytes)
+    public Sound PrecacheSound(byte[] bytes)
     {
         Sound sound;
 
@@ -56,7 +63,7 @@ class AudioManager : MonoBehaviour
         return sound;
     }
 
-    Sound PrecacheSound(string path)
+    public Sound PrecacheSound(string path)
     {
         Sound sound;
 
@@ -67,30 +74,37 @@ class AudioManager : MonoBehaviour
         return sound;
     }
 
-    void UnloadSound(Sound sound)
+    public void UnloadSound(Sound sound)
     {
         LoadedSound.Remove(sound);
         sound.release();
     }
 
-    Channel PlaySE(Sound sound)
+    public Channel PlaySE(Sound sound)
     {
-        Channel channel = new Channel();
-        channel.setChannelGroup(SEChannelGroup);
+        Channel channel;
 
         System.playSound(sound, SEChannelGroup, false, out channel);
 
         return channel;
     }
 
-    Channel PlayBGM(Sound sound)
+    public Channel PlayBGM(Sound sound)
     {
-        Channel channel = new Channel();
-        channel.setChannelGroup(BGMChannelGroup);
-
+        Channel channel;
+        
         System.playSound(sound, BGMChannelGroup, false, out channel);
 
+        CurrentBGMChannel = channel;
         return channel;
+    }
+
+    public int GetBGMPlaybackTime()
+    {
+        uint pos;
+        CurrentBGMChannel.getPosition(out pos, TIMEUNIT.MS);
+
+        return (int)pos;
     }
 
     void OnApplicationQuit()
