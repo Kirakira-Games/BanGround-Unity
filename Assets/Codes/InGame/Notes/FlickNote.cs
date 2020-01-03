@@ -8,7 +8,7 @@ public class FlickNote : NoteBase
     protected override void Start()
     {
         base.Start();
-        sprite.sprite = NoteUtility.LoadResource<Sprite>("note_flick_default");
+        mesh.material.SetTexture("_MainTex", NoteUtility.LoadResource<Texture2D>("note_flick_default"));
     }
 
     public override void TraceTouch(int audioTime, Touch touch)

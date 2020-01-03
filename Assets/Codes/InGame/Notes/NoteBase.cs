@@ -11,7 +11,7 @@ public abstract class NoteBase : MonoBehaviour
     public GameNoteType type;
     public JudgeResult judgeResult = JudgeResult.None;
 
-    protected SpriteRenderer sprite;
+    protected MeshRenderer mesh;
 
     private Vector3 _cachedInitPos = Vector3.zero;
     private Vector3 _cachedJudgePos = Vector3.zero;
@@ -27,8 +27,7 @@ public abstract class NoteBase : MonoBehaviour
         transform.position = initPos;
         transform.localScale = new Vector3(NoteUtility.NOTE_SCALE, NoteUtility.NOTE_SCALE, 1) * LiveSetting.noteSize;
 
-        sprite = gameObject.AddComponent<SpriteRenderer>();
-        sprite.sortingLayerID = SortingLayer.NameToID("Note");
+        mesh = NoteMesh.Create(gameObject, lane);
 
         if (syncLane != -1)
         {

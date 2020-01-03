@@ -40,7 +40,7 @@ public static class NoteUtility
     public const float NOTE_JUDGE_POS = 20;
     public const float NOTE_Y_POS = -105.5f;
     public const float LANE_WIDTH = 1.366f;
-    public const float NOTE_SCALE = 0.5f;
+    public const float NOTE_SCALE = 0.8f;
 
     public static readonly int[] TAP_JUDGE_RANGE = { 50, 100, 117, 133 };
     public static readonly int[] SLIDE_END_JUDGE_RANGE = { 67, 117, 133, 150 };

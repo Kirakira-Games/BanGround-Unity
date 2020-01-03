@@ -1,30 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
 
-// 绿条
-public class NoteMesh : MonoBehaviour
+public class NoteMesh
 {
-    private MeshRenderer meshRenderer;
-    private MeshFilter meshFilter;
-    private Vector3[] meshVertices;
-
-    public Transform afterNoteTrans;
-    public const float BODY_WIDTH = 1.2f;
-
-    public static NoteMesh Create(Transform start, Transform after)
-    {
-        GameObject slideMesh = new GameObject("SlideBody");
-        NoteMesh mesh = slideMesh.AddComponent<NoteMesh>();
-        mesh.transform.SetParent(start);
-        mesh.transform.localPosition = new Vector3(0f, -0.01f);
-        mesh.afterNoteTrans = after;
-        slideMesh.AddComponent<SortingGroup>().sortingLayerID = SortingLayer.NameToID("SlideBody");
-        return mesh;
-    }
-
-    readonly Vector2[] uv =
+    static readonly Vector2[] uv =
     {
         new Vector2(0, 0),
         new Vector2(1, 0),
@@ -32,7 +12,7 @@ public class NoteMesh : MonoBehaviour
         new Vector2(1, 1)
     };
 
-    readonly Vector3[] normals =
+    static readonly Vector3[] normals =
     {
         Vector3.up,
         Vector3.up,
@@ -40,56 +20,33 @@ public class NoteMesh : MonoBehaviour
         Vector3.up
     };
 
-    public void Start()
-    {
-        InitMesh();
-        OnUpdate();
-    }
+    static readonly int[] indices = { 0, 2, 1, 2, 3, 1 };
 
-    public void OnUpdate()
+    public static MeshRenderer Create(GameObject note, int lane)
     {
-        Vector3 delta = afterNoteTrans.position - transform.parent.position;
-        delta.x /= transform.parent.localScale.x;
-        delta.y /= transform.parent.localScale.y;
-        delta.z /= transform.parent.localScale.z;
-        Vector3[] vertices =
+        MeshRenderer meshRenderer = note.AddComponent<MeshRenderer>();
+        Material material = Resources.Load<Material>("TestAssets/Materials/note");
+        meshRenderer.material = material;
+
+        MeshFilter meshFilter = note.AddComponent<MeshFilter>();
+        float delta = (lane - 3) * 0.1f;
+        Vector3[] vertices = new Vector3[]
         {
-            new Vector3(-BODY_WIDTH, 0, 0),
-            new Vector3(BODY_WIDTH, 0, 0),
-            new Vector3(delta.x - BODY_WIDTH, 0, delta.z),
-            new Vector3(delta.x + BODY_WIDTH, 0, delta.z)
+            new Vector3(-1 + delta, -0.5f),
+            new Vector3(1 + delta, -0.5f),
+            new Vector3(-1 - delta, 0.5f),
+            new Vector3(1 - delta, 0.5f)
         };
-        meshFilter.mesh.vertices = vertices;
-        meshFilter.mesh.RecalculateBounds();
-    }
-
-    public void InitMesh()
-    {
-        meshRenderer = gameObject.AddComponent<MeshRenderer>();
-        meshFilter = gameObject.AddComponent<MeshFilter>();
-
-        meshVertices = new Vector3[]
-        {
-           Vector3.zero,
-           Vector3.zero,
-           Vector3.zero,
-           Vector3.zero
-        };
-
-        int[] indices = { 0, 2, 1, 2, 3, 1 };
-
         Mesh mesh = new Mesh
         {
-            vertices = meshVertices,
-            normals = normals,
+            vertices = vertices,
             uv = uv,
+            normals = normals,
             triangles = indices
         };
         mesh.RecalculateBounds();
-
         meshFilter.mesh = mesh;
-        Material material = Resources.Load<Material>("TestAssets/Materials/note_body");
-        material.mainTexture = NoteUtility.LoadResource<Texture2D>("long_note_mask");
-        meshRenderer.material = material;
+        meshRenderer.sortingLayerID = SortingLayer.NameToID("Note");
+        return meshRenderer;
     }
 }

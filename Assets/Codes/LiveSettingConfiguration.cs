@@ -7,7 +7,7 @@ public static class LiveSetting
     public static float offset = .0f;
 
     public static float noteSpeed = 5.0f;
-    public static float noteSize = 1.5f;
+    public static float noteSize = 1f;
     public static float meshSize = .75f;
     public static float meshOpacity = .6f;
 
@@ -17,7 +17,7 @@ public static class LiveSetting
     public static bool syncLineEnabled = true;
     public static bool laneEffectEnabled = true;
     public static bool grayNoteEnabled = true;
-    public static bool autoPlayEnabled = false;
+    public static bool autoPlayEnabled = true;
 
     public static string assetDirectory = "V2Assets";
 
