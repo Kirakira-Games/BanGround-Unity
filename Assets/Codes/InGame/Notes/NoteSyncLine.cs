@@ -2,17 +2,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NoteSyncLine : MonoBehaviour
+public class NoteSyncLine
 {
-    // Start is called before the first frame update
-    void Start()
+    public static void Create(Transform start, int laneDiff)
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        Vector3 dist = NoteUtility.GetInitPos(laneDiff) - NoteUtility.GetInitPos(0);
+        Vector3 delta = new Vector3(0, 0, 0.1f);
+        dist.x /= start.localScale.x;
+        LineRenderer lineRenderer = start.gameObject.AddComponent<LineRenderer>();
+        lineRenderer.useWorldSpace = false;
+        //lineRenderer.material = start.GetComponent<SpriteRenderer>().material;
+        lineRenderer.startWidth = 0.1f;
+        lineRenderer.endWidth = 0.1f;
+        lineRenderer.startColor = Color.white;
+        lineRenderer.endColor = Color.white;
+        lineRenderer.rendererPriority = -1;
+        lineRenderer.SetPositions(new Vector3[]
+        {
+            delta,
+            dist + delta
+        });
     }
 }

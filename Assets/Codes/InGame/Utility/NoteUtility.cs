@@ -13,6 +13,16 @@ public enum GameNoteType
     SlideEndFlick = 5
 }
 
+public class GameNoteData
+{
+    public int time;
+    public int lane;
+    public int syncLane = -1;
+    public GameNoteType type;
+    public bool isGray;
+    public List<GameNoteData> seg;
+}
+
 public enum JudgeResult
 {
     None = -1,
@@ -30,7 +40,7 @@ public static class NoteUtility
     public const float NOTE_JUDGE_POS = 20;
     public const float NOTE_Y_POS = -105.5f;
     public const float LANE_WIDTH = 1.366f;
-    public const float NOTE_SCALE = 0.5f;
+    public const float NOTE_SCALE = 0.8f;
 
     public static readonly int[] TAP_JUDGE_RANGE = { 50, 100, 117, 133 };
     public static readonly int[] SLIDE_END_JUDGE_RANGE = { 67, 117, 133, 150 };
@@ -40,6 +50,8 @@ public static class NoteUtility
     public const float FLICK_JUDGE_DIST = 0.5f;
 
     public const int MOUSE_TOUCH_ID = -16;
+
+    public const float EPS = 1e-4f;
 
     public static Vector3 GetInitPos(int lane)
     {
@@ -55,7 +67,12 @@ public static class NoteUtility
     {
         return type == GameNoteType.SlideStart ||
             type == GameNoteType.SlideTick ||
-            type == GameNoteType.SlideEnd ||
+            IsSlideEnd(type);
+    }
+
+    public static bool IsSlideEnd(GameNoteType type)
+    {
+        return type == GameNoteType.SlideEnd ||
             type == GameNoteType.SlideEndFlick;
     }
 

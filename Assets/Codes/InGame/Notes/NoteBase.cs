@@ -3,14 +3,15 @@ public abstract class NoteBase : MonoBehaviour
 {
     public int lane;
     public int time;
-    public int judgeTime;
-    public int touchId;
+    public int judgeTime = -1;
+    public int touchId = -1;
+    public int syncLane;
+    public bool isGray;
 
     public GameNoteType type;
-    public JudgeResult judgeResult;
+    public JudgeResult judgeResult = JudgeResult.None;
 
-    private NoteSyncLine syncLine;
-    protected SpriteRenderer sprite;
+    protected MeshRenderer mesh;
 
     private Vector3 _cachedInitPos = Vector3.zero;
     private Vector3 _cachedJudgePos = Vector3.zero;
@@ -26,8 +27,12 @@ public abstract class NoteBase : MonoBehaviour
         transform.position = initPos;
         transform.localScale = new Vector3(NoteUtility.NOTE_SCALE, NoteUtility.NOTE_SCALE, 1) * LiveSetting.noteSize;
 
-        sprite = gameObject.AddComponent<SpriteRenderer>();
-        sprite.sortingLayerID = SortingLayer.NameToID("Note");
+        mesh = NoteMesh.Create(gameObject, lane);
+
+        if (syncLane != -1)
+        {
+            NoteSyncLine.Create(transform, syncLane - lane);
+        }
 
         OnNoteUpdate();
     }

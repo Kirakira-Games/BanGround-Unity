@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Slide : MonoBehaviour
 {
-    public int tickStack;
     private ArrayList notes;
     private int judgeHead;
     private int displayHead;
@@ -23,16 +22,14 @@ public class Slide : MonoBehaviour
             NoteController.controller.UnregisterTouch(touchId, gameObject);
             touchId = -1;
         }
-        NoteController.controller.EndSlide(tickStack);
     }
 
-    public void InitSlide(int tickStack)
+    public void InitSlide()
     {
         notes = new ArrayList();
         touchId = -1;
         judgeHead = 0;
         displayHead = 1;
-        this.tickStack = tickStack;
     }
 
     private void Start()
@@ -118,7 +115,7 @@ public class Slide : MonoBehaviour
             {
                 NoteBase lastNote = notes[notes.Count - 1] as NoteBase;
                 noteHead.transform.position = NoteUtility.GetJudgePos(lastNote.lane);
-                noteHead.GetComponentInChildren<NoteMesh>().afterNoteTrans = lastNote.transform;
+                noteHead.GetComponentInChildren<SlideMesh>().afterNoteTrans = lastNote.transform;
             }
             else
             {
@@ -129,7 +126,7 @@ public class Slide : MonoBehaviour
                 Vector3 prevPos = prev.judgePos;
                 Vector3 nextPos = next.judgePos;
                 noteHead.transform.position = (nextPos - prevPos) * percentage + prevPos;
-                NoteMesh mesh = noteHead.GetComponentInChildren<NoteMesh>();
+                SlideMesh mesh = noteHead.GetComponentInChildren<SlideMesh>();
                 mesh.afterNoteTrans = next.transform;
                 mesh.GetComponent<MeshRenderer>().enabled = displayHead == 1 || !prev.gameObject.activeSelf;
             }
@@ -138,7 +135,7 @@ public class Slide : MonoBehaviour
         // Update mesh
         foreach (NoteBase note in GetComponentsInChildren<NoteBase>())
         {
-            note.GetComponentInChildren<NoteMesh>()?.OnUpdate();
+            note.GetComponentInChildren<SlideMesh>()?.OnUpdate();
         }
     }
 
@@ -147,7 +144,7 @@ public class Slide : MonoBehaviour
         note.transform.SetParent(transform);
         if (notes.Count > 0)
         {
-            NoteMesh.Create((notes[notes.Count - 1] as NoteBase).transform, note.transform);
+            SlideMesh.Create((notes[notes.Count - 1] as NoteBase).transform, note.transform);
         }
         else
         {

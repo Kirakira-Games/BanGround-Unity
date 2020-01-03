@@ -7,6 +7,6 @@ public class TapNote : NoteBase
     protected override void Start()
     {
         base.Start();
-        sprite.sprite = NoteUtility.LoadResource<Sprite>("note_single_default");
+        mesh.material.SetTexture("_MainTex", NoteUtility.LoadResource<Texture2D>("note_single_default"));
     }
 }

@@ -22,7 +22,7 @@ public class SlideEndFlick : SlideNoteBase
     protected override void Start()
     {
         base.Start();
-        sprite.sprite = NoteUtility.LoadResource<Sprite>("note_flick_default");
+        mesh.material.SetTexture("_MainTex", NoteUtility.LoadResource<Texture2D>("note_flick_default"));
     }
 
     public override void Judge(int audioTime, JudgeResult result, Touch? touch)
