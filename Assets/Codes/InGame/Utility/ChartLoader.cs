@@ -94,7 +94,7 @@ public static class ChartLoader
         // Compute actual time of each note
         float currentBpm = 120;
         float startDash = 0;
-        float startTime = chart.offset * 1000;
+        float startTime = chart.offset / 1000f;
         // Create sync table
         foreach (Note note in notes)
         {
