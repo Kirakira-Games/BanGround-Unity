@@ -24,12 +24,59 @@ public class ResultManager : MonoBehaviour
 
     private const string IconPath = "UI/v3/";
 
+    public AudioClip[] voices = new AudioClip[9];
+
     void Start()
     {
+        StartCoroutine(ReadRank());
         SetBtnObject();
         GetResultObjectAndComponent();
         ShowScore();
         ShowRank();
+        
+    }
+
+    IEnumerator ReadRank()
+    {
+        yield return new WaitForSeconds(0.8f);
+        print("read");
+        AudioSource audioSource = GetComponent<AudioSource>();
+
+        audioSource.clip = voices[0];
+        audioSource.Play();
+
+        yield return new WaitForSeconds(1);
+
+
+        switch (ResultsGetter.GetRanks())
+        {
+            case Ranks.SSS:
+                audioSource.clip = voices[1];
+                break;
+            case Ranks.SS:
+                audioSource.clip = voices[2];
+                break;
+            case Ranks.S:
+                audioSource.clip = voices[3];
+                break;
+            case Ranks.A:
+                audioSource.clip = voices[4];
+                break;
+            case Ranks.B:
+                audioSource.clip = voices[5];
+                break;
+            case Ranks.C:
+                audioSource.clip = voices[6];
+                break;
+            case Ranks.D:
+                audioSource.clip = voices[7];
+                break;
+            default:
+                audioSource.clip = voices[8]; ;
+                break;
+        }
+        audioSource.Play();
+        yield return new WaitForSeconds(1);
     }
 
     private void SetBtnObject()

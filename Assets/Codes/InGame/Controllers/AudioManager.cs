@@ -20,6 +20,11 @@ class AudioManager : MonoBehaviour
 
     public bool loading = true;//bgm will not start untill the gate open
 
+    public AudioClip APvoice;
+    public AudioClip FCvoice;
+    public AudioClip CLvoice;
+    public AudioClip Fvoice;
+
     void Awake()
     {
         Factory.System_Create(out System);
@@ -133,19 +138,23 @@ class AudioManager : MonoBehaviour
         {
             case ClearMarks.AP:
                 gateTxt.text = "ALL PERFECT";//TODO:switch to image
+                AudioSource.PlayClipAtPoint(APvoice, Vector3.zero);
                 break;
             case ClearMarks.FC:
                 gateTxt.text = "FULL COMBO";//TODO:switch to image
+                AudioSource.PlayClipAtPoint(FCvoice, Vector3.zero);
                 break;
             case ClearMarks.CL:
                 gateTxt.text = "CLEAR";//TODO:switch to image
+                AudioSource.PlayClipAtPoint(CLvoice, Vector3.zero);
                 break;
             case ClearMarks.F:
                 gateTxt.text = "FAILED";//TODO:switch to image
+                AudioSource.PlayClipAtPoint(Fvoice, Vector3.zero);
                 break;
         }
         GameObject.Find("GateCanvas").GetComponent<Animator>().SetBool("SongOver", true);
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(3);
         SceneManager.LoadSceneAsync("Result");
     }
 
