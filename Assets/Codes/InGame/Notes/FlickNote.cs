@@ -26,7 +26,7 @@ public class FlickNote : NoteBase
 
     protected override void OnNoteUpdateJudge(int audioTime)
     {
-        if (judgeTime == -1)
+        if (judgeTime == int.MinValue)
         {
             if (audioTime > time + NoteUtility.TAP_JUDGE_RANGE[(int)JudgeResult.Bad])
             {

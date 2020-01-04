@@ -104,7 +104,7 @@ class AudioManager : MonoBehaviour
         uint pos;
         CurrentBGMChannel.getPosition(out pos, TIMEUNIT.MS);
 
-        return (int)pos;
+        return (int)pos + LiveSetting.audioOffset;
     }
 
     void OnApplicationQuit()

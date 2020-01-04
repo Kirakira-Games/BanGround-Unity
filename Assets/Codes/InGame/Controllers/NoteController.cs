@@ -122,7 +122,7 @@ public class NoteController : MonoBehaviour
             while (laneQueue[i].Count > 0)
             {
                 GameObject obj = laneQueue[i].Peek();
-                if (obj == null || obj.GetComponent<NoteBase>().judgeTime != -1)
+                if (obj == null || obj.GetComponent<NoteBase>().judgeTime != int.MinValue)
                 {
                     laneQueue[i].Dequeue();
                 }
@@ -224,6 +224,7 @@ public class NoteController : MonoBehaviour
     private void UpdateTouch(int audioTime)
     {
         if (LiveSetting.autoPlayEnabled) return;
+        audioTime -= LiveSetting.judgeOffset;
         Touch[] touches = Input.touches;
         if (Input.touchCount == 0)
         {
@@ -310,11 +311,11 @@ public class NoteController : MonoBehaviour
 
         audioMgr = GetComponent<AudioManager>();
 
-        SE_PERFECT = audioMgr.PrecacheSound(Resources.Load<TextAsset>("TestAssets/SoundEffects/note_perfect.mp3"));
-        SE_GREAT = audioMgr.PrecacheSound(Resources.Load<TextAsset>("TestAssets/SoundEffects/note_great.mp3"));
-        SE_GOOD = audioMgr.PrecacheSound(Resources.Load<TextAsset>("TestAssets/SoundEffects/note_good.mp3"));
-        SE_FLICK = audioMgr.PrecacheSound(Resources.Load<TextAsset>("TestAssets/SoundEffects/note_flick.mp3"));
-        SE_CLICK = audioMgr.PrecacheSound(Resources.Load<TextAsset>("TestAssets/SoundEffects/game_button.mp3"));
+        SE_PERFECT = audioMgr.PrecacheSound(Resources.Load<TextAsset>("TestAssets/SoundEffects/note_perfect.wav"));
+        SE_GREAT = audioMgr.PrecacheSound(Resources.Load<TextAsset>("TestAssets/SoundEffects/note_great.wav"));
+        SE_GOOD = audioMgr.PrecacheSound(Resources.Load<TextAsset>("TestAssets/SoundEffects/note_good.wav"));
+        SE_FLICK = audioMgr.PrecacheSound(Resources.Load<TextAsset>("TestAssets/SoundEffects/note_flick.wav"));
+        SE_CLICK = audioMgr.PrecacheSound(Resources.Load<TextAsset>("TestAssets/SoundEffects/game_button.wav"));
 
         var BGM = audioMgr.PrecacheSound(Resources.Load<TextAsset>("TestCharts/0.mp3"));
         audioMgr.PlayBGM(BGM);

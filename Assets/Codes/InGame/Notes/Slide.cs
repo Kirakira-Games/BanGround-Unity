@@ -107,7 +107,7 @@ public class Slide : MonoBehaviour
             return;
         }
         // Update position of noteHead
-        if (noteHead.judgeTime != -1)
+        if (noteHead.judgeResult != JudgeResult.None)
         {
             if (displayHead >= notes.Count)
             {

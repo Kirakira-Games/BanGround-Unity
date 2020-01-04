@@ -4,7 +4,8 @@ using UnityEngine;
 
 public static class LiveSetting
 {
-    public static float offset = .0f;
+    public static int judgeOffset = 100;
+    public static int audioOffset = 0;
 
     public static float noteSpeed = 10.0f;
     public static float noteSize = 1f;

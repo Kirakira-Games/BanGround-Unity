@@ -15,7 +15,7 @@ public abstract class SlideNoteBase : NoteBase
 
     public override JudgeResult TryJudge(int audioTime, Touch touch)
     {
-        if (judgeTime != -1 || (GetComponentInParent<Slide>().GetTouchId() != -1 &&
+        if (judgeTime != int.MinValue || (GetComponentInParent<Slide>().GetTouchId() != -1 &&
             GetComponentInParent<Slide>().GetTouchId() != touch.fingerId))
         {
             return JudgeResult.None;

@@ -3,7 +3,7 @@ public abstract class NoteBase : MonoBehaviour
 {
     public int lane;
     public int time;
-    public int judgeTime = -1;
+    public int judgeTime = int.MinValue;
     public int touchId = -1;
     public int syncLane;
     public bool isGray;
@@ -22,7 +22,7 @@ public abstract class NoteBase : MonoBehaviour
     protected virtual void Start()
     {
         touchId = -1;
-        judgeTime = -1;
+        judgeTime = int.MinValue;
         judgeResult = JudgeResult.None;
         transform.position = initPos;
         transform.localScale = new Vector3(NoteUtility.NOTE_SCALE, NoteUtility.NOTE_SCALE, 1) * LiveSetting.noteSize;
@@ -76,7 +76,7 @@ public abstract class NoteBase : MonoBehaviour
         }
         else
         {
-            OnNoteUpdateJudge(audioTime);
+            OnNoteUpdateJudge(audioTime - LiveSetting.judgeOffset);
         }
     }
 
@@ -95,7 +95,7 @@ public abstract class NoteBase : MonoBehaviour
 
     public virtual JudgeResult TryJudge(int audioTime, Touch touch)
     {
-        if (judgeTime != -1 || touch.phase != TouchPhase.Began)
+        if (judgeTime != int.MinValue || touch.phase != TouchPhase.Began)
         {
             return JudgeResult.None;
         }
