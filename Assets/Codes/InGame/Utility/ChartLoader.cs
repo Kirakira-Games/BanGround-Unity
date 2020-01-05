@@ -43,25 +43,26 @@ public static class ChartLoader
             {
                 return GameNoteType.Flick;
             }
-            Debug.LogWarning("Cannot recognize NoteType " + note.type + " on single notes.");
+            Debug.LogError("Cannot recognize NoteType " + note.type + " on single notes.");
             return GameNoteType.None;
         }
         if (note.type == NoteType.Single)
         {
             return GameNoteType.SlideStart;
         }
-        if (note.type == NoteType.SlideTick)
+        else if (note.type == NoteType.SlideTick)
         {
             return GameNoteType.SlideTick;
         }
-        if (note.type == NoteType.SlideTickEnd)
+        else if (note.type == NoteType.SlideTickEnd)
         {
             return GameNoteType.SlideEnd;
         }
-        if (note.type == NoteType.Flick)
+        else if (note.type == NoteType.Flick)
         {
             return GameNoteType.SlideEndFlick;
         }
+        Debug.LogError("Cannot recognize NoteType " + note.type + " on slide notes.");
         return GameNoteType.None;
     }
     public static Header LoadHeaderFromFile(string path)
@@ -85,6 +86,11 @@ public static class ChartLoader
     {
         Chart chart = LoadChartFromFile(path);
         List<Note> notes = chart.notes;
+        if (notes == null)
+        {
+            Debug.LogError("No notes found for current chart.");
+            return null;
+        }
         List<GameNoteData> gameNotes = new List<GameNoteData>();
         notes.Sort(new NoteComparer());
         var syncMaxTable = new Dictionary<(int, int), int>();
@@ -152,6 +158,10 @@ public static class ChartLoader
             // Note is part of a slide
             if (!tickStackTable.ContainsKey(note.tickStack))
             {
+                if (note.type != NoteType.Single)
+                {
+                    Debug.LogWarning("Start of a slide must be 'Single' instead of '" + note.type + "'.");
+                }
                 GameNoteData tmp = new GameNoteData
                 {
                     time = (int)(time * 1000),
@@ -170,16 +180,9 @@ public static class ChartLoader
                 tickStackTable.Remove(note.tickStack);
             }
         }
-        foreach (GameNoteData note in gameNotes)
+        if (tickStackTable.Count > 0)
         {
-            if (note.type == GameNoteType.SlideStart)
-            {
-                Debug.Assert(note.time == note.seg[0].time);
-            }
-        }
-        for (int i = 1; i < gameNotes.Count; i++)
-        {
-            Debug.Assert(gameNotes[i].time >= gameNotes[i - 1].time);
+            Debug.LogError("Some slides do not contain a tail. Ignored.");
         }
         return gameNotes;
     }
