@@ -93,31 +93,16 @@ public static class ChartLoader
         }
         List<GameNoteData> gameNotes = new List<GameNoteData>();
         notes.Sort(new NoteComparer());
-        var syncMaxTable = new Dictionary<(int, int), int>();
-        var syncMinTable = new Dictionary<(int, int), int>();
         var tickStackTable = new Dictionary<int, GameNoteData>();
 
         // Compute actual time of each note
         float currentBpm = 120;
         float startDash = 0;
         float startTime = chart.offset / 1000f;
-        // Create sync table
-        foreach (Note note in notes)
-        {
-            NormalizeBeat(note.beat);
-            if (note.type == NoteType.SlideTick || note.type == NoteType.BPM) continue;
-            (int, int) syncEntry = (note.beat[1], note.beat[2]);
-            if (!syncMinTable.ContainsKey(syncEntry))
-            {
-                syncMinTable.Add(syncEntry, note.lane);
-                syncMaxTable.Add(syncEntry, note.lane);
-            }
-            syncMinTable[syncEntry] = Mathf.Min(syncMinTable[syncEntry], note.lane);
-            syncMaxTable[syncEntry] = Mathf.Max(syncMaxTable[syncEntry], note.lane);
-        }
         // Create game notes
         foreach (Note note in notes)
         {
+            NormalizeBeat(note.beat);
             float beat = GetFloatingPointBeat(note.beat);
             if (note.type == NoteType.BPM)
             {
@@ -138,17 +123,6 @@ public static class ChartLoader
                 type = type,
                 isGray = type == GameNoteType.Normal && note.beat[2] <= 2
             };
-            // Update sync table
-            if (note.type != NoteType.SlideTick)
-            {
-                (int, int) syncEntry = (note.beat[1], note.beat[2]);
-                int minLane = syncMinTable[syncEntry];
-                int maxLane = syncMaxTable[syncEntry];
-                if (minLane == note.lane && maxLane > note.lane)
-                {
-                    gameNote.syncLane = maxLane;
-                }
-            }
             if (note.tickStack == -1)
             {
                 // Note is a single note or flick

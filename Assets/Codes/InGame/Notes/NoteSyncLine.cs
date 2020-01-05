@@ -2,25 +2,60 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NoteSyncLine
+public class NoteSyncLine : MonoBehaviour
 {
-    public static void Create(Transform start, int laneDiff)
+    public List<GameObject> syncNotes;
+    private LineRenderer lineRenderer;
+
+    private void Awake()
     {
-        Vector3 dist = NoteUtility.GetInitPos(laneDiff) - NoteUtility.GetInitPos(0);
-        Vector3 delta = new Vector3(0, 0, 0.1f);
-        dist.x /= start.localScale.x;
-        LineRenderer lineRenderer = start.gameObject.AddComponent<LineRenderer>();
+        syncNotes = new List<GameObject>();
+        lineRenderer = gameObject.AddComponent<LineRenderer>();
         lineRenderer.useWorldSpace = false;
         lineRenderer.material = Resources.Load<Material>("TestAssets/Materials/sync_line");
-        lineRenderer.startWidth = 0.1f;
-        lineRenderer.endWidth = 0.1f;
+        lineRenderer.startWidth = 0.1f * LiveSetting.noteSize;
+        lineRenderer.endWidth = 0.1f * LiveSetting.noteSize;
         lineRenderer.startColor = Color.white;
         lineRenderer.endColor = Color.white;
         lineRenderer.rendererPriority = -1;
-        lineRenderer.SetPositions(new Vector3[]
+        lineRenderer.enabled = false;
+    }
+
+    public void OnSyncLineUpdate()
+    {
+        for (int i = syncNotes.Count - 1; i >= 0; i--)
         {
-            delta,
-            dist + delta
-        });
+            GameObject obj = syncNotes[i];
+            if (obj == null || obj.GetComponent<NoteBase>().judgeResult != JudgeResult.None)
+            {
+                syncNotes.RemoveAt(i);
+            }
+        }
+        if (syncNotes.Count == 0) {
+            Destroy(gameObject);
+            return;
+        }
+        if (syncNotes.Count == 1)
+        {
+            lineRenderer.enabled = false;
+            return;
+        }
+        lineRenderer.enabled = true;
+        Vector3 start = Vector3.zero;
+        Vector3 end = Vector3.zero;
+        foreach (GameObject obj in syncNotes)
+        {
+            if (start == Vector3.zero || start.x > obj.transform.position.x)
+            {
+                start = obj.transform.position;
+            }
+            if (end == Vector3.zero || end.x < obj.transform.position.x)
+            {
+                end = obj.transform.position;
+            }
+        }
+        start.z += 0.01f;
+        end.z += 0.01f;
+        lineRenderer.SetPositions(new Vector3[] { start, end });
     }
 }

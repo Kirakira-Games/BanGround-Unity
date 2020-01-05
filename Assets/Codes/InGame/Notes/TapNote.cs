@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class TapNote : NoteBase
 {
-    protected override void Start()
+    public override void InitNote()
     {
-        base.Start();
+        base.InitNote();
         mesh.material.SetTexture("_MainTex", NoteUtility.LoadResource<Texture2D>("note_single_default"));
     }
 }

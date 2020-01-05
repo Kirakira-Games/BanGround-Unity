@@ -7,6 +7,7 @@ public class NoteController : MonoBehaviour
     public static NoteController controller;
     private Queue<GameObject>[] laneQueue;
     private Dictionary<int, GameObject> touchTable;
+    private Dictionary<int, NoteSyncLine> syncTable;
     private List<GameNoteData> notes;
     private int noteHead;
     private GradeColorChange scoreDisplay;
@@ -189,9 +190,21 @@ public class NoteController : MonoBehaviour
         note.time = gameNote.time;
         note.lane = gameNote.lane;
         note.type = gameNote.type;
-        note.syncLane = LiveSetting.syncLineEnabled ? gameNote.syncLane : -1;
         note.isGray = LiveSetting.grayNoteEnabled ? gameNote.isGray : false;
+        note.InitNote();
         laneQueue[note.lane].Enqueue(noteObj);
+        // Add sync line
+        if (LiveSetting.syncLineEnabled && note.type != GameNoteType.SlideTick)
+        {
+            if (!syncTable.ContainsKey(note.time))
+            {
+                GameObject syncLineObj = new GameObject("syncLine");
+                syncLineObj.transform.SetParent(transform);
+                syncTable.Add(note.time, syncLineObj.AddComponent<NoteSyncLine>());
+            }
+            NoteSyncLine syncLine = syncTable[note.time];
+            syncLine.syncNotes.Add(noteObj);
+        }
         return noteObj;
     }
 
@@ -283,6 +296,7 @@ public class NoteController : MonoBehaviour
     void Start()
     {
         touchTable = new Dictionary<int, GameObject>();
+        syncTable = new Dictionary<int, NoteSyncLine>();
         Application.targetFrameRate = 120;
         
         scoreDisplay = GameObject.Find("Grades").GetComponent<GradeColorChange>();
@@ -333,6 +347,10 @@ public class NoteController : MonoBehaviour
         {
             child.GetComponent<NoteBase>()?.OnNoteUpdate(audioTime);
             child.GetComponent<Slide>()?.OnSlideUpdate(audioTime);
+        }
+        foreach (Transform child in transform)
+        {
+            child.GetComponent<NoteSyncLine>()?.OnSyncLineUpdate();
         }
     }
 }

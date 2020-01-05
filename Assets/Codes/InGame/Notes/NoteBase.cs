@@ -5,7 +5,6 @@ public abstract class NoteBase : MonoBehaviour
     public int time;
     public int judgeTime = int.MinValue;
     public int touchId = -1;
-    public int syncLane;
     public bool isGray;
 
     public GameNoteType type;
@@ -19,7 +18,7 @@ public abstract class NoteBase : MonoBehaviour
     public Vector3 initPos { get { return _cachedInitPos == Vector3.zero ? _cachedInitPos = NoteUtility.GetInitPos(lane) : _cachedInitPos; } }
     public Vector3 judgePos { get { return _cachedJudgePos == Vector3.zero ? _cachedJudgePos = NoteUtility.GetJudgePos(lane) : _cachedJudgePos; } }
 
-    protected virtual void Start()
+    public virtual void InitNote()
     {
         touchId = -1;
         judgeTime = int.MinValue;
@@ -28,11 +27,6 @@ public abstract class NoteBase : MonoBehaviour
         transform.localScale = new Vector3(NoteUtility.NOTE_SCALE, NoteUtility.NOTE_SCALE, 1) * LiveSetting.noteSize;
 
         mesh = NoteMesh.Create(gameObject, lane);
-
-        if (syncLane != -1)
-        {
-            NoteSyncLine.Create(transform, syncLane - lane);
-        }
     }
 
     public virtual void UpdatePosition(int audioTime)

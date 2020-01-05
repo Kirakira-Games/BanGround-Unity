@@ -5,9 +5,9 @@ using UnityEngine;
 public class FlickNote : NoteBase
 {
     private Vector2 touchPosition;
-    protected override void Start()
+    public override void InitNote()
     {
-        base.Start();
+        base.InitNote();
         mesh.material.SetTexture("_MainTex", NoteUtility.LoadResource<Texture2D>("note_flick_default"));
     }
 

@@ -11,7 +11,7 @@ public class SlideMesh : MonoBehaviour
     private Vector3[] meshVertices;
 
     public Transform afterNoteTrans;
-    public const float BODY_WIDTH = 0.8f;
+    public const float BODY_WIDTH = 0.7f;
 
     public static SlideMesh Create(Transform start, Transform after)
     {
@@ -44,15 +44,13 @@ public class SlideMesh : MonoBehaviour
     public void OnUpdate()
     {
         Vector3 delta = afterNoteTrans.position - transform.parent.position;
-        delta.x /= transform.parent.localScale.x;
-        delta.y /= transform.parent.localScale.y;
-        delta.z /= transform.parent.localScale.z;
+        float width = BODY_WIDTH * LiveSetting.noteSize;
         Vector3[] vertices =
         {
-            new Vector3(-BODY_WIDTH, 0, 0),
-            new Vector3(BODY_WIDTH, 0, 0),
-            new Vector3(delta.x - BODY_WIDTH, 0, delta.z),
-            new Vector3(delta.x + BODY_WIDTH, 0, delta.z)
+            new Vector3(-width, 0, 0),
+            new Vector3(width, 0, 0),
+            new Vector3(delta.x - width, 0, delta.z),
+            new Vector3(delta.x + width, 0, delta.z)
         };
         meshFilter.mesh.vertices = vertices;
         meshFilter.mesh.RecalculateBounds();
