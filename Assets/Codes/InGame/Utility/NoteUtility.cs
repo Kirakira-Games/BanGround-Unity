@@ -35,7 +35,7 @@ public enum JudgeResult
 public static class NoteUtility
 {
     public const int LANE_COUNT = 7;
-    public const float NOTE_START_POS = 420;
+    public const float NOTE_START_POS = 365;
     public const float NOTE_JUDGE_POS = 20;
     public const float NOTE_Y_POS = -105.5f;
     public const float LANE_WIDTH = 1.366f;

@@ -109,10 +109,15 @@ public class NoteController : MonoBehaviour
         }
         score += (int)JudgeResult.Miss - (int)result;
 
+        // Tap effect
         EmitEffect(note.transform.position, result, note.GetComponent<NoteBase>().type);
 
+        // Update score
         JudgeResultController.controller.DisplayJudgeResult(result);
         scoreDisplay.SetScore(normalizedScore);
+
+        // Update combo
+        ComboManager.manager.UpdateCombo(result);
     }
 
     private void OnTouch(int audioTime, int lane, Touch touch)
