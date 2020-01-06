@@ -121,7 +121,7 @@ public static class ChartLoader
                 time = (int)(time * 1000),
                 lane = note.lane,
                 type = type,
-                isGray = type == GameNoteType.Normal && note.beat[2] <= 2
+                isGray = type == GameNoteType.Normal && note.beat[2] > 2
             };
             if (note.tickStack == -1)
             {

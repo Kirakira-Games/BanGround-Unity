@@ -134,6 +134,7 @@ public class Slide : MonoBehaviour
         foreach (NoteBase note in GetComponentsInChildren<NoteBase>())
         {
             note.GetComponentInChildren<SlideMesh>()?.OnUpdate();
+            note.GetComponentInChildren<TapEffect>()?.OnUpdate();
         }
     }
 
@@ -187,7 +188,12 @@ public class Slide : MonoBehaviour
             BindTouch(touch);
         }
         NoteController.controller.Judge(note, result, touch);
-        if (judgeHead > 0)
+        if (judgeHead == 0)
+        {
+            var obj = Instantiate(Resources.Load("Effects/effect_TapKeep"), noteHead.transform) as GameObject;
+            obj.AddComponent<TapEffect>();
+        }
+        else
         {
             note.gameObject.SetActive(false);
         }

@@ -32,10 +32,10 @@ public class NoteMesh
         float delta = (lane - 3) * 0.1f;
         Vector3[] vertices = new Vector3[]
         {
-            new Vector3(-1 + delta, -0.5f),
-            new Vector3(1 + delta, -0.5f),
-            new Vector3(-1 - delta, 0.5f),
-            new Vector3(1 - delta, 0.5f)
+            new Vector3(-1 + delta, -0.4f),
+            new Vector3(1 + delta, -0.4f),
+            new Vector3(-1 - delta, 0.4f),
+            new Vector3(1 - delta, 0.4f)
         };
         Mesh mesh = new Mesh
         {
