@@ -89,6 +89,7 @@ public class NoteController : MonoBehaviour
             audioMgr.PlaySE(SE_GOOD);
 
         var fx = Instantiate(Resources.Load(effect), pos, Quaternion.identity) as GameObject;
+        fx.transform.localScale = Vector3.one * LiveSetting.noteSize * NoteUtility.NOTE_SCALE;
         StartCoroutine(KillFX(fx, 0.5f));
     }
 

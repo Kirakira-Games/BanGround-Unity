@@ -11,7 +11,7 @@ public class SlideMesh : MonoBehaviour
     private Vector3[] meshVertices;
 
     public Transform afterNoteTrans;
-    public const float BODY_WIDTH = 0.7f;
+    public const float BODY_WIDTH = 0.6f;
 
     public static SlideMesh Create(Transform start, Transform after)
     {
