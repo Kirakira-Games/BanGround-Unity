@@ -17,7 +17,6 @@ public class GameNoteData
 {
     public int time;
     public int lane;
-    public int syncLane = -1;
     public GameNoteType type;
     public bool isGray;
     public List<GameNoteData> seg;
