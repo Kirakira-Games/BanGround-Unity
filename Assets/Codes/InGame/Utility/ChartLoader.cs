@@ -108,7 +108,7 @@ public static class ChartLoader
             {
                 // Note is a timing point
                 float beatDuration = 60 / note.value;
-                startTime += (beat - startDash) * beatDuration;
+                startTime += (beat - startDash) * 60 / currentBpm;
                 startDash = GetFloatingPointBeat(note.beat);
                 currentBpm = note.value;
                 continue;
@@ -158,6 +158,43 @@ public static class ChartLoader
         {
             Debug.LogError("Some slides do not contain a tail. Ignored.");
         }
+        /*
+        gameNotes = new List<GameNoteData>
+        {
+            new GameNoteData
+            {
+                time = 1000,
+                type = GameNoteType.SlideStart,
+                seg = new List<GameNoteData>()
+                {
+                    new GameNoteData
+                    {
+                        time = 1000,
+                        type = GameNoteType.SlideStart,
+                        lane = 0
+                    },
+                    new GameNoteData
+                    {
+                        time = 2000,
+                        type = GameNoteType.SlideTick,
+                        lane = 1
+                    },
+                    new GameNoteData
+                    {
+                        time = 3000,
+                        type = GameNoteType.SlideTick,
+                        lane = 2
+                    },
+                    new GameNoteData
+                    {
+                        time = 4000,
+                        type = GameNoteType.SlideEnd,
+                        lane = 3
+                    }
+                }
+            }
+        };
+        */
         return gameNotes;
     }
 }

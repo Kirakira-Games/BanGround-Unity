@@ -307,7 +307,7 @@ public class NoteController : MonoBehaviour
         }
         controller = this;
         // Load chart
-        notes = ChartLoader.LoadNotesFromFile("TestCharts/0");
+        notes = ChartLoader.LoadNotesFromFile("TestCharts/128");
         noteHead = 0;
         // Compute score
         maxScore = 0;
@@ -331,7 +331,7 @@ public class NoteController : MonoBehaviour
         SE_FLICK = audioMgr.PrecacheSound(Resources.Load<TextAsset>("TestAssets/SoundEffects/note_flick.wav"));
         SE_CLICK = audioMgr.PrecacheSound(Resources.Load<TextAsset>("TestAssets/SoundEffects/game_button.wav"));
 
-        var BGM = audioMgr.PrecacheSound(Resources.Load<TextAsset>("TestCharts/0.mp3"));
+        var BGM = audioMgr.PrecacheSound(Resources.Load<TextAsset>("TestCharts/bgm128.wav"));
         audioMgr.PlayBGM(BGM);
     }
 

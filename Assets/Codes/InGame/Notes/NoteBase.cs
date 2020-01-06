@@ -34,7 +34,10 @@ public abstract class NoteBase : MonoBehaviour
         int timeSub = time - audioTime;
 
         Vector3 newPos = _cachedInitPos;
-        newPos.z = initPos.z - (NoteUtility.NOTE_START_POS - NoteUtility.NOTE_JUDGE_POS) * (1 - (float)timeSub / LiveSetting.NoteScreenTime);
+        float ratio = 1 - (float)timeSub / LiveSetting.NoteScreenTime;
+        if (LiveSetting.bangPerspective)
+            ratio = NoteUtility.GetBangPerspective(ratio);
+        newPos.z = initPos.z - (NoteUtility.NOTE_START_POS - NoteUtility.NOTE_JUDGE_POS) * ratio;
         transform.position = newPos;
     }
 

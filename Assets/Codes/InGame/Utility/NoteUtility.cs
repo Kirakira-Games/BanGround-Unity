@@ -36,11 +36,16 @@ public enum JudgeResult
 public static class NoteUtility
 {
     public const int LANE_COUNT = 7;
-    public const float NOTE_START_POS = 365;
+    public const float NOTE_START_POS = 420;
     public const float NOTE_JUDGE_POS = 20;
     public const float NOTE_Y_POS = -105.5f;
     public const float LANE_WIDTH = 1.366f;
     public const float NOTE_SCALE = 0.8f;
+
+    public const float BANG_PERSPECTIVE_EXP = 15f;
+    public const float BANG_PERSPECTIVE_CONST = 0.5f;
+    public static readonly float BANG_PERSPECTIVE_START = Mathf.Pow(BANG_PERSPECTIVE_EXP, BANG_PERSPECTIVE_CONST);
+    public static readonly float BANG_PERSPECTIVE_END = BANG_PERSPECTIVE_START - Mathf.Pow(BANG_PERSPECTIVE_EXP, BANG_PERSPECTIVE_CONST - 1);
 
     public static readonly int[] TAP_JUDGE_RANGE = { 50, 100, 117, 133 };
     public static readonly int[] SLIDE_END_JUDGE_RANGE = { 67, 117, 133, 150 };
@@ -106,5 +111,10 @@ public static class NoteUtility
     public static bool IsTouchEnd(Touch touch)
     {
         return touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled;
+    }
+
+    public static float GetBangPerspective(float x)
+    {
+        return (BANG_PERSPECTIVE_START - Mathf.Pow(BANG_PERSPECTIVE_EXP, BANG_PERSPECTIVE_CONST - x)) / BANG_PERSPECTIVE_END;
     }
 }
