@@ -11,24 +11,13 @@ public class NoteController : MonoBehaviour
     private List<GameNoteData> notes;
     private int noteHead;
     private GradeColorChange scoreDisplay;
-    private int maxScore;
-    private int score;
+    private int numNotes;
     private AudioManager audioMgr;
     private FMOD.Sound SE_PERFECT;
     private FMOD.Sound SE_GREAT;
     private FMOD.Sound SE_GOOD;
     private FMOD.Sound SE_CLICK;
     private FMOD.Sound SE_FLICK;
-
-
-    private float normalizedScore
-    {
-        get
-        {
-            if (maxScore == 0) return 0;
-            return (float)score / maxScore;
-        }
-    }
 
     public void RegisterTouch(int id, GameObject obj)
     {
@@ -107,14 +96,12 @@ public class NoteController : MonoBehaviour
             Debug.LogWarning("'None' cannot be final judge result. Recognized as 'Miss'.");
             result = JudgeResult.Miss;
         }
-        score += (int)JudgeResult.Miss - (int)result;
 
         // Tap effect
         EmitEffect(note.transform.position, result, note.GetComponent<NoteBase>().type);
 
         // Update score
         JudgeResultController.controller.DisplayJudgeResult(result);
-        scoreDisplay.SetScore(normalizedScore);
 
         // Update combo
         ComboManager.manager.UpdateCombo(result);
@@ -315,20 +302,21 @@ public class NoteController : MonoBehaviour
         // Load chart
         notes = ChartLoader.LoadNotesFromFile("TestCharts/128");
         noteHead = 0;
-        // Compute score
-        maxScore = 0;
-        score = 0;
+        // Compute number of notes
+        numNotes = 0;
         foreach (GameNoteData note in notes)
         {
             if (note.type == GameNoteType.SlideStart)
             {
-                maxScore += (int)JudgeResult.Miss * note.seg.Count;
+                numNotes += note.seg.Count;
             } else
             {
-                maxScore += (int)JudgeResult.Miss;
+                numNotes++;
             }
         }
+        ComboManager.manager.Init(numNotes);
 
+        // Init AudioManager
         audioMgr = GetComponent<AudioManager>();
 
         SE_PERFECT = audioMgr.PrecacheSound(Resources.Load<TextAsset>("TestAssets/SoundEffects/note_perfect.wav"));
