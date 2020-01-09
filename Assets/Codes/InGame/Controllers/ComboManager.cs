@@ -51,12 +51,12 @@ public class ComboManager : MonoBehaviour
                 combo[i] = 0;
             }
         }
-        score += 1 + combo[0] / 50 * 0.005 + combo[1] / 100 * 0.005;
+        score += (double)accRate[intResult] / accRate[0] + combo[0] / 50 * 0.005 + combo[1] / 100 * 0.005;
         if (score > maxScore)
         {
             score = maxScore;
         }
-        scoreDisplay.SetScore(score / maxScore, (float)acc / maxAcc);
+        scoreDisplay.SetScore(score / maxScore, (double)acc / maxAcc);
     }
 
     private static double Accumulate(int segSize, double segDelta, int num)

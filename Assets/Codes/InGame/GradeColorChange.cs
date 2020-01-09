@@ -5,10 +5,8 @@ using UnityEngine.UI;
 
 public class GradeColorChange : MonoBehaviour
 {
-    public Color[] Colors;
-
-    public readonly string[] Texts = { "SSS", "SS", "S", "A", "B", "C", "D", "F" };
-    public readonly float[] GradeDiff = { 0.998f, 0.99f, 0.97f, 0.94f, 0.90f, 0.85f, 0.6f, 0f };
+    public Color startColor;
+    public Color endColor;
     
     Slider sld;
     Image fill;
@@ -27,25 +25,18 @@ public class GradeColorChange : MonoBehaviour
         scoreTxt = GameObject.Find("ScoreText").GetComponent<Text>();
     }
 
-    public void SetScore(double _score, float _acc)
+    public void SetScore(double _score, double _acc)
     {
         score = _score;
-        sld.value = _acc;
-        for (int i = 0; i < GradeDiff.Length; i++)
-        {
-            if (_acc >= GradeDiff[i])
-            {
-                fill.color = Colors[i];
-                txt.text = Texts[i];
-                break;
-            }
-        }
+        sld.value = (float)_score;
+        txt.text = string.Format("{0:P2}", _acc);
     }
 
     void ScoreAddAnimation() {
         if (displayScore < score)
             displayScore += (score - displayScore) * 0.5;
         scoreTxt.text = string.Format("{0:0000000}", displayScore * 1000000);
+        fill.color = startColor * (float)(1 - displayScore) + endColor * (float)displayScore;
     }
 
     private void Update()
