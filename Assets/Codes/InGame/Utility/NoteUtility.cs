@@ -114,6 +114,9 @@ public static class NoteUtility
 
     public static float GetBangPerspective(float x)
     {
+        if (x <= 0) return 0;
+        if (x >= 1) return x;
+        return (1 - Mathf.Cos(x * Mathf.PI * 0.95f)) / (1 - Mathf.Cos(0.95f * Mathf.PI));
         return (BANG_PERSPECTIVE_START - Mathf.Pow(BANG_PERSPECTIVE_EXP, BANG_PERSPECTIVE_CONST - x)) / BANG_PERSPECTIVE_END;
     }
 }
