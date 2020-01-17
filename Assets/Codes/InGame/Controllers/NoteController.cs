@@ -329,7 +329,7 @@ public class NoteController : MonoBehaviour
         audioMgr.PlayBGM(BGM);
     }
 
-    void Update()
+    void FixedUpdate()
     {
         int audioTime = audioMgr.GetBGMPlaybackTime();
         // Create notes

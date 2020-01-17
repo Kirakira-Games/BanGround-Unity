@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Collections;
 using UnityEngine;
 using FMOD;
 using System.Runtime.InteropServices;
+using UnityEngine.SceneManagement;
 
 class AudioManager : MonoBehaviour
 {
@@ -15,6 +16,8 @@ class AudioManager : MonoBehaviour
     Channel CurrentBGMChannel;
 
     List<Sound> LoadedSound = new List<Sound>();
+
+    bool loading = false;
 
     void Awake()
     {
@@ -29,6 +32,12 @@ class AudioManager : MonoBehaviour
     void Update()
     {
         System.update();
+
+        if (!loading && !GetPlayStatus())
+        {
+            loading = true;
+            StartCoroutine(ShowResult());
+        }
     }
 
     public Sound PrecacheSound(TextAsset asset)
@@ -105,6 +114,20 @@ class AudioManager : MonoBehaviour
         CurrentBGMChannel.getPosition(out pos, TIMEUNIT.MS);
 
         return (int)pos + LiveSetting.audioOffset;
+    }
+
+    public bool GetPlayStatus()
+    {
+        bool isPlaying;
+        CurrentBGMChannel.isPlaying(out isPlaying);
+        //UnityEngine.Debug.Log(isPlaying);
+        return isPlaying;
+    }
+
+    IEnumerator ShowResult()
+    {
+        yield return new WaitForSeconds(2);
+        SceneManager.LoadSceneAsync("Result");
     }
 
     void OnApplicationQuit()

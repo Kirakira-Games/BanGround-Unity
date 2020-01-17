@@ -11,6 +11,7 @@ public class ComboManager : MonoBehaviour
     public static double maxScore;
     public static int acc;
     public static int maxAcc;
+    public static int noteCount;
     public static ComboManager manager;
 
     private int[] combo;
@@ -76,6 +77,7 @@ public class ComboManager : MonoBehaviour
             maxAcc = 1;
             return;
         }
+        noteCount = numNotes;
         maxScore = numNotes + Accumulate(50, 0.005, numNotes) + Accumulate(100, 0.005, numNotes);
     }
 
