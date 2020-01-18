@@ -9,6 +9,7 @@ public class NoteController : MonoBehaviour
     private Dictionary<int, GameObject> touchTable;
     private Dictionary<int, NoteSyncLine> syncTable;
     private List<GameNoteData> notes;
+    private Header header;
     private int noteHead;
     private GradeColorChange scoreDisplay;
     private int numNotes;
@@ -300,7 +301,8 @@ public class NoteController : MonoBehaviour
         }
         controller = this;
         // Load chart
-        notes = ChartLoader.LoadNotesFromFile("TestCharts/128");
+        notes = ChartLoader.LoadNotesFromFile(LiveSetting.testChart);
+        header = ChartLoader.LoadHeaderFromFile(LiveSetting.testHeader);
         noteHead = 0;
         // Compute number of notes
         numNotes = 0;
@@ -325,7 +327,7 @@ public class NoteController : MonoBehaviour
         SE_FLICK = audioMgr.PrecacheSound(Resources.Load<TextAsset>("TestAssets/SoundEffects/note_flick.wav"));
         SE_CLICK = audioMgr.PrecacheSound(Resources.Load<TextAsset>("TestAssets/SoundEffects/game_button.wav"));
 
-        var BGM = audioMgr.PrecacheSound(Resources.Load<TextAsset>("TestCharts/bgm128.wav"));
+        var BGM = audioMgr.PrecacheSound(Resources.Load<TextAsset>(LiveSetting.testMusic));
         audioMgr.PlayBGM(BGM);
     }
 

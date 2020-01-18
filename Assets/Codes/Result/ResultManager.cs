@@ -19,6 +19,8 @@ public class ResultManager : MonoBehaviour
     private RawImage rankIcon;
     private RawImage markIcon;
 
+    private const string IconPath = "UI/v3/";
+
     void Start()
     {
         GetResultObjectAndComponent();
@@ -59,31 +61,35 @@ public class ResultManager : MonoBehaviour
         double acc = ComboManager.acc / (double)ComboManager.maxAcc;
         Texture2D rank;
         if (acc >= 0.998)
-            rank = Resources.Load("UI/icons/SSS") as Texture2D;
+            rank = Resources.Load(IconPath + "SSS") as Texture2D;
         else if (acc >= 0.99)
-            rank = Resources.Load("UI/icons/SS") as Texture2D;
+            rank = Resources.Load(IconPath + "SS") as Texture2D;
         else if (acc >= 0.97)
-            rank = Resources.Load("UI/icons/S") as Texture2D;
+            rank = Resources.Load(IconPath + "S") as Texture2D;
         else if (acc >= 0.94)
-            rank = Resources.Load("UI/icons/A") as Texture2D;
+            rank = Resources.Load(IconPath + "A") as Texture2D;
         else if (acc >= 0.90)
-            rank = Resources.Load("UI/icons/B") as Texture2D;
+            rank = Resources.Load(IconPath + "B") as Texture2D;
         else if (acc >= 0.85)
-            rank = Resources.Load("UI/icons/C") as Texture2D;
+            rank = Resources.Load(IconPath + "C") as Texture2D;
         else if (acc >= 0.60)
-            rank = Resources.Load("UI/icons/D") as Texture2D;
+            rank = Resources.Load(IconPath + "D") as Texture2D;
         else
-            rank = Resources.Load("UI/icons/Fail") as Texture2D;
+            rank = Resources.Load(IconPath + "F") as Texture2D;
         rankIcon.texture = rank;
 
         //Set Mark
         if (ComboManager.judgeCount[(int)JudgeResult.Perfect] == ComboManager.noteCount)
         {
-            markIcon.texture = Resources.Load("UI/icons/AP") as Texture2D;
+            markIcon.texture = Resources.Load(IconPath + "AP") as Texture2D;
         }
-        else if (ComboManager.maxCombo[(int)JudgeResult.Great] == ComboManager.noteCount) 
+        else if (ComboManager.maxCombo[(int)JudgeResult.Great] == ComboManager.noteCount)
         {
-            markIcon.texture = Resources.Load("UI/icons/FC") as Texture2D;
+            markIcon.texture = Resources.Load(IconPath + "FC") as Texture2D;
+        }
+        else if (acc >= 0.60) 
+        {
+            markIcon.texture = Resources.Load(IconPath + "CL") as Texture2D;
         }
         else
         {

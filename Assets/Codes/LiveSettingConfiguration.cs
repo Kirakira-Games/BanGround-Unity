@@ -28,6 +28,10 @@ public static class LiveSetting
 
     private static float cachedSpeed = 0;
     private static int cachedScreenTime = 0;
+
+    public const string testChart = "TestCharts/6125/0";
+    public const string testHeader = "TestCharts/6125/header";
+    public const string testMusic = "TestCharts/6125/bgm.mp3";
     
     public static int NoteScreenTime
     {
