@@ -7,7 +7,7 @@ public static class LiveSetting
     public static int judgeOffset = 0;
     public static int audioOffset = 0;
 
-    public static float noteSpeed = 10.0f;
+    public static float noteSpeed = 10.8f;
     public static float noteSize = 1f;
     public static float meshSize = .75f;
     public static float meshOpacity = .6f;
@@ -29,9 +29,10 @@ public static class LiveSetting
     private static float cachedSpeed = 0;
     private static int cachedScreenTime = 0;
 
-    public const string testChart = "TestCharts/6125/0";
-    public const string testHeader = "TestCharts/6125/header";
-    public const string testMusic = "TestCharts/6125/bgm.mp3";
+    public const string testChart = "TestCharts/{0}/0";
+    public const string testHeader = "TestCharts/{0}/header";
+    public const string testMusic = "TestCharts/{0}/bgm";
+    public static string selected = "";
     
     public static int NoteScreenTime
     {

@@ -301,8 +301,8 @@ public class NoteController : MonoBehaviour
         }
         controller = this;
         // Load chart
-        notes = ChartLoader.LoadNotesFromFile(LiveSetting.testChart);
-        header = ChartLoader.LoadHeaderFromFile(LiveSetting.testHeader);
+        notes = ChartLoader.LoadNotesFromFile(string.Format(LiveSetting.testChart, LiveSetting.selected));
+        //header = ChartLoader.LoadHeaderFromFile(string.Format(LiveSetting.testHeader, LiveSetting.selected));
         noteHead = 0;
         // Compute number of notes
         numNotes = 0;
@@ -327,11 +327,11 @@ public class NoteController : MonoBehaviour
         SE_FLICK = audioMgr.PrecacheSound(Resources.Load<TextAsset>("TestAssets/SoundEffects/note_flick.wav"));
         SE_CLICK = audioMgr.PrecacheSound(Resources.Load<TextAsset>("TestAssets/SoundEffects/game_button.wav"));
 
-        var BGM = audioMgr.PrecacheSound(Resources.Load<TextAsset>(LiveSetting.testMusic));
+        var BGM = audioMgr.PrecacheSound(Resources.Load<TextAsset>(string.Format(LiveSetting.testMusic, LiveSetting.selected)));
         audioMgr.PlayBGM(BGM);
     }
 
-    void FixedUpdate()
+    void Update()
     {
         int audioTime = audioMgr.GetBGMPlaybackTime();
         // Create notes

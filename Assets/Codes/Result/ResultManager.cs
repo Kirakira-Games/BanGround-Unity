@@ -7,6 +7,9 @@ using System;
 
 public class ResultManager : MonoBehaviour
 {
+    private Button button_back;
+    private Button button_retry;
+
     private Text score;
     private Text score_delta;
     private Text perfect;
@@ -23,9 +26,26 @@ public class ResultManager : MonoBehaviour
 
     void Start()
     {
+        SetBtnObject();
         GetResultObjectAndComponent();
         ShowScore();
         ShowRank();
+    }
+
+    private void SetBtnObject()
+    {
+        button_back = GameObject.Find("Button_back").GetComponent<Button>();
+        button_retry = GameObject.Find("Button_retry").GetComponent<Button>();
+
+        button_back.onClick.AddListener(() =>
+        {
+            SceneManager.LoadSceneAsync("Select");
+        });
+
+        button_retry.onClick.AddListener(() =>
+        {
+            SceneManager.LoadSceneAsync("InGame");
+        });
     }
 
     private void GetResultObjectAndComponent()
