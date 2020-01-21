@@ -321,11 +321,11 @@ public class NoteController : MonoBehaviour
         // Init AudioManager
         audioMgr = GetComponent<AudioManager>();
 
-        SE_PERFECT = audioMgr.PrecacheSound(Resources.Load<TextAsset>("TestAssets/SoundEffects/note_perfect.wav"));
-        SE_GREAT = audioMgr.PrecacheSound(Resources.Load<TextAsset>("TestAssets/SoundEffects/note_great.wav"));
-        SE_GOOD = audioMgr.PrecacheSound(Resources.Load<TextAsset>("TestAssets/SoundEffects/note_good.wav"));
-        SE_FLICK = audioMgr.PrecacheSound(Resources.Load<TextAsset>("TestAssets/SoundEffects/note_flick.wav"));
-        SE_CLICK = audioMgr.PrecacheSound(Resources.Load<TextAsset>("TestAssets/SoundEffects/game_button.wav"));
+        SE_PERFECT = audioMgr.PrecacheSound(Resources.Load<TextAsset>("SoundEffects/perfect.wav"));
+        SE_GREAT = audioMgr.PrecacheSound(Resources.Load<TextAsset>("SoundEffects/great.wav"));
+        SE_GOOD = audioMgr.PrecacheSound(Resources.Load<TextAsset>("SoundEffects/empty.wav"));
+        SE_FLICK = audioMgr.PrecacheSound(Resources.Load<TextAsset>("SoundEffects/flick.wav"));
+        SE_CLICK = audioMgr.PrecacheSound(Resources.Load<TextAsset>("SoundEffects/empty.wav"));
 
         var BGM = audioMgr.PrecacheSound(Resources.Load<TextAsset>(string.Format(LiveSetting.testMusic, LiveSetting.selected)));
         audioMgr.PlayBGM(BGM);

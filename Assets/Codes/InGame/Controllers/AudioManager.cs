@@ -25,6 +25,7 @@ class AudioManager : MonoBehaviour
         var result = System.init(1024, INITFLAGS.NORMAL, IntPtr.Zero);
 
         result = System.createChannelGroup("SoundEffects", out SEChannelGroup);
+        SEChannelGroup.setVolume(LiveSetting.seVolume);
 
         result = System.createChannelGroup("BackgroundMuisc", out BGMChannelGroup);
     }
