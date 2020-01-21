@@ -327,8 +327,17 @@ public class NoteController : MonoBehaviour
         SE_FLICK = audioMgr.PrecacheSound(Resources.Load<TextAsset>("SoundEffects/flick.wav"));
         SE_CLICK = audioMgr.PrecacheSound(Resources.Load<TextAsset>("SoundEffects/empty.wav"));
 
+        StartCoroutine(DelayPlayBGM());
+    }
+
+    IEnumerator DelayPlayBGM()
+    {
         var BGM = audioMgr.PrecacheSound(Resources.Load<TextAsset>(string.Format(LiveSetting.testMusic, LiveSetting.selected)));
+        //bgm will not start untill the gate open
+        audioMgr.loading = true;
+        yield return new WaitForSeconds(2f);
         audioMgr.PlayBGM(BGM);
+        audioMgr.loading = false;
     }
 
     void Update()

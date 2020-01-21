@@ -5,6 +5,7 @@ using UnityEngine;
 using FMOD;
 using System.Runtime.InteropServices;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 class AudioManager : MonoBehaviour
 {
@@ -17,7 +18,7 @@ class AudioManager : MonoBehaviour
 
     List<Sound> LoadedSound = new List<Sound>();
 
-    bool loading = false;
+    public bool loading = true;//bgm will not start untill the gate open
 
     void Awake()
     {
@@ -104,7 +105,7 @@ class AudioManager : MonoBehaviour
         Channel channel;
         
         System.playSound(sound, BGMChannelGroup, false, out channel);
-
+        
         CurrentBGMChannel = channel;
         return channel;
     }
@@ -127,6 +128,23 @@ class AudioManager : MonoBehaviour
 
     IEnumerator ShowResult()
     {
+        Text gateTxt = GameObject.Find("GateText").GetComponent<Text>();
+        switch (ResultsGetter.GetClearMark())
+        {
+            case ClearMarks.AP:
+                gateTxt.text = "ALL PERFECT";//TODO:switch to image
+                break;
+            case ClearMarks.FC:
+                gateTxt.text = "FULL COMBO";//TODO:switch to image
+                break;
+            case ClearMarks.CL:
+                gateTxt.text = "CLEAR";//TODO:switch to image
+                break;
+            case ClearMarks.F:
+                gateTxt.text = "FAILED";//TODO:switch to image
+                break;
+        }
+        GameObject.Find("GateCanvas").GetComponent<Animator>().SetBool("SongOver", true);
         yield return new WaitForSeconds(2);
         SceneManager.LoadSceneAsync("Result");
     }

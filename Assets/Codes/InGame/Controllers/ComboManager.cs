@@ -90,6 +90,6 @@ public class ComboManager : MonoBehaviour
 
     void Update()
     {
-        comboText.text = string.Format("{0:D4}", combo[0]);
+        comboText.text = string.Format("{0:D4}", combo[1]);
     }
 }
