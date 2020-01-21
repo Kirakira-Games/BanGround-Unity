@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-//挂在了相机上
 public class SelectManager : MonoBehaviour
 {
     private Button enter_Btn;
@@ -16,9 +15,13 @@ public class SelectManager : MonoBehaviour
     private InputField size_Input;
     private InputField seVolume_Input;
 
+    private Animator scene_Animator;
+
     // Start is called before the first frame update
     void Start()
     {
+        scene_Animator = GameObject.Find("SceneAnimator").GetComponent<Animator>();
+
         enter_Btn = GameObject.Find("Enter_Btn").GetComponent<Button>();
         selectGroup = GameObject.Find("Select_Group").GetComponent<ToggleGroup>();
 
@@ -28,6 +31,7 @@ public class SelectManager : MonoBehaviour
         size_Input = GameObject.Find("Size_Input").GetComponent<InputField>();
         seVolume_Input = GameObject.Find("SeVolume_Input").GetComponent<InputField>();
 
+        
         speed_Input.text = LiveSetting.noteSpeed.ToString();
         judge_Input.text = LiveSetting.judgeOffset.ToString();
         audio_Input.text = LiveSetting.audioOffset.ToString();
@@ -49,9 +53,17 @@ public class SelectManager : MonoBehaviour
             LiveSetting.noteSize = float.Parse(size_Input.text);
             LiveSetting.seVolume = float.Parse(seVolume_Input.text);
 
-            SceneManager.LoadScene("InGame");
+            scene_Animator.Play("OutPlay", -1, 0);
+            StartCoroutine(DelayLoadScene());
+            
         });
 
+    }
+
+    IEnumerator DelayLoadScene()
+    {
+        yield return new WaitForSeconds(2f);
+        SceneManager.LoadSceneAsync("InGame");
     }
 
 }

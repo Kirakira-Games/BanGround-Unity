@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ComboManager : MonoBehaviour
 {
@@ -15,6 +16,9 @@ public class ComboManager : MonoBehaviour
     public static ComboManager manager;
 
     private int[] combo;
+
+    private Text comboText;
+    private Animator comboAnimator;
     private GradeColorChange scoreDisplay;
 
     private void Awake()
@@ -32,6 +36,8 @@ public class ComboManager : MonoBehaviour
     private void Start()
     {
         scoreDisplay = GameObject.Find("Grades").GetComponent<GradeColorChange>();
+        comboText = GameObject.Find("Combo_Nmber").GetComponent<Text>();
+        comboAnimator = GameObject.Find("Combos").GetComponent<Animator>();
     }
 
     public void UpdateCombo(JudgeResult result)
@@ -46,6 +52,7 @@ public class ComboManager : MonoBehaviour
             {
                 combo[i]++;
                 maxCombo[i] = Mathf.Max(maxCombo[i], combo[i]);
+                comboAnimator.Play("Play", -1, 0);
             }
             else
             {
@@ -83,6 +90,6 @@ public class ComboManager : MonoBehaviour
 
     void Update()
     {
-        // TODO
+        comboText.text = string.Format("{0:D4}", combo[0]);
     }
 }
