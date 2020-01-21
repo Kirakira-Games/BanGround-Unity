@@ -13,6 +13,7 @@ public class SelectManager : MonoBehaviour
     private InputField speed_Input;
     private InputField judge_Input;
     private InputField audio_Input;
+    private InputField size_Input;
 
     // Start is called before the first frame update
     void Start()
@@ -23,10 +24,12 @@ public class SelectManager : MonoBehaviour
         speed_Input = GameObject.Find("Speed_Input").GetComponent<InputField>();
         judge_Input = GameObject.Find("Judge_Input").GetComponent<InputField>();
         audio_Input = GameObject.Find("Audio_Input").GetComponent<InputField>();
+        size_Input = GameObject.Find("Size_Input").GetComponent<InputField>();
 
         speed_Input.text = LiveSetting.noteSpeed.ToString();
         judge_Input.text = LiveSetting.judgeOffset.ToString();
         audio_Input.text = LiveSetting.audioOffset.ToString();
+        size_Input.text = LiveSetting.noteSize.ToString();
 
         enter_Btn.onClick.AddListener(() =>
         {
@@ -40,6 +43,7 @@ public class SelectManager : MonoBehaviour
             LiveSetting.noteSpeed = float.Parse(speed_Input.text);
             LiveSetting.judgeOffset = int.Parse(judge_Input.text);
             LiveSetting.audioOffset = int.Parse(audio_Input.text);
+            LiveSetting.noteSize = float.Parse(size_Input.text);
 
             SceneManager.LoadScene("InGame");
         });
