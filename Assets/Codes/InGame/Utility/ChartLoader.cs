@@ -68,6 +68,7 @@ public static class ChartLoader
     public static Header LoadHeaderFromFile(string path)
     {
         TextAsset headerText = Resources.Load<TextAsset>(path);
+        if (headerText == null) return null;
         return JsonConvert.DeserializeObject<Header>(headerText.text);
     }
 

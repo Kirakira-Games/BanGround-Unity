@@ -23,6 +23,6 @@ public class NoteCamera : MonoBehaviour
         renderTarget.height = size;
         renderTarget.width = size;
 
-        Debug.Log(size);
+        Debug.LogWarning("render size = " + size);
     }
 }

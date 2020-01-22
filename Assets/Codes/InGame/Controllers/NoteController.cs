@@ -9,7 +9,6 @@ public class NoteController : MonoBehaviour
     private Dictionary<int, GameObject> touchTable;
     private Dictionary<int, NoteSyncLine> syncTable;
     private List<GameNoteData> notes;
-    private Header header;
     private int noteHead;
     private GradeColorChange scoreDisplay;
     private int numNotes;
@@ -302,7 +301,6 @@ public class NoteController : MonoBehaviour
         controller = this;
         // Load chart
         notes = ChartLoader.LoadNotesFromFile(string.Format(LiveSetting.testChart, LiveSetting.selected));
-        //header = ChartLoader.LoadHeaderFromFile(string.Format(LiveSetting.testHeader, LiveSetting.selected));
         noteHead = 0;
         // Compute number of notes
         numNotes = 0;

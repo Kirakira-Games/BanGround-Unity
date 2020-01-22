@@ -10,14 +10,21 @@ public class ResultManager : MonoBehaviour
     private Button button_back;
     private Button button_retry;
 
-    private Text score;
-    private Text score_delta;
-    private Text perfect;
-    private Text great;
-    private Text good;
-    private Text bad;
-    private Text miss;
-    private Text maxCombo;
+    private Text score_Text;
+    private Text score_delta_Text;
+    private Text perfect_Text;
+    private Text great_Text;
+    private Text good_Text;
+    private Text bad_Text;
+    private Text miss_Text;
+    private Text maxCombo_Text;
+
+    private Text level_Text;
+    private Text songName_Text;
+    private Text acc_Text;
+
+    private Chart chart;
+    private Header header;
 
     private RawImage rankIcon;
     private RawImage markIcon;
@@ -33,13 +40,13 @@ public class ResultManager : MonoBehaviour
         GetResultObjectAndComponent();
         ShowScore();
         ShowRank();
-        
+        ShowSongInfo();
     }
 
     IEnumerator ReadRank()
     {
         yield return new WaitForSeconds(0.8f);
-        print("read");
+        //print("read");
         AudioSource audioSource = GetComponent<AudioSource>();
 
         audioSource.clip = voices[0];
@@ -107,14 +114,18 @@ public class ResultManager : MonoBehaviour
 
     private void GetResultObjectAndComponent()
     {
-        score = GameObject.Find("Score").GetComponent<Text>();
-        score_delta = GameObject.Find("Score_delta").GetComponent<Text>();
-        perfect = GameObject.Find("Per_count").GetComponent<Text>();
-        great = GameObject.Find("Gre_count").GetComponent<Text>();
-        good = GameObject.Find("God_count").GetComponent<Text>();
-        bad = GameObject.Find("Bad_count").GetComponent<Text>();
-        miss = GameObject.Find("Mis_count").GetComponent<Text>();
-        maxCombo = GameObject.Find("Mxm_Comb_count").GetComponent<Text>();
+        score_Text = GameObject.Find("Score").GetComponent<Text>();
+        score_delta_Text = GameObject.Find("Score_delta").GetComponent<Text>();
+        perfect_Text = GameObject.Find("Per_count").GetComponent<Text>();
+        great_Text = GameObject.Find("Gre_count").GetComponent<Text>();
+        good_Text = GameObject.Find("God_count").GetComponent<Text>();
+        bad_Text = GameObject.Find("Bad_count").GetComponent<Text>();
+        miss_Text = GameObject.Find("Mis_count").GetComponent<Text>();
+        maxCombo_Text = GameObject.Find("Mxm_Comb_count").GetComponent<Text>();
+
+        level_Text = GameObject.Find("Level").GetComponent<Text>();
+        songName_Text = GameObject.Find("SongName").GetComponent<Text>();
+        acc_Text = GameObject.Find("Acc").GetComponent<Text>();
 
         rankIcon = GameObject.Find("RankIcon").GetComponent<RawImage>();
         markIcon = GameObject.Find("MarkIcon").GetComponent<RawImage>();
@@ -122,14 +133,14 @@ public class ResultManager : MonoBehaviour
 
     public void ShowScore()
     {
-        score.text = string.Format("{0:0000000}", ComboManager.score / ComboManager.maxScore * 1000000);
-        score_delta.text = "Not Implemented";
-        perfect.text = ComboManager.judgeCount[(int)JudgeResult.Perfect].ToString();
-        great.text = ComboManager.judgeCount[(int)JudgeResult.Great].ToString();
-        good.text = ComboManager.judgeCount[(int)JudgeResult.Good].ToString();
-        bad.text = ComboManager.judgeCount[(int)JudgeResult.Bad].ToString();
-        miss.text = ComboManager.judgeCount[(int)JudgeResult.Miss].ToString();
-        maxCombo.text = ComboManager.maxCombo[(int)JudgeResult.Great].ToString();
+        score_Text.text = string.Format("{0:0000000}", ComboManager.score / ComboManager.maxScore * 1000000);
+        score_delta_Text.text = "Not Implemented";
+        perfect_Text.text = ComboManager.judgeCount[(int)JudgeResult.Perfect].ToString();
+        great_Text.text = ComboManager.judgeCount[(int)JudgeResult.Great].ToString();
+        good_Text.text = ComboManager.judgeCount[(int)JudgeResult.Good].ToString();
+        bad_Text.text = ComboManager.judgeCount[(int)JudgeResult.Bad].ToString();
+        miss_Text.text = ComboManager.judgeCount[(int)JudgeResult.Miss].ToString();
+        maxCombo_Text.text = ComboManager.maxCombo[(int)JudgeResult.Great].ToString();
     }
 
     private void ShowRank()
@@ -183,15 +194,26 @@ public class ResultManager : MonoBehaviour
                 break;
         }
     }
+
+    private void ShowSongInfo()
+    {
+        chart = ChartLoader.LoadChartFromFile(string.Format(LiveSetting.testChart, LiveSetting.selected));
+        header = ChartLoader.LoadHeaderFromFile(string.Format(LiveSetting.testHeader, LiveSetting.selected));
+        double acc = ComboManager.acc / (double)ComboManager.maxAcc;
+
+        level_Text.text = Enum.GetName(typeof(Difficulty), chart.difficulty).ToUpper() + " " + chart.level.ToString();
+        songName_Text.text = header?.TitleUnicode;
+        acc_Text.text = string.Format("{0:P2}", acc);
+    }
 }
 
 enum ClearMarks { AP,FC,CL,F};
 enum Ranks { SSS,SS,S,A,B,C,D,F};
 static class ResultsGetter
 {
-    static double acc = ComboManager.acc / (double)ComboManager.maxAcc;
     public static ClearMarks GetClearMark()
     {
+        double acc = ComboManager.acc / (double)ComboManager.maxAcc;
         if (ComboManager.judgeCount[(int)JudgeResult.Perfect] == ComboManager.noteCount)
         {
             return ClearMarks.AP;
@@ -211,6 +233,7 @@ static class ResultsGetter
     }
     public static Ranks GetRanks()
     {
+        double acc = ComboManager.acc / (double)ComboManager.maxAcc;
         if (acc >= 0.998)
             return Ranks.SSS;
         else if (acc >= 0.99)
