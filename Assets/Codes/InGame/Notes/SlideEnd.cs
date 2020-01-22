@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SlideEnd : SlideNoteBase
 {
-    protected override JudgeResult TrySlideJudge(int audioTime, Touch touch)
+    protected override JudgeResult TrySlideJudge(int audioTime, UnityEngine.InputSystem.EnhancedTouch.Touch touch)
     {
         if (!NoteUtility.IsTouchEnd(touch))
         {
