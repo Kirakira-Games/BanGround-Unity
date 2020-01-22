@@ -355,6 +355,8 @@ public class NoteController : MonoBehaviour
         int audioTime = audioMgr.GetBGMPlaybackTime();
         // Create notes
         UpdateNotes(audioTime);
+        // Trigger touch event
+        UpdateTouch(audioTime);
         // Update each note child
         foreach (Transform child in transform)
         {
@@ -365,12 +367,5 @@ public class NoteController : MonoBehaviour
         {
             child.GetComponent<NoteSyncLine>()?.OnSyncLineUpdate();
         }
-    }
-
-    private void FixedUpdate()
-    {
-        int audioTime = audioMgr.GetBGMPlaybackTime();
-        // Trigger touch event
-        UpdateTouch(audioTime);
     }
 }
