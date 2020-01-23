@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
+
 public abstract class NoteBase : MonoBehaviour
 {
     public int lane;
@@ -69,7 +71,7 @@ public abstract class NoteBase : MonoBehaviour
         {
             if (audioTime >= time - NoteUtility.AUTO_JUDGE_RANGE)
             {
-                RealJudge(audioTime, JudgeResult.Perfect, new UnityEngine.InputSystem.EnhancedTouch.Touch());
+                RealJudge(audioTime, JudgeResult.Perfect, new TouchState());
             }
         }
         else
@@ -91,7 +93,7 @@ public abstract class NoteBase : MonoBehaviour
         return JudgeResult.None;
     }
 
-    public virtual JudgeResult TryJudge(int audioTime, UnityEngine.InputSystem.EnhancedTouch.Touch touch)
+    public virtual JudgeResult TryJudge(int audioTime, TouchState touch)
     {
         if (judgeTime != int.MinValue || touch.phase != UnityEngine.InputSystem.TouchPhase.Began)
         {
@@ -100,9 +102,9 @@ public abstract class NoteBase : MonoBehaviour
         return TranslateTimeToJudge(NoteUtility.TAP_JUDGE_RANGE, audioTime);
     }
 
-    public virtual void TraceTouch(int audioTime, UnityEngine.InputSystem.EnhancedTouch.Touch touch) { }
+    public virtual void TraceTouch(int audioTime, TouchState touch) { }
 
-    public virtual void RealJudge(int audioTime, JudgeResult result, UnityEngine.InputSystem.EnhancedTouch.Touch? touch)
+    public virtual void RealJudge(int audioTime, JudgeResult result, TouchState? touch)
     {
         if (judgeResult != JudgeResult.None) return;
         judgeTime = audioTime;
@@ -111,7 +113,7 @@ public abstract class NoteBase : MonoBehaviour
         Destroy(gameObject);
     }
 
-    public virtual void Judge(int audioTime, JudgeResult result, UnityEngine.InputSystem.EnhancedTouch.Touch? touch)
+    public virtual void Judge(int audioTime, JudgeResult result, TouchState? touch)
     {
         RealJudge(audioTime, result, touch);
     }

@@ -1,10 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem.LowLevel;
 
 public class SlideEnd : SlideNoteBase
 {
-    protected override JudgeResult TrySlideJudge(int audioTime, UnityEngine.InputSystem.EnhancedTouch.Touch touch)
+    protected override JudgeResult TrySlideJudge(int audioTime, TouchState touch)
     {
         if (!NoteUtility.IsTouchEnd(touch))
         {

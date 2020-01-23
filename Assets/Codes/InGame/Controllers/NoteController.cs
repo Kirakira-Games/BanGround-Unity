@@ -2,10 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
+using UnityEngine.InputSystem.LowLevel;
+using UnityEngine.InputSystem.Utilities;
 
 public class NoteController : MonoBehaviour
 {
     public static NoteController controller;
+    public static Touchscreen currentScreen;
+    private ReadOnlyArray<TouchControl> touchControls;
     private Queue<GameObject>[] laneQueue;
     private Dictionary<int, GameObject> touchTable;
     private Dictionary<int, NoteSyncLine> syncTable;
@@ -22,12 +27,14 @@ public class NoteController : MonoBehaviour
 
     private void OnEnable()
     {
-        UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
+        //UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
+        currentScreen = Touchscreen.current;
+        touchControls = currentScreen.touches;
     }
 
     private void OnDisable()
     {
-        UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Disable();
+        //UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Disable();
     }
 
     public void RegisterTouch(int id, GameObject obj)
@@ -48,16 +55,16 @@ public class NoteController : MonoBehaviour
     }
 
     // For debugging purpose only, simulate touch event from mouse event
-    //static private Touch[] SimulateMouseTouch(UnityEngine.InputSystem.TouchPhase phase)
-    //{
-    //    Touch touch = new Touch
-    //    {
-    //        position = Input.mousePosition,
-    //        fingerId = NoteUtility.MOUSE_TOUCH_ID,
-    //        phase = phase
-    //    };
-    //    return new Touch[] { touch };
-    //}
+    static private void SimulateMouseTouch(UnityEngine.InputSystem.TouchPhase phase)
+    {
+        InputSystem.QueueStateEvent(currentScreen,
+            new TouchState
+            {
+                phase = phase,
+                touchId = 1,
+                position = new Vector2(123, 234),
+            });
+    }
 
     public void EmitEffect(Vector3 position, JudgeResult result, GameNoteType type)
     {
@@ -100,7 +107,7 @@ public class NoteController : MonoBehaviour
     }
 
     // Judge a note as result
-    public void Judge(GameObject note, JudgeResult result, UnityEngine.InputSystem.EnhancedTouch.Touch? touch)
+    public void Judge(GameObject note, JudgeResult result, TouchState? touch)
     {
         if (result == JudgeResult.None)
         {
@@ -118,7 +125,7 @@ public class NoteController : MonoBehaviour
         ComboManager.manager.UpdateCombo(result);
     }
 
-    private void OnTouch(int audioTime, int lane, UnityEngine.InputSystem.EnhancedTouch.Touch touch)
+    private void OnTouch(int audioTime, int lane, TouchState touch)
     {
         NoteBase noteToJudge = null;
         for (int i = Mathf.Max(0, lane - 1); i < Mathf.Min(NoteUtility.LANE_COUNT, lane + 2); i++)
@@ -243,25 +250,31 @@ public class NoteController : MonoBehaviour
         if (LiveSetting.autoPlayEnabled) return;
         audioTime -= LiveSetting.judgeOffset;
         //Touch[] touches = Input.touches;
-        var touches = UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches;
+        //var touches = currentScreen.touches;
         //if (touches.Count == 0)
         //{
-            // Simulate touches with mouse
-            //if (Input.GetMouseButtonDown(0))
-            //{
-            //    touches = SimulateMouseTouch(TouchPhase.Began);
-            //}
-            //else if (Input.GetMouseButton(0))
-            //{
-            //    touches = SimulateMouseTouch(TouchPhase.Moved);
-            //}
-            //else if (Input.GetMouseButtonUp(0))
-            //{
-            //    touches = SimulateMouseTouch(TouchPhase.Ended);
-            //}
+        //    //Simulate touches with mouse
+        //    if (Input.GetMouseButtonDown(0))
+        //    {
+        //        SimulateMouseTouch(UnityEngine.InputSystem.TouchPhase.Began);
+        //    }
+        //    else if (Input.GetMouseButton(0))
+        //    {
+        //        SimulateMouseTouch(UnityEngine.InputSystem.TouchPhase.Moved);
+        //    }
+        //    else if (Input.GetMouseButtonUp(0))
+        //    {
+        //        SimulateMouseTouch(UnityEngine.InputSystem.TouchPhase.Ended);
+        //    }
+
+        //    touches = currentScreen.touches;
         //}
-        foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in touches)
+        foreach (TouchControl touchState in touchControls)
         {
+            TouchState touch = touchState.ReadUnprocessedValue();
+            if (touch.touchId == 0) continue;
+            Debug.Log(touchState.phase.ReadValue());
+
             if (touchTable.ContainsKey(touch.touchId))
             {
                 GameObject obj = touchTable[touch.touchId];
@@ -271,7 +284,7 @@ public class NoteController : MonoBehaviour
                     obj.GetComponent<Slide>()?.TraceTouch(audioTime, touch);
                 continue;
             }
-            int lane = GetLaneByTouchPosition(touch.screenPosition);
+            int lane = GetLaneByTouchPosition(touch.position);
             if (lane != -1)
             {
                 OnTouch(audioTime, lane, touch);
