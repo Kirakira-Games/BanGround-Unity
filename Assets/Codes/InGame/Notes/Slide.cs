@@ -58,18 +58,18 @@ public class Slide : MonoBehaviour
         }
     }
 
-    public void TraceTouch(int audioTime, Touch touch)
+    public void TraceTouch(int audioTime, UnityEngine.InputSystem.EnhancedTouch.Touch touch)
     {
         UpdateHead();
         if (judgeHead >= notes.Count) return;
         NoteBase note = notes[judgeHead] as NoteBase;
-        if (note.touchId == touch.fingerId)
+        if (note.touchId == touch.touchId)
         {
             note.TraceTouch(audioTime, touch);
         }
         else
         {
-            int lane = NoteController.GetLaneByTouchPosition(touch.position);
+            int lane = NoteController.GetLaneByTouchPosition(touch.screenPosition);
             if (Mathf.Abs(lane - note.lane) <= 1)
             {
                 JudgeResult result = note.TryJudge(audioTime, touch);
@@ -152,10 +152,10 @@ public class Slide : MonoBehaviour
         notes.Add(note);
     }
 
-    private void BindTouch(Touch? touch)
+    private void BindTouch(UnityEngine.InputSystem.EnhancedTouch.Touch? touch)
     {
         if (LiveSetting.autoPlayEnabled || !touch.HasValue) return;
-        touchId = touch.Value.fingerId;
+        touchId = touch.Value.touchId;
         NoteController.controller.RegisterTouch(touchId, gameObject);
     }
 
@@ -166,7 +166,7 @@ public class Slide : MonoBehaviour
         touchId = -1;
     }
 
-    public bool Judge(GameObject note, JudgeResult result, Touch? touch)
+    public bool Judge(GameObject note, JudgeResult result, UnityEngine.InputSystem.EnhancedTouch.Touch? touch)
     {
         // Must judge head
         if (judgeHead >= notes.Count || !ReferenceEquals(note.GetComponent<NoteBase>(), notes[judgeHead] as NoteBase))

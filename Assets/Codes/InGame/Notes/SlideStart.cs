@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class SlideStart : SlideNoteBase
 {
-    protected override JudgeResult TrySlideJudge(int audioTime, Touch touch)
+    protected override JudgeResult TrySlideJudge(int audioTime, UnityEngine.InputSystem.EnhancedTouch.Touch touch)
     {
-        if (touch.phase != TouchPhase.Began)
+        if (touch.phase != UnityEngine.InputSystem.TouchPhase.Began)
         {
             return JudgeResult.None;
         }
