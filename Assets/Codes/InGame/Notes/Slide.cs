@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem.LowLevel;
 
 public class Slide : MonoBehaviour
 {
@@ -59,7 +58,7 @@ public class Slide : MonoBehaviour
         }
     }
 
-    public void TraceTouch(int audioTime, TouchState touch)
+    public void TraceTouch(int audioTime, UnityEngine.InputSystem.EnhancedTouch.Touch touch)
     {
         UpdateHead();
         if (judgeHead >= notes.Count) return;
@@ -70,7 +69,7 @@ public class Slide : MonoBehaviour
         }
         else
         {
-            int lane = NoteController.GetLaneByTouchPosition(touch.position);
+            int lane = NoteController.GetLaneByTouchPosition(touch.screenPosition);
             if (Mathf.Abs(lane - note.lane) <= 1)
             {
                 JudgeResult result = note.TryJudge(audioTime, touch);
@@ -153,7 +152,7 @@ public class Slide : MonoBehaviour
         notes.Add(note);
     }
 
-    private void BindTouch(TouchState? touch)
+    private void BindTouch(UnityEngine.InputSystem.EnhancedTouch.Touch? touch)
     {
         if (LiveSetting.autoPlayEnabled || !touch.HasValue) return;
         touchId = touch.Value.touchId;
@@ -167,7 +166,7 @@ public class Slide : MonoBehaviour
         touchId = -1;
     }
 
-    public bool Judge(GameObject note, JudgeResult result, TouchState? touch)
+    public bool Judge(GameObject note, JudgeResult result, UnityEngine.InputSystem.EnhancedTouch.Touch? touch)
     {
         // Must judge head
         if (judgeHead >= notes.Count || !ReferenceEquals(note.GetComponent<NoteBase>(), notes[judgeHead] as NoteBase))

@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.InputSystem.LowLevel;
 
 public enum GameNoteType
 {
@@ -103,12 +102,12 @@ public static class NoteUtility
         return Resources.Load<T>(LiveSetting.assetDirectory + "/" + name);
     }
 
-    public static bool IsTouchContinuing(TouchState touch)
+    public static bool IsTouchContinuing(UnityEngine.InputSystem.EnhancedTouch.Touch touch)
     {
         return touch.phase == UnityEngine.InputSystem.TouchPhase.Moved || touch.phase == UnityEngine.InputSystem.TouchPhase.Stationary;
     }
 
-    public static bool IsTouchEnd(TouchState touch)
+    public static bool IsTouchEnd(UnityEngine.InputSystem.EnhancedTouch.Touch touch)
     {
         return touch.phase == UnityEngine.InputSystem.TouchPhase.Ended || touch.phase == UnityEngine.InputSystem.TouchPhase.Canceled;
     }
