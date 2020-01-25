@@ -21,8 +21,8 @@ public static class LiveSetting
     public static bool bangPerspective = true;
     public static bool autoPlayEnabled = false;
 
-    public static float bgBrightness = .8f;
-    public static float laneBrightness = 0.9f;
+    public static float bgBrightness = .7f;
+    public static float laneBrightness = 0.84f;
 
     public static string assetDirectory = "V2Assets";
 
