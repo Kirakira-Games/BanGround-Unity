@@ -16,7 +16,8 @@ public class SelectManager : MonoBehaviour
     private InputField judge_Input;
     private InputField audio_Input;
     private InputField size_Input;
-    private InputField seVolume_Input;
+
+    private Slider seVolume_Input;
 
     private Animator scene_Animator;
 
@@ -35,14 +36,14 @@ public class SelectManager : MonoBehaviour
         judge_Input = GameObject.Find("Judge_Input").GetComponent<InputField>();
         audio_Input = GameObject.Find("Audio_Input").GetComponent<InputField>();
         size_Input = GameObject.Find("Size_Input").GetComponent<InputField>();
-        seVolume_Input = GameObject.Find("SeVolume_Input").GetComponent<InputField>();
+        seVolume_Input = GameObject.Find("SeVolume_Input").GetComponent<Slider>();
 
         
         speed_Input.text = LiveSetting.noteSpeed.ToString();
         judge_Input.text = LiveSetting.judgeOffset.ToString();
         audio_Input.text = LiveSetting.audioOffset.ToString();
         size_Input.text = LiveSetting.noteSize.ToString();
-        seVolume_Input.text = LiveSetting.seVolume.ToString();
+        seVolume_Input.value = LiveSetting.seVolume;
 
         enter_Btn.onClick.AddListener(OnEnterPressed);
         setting_Open_Btn.onClick.AddListener(OpenSetting);
@@ -80,9 +81,10 @@ public class SelectManager : MonoBehaviour
         LiveSetting.judgeOffset = int.Parse(judge_Input.text);
         LiveSetting.audioOffset = int.Parse(audio_Input.text);
         LiveSetting.noteSize = float.Parse(size_Input.text);
-        LiveSetting.seVolume = float.Parse(seVolume_Input.text);
+        LiveSetting.seVolume = seVolume_Input.value;
 
         scene_Animator.Play("OutPlay", -1, 0);
+        CloseSetting();
         StartCoroutine(DelayLoadScene());
 
     }
