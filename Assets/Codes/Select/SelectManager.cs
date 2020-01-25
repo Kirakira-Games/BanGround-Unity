@@ -7,6 +7,9 @@ using UnityEngine.SceneManagement;
 public class SelectManager : MonoBehaviour
 {
     private Button enter_Btn;
+    private Button setting_Open_Btn;
+    private Button setting_Close_Btn;
+
     private ToggleGroup selectGroup;
 
     private InputField speed_Input;
@@ -23,6 +26,9 @@ public class SelectManager : MonoBehaviour
         scene_Animator = GameObject.Find("SceneAnimator").GetComponent<Animator>();
 
         enter_Btn = GameObject.Find("Enter_Btn").GetComponent<Button>();
+        setting_Open_Btn = GameObject.Find("Setting_Panel").GetComponent<Button>();
+        setting_Close_Btn = GameObject.Find("Button_Close").GetComponent<Button>();
+
         selectGroup = GameObject.Find("Select_Group").GetComponent<ToggleGroup>();
 
         speed_Input = GameObject.Find("Speed_Input").GetComponent<InputField>();
@@ -38,25 +44,46 @@ public class SelectManager : MonoBehaviour
         size_Input.text = LiveSetting.noteSize.ToString();
         seVolume_Input.text = LiveSetting.seVolume.ToString();
 
-        enter_Btn.onClick.AddListener(() =>
+        enter_Btn.onClick.AddListener(OnEnterPressed);
+        setting_Open_Btn.onClick.AddListener(OpenSetting);
+        setting_Close_Btn.onClick.AddListener(CloseSetting);
+
+    }
+
+    bool isSettingOpened = false;
+    void OpenSetting()
+    {
+        GameObject.Find("Setting_Canvas").GetComponent<Animator>().SetBool("Drop", true);
+        isSettingOpened = true;
+    }
+    void CloseSetting()
+    {
+        GameObject.Find("Setting_Canvas").GetComponent<Animator>().SetBool("Drop", false);
+        isSettingOpened = false;
+    }
+
+    void OnEnterPressed()
+    {
+        if (!isSettingOpened)
         {
-            var toggles = selectGroup.ActiveToggles();
-            foreach (var seleted in toggles)
-            {
-                //Debug.Log(seleted.name);
-                LiveSetting.selected = seleted.name;
-            }
+            OpenSetting();
+            return;
+        }
+        var toggles = selectGroup.ActiveToggles();
+        foreach (var seleted in toggles)
+        {
+            //Debug.Log(seleted.name);
+            LiveSetting.selected = seleted.name;
+        }
 
-            LiveSetting.noteSpeed = float.Parse(speed_Input.text);
-            LiveSetting.judgeOffset = int.Parse(judge_Input.text);
-            LiveSetting.audioOffset = int.Parse(audio_Input.text);
-            LiveSetting.noteSize = float.Parse(size_Input.text);
-            LiveSetting.seVolume = float.Parse(seVolume_Input.text);
+        LiveSetting.noteSpeed = float.Parse(speed_Input.text);
+        LiveSetting.judgeOffset = int.Parse(judge_Input.text);
+        LiveSetting.audioOffset = int.Parse(audio_Input.text);
+        LiveSetting.noteSize = float.Parse(size_Input.text);
+        LiveSetting.seVolume = float.Parse(seVolume_Input.text);
 
-            scene_Animator.Play("OutPlay", -1, 0);
-            StartCoroutine(DelayLoadScene());
-            
-        });
+        scene_Animator.Play("OutPlay", -1, 0);
+        StartCoroutine(DelayLoadScene());
 
     }
 

@@ -10,6 +10,7 @@ public class CircleGen : MonoBehaviour
     void Start()
     {
         StartCoroutine(gen());
+        Application.targetFrameRate = 120;
     }
 
     IEnumerator gen()

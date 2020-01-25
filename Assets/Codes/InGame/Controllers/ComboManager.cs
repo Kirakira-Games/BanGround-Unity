@@ -65,7 +65,8 @@ public class ComboManager : MonoBehaviour
             score = maxScore;
         }
         scoreDisplay.SetScore(score / maxScore, (double)acc / maxAcc);
-        comboText.text = string.Format("{0:D4}", combo[1]);
+
+        comboText.text =  combo[1] <= 0 ? "":combo[1].ToString() ;
     }
 
     private static double Accumulate(int segSize, double segDelta, int num)
