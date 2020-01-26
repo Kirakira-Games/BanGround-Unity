@@ -77,16 +77,16 @@ public class ComboManager : MonoBehaviour
 
     private void UpdateComboImg()
     {
-        int i = 0;
+        int i = comboImg.Length - 1;
         int comboTemp = combo[1];
         while (comboTemp != 0)
         {
             comboImg[i].gameObject.SetActive(true);
             comboImg[i].sprite = comboSprite[comboTemp % 10];
             comboTemp /= 10;
-            i++;
+            i--;
         }
-        for (; i < comboImg.Length; i++)
+        for (; i >= 0; i--)
         {
             comboImg[i].gameObject.SetActive(false);
         }
