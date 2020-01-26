@@ -24,6 +24,7 @@ class AudioManager : MonoBehaviour
     public AudioClip FCvoice;
     public AudioClip CLvoice;
     public AudioClip Fvoice;
+    GameObject gateCanvas;
 
     void Awake()
     {
@@ -34,6 +35,11 @@ class AudioManager : MonoBehaviour
         SEChannelGroup.setVolume(LiveSetting.seVolume);
 
         result = System.createChannelGroup("BackgroundMuisc", out BGMChannelGroup);
+    }
+
+    private void Start()
+    {
+        gateCanvas = GameObject.Find("GateCanvas");
     }
 
     void Update()
@@ -107,6 +113,7 @@ class AudioManager : MonoBehaviour
 
     public Channel PlayBGM(Sound sound)
     {
+        gateCanvas.SetActive(false);
         Channel channel;
         
         System.playSound(sound, BGMChannelGroup, false, out channel);
@@ -131,8 +138,20 @@ class AudioManager : MonoBehaviour
         return isPlaying;
     }
 
+    public void PauseBGM()
+    {
+        print("pause");
+        CurrentBGMChannel.setPaused(true);
+    }
+
+    public void ResumeBGM()
+    {
+        CurrentBGMChannel.setPaused(false);
+    }
+
     IEnumerator ShowResult()
     {
+        gateCanvas.SetActive(true);
         Text gateTxt = GameObject.Find("GateText").GetComponent<Text>();
         switch (ResultsGetter.GetClearMark())
         {
