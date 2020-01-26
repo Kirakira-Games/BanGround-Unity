@@ -9,6 +9,7 @@ public class FlickNote : NoteBase
     {
         base.InitNote();
         mesh.material.SetTexture("_MainTex", NoteUtility.LoadResource<Texture2D>("note_flick_default"));
+        Instantiate(Resources.Load("V2Assets/FlickArrow"), transform);
     }
 
     public override void TraceTouch(int audioTime, Touch touch)
