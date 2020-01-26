@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,6 +21,8 @@ public class ComboManager : MonoBehaviour
     private Text comboText;
     private Animator comboAnimator;
     private GradeColorChange scoreDisplay;
+    private Image[] comboImg;
+    private Sprite[] comboSprite;
 
     private void Awake()
     {
@@ -36,8 +39,10 @@ public class ComboManager : MonoBehaviour
     private void Start()
     {
         scoreDisplay = GameObject.Find("Grades").GetComponent<GradeColorChange>();
-        comboText = GameObject.Find("Combo_Nmber").GetComponent<Text>();
+        //comboText = GameObject.Find("Combo_Nmber").GetComponent<Text>();
         comboAnimator = GameObject.Find("Combos").GetComponent<Animator>();
+        comboImg = GameObject.Find("Grid").GetComponentsInChildren<Image>(true);
+        comboSprite = Resources.LoadAll<Sprite>("UI/comboCount");
     }
 
     public void UpdateCombo(JudgeResult result)
@@ -66,7 +71,25 @@ public class ComboManager : MonoBehaviour
         }
         scoreDisplay.SetScore(score / maxScore, (double)acc / maxAcc);
 
-        comboText.text =  combo[1] <= 0 ? "":combo[1].ToString() ;
+        //comboText.text =  combo[1] <= 0 ? "":combo[1].ToString() ;
+        UpdateComboImg();
+    }
+
+    private void UpdateComboImg()
+    {
+        int i = 0;
+        int comboTemp = combo[1];
+        while (comboTemp != 0)
+        {
+            comboImg[i].gameObject.SetActive(true);
+            comboImg[i].sprite = comboSprite[comboTemp % 10];
+            comboTemp /= 10;
+            i++;
+        }
+        for (; i < comboImg.Length; i++)
+        {
+            comboImg[i].gameObject.SetActive(false);
+        }
     }
 
     private static double Accumulate(int segSize, double segDelta, int num)
