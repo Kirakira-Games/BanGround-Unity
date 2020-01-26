@@ -102,14 +102,14 @@ public static class NoteUtility
         return Resources.Load<T>(LiveSetting.assetDirectory + "/" + name);
     }
 
-    public static bool IsTouchContinuing(UnityEngine.InputSystem.EnhancedTouch.Touch touch)
+    public static bool IsTouchContinuing(Touch touch)
     {
-        return touch.phase == UnityEngine.InputSystem.TouchPhase.Moved || touch.phase == UnityEngine.InputSystem.TouchPhase.Stationary;
+        return touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Stationary;
     }
 
-    public static bool IsTouchEnd(UnityEngine.InputSystem.EnhancedTouch.Touch touch)
+    public static bool IsTouchEnd(Touch touch)
     {
-        return touch.phase == UnityEngine.InputSystem.TouchPhase.Ended || touch.phase == UnityEngine.InputSystem.TouchPhase.Canceled;
+        return touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled;
     }
 
     public static float GetBangPerspective(float x)

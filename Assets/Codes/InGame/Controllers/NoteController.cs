@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class NoteController : MonoBehaviour
 {
@@ -19,16 +18,6 @@ public class NoteController : MonoBehaviour
     private FMOD.Sound SE_GOOD;
     private FMOD.Sound SE_CLICK;
     private FMOD.Sound SE_FLICK;
-
-    private void OnEnable()
-    {
-        UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
-    }
-
-    private void OnDisable()
-    {
-        UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Disable();
-    }
 
     public void RegisterTouch(int id, GameObject obj)
     {
@@ -48,16 +37,16 @@ public class NoteController : MonoBehaviour
     }
 
     // For debugging purpose only, simulate touch event from mouse event
-    //static private Touch[] SimulateMouseTouch(UnityEngine.InputSystem.TouchPhase phase)
-    //{
-    //    Touch touch = new Touch
-    //    {
-    //        position = Input.mousePosition,
-    //        fingerId = NoteUtility.MOUSE_TOUCH_ID,
-    //        phase = phase
-    //    };
-    //    return new Touch[] { touch };
-    //}
+    static private Touch[] SimulateMouseTouch(TouchPhase phase)
+    {
+        Touch touch = new Touch
+        {
+            position = Input.mousePosition,
+            fingerId = NoteUtility.MOUSE_TOUCH_ID,
+            phase = phase
+        };
+        return new Touch[] { touch };
+    }
 
     public void EmitEffect(Vector3 position, JudgeResult result, GameNoteType type)
     {
@@ -100,7 +89,7 @@ public class NoteController : MonoBehaviour
     }
 
     // Judge a note as result
-    public void Judge(GameObject note, JudgeResult result, UnityEngine.InputSystem.EnhancedTouch.Touch? touch)
+    public void Judge(GameObject note, JudgeResult result, Touch? touch)
     {
         if (result == JudgeResult.None)
         {
@@ -118,7 +107,7 @@ public class NoteController : MonoBehaviour
         ComboManager.manager.UpdateCombo(result);
     }
 
-    private void OnTouch(int audioTime, int lane, UnityEngine.InputSystem.EnhancedTouch.Touch touch)
+    private void OnTouch(int audioTime, int lane, Touch touch)
     {
         NoteBase noteToJudge = null;
         for (int i = Mathf.Max(0, lane - 1); i < Mathf.Min(NoteUtility.LANE_COUNT, lane + 2); i++)
@@ -153,7 +142,7 @@ public class NoteController : MonoBehaviour
         // A note to judge is found
         if (noteToJudge == null)
         {
-            if (touch.phase == UnityEngine.InputSystem.TouchPhase.Began)
+            if (touch.phase == TouchPhase.Began)
                 EmitEffect(NoteUtility.GetJudgePos(lane), JudgeResult.None, GameNoteType.Normal);
         }
         else
@@ -242,36 +231,34 @@ public class NoteController : MonoBehaviour
     {
         if (LiveSetting.autoPlayEnabled) return;
         audioTime -= LiveSetting.judgeOffset;
-        //Touch[] touches = Input.touches;
-        var touches = UnityEngine.InputSystem.EnhancedTouch.Touch.activeTouches;
-        //if (touches.Count == 0)
-        //{
-            // Simulate touches with mouse
-            //if (Input.GetMouseButtonDown(0))
-            //{
-            //    touches = SimulateMouseTouch(TouchPhase.Began);
-            //}
-            //else if (Input.GetMouseButton(0))
-            //{
-            //    touches = SimulateMouseTouch(TouchPhase.Moved);
-            //}
-            //else if (Input.GetMouseButtonUp(0))
-            //{
-            //    touches = SimulateMouseTouch(TouchPhase.Ended);
-            //}
-        //}
-        foreach (UnityEngine.InputSystem.EnhancedTouch.Touch touch in touches)
+        Touch[] touches = Input.touches;
+        //var touches = Touch.activeTouches;
+        if (touches.Length == 0)
         {
-            if (touchTable.ContainsKey(touch.touchId))
+            //Simulate touches with mouse
+            if (Input.GetMouseButtonDown(0))
             {
-                GameObject obj = touchTable[touch.touchId];
-                //if (obj.GetComponent<NoteBase>() != null)
-                    obj.GetComponent<NoteBase>()?.TraceTouch(audioTime, touch);
-                //if (obj.GetComponent<Slide>() != null)
-                    obj.GetComponent<Slide>()?.TraceTouch(audioTime, touch);
+                touches = SimulateMouseTouch(TouchPhase.Began);
+            }
+            else if (Input.GetMouseButton(0))
+            {
+                touches = SimulateMouseTouch(TouchPhase.Moved);
+            }
+            else if (Input.GetMouseButtonUp(0))
+            {
+                touches = SimulateMouseTouch(TouchPhase.Ended);
+            }
+        }
+        foreach (Touch touch in touches)
+        {
+            if (touchTable.ContainsKey(touch.fingerId))
+            {
+                GameObject obj = touchTable[touch.fingerId];
+                obj.GetComponent<NoteBase>()?.TraceTouch(audioTime, touch);
+                obj.GetComponent<Slide>()?.TraceTouch(audioTime, touch);
                 continue;
             }
-            int lane = GetLaneByTouchPosition(touch.screenPosition);
+            int lane = GetLaneByTouchPosition(touch.position);
             if (lane != -1)
             {
                 OnTouch(audioTime, lane, touch);

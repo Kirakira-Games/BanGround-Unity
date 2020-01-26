@@ -5,7 +5,7 @@ using UnityEngine;
 public class SlideEndFlick : SlideNoteBase
 {
     private Vector2 touchPosition;
-    protected override JudgeResult TrySlideJudge(int audioTime, UnityEngine.InputSystem.EnhancedTouch.Touch touch)
+    protected override JudgeResult TrySlideJudge(int audioTime, Touch touch)
     {
         if (IsTilt)
         {
@@ -25,16 +25,16 @@ public class SlideEndFlick : SlideNoteBase
         mesh.material.SetTexture("_MainTex", NoteUtility.LoadResource<Texture2D>("note_flick_default"));
     }
 
-    public override void Judge(int audioTime, JudgeResult result, UnityEngine.InputSystem.EnhancedTouch.Touch? touch)
+    public override void Judge(int audioTime, JudgeResult result, Touch? touch)
     {
-        touchId = touch.Value.touchId;
-        touchPosition = touch.Value.screenPosition;
+        touchId = touch.Value.fingerId;
+        touchPosition = touch.Value.position;
         judgeTime = audioTime;
     }
 
-    public override void TraceTouch(int audioTime, UnityEngine.InputSystem.EnhancedTouch.Touch touch)
+    public override void TraceTouch(int audioTime, Touch touch)
     {
-        Vector2 dist = touch.screenPosition - touchPosition;
+        Vector2 dist = touch.position - touchPosition;
         if (dist.magnitude * 2.54F >= Screen.dpi * NoteUtility.FLICK_JUDGE_DIST)
         {
             RealJudge(audioTime, IsTilt ?
