@@ -172,7 +172,7 @@ class AudioManager : MonoBehaviour
                 AudioSource.PlayClipAtPoint(Fvoice, Vector3.zero);
                 break;
         }
-        GameObject.Find("GateCanvas").GetComponent<Animator>().SetBool("SongOver", true);
+        GameObject.Find("GateCanvas").GetComponent<Animator>().Play("GateClose");
         yield return new WaitForSeconds(3);
         SceneManager.LoadSceneAsync("Result");
     }
