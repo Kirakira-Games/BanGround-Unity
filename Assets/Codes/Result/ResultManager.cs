@@ -203,7 +203,7 @@ public class ResultManager : MonoBehaviour
 
         level_Text.text = Enum.GetName(typeof(Difficulty), chart.difficulty).ToUpper() + " " + chart.level.ToString();
         songName_Text.text = header?.TitleUnicode;
-        acc_Text.text = string.Format("{0:P2}", acc);
+        acc_Text.text = LiveSetting.autoPlayEnabled ? "AUTOPLAY": string.Format("{0:P2}", acc);
     }
 }
 

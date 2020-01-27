@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System.IO;
+using Newtonsoft.Json;
 
 public class SelectManager : MonoBehaviour
 {
@@ -86,10 +88,24 @@ public class SelectManager : MonoBehaviour
             GameObject.Find("AudOff>").GetComponent<Button>().onClick.AddListener(() => { audio_Input.text = (float.Parse(audio_Input.text) + 1f).ToString(); });
             GameObject.Find("AudOff<").GetComponent<Button>().onClick.AddListener(() => { audio_Input.text = (float.Parse(audio_Input.text) - 1f).ToString(); });
         }//live setting init
-
+        LoadLiveSettingFile();
         initSongList();
         GetLiveSetting();
 
+    }
+
+    private static void LoadLiveSettingFile()
+    {
+        if (File.Exists(LiveSetting.settingsPath))
+        {
+            string sets = File.ReadAllText(LiveSetting.settingsPath);
+            LiveSettingTemplate loaded = JsonConvert.DeserializeObject<LiveSettingTemplate>(sets);
+            LiveSettingTemplate.ApplyToLiveSetting(loaded);
+        }
+        else
+        {
+            Debug.LogWarning("Live setting file not found");
+        }
     }
 
     private void initSongList()
@@ -118,7 +134,13 @@ public class SelectManager : MonoBehaviour
     IEnumerator SelectDefault()
     {
         yield return new WaitForEndOfFrame();
-        SelectSong(LiveSetting.selectedIndex);
+        try
+        {
+            SelectSong(LiveSetting.selectedIndex);
+        }catch
+        {
+
+        }
     }
 
     public void SelectSong(int index)
@@ -200,6 +222,9 @@ public class SelectManager : MonoBehaviour
 
         scene_Animator.Play("OutPlay", -1, 0);
         CloseSetting();
+       
+        File.WriteAllText(LiveSetting.settingsPath, JsonConvert.SerializeObject(new LiveSettingTemplate()));
+
         StartCoroutine(DelayLoadScene());
 
     }
