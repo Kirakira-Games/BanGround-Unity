@@ -33,7 +33,8 @@ public static class LiveSetting
     public const string testHeader = "TestCharts/{0}/header";
     public const string testMusic = "TestCharts/{0}/bgm";
     public static string selected = "";
-    
+    public static int selectedIndex = 0;
+
     public static int NoteScreenTime
     {
         get

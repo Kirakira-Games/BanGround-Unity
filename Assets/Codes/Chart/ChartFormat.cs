@@ -57,4 +57,11 @@ public class Header
     public float PreviewEnd;
 
     public short NumCharts;
+    public string DirName;
+    public Header(string title,string artist,string dirName)
+    {
+        TitleUnicode = title;
+        ArtistUnicode = artist;
+        DirName = dirName;
+    }
 };
