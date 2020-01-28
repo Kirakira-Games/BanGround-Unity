@@ -75,8 +75,8 @@ public class SelectManager : MonoBehaviour
             GameObject.Find("Speed<<").GetComponent<Button>().onClick.AddListener(() => { speed_Input.text = (float.Parse(speed_Input.text) - 1f).ToString(); });
             speed_Input.onValueChanged.AddListener((string a) =>
             {
-                if (float.Parse(speed_Input.text) < 0) { speed_Input.text = "11"; }
-                if (float.Parse(speed_Input.text) > 11f) { speed_Input.text = "0.1"; }
+                if (float.Parse(speed_Input.text) < 1) { speed_Input.text = "11"; }
+                if (float.Parse(speed_Input.text) > 11f) { speed_Input.text = "1"; }
                 speed_Input.text = string.Format("{0:F1}", float.Parse(speed_Input.text));
             });
 
