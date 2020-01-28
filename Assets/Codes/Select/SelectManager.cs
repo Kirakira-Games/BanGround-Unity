@@ -111,7 +111,7 @@ public class SelectManager : MonoBehaviour
     private void initSongList()
     {
         songList.Add(new Header("六兆年と一夜物語", "Roselia", "128"));
-        songList.Add(new Header("ハッピーシンセサイザ ", "Pastel＊Palettes", "85"));
+        songList.Add(new Header("ハッピーシンセサイザ", "Pastel＊Palettes", "85"));
         //songList.Add(new Header("君にふれて", " TVアニメ「やがて君になる」OP", "2940"));
         //songList.Add(new Header("炉心融解", "sasaki", "6283"));
         songList.Add(new Header("Light Delight", "Poppin'Party", "112"));
