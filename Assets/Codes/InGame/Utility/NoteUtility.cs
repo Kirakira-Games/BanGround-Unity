@@ -7,10 +7,10 @@ public enum GameNoteType
     None = -1,
     Normal = 0,
     Flick = 1,
-    SlideEnd = 2,
-    SlideEndFlick = 3,
-    SlideStart = 4,
-    SlideTick = 5,
+    SlideStart = 2,
+    SlideTick = 3,
+    SlideEnd = 4,
+    SlideEndFlick = 5
 }
 
 public class GameNoteData
