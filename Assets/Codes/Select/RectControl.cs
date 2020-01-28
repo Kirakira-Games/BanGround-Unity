@@ -29,6 +29,7 @@ public class RectControl : MonoBehaviour
 
     void OnPressed()
     {
+        StopAllCoroutines();
         sm.SelectSong(index);
     }
 
@@ -39,15 +40,21 @@ public class RectControl : MonoBehaviour
 
     IEnumerator OnSelectAnimation()
     {
-        rt.sizeDelta = new Vector2(rt.sizeDelta.x, 200);
         yield return new WaitForEndOfFrame();
-        float destPos = 0 - rt.anchoredPosition.y - vg.padding.top - 100;
+        float destPos = 0 - rt.anchoredPosition.y - vg.padding.top -(rt.sizeDelta.y/2);
         while (Math.Abs(rt_m.anchoredPosition.y - destPos) > 1f)
         {
             rt_m.anchoredPosition -= new Vector2(0, (rt_m.anchoredPosition.y - destPos) * 0.3f);
             yield return new WaitForEndOfFrame();
         }
         rt_m.anchoredPosition = new Vector2(rt_m.anchoredPosition.x, destPos);
+        while (Math.Abs(rt.sizeDelta.y - 200) > 1f)
+        {
+            rt.sizeDelta -= new Vector2(0, (rt.sizeDelta.y - 200) * 0.3f);
+            yield return new WaitForEndOfFrame();
+        }
+        rt.sizeDelta = new Vector2(rt.sizeDelta.x, 200);
+
         while (Math.Abs(rt_m.anchoredPosition.y - destPos) < 1f)
             yield return new WaitForEndOfFrame();
         sm.SelectSong(-1);

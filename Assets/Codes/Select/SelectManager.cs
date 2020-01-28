@@ -165,7 +165,7 @@ public class SelectManager : MonoBehaviour
 
         var lastpos = rt.anchoredPosition.y;
         yield return new WaitForFixedUpdate();
-        while (rt.anchoredPosition.y - lastpos > 0.01)
+        while (rt.anchoredPosition.y - lastpos > 0.01 || Input.GetMouseButton(0))
         {
             yield return new WaitForFixedUpdate();
             lastpos = rt.anchoredPosition.y;
