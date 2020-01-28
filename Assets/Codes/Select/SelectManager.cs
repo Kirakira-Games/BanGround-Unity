@@ -27,6 +27,10 @@ public class SelectManager : MonoBehaviour
     private Slider lane_Bright;
     private Slider seVolume_Input;
 
+    RectTransform rt ;
+    RectTransform rt_v ;
+    VerticalLayoutGroup lg ;
+
     private Animator scene_Animator;
 
     public GameObject songItemPrefab;
@@ -38,6 +42,9 @@ public class SelectManager : MonoBehaviour
     void Start()
     {
         scene_Animator = GameObject.Find("SceneAnimator").GetComponent<Animator>();
+        rt = GameObject.Find("SongContent").GetComponent<RectTransform>();
+        rt_v = GameObject.Find("Song Scroll View").GetComponent<RectTransform>();
+        lg = GameObject.Find("SongContent").GetComponent<VerticalLayoutGroup>();
         {
             enter_Btn = GameObject.Find("Enter_Btn").GetComponent<Button>();
             setting_Open_Btn = GameObject.Find("Setting_Panel").GetComponent<Button>();
@@ -69,7 +76,7 @@ public class SelectManager : MonoBehaviour
             speed_Input.onValueChanged.AddListener((string a) =>
             {
                 if (float.Parse(speed_Input.text) < 0) { speed_Input.text = "11"; }
-                if (float.Parse(speed_Input.text) > 11f) { speed_Input.text = "0"; }
+                if (float.Parse(speed_Input.text) > 11f) { speed_Input.text = "0.1"; }
                 speed_Input.text = string.Format("{0:F1}", float.Parse(speed_Input.text));
             });
 
@@ -128,9 +135,7 @@ public class SelectManager : MonoBehaviour
             go.GetComponent<RectControl>().index = i;
             SelectButtons.Add(go);
         }
-        RectTransform rt = GameObject.Find("SongContent").GetComponent<RectTransform>();
-        RectTransform rt_v = GameObject.Find("Song Scroll View").GetComponent<RectTransform>();
-        VerticalLayoutGroup lg = GameObject.Find("SongContent").GetComponent<VerticalLayoutGroup>();
+
         lg.padding = new RectOffset(0, 0, (int)((rt_v.sizeDelta.y / 2) - 100),0);
 
         rt.sizeDelta = new Vector2(rt.sizeDelta.x, lg.padding.top * 2 + songList.Count * (116) + (songList.Count - 1) * lg.spacing + (200 - 116));
@@ -149,12 +154,53 @@ public class SelectManager : MonoBehaviour
         }
     }
 
+    IEnumerator SelectNear()
+    {
+        yield return new WaitForSeconds(1);
+        RectTransform[] rts = new RectTransform[SelectButtons.Count];
+        for(int i =0;i<SelectButtons.Count;i++)
+        {
+            rts[i] = SelectButtons[i].GetComponent<RectTransform>();
+        }
+
+        var lastpos = rt.anchoredPosition.y;
+        yield return new WaitForFixedUpdate();
+        while (rt.anchoredPosition.y - lastpos > 0.01)
+        {
+            yield return new WaitForFixedUpdate();
+            lastpos = rt.anchoredPosition.y;
+        }
+        print("select near");
+        var destPos = 0 - rt.anchoredPosition.y - lg.padding.top - 100;
+        float nearestDistance=999f;
+        int nearstIndex = 0;
+        for (int i = 0; i < SelectButtons.Count; i++)
+        {
+            float distance =  Mathf.Abs( rts[i].anchoredPosition.y - destPos);
+            //print(distance);
+            if ( distance< nearestDistance)
+            {
+                nearestDistance = distance;
+                nearstIndex = i;
+            }
+
+        }
+        SelectSong(nearstIndex);
+    }
+
     public void SelectSong(int index)
     {
-        
+        if (index == -1)
+        {
+            StartCoroutine(SelectNear());
+            return;
+        }
+            
         foreach(GameObject selected in SelectButtons)
         {
+           
             RectControl rc = selected.GetComponent<RectControl>();
+            rc.StopAllCoroutines();
             if (rc.index != index)
                 rc.UnSelect();
             else
@@ -221,14 +267,14 @@ public class SelectManager : MonoBehaviour
             LiveSetting.selected = seleted.name;
         }
         */
-
+        enter_Btn.interactable = false;
         LiveSetting.selected = songList[LiveSetting.selectedIndex].DirName;
 
         SetLiveSetting();
 
         scene_Animator.Play("OutPlay", -1, 0);
         CloseSetting();
-       
+        
         File.WriteAllText(LiveSetting.settingsPath, JsonConvert.SerializeObject(new LiveSettingTemplate()));
 
         StartCoroutine(DelayLoadScene());
@@ -238,6 +284,7 @@ public class SelectManager : MonoBehaviour
     IEnumerator DelayLoadScene()
     {
         yield return new WaitForSeconds(2f);
+
         SceneManager.LoadSceneAsync("InGame");
     }
 
