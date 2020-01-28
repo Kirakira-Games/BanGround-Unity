@@ -129,7 +129,11 @@ public class SelectManager : MonoBehaviour
             SelectButtons.Add(go);
         }
         RectTransform rt = GameObject.Find("SongContent").GetComponent<RectTransform>();
-        rt.sizeDelta = new Vector2(rt.sizeDelta.x, 440 * 2 + songList.Count * (116) + (songList.Count-1)*32+(200 - 116));
+        RectTransform rt_v = GameObject.Find("Song Scroll View").GetComponent<RectTransform>();
+        VerticalLayoutGroup lg = GameObject.Find("SongContent").GetComponent<VerticalLayoutGroup>();
+        lg.padding = new RectOffset(0, 0, (int)((rt_v.sizeDelta.y / 2) - 100),0);
+
+        rt.sizeDelta = new Vector2(rt.sizeDelta.x, lg.padding.top * 2 + songList.Count * (116) + (songList.Count - 1) * lg.spacing + (200 - 116));
         StartCoroutine(SelectDefault());
     }
 

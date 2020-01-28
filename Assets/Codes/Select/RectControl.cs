@@ -9,15 +9,17 @@ public class RectControl : MonoBehaviour
     RectTransform rt_m;
     RectTransform rt_v;
     RectTransform rt;
+    VerticalLayoutGroup vg;
 
     SelectManager sm;
     public int index;
     Button bt;
-    
+
     // Start is called before the first frame update
     void Start()
     {
         rt_m = GameObject.Find("SongContent").GetComponent<RectTransform>();
+        vg = GameObject.Find("SongContent").GetComponent<VerticalLayoutGroup>();
         rt_v = GameObject.Find("Song Scroll View").GetComponent<RectTransform>();
         sm = GameObject.Find("SelectManager").GetComponent<SelectManager>();
         bt = GetComponent<Button>();
@@ -39,8 +41,8 @@ public class RectControl : MonoBehaviour
     {
         rt.sizeDelta = new Vector2(rt.sizeDelta.x, 200);
         yield return new WaitForEndOfFrame();
-        float destPos = 0 - rt.anchoredPosition.y - 540;
-        while (Math.Abs( rt_m.anchoredPosition.y - destPos) > 1f)
+        float destPos = 0 - rt.anchoredPosition.y - vg.padding.top - 100;
+        while (Math.Abs(rt_m.anchoredPosition.y - destPos) > 1f)
         {
             rt_m.anchoredPosition -= new Vector2(0, (rt_m.anchoredPosition.y - destPos) * 0.3f);
             yield return new WaitForEndOfFrame();
@@ -56,14 +58,16 @@ public class RectControl : MonoBehaviour
     void Update()
     {
         var r = 2096 / 2;
-        var position = rt.anchoredPosition.y+(rt_v.sizeDelta.y/2);
-        var deltaHeight = Math.Abs(rt_m.anchoredPosition.y+position);
+        var position = rt.anchoredPosition.y + (rt_v.sizeDelta.y / 2);
+        var deltaHeight = Math.Abs(rt_m.anchoredPosition.y + position);
         var angle = Math.Asin(deltaHeight / r);
-        float width = (float)(deltaHeight/ Math.Tan(angle)) ;
+        float width = (float)(deltaHeight / Math.Tan(angle));
 
-        if (rt_m.anchoredPosition.y == 0 - rt.anchoredPosition.y - 540)
-            width = 1048;
+        width -= 200f;
 
-        rt.sizeDelta = new Vector2(width-200f, rt.sizeDelta.y);
+        if (rt_m.anchoredPosition.y == 0 - rt.anchoredPosition.y - vg.padding.top - 100 || width <= 0)
+            width = 848;
+
+        rt.sizeDelta = new Vector2(width, rt.sizeDelta.y);
     }
 }
