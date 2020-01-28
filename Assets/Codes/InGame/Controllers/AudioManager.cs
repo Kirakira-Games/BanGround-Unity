@@ -186,4 +186,14 @@ class AudioManager : MonoBehaviour
         BGMChannelGroup.release();
         System.release();
     }
+
+    private void OnDestroy()
+    {
+        foreach (var sound in LoadedSound)
+            sound.release();
+
+        SEChannelGroup.release();
+        BGMChannelGroup.release();
+        System.release();
+    }
 }

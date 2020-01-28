@@ -329,7 +329,8 @@ public class NoteController : MonoBehaviour
 
     IEnumerator DelayPlayBGM()
     {
-        var BGM = audioMgr.PrecacheSound(Resources.Load<TextAsset>(string.Format(LiveSetting.testMusic, LiveSetting.selected)));
+        var music = string.Format(LiveSetting.testMusic, LiveSetting.selected);
+        var BGM = audioMgr.PrecacheSound(Resources.Load<TextAsset>(music));
         //bgm will not start untill the gate open
         audioMgr.loading = true;
         yield return new WaitForSeconds(2f);
