@@ -290,6 +290,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b0b6e665f9d83d499a37fe501f21f1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  APvoice: {fileID: 8300000, guid: 4f1a76e6e38ae0f4494b49189f731403, type: 3}
+  FCvoice: {fileID: 8300000, guid: bd982f174e46a66498af35318a521382, type: 3}
+  CLvoice: {fileID: 8300000, guid: 9bf0130e99022e2489b972af093a1850, type: 3}
+  Fvoice: {fileID: 8300000, guid: e0a10f8b28a9e0b4c951aa54d35a7c91, type: 3}
 --- !u!4 &93338203
 Transform:
   m_ObjectHideFlags: 0
@@ -1816,10 +1820,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   loading: 1
-  APvoice: {fileID: 8300000, guid: 4f1a76e6e38ae0f4494b49189f731403, type: 3}
-  FCvoice: {fileID: 8300000, guid: bd982f174e46a66498af35318a521382, type: 3}
-  CLvoice: {fileID: 8300000, guid: 9bf0130e99022e2489b972af093a1850, type: 3}
-  Fvoice: {fileID: 8300000, guid: e0a10f8b28a9e0b4c951aa54d35a7c91, type: 3}
+  isInGame: 1
 --- !u!1 &771107502
 GameObject:
   m_ObjectHideFlags: 0
@@ -3951,7 +3952,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.49019608}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:

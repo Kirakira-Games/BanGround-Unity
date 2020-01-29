@@ -17,7 +17,12 @@ public class UIManager : MonoBehaviour
     Button retry_Btn;
     Button retire_Btn;
 
-    //function show result is in audio manager
+    public AudioClip APvoice;
+    public AudioClip FCvoice;
+    public AudioClip CLvoice;
+    public AudioClip Fvoice;
+    GameObject gateCanvas;
+
 
     void Start()
     {
@@ -42,6 +47,8 @@ public class UIManager : MonoBehaviour
         pause_Canvas.SetActive(false);
 
         am = GameObject.Find("NoteController").GetComponent<AudioManager>();
+
+        gateCanvas = GameObject.Find("GateCanvas");
 
     }
 
@@ -80,9 +87,43 @@ public class UIManager : MonoBehaviour
         GamePause();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void OnAudioFinish()
     {
-        
+        StartCoroutine(ShowResult());
     }
+
+    IEnumerator DelayDisableGate()
+    {
+        yield return new WaitForSeconds(3f);
+        gateCanvas.SetActive(false);
+    }
+
+    IEnumerator ShowResult()
+    {
+        gateCanvas.SetActive(true);
+        Image gateImg = GameObject.Find("GateImg").GetComponent<Image>();
+        switch (ResultsGetter.GetClearMark())
+        {
+            case ClearMarks.AP:
+                gateImg.sprite = Resources.Load<Sprite>("UI/SwitchUI/AllPerfect");
+                AudioSource.PlayClipAtPoint(APvoice, Vector3.zero);
+                break;
+            case ClearMarks.FC:
+                gateImg.sprite = Resources.Load<Sprite>("UI/SwitchUI/FullCombo");
+                AudioSource.PlayClipAtPoint(FCvoice, Vector3.zero);
+                break;
+            case ClearMarks.CL:
+                gateImg.sprite = Resources.Load<Sprite>("UI/SwitchUI/Clear");
+                AudioSource.PlayClipAtPoint(CLvoice, Vector3.zero);
+                break;
+            case ClearMarks.F:
+                gateImg.sprite = Resources.Load<Sprite>("UI/SwitchUI/Fail");
+                AudioSource.PlayClipAtPoint(Fvoice, Vector3.zero);
+                break;
+        }
+        GameObject.Find("GateCanvas").GetComponent<Animator>().Play("GateClose");
+        yield return new WaitForSeconds(3);
+        SceneManager.LoadSceneAsync("Result");
+    }
+
 }
