@@ -27,6 +27,8 @@ public class SelectManager : MonoBehaviour
     private Slider lane_Bright;
     private Slider seVolume_Input;
 
+    AudioManager audioManager;
+
     RectTransform rt ;
     RectTransform rt_v ;
     VerticalLayoutGroup lg ;
@@ -45,6 +47,7 @@ public class SelectManager : MonoBehaviour
         rt = GameObject.Find("SongContent").GetComponent<RectTransform>();
         rt_v = GameObject.Find("Song Scroll View").GetComponent<RectTransform>();
         lg = GameObject.Find("SongContent").GetComponent<VerticalLayoutGroup>();
+        audioManager = GetComponent<AudioManager>();
         {
             enter_Btn = GameObject.Find("Enter_Btn").GetComponent<Button>();
             setting_Open_Btn = GameObject.Find("Setting_Panel").GetComponent<Button>();
@@ -98,7 +101,7 @@ public class SelectManager : MonoBehaviour
         LoadLiveSettingFile();
         InitSongList();
         GetLiveSetting();
-
+        audioManager.loading = false;
     }
 
     private static void LoadLiveSettingFile()
@@ -194,8 +197,7 @@ public class SelectManager : MonoBehaviour
         {
             StartCoroutine(SelectNear());
             return;
-        }
-            
+        }    
         foreach(GameObject selected in SelectButtons)
         {
            
@@ -207,9 +209,22 @@ public class SelectManager : MonoBehaviour
                 rc.OnSelect();
         }
         LiveSetting.selectedIndex = index;
-        
+        LiveSetting.selected = songList[LiveSetting.selectedIndex].DirName;
+        StartCoroutine(playPreview());
     }
 
+    FMOD.Sound sdBGM;
+    IEnumerator playPreview()
+    {
+        audioManager.StopBGM();
+        TextAsset ta = Resources.Load<TextAsset>(string.Format(LiveSetting.testMusic, LiveSetting.selected));
+        sdBGM = audioManager.PrecacheSound(ta);
+        audioManager.PlayBGM(sdBGM);
+        
+        yield return new WaitForEndOfFrame();
+    }
+
+    //--------------------------------------------
     bool isSettingOpened = false;
     void OpenSetting()
     {
@@ -251,7 +266,7 @@ public class SelectManager : MonoBehaviour
         LiveSetting.bgBrightness = bg_Bright.value;
         LiveSetting.laneBrightness = lane_Bright.value;
     }
-
+    //============================================
     void OnEnterPressed()
     {
         if (!isSettingOpened)
@@ -268,10 +283,9 @@ public class SelectManager : MonoBehaviour
         }
         */
         enter_Btn.interactable = false;
-        LiveSetting.selected = songList[LiveSetting.selectedIndex].DirName;
+        
 
         SetLiveSetting();
-
         scene_Animator.Play("OutPlay", -1, 0);
         CloseSetting();
         
@@ -280,7 +294,6 @@ public class SelectManager : MonoBehaviour
         StartCoroutine(DelayLoadScene());
 
     }
-
     IEnumerator DelayLoadScene()
     {
         yield return new WaitForSeconds(2f);

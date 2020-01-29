@@ -19,12 +19,7 @@ class AudioManager : MonoBehaviour
     List<Sound> LoadedSound = new List<Sound>();
 
     public bool loading = true;//bgm will not start untill the gate open
-
-    public AudioClip APvoice;
-    public AudioClip FCvoice;
-    public AudioClip CLvoice;
-    public AudioClip Fvoice;
-    GameObject gateCanvas;
+    public bool isInGame;
 
     private int lastPos = -1;
     private float lastUpdateTime = -1;
@@ -40,19 +35,18 @@ class AudioManager : MonoBehaviour
         System.createChannelGroup("BackgroundMuisc", out BGMChannelGroup);
     }
 
-    private void Start()
-    {
-        gateCanvas = GameObject.Find("GateCanvas");
-    }
 
     void Update()
     {
         System.update();
-
-        if (!loading && !GetPlayStatus())
+        if (isInGame)
         {
-            loading = true;
-            StartCoroutine(ShowResult());
+            if (!loading && !GetPlayStatus())
+            {
+                loading = true;
+                GameObject.Find("UIManager").GetComponent<UIManager>().OnAudioFinish();
+                
+            }
         }
     }
 
@@ -116,7 +110,7 @@ class AudioManager : MonoBehaviour
 
     public Channel PlayBGM(Sound sound)
     {
-        gateCanvas.SetActive(false);
+        
         Channel channel;
         
         System.playSound(sound, BGMChannelGroup, false, out channel);
@@ -164,32 +158,9 @@ class AudioManager : MonoBehaviour
         CurrentBGMChannel.setPaused(false);
     }
 
-    IEnumerator ShowResult()
+    public void StopBGM()
     {
-        gateCanvas.SetActive(true);
-        Text gateTxt = GameObject.Find("GateText").GetComponent<Text>();
-        switch (ResultsGetter.GetClearMark())
-        {
-            case ClearMarks.AP:
-                gateTxt.text = "ALL PERFECT";//TODO:switch to image
-                AudioSource.PlayClipAtPoint(APvoice, Vector3.zero);
-                break;
-            case ClearMarks.FC:
-                gateTxt.text = "FULL COMBO";//TODO:switch to image
-                AudioSource.PlayClipAtPoint(FCvoice, Vector3.zero);
-                break;
-            case ClearMarks.CL:
-                gateTxt.text = "CLEAR";//TODO:switch to image
-                AudioSource.PlayClipAtPoint(CLvoice, Vector3.zero);
-                break;
-            case ClearMarks.F:
-                gateTxt.text = "FAILED";//TODO:switch to image
-                AudioSource.PlayClipAtPoint(Fvoice, Vector3.zero);
-                break;
-        }
-        GameObject.Find("GateCanvas").GetComponent<Animator>().Play("GateClose");
-        yield return new WaitForSeconds(3);
-        SceneManager.LoadSceneAsync("Result");
+        CurrentBGMChannel.stop();
     }
 
     void OnApplicationQuit()

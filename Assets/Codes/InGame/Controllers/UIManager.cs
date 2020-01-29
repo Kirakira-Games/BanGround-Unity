@@ -17,6 +17,12 @@ public class UIManager : MonoBehaviour
     Button retry_Btn;
     Button retire_Btn;
 
+    public AudioClip APvoice;
+    public AudioClip FCvoice;
+    public AudioClip CLvoice;
+    public AudioClip Fvoice;
+    GameObject gateCanvas;
+
     //function show result is in audio manager
 
     void Start()
@@ -42,6 +48,8 @@ public class UIManager : MonoBehaviour
         pause_Canvas.SetActive(false);
 
         am = GameObject.Find("NoteController").GetComponent<AudioManager>();
+
+        gateCanvas = GameObject.Find("GateCanvas");
 
     }
 
@@ -80,9 +88,43 @@ public class UIManager : MonoBehaviour
         GamePause();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void OnAudioFinish()
     {
-        
+        StartCoroutine(ShowResult());
     }
+
+    IEnumerator DelayDisableGate()
+    {
+        yield return new WaitForSeconds(3f);
+        gateCanvas.SetActive(false);
+    }
+
+    IEnumerator ShowResult()
+    {
+        gateCanvas.SetActive(true);
+        Text gateTxt = GameObject.Find("GateText").GetComponent<Text>();
+        switch (ResultsGetter.GetClearMark())
+        {
+            case ClearMarks.AP:
+                gateTxt.text = "ALL PERFECT";//TODO:switch to image
+                AudioSource.PlayClipAtPoint(APvoice, Vector3.zero);
+                break;
+            case ClearMarks.FC:
+                gateTxt.text = "FULL COMBO";//TODO:switch to image
+                AudioSource.PlayClipAtPoint(FCvoice, Vector3.zero);
+                break;
+            case ClearMarks.CL:
+                gateTxt.text = "CLEAR";//TODO:switch to image
+                AudioSource.PlayClipAtPoint(CLvoice, Vector3.zero);
+                break;
+            case ClearMarks.F:
+                gateTxt.text = "FAILED";//TODO:switch to image
+                AudioSource.PlayClipAtPoint(Fvoice, Vector3.zero);
+                break;
+        }
+        GameObject.Find("GateCanvas").GetComponent<Animator>().Play("GateClose");
+        yield return new WaitForSeconds(3);
+        SceneManager.LoadSceneAsync("Result");
+    }
+
 }
