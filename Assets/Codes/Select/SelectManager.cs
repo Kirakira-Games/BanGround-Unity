@@ -84,8 +84,8 @@ public class SelectManager : MonoBehaviour
             GameObject.Find("Size<").GetComponent<Button>().onClick.AddListener(() => { size_Input.text = (float.Parse(size_Input.text) - 0.1f).ToString(); });
             size_Input.onValueChanged.AddListener((string a) =>
             {
-                if (float.Parse(size_Input.text) < 0) { size_Input.text = "2"; }
-                if (float.Parse(size_Input.text) > 2f) { size_Input.text = "0"; }
+                if (float.Parse(size_Input.text) < 0.1f) { size_Input.text = "2"; }
+                if (float.Parse(size_Input.text) > 2f) { size_Input.text = "0.1"; }
                 size_Input.text = string.Format("{0:F1}", float.Parse(size_Input.text));
             });
 
@@ -96,7 +96,7 @@ public class SelectManager : MonoBehaviour
             GameObject.Find("AudOff<").GetComponent<Button>().onClick.AddListener(() => { audio_Input.text = (float.Parse(audio_Input.text) - 1f).ToString(); });
         }//live setting init
         LoadLiveSettingFile();
-        initSongList();
+        InitSongList();
         GetLiveSetting();
 
     }
@@ -115,7 +115,7 @@ public class SelectManager : MonoBehaviour
         }
     }
 
-    private void initSongList()
+    private void InitSongList()
     {
         songList.Add(new Header("六兆年と一夜物語", "Roselia", "128"));
         songList.Add(new Header("ハッピーシンセサイザ", "Pastel＊Palettes", "85"));

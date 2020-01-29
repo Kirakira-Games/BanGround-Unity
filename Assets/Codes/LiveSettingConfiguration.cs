@@ -9,6 +9,7 @@ public static class LiveSetting
     public static int audioOffset = 0;
 
     public static float noteSpeed = 10.8f;
+    private static float trueNoteSpeed => noteSpeed - 0.07f;
     public static float noteSize = 1f;
     public static float meshSize = .75f;
     public static float meshOpacity = .6f;
@@ -42,10 +43,10 @@ public static class LiveSetting
     {
         get
         {
-            if(cachedSpeed != noteSpeed)
+            if(cachedSpeed != trueNoteSpeed)
             {
-                cachedSpeed = noteSpeed;
-                cachedScreenTime = (int)(-500 * noteSpeed + 6000);
+                cachedSpeed = trueNoteSpeed;
+                cachedScreenTime = (int)(-500 * trueNoteSpeed + 6000);
             }
 
             return cachedScreenTime;

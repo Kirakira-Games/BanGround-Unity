@@ -26,15 +26,18 @@ class AudioManager : MonoBehaviour
     public AudioClip Fvoice;
     GameObject gateCanvas;
 
+    private int lastPos = -1;
+    private float lastUpdateTime = -1;
+
     void Awake()
     {
         Factory.System_Create(out System);
-        var result = System.init(1024, INITFLAGS.NORMAL, IntPtr.Zero);
+        System.init(1024, INITFLAGS.NORMAL, IntPtr.Zero);
 
-        result = System.createChannelGroup("SoundEffects", out SEChannelGroup);
+        System.createChannelGroup("SoundEffects", out SEChannelGroup);
         SEChannelGroup.setVolume(LiveSetting.seVolume);
 
-        result = System.createChannelGroup("BackgroundMuisc", out BGMChannelGroup);
+        System.createChannelGroup("BackgroundMuisc", out BGMChannelGroup);
     }
 
     private void Start()
@@ -127,14 +130,26 @@ class AudioManager : MonoBehaviour
         uint pos;
         CurrentBGMChannel.getPosition(out pos, TIMEUNIT.MS);
 
+        CurrentBGMChannel.getPaused(out bool paused);
+        if (!paused)
+        {
+            if (pos != lastPos)
+            {
+                lastPos = (int)pos;
+                lastUpdateTime = Time.time;
+            }
+            else if(GetPlayStatus())
+            {
+                return (int)((Time.time - lastUpdateTime) * 1000) + lastPos;
+            }
+        }
+
         return (int)pos + LiveSetting.audioOffset;
     }
 
     public bool GetPlayStatus()
     {
-        bool isPlaying;
-        CurrentBGMChannel.isPlaying(out isPlaying);
-        //UnityEngine.Debug.Log(isPlaying);
+        CurrentBGMChannel.isPlaying(out bool isPlaying);
         return isPlaying;
     }
 
