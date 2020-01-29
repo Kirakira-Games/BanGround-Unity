@@ -49,7 +49,7 @@ public class UIManager : MonoBehaviour
         am = GameObject.Find("NoteController").GetComponent<AudioManager>();
 
         gateCanvas = GameObject.Find("GateCanvas");
-
+        StartCoroutine(DelayDisableGate());
     }
 
     int clickCount = 0;

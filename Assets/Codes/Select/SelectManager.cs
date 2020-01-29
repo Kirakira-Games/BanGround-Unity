@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.IO;
+using System.Threading;
 using Newtonsoft.Json;
 
 public class SelectManager : MonoBehaviour
@@ -213,15 +214,34 @@ public class SelectManager : MonoBehaviour
         StartCoroutine(playPreview());
     }
 
-    FMOD.Sound sdBGM;
+    
     IEnumerator playPreview()
     {
         audioManager.StopBGM();
-        TextAsset ta = Resources.Load<TextAsset>(string.Format(LiveSetting.testMusic, LiveSetting.selected));
+        for(int i=0;i< audioManager.LoadedSound.Count;i++)
+        {
+            audioManager.UnloadSound(audioManager.LoadedSound[i]);
+        }
+        audioManager.LoadedSound = new List<FMOD.Sound>();
+        FMOD.Sound sdBGM;
+        yield return new WaitForEndOfFrame();
+        print("a");
+        ResourceRequest rr = Resources.LoadAsync<TextAsset>(string.Format(LiveSetting.testMusic, LiveSetting.selected));
+        while (!rr.isDone) yield return new WaitForEndOfFrame();
+        
+        TextAsset ta = rr.asset as TextAsset;
+        
+        print("b");
         sdBGM = audioManager.PrecacheSound(ta);
+        yield return new WaitForEndOfFrame();
+        print("c");
         audioManager.PlayBGM(sdBGM);
         
         yield return new WaitForEndOfFrame();
+    }
+    void ThreadLoadSong()
+    {
+
     }
 
     //--------------------------------------------

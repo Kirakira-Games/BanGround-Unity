@@ -16,7 +16,7 @@ class AudioManager : MonoBehaviour
 
     Channel CurrentBGMChannel;
 
-    List<Sound> LoadedSound = new List<Sound>();
+    public List<Sound> LoadedSound = new List<Sound>();
 
     public bool loading = true;//bgm will not start untill the gate open
     public bool isInGame;
@@ -39,6 +39,7 @@ class AudioManager : MonoBehaviour
     void Update()
     {
         System.update();
+        //print(LoadedSound.Count);
         if (isInGame)
         {
             if (!loading && !GetPlayStatus())
