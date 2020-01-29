@@ -167,23 +167,23 @@ class AudioManager : MonoBehaviour
     IEnumerator ShowResult()
     {
         gateCanvas.SetActive(true);
-        Text gateTxt = GameObject.Find("GateText").GetComponent<Text>();
+        Image gateImg = GameObject.Find("GateImg").GetComponent<Image>();
         switch (ResultsGetter.GetClearMark())
         {
             case ClearMarks.AP:
-                gateTxt.text = "ALL PERFECT";//TODO:switch to image
+                gateImg.sprite = Resources.Load<Sprite>("UI/SwitchUI/AllPerfect");
                 AudioSource.PlayClipAtPoint(APvoice, Vector3.zero);
                 break;
             case ClearMarks.FC:
-                gateTxt.text = "FULL COMBO";//TODO:switch to image
+                gateImg.sprite = Resources.Load<Sprite>("UI/SwitchUI/FullCombo");
                 AudioSource.PlayClipAtPoint(FCvoice, Vector3.zero);
                 break;
             case ClearMarks.CL:
-                gateTxt.text = "CLEAR";//TODO:switch to image
+                gateImg.sprite = Resources.Load<Sprite>("UI/SwitchUI/Clear");
                 AudioSource.PlayClipAtPoint(CLvoice, Vector3.zero);
                 break;
             case ClearMarks.F:
-                gateTxt.text = "FAILED";//TODO:switch to image
+                gateImg.sprite = Resources.Load<Sprite>("UI/SwitchUI/Fail");
                 AudioSource.PlayClipAtPoint(Fvoice, Vector3.zero);
                 break;
         }
