@@ -14,6 +14,7 @@ public class SelectManager : MonoBehaviour
     private Button setting_Open_Btn;
     private Button setting_Close_Btn;
 
+    private int lastIndex = -1;
 
     private Toggle syncLine_Tog;
     private Toggle offBeat_Tog;
@@ -325,6 +326,9 @@ public class SelectManager : MonoBehaviour
     }
     void PlayPreview()
     {
+        if (lastIndex == LiveSetting.selectedIndex) return;
+        else lastIndex = LiveSetting.selectedIndex;
+
         audioManager.StopBGM();
         for (int i = 0; i < audioManager.LoadedSound.Count; i++)
         {
