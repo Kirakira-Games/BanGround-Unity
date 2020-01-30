@@ -32,11 +32,24 @@ public static class LiveSetting
     private static float cachedSpeed = 0;
     private static int cachedScreenTime = 0;
 
-    public const string testChart = "TestCharts/{0}/0.json";
-    public const string testHeader = "TestCharts/{0}/header.json";
-    public const string testMusic = "TestCharts/{0}/bgm.mp3";
-    public static string selected = "";
+    public static string ChartDir = Application.streamingAssetsPath + "/TestCharts/";
+    public static string selectedMusic = "bgm.mp3";
+    public static string selectedChart = "0";//file name
+    public static string selectedFolder = "";
     public static int selectedIndex = 0;
+
+    public static string GetChartPath()
+    {
+        return ChartDir + selectedFolder + "/" + selectedChart +".json";
+    }
+    public static string GetBGMPath()
+    {
+        return ChartDir + selectedFolder + "/" + selectedMusic;
+    }
+    public static string GetHeaderPath()
+    {
+        return ChartDir + selectedFolder + "/" + "header.json";
+    }
 
     public static string settingsPath = Application.persistentDataPath + "/LiveSettings.json";
     public static string scoresPath = Application.persistentDataPath + "/Scores.json";

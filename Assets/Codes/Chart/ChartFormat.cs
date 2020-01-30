@@ -7,11 +7,11 @@ using Newtonsoft.Json.Converters;
 [JsonConverter(typeof(StringEnumConverter))]
 public enum Difficulty
 {
-	Easy = 0,
-	Normal,
-	Hard,
-	Expert,
-	Special
+	Easy = 0 ,
+	Normal = 1 ,
+	Hard = 2 ,
+	Expert = 3 ,
+	Special = 4
 };
 
 [JsonConverter(typeof(StringEnumConverter))]
@@ -40,6 +40,7 @@ public class Chart
     public string authorUnicode;
     public string backgroundFile;
     public Difficulty difficulty;
+    public string fileName;//for load in usage
     public byte level;
     // TODO: Fix this delay
     public int offset = 0;
@@ -58,7 +59,9 @@ public class Header
     public float PreviewEnd;
 
     public short NumCharts;
-    public string DirName;
+    public string DirName;//for load in usage
+
+    public List<Chart> charts;
     public Header(string title,string artist,string dirName)
     {
         TitleUnicode = title;

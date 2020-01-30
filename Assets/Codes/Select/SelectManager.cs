@@ -236,7 +236,7 @@ public class SelectManager : MonoBehaviour
                 rc.OnSelect();
         }
         LiveSetting.selectedIndex = index;
-        LiveSetting.selected = songList[LiveSetting.selectedIndex].DirName;
+        LiveSetting.selectedFolder = songList[LiveSetting.selectedIndex].DirName;
         DisplayRecord();
         PlayPreview();
     }
@@ -246,7 +246,7 @@ public class SelectManager : MonoBehaviour
         PlayResult a= new PlayResult();
         for (int i = 0; i < playRecords.resultsList.Count; i++)
         {
-            if (playRecords.resultsList[i].FolderName == LiveSetting.selected && playRecords.resultsList[i].ChartName == "0")
+            if (playRecords.resultsList[i].FolderName == LiveSetting.selectedFolder && playRecords.resultsList[i].ChartName == LiveSetting.selectedChart)
             {
                 count++;
                 a = playRecords.resultsList[i];
@@ -338,7 +338,7 @@ public class SelectManager : MonoBehaviour
         FMOD.Sound sdBGM;
 
         print("a");
-        sdBGM = audioManager.PrecacheSound(File.ReadAllBytes(Application.streamingAssetsPath + "/" + string.Format(LiveSetting.testMusic, LiveSetting.selected)));
+        sdBGM = audioManager.PrecacheSound(LiveSetting.GetBGMPath());
         print("b");
 
         var channel = audioManager.PlayBGM(sdBGM, true);

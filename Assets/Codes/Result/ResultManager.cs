@@ -202,8 +202,8 @@ public class ResultManager : MonoBehaviour
 
     private void ShowSongInfo()
     {
-        chart = ChartLoader.LoadChartFromFile(Application.streamingAssetsPath + "/" + string.Format(LiveSetting.testChart, LiveSetting.selected));
-        header = ChartLoader.LoadHeaderFromFile(Application.streamingAssetsPath + "/" + string.Format(LiveSetting.testHeader, LiveSetting.selected));
+        chart = ChartLoader.LoadChartFromFile(LiveSetting.GetChartPath());
+        header = ChartLoader.LoadHeaderFromFile(LiveSetting.GetHeaderPath());
         
 
         level_Text.text = Enum.GetName(typeof(Difficulty), chart.difficulty).ToUpper() + " " + chart.level.ToString();
@@ -217,13 +217,13 @@ public class ResultManager : MonoBehaviour
         playResult.ranks = ResultsGetter.GetRanks();
         playResult.clearMark = ResultsGetter.GetClearMark();
         playResult.Acc = ResultsGetter.GetAcc();
-        playResult.ChartName = "0";
-        playResult.FolderName = LiveSetting.selected;
+        playResult.ChartName = LiveSetting.selectedChart;
+        playResult.FolderName = LiveSetting.selectedFolder;
         PlayRecords pr = PlayRecords.OpenRecord();
         int count = 0;
         for(int i =0;i<pr.resultsList.Count;i++)
         {
-            if (pr.resultsList[i].FolderName == LiveSetting.selected && pr.resultsList[i].ChartName == "0")
+            if (pr.resultsList[i].FolderName == LiveSetting.selectedFolder && pr.resultsList[i].ChartName == LiveSetting.selectedChart)
             {
                 count++;
                 lastScore = pr.resultsList[i].Score;
