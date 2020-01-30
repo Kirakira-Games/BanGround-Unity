@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -65,3 +66,44 @@ public class Header
         DirName = dirName;
     }
 };
+
+[JsonConverter(typeof(StringEnumConverter))]
+public enum ClearMarks { AP, FC, CL, F };
+[JsonConverter(typeof(StringEnumConverter))]
+public enum Ranks { SSS, SS, S, A, B, C, D, F };
+
+public class PlayResult
+{
+    public ClearMarks clearMark;
+    public Ranks ranks;
+    public double Score;
+    public double Acc;
+    public String FolderName;
+    public String ChartName;
+}
+
+public class PlayRecords {
+    public List<PlayResult> resultsList;
+    public PlayRecords()
+    {
+        resultsList = new List<PlayResult>();
+    }
+    public static PlayRecords OpenRecord()
+    {
+        if (File.Exists(LiveSetting.scoresPath))
+        {
+            string json = File.ReadAllText(LiveSetting.scoresPath);
+            return JsonConvert.DeserializeObject<PlayRecords>(json);
+        }
+        else
+        {
+            return new PlayRecords();
+        }
+    }
+    public static string SaveRecord(PlayRecords a)
+    {
+        string json = JsonConvert.SerializeObject(a);
+        File.WriteAllText(LiveSetting.scoresPath,json);
+        return json;
+    }
+}

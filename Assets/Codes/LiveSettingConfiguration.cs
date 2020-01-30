@@ -38,6 +38,7 @@ public static class LiveSetting
     public static int selectedIndex = 0;
 
     public static string settingsPath = Application.persistentDataPath + "/LiveSettings.json";
+    public static string scoresPath = Application.persistentDataPath + "/Scores.json";
 
     public static int NoteScreenTime
     {

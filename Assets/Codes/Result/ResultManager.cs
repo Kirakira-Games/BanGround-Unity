@@ -29,6 +29,9 @@ public class ResultManager : MonoBehaviour
     private RawImage rankIcon;
     private RawImage markIcon;
 
+    PlayResult playResult = new PlayResult();
+    double lastScore = 0;
+
     private const string IconPath = "UI/v3/";
 
     public AudioClip[] voices = new AudioClip[9];
@@ -38,6 +41,7 @@ public class ResultManager : MonoBehaviour
         StartCoroutine(ReadRank());
         SetBtnObject();
         GetResultObjectAndComponent();
+        ReadScores();
         ShowScore();
         ShowRank();
         ShowSongInfo();
@@ -133,8 +137,10 @@ public class ResultManager : MonoBehaviour
 
     public void ShowScore()
     {
-        score_Text.text = string.Format("{0:0000000}", ComboManager.score / ComboManager.maxScore * 1000000);
-        score_delta_Text.text = "Not Implemented";
+        
+        score_Text.text = string.Format("{0:0000000}",playResult.Score);
+        double delta = playResult.Score - lastScore;
+        score_delta_Text.text = string.Format(delta < 0 ? "-{0:0000000}": "+{0:0000000}", playResult.Score - lastScore) ;
         perfect_Text.text = ComboManager.judgeCount[(int)JudgeResult.Perfect].ToString();
         great_Text.text = ComboManager.judgeCount[(int)JudgeResult.Great].ToString();
         good_Text.text = ComboManager.judgeCount[(int)JudgeResult.Good].ToString();
@@ -147,7 +153,8 @@ public class ResultManager : MonoBehaviour
     {
         //Set Rank
         var rank = new Texture2D(0,0);
-        switch (ResultsGetter.GetRanks())
+        
+        switch (playResult.ranks)
         {
             case Ranks.SSS:
                 rank = Resources.Load(IconPath + "SSS") as Texture2D;
@@ -177,8 +184,8 @@ public class ResultManager : MonoBehaviour
         rankIcon.texture = rank;
 
         //Set Mark
-
-        switch (ResultsGetter.GetClearMark())
+        
+        switch (playResult.clearMark)
         {
             case ClearMarks.AP:
                 markIcon.texture = Resources.Load(IconPath + "AP") as Texture2D;
@@ -199,21 +206,55 @@ public class ResultManager : MonoBehaviour
     {
         chart = ChartLoader.LoadChartFromFile(string.Format(LiveSetting.testChart, LiveSetting.selected));
         header = ChartLoader.LoadHeaderFromFile(string.Format(LiveSetting.testHeader, LiveSetting.selected));
-        double acc = ComboManager.acc / (double)ComboManager.maxAcc;
+        
 
         level_Text.text = Enum.GetName(typeof(Difficulty), chart.difficulty).ToUpper() + " " + chart.level.ToString();
         songName_Text.text = header?.TitleUnicode;
-        acc_Text.text = LiveSetting.autoPlayEnabled ? "AUTOPLAY": string.Format("{0:P2}", acc);
+        acc_Text.text = LiveSetting.autoPlayEnabled ? "AUTOPLAY": string.Format("{0:P2}", playResult.Acc);
     }
+
+    void ReadScores()
+    {
+        playResult.Score = (ComboManager.score / ComboManager.maxScore) * 1000000;
+        playResult.ranks = ResultsGetter.GetRanks();
+        playResult.clearMark = ResultsGetter.GetClearMark();
+        playResult.Acc = ResultsGetter.GetAcc();
+        playResult.ChartName = "0";
+        playResult.FolderName = LiveSetting.selected;
+        PlayRecords pr = PlayRecords.OpenRecord();
+        int count = 0;
+        for(int i =0;i<pr.resultsList.Count;i++)
+        {
+            if (pr.resultsList[i].FolderName == LiveSetting.selected && pr.resultsList[i].ChartName == "0")
+            {
+                count++;
+                lastScore = pr.resultsList[i].Score;
+                if (lastScore < playResult.Score)
+                {
+                    pr.resultsList.RemoveAt(i);
+                    pr.resultsList.Add(playResult);
+                }
+            }
+        }
+        if (count == 0)
+        {
+            lastScore = 0;
+            pr.resultsList.Add(playResult);
+        }
+        if (!LiveSetting.autoPlayEnabled)
+            print("Record Saved: " + PlayRecords.SaveRecord(pr));
+        else
+            print("Autoplay score not saved");
+    }
+
 }
 
-enum ClearMarks { AP,FC,CL,F};
-enum Ranks { SSS,SS,S,A,B,C,D,F};
+
 static class ResultsGetter
 {
     public static ClearMarks GetClearMark()
     {
-        double acc = ComboManager.acc / (double)ComboManager.maxAcc;
+        double acc = GetAcc();
         if (ComboManager.judgeCount[(int)JudgeResult.Perfect] == ComboManager.noteCount)
         {
             return ClearMarks.AP;
@@ -250,5 +291,10 @@ static class ResultsGetter
             return Ranks.D;
         else
             return Ranks.F;
+    }
+    public static double GetAcc()
+    {
+        double acc = ComboManager.acc / (double)ComboManager.maxAcc;
+        return acc;
     }
 }
