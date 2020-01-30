@@ -23,7 +23,7 @@ public class SlideEnd : SlideNoteBase
     public override void InitNote()
     {
         base.InitNote();
-        mesh.material.SetTexture("_MainTex", NoteUtility.LoadResource<Texture2D>("note_long_default"));
+        mesh.material.SetTexture("_BaseMap", NoteUtility.LoadResource<Texture2D>("note_long_default"));
     }
 
     protected override void OnNoteUpdateJudge(int audioTime)
