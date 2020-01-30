@@ -35,78 +35,101 @@ public class SelectManager : MonoBehaviour
     RectTransform rt_v ;
     VerticalLayoutGroup lg ;
 
+    RawImage Rank;
+    RawImage clearMark;
+    Text score;
+    Text acc;
+
     private Animator scene_Animator;
 
     public GameObject songItemPrefab;
 
     List<Header> songList = new List<Header>();
     List<GameObject> SelectButtons = new List<GameObject>();
+    
+
+    PlayRecords playRecords;
 
     // Start is called before the first frame update
     void Start()
+    {
+        initComponent();
+        LoadScoreRecord();
+        LoadLiveSettingFile();
+        InitSongList();
+        GetLiveSetting();
+        
+        audioManager.loading = false;
+    }
+
+    private void initComponent()
     {
         scene_Animator = GameObject.Find("SceneAnimator").GetComponent<Animator>();
         rt = GameObject.Find("SongContent").GetComponent<RectTransform>();
         rt_v = GameObject.Find("Song Scroll View").GetComponent<RectTransform>();
         lg = GameObject.Find("SongContent").GetComponent<VerticalLayoutGroup>();
         audioManager = GetComponent<AudioManager>();
+
+        enter_Btn = GameObject.Find("Enter_Btn").GetComponent<Button>();
+        setting_Open_Btn = GameObject.Find("Setting_Panel").GetComponent<Button>();
+        setting_Close_Btn = GameObject.Find("Button_Close").GetComponent<Button>();
+
+
+        syncLine_Tog = GameObject.Find("Sync_Toggle").GetComponent<Toggle>();
+        offBeat_Tog = GameObject.Find("Offbeat_Toggle").GetComponent<Toggle>();
+        auto_Tog = GameObject.Find("Autoplay_Toggle").GetComponent<Toggle>();
+        persp_Tog = GameObject.Find("Perspective_Toggle").GetComponent<Toggle>();
+
+        speed_Input = GameObject.Find("Speed_Input").GetComponent<InputField>();
+        judge_Input = GameObject.Find("Judge_Input").GetComponent<InputField>();
+        audio_Input = GameObject.Find("Audio_Input").GetComponent<InputField>();
+        size_Input = GameObject.Find("Size_Input").GetComponent<InputField>();
+
+        bg_Bright = GameObject.Find("BG_Bri_Slider").GetComponent<Slider>();
+        lane_Bright = GameObject.Find("Lane_Bri_Slider").GetComponent<Slider>();
+        seVolume_Input = GameObject.Find("SeVolume_Input").GetComponent<Slider>();
+
+        enter_Btn.onClick.AddListener(OnEnterPressed);
+        setting_Open_Btn.onClick.AddListener(OpenSetting);
+        setting_Close_Btn.onClick.AddListener(CloseSetting);
+
+        GameObject.Find("Speed>").GetComponent<Button>().onClick.AddListener(() => { speed_Input.text = (float.Parse(speed_Input.text) + 0.1f).ToString(); });
+        GameObject.Find("Speed<").GetComponent<Button>().onClick.AddListener(() => { speed_Input.text = (float.Parse(speed_Input.text) - 0.1f).ToString(); });
+        GameObject.Find("Speed>>").GetComponent<Button>().onClick.AddListener(() => { speed_Input.text = (float.Parse(speed_Input.text) + 1f).ToString(); });
+        GameObject.Find("Speed<<").GetComponent<Button>().onClick.AddListener(() => { speed_Input.text = (float.Parse(speed_Input.text) - 1f).ToString(); });
+        speed_Input.onValueChanged.AddListener((string a) =>
         {
-            enter_Btn = GameObject.Find("Enter_Btn").GetComponent<Button>();
-            setting_Open_Btn = GameObject.Find("Setting_Panel").GetComponent<Button>();
-            setting_Close_Btn = GameObject.Find("Button_Close").GetComponent<Button>();
+            if (float.Parse(speed_Input.text) < 1) { speed_Input.text = "11"; }
+            if (float.Parse(speed_Input.text) > 11f) { speed_Input.text = "1"; }
+            speed_Input.text = string.Format("{0:F1}", float.Parse(speed_Input.text));
+        });
 
+        GameObject.Find("Size>").GetComponent<Button>().onClick.AddListener(() => { size_Input.text = (float.Parse(size_Input.text) + 0.1f).ToString(); });
+        GameObject.Find("Size<").GetComponent<Button>().onClick.AddListener(() => { size_Input.text = (float.Parse(size_Input.text) - 0.1f).ToString(); });
+        size_Input.onValueChanged.AddListener((string a) =>
+        {
+            if (float.Parse(size_Input.text) < 0.1f) { size_Input.text = "2"; }
+            if (float.Parse(size_Input.text) > 2f) { size_Input.text = "0.1"; }
+            size_Input.text = string.Format("{0:F1}", float.Parse(size_Input.text));
+        });
 
-            syncLine_Tog = GameObject.Find("Sync_Toggle").GetComponent<Toggle>();
-            offBeat_Tog = GameObject.Find("Offbeat_Toggle").GetComponent<Toggle>();
-            auto_Tog = GameObject.Find("Autoplay_Toggle").GetComponent<Toggle>();
-            persp_Tog = GameObject.Find("Perspective_Toggle").GetComponent<Toggle>();
+        GameObject.Find("JudOff>").GetComponent<Button>().onClick.AddListener(() => { judge_Input.text = (float.Parse(judge_Input.text) + 1f).ToString(); });
+        GameObject.Find("JudOff<").GetComponent<Button>().onClick.AddListener(() => { judge_Input.text = (float.Parse(judge_Input.text) - 1f).ToString(); });
 
-            speed_Input = GameObject.Find("Speed_Input").GetComponent<InputField>();
-            judge_Input = GameObject.Find("Judge_Input").GetComponent<InputField>();
-            audio_Input = GameObject.Find("Audio_Input").GetComponent<InputField>();
-            size_Input = GameObject.Find("Size_Input").GetComponent<InputField>();
+        GameObject.Find("AudOff>").GetComponent<Button>().onClick.AddListener(() => { audio_Input.text = (float.Parse(audio_Input.text) + 1f).ToString(); });
+        GameObject.Find("AudOff<").GetComponent<Button>().onClick.AddListener(() => { audio_Input.text = (float.Parse(audio_Input.text) - 1f).ToString(); });
+        //live setting init
 
-            bg_Bright = GameObject.Find("BG_Bri_Slider").GetComponent<Slider>();
-            lane_Bright = GameObject.Find("Lane_Bri_Slider").GetComponent<Slider>();
-            seVolume_Input = GameObject.Find("SeVolume_Input").GetComponent<Slider>();
-
-            enter_Btn.onClick.AddListener(OnEnterPressed);
-            setting_Open_Btn.onClick.AddListener(OpenSetting);
-            setting_Close_Btn.onClick.AddListener(CloseSetting);
-
-            GameObject.Find("Speed>").GetComponent<Button>().onClick.AddListener(() => { speed_Input.text = (float.Parse(speed_Input.text) + 0.1f).ToString(); });
-            GameObject.Find("Speed<").GetComponent<Button>().onClick.AddListener(() => { speed_Input.text = (float.Parse(speed_Input.text) - 0.1f).ToString(); });
-            GameObject.Find("Speed>>").GetComponent<Button>().onClick.AddListener(() => { speed_Input.text = (float.Parse(speed_Input.text) + 1f).ToString(); });
-            GameObject.Find("Speed<<").GetComponent<Button>().onClick.AddListener(() => { speed_Input.text = (float.Parse(speed_Input.text) - 1f).ToString(); });
-            speed_Input.onValueChanged.AddListener((string a) =>
-            {
-                if (float.Parse(speed_Input.text) < 1) { speed_Input.text = "11"; }
-                if (float.Parse(speed_Input.text) > 11f) { speed_Input.text = "1"; }
-                speed_Input.text = string.Format("{0:F1}", float.Parse(speed_Input.text));
-            });
-
-            GameObject.Find("Size>").GetComponent<Button>().onClick.AddListener(() => { size_Input.text = (float.Parse(size_Input.text) + 0.1f).ToString(); });
-            GameObject.Find("Size<").GetComponent<Button>().onClick.AddListener(() => { size_Input.text = (float.Parse(size_Input.text) - 0.1f).ToString(); });
-            size_Input.onValueChanged.AddListener((string a) =>
-            {
-                if (float.Parse(size_Input.text) < 0.1f) { size_Input.text = "2"; }
-                if (float.Parse(size_Input.text) > 2f) { size_Input.text = "0.1"; }
-                size_Input.text = string.Format("{0:F1}", float.Parse(size_Input.text));
-            });
-
-            GameObject.Find("JudOff>").GetComponent<Button>().onClick.AddListener(() => { judge_Input.text = (float.Parse(judge_Input.text) + 1f).ToString(); });
-            GameObject.Find("JudOff<").GetComponent<Button>().onClick.AddListener(() => { judge_Input.text = (float.Parse(judge_Input.text) - 1f).ToString(); });
-
-            GameObject.Find("AudOff>").GetComponent<Button>().onClick.AddListener(() => { audio_Input.text = (float.Parse(audio_Input.text) + 1f).ToString(); });
-            GameObject.Find("AudOff<").GetComponent<Button>().onClick.AddListener(() => { audio_Input.text = (float.Parse(audio_Input.text) - 1f).ToString(); });
-        }//live setting init
-        LoadLiveSettingFile();
-        InitSongList();
-        GetLiveSetting();
-        audioManager.loading = false;
+        Rank = GameObject.Find("Rank").GetComponent<RawImage>();
+        clearMark = GameObject.Find("ClearMark").GetComponent<RawImage>();
+        score = GameObject.Find("ScoreText").GetComponent<Text>();
+        acc = GameObject.Find("AccText").GetComponent<Text>();
     }
-
-    private static void LoadLiveSettingFile()
+    void LoadScoreRecord()
+    {
+        playRecords = PlayRecords.OpenRecord();
+    }
+    private void LoadLiveSettingFile()
     {
         if (File.Exists(LiveSetting.settingsPath))
         {
@@ -120,6 +143,7 @@ public class SelectManager : MonoBehaviour
         }
     }
 
+    //--------------------------------------------
     private void InitSongList()
     {
         songList.Add(new Header("六兆年と一夜物語", "Roselia", "128"));
@@ -212,11 +236,93 @@ public class SelectManager : MonoBehaviour
         }
         LiveSetting.selectedIndex = index;
         LiveSetting.selected = songList[LiveSetting.selectedIndex].DirName;
-        //StartCoroutine(playPreview());
+        DisplayRecord();
         PlayPreview();
     }
+    void DisplayRecord()
+    {
+        int count = 0;
+        PlayResult a= new PlayResult();
+        for (int i = 0; i < playRecords.resultsList.Count; i++)
+        {
+            if (playRecords.resultsList[i].FolderName == LiveSetting.selected && playRecords.resultsList[i].ChartName == "0")
+            {
+                count++;
+                a = playRecords.resultsList[i];
+                
+            }
+        }
+        score.text = string.Format("{0:0000000}", a.Score);
+        acc.text = string.Format("{0:P2}", a.Acc);
+        //Set Rank
+        if (count == 0)
+        {
+            Rank.enabled = false;
+            clearMark.enabled = false;
+            return;
+        }
+        else
+        {
+            Rank.enabled = true;
+            clearMark.enabled = true;
+        }
+        
+            
+        var rank = new Texture2D(0, 0);
+        switch (a.ranks)
+        {
+            case Ranks.SSS:
+                rank = Resources.Load(LiveSetting.IconPath + "SSS") as Texture2D;
+                break;
+            case Ranks.SS:
+                rank = Resources.Load(LiveSetting.IconPath + "SS") as Texture2D;
+                break;
+            case Ranks.S:
+                rank = Resources.Load(LiveSetting.IconPath + "S") as Texture2D;
+                break;
+            case Ranks.A:
+                rank = Resources.Load(LiveSetting.IconPath + "A") as Texture2D;
+                break;
+            case Ranks.B:
+                rank = Resources.Load(LiveSetting.IconPath + "B") as Texture2D;
+                break;
+            case Ranks.C:
+                rank = Resources.Load(LiveSetting.IconPath + "C") as Texture2D;
+                break;
+            case Ranks.D:
+                rank = Resources.Load(LiveSetting.IconPath + "D") as Texture2D;
+                break;
+            case Ranks.F:
+                rank = Resources.Load(LiveSetting.IconPath + "F") as Texture2D;
+                break;
+            default:
+                rank = null;
+                break;
+        }
+        Rank.texture = rank;
 
-    
+        //Set Mark
+        var mark = new Texture2D(0, 0);
+        switch (a.clearMark)
+        {
+            case ClearMarks.AP:
+                mark = Resources.Load(LiveSetting.IconPath + "AP") as Texture2D;
+                break;
+            case ClearMarks.FC:
+                mark = Resources.Load(LiveSetting.IconPath + "FC") as Texture2D;
+                break;
+            case ClearMarks.CL:
+                mark = Resources.Load(LiveSetting.IconPath + "CL") as Texture2D;
+                break;
+            case ClearMarks.F:
+                clearMark.enabled = false;
+                break;
+            default:
+                clearMark.enabled = false;
+                break;
+        }
+        clearMark.texture = mark;
+    }
     void PlayPreview()
     {
         audioManager.StopBGM();

@@ -32,8 +32,6 @@ public class ResultManager : MonoBehaviour
     PlayResult playResult = new PlayResult();
     double lastScore = 0;
 
-    private const string IconPath = "UI/v3/";
-
     public AudioClip[] voices = new AudioClip[9];
 
     void Start()
@@ -157,28 +155,28 @@ public class ResultManager : MonoBehaviour
         switch (playResult.ranks)
         {
             case Ranks.SSS:
-                rank = Resources.Load(IconPath + "SSS") as Texture2D;
+                rank = Resources.Load(LiveSetting.IconPath + "SSS") as Texture2D;
                 break;
             case Ranks.SS:
-                rank = Resources.Load(IconPath + "SS") as Texture2D;
+                rank = Resources.Load(LiveSetting.IconPath + "SS") as Texture2D;
                 break;
             case Ranks.S:
-                rank = Resources.Load(IconPath + "S") as Texture2D;
+                rank = Resources.Load(LiveSetting.IconPath + "S") as Texture2D;
                 break;
             case Ranks.A:
-                rank = Resources.Load(IconPath + "A") as Texture2D;
+                rank = Resources.Load(LiveSetting.IconPath + "A") as Texture2D;
                 break;
             case Ranks.B:
-                rank = Resources.Load(IconPath + "B") as Texture2D;
+                rank = Resources.Load(LiveSetting.IconPath + "B") as Texture2D;
                 break;
             case Ranks.C:
-                rank = Resources.Load(IconPath + "C") as Texture2D;
+                rank = Resources.Load(LiveSetting.IconPath + "C") as Texture2D;
                 break;
             case Ranks.D:
-                rank = Resources.Load(IconPath + "D") as Texture2D;
+                rank = Resources.Load(LiveSetting.IconPath + "D") as Texture2D;
                 break;
             case Ranks.F:
-                rank = Resources.Load(IconPath + "F") as Texture2D;
+                rank = Resources.Load(LiveSetting.IconPath + "F") as Texture2D;
                 break;
         }
         rankIcon.texture = rank;
@@ -188,13 +186,13 @@ public class ResultManager : MonoBehaviour
         switch (playResult.clearMark)
         {
             case ClearMarks.AP:
-                markIcon.texture = Resources.Load(IconPath + "AP") as Texture2D;
+                markIcon.texture = Resources.Load(LiveSetting.IconPath + "AP") as Texture2D;
                 break;
             case ClearMarks.FC:
-                markIcon.texture = Resources.Load(IconPath + "FC") as Texture2D;
+                markIcon.texture = Resources.Load(LiveSetting.IconPath + "FC") as Texture2D;
                 break;
             case ClearMarks.CL:
-                markIcon.texture = Resources.Load(IconPath + "CL") as Texture2D;
+                markIcon.texture = Resources.Load(LiveSetting.IconPath + "CL") as Texture2D;
                 break;
             case ClearMarks.F:
                 markIcon.texture = null;

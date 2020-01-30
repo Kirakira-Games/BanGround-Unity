@@ -27,6 +27,7 @@ public static class LiveSetting
     public static float laneBrightness = 0.84f;
 
     public static string assetDirectory = "V2Assets";
+    public const string IconPath = "UI/v3/";
 
     private static float cachedSpeed = 0;
     private static int cachedScreenTime = 0;
