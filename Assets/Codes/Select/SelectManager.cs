@@ -45,9 +45,10 @@ public class SelectManager : MonoBehaviour
 
     public GameObject songItemPrefab;
 
-    List<Header> songList = new List<Header>();
+    public List<Header> songList = new List<Header>();
     List<GameObject> SelectButtons = new List<GameObject>();
-    
+
+    DifficultySelect difficultySelect;
 
     PlayRecords playRecords;
 
@@ -125,6 +126,8 @@ public class SelectManager : MonoBehaviour
         clearMark = GameObject.Find("ClearMark").GetComponent<RawImage>();
         score = GameObject.Find("ScoreText").GetComponent<Text>();
         acc = GameObject.Find("AccText").GetComponent<Text>();
+
+        difficultySelect = GameObject.Find("DifficultySelect").GetComponent<DifficultySelect>();
     }
     void LoadScoreRecord()
     {
@@ -147,13 +150,25 @@ public class SelectManager : MonoBehaviour
     //--------------------------------------------
     private void InitSongList()
     {
-        songList.Add(new Header("六兆年と一夜物語", "Roselia", "128"));
-        songList.Add(new Header("ハッピーシンセサイザ", "Pastel＊Palettes", "85"));
-        //songList.Add(new Header("君にふれて", " TVアニメ「やがて君になる」OP", "2940"));
-        //songList.Add(new Header("炉心融解", "sasaki", "6283"));
-        songList.Add(new Header("Light Delight", "Poppin'Party", "112"));
-        songList.Add(new Header("[FULL] FIRE BIRD", "Roselia", "243"));
-        songList.Add(new Header("Ringing Bloom", "Roselia", "175"));
+        //songList.Add(new Header("六兆年と一夜物語", "Roselia", "128"));
+        Header header = new Header("ハッピーシンセサイザ", "Pastel＊Palettes", "85");
+        List<Chart> ch = new List<Chart>();
+        ch.Add(new Chart("Uk", 26, Difficulty.Expert, "0"));
+        ch.Add(new Chart("Uk", 25, Difficulty.Special, "1"));
+        ch.Add(new Chart("Uk", 18, Difficulty.Hard, "2"));
+        header.PreviewStart = 58.6f;
+        header.charts = ch;
+        songList.Add(header);
+        //songList.Add(new Header("Light Delight", "Poppin'Party", "112"));
+        //songList.Add(new Header("[FULL] FIRE BIRD", "Roselia", "243"));
+        //songList.Add(new Header("Ringing Bloom", "Roselia", "175"));
+        header = new Header("[FULL] FIRE BIRD", "Roselia", "243");
+        ch = new List<Chart>();
+        ch.Add(new Chart("Uk", 28, Difficulty.Expert, "0"));
+        ch.Add(new Chart("Uk", 21, Difficulty.Hard, "1"));
+        header.PreviewStart = 85f;
+        header.charts = ch;
+        songList.Add(header);
 
         for (int i = 0; i < songList.Count; i++)
         {
@@ -237,10 +252,17 @@ public class SelectManager : MonoBehaviour
         }
         LiveSetting.selectedIndex = index;
         LiveSetting.selectedFolder = songList[LiveSetting.selectedIndex].DirName;
+        int[] diffs = new int[5] { -1,-1,-1,-1,-114};
+        foreach(Chart a in songList[LiveSetting.selectedIndex].charts)
+        {
+            diffs[(int)a.difficulty] = a.level;
+        }
+        difficultySelect.levels = diffs;
+        difficultySelect.OnSongChange();
         DisplayRecord();
         PlayPreview();
     }
-    void DisplayRecord()
+    public void DisplayRecord()
     {
         int count = 0;
         PlayResult a= new PlayResult();
@@ -342,7 +364,7 @@ public class SelectManager : MonoBehaviour
         print("b");
 
         var channel = audioManager.PlayBGM(sdBGM, true);
-        channel.setPosition(30 * 1000, FMOD.TIMEUNIT.MS);
+        channel.setPosition((uint)(songList[LiveSetting.selectedIndex].PreviewStart * 1000), FMOD.TIMEUNIT.MS);
         channel.setPaused(false);
     }
 

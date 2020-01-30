@@ -45,6 +45,13 @@ public class Chart
     // TODO: Fix this delay
     public int offset = 0;
     public List<Note> notes;
+    public Chart(string _auther,byte _level,Difficulty _diff,string _fileName)
+    {
+        authorUnicode = _auther;
+        level = _level;
+        difficulty = _diff;
+        fileName = _fileName;
+    }
 };
 
 public class Header

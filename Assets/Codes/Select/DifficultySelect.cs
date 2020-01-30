@@ -14,10 +14,11 @@ public class DifficultySelect : MonoBehaviour
     int selected =0;
     Text difficultyText;
     Text levelText;
+    SelectManager selectManager;
 
     void Start()
     {
-        levels = new int[]{ 1,1,18,26,28 };
+        //levels = new int[]{ 1,1,18,26,28 };
         for (int i = 0; i < cards.Length; i++)
         {
             cardImg[i] = cards[i].GetComponent<Image>();
@@ -25,7 +26,8 @@ public class DifficultySelect : MonoBehaviour
         }
         levelText = GameObject.Find("Text_SelectedLevel").GetComponent<Text>();
         difficultyText = GameObject.Find("Text_SelectedDifficulty").GetComponent<Text>();
-        OnSongChange();
+        selectManager = GameObject.Find("SelectManager").GetComponent<SelectManager>();
+        //OnSongChange();
     }
     
     public void OnSongChange()
@@ -50,31 +52,18 @@ public class DifficultySelect : MonoBehaviour
     {
         for (int i = 0; i < enabledCards.Count; i++)
         {
-            Rects[enabledCards[i]].anchoredPosition = new Vector2(0 - (i * 10), 0);
+            Rects[enabledCards[i]].anchoredPosition = new Vector2(0 - (i * 10), 0); //图层 位置
             Rects[enabledCards[i]].SetAsFirstSibling();
         }
-        selected = enabledCards[0];
-        string difficulty = "";
-        switch (selected)
-        {
-            case 0:
-                difficulty = "EASY";
-                break;
-            case 1:
-                difficulty = "NORMAL";
-                break;
-            case 2:
-                difficulty = "HARD";
-                break;
-            case 3:
-                difficulty = "EXPERT";
-                break;
-            case 4:
-                difficulty = "SPECIAL";
-                break;
-        }
-        difficultyText.text = difficulty;
+        selected = enabledCards[0]; //最顶上一层
+        difficultyText.text = Enum.GetName(typeof(Difficulty), selected).ToUpper();
         levelText.text = levels[selected].ToString();
+
+        foreach (Chart a in selectManager.songList[LiveSetting.selectedIndex].charts) {
+            if ((int)a.difficulty == selected)
+                LiveSetting.selectedChart = a.fileName; //更新选择的难度的文件名
+        }
+        selectManager.DisplayRecord();
         //LiveSetting.selectedDifficulty = (Difficulty)enabledCards[0];
         //print(Enum.GetName(typeof(Difficulty), LiveSetting.selectedDifficulty));
     }
