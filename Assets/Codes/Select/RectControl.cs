@@ -25,6 +25,7 @@ public class RectControl : MonoBehaviour
         bt = GetComponent<Button>();
         rt = GetComponent<RectTransform>();
         bt.onClick.AddListener(OnPressed);
+        rt.sizeDelta = new Vector2(900, 116);
     }
 
     void OnPressed()
@@ -77,7 +78,7 @@ public class RectControl : MonoBehaviour
 
         width -= 120f;
 
-        if (rt_m.anchoredPosition.y == 0 - rt.anchoredPosition.y - vg.padding.top - 100 || width <= 0)
+        if (rt_m.anchoredPosition.y == 0 - rt.anchoredPosition.y - vg.padding.top - 100 || width <= 460 ||float.IsNaN(width))
             width = 928;
 
         rt.sizeDelta = new Vector2(width, rt.sizeDelta.y);
