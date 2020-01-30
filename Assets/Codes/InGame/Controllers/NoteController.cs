@@ -343,6 +343,9 @@ public class NoteController : MonoBehaviour
         int audioTime = audioMgr.GetBGMPlaybackTime();
         // Create notes
         UpdateNotes(audioTime);
+
+        if (audioMgr.GetPauseStatus()) return;
+
         // Trigger touch event
         UpdateTouch(audioTime);
         // Update each note child

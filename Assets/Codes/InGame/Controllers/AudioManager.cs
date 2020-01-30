@@ -148,6 +148,12 @@ class AudioManager : MonoBehaviour
         return isPlaying;
     }
 
+    public bool GetPauseStatus()
+    {
+        CurrentBGMChannel.getPaused(out bool paused);
+        return paused;
+    }
+
     public void PauseBGM()
     {
         print("pause");

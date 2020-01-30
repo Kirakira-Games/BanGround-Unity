@@ -55,9 +55,10 @@ public class UIManager : MonoBehaviour
     int clickCount = 0;
     public void OnPauseButtonClick()
     {
-        clickCount++;
-        if (clickCount >= 2)
-            GamePause();
+        //clickCount++;
+        //if (clickCount >= 2)
+        if (Input.touches.Length >= 2) return;
+        GamePause();
     }
     public void GamePause()
     {
