@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class NoteController : MonoBehaviour
@@ -299,7 +300,7 @@ public class NoteController : MonoBehaviour
         }
         controller = this;
         // Load chart
-        notes = ChartLoader.LoadNotesFromFile(string.Format(LiveSetting.testChart, LiveSetting.selected));
+        notes = ChartLoader.LoadNotesFromFile(Application.streamingAssetsPath + "/" + string.Format(LiveSetting.testChart, LiveSetting.selected));
         noteHead = 0;
         // Compute number of notes
         numNotes = 0;
@@ -329,8 +330,9 @@ public class NoteController : MonoBehaviour
 
     IEnumerator DelayPlayBGM()
     {
-        var music = string.Format(LiveSetting.testMusic, LiveSetting.selected);
-        var BGM = audioMgr.PrecacheSound(Resources.Load<TextAsset>(music));
+        //    var music = string.Format(LiveSetting.testMusic, LiveSetting.selected);
+        //    var BGM = audioMgr.PrecacheSound(Resources.Load<TextAsset>(music));
+        var BGM = audioMgr.PrecacheSound(File.ReadAllBytes(Application.streamingAssetsPath + "/" + string.Format(LiveSetting.testMusic, LiveSetting.selected)));
         //bgm will not start untill the gate open
         audioMgr.loading = true;
         yield return new WaitForSeconds(2f);

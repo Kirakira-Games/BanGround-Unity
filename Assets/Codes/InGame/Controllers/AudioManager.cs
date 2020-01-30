@@ -109,7 +109,7 @@ class AudioManager : MonoBehaviour
         return channel;
     }
 
-    public Channel PlayBGM(Sound sound)
+    public Channel PlayBGM(Sound sound, bool paused = false)
     {
         
         Channel channel;

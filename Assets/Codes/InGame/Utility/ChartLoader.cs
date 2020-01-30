@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
+using System.IO;
 
 class NoteComparer : Comparer<Note>
 {
@@ -67,15 +68,16 @@ public static class ChartLoader
     }
     public static Header LoadHeaderFromFile(string path)
     {
-        TextAsset headerText = Resources.Load<TextAsset>(path);
-        if (headerText == null) return null;
-        return JsonConvert.DeserializeObject<Header>(headerText.text);
+        if (!File.Exists(path)) return null;
+        //TextAsset headerText = Resources.Load<TextAsset>(path);
+        //if (headerText == null) return null;
+        return JsonConvert.DeserializeObject<Header>(File.ReadAllText(path));
     }
 
     public static Chart LoadChartFromFile(string path)
     {
-        TextAsset chartText = Resources.Load<TextAsset>(path);
-        return JsonConvert.DeserializeObject<Chart>(chartText.text);
+        //TextAsset chartText = Resources.Load<TextAsset>(path);
+        return JsonConvert.DeserializeObject<Chart>(File.ReadAllText(path));
     }
 
     public static float GetFloatingPointBeat(int[] beat)
