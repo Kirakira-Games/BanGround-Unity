@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 using System.IO;
 using System.Threading;
 using Newtonsoft.Json;
+using UnityEngine.Networking;
 
 public class SelectManager : MonoBehaviour
 {
@@ -211,37 +212,28 @@ public class SelectManager : MonoBehaviour
         }
         LiveSetting.selectedIndex = index;
         LiveSetting.selected = songList[LiveSetting.selectedIndex].DirName;
-        StartCoroutine(playPreview());
+        //StartCoroutine(playPreview());
+        PlayPreview();
     }
 
     
-    IEnumerator playPreview()
+    void PlayPreview()
     {
         audioManager.StopBGM();
-        for(int i=0;i< audioManager.LoadedSound.Count;i++)
+        for (int i = 0; i < audioManager.LoadedSound.Count; i++)
         {
             audioManager.UnloadSound(audioManager.LoadedSound[i]);
         }
-        audioManager.LoadedSound = new List<FMOD.Sound>();
+        audioManager.LoadedSound.Clear();
         FMOD.Sound sdBGM;
-        yield return new WaitForEndOfFrame();
-        print("a");
-        ResourceRequest rr = Resources.LoadAsync<TextAsset>(string.Format(LiveSetting.testMusic, LiveSetting.selected));
-        while (!rr.isDone) yield return new WaitForEndOfFrame();
-        
-        TextAsset ta = rr.asset as TextAsset;
-        
-        print("b");
-        sdBGM = audioManager.PrecacheSound(ta);
-        yield return new WaitForEndOfFrame();
-        print("c");
-        audioManager.PlayBGM(sdBGM);
-        
-        yield return new WaitForEndOfFrame();
-    }
-    void ThreadLoadSong()
-    {
 
+        print("a");
+        sdBGM = audioManager.PrecacheSound(File.ReadAllBytes(Application.streamingAssetsPath + "/" + string.Format(LiveSetting.testMusic, LiveSetting.selected)));
+        print("b");
+
+        var channel = audioManager.PlayBGM(sdBGM, true);
+        channel.setPosition(30 * 1000, FMOD.TIMEUNIT.MS);
+        channel.setPaused(false);
     }
 
     //--------------------------------------------

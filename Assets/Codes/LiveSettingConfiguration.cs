@@ -31,9 +31,9 @@ public static class LiveSetting
     private static float cachedSpeed = 0;
     private static int cachedScreenTime = 0;
 
-    public const string testChart = "TestCharts/{0}/0";
-    public const string testHeader = "TestCharts/{0}/header";
-    public const string testMusic = "TestCharts/{0}/bgm";
+    public const string testChart = "TestCharts/{0}/0.json";
+    public const string testHeader = "TestCharts/{0}/header.json";
+    public const string testMusic = "TestCharts/{0}/bgm.mp3";
     public static string selected = "";
     public static int selectedIndex = 0;
 
