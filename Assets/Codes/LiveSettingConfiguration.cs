@@ -32,7 +32,7 @@ public static class LiveSetting
     private static float cachedSpeed = 0;
     private static int cachedScreenTime = 0;
 
-    public static string ChartDir = Application.streamingAssetsPath + "/TestCharts/";
+    public static string ChartDir = Application.persistentDataPath + "/TestCharts/";
     public static string selectedMusic = "bgm.mp3";
     public static string selectedChart = "0";//file name
     public static string selectedFolder = "";

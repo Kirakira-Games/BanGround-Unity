@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 1
+  m_UseShadowmask: 0
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -5364,6 +5364,7 @@ GameObject:
   - component: {fileID: 410585087}
   - component: {fileID: 410585086}
   - component: {fileID: 410585085}
+  - component: {fileID: 410585089}
   m_Layer: 0
   m_Name: Plane
   m_TagString: Untagged
@@ -5446,6 +5447,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 173.428, y: 0, z: -180}
+--- !u!114 &410585089
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 410585084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b254bb97372e7244b16d63e9257508e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &825176225
 GameObject:
   m_ObjectHideFlags: 0
