@@ -20,6 +20,10 @@ class NoteComparer : Comparer<Note>
 
 public static class ChartLoader
 {
+    public static string BeatToString(int[] beat)
+    {
+        return "[" + beat[1] + "/" + beat[2] + "]";
+    }
     public static int Gcd(int a, int b)
     {
         return a == 0 ? b : Gcd(b % a, a);
@@ -44,7 +48,7 @@ public static class ChartLoader
             {
                 return GameNoteType.Flick;
             }
-            Debug.LogError("Cannot recognize NoteType " + note.type + " on single notes.");
+            Debug.LogError(BeatToString(note.beat) + "Cannot recognize NoteType " + note.type + " on single notes.");
             return GameNoteType.None;
         }
         if (note.type == NoteType.Single)
@@ -63,7 +67,7 @@ public static class ChartLoader
         {
             return GameNoteType.SlideEndFlick;
         }
-        Debug.LogError("Cannot recognize NoteType " + note.type + " on slide notes.");
+        Debug.LogError(BeatToString(note.beat) + "Cannot recognize NoteType " + note.type + " on slide notes.");
         return GameNoteType.None;
     }
     public static Header LoadHeaderFromFile(string path)
@@ -137,7 +141,7 @@ public static class ChartLoader
             {
                 if (note.type != NoteType.Single)
                 {
-                    Debug.LogWarning("Start of a slide must be 'Single' instead of '" + note.type + "'.");
+                    Debug.LogWarning(BeatToString(note.beat) + "Start of a slide must be 'Single' instead of '" + note.type + "'.");
                 }
                 GameNoteData tmp = new GameNoteData
                 {
