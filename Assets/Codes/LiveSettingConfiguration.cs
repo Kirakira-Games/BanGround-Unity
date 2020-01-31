@@ -43,6 +43,8 @@ public static class LiveSetting
     public static string selectedFolder = "";
     public static int selectedIndex = 0;
 
+    public static SongList songList;
+
     public static string GetChartPath()
     {
         return ChartDir + selectedFolder + "/" + selectedChart +".json";

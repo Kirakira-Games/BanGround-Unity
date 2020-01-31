@@ -117,3 +117,14 @@ public class PlayRecords {
         return json;
     }
 }
+
+public class SongList
+{
+    public string GenerateDate;
+    public List<Header> songs = new List<Header>();
+    public SongList(string date,List<Header> list)
+    {
+        songs = list;
+        GenerateDate = date;
+    }
+}

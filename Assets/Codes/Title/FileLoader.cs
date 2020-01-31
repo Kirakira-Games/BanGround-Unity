@@ -5,15 +5,35 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using UnityEngine.Networking;
+using Newtonsoft.Json;
 using UnityEngine;
 
 public class FileLoader : MonoBehaviour
 {
     private void Start()
     {
-        #if UNITY_ANDROID && !UNITY_EDITOR
+#if UNITY_ANDROID && !UNITY_EDITOR
         InitCharts();
-        #endif
+#endif
+        LoadSongListFromFile();
+    }
+
+    void LoadSongListFromFile()
+    {
+        string songListJson;
+#if UNITY_ANDROID && !UNITY_EDITOR
+#else
+        if (File.Exists(Application.streamingAssetsPath + "/SongList.json"))
+        {
+            songListJson = File.ReadAllText(Application.streamingAssetsPath + "/SongList.json");
+            LiveSetting.songList = JsonConvert.DeserializeObject<SongList>(songListJson);
+            print("SongList Loaded");
+        }
+        else
+        {
+            Debug.LogError("SongList.json not found! pls gennerate it in editor");
+        }
+#endif
     }
 
     private void InitCharts()

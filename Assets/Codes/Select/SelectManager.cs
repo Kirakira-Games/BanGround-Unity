@@ -151,25 +151,7 @@ public class SelectManager : MonoBehaviour
     //--------------------------------------------
     private void InitSongList()
     {
-        //songList.Add(new Header("六兆年と一夜物語", "Roselia", "128"));
-        Header header = new Header("ハッピーシンセサイザ", "Pastel＊Palettes", "85");
-        List<Chart> ch = new List<Chart>();
-        ch.Add(new Chart("Uk", 26, Difficulty.Expert, "0"));
-        ch.Add(new Chart("Uk", 25, Difficulty.Special, "1"));
-        ch.Add(new Chart("Uk", 18, Difficulty.Hard, "2"));
-        header.PreviewStart = 58.6f;
-        header.charts = ch;
-        songList.Add(header);
-        //songList.Add(new Header("Light Delight", "Poppin'Party", "112"));
-        //songList.Add(new Header("[FULL] FIRE BIRD", "Roselia", "243"));
-        //songList.Add(new Header("Ringing Bloom", "Roselia", "175"));
-        header = new Header("[FULL] FIRE BIRD", "Roselia", "243");
-        ch = new List<Chart>();
-        ch.Add(new Chart("Uk", 28, Difficulty.Expert, "0"));
-        ch.Add(new Chart("Uk", 21, Difficulty.Hard, "1"));
-        header.PreviewStart = 85f;
-        header.charts = ch;
-        songList.Add(header);
+        songList = LiveSetting.songList.songs;
 
         for (int i = 0; i < songList.Count; i++)
         {
