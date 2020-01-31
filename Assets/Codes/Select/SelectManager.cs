@@ -343,7 +343,7 @@ public class SelectManager : MonoBehaviour
         FMOD.Sound sdBGM;
 
         print("a");
-        sdBGM = audioManager.PrecacheSound(LiveSetting.GetBGMPath());
+        sdBGM = audioManager.PrecacheSound(File.ReadAllBytes(LiveSetting.GetBGMPath()));
         print("b");
 
         BGMChannel = audioManager.PlayBGM(sdBGM, true);
