@@ -41,7 +41,7 @@ public class FileLoader : MonoBehaviour
     private IEnumerator InitCharts()
     {
         SongList list;
-        UnityWebRequest webRequest = UnityWebRequest.Get(Application.streamingAssetsPath + "/Songlist.json");
+        UnityWebRequest webRequest = UnityWebRequest.Get(Application.streamingAssetsPath + "/SongList.json");
         yield return webRequest.SendWebRequest();
         string newJson = webRequest.downloadHandler.text;
         list = JsonConvert.DeserializeObject<SongList>(newJson);
