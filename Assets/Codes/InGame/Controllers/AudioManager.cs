@@ -135,7 +135,7 @@ class AudioManager : MonoBehaviour
             }
             else if(GetPlayStatus())
             {
-                return (int)((Time.time - lastUpdateTime) * 1000) + lastPos;
+                return (int)((Time.time - lastUpdateTime) * 1000) + lastPos + LiveSetting.audioOffset;
             }
         }
 
