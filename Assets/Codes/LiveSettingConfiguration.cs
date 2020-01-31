@@ -32,7 +32,12 @@ public static class LiveSetting
     private static float cachedSpeed = 0;
     private static int cachedScreenTime = 0;
 
+#if UNITY_ANDROID && !UNITY_EDITOR
     public static string ChartDir = Application.persistentDataPath + "/TestCharts/";
+#else 
+    public static string ChartDir = Application.streamingAssetsPath + "/TestCharts/";
+#endif
+
     public static string selectedMusic = "bgm.mp3";
     public static string selectedChart = "0";//file name
     public static string selectedFolder = "";

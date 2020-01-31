@@ -11,7 +11,9 @@ public class FileLoader : MonoBehaviour
 {
     private void Start()
     {
+        #if UNITY_ANDROID && !UNITY_EDITOR
         InitCharts();
+        #endif
     }
 
     private void InitCharts()
