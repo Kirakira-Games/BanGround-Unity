@@ -46,7 +46,8 @@ public class FileLoader : MonoBehaviour
 
         for (int i = 0; i < files.Length; i++)
         {
-            StartCoroutine(CopyFileFromStreamingAssetsToPersistentDataPath(files[i]));
+            if (!File.Exists(Application.persistentDataPath + files[i])) 
+                StartCoroutine(CopyFileFromStreamingAssetsToPersistentDataPath(files[i]));
         }
     }
 
