@@ -12,20 +12,23 @@ public class FileLoader : MonoBehaviour
 {
     private void Start()
     {
+
 #if UNITY_ANDROID && !UNITY_EDITOR
-        InitCharts();
+        //InitCharts();
+        StartCoroutine(InitCharts());
+#else
+        //StartCoroutine(InitCharts());
+        LoadSongListFromFile(Application.streamingAssetsPath + "/SongList.json");
 #endif
-        LoadSongListFromFile();
+
     }
 
-    void LoadSongListFromFile()
+    void LoadSongListFromFile(string path)
     {
         string songListJson;
-#if UNITY_ANDROID && !UNITY_EDITOR
-#else
-        if (File.Exists(Application.streamingAssetsPath + "/SongList.json"))
+        if (File.Exists(path))
         {
-            songListJson = File.ReadAllText(Application.streamingAssetsPath + "/SongList.json");
+            songListJson = File.ReadAllText(path);
             LiveSetting.songList = JsonConvert.DeserializeObject<SongList>(songListJson);
             print("SongList Loaded");
         }
@@ -33,19 +36,55 @@ public class FileLoader : MonoBehaviour
         {
             Debug.LogError("SongList.json not found! pls gennerate it in editor");
         }
-#endif
     }
 
-    private void InitCharts()
+    private IEnumerator InitCharts()
     {
-        string fileVersion = "/FileVersion20200131001.txt";
-        if (File.Exists(Application.persistentDataPath + fileVersion)) return;
-        else
+        SongList list;
+        UnityWebRequest webRequest = UnityWebRequest.Get(Application.streamingAssetsPath + "/Songlist.json");
+        yield return webRequest.SendWebRequest();
+        string newJson = webRequest.downloadHandler.text;
+        list = JsonConvert.DeserializeObject<SongList>(newJson);
+        string fileVersion = list.GenerateDate;//read from streaming assets
+        string songListJsonOLD;
+        
+        if (File.Exists(Application.persistentDataPath + "/SongList.json"))
         {
-            StartCoroutine(CopyFileFromStreamingAssetsToPersistentDataPath(fileVersion));
+            songListJsonOLD = File.ReadAllText(Application.persistentDataPath + "/SongList.json");
+            list = JsonConvert.DeserializeObject<SongList>(songListJsonOLD);
+            if (list.GenerateDate == fileVersion)
+            {
+                LiveSetting.songList = list;
+                yield break;
+            }
         }
 
-        string[] files =
+        yield return StartCoroutine(CopyFileFromStreamingAssetsToPersistentDataPath("/SongList.json"));
+
+        songListJsonOLD = File.ReadAllText(Application.persistentDataPath + "/SongList.json");
+        list = JsonConvert.DeserializeObject<SongList>(songListJsonOLD);
+        if (list.GenerateDate == fileVersion)
+        {
+            LiveSetting.songList = list;
+            print("songList updated");
+        }
+        else
+        {
+            Debug.LogError("NMSL");
+        }
+
+        List<string> files = new List<string>();
+        foreach(Header h in LiveSetting.songList.songs)
+        {
+            files.Add("/TestCharts/" + h.DirName + "/header.json");
+            files.Add("/TestCharts/" + h.DirName + "/bgm.mp3");
+            foreach(Chart c in h.charts)
+            {
+                files.Add("/TestCharts/" + h.DirName + "/" + c.fileName + ".json");
+            }
+        }
+
+        /*string[] files =
         {
 
             "/TestCharts/85/bgm.mp3",
@@ -65,12 +104,13 @@ public class FileLoader : MonoBehaviour
             "/TestCharts/243/0.json",
             "/TestCharts/243/1.json",
         };
-
-        for (int i = 0; i < files.Length; i++)
+        */
+        for (int i = 0; i < files.Count; i++)
         {
             if (!File.Exists(Application.persistentDataPath + files[i])) 
                 StartCoroutine(CopyFileFromStreamingAssetsToPersistentDataPath(files[i]));
         }
+        
     }
 
     private IEnumerator CopyFileFromStreamingAssetsToPersistentDataPath(string relativePath)
