@@ -30,7 +30,8 @@ public class SelectManager : MonoBehaviour
     private Slider lane_Bright;
     private Slider seVolume_Input;
 
-    AudioManager audioManager;
+    private AudioManager audioManager;
+    private FMOD.Channel BGMChannel;
 
     RectTransform rt ;
     RectTransform rt_v ;
@@ -363,9 +364,9 @@ public class SelectManager : MonoBehaviour
         sdBGM = audioManager.PrecacheSound(LiveSetting.GetBGMPath());
         print("b");
 
-        var channel = audioManager.PlayBGM(sdBGM, true);
-        channel.setPosition((uint)(songList[LiveSetting.selectedIndex].PreviewStart * 1000), FMOD.TIMEUNIT.MS);
-        channel.setPaused(false);
+        BGMChannel = audioManager.PlayBGM(sdBGM, true);
+        BGMChannel.setPosition((uint)(songList[LiveSetting.selectedIndex].PreviewStart * 1000), FMOD.TIMEUNIT.MS);
+        BGMChannel.setPaused(false);
     }
 
     //--------------------------------------------
@@ -441,10 +442,22 @@ public class SelectManager : MonoBehaviour
     }
     IEnumerator DelayLoadScene()
     {
-        yield return new WaitForSeconds(2f);
+        float delay = 2f;
+        BGMChannel.getVolume(out float startVolume);
+        while (delay >= 0)
+        {
+            yield return new WaitForEndOfFrame();
+            delay -= Time.deltaTime;
+            BGMChannel.setVolume(startVolume * (delay / 2f));
+        }
 
+        //yield return new WaitForSeconds(2f);
         SceneManager.LoadSceneAsync("InGame");
     }
 
+    private void OnApplicationPause(bool pause)
+    {
+        BGMChannel.setPaused(pause);
+    }
 }
 
