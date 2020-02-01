@@ -105,6 +105,7 @@ public class LiveSettingTemplate
         judgeOffset = LiveSetting.judgeOffset;
         audioOffset = LiveSetting.audioOffset;
         noteSpeed = LiveSetting.noteSpeed;
+        noteSize = LiveSetting.noteSize;
         meshSize = LiveSetting.meshSize;
         meshOpacity = LiveSetting.meshOpacity;
         bgmVolume = LiveSetting.bgmVolume;
@@ -126,6 +127,7 @@ public class LiveSettingTemplate
         LiveSetting.judgeOffset = st.judgeOffset;
         LiveSetting.audioOffset = st.audioOffset;
         LiveSetting.noteSpeed = st.noteSpeed;
+        LiveSetting.noteSize = st.noteSize;
         LiveSetting.meshSize = st.meshSize;
         LiveSetting.meshOpacity = st.meshOpacity;
         LiveSetting.bgmVolume = st.bgmVolume;
