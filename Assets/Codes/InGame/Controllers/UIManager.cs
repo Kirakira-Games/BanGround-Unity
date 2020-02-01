@@ -52,7 +52,6 @@ public class UIManager : MonoBehaviour
         StartCoroutine(DelayDisableGate());
     }
 
-    int clickCount = 0;
     public void OnPauseButtonClick()
     {
         //clickCount++;
@@ -62,13 +61,14 @@ public class UIManager : MonoBehaviour
     }
     public void GamePause()
     {
+        Time.timeScale = 0;
         am.PauseBGM();
         pause_Canvas.SetActive(true);
     }
 
     public void GameResume()
     {
-        clickCount = 0;
+        Time.timeScale = 1;
         am.ResumeBGM();
         pause_Canvas.SetActive(false);
     }
