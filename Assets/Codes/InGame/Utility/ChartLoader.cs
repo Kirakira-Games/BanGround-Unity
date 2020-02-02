@@ -12,7 +12,9 @@ class NoteComparer : Comparer<Note>
         float t2 = ChartLoader.GetFloatingPointBeat(b.beat);
         if (Mathf.Abs(t1-t2) <= NoteUtility.EPS)
         {
-            return (int)b.type - (int)a.type;
+            int ta = a.type == NoteType.BPM ? 10 : (int)a.type;
+            int tb = b.type == NoteType.BPM ? 10 : (int)b.type;
+            return tb - ta;
         }
         return t1 < t2 ? -1: 1;
     }

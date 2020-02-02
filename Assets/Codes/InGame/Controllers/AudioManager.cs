@@ -4,8 +4,6 @@ using System.Collections;
 using UnityEngine;
 using FMOD;
 using System.Runtime.InteropServices;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 class AudioManager : MonoBehaviour
 {
@@ -49,6 +47,17 @@ class AudioManager : MonoBehaviour
                 
             }
         }
+    }
+
+    public IEnumerator DelayPlayBGM(byte[] audioData, float seconds)
+    {
+        var BGM = PrecacheSound(audioData);
+        loading = true;
+        lastPos = (int)((Time.time + seconds) * 1000);
+        yield return new WaitForSeconds(seconds);
+        PlayBGM(BGM);
+        loading = false;
+        lastPos = -999;
     }
 
     public Sound PrecacheSound(TextAsset asset, MODE mode = MODE._2D | MODE.OPENMEMORY)
@@ -136,18 +145,18 @@ class AudioManager : MonoBehaviour
 
     public int GetBGMPlaybackTime()
     {
+        if (loading) return (int)(Time.time * 1000) - lastPos + LiveSetting.audioOffset;
         uint pos;
         CurrentBGMChannel.getPosition(out pos, TIMEUNIT.MS);
 
-        CurrentBGMChannel.getPaused(out bool paused);
-        if (!paused)
+        if (GetPlayStatus())
         {
             if (pos != lastPos)
             {
                 lastPos = (int)pos;
                 lastUpdateTime = Time.time;
             }
-            else if(GetPlayStatus())
+            else
             {
                 return (int)((Time.time - lastUpdateTime) * 1000) + lastPos + LiveSetting.audioOffset;
             }

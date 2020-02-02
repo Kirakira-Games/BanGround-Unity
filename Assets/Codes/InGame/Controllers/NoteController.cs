@@ -1,12 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 public class NoteController : MonoBehaviour
 {
     public static NoteController controller;
-    private Queue<GameObject>[] laneQueue;
+    private SortedDictionary<int, GameObject>[] laneQueue;
+
     private Dictionary<int, GameObject> touchTable;
     private Dictionary<int, NoteSyncLine> syncTable;
     private List<GameNoteData> notes;
@@ -116,10 +118,11 @@ public class NoteController : MonoBehaviour
             // Remove judged and destroyed notes from queue
             while (laneQueue[i].Count > 0)
             {
-                GameObject obj = laneQueue[i].Peek();
+                int key = laneQueue[i].Keys.First();
+                GameObject obj = laneQueue[i][key];
                 if (obj == null || obj.GetComponent<NoteBase>().judgeTime != int.MinValue)
                 {
-                    laneQueue[i].Dequeue();
+                    laneQueue[i].Remove(key);
                 }
                 else
                 {
@@ -129,7 +132,7 @@ public class NoteController : MonoBehaviour
             // Try to judge the front of the queue
             if (laneQueue[i].Count > 0)
             {
-                NoteBase note = laneQueue[i].Peek().GetComponent<NoteBase>();
+                NoteBase note = laneQueue[i][laneQueue[i].Keys.First()].GetComponent<NoteBase>();
                 JudgeResult result = note.TryJudge(audioTime, touch);
                 if (result != JudgeResult.None)
                 {
@@ -186,7 +189,7 @@ public class NoteController : MonoBehaviour
         note.type = gameNote.type;
         note.isGray = LiveSetting.grayNoteEnabled ? gameNote.isGray : false;
         note.InitNote();
-        laneQueue[note.lane].Enqueue(noteObj);
+        laneQueue[note.lane].Add(note.time, noteObj);
         // Add sync line
         if (LiveSetting.syncLineEnabled && note.type != GameNoteType.SlideTick)
         {
@@ -293,10 +296,10 @@ public class NoteController : MonoBehaviour
         Application.targetFrameRate = 120;
         
         scoreDisplay = GameObject.Find("Grades").GetComponent<GradeColorChange>();
-        laneQueue = new Queue<GameObject>[NoteUtility.LANE_COUNT];
+        laneQueue = new SortedDictionary<int, GameObject>[NoteUtility.LANE_COUNT];
         for (int i = 0; i < NoteUtility.LANE_COUNT; i++)
         {
-            laneQueue[i] = new Queue<GameObject>();
+            laneQueue[i] = new SortedDictionary<int, GameObject>();
         }
         controller = this;
         // Load chart
@@ -325,19 +328,7 @@ public class NoteController : MonoBehaviour
         SE_FLICK = audioMgr.PrecacheSound(Resources.Load<TextAsset>("SoundEffects/flick.wav"));
         SE_CLICK = audioMgr.PrecacheSound(Resources.Load<TextAsset>("SoundEffects/empty.wav"));
 
-        StartCoroutine(DelayPlayBGM());
-    }
-
-    IEnumerator DelayPlayBGM()
-    {
-        //    var music = string.Format(LiveSetting.testMusic, LiveSetting.selected);
-        //    var BGM = audioMgr.PrecacheSound(Resources.Load<TextAsset>(music));
-        var BGM = audioMgr.PrecacheSound(File.ReadAllBytes(LiveSetting.GetBGMPath));
-        //bgm will not start untill the gate open
-        audioMgr.loading = true;
-        yield return new WaitForSeconds(2f);
-        audioMgr.PlayBGM(BGM);
-        audioMgr.loading = false;
+        StartCoroutine(audioMgr.DelayPlayBGM(File.ReadAllBytes(LiveSetting.GetBGMPath), 2f));
     }
 
     void Update()
