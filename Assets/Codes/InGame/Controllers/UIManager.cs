@@ -75,11 +75,15 @@ public class UIManager : MonoBehaviour
 
     public void GameRetry()
     {
+        Time.timeScale = 1;
+
         SceneManager.LoadScene("InGame");
     }
 
     public void GameRetire()
     {
+        Time.timeScale = 1;
+
         SceneManager.LoadScene("Select");
     }
 

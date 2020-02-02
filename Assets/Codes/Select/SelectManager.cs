@@ -233,7 +233,12 @@ public class SelectManager : MonoBehaviour
             else
                 rc.OnSelect();
         }
+
         LiveSetting.selectedIndex = index;
+
+        if (lastIndex == LiveSetting.selectedIndex) return;
+        else lastIndex = LiveSetting.selectedIndex;
+
         LiveSetting.selectedFolder = songList[LiveSetting.selectedIndex].DirName;
         int[] diffs = new int[5] { -1,-1,-1,-1,-114};
         foreach(Chart a in songList[LiveSetting.selectedIndex].charts)
@@ -331,8 +336,8 @@ public class SelectManager : MonoBehaviour
     }
     void PlayPreview()
     {
-        if (lastIndex == LiveSetting.selectedIndex) return;
-        else lastIndex = LiveSetting.selectedIndex;
+        //if (lastIndex == LiveSetting.selectedIndex) return;
+        //else lastIndex = LiveSetting.selectedIndex;
 
         audioManager.StopBGM();
         for (int i = 0; i < audioManager.LoadedSound.Count; i++)
