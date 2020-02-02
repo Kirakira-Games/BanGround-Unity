@@ -38,7 +38,6 @@ public static class LiveSetting
     public static string ChartDir = Application.streamingAssetsPath + "/TestCharts/";
 #endif
 
-    public static string selectedMusic = "bgm.mp3";
     public static string selectedChart = "0";//file name
     public static string selectedFolder = "";
     public static int selectedIndex = 0;
@@ -51,11 +50,15 @@ public static class LiveSetting
     }
     public static string GetBGMPath()
     {
-        return ChartDir + selectedFolder + "/" + selectedMusic;
+        return ChartDir + selectedFolder + "/" + "bgm.mp3";
     }
     public static string GetHeaderPath()
     {
         return ChartDir + selectedFolder + "/" + "header.json";
+    }
+    public static string GetPreviewMusicPath()
+    {
+        return ChartDir + selectedFolder + "/" + "preview.wav";
     }
 
     public static string settingsPath = Application.persistentDataPath + "/LiveSettings.json";

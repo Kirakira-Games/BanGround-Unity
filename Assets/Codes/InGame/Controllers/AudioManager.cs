@@ -51,7 +51,7 @@ class AudioManager : MonoBehaviour
         }
     }
 
-    public Sound PrecacheSound(TextAsset asset)
+    public Sound PrecacheSound(TextAsset asset, MODE mode = MODE._2D | MODE.OPENMEMORY)
     {
         var bytes = asset.bytes;
 
@@ -61,14 +61,14 @@ class AudioManager : MonoBehaviour
         exinfo.cbsize = Marshal.SizeOf(exinfo);
         exinfo.length = (uint)bytes.Length;
 
-        var result = System.createSound(bytes, MODE._2D | MODE.OPENMEMORY, ref exinfo, out sound);
+        var result = System.createSound(bytes, mode, ref exinfo, out sound);
 
         LoadedSound.Add(sound);
 
         return sound;
     }
 
-    public Sound PrecacheSound(byte[] bytes)
+    public Sound PrecacheSound(byte[] bytes, MODE mode = MODE._2D | MODE.OPENMEMORY)
     {
         Sound sound;
 
@@ -76,18 +76,18 @@ class AudioManager : MonoBehaviour
         exinfo.cbsize = Marshal.SizeOf(exinfo);
         exinfo.length = (uint)bytes.Length;
 
-        var result = System.createSound(bytes, MODE._2D | MODE.OPENMEMORY, ref exinfo, out sound);
+        var result = System.createSound(bytes, mode, ref exinfo, out sound);
 
         LoadedSound.Add(sound);
 
         return sound;
     }
 
-    public Sound PrecacheSound(string path)
+    public Sound PrecacheSound(string path, MODE mode = MODE._2D)
     {
         Sound sound;
 
-        var result = System.createSound(path, MODE._2D, out sound);
+        var result = System.createSound(path, mode, out sound);
 
         LoadedSound.Add(sound);
 
@@ -116,6 +116,20 @@ class AudioManager : MonoBehaviour
         
         System.playSound(sound, BGMChannelGroup, false, out channel);
         
+        CurrentBGMChannel = channel;
+        return channel;
+    }
+
+    public Channel PlayPreview(Sound sound)
+    {
+        Channel channel;
+        sound.getLength(out uint length, TIMEUNIT.MS);
+
+        sound.setLoopPoints(0, TIMEUNIT.MS, length, TIMEUNIT.MS);
+        sound.setLoopCount(int.MaxValue);
+
+        System.playSound(sound, BGMChannelGroup, false, out channel);
+
         CurrentBGMChannel = channel;
         return channel;
     }

@@ -343,12 +343,10 @@ public class SelectManager : MonoBehaviour
         FMOD.Sound sdBGM;
 
         print("a");
-        sdBGM = audioManager.PrecacheSound(File.ReadAllBytes(LiveSetting.GetBGMPath()));
+        sdBGM = audioManager.PrecacheSound(File.ReadAllBytes(LiveSetting.GetPreviewMusicPath()), FMOD.MODE.LOOP_NORMAL | FMOD.MODE._2D | FMOD.MODE.OPENMEMORY);
         print("b");
 
-        BGMChannel = audioManager.PlayBGM(sdBGM, true);
-        BGMChannel.setPosition((uint)(songList[LiveSetting.selectedIndex].PreviewStart * 1000), FMOD.TIMEUNIT.MS);
-        BGMChannel.setPaused(false);
+        BGMChannel = audioManager.PlayPreview(sdBGM);
     }
 
     //--------------------------------------------
