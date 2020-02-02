@@ -10,6 +10,7 @@ using UnityEngine.Networking;
 
 public class SelectManager : MonoBehaviour
 {
+    public const float scroll_Min_Speed = 50f;
     //private Button enter_Btn;
     private Button setting_Open_Btn;
     private Button setting_Close_Btn;
@@ -34,7 +35,8 @@ public class SelectManager : MonoBehaviour
     private FMOD.Channel BGMChannel;
 
     RectTransform rt ;
-    RectTransform rt_v ;
+    RectTransform rt_v;
+    ScrollRect rt_s;
     VerticalLayoutGroup lg ;
 
     RawImage Rank;
@@ -70,6 +72,7 @@ public class SelectManager : MonoBehaviour
         scene_Animator = GameObject.Find("SceneAnimator").GetComponent<Animator>();
         rt = GameObject.Find("SongContent").GetComponent<RectTransform>();
         rt_v = GameObject.Find("Song Scroll View").GetComponent<RectTransform>();
+        rt_s = GameObject.Find("Song Scroll View").GetComponent<ScrollRect>();
         lg = GameObject.Find("SongContent").GetComponent<VerticalLayoutGroup>();
         audioManager = GetComponent<AudioManager>();
 
@@ -184,21 +187,20 @@ public class SelectManager : MonoBehaviour
 
     IEnumerator SelectNear()
     {
-        yield return new WaitForSeconds(1);
+        //yield return new WaitForSeconds(1);
         RectTransform[] rts = new RectTransform[SelectButtons.Count];
         for(int i =0;i<SelectButtons.Count;i++)
         {
             rts[i] = SelectButtons[i].GetComponent<RectTransform>();
         }
 
-        var lastpos = rt.anchoredPosition.y;
-        yield return new WaitForFixedUpdate();
-        while (rt.anchoredPosition.y - lastpos > 0.01 || Input.GetMouseButton(0))
+        yield return 0;
+        while (Mathf.Abs(rt_s.velocity.y) > scroll_Min_Speed || Input.GetMouseButton(0))
         {
-            yield return new WaitForFixedUpdate();
-            lastpos = rt.anchoredPosition.y;
+            yield return 0;
         }
         print("select near");
+        rt_s.StopMovement();
         var destPos = 0 - rt.anchoredPosition.y - lg.padding.top - 100;
         float nearestDistance=999f;
         int nearstIndex = 0;
