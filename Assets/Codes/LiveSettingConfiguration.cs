@@ -26,16 +26,16 @@ public static class LiveSetting
     public static float bgBrightness = .7f;
     public static float laneBrightness = 0.84f;
 
-    public static string assetDirectory = "V2Assets";
+    public const string assetDirectory = "V2Assets";
     public const string IconPath = "UI/v3/";
 
     private static float cachedSpeed = 0;
     private static int cachedScreenTime = 0;
 
 #if UNITY_ANDROID && !UNITY_EDITOR
-    public static string ChartDir = Application.persistentDataPath + "/TestCharts/";
+    public static readonly string ChartDir = Application.persistentDataPath + "/TestCharts/";
 #else 
-    public static string ChartDir = Application.streamingAssetsPath + "/TestCharts/";
+    public static readonly string ChartDir = Application.streamingAssetsPath + "/TestCharts/";
 #endif
 
     public static string selectedChart = "0";//file name
@@ -44,25 +44,13 @@ public static class LiveSetting
 
     public static SongList songList;
 
-    public static string GetChartPath()
-    {
-        return ChartDir + selectedFolder + "/" + selectedChart +".json";
-    }
-    public static string GetBGMPath()
-    {
-        return ChartDir + selectedFolder + "/" + "bgm.mp3";
-    }
-    public static string GetHeaderPath()
-    {
-        return ChartDir + selectedFolder + "/" + "header.json";
-    }
-    public static string GetPreviewMusicPath()
-    {
-        return ChartDir + selectedFolder + "/" + "preview.wav";
-    }
+    public static string GetChartPath => ChartDir + selectedFolder + "/" + selectedChart + ".json";
+    public static string GetBGMPath => ChartDir + selectedFolder + "/" + "bgm.mp3";
+    public static string GetHeaderPath => ChartDir + selectedFolder + "/" + "header.json";
+    public static string GetPreviewMusicPath => ChartDir + selectedFolder + "/" + "preview.wav";
 
-    public static string settingsPath = Application.persistentDataPath + "/LiveSettings.json";
-    public static string scoresPath = Application.persistentDataPath + "/Scores.json";
+    public static readonly string settingsPath = Application.persistentDataPath + "/LiveSettings.json";
+    public static readonly string scoresPath = Application.persistentDataPath + "/Scores.json";
 
     public static int NoteScreenTime
     {

@@ -300,7 +300,7 @@ public class NoteController : MonoBehaviour
         }
         controller = this;
         // Load chart
-        notes = ChartLoader.LoadNotesFromFile(LiveSetting.GetChartPath());
+        notes = ChartLoader.LoadNotesFromFile(LiveSetting.GetChartPath);
         noteHead = 0;
         // Compute number of notes
         numNotes = 0;
@@ -332,7 +332,7 @@ public class NoteController : MonoBehaviour
     {
         //    var music = string.Format(LiveSetting.testMusic, LiveSetting.selected);
         //    var BGM = audioMgr.PrecacheSound(Resources.Load<TextAsset>(music));
-        var BGM = audioMgr.PrecacheSound(File.ReadAllBytes(LiveSetting.GetBGMPath()));
+        var BGM = audioMgr.PrecacheSound(File.ReadAllBytes(LiveSetting.GetBGMPath));
         //bgm will not start untill the gate open
         audioMgr.loading = true;
         yield return new WaitForSeconds(2f);
