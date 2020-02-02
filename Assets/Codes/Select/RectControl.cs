@@ -15,6 +15,8 @@ public class RectControl : MonoBehaviour
     public int index;
     Button bt;
 
+    GameObject startImg;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -22,6 +24,8 @@ public class RectControl : MonoBehaviour
         vg = GameObject.Find("SongContent").GetComponent<VerticalLayoutGroup>();
         rt_v = GameObject.Find("Song Scroll View").GetComponent<RectTransform>();
         sm = GameObject.Find("SelectManager").GetComponent<SelectManager>();
+        startImg = transform.Find("StartImg").gameObject;
+
         bt = GetComponent<Button>();
         rt = GetComponent<RectTransform>();
         bt.onClick.AddListener(OnPressed);
@@ -42,6 +46,10 @@ public class RectControl : MonoBehaviour
     IEnumerator OnSelectAnimation()
     {
         yield return new WaitForEndOfFrame();
+        startImg.SetActive(true);
+        bt.onClick.RemoveListener(OnPressed);
+        bt.onClick.AddListener(OnEnterPressed);
+
         float destPos = 0 - rt.anchoredPosition.y - vg.padding.top -(rt.sizeDelta.y/2);
         while (Math.Abs(rt_m.anchoredPosition.y - destPos) > 1f)
         {
@@ -65,6 +73,15 @@ public class RectControl : MonoBehaviour
     public void UnSelect()
     {
         rt.sizeDelta = new Vector2(rt.sizeDelta.x, 116);
+        startImg.SetActive(false);
+        bt.onClick.RemoveListener(OnEnterPressed);
+        bt.onClick.AddListener(OnPressed);
+    }
+
+    private void OnEnterPressed()
+    {
+        bt.interactable = false;
+        sm.OnEnterPressed();
     }
 
     // Update is called once per frame

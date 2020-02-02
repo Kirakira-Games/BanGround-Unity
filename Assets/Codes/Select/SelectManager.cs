@@ -10,7 +10,7 @@ using UnityEngine.Networking;
 
 public class SelectManager : MonoBehaviour
 {
-    private Button enter_Btn;
+    //private Button enter_Btn;
     private Button setting_Open_Btn;
     private Button setting_Close_Btn;
 
@@ -73,7 +73,7 @@ public class SelectManager : MonoBehaviour
         lg = GameObject.Find("SongContent").GetComponent<VerticalLayoutGroup>();
         audioManager = GetComponent<AudioManager>();
 
-        enter_Btn = GameObject.Find("Enter_Btn").GetComponent<Button>();
+        //enter_Btn = GameObject.Find("Enter_Btn").GetComponent<Button>();
         setting_Open_Btn = GameObject.Find("Setting_Panel").GetComponent<Button>();
         setting_Close_Btn = GameObject.Find("Button_Close").GetComponent<Button>();
 
@@ -92,7 +92,7 @@ public class SelectManager : MonoBehaviour
         lane_Bright = GameObject.Find("Lane_Bri_Slider").GetComponent<Slider>();
         seVolume_Input = GameObject.Find("SeVolume_Input").GetComponent<Slider>();
 
-        enter_Btn.onClick.AddListener(OnEnterPressed);
+        //enter_Btn.onClick.AddListener(OnEnterPressed);
         setting_Open_Btn.onClick.AddListener(OpenSetting);
         setting_Close_Btn.onClick.AddListener(CloseSetting);
 
@@ -397,7 +397,7 @@ public class SelectManager : MonoBehaviour
         LiveSetting.laneBrightness = lane_Bright.value;
     }
     //============================================
-    void OnEnterPressed()
+    public void OnEnterPressed()
     {
         /*if (!isSettingOpened)
         {
@@ -413,7 +413,7 @@ public class SelectManager : MonoBehaviour
             LiveSetting.selected = seleted.name;
         }
         */
-        enter_Btn.interactable = false;
+        //enter_Btn.interactable = false;
         
 
         SetLiveSetting();
