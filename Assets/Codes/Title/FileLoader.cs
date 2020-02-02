@@ -78,7 +78,8 @@ public class FileLoader : MonoBehaviour
         {
             files.Add("/TestCharts/" + h.DirName + "/header.json");
             files.Add("/TestCharts/" + h.DirName + "/bgm.mp3");
-            foreach(Chart c in h.charts)
+            files.Add("/TestCharts/" + h.DirName + "/preview.wav");
+            foreach (Chart c in h.charts)
             {
                 files.Add("/TestCharts/" + h.DirName + "/" + c.fileName + ".json");
             }
