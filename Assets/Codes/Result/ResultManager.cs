@@ -202,8 +202,8 @@ public class ResultManager : MonoBehaviour
 
     private void ShowSongInfo()
     {
-        chart = ChartLoader.LoadChartFromFile(LiveSetting.GetChartPath());
-        header = ChartLoader.LoadHeaderFromFile(LiveSetting.GetHeaderPath());
+        chart = ChartLoader.LoadChartFromFile(LiveSetting.GetChartPath);
+        header = ChartLoader.LoadHeaderFromFile(LiveSetting.GetHeaderPath);
         
 
         level_Text.text = Enum.GetName(typeof(Difficulty), chart.difficulty).ToUpper() + " " + chart.level.ToString();

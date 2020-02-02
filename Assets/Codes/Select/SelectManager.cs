@@ -19,7 +19,7 @@ public class SelectManager : MonoBehaviour
     private Toggle syncLine_Tog;
     private Toggle offBeat_Tog;
     private Toggle auto_Tog;
-    //private Toggle persp_Tog;
+    private Toggle persp_Tog;
 
     private InputField speed_Input;
     private InputField judge_Input;
@@ -81,7 +81,7 @@ public class SelectManager : MonoBehaviour
         syncLine_Tog = GameObject.Find("Sync_Toggle").GetComponent<Toggle>();
         offBeat_Tog = GameObject.Find("Offbeat_Toggle").GetComponent<Toggle>();
         auto_Tog = GameObject.Find("Autoplay_Toggle").GetComponent<Toggle>();
-        //persp_Tog = GameObject.Find("Perspective_Toggle").GetComponent<Toggle>();
+        persp_Tog = GameObject.Find("Perspective_Toggle").GetComponent<Toggle>();
 
         speed_Input = GameObject.Find("Speed_Input").GetComponent<InputField>();
         judge_Input = GameObject.Find("Judge_Input").GetComponent<InputField>();
@@ -348,7 +348,7 @@ public class SelectManager : MonoBehaviour
         FMOD.Sound sdBGM;
 
         print("a");
-        sdBGM = audioManager.PrecacheSound(File.ReadAllBytes(LiveSetting.GetPreviewMusicPath()), FMOD.MODE.LOOP_NORMAL | FMOD.MODE._2D | FMOD.MODE.OPENMEMORY);
+        sdBGM = audioManager.PrecacheSound(File.ReadAllBytes(LiveSetting.GetPreviewMusicPath), FMOD.MODE.LOOP_NORMAL | FMOD.MODE._2D | FMOD.MODE.OPENMEMORY);
         print("b");
 
         BGMChannel = audioManager.PlayPreview(sdBGM);
@@ -375,7 +375,7 @@ public class SelectManager : MonoBehaviour
         syncLine_Tog.isOn = LiveSetting.syncLineEnabled;
         offBeat_Tog.isOn = LiveSetting.grayNoteEnabled;
         auto_Tog.isOn = LiveSetting.autoPlayEnabled;
-        //persp_Tog.isOn = LiveSetting.bangPerspective;
+        persp_Tog.isOn = LiveSetting.bangPerspective;
 
         bg_Bright.value = LiveSetting.bgBrightness;
         lane_Bright.value = LiveSetting.laneBrightness;
@@ -391,7 +391,7 @@ public class SelectManager : MonoBehaviour
         LiveSetting.syncLineEnabled = syncLine_Tog.isOn;
         LiveSetting.grayNoteEnabled = offBeat_Tog.isOn;
         LiveSetting.autoPlayEnabled = auto_Tog.isOn;
-        //LiveSetting.bangPerspective = persp_Tog.isOn;
+        LiveSetting.bangPerspective = persp_Tog.isOn;
 
         LiveSetting.bgBrightness = bg_Bright.value;
         LiveSetting.laneBrightness = lane_Bright.value;
