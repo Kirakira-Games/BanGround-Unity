@@ -420,12 +420,12 @@ public class SelectManager : MonoBehaviour
         }
         */
         //enter_Btn.interactable = false;
-
         enterAniObj.SetActive(true);
         SetLiveSetting();
         scene_Animator.Play("OutPlay", -1, 0);
         CloseSetting();
-        
+        setting_Open_Btn.gameObject.SetActive(false);
+
         File.WriteAllText(LiveSetting.settingsPath, JsonConvert.SerializeObject(new LiveSettingTemplate()));
 
         StartCoroutine(DelayLoadScene());
