@@ -7,8 +7,8 @@ QualitySettings:
   m_CurrentQuality: 0
   m_QualitySettings:
   - serializedVersion: 2
-    name: Medium
-    pixelLightCount: 1
+    name: Low
+    pixelLightCount: 0
     shadows: 0
     shadowResolution: 0
     shadowProjection: 1
@@ -27,7 +27,7 @@ QualitySettings:
     realtimeReflectionProbes: 0
     billboardsFaceCameraPosition: 0
     vSyncCount: 0
-    lodBias: 0.7
+    lodBias: 0.4
     maximumLODLevel: 0
     streamingMipmapsActive: 0
     streamingMipmapsAddAllCameras: 1
@@ -35,16 +35,23 @@ QualitySettings:
     streamingMipmapsRenderersPerFrame: 512
     streamingMipmapsMaxLevelReduction: 2
     streamingMipmapsMaxFileIORequests: 1024
-    particleRaycastBudget: 64
+    particleRaycastBudget: 16
     asyncUploadTimeSlice: 2
     asyncUploadBufferSize: 16
     asyncUploadPersistentBuffer: 1
     resolutionScalingFixedDPIFactor: 1
-    customRenderPipeline: {fileID: 11400000, guid: 967c7cbebd1a10949bc27f0c805f0957,
+    customRenderPipeline: {fileID: 11400000, guid: a31e9f9f9c9d4b9429ed0d1234e22103,
       type: 2}
     excludedTargetPlatforms: []
   m_PerPlatformDefaultQuality:
     Android: 0
+    Lumin: 0
+    Nintendo Switch: 0
+    PS4: 0
+    Stadia: 0
     Standalone: 0
     WebGL: 0
+    Windows Store Apps: 0
+    XboxOne: 0
     iPhone: 0
+    tvOS: 0
