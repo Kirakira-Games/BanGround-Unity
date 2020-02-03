@@ -31,9 +31,12 @@ public class SelectManager : MonoBehaviour
     private Slider bg_Bright;
     private Slider lane_Bright;
     private Slider seVolume_Input;
+    private Slider bgmVolume_Input;
 
     private AudioManager audioManager;
     private FMOD.Channel BGMChannel;
+
+    public GameObject enterAniObj;
 
     RectTransform rt ;
     RectTransform rt_v;
@@ -81,7 +84,6 @@ public class SelectManager : MonoBehaviour
         setting_Open_Btn = GameObject.Find("Setting_Panel").GetComponent<Button>();
         setting_Close_Btn = GameObject.Find("Button_Close").GetComponent<Button>();
 
-
         syncLine_Tog = GameObject.Find("Sync_Toggle").GetComponent<Toggle>();
         offBeat_Tog = GameObject.Find("Offbeat_Toggle").GetComponent<Toggle>();
         auto_Tog = GameObject.Find("Autoplay_Toggle").GetComponent<Toggle>();
@@ -95,6 +97,7 @@ public class SelectManager : MonoBehaviour
         bg_Bright = GameObject.Find("BG_Bri_Slider").GetComponent<Slider>();
         lane_Bright = GameObject.Find("Lane_Bri_Slider").GetComponent<Slider>();
         seVolume_Input = GameObject.Find("SeVolume_Input").GetComponent<Slider>();
+        bgmVolume_Input = GameObject.Find("BGMVolume_Input").GetComponent<Slider>();
 
         //enter_Btn.onClick.AddListener(OnEnterPressed);
         setting_Open_Btn.onClick.AddListener(OpenSetting);
@@ -381,6 +384,7 @@ public class SelectManager : MonoBehaviour
         bg_Bright.value = LiveSetting.bgBrightness;
         lane_Bright.value = LiveSetting.laneBrightness;
         seVolume_Input.value = LiveSetting.seVolume;
+        bgmVolume_Input.value = LiveSetting.bgmVolume;
     }
     void SetLiveSetting()
     {
@@ -389,6 +393,7 @@ public class SelectManager : MonoBehaviour
         LiveSetting.audioOffset = int.Parse(audio_Input.text);
         LiveSetting.noteSize = float.Parse(size_Input.text);
         LiveSetting.seVolume = seVolume_Input.value;
+        LiveSetting.bgmVolume = bgmVolume_Input.value;
         LiveSetting.syncLineEnabled = syncLine_Tog.isOn;
         LiveSetting.grayNoteEnabled = offBeat_Tog.isOn;
         LiveSetting.autoPlayEnabled = auto_Tog.isOn;
@@ -415,8 +420,8 @@ public class SelectManager : MonoBehaviour
         }
         */
         //enter_Btn.interactable = false;
-        
 
+        enterAniObj.SetActive(true);
         SetLiveSetting();
         scene_Animator.Play("OutPlay", -1, 0);
         CloseSetting();
@@ -428,13 +433,13 @@ public class SelectManager : MonoBehaviour
     }
     IEnumerator DelayLoadScene()
     {
-        float delay = 2f;
+        float delay = 1.2f;
         BGMChannel.getVolume(out float startVolume);
         while (delay >= 0)
         {
             yield return new WaitForEndOfFrame();
             delay -= Time.deltaTime;
-            BGMChannel.setVolume(startVolume * (delay / 2f));
+            BGMChannel.setVolume(startVolume * (delay / 1.2f));
         }
 
         //yield return new WaitForSeconds(2f);
