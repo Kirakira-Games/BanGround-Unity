@@ -7,6 +7,7 @@ using System.IO;
 using System.Threading;
 using Newtonsoft.Json;
 using UnityEngine.Networking;
+using UnityEngine.Profiling;
 
 public class SelectManager : MonoBehaviour
 {
@@ -224,10 +225,11 @@ public class SelectManager : MonoBehaviour
         {
             StartCoroutine(SelectNear());
             return;
-        }    
-        foreach(GameObject selected in SelectButtons)
+        }
+
+        foreach (GameObject selected in SelectButtons)
         {
-           
+
             RectControl rc = selected.GetComponent<RectControl>();
             rc.StopAllCoroutines();
             if (rc.index != index)
@@ -237,7 +239,6 @@ public class SelectManager : MonoBehaviour
         }
 
         LiveSetting.selectedIndex = index;
-
         if (lastIndex == LiveSetting.selectedIndex) return;
         else lastIndex = LiveSetting.selectedIndex;
 
@@ -349,9 +350,7 @@ public class SelectManager : MonoBehaviour
         audioManager.LoadedSound.Clear();
         FMOD.Sound sdBGM;
 
-        print("a");
         sdBGM = audioManager.PrecacheSound(File.ReadAllBytes(LiveSetting.GetPreviewMusicPath), FMOD.MODE.LOOP_NORMAL | FMOD.MODE._2D | FMOD.MODE.OPENMEMORY);
-        print("b");
 
         BGMChannel = audioManager.PlayPreview(sdBGM);
     }

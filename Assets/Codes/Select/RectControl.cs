@@ -17,6 +17,8 @@ public class RectControl : MonoBehaviour
 
     GameObject startImg;
 
+    bool select = false;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -34,8 +36,15 @@ public class RectControl : MonoBehaviour
 
     void OnPressed()
     {
-        StopAllCoroutines();
-        sm.SelectSong(index);
+        if (!select)
+        {
+            StopAllCoroutines();
+            sm.SelectSong(index);
+        }
+        else
+        {
+            OnEnterPressed();
+        }
     }
 
     public void OnSelect()
@@ -47,8 +56,7 @@ public class RectControl : MonoBehaviour
     {
         yield return new WaitForEndOfFrame();
         startImg.SetActive(true);
-        bt.onClick.RemoveListener(OnPressed);
-        bt.onClick.AddListener(OnEnterPressed);
+        select = true;
 
         float destPos = 0 - rt.anchoredPosition.y - vg.padding.top -(rt.sizeDelta.y/2);
         while (Math.Abs(rt_m.anchoredPosition.y - destPos) > 1f)
@@ -74,8 +82,7 @@ public class RectControl : MonoBehaviour
     {
         rt.sizeDelta = new Vector2(rt.sizeDelta.x, 116);
         startImg.SetActive(false);
-        bt.onClick.RemoveListener(OnEnterPressed);
-        bt.onClick.AddListener(OnPressed);
+        select = false;
     }
 
     private void OnEnterPressed()
