@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 public class NoteController : MonoBehaviour
 {
@@ -21,6 +22,8 @@ public class NoteController : MonoBehaviour
     private FMOD.Sound SE_GOOD;
     private FMOD.Sound SE_CLICK;
     private FMOD.Sound SE_FLICK;
+
+    private FixBackground background;
 
     public void RegisterTouch(int id, GameObject obj)
     {
@@ -82,7 +85,8 @@ public class NoteController : MonoBehaviour
 
         var fx = Instantiate(Resources.Load(effect), pos, Quaternion.identity) as GameObject;
         fx.transform.localScale = Vector3.one * LiveSetting.noteSize * NoteUtility.NOTE_SCALE;
-        StartCoroutine(KillFX(fx, 0.5f));
+        //StartCoroutine(KillFX(fx, 0.5f));
+        Destroy(fx, 0.5f);
     }
 
     public static IEnumerator KillFX(GameObject fx, float delaySeconds)
@@ -329,19 +333,30 @@ public class NoteController : MonoBehaviour
         SE_CLICK = audioMgr.PrecacheSound(Resources.Load<TextAsset>("SoundEffects/empty.wav"));
 
         StartCoroutine(audioMgr.DelayPlayBGM(File.ReadAllBytes(LiveSetting.GetBGMPath), 2f));
+
+        background = GameObject.Find("Background").GetComponent<FixBackground>();
+        if (File.Exists(LiveSetting.GetBackgroundPath))
+            background.UpdateBackground(LiveSetting.GetBackgroundPath);
     }
 
     void Update()
     {
         int audioTime = audioMgr.GetBGMPlaybackTime();
+
         // Create notes
+        Profiler.BeginSample("UpdateNote");
         UpdateNotes(audioTime);
+        Profiler.EndSample();
 
         if (audioMgr.GetPauseStatus()) return;
 
         // Trigger touch event
+        Profiler.BeginSample("UpdateTouch");
         UpdateTouch(audioTime);
+        Profiler.EndSample();
+
         // Update each note child
+        Profiler.BeginSample("UpdateTransform");
         foreach (Transform child in transform)
         {
             child.GetComponent<NoteBase>()?.OnNoteUpdate(audioTime);
@@ -351,5 +366,6 @@ public class NoteController : MonoBehaviour
         {
             child.GetComponent<NoteSyncLine>()?.OnSyncLineUpdate();
         }
+        Profiler.EndSample();
     }
 }

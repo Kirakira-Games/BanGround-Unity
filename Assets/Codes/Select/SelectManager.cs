@@ -8,6 +8,7 @@ using System.Threading;
 using Newtonsoft.Json;
 using UnityEngine.Networking;
 using UnityEngine.Profiling;
+using System;
 
 public class SelectManager : MonoBehaviour
 {
@@ -62,7 +63,7 @@ public class SelectManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        initComponent();
+        InitComponent();
         LoadScoreRecord();
         LoadLiveSettingFile();
         InitSongList();
@@ -71,7 +72,7 @@ public class SelectManager : MonoBehaviour
         audioManager.loading = false;
     }
 
-    private void initComponent()
+    private void InitComponent()
     {
         scene_Animator = GameObject.Find("SceneAnimator").GetComponent<Animator>();
         rt = GameObject.Find("SongContent").GetComponent<RectTransform>();
@@ -256,6 +257,7 @@ public class SelectManager : MonoBehaviour
         DisplayRecord();
         PlayPreview();
     }
+
     public void DisplayRecord()
     {
         int count = 0;

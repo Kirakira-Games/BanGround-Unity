@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+using System.IO;
 
 public class DifficultySelect : MonoBehaviour
 {
@@ -15,6 +16,8 @@ public class DifficultySelect : MonoBehaviour
     Text difficultyText;
     Text levelText;
     SelectManager selectManager;
+    private FixBackground background;
+
 
     void Start()
     {
@@ -28,6 +31,7 @@ public class DifficultySelect : MonoBehaviour
         difficultyText = GameObject.Find("Text_SelectedDifficulty").GetComponent<Text>();
         selectManager = GameObject.Find("SelectManager").GetComponent<SelectManager>();
         //OnSongChange();
+        background = GameObject.Find("Background").GetComponent<FixBackground>();
     }
     
     public void OnSongChange()
@@ -64,6 +68,9 @@ public class DifficultySelect : MonoBehaviour
                 LiveSetting.selectedChart = a.fileName; //更新选择的难度的文件名
         }
         selectManager.DisplayRecord();
+
+        if (File.Exists(LiveSetting.GetBackgroundPath)) 
+            background.UpdateBackground(LiveSetting.GetBackgroundPath);
         //LiveSetting.selectedDifficulty = (Difficulty)enabledCards[0];
         //print(Enum.GetName(typeof(Difficulty), LiveSetting.selectedDifficulty));
     }

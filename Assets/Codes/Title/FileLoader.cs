@@ -82,6 +82,7 @@ public class FileLoader : MonoBehaviour
             foreach (Chart c in h.charts)
             {
                 files.Add("/TestCharts/" + h.DirName + "/" + c.fileName + ".json");
+                if(!string.IsNullOrWhiteSpace(c.backgroundFile)) files.Add("/TestCharts/" + h.DirName + "/" + c.fileName + ".jpg");
             }
         }
 

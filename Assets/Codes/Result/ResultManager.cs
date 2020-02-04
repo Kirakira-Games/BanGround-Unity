@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System;
+using System.IO;
 
 public class ResultManager : MonoBehaviour
 {
@@ -34,6 +35,8 @@ public class ResultManager : MonoBehaviour
 
     public AudioClip[] voices = new AudioClip[9];
 
+    private FixBackground background;
+
     void Start()
     {
         StartCoroutine(ReadRank());
@@ -43,6 +46,10 @@ public class ResultManager : MonoBehaviour
         ShowScore();
         ShowRank();
         ShowSongInfo();
+
+        background = GameObject.Find("Background").GetComponent<FixBackground>();
+        if (File.Exists(LiveSetting.GetBackgroundPath))
+            background.UpdateBackground(LiveSetting.GetBackgroundPath);
     }
 
     IEnumerator ReadRank()

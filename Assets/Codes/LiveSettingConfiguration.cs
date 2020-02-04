@@ -48,6 +48,7 @@ public static class LiveSetting
     public static string GetBGMPath => ChartDir + selectedFolder + "/" + "bgm.mp3";
     public static string GetHeaderPath => ChartDir + selectedFolder + "/" + "header.json";
     public static string GetPreviewMusicPath => ChartDir + selectedFolder + "/" + "preview.wav";
+    public static string GetBackgroundPath => ChartDir + selectedFolder + "/" + selectedChart + ".jpg";
 
     public static readonly string settingsPath = Application.persistentDataPath + "/LiveSettings.json";
     public static readonly string scoresPath = Application.persistentDataPath + "/Scores.json";
