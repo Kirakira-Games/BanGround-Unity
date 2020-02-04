@@ -343,29 +343,49 @@ public class NoteController : MonoBehaviour
     {
         int audioTime = audioMgr.GetBGMPlaybackTime();
 
+        Profiler.BeginSample("UpdateNotes");
         // Create notes
-        Profiler.BeginSample("UpdateNote");
         UpdateNotes(audioTime);
         Profiler.EndSample();
 
         if (audioMgr.GetPauseStatus()) return;
 
         // Trigger touch event
-        Profiler.BeginSample("UpdateTouch");
         UpdateTouch(audioTime);
-        Profiler.EndSample();
 
         // Update each note child
-        Profiler.BeginSample("UpdateTransform");
-        foreach (Transform child in transform)
+        var noteBase = transform.GetComponentsInChildren<NoteBase>();
+        var slide = transform.GetComponentsInChildren<Slide>();
+        var noteSyncLine = transform.GetComponentsInChildren<NoteSyncLine>();
+
+        Profiler.BeginSample("OnNoteUpdate");
+        for (int i = 0; i < noteBase.Length; i++)
         {
-            child.GetComponent<NoteBase>()?.OnNoteUpdate(audioTime);
-            child.GetComponent<Slide>()?.OnSlideUpdate(audioTime);
-        }
-        foreach (Transform child in transform)
-        {
-            child.GetComponent<NoteSyncLine>()?.OnSyncLineUpdate();
+            noteBase[i].OnNoteUpdate(audioTime);
         }
         Profiler.EndSample();
+
+        for (int i = 0; i < slide.Length; i++)
+        {
+            slide[i].OnSlideUpdate(audioTime);
+        }
+
+        for (int i = 0; i < noteSyncLine.Length; i++)
+        {
+            noteSyncLine[i].OnSyncLineUpdate();
+        }
+
+        //foreach (Transform child in transform)
+        //{
+        //    child.GetComponent<NoteBase>()?.OnNoteUpdate(audioTime);
+        //    child.GetComponent<Slide>()?.OnSlideUpdate(audioTime);
+        //}
+        //Profiler.EndSample();
+
+        //Profiler.BeginSample("UpdateSyncLineTransform");
+        //foreach (Transform child in transform)
+        //{
+        //    child.GetComponent<NoteSyncLine>()?.OnSyncLineUpdate();
+        //}
     }
 }
