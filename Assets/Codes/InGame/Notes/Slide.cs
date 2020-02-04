@@ -93,8 +93,9 @@ public class Slide : MonoBehaviour
 
     public void OnSlideUpdate(int audioTime)
     {
+    	var _notes = GetComponentsInChildren<NoteBase>();
         // Update ticks
-        foreach (NoteBase note in GetComponentsInChildren<NoteBase>())
+        foreach (NoteBase note in _notes)
         {
             note.OnNoteUpdate(audioTime);
         }
@@ -131,7 +132,8 @@ public class Slide : MonoBehaviour
             noteHead.gameObject.SetActive(touchId != -1 || LiveSetting.autoPlayEnabled);
         }
         // Update mesh
-        foreach (NoteBase note in GetComponentsInChildren<NoteBase>())
+        
+        foreach (NoteBase note in _notes)
         {
             note.GetComponentInChildren<SlideMesh>()?.OnUpdate();
             note.GetComponentInChildren<TapEffect>()?.OnUpdate();
