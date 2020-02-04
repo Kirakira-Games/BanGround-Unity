@@ -31,7 +31,7 @@ public class DifficultySelect : MonoBehaviour
         difficultyText = GameObject.Find("Text_SelectedDifficulty").GetComponent<Text>();
         selectManager = GameObject.Find("SelectManager").GetComponent<SelectManager>();
         //OnSongChange();
-        background = GameObject.Find("Background").GetComponent<FixBackground>();
+        background = GameObject.Find("KirakiraBackground").GetComponent<FixBackground>();
     }
     
     public void OnSongChange()
