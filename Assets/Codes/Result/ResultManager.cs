@@ -50,6 +50,8 @@ public class ResultManager : MonoBehaviour
         background = GameObject.Find("Background").GetComponent<FixBackground>();
         if (File.Exists(LiveSetting.GetBackgroundPath))
             background.UpdateBackground(LiveSetting.GetBackgroundPath);
+        else
+            background.UpdateBackground(null);
     }
 
     IEnumerator ReadRank()

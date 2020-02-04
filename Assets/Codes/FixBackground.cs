@@ -6,10 +6,12 @@ using UnityEngine.Networking;
 public class FixBackground : MonoBehaviour
 {
     SpriteRenderer render;
+    Sprite defaultSprite;
 
     private void Start()
     {
         render = GetComponent<SpriteRenderer>();
+        defaultSprite = render.sprite;
         UpdateScale();
     }
 
@@ -22,6 +24,12 @@ public class FixBackground : MonoBehaviour
 
     public void UpdateBackground(string path)
     {
+        if (path == null)
+        {
+            render.sprite = defaultSprite;
+            UpdateScale();
+            return;
+        }
         StartCoroutine(GetAndSetBG(path));
     }
 

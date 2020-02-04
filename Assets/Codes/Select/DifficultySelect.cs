@@ -71,6 +71,8 @@ public class DifficultySelect : MonoBehaviour
 
         if (File.Exists(LiveSetting.GetBackgroundPath)) 
             background.UpdateBackground(LiveSetting.GetBackgroundPath);
+        else
+            background.UpdateBackground(null);
         //LiveSetting.selectedDifficulty = (Difficulty)enabledCards[0];
         //print(Enum.GetName(typeof(Difficulty), LiveSetting.selectedDifficulty));
     }
