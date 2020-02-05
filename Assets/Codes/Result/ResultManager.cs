@@ -29,6 +29,7 @@ public class ResultManager : MonoBehaviour
 
     private RawImage rankIcon;
     private RawImage markIcon;
+    private Image difficultCard;
 
     PlayResult playResult = new PlayResult();
     double lastScore = 0;
@@ -140,6 +141,7 @@ public class ResultManager : MonoBehaviour
 
         rankIcon = GameObject.Find("RankIcon").GetComponent<RawImage>();
         markIcon = GameObject.Find("MarkIcon").GetComponent<RawImage>();
+        difficultCard = GameObject.Find("LevelBG").GetComponent<Image>();
     }
 
     public void ShowScore()
@@ -218,6 +220,7 @@ public class ResultManager : MonoBehaviour
         level_Text.text = Enum.GetName(typeof(Difficulty), chart.difficulty).ToUpper() + " " + chart.level.ToString();
         songName_Text.text = header?.TitleUnicode;
         acc_Text.text = LiveSetting.autoPlayEnabled ? "AUTOPLAY": string.Format("{0:P2}", playResult.Acc);
+        difficultCard.sprite = Resources.Load<Sprite>("UI/DifficultyCards/Result/" + Enum.GetName(typeof(Difficulty), chart.difficulty));
     }
 
     void ReadScores()
