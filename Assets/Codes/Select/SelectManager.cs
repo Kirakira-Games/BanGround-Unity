@@ -82,7 +82,7 @@ public class SelectManager : MonoBehaviour
         audioManager = GetComponent<AudioManager>();
 
         //enter_Btn = GameObject.Find("Enter_Btn").GetComponent<Button>();
-        setting_Open_Btn = GameObject.Find("Setting_Panel").GetComponent<Button>();
+        setting_Open_Btn = GameObject.Find("SettingOpenBtn").GetComponent<Button>();
         setting_Close_Btn = GameObject.Find("Button_Close").GetComponent<Button>();
 
         syncLine_Tog = GameObject.Find("Sync_Toggle").GetComponent<Toggle>();
