@@ -44,9 +44,9 @@ public class FixBackground : MonoBehaviour
     IEnumerator GetAndSetBG(string path)
     {
         Debug.Log(path);
-#if UNITY_ANDROID && !UNITY_EDITOR
+//#if UNITY_ANDROID && !UNITY_EDITOR
         path = "file://" + path;
-#endif
+//#endif
         using (UnityWebRequest webRequest = UnityWebRequestTexture.GetTexture(path)) 
         {
             yield return webRequest.SendWebRequest();
