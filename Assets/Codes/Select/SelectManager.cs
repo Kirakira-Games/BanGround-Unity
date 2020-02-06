@@ -180,6 +180,12 @@ public class SelectManager : MonoBehaviour
 
     IEnumerator SelectDefault()
     {
+        var background = GameObject.Find("KirakiraBackground").GetComponent<FixBackground>();
+        if (File.Exists(LiveSetting.GetBackgroundPath))
+            background.UpdateBackground(LiveSetting.GetBackgroundPath);
+        else
+            background.UpdateBackground(null);
+
         yield return new WaitForEndOfFrame();
         try
         {
@@ -361,16 +367,13 @@ public class SelectManager : MonoBehaviour
     }
 
     //--------------------------------------------
-    bool isSettingOpened = false;
     void OpenSetting()
     {
         GameObject.Find("Setting_Canvas").GetComponent<Animator>().SetBool("Drop", true);
-        isSettingOpened = true;
     }
     void CloseSetting()
     {
         GameObject.Find("Setting_Canvas").GetComponent<Animator>().SetBool("Drop", false);
-        isSettingOpened = false;
     }
     void GetLiveSetting()
     {
