@@ -7,19 +7,27 @@ public class FixBackground : MonoBehaviour
 {
     SpriteRenderer render;
     Sprite defaultSprite;
+    Camera mainCam;
+    Vector2 camSize;
 
     private void Start()
     {
+        mainCam = Camera.main;
+        float camHeight = mainCam.orthographicSize * 2;
+        camSize = new Vector2(mainCam.aspect * camHeight, camHeight);
+
         render = GetComponent<SpriteRenderer>();
         defaultSprite = render.sprite;
+
         UpdateScale();
     }
 
     private void UpdateScale()
     {
-        int width = render.sprite.texture.width;
-        int height = render.sprite.texture.height;
-        transform.localScale = new Vector3(Screen.width / (float)width, Screen.height / (float)height, 1);
+        Vector2 spriteSize = render.sprite.bounds.size;
+        float scale = Mathf.Max(camSize.x / spriteSize.x, camSize.y / spriteSize.y);
+        //transform.localScale = new Vector3(camSize.x / spriteSize.x, camSize.y / spriteSize.y, 1);
+        transform.localScale = Vector3.one * scale;
     }
 
     public void UpdateBackground(string path)
