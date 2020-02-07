@@ -2,19 +2,14 @@
 using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
-using FMOD;
+using Un4seen.Bass;
 using System.Runtime.InteropServices;
 
 class AudioManager : MonoBehaviour
 {
-    FMOD.System System;
-
-    ChannelGroup SEChannelGroup;
-    ChannelGroup BGMChannelGroup;
-
-    Channel CurrentBGMChannel;
-
-    public List<Sound> LoadedSound = new List<Sound>();
+    internal List<int> LoadedSound = new List<int>();
+    private int bgmId = 0;
+    private int bgmCid = 0;
 
     public bool loading = true;//bgm will not start untill the gate open
     public bool isInGame;
@@ -24,20 +19,17 @@ class AudioManager : MonoBehaviour
 
     void Awake()
     {
-        Factory.System_Create(out System);
-        System.init(1024, INITFLAGS.NORMAL, IntPtr.Zero);
+        Bass.BASS_Free();
 
-        System.createChannelGroup("SoundEffects", out SEChannelGroup);
-        System.createChannelGroup("BackgroundMuisc", out BGMChannelGroup);
-
-        SEChannelGroup.setVolume(LiveSetting.seVolume);
-        BGMChannelGroup.setVolume(LiveSetting.bgmVolume);
+        if (!Bass.BASS_Init(-1, AudioSettings.outputSampleRate, BASSInit.BASS_DEVICE_DEFAULT, IntPtr.Zero))
+        {
+            throw new Exception(Bass.BASS_ErrorGetCode().ToString());
+        }
     }
 
 
     void Update()
     {
-        System.update();
         //print(LoadedSound.Count);
         if (isInGame)
         {
@@ -61,100 +53,88 @@ class AudioManager : MonoBehaviour
         lastPos = -999;
     }
 
-    public Sound PrecacheSound(TextAsset asset, MODE mode = MODE._2D | MODE.OPENMEMORY)
+    public int PrecacheBGM(TextAsset internalFile)
     {
-        var bytes = asset.bytes;
+        var id = Bass.BASS_SampleLoad(internalFile.bytes, 0, internalFile.bytes.Length, 1, BASSFlag.BASS_DEFAULT);
 
-        Sound sound;
+        if (id == 0)
+        {
+            throw new Exception(Bass.BASS_ErrorGetCode().ToString());
+        }
 
-        CREATESOUNDEXINFO exinfo = new CREATESOUNDEXINFO();
-        exinfo.cbsize = Marshal.SizeOf(exinfo);
-        exinfo.length = (uint)bytes.Length;
-
-        var result = System.createSound(bytes, mode, ref exinfo, out sound);
-
-        LoadedSound.Add(sound);
-
-        return sound;
+        return id;
     }
 
-    public Sound PrecacheSound(byte[] bytes, MODE mode = MODE._2D | MODE.OPENMEMORY)
+    public int PrecacheSound(TextAsset internalFile)
     {
-        Sound sound;
+        var id = Bass.BASS_SampleLoad(internalFile.bytes, 0, internalFile.bytes.Length, 65535, BASSFlag.BASS_DEFAULT);
 
-        CREATESOUNDEXINFO exinfo = new CREATESOUNDEXINFO();
-        exinfo.cbsize = Marshal.SizeOf(exinfo);
-        exinfo.length = (uint)bytes.Length;
+        if (id == 0)
+        {
+            throw new Exception(Bass.BASS_ErrorGetCode().ToString());
+        }
 
-        var result = System.createSound(bytes, mode, ref exinfo, out sound);
-
-        LoadedSound.Add(sound);
-
-        return sound;
+        return id;
     }
 
-    public Sound PrecacheSound(string path, MODE mode = MODE._2D)
+    public int PrecacheSound(byte[] bytes)
     {
-        Sound sound;
+        var id = Bass.BASS_SampleLoad(bytes, 0, bytes.Length, 65535, BASSFlag.BASS_DEFAULT);
 
-        var result = System.createSound(path, mode, out sound);
+        if (id == 0)
+        {
+            throw new Exception(Bass.BASS_ErrorGetCode().ToString());
+        }
 
-        LoadedSound.Add(sound);
-
-        return sound;
+        return id;
     }
 
-    public void UnloadSound(Sound sound)
+    public void UnloadSound(int sound)
     {
         LoadedSound.Remove(sound);
-        sound.release();
+        Bass.BASS_SampleFree(sound);
     }
 
-    public Channel PlaySE(Sound sound)
+    public int PlaySE(int sound)
     {
-        Channel channel;
+        var cid = Bass.BASS_SampleGetChannel(sound, false);
+        Bass.BASS_ChannelPlay(cid, false);
 
-        System.playSound(sound, SEChannelGroup, false, out channel);
-
-        return channel;
+        return cid;
     }
 
-    public Channel PlayBGM(Sound sound, bool paused = false)
+    public int PlayBGM(int sound)
     {
-        
-        Channel channel;
-        
-        System.playSound(sound, BGMChannelGroup, false, out channel);
-        
-        CurrentBGMChannel = channel;
-        return channel;
+        if (bgmCid != 0)
+            Bass.BASS_ChannelStop(bgmCid);
+
+        var cid = Bass.BASS_SampleGetChannel(sound, false);
+        Bass.BASS_ChannelPlay(cid, true);
+
+        bgmId = sound;
+        bgmCid = cid;
+
+        return cid;
     }
 
-    public Channel PlayPreview(Sound sound)
+    public int PlayPreview(int sound)
     {
-        Channel channel;
-        sound.getLength(out uint length, TIMEUNIT.MS);
-
-        sound.setLoopPoints(0, TIMEUNIT.MS, length, TIMEUNIT.MS);
-        sound.setLoopCount(int.MaxValue);
-
-        System.playSound(sound, BGMChannelGroup, false, out channel);
-
-        CurrentBGMChannel = channel;
-        return channel;
+        return PlayBGM(sound);
     }
 
     public int GetBGMPlaybackTime()
     {
-        if (loading) return (int)(Time.time * 1000) - lastPos + LiveSetting.audioOffset;
-        uint pos;
-        CurrentBGMChannel.getPosition(out pos, TIMEUNIT.MS);
+        if (loading) 
+            return (int)(Time.time * 1000) - lastPos + LiveSetting.audioOffset;
+
+        var pos = Bass.BASS_ChannelGetPosition(bgmCid);
+        var time = (int)(Bass.BASS_ChannelBytes2Seconds(bgmCid, pos) * 1000);
 
         if (GetPlayStatus())
         {
-            if (pos != lastPos)
+            if (time != lastPos)
             {
-                lastPos = (int)pos;
+                lastPos = time;
                 lastUpdateTime = Time.time;
             }
             else
@@ -162,55 +142,55 @@ class AudioManager : MonoBehaviour
                 return (int)((Time.time - lastUpdateTime) * 1000) + lastPos + LiveSetting.audioOffset;
             }
         }
+        else
+        {
+            return lastPos + LiveSetting.audioOffset;
+        }
 
-        return (int)pos + LiveSetting.audioOffset;
+        return lastPos + LiveSetting.audioOffset;
     }
 
     public bool GetPlayStatus()
     {
-        CurrentBGMChannel.isPlaying(out bool isPlaying);
-        return isPlaying;
+        var status = Bass.BASS_ChannelIsActive(bgmCid);
+        return status == BASSActive.BASS_ACTIVE_PLAYING;
     }
 
     public bool GetPauseStatus()
     {
-        CurrentBGMChannel.getPaused(out bool paused);
-        return paused;
+        var status = Bass.BASS_ChannelIsActive(bgmCid);
+        return status == BASSActive.BASS_ACTIVE_PAUSED;
     }
 
     public void PauseBGM()
     {
         print("pause");
-        CurrentBGMChannel.setPaused(true);
+        Bass.BASS_ChannelPause(bgmCid);
     }
 
     public void ResumeBGM()
     {
-        CurrentBGMChannel.setPaused(false);
+        Bass.BASS_ChannelPlay(bgmCid, false);
     }
 
     public void StopBGM()
     {
-        CurrentBGMChannel.stop();
+        Bass.BASS_ChannelStop(bgmCid);
     }
 
     void OnApplicationQuit()
     {
         foreach (var sound in LoadedSound)
-            sound.release();
+            Bass.BASS_SampleFree(sound);
 
-        SEChannelGroup.release();
-        BGMChannelGroup.release();
-        System.release();
+        Bass.BASS_Free();
     }
 
     private void OnDestroy()
     {
         foreach (var sound in LoadedSound)
-            sound.release();
+            Bass.BASS_SampleFree(sound);
 
-        SEChannelGroup.release();
-        BGMChannelGroup.release();
-        System.release();
+        Bass.BASS_Free();
     }
 }

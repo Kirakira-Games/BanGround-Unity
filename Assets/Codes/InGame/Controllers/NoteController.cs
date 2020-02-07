@@ -17,11 +17,11 @@ public class NoteController : MonoBehaviour
     private GradeColorChange scoreDisplay;
     private int numNotes;
     private AudioManager audioMgr;
-    private FMOD.Sound SE_PERFECT;
-    private FMOD.Sound SE_GREAT;
-    private FMOD.Sound SE_GOOD;
-    private FMOD.Sound SE_CLICK;
-    private FMOD.Sound SE_FLICK;
+    private int SE_PERFECT;
+    private int SE_GREAT;
+    private int SE_GOOD;
+    private int SE_CLICK;
+    private int SE_FLICK;
 
     private FixBackground background;
 

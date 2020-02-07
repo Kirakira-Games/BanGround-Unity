@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using UnityEngine.Networking;
 using UnityEngine.Profiling;
 using System;
+using Un4seen.Bass;
 
 public class SelectManager : MonoBehaviour
 {
@@ -35,7 +36,7 @@ public class SelectManager : MonoBehaviour
     private Slider bgmVolume_Input;
 
     private AudioManager audioManager;
-    private FMOD.Channel BGMChannel;
+    private int BGMChannel;
 
     public GameObject enterAniObj;
 
@@ -359,9 +360,9 @@ public class SelectManager : MonoBehaviour
             audioManager.UnloadSound(audioManager.LoadedSound[i]);
         }
         audioManager.LoadedSound.Clear();
-        FMOD.Sound sdBGM;
+        int sdBGM;
 
-        sdBGM = audioManager.PrecacheSound(File.ReadAllBytes(LiveSetting.GetPreviewMusicPath), FMOD.MODE.LOOP_NORMAL | FMOD.MODE._2D | FMOD.MODE.OPENMEMORY);
+        sdBGM = audioManager.PrecacheSound(File.ReadAllBytes(LiveSetting.GetPreviewMusicPath));
 
         BGMChannel = audioManager.PlayPreview(sdBGM);
     }
@@ -439,12 +440,15 @@ public class SelectManager : MonoBehaviour
     IEnumerator DelayLoadScene()
     {
         float delay = 1.2f;
-        BGMChannel.getVolume(out float startVolume);
+
+        float startVolume = 1.0f;
+        Bass.BASS_ChannelGetAttribute(BGMChannel, BASSAttribute.BASS_ATTRIB_VOL, ref startVolume);
+
         while (delay >= 0)
         {
             yield return new WaitForEndOfFrame();
             delay -= Time.deltaTime;
-            BGMChannel.setVolume(startVolume * (delay / 1.2f));
+            Bass.BASS_ChannelSetAttribute(BGMChannel, BASSAttribute.BASS_ATTRIB_VOL, startVolume * (delay / 1.2f));
         }
 
         //yield return new WaitForSeconds(2f);
@@ -453,7 +457,10 @@ public class SelectManager : MonoBehaviour
 
     private void OnApplicationPause(bool pause)
     {
-        BGMChannel.setPaused(pause);
+        if (pause)
+            audioManager.PauseBGM();
+        else
+            audioManager.ResumeBGM();
     }
 }
 
