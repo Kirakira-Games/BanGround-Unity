@@ -31,7 +31,7 @@ public class UIManager : MonoBehaviour
         
         var bgColor = LiveSetting.bgBrightness;
         bg_SR.color = new Color(bgColor, bgColor, bgColor);
-        lan_MR.material.color = new Color(1f, 1f, 1f, LiveSetting.laneBrightness);
+        lan_MR.material.SetColor("_BaseColor", new Color(1f, 1f, 1f, LiveSetting.laneBrightness));
 
         pause_Btn = GameObject.Find("Pause_Btn").GetComponent<Button>();
         resume_Btn = GameObject.Find("Resume_Btn").GetComponent<Button>();
