@@ -43,7 +43,7 @@ public class FixBackground : MonoBehaviour
 
     IEnumerator GetAndSetBG(string path)
     {
-        Debug.Log(path);
+        //Debug.Log(path);
 //#if UNITY_ANDROID && !UNITY_EDITOR
         path = "file://" + path;
 //#endif
