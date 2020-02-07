@@ -150,10 +150,15 @@ class AudioManager : MonoBehaviour
         return lastPos + LiveSetting.audioOffset;
     }
 
+    /// <summary>
+    /// 获取bgm的播放状态（暂停状态下也应返回true）
+    /// </summary>
+    /// <returns></returns>
     public bool GetPlayStatus()
     {
         var status = Bass.BASS_ChannelIsActive(bgmCid);
-        return status == BASSActive.BASS_ACTIVE_PLAYING;
+        //return status == BASSActive.BASS_ACTIVE_PLAYING || GetPauseStatus();
+        return status != BASSActive.BASS_ACTIVE_STOPPED;
     }
 
     public bool GetPauseStatus()
