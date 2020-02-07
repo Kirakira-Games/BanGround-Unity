@@ -88,8 +88,8 @@ public class PlayResult
     public Ranks ranks;
     public double Score;
     public double Acc;
-    public String FolderName;
-    public String ChartName;
+    public string FolderName;
+    public string ChartName;
 }
 
 public class PlayRecords {

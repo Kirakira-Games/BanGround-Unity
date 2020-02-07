@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System;
 using System.IO;
+using System.Linq;
 
 public class ResultManager : MonoBehaviour
 {
@@ -219,7 +220,7 @@ public class ResultManager : MonoBehaviour
 
         level_Text.text = Enum.GetName(typeof(Difficulty), chart.difficulty).ToUpper() + " " + chart.level.ToString();
         songName_Text.text = header?.TitleUnicode;
-        acc_Text.text = LiveSetting.autoPlayEnabled ? "AUTOPLAY" : string.Format("{0:P2}", Mathf.Floor((float)playResult.Acc * 1000) / 1000);
+        acc_Text.text = LiveSetting.autoPlayEnabled ? "AUTOPLAY" : string.Format("{0:P2}", Mathf.Floor((float)playResult.Acc * 10000) / 10000);
         difficultCard.sprite = Resources.Load<Sprite>("UI/DifficultyCards/Result/" + Enum.GetName(typeof(Difficulty), chart.difficulty));
     }
 
@@ -232,26 +233,44 @@ public class ResultManager : MonoBehaviour
         playResult.ChartName = LiveSetting.selectedChart;
         playResult.FolderName = LiveSetting.selectedFolder;
         PlayRecords pr = PlayRecords.OpenRecord();
-        int count = 0;
-        for(int i =0;i<pr.resultsList.Count;i++)
+
+        var resultList = pr.resultsList.Where((x) => x.FolderName == LiveSetting.selectedFolder && x.ChartName == LiveSetting.selectedChart);
+        if (resultList.Count() == 1) 
         {
-            if (pr.resultsList[i].FolderName == LiveSetting.selectedFolder && pr.resultsList[i].ChartName == LiveSetting.selectedChart)
+            var result = resultList.First();
+            lastScore = result.Score;
+            if (lastScore < playResult.Score)
             {
-                count++;
-                lastScore = pr.resultsList[i].Score;
-                if (lastScore < playResult.Score)
-                {
-                    pr.resultsList.RemoveAt(i);
-                    pr.resultsList.Add(playResult);
-                }
-                break;
+                pr.resultsList.Remove(result);
+                pr.resultsList.Add(playResult);
             }
         }
-        if (count == 0)
+        else
         {
             lastScore = 0;
             pr.resultsList.Add(playResult);
         }
+
+        //int count = 0;
+        //for(int i =0;i<pr.resultsList.Count;i++)
+        //{
+        //    if (pr.resultsList[i].FolderName == LiveSetting.selectedFolder && pr.resultsList[i].ChartName == LiveSetting.selectedChart)
+        //    {
+        //        count++;
+        //        lastScore = pr.resultsList[i].Score;
+        //        if (lastScore < playResult.Score)
+        //        {
+        //            pr.resultsList.RemoveAt(i);
+        //            pr.resultsList.Add(playResult);
+        //        }
+        //        break;
+        //    }
+        //}
+        //if (count == 0)
+        //{
+        //    lastScore = 0;
+        //    pr.resultsList.Add(playResult);
+        //}
         if (!LiveSetting.autoPlayEnabled)
             print("Record Saved: " + PlayRecords.SaveRecord(pr));
         else
