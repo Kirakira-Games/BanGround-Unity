@@ -21537,9 +21537,29 @@
             BASSWASAPI: no WASAPI available
             </summary>
         </member>
+        <member name="F:Un4seen.Bass.BASSError.BASS_ERROR_WASAPI_BUFFER">
+            <summary>
+            BASSWASAPI: buffer size is invalid
+            </summary>
+        </member>
+        <member name="F:Un4seen.Bass.BASSError.BASS_ERROR_WASAPI_CATEGORY">
+            <summary>
+            BASSWASAPI: can't set category
+            </summary>
+        </member>
         <member name="F:Un4seen.Bass.BASSError.BASS_ERROR_MP4_NOSTREAM">
             <summary>
             BASS_AAC: non-streamable due to MP4 atom order ('mdat' before 'moov')
+            </summary>
+        </member>
+        <member name="F:Un4seen.Bass.BASSError.BASS_ERROR_WEBM_NOTAUDIO">
+            <summary>
+            BASSWEBM: non-streamable WebM audio
+            </summary>
+        </member>
+        <member name="F:Un4seen.Bass.BASSError.BASS_ERROR_WEBM_TRACK">
+            <summary>
+            BASSWEBM: invalid track number
             </summary>
         </member>
         <member name="T:Un4seen.Bass.BASSInit">
@@ -24628,6 +24648,13 @@
             <para>period: The maximum amount to data to asynchronously buffer at a time from the source, in seconds... 0 = as much as possible.</para>
             <para>When asynchronous buffering is enabled via the BASS_ATTRIB_SPLIT_ASYNCBUFFER attribute, this attribute limits how much data is requested from the source at a time. When there is more space available in the buffer, the request will be repeated until the space is filled.</para>
             <para>The setting applies to all splitter streams that have the same source. The default setting is 0 (as much as possible). Changes take immediate effect.</para>
+            </summary>
+        </member>
+        <member name="F:Un4seen.Bass.BASSAttribute.BASS_ATTRIB_WEBM_TRACK">
+            <summary>
+            BASSWEBM: The active track number.
+            <para>track: The track number... 1 = first.</para>
+            <para>This attribute is read-only, so cannot be modified via <see cref="M:Un4seen.Bass.Bass.BASS_ChannelSetAttribute(System.Int32,Un4seen.Bass.BASSAttribute,System.Single)"/>.</para>
             </summary>
         </member>
         <member name="F:Un4seen.Bass.BASSAttribute.BASS_SLIDE_LOG">

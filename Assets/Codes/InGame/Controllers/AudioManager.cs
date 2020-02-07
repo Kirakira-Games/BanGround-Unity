@@ -21,7 +21,12 @@ class AudioManager : MonoBehaviour
     {
         Bass.BASS_Free();
 
-        if (!Bass.BASS_Init(-1, AudioSettings.outputSampleRate, BASSInit.BASS_DEVICE_DEFAULT, IntPtr.Zero))
+        BASSInit flag = BASSInit.BASS_DEVICE_DEFAULT;
+#if UNITY_ANDROID && !UNITY_EDITOR
+        flag |= BASSInit.BASS_DEVICE_AUDIOTRACK;
+#endif
+
+        if (!Bass.BASS_Init(-1, AudioSettings.outputSampleRate, flag, IntPtr.Zero))
         {
             throw new Exception(Bass.BASS_ErrorGetCode().ToString());
         }
@@ -98,6 +103,7 @@ class AudioManager : MonoBehaviour
     public int PlaySE(int sound)
     {
         var cid = Bass.BASS_SampleGetChannel(sound, false);
+        Bass.BASS_ChannelSetAttribute(cid, BASSAttribute.BASS_ATTRIB_VOL, LiveSetting.seVolume);
         Bass.BASS_ChannelPlay(cid, false);
 
         return cid;
@@ -109,6 +115,7 @@ class AudioManager : MonoBehaviour
             Bass.BASS_ChannelStop(bgmCid);
 
         var cid = Bass.BASS_SampleGetChannel(sound, false);
+        Bass.BASS_ChannelSetAttribute(cid, BASSAttribute.BASS_ATTRIB_VOL, LiveSetting.bgmVolume);
         Bass.BASS_ChannelPlay(cid, true);
 
         bgmId = sound;
