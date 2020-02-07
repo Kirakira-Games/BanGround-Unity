@@ -5,6 +5,59 @@ using UnityEngine;
 using Un4seen.Bass;
 using System.Runtime.InteropServices;
 
+class BassMemStream : IDisposable
+{
+    int id;
+    GCHandle pinnedObject;
+
+    public int ID { get { return id; } }
+    public float Volume
+    {
+        get
+        {
+            float volume = 0.0f;
+            Bass.BASS_ChannelGetAttribute(ID, BASSAttribute.BASS_ATTRIB_VOL, ref volume);
+
+            return volume;
+        }
+        set
+        {
+            Bass.BASS_ChannelSetAttribute(ID, BASSAttribute.BASS_ATTRIB_VOL, value);
+        }
+    }
+
+    public BassMemStream(GCHandle handle, int id)
+    {
+        pinnedObject = handle;
+        this.id = id;
+    }
+
+    public void Play(bool restart = false)
+    {
+        Bass.BASS_ChannelSetAttribute(ID, BASSAttribute.BASS_ATTRIB_VOL, LiveSetting.bgmVolume);
+        Bass.BASS_ChannelPlay(ID, restart);
+    }
+
+    public void Pause()
+    {
+        Bass.BASS_ChannelPause(ID);
+    }
+
+    public void Stop()
+    {
+        Bass.BASS_ChannelStop(ID);
+    }
+
+    public void Dispose()
+    {
+        if (Bass.BASS_ChannelIsActive(ID) != BASSActive.BASS_ACTIVE_STOPPED)
+            Stop();
+
+        Bass.BASS_StreamFree(ID);
+        pinnedObject.Free();
+    }
+}
+
 class AudioManager : MonoBehaviour
 {
     internal List<int> LoadedSound = new List<int>();
@@ -68,6 +121,21 @@ class AudioManager : MonoBehaviour
         }
 
         return id;
+    }
+
+    public BassMemStream StreamSound(byte[] file, BASSFlag flags = BASSFlag.BASS_DEFAULT)
+    {
+        var pinnedObject = GCHandle.Alloc(file, GCHandleType.Pinned);
+        var pinnedObjectPtr = pinnedObject.AddrOfPinnedObject();
+
+        var id = Bass.BASS_StreamCreateFile(pinnedObjectPtr, 0, file.Length, flags);
+
+        return new BassMemStream(pinnedObject, id);
+    }
+
+    public BassMemStream StreamSound(TextAsset internalFile, BASSFlag flags = BASSFlag.BASS_DEFAULT)
+    {
+        return StreamSound(internalFile.bytes, flags);
     }
 
     public int PrecacheSound(TextAsset internalFile, BASSFlag flags = BASSFlag.BASS_DEFAULT)

@@ -349,6 +349,9 @@ public class SelectManager : MonoBehaviour
         }
         clearMark.texture = mark;
     }
+
+    BassMemStream lastPreviewStream = null;
+
     void PlayPreview()
     {
         //if (lastIndex == LiveSetting.selectedIndex) return;
@@ -360,11 +363,13 @@ public class SelectManager : MonoBehaviour
             audioManager.UnloadSound(audioManager.LoadedSound[i]);
         }
         audioManager.LoadedSound.Clear();
-        int sdBGM;
 
-        sdBGM = audioManager.PrecacheSound(File.ReadAllBytes(LiveSetting.GetPreviewMusicPath), BASSFlag.BASS_DEFAULT | BASSFlag.BASS_SAMPLE_LOOP);
+        if (lastPreviewStream != null)
+            lastPreviewStream.Dispose();
 
-        BGMChannel = audioManager.PlayPreview(sdBGM);
+        lastPreviewStream = audioManager.StreamSound(File.ReadAllBytes(LiveSetting.GetPreviewMusicPath), BASSFlag.BASS_DEFAULT | BASSFlag.BASS_SAMPLE_LOOP);
+
+        lastPreviewStream.Play();
     }
 
     //--------------------------------------------
@@ -441,15 +446,16 @@ public class SelectManager : MonoBehaviour
     {
         float delay = 1.2f;
 
-        float startVolume = 1.0f;
-        Bass.BASS_ChannelGetAttribute(BGMChannel, BASSAttribute.BASS_ATTRIB_VOL, ref startVolume);
+        float startVolume = lastPreviewStream.Volume;
 
         while (delay >= 0)
         {
             yield return new WaitForEndOfFrame();
             delay -= Time.deltaTime;
-            Bass.BASS_ChannelSetAttribute(BGMChannel, BASSAttribute.BASS_ATTRIB_VOL, startVolume * (delay / 1.2f));
+            lastPreviewStream.Volume = startVolume * (delay / 1.2f);
         }
+
+        lastPreviewStream.Dispose();
 
         //yield return new WaitForSeconds(2f);
         SceneManager.LoadSceneAsync("InGame");
