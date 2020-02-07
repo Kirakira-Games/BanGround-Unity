@@ -149,7 +149,7 @@ public class ResultManager : MonoBehaviour
         
         score_Text.text = string.Format("{0:0000000}",playResult.Score);
         double delta = playResult.Score - lastScore;
-        score_delta_Text.text = string.Format(delta < 0 ? "-{0:0000000}": "+{0:0000000}", playResult.Score - lastScore) ;
+        score_delta_Text.text = string.Format(delta < 0 ? "{0:0000000}": "+{0:0000000}", playResult.Score - lastScore) ;
         perfect_Text.text = ComboManager.judgeCount[(int)JudgeResult.Perfect].ToString();
         great_Text.text = ComboManager.judgeCount[(int)JudgeResult.Great].ToString();
         good_Text.text = ComboManager.judgeCount[(int)JudgeResult.Good].ToString();
@@ -244,6 +244,7 @@ public class ResultManager : MonoBehaviour
                     pr.resultsList.RemoveAt(i);
                     pr.resultsList.Add(playResult);
                 }
+                break;
             }
         }
         if (count == 0)
