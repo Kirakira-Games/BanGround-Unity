@@ -53,9 +53,9 @@ class AudioManager : MonoBehaviour
         lastPos = -999;
     }
 
-    public int PrecacheBGM(TextAsset internalFile)
+    public int PrecacheBGM(TextAsset internalFile, BASSFlag flags = BASSFlag.BASS_DEFAULT)
     {
-        var id = Bass.BASS_SampleLoad(internalFile.bytes, 0, internalFile.bytes.Length, 1, BASSFlag.BASS_DEFAULT);
+        var id = Bass.BASS_SampleLoad(internalFile.bytes, 0, internalFile.bytes.Length, 1, flags);
 
         if (id == 0)
         {
@@ -65,9 +65,9 @@ class AudioManager : MonoBehaviour
         return id;
     }
 
-    public int PrecacheSound(TextAsset internalFile)
+    public int PrecacheSound(TextAsset internalFile, BASSFlag flags = BASSFlag.BASS_DEFAULT)
     {
-        var id = Bass.BASS_SampleLoad(internalFile.bytes, 0, internalFile.bytes.Length, 65535, BASSFlag.BASS_DEFAULT);
+        var id = Bass.BASS_SampleLoad(internalFile.bytes, 0, internalFile.bytes.Length, 65535, flags);
 
         if (id == 0)
         {
@@ -77,9 +77,9 @@ class AudioManager : MonoBehaviour
         return id;
     }
 
-    public int PrecacheSound(byte[] bytes)
+    public int PrecacheSound(byte[] bytes, BASSFlag flags = BASSFlag.BASS_DEFAULT)
     {
-        var id = Bass.BASS_SampleLoad(bytes, 0, bytes.Length, 65535, BASSFlag.BASS_DEFAULT);
+        var id = Bass.BASS_SampleLoad(bytes, 0, bytes.Length, 65535, flags);
 
         if (id == 0)
         {

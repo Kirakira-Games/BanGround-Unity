@@ -362,7 +362,7 @@ public class SelectManager : MonoBehaviour
         audioManager.LoadedSound.Clear();
         int sdBGM;
 
-        sdBGM = audioManager.PrecacheSound(File.ReadAllBytes(LiveSetting.GetPreviewMusicPath));
+        sdBGM = audioManager.PrecacheSound(File.ReadAllBytes(LiveSetting.GetPreviewMusicPath), BASSFlag.BASS_DEFAULT | BASSFlag.BASS_SAMPLE_LOOP);
 
         BGMChannel = audioManager.PlayPreview(sdBGM);
     }
