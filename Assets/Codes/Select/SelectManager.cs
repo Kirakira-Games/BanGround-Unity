@@ -350,7 +350,7 @@ public class SelectManager : MonoBehaviour
         clearMark.texture = mark;
     }
 
-    BassMemStream lastPreviewStream = null;
+    LoopingBassMemStream lastPreviewStream = null;
 
     void PlayPreview()
     {
@@ -367,7 +367,8 @@ public class SelectManager : MonoBehaviour
         if (lastPreviewStream != null)
             lastPreviewStream.Dispose();
 
-        lastPreviewStream = audioManager.StreamSound(File.ReadAllBytes(LiveSetting.GetPreviewMusicPath), BASSFlag.BASS_DEFAULT | BASSFlag.BASS_SAMPLE_LOOP);
+        // TODO TODO!!! Take a real preview time instead of a dummy one
+        lastPreviewStream = audioManager.StreamLoopSound(File.ReadAllBytes(LiveSetting.GetBGMPath), 10000, 20000);
 
         lastPreviewStream.Play();
     }
