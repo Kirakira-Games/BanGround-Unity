@@ -47,6 +47,8 @@ public abstract class NoteBase : MonoBehaviour
         {
             NoteController.controller.UnregisterTouch(touchId, gameObject);
         }
+        Debug.Log(time - judgeTime);
+        ComboManager.JudgeOffsetResult.Add(time - judgeTime);
     }
 
     protected virtual void OnNoteUpdateJudge(int audioTime)
@@ -79,7 +81,8 @@ public abstract class NoteBase : MonoBehaviour
 
     protected JudgeResult TranslateTimeToJudge(int[] judgeRange, int audioTime)
     {
-        int diff = Mathf.Abs(time - audioTime);
+        int offset = time - audioTime;
+        int diff = Mathf.Abs(offset);
         for (int i = 0; i < (int)JudgeResult.Miss; i++)
         {
             if (diff <= judgeRange[i])

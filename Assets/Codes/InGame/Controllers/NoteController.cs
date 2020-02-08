@@ -124,7 +124,8 @@ public class NoteController : MonoBehaviour
             {
                 int key = laneQueue[i].Keys.First();
                 GameObject obj = laneQueue[i][key];
-                if (obj == null || obj.GetComponent<NoteBase>().judgeTime != int.MinValue)
+                bool nullObj = obj == null;
+                if (nullObj || obj.GetComponent<NoteBase>().judgeTime != int.MinValue)
                 {
                     laneQueue[i].Remove(key);
                 }

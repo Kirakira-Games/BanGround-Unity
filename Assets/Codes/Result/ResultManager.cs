@@ -20,6 +20,7 @@ public class ResultManager : MonoBehaviour
     private Text bad_Text;
     private Text miss_Text;
     private Text maxCombo_Text;
+    private Text offset_Text;
 
     private Text level_Text;
     private Text songName_Text;
@@ -48,7 +49,31 @@ public class ResultManager : MonoBehaviour
         ShowScore();
         ShowRank();
         ShowSongInfo();
+        ShowBackground();
+        ShowOffset();
+    }
 
+    private void ShowOffset()
+    {
+        //OffsetList
+        var miss = ComboManager.JudgeOffsetResult.Where(x => x == int.MinValue).Count();
+
+        var early = ComboManager.JudgeOffsetResult.Where(x => x < 0 && x != int.MinValue);
+        var late = ComboManager.JudgeOffsetResult.Where(x => x > 0 && x != int.MaxValue);
+        int earlyCount = early.Count();
+        int lateCount = late.Count();
+        int earlyAverage = earlyCount == 0 ? 0 : Mathf.RoundToInt((float)early.Average());
+        int lateAverage = lateCount == 0 ? 0 : Mathf.RoundToInt((float)late.Average());
+
+
+        //var normal = ComboManager.JudgeOffsetResult.Count - miss - slide;
+
+        Debug.Log($"total = {ComboManager.JudgeOffsetResult.Count}, early = {earlyCount}, late = {lateCount}, miss = {miss}");
+        offset_Text.text = $"Exclued Slide\n\nE:{earlyCount}(avg:{earlyAverage})\nL:{lateCount}(avg:{lateAverage})";
+    }
+
+    private void ShowBackground()
+    {
         background = GameObject.Find("Background").GetComponent<FixBackground>();
         if (File.Exists(LiveSetting.GetBackgroundPath))
             background.UpdateBackground(LiveSetting.GetBackgroundPath);
@@ -135,6 +160,7 @@ public class ResultManager : MonoBehaviour
         bad_Text = GameObject.Find("Bad_count").GetComponent<Text>();
         miss_Text = GameObject.Find("Mis_count").GetComponent<Text>();
         maxCombo_Text = GameObject.Find("Mxm_Comb_count").GetComponent<Text>();
+        offset_Text = GameObject.Find("Offset").GetComponent<Text>();
 
         level_Text = GameObject.Find("Level").GetComponent<Text>();
         songName_Text = GameObject.Find("SongName").GetComponent<Text>();

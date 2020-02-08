@@ -15,6 +15,7 @@ public class ComboManager : MonoBehaviour
     public static int maxAcc;
     public static int noteCount;
     public static ComboManager manager;
+    public static List<int> JudgeOffsetResult;
 
     private int[] combo;
 
@@ -34,6 +35,7 @@ public class ComboManager : MonoBehaviour
         acc = 0;
         maxAcc = 0;
         judgeCount = new int[(int)JudgeResult.Miss + 1];
+        JudgeOffsetResult = new List<int>();
     }
 
     private void Start()
