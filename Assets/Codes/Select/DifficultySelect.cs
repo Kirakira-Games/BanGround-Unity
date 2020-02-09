@@ -12,7 +12,7 @@ public class DifficultySelect : MonoBehaviour
     RectTransform[] Rects = new RectTransform[5];
     public int[] levels = new int[5];
     List<int> enabledCards = new List<int>();
-    int selected =0;
+    int selected = 0;
     Text difficultyText;
     Text levelText;
     SelectManager selectManager;
@@ -39,14 +39,15 @@ public class DifficultySelect : MonoBehaviour
         enabledCards = new List<int>();
         for (int i = 0; i < cards.Length; i++) //找出需要被激活的卡片
         {
-            if (levels[i] < 0)
+            int index = (i + LiveSetting.selectedDifficulty) % cards.Length;
+            if (levels[index] < 0)
             {
-                cards[i].SetActive(false);
+                cards[index].SetActive(false);
             }
             else
             {
-                enabledCards.Add(i);
-                cards[i].SetActive(true);
+                enabledCards.Add(index);
+                cards[index].SetActive(true);
             }
         }
         UpdateView();
@@ -88,6 +89,7 @@ public class DifficultySelect : MonoBehaviour
             enabledCards.Add(oldList[i]);
         }
         enabledCards.Add(oldList[0]);
+        LiveSetting.selectedDifficulty = enabledCards[0];
 
         StartCoroutine(SwipeOutAnimation());
     }
