@@ -9,6 +9,7 @@ public class RectControl : MonoBehaviour
     RectTransform rt_m;
     RectTransform rt_v;
     RectTransform rt;
+    ScrollRect rt_s;
     VerticalLayoutGroup vg;
 
     SelectManager sm;
@@ -25,6 +26,7 @@ public class RectControl : MonoBehaviour
         rt_m = GameObject.Find("SongContent").GetComponent<RectTransform>();
         vg = GameObject.Find("SongContent").GetComponent<VerticalLayoutGroup>();
         rt_v = GameObject.Find("Song Scroll View").GetComponent<RectTransform>();
+        rt_s = GameObject.Find("Song Scroll View").GetComponent<ScrollRect>();
         sm = GameObject.Find("SelectManager").GetComponent<SelectManager>();
         startImg = transform.Find("StartImg").gameObject;
 
@@ -59,7 +61,7 @@ public class RectControl : MonoBehaviour
         select = true;
 
         float destPos = 0 - rt.anchoredPosition.y - vg.padding.top -(rt.sizeDelta.y/2);
-        while (Math.Abs(rt_m.anchoredPosition.y - destPos) > 1f)
+        while (Math.Abs(rt_m.anchoredPosition.y - destPos) > 1f || Math.Abs(rt_s.velocity.y) > 1f)
         {
             rt_m.anchoredPosition -= new Vector2(0, (rt_m.anchoredPosition.y - destPos) * 0.3f);
             yield return new WaitForEndOfFrame();
