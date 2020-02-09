@@ -10,7 +10,6 @@ public abstract class SlideNoteBase : NoteBase
 
     protected override void OnDestroy()
     {
-        Debug.Log(time - judgeTime);
         ComboManager.JudgeOffsetResult.Add(time - judgeTime);
     }
 
