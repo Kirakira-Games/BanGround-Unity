@@ -11,6 +11,7 @@ public class ResultManager : MonoBehaviour
 {
     private Button button_back;
     private Button button_retry;
+    private Button button_cycleFrame;
 
     private Text score_Text;
     private Text score_delta_Text;
@@ -69,7 +70,7 @@ public class ResultManager : MonoBehaviour
         //var normal = ComboManager.JudgeOffsetResult.Count - miss - slide;
 
         Debug.Log($"total = {ComboManager.JudgeOffsetResult.Count}, early = {earlyCount}, late = {lateCount}, miss = {miss}");
-        offset_Text.text = $"Exclued Slide\n\nE:{earlyCount}(avg:{earlyAverage})\nL:{lateCount}(avg:{lateAverage})";
+        offset_Text.text = $"E:{earlyCount}(avg:{earlyAverage})\nL:{lateCount}(avg:{lateAverage})";
     }
 
     private void ShowBackground()
@@ -128,6 +129,7 @@ public class ResultManager : MonoBehaviour
     {
         button_back = GameObject.Find("Button_back").GetComponent<Button>();
         button_retry = GameObject.Find("Button_retry").GetComponent<Button>();
+        button_cycleFrame = GameObject.Find("CycleFrame").GetComponent<Button>();
 
         Animator anim = GameObject.Find("AnimationManager").GetComponent<Animator>();
 
@@ -141,6 +143,11 @@ public class ResultManager : MonoBehaviour
         {
             anim.SetBool("FadeToBlack", true);
             StartCoroutine("DelayLoadScene","InGame" ); 
+        });
+
+        button_cycleFrame.onClick.AddListener(() =>
+        {
+            offset_Text.gameObject.SetActive(!offset_Text.gameObject.activeSelf);
         });
     }
 
@@ -169,6 +176,8 @@ public class ResultManager : MonoBehaviour
         rankIcon = GameObject.Find("RankIcon").GetComponent<RawImage>();
         markIcon = GameObject.Find("MarkIcon").GetComponent<RawImage>();
         difficultCard = GameObject.Find("LevelBG").GetComponent<Image>();
+
+        offset_Text.gameObject.SetActive(false);
     }
 
     public void ShowScore()
@@ -246,7 +255,7 @@ public class ResultManager : MonoBehaviour
 
         level_Text.text = Enum.GetName(typeof(Difficulty), chart.difficulty).ToUpper() + " " + chart.level.ToString();
         songName_Text.text = header?.TitleUnicode;
-        acc_Text.text = LiveSetting.autoPlayEnabled ? "AUTOPLAY" : string.Format("{0:P2}", Mathf.Floor((float)playResult.Acc * 10000) / 10000);
+        acc_Text.text = LiveSetting.autoPlayEnabled ? "AUTOPLAY" : string.Format("{0:P2}", Mathf.FloorToInt((float)playResult.Acc * 10000) / 10000);
         difficultCard.sprite = Resources.Load<Sprite>("UI/DifficultyCards/Result/" + Enum.GetName(typeof(Difficulty), chart.difficulty));
     }
 

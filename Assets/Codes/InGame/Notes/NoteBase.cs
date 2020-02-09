@@ -47,7 +47,6 @@ public abstract class NoteBase : MonoBehaviour
         {
             NoteController.controller.UnregisterTouch(touchId, gameObject);
         }
-        Debug.Log(time - judgeTime);
         ComboManager.JudgeOffsetResult.Add(time - judgeTime);
     }
 
