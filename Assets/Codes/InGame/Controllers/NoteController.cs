@@ -190,7 +190,7 @@ public class NoteController : MonoBehaviour
                 return null;
         }
         note.time = gameNote.time;
-        note.lane = gameNote.lane;
+        note.lane = LiveSetting.mirrowEnabled ? NoteUtility.LANE_COUNT - gameNote.lane - 1 : gameNote.lane;
         note.type = gameNote.type;
         note.isGray = LiveSetting.grayNoteEnabled ? gameNote.isGray : false;
         note.InitNote();

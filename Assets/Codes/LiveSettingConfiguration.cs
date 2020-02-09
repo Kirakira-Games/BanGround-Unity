@@ -20,6 +20,7 @@ public static class LiveSetting
     public static bool syncLineEnabled = true;
     public static bool laneEffectEnabled = true;
     public static bool grayNoteEnabled = true;
+    public static bool mirrowEnabled = false;
     public static bool bangPerspective = true;
     public static bool autoPlayEnabled = false;
 
@@ -74,25 +75,26 @@ public class LiveSettingTemplate
     public int judgeOffset = 0;
     public int audioOffset = 0;
 
-    public  float noteSpeed = 10.8f;
-    public  float noteSize = 1f;
-    public  float meshSize = .75f;
-    public  float meshOpacity = .6f;
+    public float noteSpeed = 10.8f;
+    public float noteSize = 1f;
+    public float meshSize = .75f;
+    public float meshOpacity = .6f;
 
-    public  float bgmVolume = .7f;
-    public  float seVolume = .7f;
+    public float bgmVolume = .7f;
+    public float seVolume = .7f;
 
-    public  bool syncLineEnabled = true;
-    public  bool laneEffectEnabled = true;
-    public  bool grayNoteEnabled = true;
-    public  bool bangPerspective = true;
-    public  bool autoPlayEnabled = false;
+    public bool syncLineEnabled = true;
+    public bool laneEffectEnabled = true;
+    public bool grayNoteEnabled = true;
+    public bool mirrowEnabled = false;
+    public bool bangPerspective = true;
+    public bool autoPlayEnabled = false;
 
-    public  float bgBrightness = .7f;
-    public  float laneBrightness = 0.84f;
+    public float bgBrightness = .7f;
+    public float laneBrightness = 0.84f;
     public float longBrightness = .8f;
 
-    public  int selectedIndex = 0;
+    public int selectedIndex = 0;
 
     public LiveSettingTemplate()
     {
@@ -107,6 +109,7 @@ public class LiveSettingTemplate
         syncLineEnabled = LiveSetting.syncLineEnabled;
         laneEffectEnabled = LiveSetting.laneEffectEnabled;
         grayNoteEnabled = LiveSetting.grayNoteEnabled;
+        mirrowEnabled = LiveSetting.mirrowEnabled;
         bangPerspective = LiveSetting.bangPerspective;
         autoPlayEnabled = LiveSetting.autoPlayEnabled;
 
@@ -130,6 +133,7 @@ public class LiveSettingTemplate
         LiveSetting.syncLineEnabled = st.syncLineEnabled;
         LiveSetting.laneEffectEnabled = st.laneEffectEnabled;
         LiveSetting.grayNoteEnabled = st.grayNoteEnabled;
+        LiveSetting.mirrowEnabled = st.mirrowEnabled;
         LiveSetting.bangPerspective = st.bangPerspective;
         LiveSetting.autoPlayEnabled = st.autoPlayEnabled;
 

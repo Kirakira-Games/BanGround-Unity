@@ -23,6 +23,7 @@ public class SelectManager : MonoBehaviour
     private Toggle offBeat_Tog;
     private Toggle auto_Tog;
     private Toggle persp_Tog;
+    private Toggle mirrow_Tog;
 
     private InputField speed_Input;
     private InputField judge_Input;
@@ -88,6 +89,7 @@ public class SelectManager : MonoBehaviour
 
         syncLine_Tog = GameObject.Find("Sync_Toggle").GetComponent<Toggle>();
         offBeat_Tog = GameObject.Find("Offbeat_Toggle").GetComponent<Toggle>();
+        mirrow_Tog = GameObject.Find("Mirrow_Toggle").GetComponent<Toggle>();
         auto_Tog = GameObject.Find("Autoplay_Toggle").GetComponent<Toggle>();
         persp_Tog = GameObject.Find("Perspective_Toggle").GetComponent<Toggle>();
 
@@ -386,6 +388,7 @@ public class SelectManager : MonoBehaviour
         size_Input.text = LiveSetting.noteSize.ToString();
         syncLine_Tog.isOn = LiveSetting.syncLineEnabled;
         offBeat_Tog.isOn = LiveSetting.grayNoteEnabled;
+        mirrow_Tog.isOn = LiveSetting.mirrowEnabled;
         auto_Tog.isOn = LiveSetting.autoPlayEnabled;
         persp_Tog.isOn = LiveSetting.bangPerspective;
 
@@ -406,6 +409,7 @@ public class SelectManager : MonoBehaviour
         LiveSetting.bgmVolume = bgmVolume_Input.value;
         LiveSetting.syncLineEnabled = syncLine_Tog.isOn;
         LiveSetting.grayNoteEnabled = offBeat_Tog.isOn;
+        LiveSetting.mirrowEnabled = mirrow_Tog.isOn;
         LiveSetting.autoPlayEnabled = auto_Tog.isOn;
         LiveSetting.bangPerspective = persp_Tog.isOn;
 
