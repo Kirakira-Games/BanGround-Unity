@@ -62,8 +62,9 @@ public class Header
     public string TitleUnicode;
     public string ArtistUnicode;
 
-    public float PreviewStart;
-    public float PreviewEnd;
+    //public float PreviewStart;
+    //public float PreviewEnd;
+    public float[] Preview;
 
     public short NumCharts;
     public string DirName;//for load in usage

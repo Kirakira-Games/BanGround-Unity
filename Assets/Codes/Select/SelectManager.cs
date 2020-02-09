@@ -364,11 +364,13 @@ public class SelectManager : MonoBehaviour
             audioManager.UnloadSound(audioManager.LoadedSound[i]);
         }
         audioManager.LoadedSound.Clear();
-        FMOD.Sound sdBGM;
 
-        sdBGM = audioManager.PrecacheSound(File.ReadAllBytes(LiveSetting.GetPreviewMusicPath), FMOD.MODE.LOOP_NORMAL | FMOD.MODE._2D | FMOD.MODE.OPENMEMORY);
-
-        BGMChannel = audioManager.PlayPreview(sdBGM);
+        if(File.Exists(LiveSetting.GetPreviewMusicPath))
+        {
+            FMOD.Sound sdBGM;
+            sdBGM = audioManager.PrecacheSound(File.ReadAllBytes(LiveSetting.GetPreviewMusicPath), FMOD.MODE.LOOP_NORMAL | FMOD.MODE._2D | FMOD.MODE.OPENMEMORY);
+            BGMChannel = audioManager.PlayPreview(sdBGM);
+        }
     }
 
     //--------------------------------------------
