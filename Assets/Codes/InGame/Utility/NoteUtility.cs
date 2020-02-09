@@ -41,10 +41,9 @@ public static class NoteUtility
     public const float LANE_WIDTH = 1.366f;
     public const float NOTE_SCALE = 0.8f;
 
-    public const float BANG_PERSPECTIVE_EXP = 15f;
-    public const float BANG_PERSPECTIVE_CONST = 0.5f;
-    public static readonly float BANG_PERSPECTIVE_START = Mathf.Pow(BANG_PERSPECTIVE_EXP, BANG_PERSPECTIVE_CONST);
-    public static readonly float BANG_PERSPECTIVE_END = BANG_PERSPECTIVE_START - Mathf.Pow(BANG_PERSPECTIVE_EXP, BANG_PERSPECTIVE_CONST - 1);
+    private static readonly float BANG_PERSPECTIVE_START = YTo3DXHelper(0);
+    private static readonly float BANG_PERSPECTIVE_END = YTo3DXHelper(1);
+    private static readonly float BANG_EXP_START = XToBanGYHelper(0);
 
     public static readonly int[] TAP_JUDGE_RANGE = { 50, 100, 117, 133 };
     public static readonly int[] SLIDE_END_JUDGE_RANGE = { 67, 117, 133, 150 };
@@ -112,16 +111,29 @@ public static class NoteUtility
         return touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled;
     }
 
+    private static float XToBanGYHelper(float x)
+    {
+        return Mathf.Pow(1.1f, -50 * (1-x));
+    }
+
+    private static float XToBanGY(float x)
+    {
+        return (XToBanGYHelper(x) - BANG_EXP_START) / (1 - BANG_EXP_START);
+    }
+
+    private static float YTo3DXHelper(float x)
+    {
+        return -1.02458329f / Mathf.Pow(3.90425367f * Mathf.Pow(x, 0.9f) + 0.99125229f, 2f) + 1.04274808f;
+    }
+
+    private static float YTo3DX(float x)
+    {
+        return (YTo3DXHelper(x) - BANG_PERSPECTIVE_START) / (BANG_PERSPECTIVE_END - BANG_PERSPECTIVE_START);
+    }
+
     public static float GetBangPerspective(float x)
     {
         if (x <= 0) return 0;
-        if (x >= 1)
-        {
-            return 1 + (x - 1) * 0.5f;
-        }
-        return 0.8f *
-            (1 - Mathf.Cos(x * Mathf.PI * 0.9f)) / (1 - Mathf.Cos(0.9f * Mathf.PI))
-            + 0.2f *
-            (BANG_PERSPECTIVE_START - Mathf.Pow(BANG_PERSPECTIVE_EXP, BANG_PERSPECTIVE_CONST - x)) / BANG_PERSPECTIVE_END;
+        return YTo3DX(XToBanGY(x));
     }
 }
