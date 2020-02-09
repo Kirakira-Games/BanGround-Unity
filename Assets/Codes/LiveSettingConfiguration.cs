@@ -43,6 +43,7 @@ public static class LiveSetting
     public static string selectedChart = "0";//file name
     public static string selectedFolder = "";
     public static int selectedIndex = 0;
+    public static int selectedDifficulty = (int)Difficulty.Easy;
 
     public static SongList songList;
 
@@ -94,8 +95,6 @@ public class LiveSettingTemplate
     public float laneBrightness = 0.84f;
     public float longBrightness = .8f;
 
-    public int selectedIndex = 0;
-
     public LiveSettingTemplate()
     {
         judgeOffset = LiveSetting.judgeOffset;
@@ -116,8 +115,6 @@ public class LiveSettingTemplate
         bgBrightness = LiveSetting.bgBrightness;
         laneBrightness = LiveSetting.laneBrightness;
         longBrightness = LiveSetting.longBrightness;
-
-        selectedIndex = LiveSetting.selectedIndex;
     }
     public static void ApplyToLiveSetting(LiveSettingTemplate st)
     {
@@ -140,7 +137,5 @@ public class LiveSettingTemplate
         LiveSetting.bgBrightness = st.bgBrightness;
         LiveSetting.laneBrightness = st.laneBrightness;
         LiveSetting.longBrightness = st.longBrightness;
-
-        LiveSetting.selectedIndex = st.selectedIndex;
     }
 }
