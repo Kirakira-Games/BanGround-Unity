@@ -29,7 +29,7 @@ public class GradeColorChange : MonoBehaviour
     {
         score = _score;
         sld.value = (float)_score;
-        txt.text = LiveSetting.autoPlayEnabled ? "AUTO": string.Format("{0:P2}", Mathf.FloorToInt((float)_acc * 10000) / 10000);
+        txt.text = LiveSetting.autoPlayEnabled ? "AUTO": string.Format("{0:P2}", Mathf.FloorToInt((float)_acc * 10000) / 10000f);
         
     }
 

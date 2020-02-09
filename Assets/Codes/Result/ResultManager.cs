@@ -255,7 +255,7 @@ public class ResultManager : MonoBehaviour
 
         level_Text.text = Enum.GetName(typeof(Difficulty), chart.difficulty).ToUpper() + " " + chart.level.ToString();
         songName_Text.text = header?.TitleUnicode;
-        acc_Text.text = LiveSetting.autoPlayEnabled ? "AUTOPLAY" : string.Format("{0:P2}", Mathf.FloorToInt((float)playResult.Acc * 10000) / 10000);
+        acc_Text.text = LiveSetting.autoPlayEnabled ? "AUTOPLAY" : string.Format("{0:P2}", Mathf.FloorToInt((float)playResult.Acc * 10000) / 10000f);
         difficultCard.sprite = Resources.Load<Sprite>("UI/DifficultyCards/Result/" + Enum.GetName(typeof(Difficulty), chart.difficulty));
     }
 
