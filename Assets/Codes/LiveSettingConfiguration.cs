@@ -25,6 +25,7 @@ public static class LiveSetting
 
     public static float bgBrightness = .7f;
     public static float laneBrightness = 0.84f;
+    public static float longBrightness = .8f;
 
     public const string assetDirectory = "V2Assets";
     public const string IconPath = "UI/v3/";
@@ -89,6 +90,7 @@ public class LiveSettingTemplate
 
     public  float bgBrightness = .7f;
     public  float laneBrightness = 0.84f;
+    public float longBrightness = .8f;
 
     public  int selectedIndex = 0;
 
@@ -110,6 +112,7 @@ public class LiveSettingTemplate
 
         bgBrightness = LiveSetting.bgBrightness;
         laneBrightness = LiveSetting.laneBrightness;
+        longBrightness = LiveSetting.longBrightness;
 
         selectedIndex = LiveSetting.selectedIndex;
     }
@@ -132,6 +135,7 @@ public class LiveSettingTemplate
 
         LiveSetting.bgBrightness = st.bgBrightness;
         LiveSetting.laneBrightness = st.laneBrightness;
+        LiveSetting.longBrightness = st.longBrightness;
 
         LiveSetting.selectedIndex = st.selectedIndex;
     }

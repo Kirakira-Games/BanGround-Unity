@@ -5,11 +5,13 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System;
 using System.IO;
+using System.Linq;
 
 public class ResultManager : MonoBehaviour
 {
     private Button button_back;
     private Button button_retry;
+    private Button button_cycleFrame;
 
     private Text score_Text;
     private Text score_delta_Text;
@@ -19,6 +21,7 @@ public class ResultManager : MonoBehaviour
     private Text bad_Text;
     private Text miss_Text;
     private Text maxCombo_Text;
+    private Text offset_Text;
 
     private Text level_Text;
     private Text songName_Text;
@@ -47,7 +50,31 @@ public class ResultManager : MonoBehaviour
         ShowScore();
         ShowRank();
         ShowSongInfo();
+        ShowBackground();
+        ShowOffset();
+    }
 
+    private void ShowOffset()
+    {
+        //OffsetList
+        var miss = ComboManager.JudgeOffsetResult.Where(x => x == int.MinValue).Count();
+
+        var early = ComboManager.JudgeOffsetResult.Where(x => x < 0 && x != int.MinValue);
+        var late = ComboManager.JudgeOffsetResult.Where(x => x > 0 && x != int.MaxValue);
+        int earlyCount = early.Count();
+        int lateCount = late.Count();
+        int earlyAverage = earlyCount == 0 ? 0 : Mathf.RoundToInt((float)early.Average());
+        int lateAverage = lateCount == 0 ? 0 : Mathf.RoundToInt((float)late.Average());
+
+
+        //var normal = ComboManager.JudgeOffsetResult.Count - miss - slide;
+
+        Debug.Log($"total = {ComboManager.JudgeOffsetResult.Count}, early = {earlyCount}, late = {lateCount}, miss = {miss}");
+        offset_Text.text = $"E:{earlyCount}(avg:{earlyAverage})\nL:{lateCount}(avg:{lateAverage})";
+    }
+
+    private void ShowBackground()
+    {
         background = GameObject.Find("Background").GetComponent<FixBackground>();
         if (File.Exists(LiveSetting.GetBackgroundPath))
             background.UpdateBackground(LiveSetting.GetBackgroundPath);
@@ -102,6 +129,7 @@ public class ResultManager : MonoBehaviour
     {
         button_back = GameObject.Find("Button_back").GetComponent<Button>();
         button_retry = GameObject.Find("Button_retry").GetComponent<Button>();
+        button_cycleFrame = GameObject.Find("CycleFrame").GetComponent<Button>();
 
         Animator anim = GameObject.Find("AnimationManager").GetComponent<Animator>();
 
@@ -115,6 +143,11 @@ public class ResultManager : MonoBehaviour
         {
             anim.SetBool("FadeToBlack", true);
             StartCoroutine("DelayLoadScene","InGame" ); 
+        });
+
+        button_cycleFrame.onClick.AddListener(() =>
+        {
+            offset_Text.gameObject.SetActive(!offset_Text.gameObject.activeSelf);
         });
     }
 
@@ -134,6 +167,7 @@ public class ResultManager : MonoBehaviour
         bad_Text = GameObject.Find("Bad_count").GetComponent<Text>();
         miss_Text = GameObject.Find("Mis_count").GetComponent<Text>();
         maxCombo_Text = GameObject.Find("Mxm_Comb_count").GetComponent<Text>();
+        offset_Text = GameObject.Find("Offset").GetComponent<Text>();
 
         level_Text = GameObject.Find("Level").GetComponent<Text>();
         songName_Text = GameObject.Find("SongName").GetComponent<Text>();
@@ -142,6 +176,8 @@ public class ResultManager : MonoBehaviour
         rankIcon = GameObject.Find("RankIcon").GetComponent<RawImage>();
         markIcon = GameObject.Find("MarkIcon").GetComponent<RawImage>();
         difficultCard = GameObject.Find("LevelBG").GetComponent<Image>();
+
+        offset_Text.gameObject.SetActive(false);
     }
 
     public void ShowScore()
@@ -219,7 +255,7 @@ public class ResultManager : MonoBehaviour
 
         level_Text.text = Enum.GetName(typeof(Difficulty), chart.difficulty).ToUpper() + " " + chart.level.ToString();
         songName_Text.text = header?.TitleUnicode;
-        acc_Text.text = LiveSetting.autoPlayEnabled ? "AUTOPLAY" : string.Format("{0:P2}", Mathf.Floor((float)playResult.Acc * 1000) / 1000);
+        acc_Text.text = LiveSetting.autoPlayEnabled ? "AUTOPLAY" : string.Format("{0:P2}", Mathf.FloorToInt((float)playResult.Acc * 10000) / 10000);
         difficultCard.sprite = Resources.Load<Sprite>("UI/DifficultyCards/Result/" + Enum.GetName(typeof(Difficulty), chart.difficulty));
     }
 
@@ -232,26 +268,44 @@ public class ResultManager : MonoBehaviour
         playResult.ChartName = LiveSetting.selectedChart;
         playResult.FolderName = LiveSetting.selectedFolder;
         PlayRecords pr = PlayRecords.OpenRecord();
-        int count = 0;
-        for(int i =0;i<pr.resultsList.Count;i++)
+
+        var resultList = pr.resultsList.Where((x) => x.FolderName == LiveSetting.selectedFolder && x.ChartName == LiveSetting.selectedChart);
+        if (resultList.Count() == 1) 
         {
-            if (pr.resultsList[i].FolderName == LiveSetting.selectedFolder && pr.resultsList[i].ChartName == LiveSetting.selectedChart)
+            var result = resultList.First();
+            lastScore = result.Score;
+            if (lastScore < playResult.Score)
             {
-                count++;
-                lastScore = pr.resultsList[i].Score;
-                if (lastScore < playResult.Score)
-                {
-                    pr.resultsList.RemoveAt(i);
-                    pr.resultsList.Add(playResult);
-                }
-                break;
+                pr.resultsList.Remove(result);
+                pr.resultsList.Add(playResult);
             }
         }
-        if (count == 0)
+        else
         {
             lastScore = 0;
             pr.resultsList.Add(playResult);
         }
+
+        //int count = 0;
+        //for(int i =0;i<pr.resultsList.Count;i++)
+        //{
+        //    if (pr.resultsList[i].FolderName == LiveSetting.selectedFolder && pr.resultsList[i].ChartName == LiveSetting.selectedChart)
+        //    {
+        //        count++;
+        //        lastScore = pr.resultsList[i].Score;
+        //        if (lastScore < playResult.Score)
+        //        {
+        //            pr.resultsList.RemoveAt(i);
+        //            pr.resultsList.Add(playResult);
+        //        }
+        //        break;
+        //    }
+        //}
+        //if (count == 0)
+        //{
+        //    lastScore = 0;
+        //    pr.resultsList.Add(playResult);
+        //}
         if (!LiveSetting.autoPlayEnabled)
             print("Record Saved: " + PlayRecords.SaveRecord(pr));
         else

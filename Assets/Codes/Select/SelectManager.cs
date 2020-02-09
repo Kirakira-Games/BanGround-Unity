@@ -32,6 +32,7 @@ public class SelectManager : MonoBehaviour
 
     private Slider bg_Bright;
     private Slider lane_Bright;
+    private Slider long_Bright;
     private Slider seVolume_Input;
     private Slider bgmVolume_Input;
 
@@ -98,6 +99,7 @@ public class SelectManager : MonoBehaviour
 
         bg_Bright = GameObject.Find("BG_Bri_Slider").GetComponent<Slider>();
         lane_Bright = GameObject.Find("Lane_Bri_Slider").GetComponent<Slider>();
+        long_Bright = GameObject.Find("Long_Bri_Slider").GetComponent<Slider>();
         seVolume_Input = GameObject.Find("SeVolume_Input").GetComponent<Slider>();
         bgmVolume_Input = GameObject.Find("BGMVolume_Input").GetComponent<Slider>();
 
@@ -167,8 +169,9 @@ public class SelectManager : MonoBehaviour
             GameObject go = Instantiate(songItemPrefab, GameObject.Find("SongContent").transform);
             go.name = i.ToString();
             Text[] txt = go.GetComponentsInChildren<Text>();
+            string author = string.IsNullOrEmpty(songList[i].charts[0].authorUnicode) ? songList[i].charts[0].author : songList[i].charts[0].authorUnicode;
             txt[0].text = songList[i].TitleUnicode;
-            txt[1].text = songList[i].ArtistUnicode;
+            txt[1].text = songList[i].ArtistUnicode +" / "+ author;
             go.GetComponent<RectControl>().index = i;
             SelectButtons.Add(go);
         }
@@ -394,6 +397,8 @@ public class SelectManager : MonoBehaviour
 
         bg_Bright.value = LiveSetting.bgBrightness;
         lane_Bright.value = LiveSetting.laneBrightness;
+        long_Bright.value = LiveSetting.longBrightness;
+
         seVolume_Input.value = LiveSetting.seVolume;
         bgmVolume_Input.value = LiveSetting.bgmVolume;
     }
@@ -412,6 +417,7 @@ public class SelectManager : MonoBehaviour
 
         LiveSetting.bgBrightness = bg_Bright.value;
         LiveSetting.laneBrightness = lane_Bright.value;
+        LiveSetting.longBrightness = long_Bright.value;
     }
     //============================================
     public void OnEnterPressed()

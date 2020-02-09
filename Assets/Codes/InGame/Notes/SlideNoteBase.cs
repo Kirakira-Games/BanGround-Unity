@@ -10,7 +10,7 @@ public abstract class SlideNoteBase : NoteBase
 
     protected override void OnDestroy()
     {
-        
+        ComboManager.JudgeOffsetResult.Add(time - judgeTime);
     }
 
     public override JudgeResult TryJudge(int audioTime, Touch touch)
