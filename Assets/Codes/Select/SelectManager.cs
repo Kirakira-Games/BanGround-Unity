@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using UnityEngine.Networking;
 using UnityEngine.Profiling;
 using System;
+using Un4seen.Bass;
 
 public class SelectManager : MonoBehaviour
 {
@@ -37,7 +38,7 @@ public class SelectManager : MonoBehaviour
     private Slider bgmVolume_Input;
 
     private AudioManager audioManager;
-    private FMOD.Channel BGMChannel;
+    private int BGMChannel;
 
     public GameObject enterAniObj;
 
@@ -258,6 +259,8 @@ public class SelectManager : MonoBehaviour
         else lastIndex = LiveSetting.selectedIndex;
 
         LiveSetting.selectedFolder = songList[LiveSetting.selectedIndex].DirName;
+        LiveSetting.CurrentHeader = songList[LiveSetting.selectedIndex];
+
         int[] diffs = new int[5] { -1,-1,-1,-1,-114};
         foreach(Chart a in songList[LiveSetting.selectedIndex].charts)
         {
@@ -353,6 +356,9 @@ public class SelectManager : MonoBehaviour
         }
         clearMark.texture = mark;
     }
+
+    LoopingBassMemStream lastPreviewStream = null;
+
     void PlayPreview()
     {
         //if (lastIndex == LiveSetting.selectedIndex) return;
@@ -365,12 +371,22 @@ public class SelectManager : MonoBehaviour
         }
         audioManager.LoadedSound.Clear();
 
+<<<<<<< HEAD
         if(File.Exists(LiveSetting.GetPreviewMusicPath))
         {
             FMOD.Sound sdBGM;
             sdBGM = audioManager.PrecacheSound(File.ReadAllBytes(LiveSetting.GetPreviewMusicPath), FMOD.MODE.LOOP_NORMAL | FMOD.MODE._2D | FMOD.MODE.OPENMEMORY);
             BGMChannel = audioManager.PlayPreview(sdBGM);
         }
+=======
+        if (lastPreviewStream != null)
+            lastPreviewStream.Dispose();
+
+        // TODO TODO!!! Take a real preview time instead of a dummy one
+        lastPreviewStream = audioManager.StreamLoopSound(File.ReadAllBytes(LiveSetting.GetBGMPath), LiveSetting.CurrentHeader.Preview[0], LiveSetting.CurrentHeader.Preview[1]);
+
+        lastPreviewStream.Play();
+>>>>>>> audio/bassnew
     }
 
     //--------------------------------------------
@@ -451,13 +467,17 @@ public class SelectManager : MonoBehaviour
     IEnumerator DelayLoadScene()
     {
         float delay = 1.2f;
-        BGMChannel.getVolume(out float startVolume);
+
+        float startVolume = lastPreviewStream.Volume;
+
         while (delay >= 0)
         {
             yield return new WaitForEndOfFrame();
             delay -= Time.deltaTime;
-            BGMChannel.setVolume(startVolume * (delay / 1.2f));
+            lastPreviewStream.Volume = startVolume * (delay / 1.2f);
         }
+
+        lastPreviewStream.Dispose();
 
         //yield return new WaitForSeconds(2f);
         SceneManager.LoadSceneAsync("InGame");
@@ -465,7 +485,10 @@ public class SelectManager : MonoBehaviour
 
     private void OnApplicationPause(bool pause)
     {
-        BGMChannel.setPaused(pause);
+        if (pause)
+            audioManager.PauseBGM();
+        else
+            audioManager.ResumeBGM();
     }
 }
 

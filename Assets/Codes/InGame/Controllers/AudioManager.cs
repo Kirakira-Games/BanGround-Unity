@@ -2,19 +2,151 @@
 using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
-using FMOD;
+using Un4seen.Bass;
 using System.Runtime.InteropServices;
+
+class LoopingBassMemStream : BassMemStream
+{
+    public int LoopStart;
+    public int LoopEnd;
+    public bool Fade;
+
+    private float OrigVolume;
+
+    public LoopingBassMemStream(GCHandle handle, int id, float start = -1, float end = -1, bool fade = false) : base(handle, id)
+    {
+        LoopStart = (int)start * 1000;
+        LoopEnd = (int)end * 1000;
+
+        if (start == -1 || end == -1)
+        {
+            LoopStart = 0;
+            var bytesLen = Bass.BASS_ChannelGetLength(ID);
+            LoopEnd = (int)(Bass.BASS_ChannelBytes2Seconds(ID, bytesLen) * 1000);
+        }
+
+        Position = LoopStart;
+        Fade = fade;
+    }
+
+    public new void Play(bool restart = false)
+    {
+        OrigVolume = Volume;
+
+        base.Play(restart);
+    }
+
+    public void OnUpdate()
+    {
+        if (Status != BASSActive.BASS_ACTIVE_PLAYING)
+            return;
+
+        int diff = LoopEnd - Position;
+
+        if (diff < 2000)
+        {
+            float volume = Math.Max(diff, 0) / 2000.0f;
+            Volume = OrigVolume * volume;
+
+            if (diff <= -750)
+            {
+                Position = LoopStart;
+                Volume = OrigVolume;
+            }
+        }
+    }
+}
+
+class BassMemStream : IDisposable
+{
+    int id;
+    GCHandle pinnedObject;
+
+    public int ID { get { return id; } }
+    public float Volume
+    {
+        get
+        {
+            float volume = 0.0f;
+            Bass.BASS_ChannelGetAttribute(ID, BASSAttribute.BASS_ATTRIB_VOL, ref volume);
+
+            return volume;
+        }
+        set
+        {
+            Bass.BASS_ChannelSetAttribute(ID, BASSAttribute.BASS_ATTRIB_VOL, value);
+        }
+    }
+
+    public int Position
+    {
+        get
+        {
+            var pos = Bass.BASS_ChannelGetPosition(ID);
+            var time = (int)(Bass.BASS_ChannelBytes2Seconds(ID, pos) * 1000);
+
+            return time;
+        }
+        set
+        {
+            var pos = Bass.BASS_ChannelSeconds2Bytes(ID, value / 1000.0);
+            Bass.BASS_ChannelSetPosition(ID, pos);
+        }
+    }
+
+    public BASSActive Status
+    {
+        get
+        {
+            return Bass.BASS_ChannelIsActive(ID);
+        }
+    }
+
+    public BassMemStream(GCHandle handle, int id)
+    {
+        pinnedObject = handle;
+        this.id = id;
+    }
+
+    public void Play(bool restart = false)
+    {
+        Bass.BASS_ChannelPlay(ID, restart);
+    }
+
+    public void Pause()
+    {
+        Bass.BASS_ChannelPause(ID);
+    }
+
+    public void Stop()
+    {
+        Bass.BASS_ChannelStop(ID);
+    }
+
+    public bool IsDisposed { get; private set; } = false;
+
+    public void Dispose()
+    {
+        if (IsDisposed)
+            throw new InvalidOperationException("Object already disposed!");
+
+        IsDisposed = true;
+
+        if (Bass.BASS_ChannelIsActive(ID) != BASSActive.BASS_ACTIVE_STOPPED)
+            Stop();
+
+        Bass.BASS_StreamFree(ID);
+        pinnedObject.Free();
+    }
+}
 
 class AudioManager : MonoBehaviour
 {
-    FMOD.System System;
+    internal List<int> LoadedSound = new List<int>();
+    private int bgmId = 0;
+    private int bgmCid = 0;
 
-    ChannelGroup SEChannelGroup;
-    ChannelGroup BGMChannelGroup;
-
-    Channel CurrentBGMChannel;
-
-    public List<Sound> LoadedSound = new List<Sound>();
+    private List<LoopingBassMemStream> LoopingStreams = new List<LoopingBassMemStream>();
 
     public bool loading = true;//bgm will not start untill the gate open
     public bool isInGame;
@@ -24,20 +156,30 @@ class AudioManager : MonoBehaviour
 
     void Awake()
     {
-        Factory.System_Create(out System);
-        System.init(1024, INITFLAGS.NORMAL, IntPtr.Zero);
+        Bass.BASS_Free();
 
-        System.createChannelGroup("SoundEffects", out SEChannelGroup);
-        System.createChannelGroup("BackgroundMuisc", out BGMChannelGroup);
+        BASSInit flag = BASSInit.BASS_DEVICE_DEFAULT;
+#if UNITY_ANDROID && !UNITY_EDITOR
+        flag |= BASSInit.BASS_DEVICE_AUDIOTRACK;
+#endif
 
-        SEChannelGroup.setVolume(LiveSetting.seVolume);
-        BGMChannelGroup.setVolume(LiveSetting.bgmVolume);
+        if (!Bass.BASS_Init(-1, AudioSettings.outputSampleRate, flag, IntPtr.Zero))
+        {
+            throw new Exception(Bass.BASS_ErrorGetCode().ToString());
+        }
     }
 
 
     void Update()
     {
-        System.update();
+        for (int i = LoopingStreams.Count - 1; i >= 0; i--)
+        {
+            if (LoopingStreams[i].IsDisposed)
+                LoopingStreams.RemoveAt(i);
+
+            LoopingStreams[i].OnUpdate();
+        }
+
         //print(LoadedSound.Count);
         if (isInGame)
         {
@@ -61,100 +203,118 @@ class AudioManager : MonoBehaviour
         lastPos = -999;
     }
 
-    public Sound PrecacheSound(TextAsset asset, MODE mode = MODE._2D | MODE.OPENMEMORY)
+    public int PrecacheBGM(TextAsset internalFile, BASSFlag flags = BASSFlag.BASS_DEFAULT)
     {
-        var bytes = asset.bytes;
+        var id = Bass.BASS_SampleLoad(internalFile.bytes, 0, internalFile.bytes.Length, 1, flags);
 
-        Sound sound;
+        if (id == 0)
+        {
+            throw new Exception(Bass.BASS_ErrorGetCode().ToString());
+        }
 
-        CREATESOUNDEXINFO exinfo = new CREATESOUNDEXINFO();
-        exinfo.cbsize = Marshal.SizeOf(exinfo);
-        exinfo.length = (uint)bytes.Length;
-
-        var result = System.createSound(bytes, mode, ref exinfo, out sound);
-
-        LoadedSound.Add(sound);
-
-        return sound;
+        return id;
     }
 
-    public Sound PrecacheSound(byte[] bytes, MODE mode = MODE._2D | MODE.OPENMEMORY)
+    public LoopingBassMemStream StreamLoopSound(byte[] file, float start = -1, float end = -1, bool fade = true, BASSFlag flags = BASSFlag.BASS_DEFAULT)
     {
-        Sound sound;
+        var pinnedObject = GCHandle.Alloc(file, GCHandleType.Pinned);
+        var pinnedObjectPtr = pinnedObject.AddrOfPinnedObject();
 
-        CREATESOUNDEXINFO exinfo = new CREATESOUNDEXINFO();
-        exinfo.cbsize = Marshal.SizeOf(exinfo);
-        exinfo.length = (uint)bytes.Length;
+        var id = Bass.BASS_StreamCreateFile(pinnedObjectPtr, 0, file.Length, flags);
 
-        var result = System.createSound(bytes, mode, ref exinfo, out sound);
+        var result = new LoopingBassMemStream(pinnedObject, id, start, end, fade);
 
-        LoadedSound.Add(sound);
-
-        return sound;
+        LoopingStreams.Add(result);
+        return result;
     }
 
-    public Sound PrecacheSound(string path, MODE mode = MODE._2D)
+    public BassMemStream StreamSound(byte[] file, BASSFlag flags = BASSFlag.BASS_DEFAULT)
     {
-        Sound sound;
+        var pinnedObject = GCHandle.Alloc(file, GCHandleType.Pinned);
+        var pinnedObjectPtr = pinnedObject.AddrOfPinnedObject();
 
-        var result = System.createSound(path, mode, out sound);
+        var id = Bass.BASS_StreamCreateFile(pinnedObjectPtr, 0, file.Length, flags);
 
-        LoadedSound.Add(sound);
-
-        return sound;
+        return new BassMemStream(pinnedObject, id);
     }
 
-    public void UnloadSound(Sound sound)
+    public BassMemStream StreamSound(TextAsset internalFile, BASSFlag flags = BASSFlag.BASS_DEFAULT)
+    {
+        return StreamSound(internalFile.bytes, flags);
+    }
+
+    public int PrecacheSound(TextAsset internalFile, BASSFlag flags = BASSFlag.BASS_DEFAULT)
+    {
+        var id = Bass.BASS_SampleLoad(internalFile.bytes, 0, internalFile.bytes.Length, 65535, flags);
+
+        if (id == 0)
+        {
+            throw new Exception(Bass.BASS_ErrorGetCode().ToString());
+        }
+
+        return id;
+    }
+
+    public int PrecacheSound(byte[] bytes, BASSFlag flags = BASSFlag.BASS_DEFAULT)
+    {
+        var id = Bass.BASS_SampleLoad(bytes, 0, bytes.Length, 65535, flags);
+
+        if (id == 0)
+        {
+            throw new Exception(Bass.BASS_ErrorGetCode().ToString());
+        }
+
+        return id;
+    }
+
+    public void UnloadSound(int sound)
     {
         LoadedSound.Remove(sound);
-        sound.release();
+        Bass.BASS_SampleFree(sound);
     }
 
-    public Channel PlaySE(Sound sound)
+    public int PlaySE(int sound)
     {
-        Channel channel;
+        var cid = Bass.BASS_SampleGetChannel(sound, false);
+        Bass.BASS_ChannelSetAttribute(cid, BASSAttribute.BASS_ATTRIB_VOL, LiveSetting.seVolume);
+        Bass.BASS_ChannelPlay(cid, false);
 
-        System.playSound(sound, SEChannelGroup, false, out channel);
-
-        return channel;
+        return cid;
     }
 
-    public Channel PlayBGM(Sound sound, bool paused = false)
+    public int PlayBGM(int sound)
     {
-        
-        Channel channel;
-        
-        System.playSound(sound, BGMChannelGroup, false, out channel);
-        
-        CurrentBGMChannel = channel;
-        return channel;
+        if (bgmCid != 0)
+            Bass.BASS_ChannelStop(bgmCid);
+
+        var cid = Bass.BASS_SampleGetChannel(sound, false);
+        Bass.BASS_ChannelSetAttribute(cid, BASSAttribute.BASS_ATTRIB_VOL, LiveSetting.bgmVolume);
+        Bass.BASS_ChannelPlay(cid, true);
+
+        bgmId = sound;
+        bgmCid = cid;
+
+        return cid;
     }
 
-    public Channel PlayPreview(Sound sound)
+    public int PlayPreview(int sound)
     {
-        Channel channel;
-        sound.getLength(out uint length, TIMEUNIT.MS);
-
-        sound.setLoopPoints(0, TIMEUNIT.MS, length, TIMEUNIT.MS);
-        sound.setLoopCount(int.MaxValue);
-
-        System.playSound(sound, BGMChannelGroup, false, out channel);
-
-        CurrentBGMChannel = channel;
-        return channel;
+        return PlayBGM(sound);
     }
 
     public int GetBGMPlaybackTime()
     {
-        if (loading) return (int)(Time.time * 1000) - lastPos + LiveSetting.audioOffset;
-        uint pos;
-        CurrentBGMChannel.getPosition(out pos, TIMEUNIT.MS);
+        if (loading) 
+            return (int)(Time.time * 1000) - lastPos + LiveSetting.audioOffset;
+
+        var pos = Bass.BASS_ChannelGetPosition(bgmCid);
+        var time = (int)(Bass.BASS_ChannelBytes2Seconds(bgmCid, pos) * 1000);
 
         if (GetPlayStatus())
         {
-            if (pos != lastPos)
+            if (time != lastPos)
             {
-                lastPos = (int)pos;
+                lastPos = time;
                 lastUpdateTime = Time.time;
             }
             else
@@ -162,55 +322,60 @@ class AudioManager : MonoBehaviour
                 return (int)((Time.time - lastUpdateTime) * 1000) + lastPos + LiveSetting.audioOffset;
             }
         }
+        else
+        {
+            return lastPos + LiveSetting.audioOffset;
+        }
 
-        return (int)pos + LiveSetting.audioOffset;
+        return lastPos + LiveSetting.audioOffset;
     }
 
+    /// <summary>
+    /// 获取bgm的播放状态（暂停状态下也应返回true）
+    /// </summary>
+    /// <returns></returns>
     public bool GetPlayStatus()
     {
-        CurrentBGMChannel.isPlaying(out bool isPlaying);
-        return isPlaying;
+        var status = Bass.BASS_ChannelIsActive(bgmCid);
+        //return status == BASSActive.BASS_ACTIVE_PLAYING || GetPauseStatus();
+        return status != BASSActive.BASS_ACTIVE_STOPPED;
     }
 
     public bool GetPauseStatus()
     {
-        CurrentBGMChannel.getPaused(out bool paused);
-        return paused;
+        var status = Bass.BASS_ChannelIsActive(bgmCid);
+        return status == BASSActive.BASS_ACTIVE_PAUSED;
     }
 
     public void PauseBGM()
     {
         print("pause");
-        CurrentBGMChannel.setPaused(true);
+        Bass.BASS_ChannelPause(bgmCid);
     }
 
     public void ResumeBGM()
     {
-        CurrentBGMChannel.setPaused(false);
+        Bass.BASS_ChannelPlay(bgmCid, false);
     }
 
     public void StopBGM()
     {
-        CurrentBGMChannel.stop();
+        Bass.BASS_ChannelStop(bgmCid);
     }
 
     void OnApplicationQuit()
     {
         foreach (var sound in LoadedSound)
-            sound.release();
+            Bass.BASS_SampleFree(sound);
 
-        SEChannelGroup.release();
-        BGMChannelGroup.release();
-        System.release();
+        Bass.BASS_Free();
     }
 
     private void OnDestroy()
     {
         foreach (var sound in LoadedSound)
-            sound.release();
+            Bass.BASS_SampleFree(sound);
 
-        SEChannelGroup.release();
-        BGMChannelGroup.release();
-        System.release();
+        Bass.BASS_Free();
     }
 }
