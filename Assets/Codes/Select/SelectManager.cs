@@ -257,6 +257,8 @@ public class SelectManager : MonoBehaviour
         else lastIndex = LiveSetting.selectedIndex;
 
         LiveSetting.selectedFolder = songList[LiveSetting.selectedIndex].DirName;
+        LiveSetting.CurrentHeader = songList[LiveSetting.selectedIndex];
+
         int[] diffs = new int[5] { -1,-1,-1,-1,-114};
         foreach(Chart a in songList[LiveSetting.selectedIndex].charts)
         {
@@ -371,7 +373,7 @@ public class SelectManager : MonoBehaviour
             lastPreviewStream.Dispose();
 
         // TODO TODO!!! Take a real preview time instead of a dummy one
-        lastPreviewStream = audioManager.StreamLoopSound(File.ReadAllBytes(LiveSetting.GetBGMPath), 10000, 20000);
+        lastPreviewStream = audioManager.StreamLoopSound(File.ReadAllBytes(LiveSetting.GetBGMPath), LiveSetting.CurrentHeader.Preview[0], LiveSetting.CurrentHeader.Preview[1]);
 
         lastPreviewStream.Play();
     }

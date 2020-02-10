@@ -13,10 +13,10 @@ class LoopingBassMemStream : BassMemStream
 
     private float OrigVolume;
 
-    public LoopingBassMemStream(GCHandle handle, int id, int start = -1, int end = -1, bool fade = false) : base(handle, id)
+    public LoopingBassMemStream(GCHandle handle, int id, float start = -1, float end = -1, bool fade = false) : base(handle, id)
     {
-        LoopStart = start;
-        LoopEnd = end;
+        LoopStart = (int)start * 1000;
+        LoopEnd = (int)end * 1000;
 
         if (start == -1 || end == -1)
         {
@@ -215,7 +215,7 @@ class AudioManager : MonoBehaviour
         return id;
     }
 
-    public LoopingBassMemStream StreamLoopSound(byte[] file, int start = -1, int end = -1, bool fade = true, BASSFlag flags = BASSFlag.BASS_DEFAULT)
+    public LoopingBassMemStream StreamLoopSound(byte[] file, float start = -1, float end = -1, bool fade = true, BASSFlag flags = BASSFlag.BASS_DEFAULT)
     {
         var pinnedObject = GCHandle.Alloc(file, GCHandleType.Pinned);
         var pinnedObjectPtr = pinnedObject.AddrOfPinnedObject();
