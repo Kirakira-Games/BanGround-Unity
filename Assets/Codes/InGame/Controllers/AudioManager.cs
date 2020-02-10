@@ -177,7 +177,8 @@ class AudioManager : MonoBehaviour
             if (LoopingStreams[i].IsDisposed)
                 LoopingStreams.RemoveAt(i);
 
-            LoopingStreams[i].OnUpdate();
+            else 
+                LoopingStreams[i].OnUpdate();
         }
 
         //print(LoadedSound.Count);

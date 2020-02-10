@@ -62,11 +62,6 @@ public class Header
     public string TitleUnicode;
     public string ArtistUnicode;
 
-<<<<<<< HEAD
-    //public float PreviewStart;
-    //public float PreviewEnd;
-=======
->>>>>>> audio/bassnew
     public float[] Preview;
 
     public short NumCharts;

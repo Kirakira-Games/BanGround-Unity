@@ -38,7 +38,6 @@ public class SelectManager : MonoBehaviour
     private Slider bgmVolume_Input;
 
     private AudioManager audioManager;
-    private int BGMChannel;
 
     public GameObject enterAniObj;
 
@@ -371,14 +370,6 @@ public class SelectManager : MonoBehaviour
         }
         audioManager.LoadedSound.Clear();
 
-<<<<<<< HEAD
-        if(File.Exists(LiveSetting.GetPreviewMusicPath))
-        {
-            FMOD.Sound sdBGM;
-            sdBGM = audioManager.PrecacheSound(File.ReadAllBytes(LiveSetting.GetPreviewMusicPath), FMOD.MODE.LOOP_NORMAL | FMOD.MODE._2D | FMOD.MODE.OPENMEMORY);
-            BGMChannel = audioManager.PlayPreview(sdBGM);
-        }
-=======
         if (lastPreviewStream != null)
             lastPreviewStream.Dispose();
 
@@ -386,7 +377,6 @@ public class SelectManager : MonoBehaviour
         lastPreviewStream = audioManager.StreamLoopSound(File.ReadAllBytes(LiveSetting.GetBGMPath), LiveSetting.CurrentHeader.Preview[0], LiveSetting.CurrentHeader.Preview[1]);
 
         lastPreviewStream.Play();
->>>>>>> audio/bassnew
     }
 
     //--------------------------------------------
@@ -486,9 +476,9 @@ public class SelectManager : MonoBehaviour
     private void OnApplicationPause(bool pause)
     {
         if (pause)
-            audioManager.PauseBGM();
+            lastPreviewStream.Pause();
         else
-            audioManager.ResumeBGM();
+            lastPreviewStream.Play();
     }
 }
 
