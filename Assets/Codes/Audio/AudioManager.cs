@@ -325,15 +325,13 @@ class AudioManager : MonoBehaviour
             {
                 return (int)((Time.time - lastUpdateTime) * 1000) + lastPos + LiveSetting.audioOffset;
 #else
-            return time;
+            return time + LiveSetting.audioOffset;
 #endif
         }
         else
         {
             return lastPos + LiveSetting.audioOffset;
         }
-
-        return lastPos + LiveSetting.audioOffset;
     }
 
     /// <summary>
