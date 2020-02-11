@@ -79,7 +79,8 @@ public class SelectManager : MonoBehaviour
         LoadScoreRecord();
         LoadLiveSettingFile();
         InitSongList();
-        
+        GetLiveSetting();
+
         audioManager.loading = false;
     }
 
@@ -386,7 +387,7 @@ public class SelectManager : MonoBehaviour
     //--------------------------------------------
     void OpenSetting()
     {
-        GetLiveSetting();
+        GetModStatus();
         GameObject.Find("Setting_Canvas").GetComponent<Animator>().SetBool("Drop", true);
     }
     void CloseSetting()
@@ -411,7 +412,9 @@ public class SelectManager : MonoBehaviour
 
         seVolume_Input.value = LiveSetting.seVolume;
         bgmVolume_Input.value = LiveSetting.bgmVolume;
-
+    }
+    void GetModStatus()
+    {
         half_Tog.isOn = LiveSetting.attachedMods.Contains(HalfMod.Instanse);
         double_Tog.isOn = LiveSetting.attachedMods.Contains(DoubleMod.Instanse);
     }
