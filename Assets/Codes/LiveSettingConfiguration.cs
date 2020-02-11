@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Newtonsoft.Json;
 
@@ -56,6 +57,39 @@ public static class LiveSetting
     public static readonly string settingsPath = Application.persistentDataPath + "/LiveSettings.json";
     public static readonly string scoresPath = Application.persistentDataPath + "/Scores.json";
 
+    public static List<ModBase> attachedMods = new List<ModBase>();
+    private static float SpeedCompensationSum = 1.0f;
+
+    public static bool AddMod(ModBase mod)
+    {
+        if (!attachedMods.Contains(mod))
+        {
+            if (attachedMods.Any(c => c.IncompatibleMods.Any(m => m.IsInstanceOfType(mod))))
+                return false;
+
+            attachedMods.Add(mod);
+            if(mod is AudioMod)
+            {
+                SpeedCompensationSum *= (mod as AudioMod).SpeedCompensation;
+            }
+        }
+
+        return true;
+    }
+
+    public static void RemoveMod(ModBase mod)
+    {
+        if (attachedMods.Contains(mod))
+        {
+            attachedMods.Remove(mod);
+
+            if (mod is AudioMod)
+            {
+                SpeedCompensationSum /= (mod as AudioMod).SpeedCompensation;
+            }
+        }
+    }
+
     public static int NoteScreenTime
     {
         get
@@ -66,7 +100,7 @@ public static class LiveSetting
                 cachedScreenTime = (int)(-490 * trueNoteSpeed + 5990);
             }
 
-            return cachedScreenTime;
+            return (int)(cachedScreenTime * SpeedCompensationSum);
         }
     }
 }

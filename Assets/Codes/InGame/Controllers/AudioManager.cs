@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
 using Un4seen.Bass;
+using Un4seen.Bass.AddOn.Fx;
 using System.Runtime.InteropServices;
 
-class LoopingBassMemStream : BassMemStream
+public class LoopingBassMemStream : BassMemStream
 {
     public int LoopStart;
     public int LoopEnd;
@@ -57,7 +58,7 @@ class LoopingBassMemStream : BassMemStream
     }
 }
 
-class BassMemStream : IDisposable
+public class BassMemStream : IDisposable
 {
     int id;
     GCHandle pinnedObject;
@@ -143,8 +144,7 @@ class BassMemStream : IDisposable
 class AudioManager : MonoBehaviour
 {
     internal List<int> LoadedSound = new List<int>();
-    private int bgmId = 0;
-    private int bgmCid = 0;
+    private BassMemStream BGMStream;
 
     private List<LoopingBassMemStream> LoopingStreams = new List<LoopingBassMemStream>();
 
@@ -193,17 +193,6 @@ class AudioManager : MonoBehaviour
         }
     }
 
-    public IEnumerator DelayPlayBGM(byte[] audioData, float seconds)
-    {
-        var BGM = PrecacheSound(audioData);
-        loading = true;
-        lastPos = (int)((Time.time + seconds) * 1000);
-        yield return new WaitForSeconds(seconds);
-        PlayBGM(BGM);
-        loading = false;
-        lastPos = -999;
-    }
-
     public int PrecacheBGM(TextAsset internalFile, BASSFlag flags = BASSFlag.BASS_DEFAULT)
     {
         var id = Bass.BASS_SampleLoad(internalFile.bytes, 0, internalFile.bytes.Length, 1, flags);
@@ -229,14 +218,19 @@ class AudioManager : MonoBehaviour
         return result;
     }
 
-    public BassMemStream StreamSound(byte[] file, BASSFlag flags = BASSFlag.BASS_DEFAULT)
+    public BassMemStream StreamSound(byte[] file, BASSFlag flags = BASSFlag.BASS_STREAM_DECODE)
     {
         var pinnedObject = GCHandle.Alloc(file, GCHandleType.Pinned);
         var pinnedObjectPtr = pinnedObject.AddrOfPinnedObject();
 
         var id = Bass.BASS_StreamCreateFile(pinnedObjectPtr, 0, file.Length, flags);
 
-        return new BassMemStream(pinnedObject, id);
+        var cid = BassFx.BASS_FX_TempoCreate(id, BASSFlag.BASS_FX_FREESOURCE);
+        Bass.BASS_ChannelSetAttribute(cid, BASSAttribute.BASS_ATTRIB_TEMPO_OPTION_USE_QUICKALGO, 1);
+        Bass.BASS_ChannelSetAttribute(cid, BASSAttribute.BASS_ATTRIB_TEMPO_OPTION_OVERLAP_MS, 4);
+        Bass.BASS_ChannelSetAttribute(cid, BASSAttribute.BASS_ATTRIB_TEMPO_OPTION_SEQUENCE_MS, 30);
+
+        return new BassMemStream(pinnedObject, cid);
     }
 
     public BassMemStream StreamSound(TextAsset internalFile, BASSFlag flags = BASSFlag.BASS_DEFAULT)
@@ -283,24 +277,21 @@ class AudioManager : MonoBehaviour
         return cid;
     }
 
-    public int PlayBGM(int sound)
+    public IEnumerator DelayPlayBGM(byte[] audioData, float seconds)
     {
-        if (bgmCid != 0)
-            Bass.BASS_ChannelStop(bgmCid);
+        BGMStream = StreamSound(audioData);
+        loading = true;
+        lastPos = (int)((Time.time + seconds) * 1000);
+        yield return new WaitForSeconds(seconds);
+        foreach(var mod in LiveSetting.attachedMods)
+        {
+            if (mod is AudioMod)
+                (mod as AudioMod).ApplyMod(BGMStream);
+        }
 
-        var cid = Bass.BASS_SampleGetChannel(sound, false);
-        Bass.BASS_ChannelSetAttribute(cid, BASSAttribute.BASS_ATTRIB_VOL, LiveSetting.bgmVolume);
-        Bass.BASS_ChannelPlay(cid, true);
-
-        bgmId = sound;
-        bgmCid = cid;
-
-        return cid;
-    }
-
-    public int PlayPreview(int sound)
-    {
-        return PlayBGM(sound);
+        BGMStream.Play();
+        loading = false;
+        lastPos = -999;
     }
 
     public int GetBGMPlaybackTime()
@@ -308,8 +299,7 @@ class AudioManager : MonoBehaviour
         if (loading) 
             return (int)(Time.time * 1000) - lastPos + LiveSetting.audioOffset;
 
-        var pos = Bass.BASS_ChannelGetPosition(bgmCid);
-        var time = (int)(Bass.BASS_ChannelBytes2Seconds(bgmCid, pos) * 1000);
+        var time = BGMStream.Position;
 
         if (GetPlayStatus())
         {
@@ -337,31 +327,31 @@ class AudioManager : MonoBehaviour
     /// <returns></returns>
     public bool GetPlayStatus()
     {
-        var status = Bass.BASS_ChannelIsActive(bgmCid);
+        var status = BGMStream.Status;
         //return status == BASSActive.BASS_ACTIVE_PLAYING || GetPauseStatus();
         return status != BASSActive.BASS_ACTIVE_STOPPED;
     }
 
     public bool GetPauseStatus()
     {
-        var status = Bass.BASS_ChannelIsActive(bgmCid);
+        var status = BGMStream.Status;
         return status == BASSActive.BASS_ACTIVE_PAUSED;
     }
 
     public void PauseBGM()
     {
         print("pause");
-        Bass.BASS_ChannelPause(bgmCid);
+        BGMStream.Pause();
     }
 
     public void ResumeBGM()
     {
-        Bass.BASS_ChannelPlay(bgmCid, false);
+        BGMStream.Play();
     }
 
     public void StopBGM()
     {
-        Bass.BASS_ChannelStop(bgmCid);
+        BGMStream.Stop();
     }
 
     void OnApplicationQuit()

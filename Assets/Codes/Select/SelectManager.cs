@@ -22,9 +22,19 @@ public class SelectManager : MonoBehaviour
 
     private Toggle syncLine_Tog;
     private Toggle offBeat_Tog;
-    private Toggle auto_Tog;
     private Toggle persp_Tog;
     private Toggle mirrow_Tog;
+
+    /* Mods     */
+
+    // Auto
+    private Toggle auto_Tog;
+    // Double
+    private Toggle double_Tog;
+    // Half
+    private Toggle half_Tog;
+
+    /* Mods End */
 
     private InputField speed_Input;
     private InputField judge_Input;
@@ -69,7 +79,6 @@ public class SelectManager : MonoBehaviour
         LoadScoreRecord();
         LoadLiveSettingFile();
         InitSongList();
-        GetLiveSetting();
         
         audioManager.loading = false;
     }
@@ -90,7 +99,6 @@ public class SelectManager : MonoBehaviour
         syncLine_Tog = GameObject.Find("Sync_Toggle").GetComponent<Toggle>();
         offBeat_Tog = GameObject.Find("Offbeat_Toggle").GetComponent<Toggle>();
         mirrow_Tog = GameObject.Find("Mirrow_Toggle").GetComponent<Toggle>();
-        auto_Tog = GameObject.Find("Autoplay_Toggle").GetComponent<Toggle>();
         persp_Tog = GameObject.Find("Perspective_Toggle").GetComponent<Toggle>();
 
         speed_Input = GameObject.Find("Speed_Input").GetComponent<InputField>();
@@ -103,6 +111,10 @@ public class SelectManager : MonoBehaviour
         long_Bright = GameObject.Find("Long_Bri_Slider").GetComponent<Slider>();
         seVolume_Input = GameObject.Find("SeVolume_Input").GetComponent<Slider>();
         bgmVolume_Input = GameObject.Find("BGMVolume_Input").GetComponent<Slider>();
+
+        auto_Tog = GameObject.Find("Autoplay_Toggle").GetComponent<Toggle>();
+        half_Tog = GameObject.Find("Half_Toggle").GetComponent<Toggle>();
+        double_Tog = GameObject.Find("Double_Toggle").GetComponent<Toggle>();
 
         //enter_Btn.onClick.AddListener(OnEnterPressed);
         setting_Open_Btn.onClick.AddListener(OpenSetting);
@@ -363,17 +375,9 @@ public class SelectManager : MonoBehaviour
         //if (lastIndex == LiveSetting.selectedIndex) return;
         //else lastIndex = LiveSetting.selectedIndex;
 
-        audioManager.StopBGM();
-        for (int i = 0; i < audioManager.LoadedSound.Count; i++)
-        {
-            audioManager.UnloadSound(audioManager.LoadedSound[i]);
-        }
-        audioManager.LoadedSound.Clear();
-
         if (lastPreviewStream != null)
             lastPreviewStream.Dispose();
 
-        // TODO TODO!!! Take a real preview time instead of a dummy one
         lastPreviewStream = audioManager.StreamLoopSound(File.ReadAllBytes(LiveSetting.GetBGMPath), LiveSetting.CurrentHeader.Preview[0], LiveSetting.CurrentHeader.Preview[1]);
 
         lastPreviewStream.Play();
@@ -382,6 +386,7 @@ public class SelectManager : MonoBehaviour
     //--------------------------------------------
     void OpenSetting()
     {
+        GetLiveSetting();
         GameObject.Find("Setting_Canvas").GetComponent<Animator>().SetBool("Drop", true);
     }
     void CloseSetting()
@@ -406,6 +411,9 @@ public class SelectManager : MonoBehaviour
 
         seVolume_Input.value = LiveSetting.seVolume;
         bgmVolume_Input.value = LiveSetting.bgmVolume;
+
+        half_Tog.isOn = LiveSetting.attachedMods.Contains(HalfMod.Instanse);
+        double_Tog.isOn = LiveSetting.attachedMods.Contains(DoubleMod.Instanse);
     }
     void SetLiveSetting()
     {
@@ -424,6 +432,30 @@ public class SelectManager : MonoBehaviour
         LiveSetting.bgBrightness = bg_Bright.value;
         LiveSetting.laneBrightness = lane_Bright.value;
         LiveSetting.longBrightness = long_Bright.value;
+
+        if(!double_Tog.isOn)
+            LiveSetting.RemoveMod(DoubleMod.Instanse);
+
+        if(!half_Tog.isOn)
+            LiveSetting.RemoveMod(HalfMod.Instanse);
+
+        if (double_Tog.isOn)
+            LiveSetting.AddMod(DoubleMod.Instanse);
+
+        if (half_Tog.isOn)
+            LiveSetting.AddMod(HalfMod.Instanse);
+    }
+
+    public void OnDoubleModChange()
+    {
+        if (double_Tog.isOn)
+            half_Tog.isOn = false;
+    }
+
+    public void OnHalfModChange()
+    {
+        if (half_Tog.isOn)
+            double_Tog.isOn = false;
     }
     //============================================
     public void OnEnterPressed()

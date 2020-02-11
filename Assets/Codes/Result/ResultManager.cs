@@ -261,7 +261,12 @@ public class ResultManager : MonoBehaviour
 
     void ReadScores()
     {
-        playResult.Score = (ComboManager.score / ComboManager.maxScore) * 1000000;
+        float modScoreMultiplier = 1.0f;
+
+        foreach (var mod in LiveSetting.attachedMods)
+            modScoreMultiplier *= mod.ScoreMultiplier;
+
+        playResult.Score = (ComboManager.score / ComboManager.maxScore) * 1000000 * modScoreMultiplier;
         playResult.ranks = ResultsGetter.GetRanks();
         playResult.clearMark = ResultsGetter.GetClearMark();
         playResult.Acc = ResultsGetter.GetAcc();
