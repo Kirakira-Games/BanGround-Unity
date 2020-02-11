@@ -129,7 +129,8 @@ public class BassMemStream : IDisposable
     public void Dispose()
     {
         if (IsDisposed)
-            throw new InvalidOperationException("Object already disposed!");
+            return;
+            //throw new InvalidOperationException("Object already disposed!");
 
         IsDisposed = true;
 
@@ -169,7 +170,7 @@ class AudioManager : MonoBehaviour
         }
 #endif
 
-        if (!Bass.BASS_Init(-1, AudioSettings.outputSampleRate, flag, IntPtr.Zero))
+        if (!Bass.BASS_Init(-1, 48000, flag, IntPtr.Zero))
         {
             throw new Exception(Bass.BASS_ErrorGetCode().ToString());
         }
