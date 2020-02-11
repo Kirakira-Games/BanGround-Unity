@@ -46,7 +46,7 @@ public static class NoteUtility
     private static readonly float BANG_EXP_START = XToBanGYHelper(0);
 
     public static readonly int[] TAP_JUDGE_RANGE = { 50, 100, 117, 133 };
-    public static readonly int[] SLIDE_END_JUDGE_RANGE = { 67, 117, 133, 150 };
+    public static readonly int[] SLIDE_END_JUDGE_RANGE = { 200, 250, 266, 283 };
     public const int SLIDE_END_FLICK_JUDGE_RANGE = 100;
     public const int SLIDE_TICK_JUDGE_RANGE = 200;
     public const int AUTO_JUDGE_RANGE = 10;

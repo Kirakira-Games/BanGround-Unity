@@ -27,7 +27,12 @@ public class GradeColorChange : MonoBehaviour
 
     public void SetScore(double _score, double _acc)
     {
-        score = _score;
+        float modScoreMultiplier = 1.0f;
+
+        foreach (var mod in LiveSetting.attachedMods)
+            modScoreMultiplier *= mod.ScoreMultiplier;
+
+        score = _score * modScoreMultiplier;
         sld.value = (float)_score;
         txt.text = LiveSetting.autoPlayEnabled ? "AUTO": string.Format("{0:P2}", Mathf.FloorToInt((float)_acc * 10000) / 10000f);
         
