@@ -133,6 +133,8 @@ public class LiveSettingTemplate
 
     public bool enableAudioTrack = true;
 
+    public int selectedIndex = 0;
+
     public LiveSettingTemplate()
     {
         judgeOffset = LiveSetting.judgeOffset;
@@ -155,6 +157,8 @@ public class LiveSettingTemplate
         longBrightness = LiveSetting.longBrightness;
 
         enableAudioTrack = LiveSetting.enableAudioTrack;
+
+        selectedIndex = LiveSetting.selectedIndex;
     }
     public void ApplyToLiveSetting()
     {
@@ -179,5 +183,7 @@ public class LiveSettingTemplate
         LiveSetting.longBrightness = longBrightness;
 
         LiveSetting.enableAudioTrack = enableAudioTrack;
+
+        LiveSetting.selectedIndex = selectedIndex;
     }
 }
