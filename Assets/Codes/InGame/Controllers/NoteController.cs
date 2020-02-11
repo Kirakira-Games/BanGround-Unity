@@ -325,7 +325,8 @@ public class NoteController : MonoBehaviour
         ComboManager.manager.Init(numNotes);
 
         // Init AudioManager
-        audioMgr = GetComponent<AudioManager>();
+        audioMgr = AudioManager.Instanse;
+        audioMgr.isInGame = true;
 
         SE_PERFECT = audioMgr.PrecacheSound(Resources.Load<TextAsset>("SoundEffects/perfect.wav"));
         SE_GREAT = audioMgr.PrecacheSound(Resources.Load<TextAsset>("SoundEffects/great.wav"));

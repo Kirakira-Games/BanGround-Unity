@@ -17,10 +17,10 @@ public class UIManager : MonoBehaviour
     Button retry_Btn;
     Button retire_Btn;
 
-    public AudioClip APvoice;
-    public AudioClip FCvoice;
-    public AudioClip CLvoice;
-    public AudioClip Fvoice;
+    public TextAsset APvoice;
+    public TextAsset FCvoice;
+    public TextAsset CLvoice;
+    public TextAsset Fvoice;
     GameObject gateCanvas;
 
 
@@ -46,7 +46,7 @@ public class UIManager : MonoBehaviour
         pause_Canvas = GameObject.Find("PauseCanvas");
         pause_Canvas.SetActive(false);
 
-        am = GameObject.Find("NoteController").GetComponent<AudioManager>();
+        am = AudioManager.Instanse;
 
         gateCanvas = GameObject.Find("GateCanvas");
         StartCoroutine(DelayDisableGate());
@@ -111,19 +111,19 @@ public class UIManager : MonoBehaviour
         {
             case ClearMarks.AP:
                 gateImg.sprite = Resources.Load<Sprite>("UI/SwitchUI/AllPerfect");
-                AudioSource.PlayClipAtPoint(APvoice, Vector3.zero);
+                AudioManager.Instanse.StreamSound(APvoice).Play();
                 break;
             case ClearMarks.FC:
                 gateImg.sprite = Resources.Load<Sprite>("UI/SwitchUI/FullCombo");
-                AudioSource.PlayClipAtPoint(FCvoice, Vector3.zero);
+                AudioManager.Instanse.StreamSound(FCvoice).Play();
                 break;
             case ClearMarks.CL:
                 gateImg.sprite = Resources.Load<Sprite>("UI/SwitchUI/Clear");
-                AudioSource.PlayClipAtPoint(CLvoice, Vector3.zero);
+                AudioManager.Instanse.StreamSound(CLvoice).Play();
                 break;
             case ClearMarks.F:
                 gateImg.sprite = Resources.Load<Sprite>("UI/SwitchUI/Fail");
-                AudioSource.PlayClipAtPoint(Fvoice, Vector3.zero);
+                AudioManager.Instanse.StreamSound(Fvoice).Play();
                 break;
         }
         GameObject.Find("GateCanvas").GetComponent<Animator>().Play("GateClose");

@@ -29,6 +29,8 @@ public static class LiveSetting
     public static float laneBrightness = 0.84f;
     public static float longBrightness = .8f;
 
+    public static bool enableAudioTrack = true;
+
     public const string assetDirectory = "V2Assets";
     public const string IconPath = "UI/v3/";
 
@@ -129,6 +131,8 @@ public class LiveSettingTemplate
     public float laneBrightness = 0.84f;
     public float longBrightness = .8f;
 
+    public bool enableAudioTrack = true;
+
     public LiveSettingTemplate()
     {
         judgeOffset = LiveSetting.judgeOffset;
@@ -149,27 +153,31 @@ public class LiveSettingTemplate
         bgBrightness = LiveSetting.bgBrightness;
         laneBrightness = LiveSetting.laneBrightness;
         longBrightness = LiveSetting.longBrightness;
+
+        enableAudioTrack = LiveSetting.enableAudioTrack;
     }
-    public static void ApplyToLiveSetting(LiveSettingTemplate st)
+    public void ApplyToLiveSetting()
     {
 
-        LiveSetting.judgeOffset = st.judgeOffset;
-        LiveSetting.audioOffset = st.audioOffset;
-        LiveSetting.noteSpeed = st.noteSpeed;
-        LiveSetting.noteSize = st.noteSize;
-        LiveSetting.meshSize = st.meshSize;
-        LiveSetting.meshOpacity = st.meshOpacity;
-        LiveSetting.bgmVolume = st.bgmVolume;
-        LiveSetting.seVolume = st.seVolume;
-        LiveSetting.syncLineEnabled = st.syncLineEnabled;
-        LiveSetting.laneEffectEnabled = st.laneEffectEnabled;
-        LiveSetting.grayNoteEnabled = st.grayNoteEnabled;
-        LiveSetting.mirrowEnabled = st.mirrowEnabled;
-        LiveSetting.bangPerspective = st.bangPerspective;
-        LiveSetting.autoPlayEnabled = st.autoPlayEnabled;
+        LiveSetting.judgeOffset = judgeOffset;
+        LiveSetting.audioOffset = audioOffset;
+        LiveSetting.noteSpeed = noteSpeed;
+        LiveSetting.noteSize = noteSize;
+        LiveSetting.meshSize = meshSize;
+        LiveSetting.meshOpacity = meshOpacity;
+        LiveSetting.bgmVolume = bgmVolume;
+        LiveSetting.seVolume = seVolume;
+        LiveSetting.syncLineEnabled = syncLineEnabled;
+        LiveSetting.laneEffectEnabled = laneEffectEnabled;
+        LiveSetting.grayNoteEnabled = grayNoteEnabled;
+        LiveSetting.mirrowEnabled = mirrowEnabled;
+        LiveSetting.bangPerspective = bangPerspective;
+        LiveSetting.autoPlayEnabled = autoPlayEnabled;
 
-        LiveSetting.bgBrightness = st.bgBrightness;
-        LiveSetting.laneBrightness = st.laneBrightness;
-        LiveSetting.longBrightness = st.longBrightness;
+        LiveSetting.bgBrightness = bgBrightness;
+        LiveSetting.laneBrightness = laneBrightness;
+        LiveSetting.longBrightness = longBrightness;
+
+        LiveSetting.enableAudioTrack = enableAudioTrack;
     }
 }

@@ -37,12 +37,13 @@ public class ResultManager : MonoBehaviour
     PlayResult playResult = new PlayResult();
     double lastScore = 0;
 
-    public AudioClip[] voices = new AudioClip[9];
+    public TextAsset[] voices = new TextAsset[9];
 
     private FixBackground background;
 
     void Start()
     {
+        AudioManager.Instanse.isInGame = false;
         StartCoroutine(ReadRank());
         SetBtnObject();
         GetResultObjectAndComponent();
@@ -85,43 +86,43 @@ public class ResultManager : MonoBehaviour
     IEnumerator ReadRank()
     {
         yield return new WaitForSeconds(0.8f);
-        //print("read");
-        AudioSource audioSource = GetComponent<AudioSource>();
-
+        var audioSource = gameObject.AddComponent<BassAudioSource>();
         audioSource.clip = voices[0];
-        audioSource.Play();
+        audioSource.playOnAwake = true;
+        //print("read");
 
         yield return new WaitForSeconds(1);
-
+        
 
         switch (ResultsGetter.GetRanks())
         {
             case Ranks.SSS:
-                audioSource.clip = voices[1];
+                audioSource.Clip = voices[1];
                 break;
             case Ranks.SS:
-                audioSource.clip = voices[2];
+                audioSource.Clip = voices[2];
                 break;
             case Ranks.S:
-                audioSource.clip = voices[3];
+                audioSource.Clip = voices[3];
                 break;
             case Ranks.A:
-                audioSource.clip = voices[4];
+                audioSource.Clip = voices[4];
                 break;
             case Ranks.B:
-                audioSource.clip = voices[5];
+                audioSource.Clip = voices[5];
                 break;
             case Ranks.C:
-                audioSource.clip = voices[6];
+                audioSource.Clip = voices[6];
                 break;
             case Ranks.D:
-                audioSource.clip = voices[7];
+                audioSource.Clip = voices[7];
                 break;
             default:
-                audioSource.clip = voices[8]; ;
+                audioSource.Clip = voices[8];
                 break;
         }
         audioSource.Play();
+
         yield return new WaitForSeconds(1);
     }
 

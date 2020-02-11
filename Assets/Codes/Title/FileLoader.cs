@@ -10,6 +10,9 @@ using UnityEngine;
 
 public class FileLoader : MonoBehaviour
 {
+    public TextAsset titleMusic;
+    public TextAsset voice;
+
     private void Start()
     {
 
@@ -20,7 +23,25 @@ public class FileLoader : MonoBehaviour
         //StartCoroutine(InitCharts());
         LoadSongListFromFile(Application.streamingAssetsPath + "/SongList.json");
 #endif
+        LoadLiveSettingFile();
 
+        GameObject.Find("AudioMgr").AddComponent<AudioManager>();
+        StartCoroutine(PlayTitle());
+    }
+
+    IEnumerator PlayTitle()
+    {
+        yield return new WaitForSeconds(0.5f);
+        var music = gameObject.AddComponent<BassAudioSource>();
+        music.clip = titleMusic;
+        music.loop = true;
+        music.playOnAwake = true;
+
+        yield return new WaitForSeconds(3f);
+
+        var banGround = gameObject.AddComponent<BassAudioSource>();
+        banGround.clip = voice;
+        banGround.playOnAwake = true;
     }
 
     void LoadSongListFromFile(string path)
@@ -35,6 +56,20 @@ public class FileLoader : MonoBehaviour
         else
         {
             Debug.LogError("SongList.json not found! pls gennerate it in editor");
+        }
+    }
+
+    void LoadLiveSettingFile()
+    {
+        if (File.Exists(LiveSetting.settingsPath))
+        {
+            string sets = File.ReadAllText(LiveSetting.settingsPath);
+            LiveSettingTemplate loaded = JsonConvert.DeserializeObject<LiveSettingTemplate>(sets);
+            loaded.ApplyToLiveSetting();
+        }
+        else
+        {
+            Debug.LogWarning("Live setting file not found");
         }
     }
 
@@ -77,7 +112,7 @@ public class FileLoader : MonoBehaviour
         foreach(Header h in LiveSetting.songList.songs)
         {
             files.Add("/TestCharts/" + h.DirName + "/header.json");
-            files.Add("/TestCharts/" + h.DirName + "/bgm.mp3");
+            files.Add("/TestCharts/" + h.DirName + "/bgm.ogg");
             files.Add("/TestCharts/" + h.DirName + "/preview.wav");
             foreach (Chart c in h.charts)
             {

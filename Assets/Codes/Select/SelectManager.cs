@@ -25,6 +25,8 @@ public class SelectManager : MonoBehaviour
     private Toggle persp_Tog;
     private Toggle mirrow_Tog;
 
+    private Toggle audioTrack_Tog;
+
     /* Mods     */
 
     // Auto
@@ -77,7 +79,6 @@ public class SelectManager : MonoBehaviour
     {
         InitComponent();
         LoadScoreRecord();
-        LoadLiveSettingFile();
         InitSongList();
         GetLiveSetting();
 
@@ -91,7 +92,7 @@ public class SelectManager : MonoBehaviour
         rt_v = GameObject.Find("Song Scroll View").GetComponent<RectTransform>();
         rt_s = GameObject.Find("Song Scroll View").GetComponent<ScrollRect>();
         lg = GameObject.Find("SongContent").GetComponent<VerticalLayoutGroup>();
-        audioManager = GetComponent<AudioManager>();
+        audioManager = AudioManager.Instanse;
 
         //enter_Btn = GameObject.Find("Enter_Btn").GetComponent<Button>();
         setting_Open_Btn = GameObject.Find("SettingOpenBtn").GetComponent<Button>();
@@ -116,6 +117,8 @@ public class SelectManager : MonoBehaviour
         auto_Tog = GameObject.Find("Autoplay_Toggle").GetComponent<Toggle>();
         half_Tog = GameObject.Find("Half_Toggle").GetComponent<Toggle>();
         double_Tog = GameObject.Find("Double_Toggle").GetComponent<Toggle>();
+
+        audioTrack_Tog = GameObject.Find("AudioTrack_Toggle").GetComponent<Toggle>();
 
         //enter_Btn.onClick.AddListener(OnEnterPressed);
         setting_Open_Btn.onClick.AddListener(OpenSetting);
@@ -159,19 +162,7 @@ public class SelectManager : MonoBehaviour
     {
         playRecords = PlayRecords.OpenRecord();
     }
-    private void LoadLiveSettingFile()
-    {
-        if (File.Exists(LiveSetting.settingsPath))
-        {
-            string sets = File.ReadAllText(LiveSetting.settingsPath);
-            LiveSettingTemplate loaded = JsonConvert.DeserializeObject<LiveSettingTemplate>(sets);
-            LiveSettingTemplate.ApplyToLiveSetting(loaded);
-        }
-        else
-        {
-            Debug.LogWarning("Live setting file not found");
-        }
-    }
+    
 
     //--------------------------------------------
     private void InitSongList()
@@ -412,6 +403,8 @@ public class SelectManager : MonoBehaviour
 
         seVolume_Input.value = LiveSetting.seVolume;
         bgmVolume_Input.value = LiveSetting.bgmVolume;
+
+        audioTrack_Tog.isOn = LiveSetting.enableAudioTrack;
     }
     void GetModStatus()
     {
@@ -435,6 +428,8 @@ public class SelectManager : MonoBehaviour
         LiveSetting.bgBrightness = bg_Bright.value;
         LiveSetting.laneBrightness = lane_Bright.value;
         LiveSetting.longBrightness = long_Bright.value;
+
+        LiveSetting.enableAudioTrack = audioTrack_Tog.isOn;
 
         if(!double_Tog.isOn)
             LiveSetting.RemoveMod(DoubleMod.Instanse);
