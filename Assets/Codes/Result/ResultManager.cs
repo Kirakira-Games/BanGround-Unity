@@ -58,10 +58,8 @@ public class ResultManager : MonoBehaviour
     private void ShowOffset()
     {
         //OffsetList
-        var miss = ComboManager.JudgeOffsetResult.Where(x => x == int.MinValue).Count();
-
-        var early = ComboManager.JudgeOffsetResult.Where(x => x < 0 && x != int.MinValue);
-        var late = ComboManager.JudgeOffsetResult.Where(x => x > 0 && x != int.MaxValue);
+        var early = ComboManager.JudgeOffsetResult.Where(x => x > 0 && x != int.MinValue);
+        var late = ComboManager.JudgeOffsetResult.Where(x => x < 0 && x != int.MaxValue);
         int earlyCount = early.Count();
         int lateCount = late.Count();
         int earlyAverage = earlyCount == 0 ? 0 : Mathf.RoundToInt((float)early.Average());
@@ -70,7 +68,7 @@ public class ResultManager : MonoBehaviour
 
         //var normal = ComboManager.JudgeOffsetResult.Count - miss - slide;
 
-        Debug.Log($"total = {ComboManager.JudgeOffsetResult.Count}, early = {earlyCount}, late = {lateCount}, miss = {miss}");
+        Debug.Log($"total = {ComboManager.JudgeOffsetResult.Count}, early = {earlyCount}, late = {lateCount}");
         offset_Text.text = $"E:{earlyCount}(avg:{earlyAverage})\nL:{lateCount}(avg:{lateAverage})";
     }
 

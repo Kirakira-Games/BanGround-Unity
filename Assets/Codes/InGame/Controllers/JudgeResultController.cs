@@ -7,7 +7,11 @@ public class JudgeResultController : MonoBehaviour
     public static JudgeResultController controller;
 
     private Sprite[] judges;
-    private SpriteRenderer spriteRenderer;
+    private Sprite early;
+    private Sprite late;
+
+    private SpriteRenderer resultRenderer;
+    private SpriteRenderer offsetRenderer;
     private Animator animator;
 
     private void Awake()
@@ -18,13 +22,40 @@ public class JudgeResultController : MonoBehaviour
         {
             judges[i] = NoteUtility.LoadResource<Sprite>("judge_" + i);
         }
+
+        early = NoteUtility.LoadResource<Sprite>("early"); 
+        late = NoteUtility.LoadResource<Sprite>("late");
+
         animator = GetComponent<Animator>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
+        resultRenderer = GetComponent<SpriteRenderer>();
+        offsetRenderer=transform.Find("JudgeOffset").GetComponent<SpriteRenderer>();
     }
 
     public void DisplayJudgeResult(JudgeResult result)
     {
-        spriteRenderer.sprite = judges[(int)result];
+        resultRenderer.sprite = judges[(int)result];
         animator.Play("Play", -1, 0);
     }
+
+    public void DisplayJudgeOffset(OffsetResult result)
+    {
+        if (offsetRenderer == null) return;
+        switch (result)
+        {
+            case OffsetResult.None:
+                offsetRenderer.sprite = null;
+                break;
+            case OffsetResult.Early:
+                offsetRenderer.sprite = early;
+                break;
+            case OffsetResult.Late:
+                offsetRenderer.sprite = late;
+                break;
+            default:
+                break;
+        }
+    }
+
 }
+public enum OffsetResult { None, Early, Late }
+

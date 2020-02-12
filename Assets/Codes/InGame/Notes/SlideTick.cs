@@ -11,6 +11,8 @@ public class SlideTick : SlideNoteBase
         return JudgeResult.None;
     }
 
+    protected override void OnDestroy() { }
+
     public override void InitNote()
     {
         base.InitNote();

@@ -47,7 +47,15 @@ public abstract class NoteBase : MonoBehaviour
         {
             NoteController.controller.UnregisterTouch(touchId, gameObject);
         }
-        ComboManager.JudgeOffsetResult.Add(time - judgeTime);
+
+        int result = (int)judgeResult;
+        if (result >= 1 && result <= 3)
+        {
+            ComboManager.JudgeOffsetResult.Add(time - judgeTime);
+            JudgeResultController.controller.DisplayJudgeOffset(time - judgeTime > 0 ? OffsetResult.Early : OffsetResult.Late);
+            return;
+        }
+        JudgeResultController.controller.DisplayJudgeOffset(OffsetResult.None);
     }
 
     protected virtual void OnNoteUpdateJudge(int audioTime)
