@@ -371,8 +371,7 @@ public class SelectManager : MonoBehaviour
         //if (lastIndex == LiveSetting.selectedIndex) return;
         //else lastIndex = LiveSetting.selectedIndex;
 
-        if (lastPreviewStream != null)
-            lastPreviewStream.Dispose();
+        LoopingBassMemStream.DisposeAll();
 
         lastPreviewStream = audioManager.StreamLoopSound(File.ReadAllBytes(LiveSetting.GetBGMPath), LiveSetting.CurrentHeader.Preview[0], LiveSetting.CurrentHeader.Preview[1]);
 
