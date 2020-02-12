@@ -13,9 +13,12 @@ public class LoopingBassMemStream : BassMemStream
     public bool Fade;
 
     private float OrigVolume;
+    
+    private static List<LoopingBassMemStream> AllInstanses = new List<LoopingBassMemStream>();
 
     public LoopingBassMemStream(GCHandle handle, int id, float start = -1, float end = -1, bool fade = false) : base(handle, id)
     {
+    	AllInstanses.Add(this);
         LoopStart = (int)start * 1000;
         LoopEnd = (int)end * 1000;
 
@@ -28,6 +31,19 @@ public class LoopingBassMemStream : BassMemStream
 
         Position = LoopStart;
         Fade = fade;
+    }
+    
+    public static void DisposeAll()
+    {
+    	foreach(var instanse in AllInstanses)
+        {
+        	if(instanse != null && !instanse.IsDisposed)
+            {
+            	instanse.Dispose();
+            }
+        }
+        
+        AllInstanses = new List<LoopingBassMemStream>();
     }
 
     public new void Play(bool restart = false)
