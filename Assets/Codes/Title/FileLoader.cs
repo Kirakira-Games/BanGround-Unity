@@ -84,8 +84,8 @@ public class FileLoader : MonoBehaviour
         SongList newList = ProtobufHelper.Load<SongList>(Application.persistentDataPath + "/SongList.bin.tmp");
         SongList oldList= ProtobufHelper.Load<SongList>(Application.persistentDataPath + "/SongList.bin");
         LiveSetting.songList = oldList;
-        
-        if (newList.GenerateDate == oldList.GenerateDate) yield break;
+
+        if (oldList != null && newList.GenerateDate == oldList.GenerateDate) yield break;
         //need update
         else
         {
