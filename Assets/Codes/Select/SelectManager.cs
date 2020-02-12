@@ -4,12 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.IO;
-using System.Threading;
 using Newtonsoft.Json;
-using UnityEngine.Networking;
-using UnityEngine.Profiling;
-using System;
-using Un4seen.Bass;
 
 public class SelectManager : MonoBehaviour
 {
@@ -57,6 +52,7 @@ public class SelectManager : MonoBehaviour
     RectTransform rt_v;
     ScrollRect rt_s;
     VerticalLayoutGroup lg ;
+    DragHandler dh;
 
     RawImage Rank;
     RawImage clearMark;
@@ -91,6 +87,7 @@ public class SelectManager : MonoBehaviour
         rt = GameObject.Find("SongContent").GetComponent<RectTransform>();
         rt_v = GameObject.Find("Song Scroll View").GetComponent<RectTransform>();
         rt_s = GameObject.Find("Song Scroll View").GetComponent<ScrollRect>();
+        dh = GameObject.Find("Song Scroll View").GetComponent<DragHandler>();
         lg = GameObject.Find("SongContent").GetComponent<VerticalLayoutGroup>();
         audioManager = AudioManager.Instanse;
 
@@ -215,20 +212,19 @@ public class SelectManager : MonoBehaviour
         }
 
         yield return 0;
-        while (Mathf.Abs(rt_s.velocity.y) > scroll_Min_Speed || Input.GetMouseButton(0))
+        while (Mathf.Abs(rt_s.velocity.y) > scroll_Min_Speed || dh.isDragging)
         {
             yield return 0;
         }
         print("select near");
         rt_s.StopMovement();
         var destPos = 0 - rt.anchoredPosition.y - lg.padding.top - 100;
-        float nearestDistance=999f;
+        float nearestDistance = 9999f;
         int nearstIndex = 0;
         for (int i = 0; i < SelectButtons.Count; i++)
         {
             float distance =  Mathf.Abs( rts[i].anchoredPosition.y - destPos);
-            //print(distance);
-            if ( distance< nearestDistance)
+            if (distance < nearestDistance)
             {
                 nearestDistance = distance;
                 nearstIndex = i;
@@ -273,6 +269,14 @@ public class SelectManager : MonoBehaviour
         difficultySelect.OnSongChange();
         DisplayRecord();
         PlayPreview();
+    }
+
+    public void UnselectSong()
+    {
+        if (LiveSetting.selectedIndex >= 0)
+        {
+            SelectButtons[LiveSetting.selectedIndex].GetComponent<RectControl>().UnSelect();
+        }
     }
 
     public void DisplayRecord()

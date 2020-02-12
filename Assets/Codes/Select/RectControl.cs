@@ -73,15 +73,11 @@ public class RectControl : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
         rt.sizeDelta = new Vector2(rt.sizeDelta.x, 200);
-
-        while (Math.Abs(rt_m.anchoredPosition.y - destPos) < 1f)
-            yield return new WaitForEndOfFrame();
-        sm.SelectSong(-1);
-        UnSelect();
     }
 
     public void UnSelect()
     {
+        StopAllCoroutines();
         rt.sizeDelta = new Vector2(rt.sizeDelta.x, 116);
         startImg.SetActive(false);
         select = false;

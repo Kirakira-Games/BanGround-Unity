@@ -198,7 +198,6 @@ class AudioManager : MonoBehaviour
             {
                 loading = true;
                 GameObject.Find("UIManager").GetComponent<UIManager>().OnAudioFinish();
-                
             }
         }
     }
