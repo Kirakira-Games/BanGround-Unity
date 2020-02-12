@@ -18,23 +18,25 @@ public class ScanChartsToJson : MonoBehaviour
         {
             //print(a.Name);
             
-            if (File.Exists(a.FullName + "/header.json"))
+            if (File.Exists(a.FullName + "/header.bin"))
             {
-                string HeaderJson = File.ReadAllText(a.FullName + "/header.json");
-                Header header = JsonConvert.DeserializeObject<Header>(HeaderJson);
+                //string HeaderJson = File.ReadAllText(a.FullName + "/header.json");
+                //Header header = JsonConvert.DeserializeObject<Header>(HeaderJson);
+                Header header = ProtobufHelper.Load<Header>(a.FullName + "/header.bin");
                 Debug.Log("Scan: " + header.TitleUnicode + " in " + a.Name);
                 header.DirName = a.Name;
                 header.charts = new List<Chart>();
                 FileInfo[] files = a.GetFiles();
                 foreach (FileInfo b in files)
                 {
-                    if (b.Extension == ".json" && b.Name != "header.json")
+                    if (b.Extension == ".bin" && b.Name != "header.bin")
                     {
                         //print(b.Name);
-                        string chartJson = File.ReadAllText(b.FullName);
-                        Chart chart = JsonConvert.DeserializeObject<Chart>(chartJson);
+                        //string chartJson = File.ReadAllText(b.FullName);
+                        //Chart chart = JsonConvert.DeserializeObject<Chart>(chartJson);
+                        Chart chart = ProtobufHelper.Load<Chart>(b.FullName);
                         chart.notes = new List<Note>();//删除note信息
-                        chart.fileName = b.Name.Replace(".json","");
+                        chart.fileName = b.Name.Replace(".bin","");
                         header.charts.Add(chart);
                     }
                 }
@@ -51,6 +53,40 @@ public class ScanChartsToJson : MonoBehaviour
         Debug.LogWarning("Gennerrate Success");
         ProtobufHelper.Save(songList, Application.streamingAssetsPath + "/SongList.bin");
         //File.WriteAllText(Application.streamingAssetsPath + "/SongList.json", listJson);
+    }
+
+    [MenuItem("BanGround/扫描json谱面并转为bin")]
+    public static void ConvertJson2Bin()
+    {
+        DirectoryInfo ChartDir = new DirectoryInfo(LiveSetting.ChartDir);
+        DirectoryInfo[] songDir = ChartDir.GetDirectories();
+        foreach (DirectoryInfo a in songDir)
+        {
+            FileInfo[] files = a.GetFiles();
+            foreach (FileInfo b in files)
+            {
+                if (b.Extension == ".json")
+                {
+                    string json = File.ReadAllText(b.FullName);
+
+                    if (b.Name == "header.json")
+                    {
+                        Header header = JsonConvert.DeserializeObject<Header>(json);
+                        string des = b.FullName.Substring(0, b.FullName.Length - 5);
+                        ProtobufHelper.Save(header, des + ".bin");
+                        Debug.Log(des + ".bin");
+                    }
+                    else
+                    {
+                        Chart chart = JsonConvert.DeserializeObject<Chart>(json);
+                        string des = b.FullName.Substring(0, b.FullName.Length - 5);
+                        ProtobufHelper.Save(chart, des + ".bin");
+                        Debug.Log(des + ".bin");
+                    }
+                    File.Delete(b.FullName);
+                }
+            }
+        }
     }
 }
 

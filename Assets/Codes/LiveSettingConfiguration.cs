@@ -50,7 +50,7 @@ public static class LiveSetting
 
     public static SongList songList;
 
-    public static string GetChartPath => ChartDir + selectedFolder + "/" + selectedChart + ".json";
+    public static string GetChartPath => ChartDir + selectedFolder + "/" + selectedChart + ".bin";
     public static string GetBGMPath => ChartDir + selectedFolder + "/" + "bgm.ogg";
     public static string GetHeaderPath => ChartDir + selectedFolder + "/" + "header.json";
     public static string GetBackgroundPath => ChartDir + selectedFolder + "/" + selectedChart + ".jpg";

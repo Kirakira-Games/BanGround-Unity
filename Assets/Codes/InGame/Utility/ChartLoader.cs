@@ -75,12 +75,12 @@ public static class ChartLoader
     public static Header LoadHeaderFromFile(string path)
     {
         if (!File.Exists(path)) return null;
-        return JsonConvert.DeserializeObject<Header>(File.ReadAllText(path));
+        return ProtobufHelper.Load<Header>(path);
     }
 
     public static Chart LoadChartFromFile(string path)
     {
-        return JsonConvert.DeserializeObject<Chart>(File.ReadAllText(path));
+        return ProtobufHelper.Load<Chart>(path);
     }
 
     public static float GetFloatingPointBeat(int[] beat)
