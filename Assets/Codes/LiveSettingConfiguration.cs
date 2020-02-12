@@ -52,7 +52,7 @@ public static class LiveSetting
 
     public static string GetChartPath => ChartDir + selectedFolder + "/" + selectedChart + ".bin";
     public static string GetBGMPath => ChartDir + selectedFolder + "/" + "bgm.ogg";
-    public static string GetHeaderPath => ChartDir + selectedFolder + "/" + "header.json";
+    public static string GetHeaderPath => ChartDir + selectedFolder + "/" + "header.bin";
     public static string GetBackgroundPath => ChartDir + selectedFolder + "/" + selectedChart + ".jpg";
     public static Header CurrentHeader;
 

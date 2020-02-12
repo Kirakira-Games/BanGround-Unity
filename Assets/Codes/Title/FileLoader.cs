@@ -100,11 +100,11 @@ public class FileLoader : MonoBehaviour
             List<string> files = new List<string>();
             foreach (Header h in LiveSetting.songList.songs)
             {
-                files.Add("/TestCharts/" + h.DirName + "/header.json");
+                files.Add("/TestCharts/" + h.DirName + "/header.bin");
                 files.Add("/TestCharts/" + h.DirName + "/bgm.ogg");
                 foreach (Chart c in h.charts)
                 {
-                    files.Add("/TestCharts/" + h.DirName + "/" + c.fileName + ".json");
+                    files.Add("/TestCharts/" + h.DirName + "/" + c.fileName + ".bin");
                     if (!string.IsNullOrWhiteSpace(c.backgroundFile)) files.Add("/TestCharts/" + h.DirName + "/" + c.fileName + ".jpg");
                 }
             }
