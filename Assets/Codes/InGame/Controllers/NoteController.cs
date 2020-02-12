@@ -8,7 +8,7 @@ using UnityEngine.Profiling;
 public class NoteController : MonoBehaviour
 {
     public static NoteController controller;
-    private SortedDictionary<int, GameObject>[] laneQueue;
+    private PriorityQueue<int, NoteBase>[] laneQueue;
 
     private Dictionary<int, GameObject> touchTable;
     private Dictionary<int, NoteSyncLine> syncTable;
@@ -120,14 +120,13 @@ public class NoteController : MonoBehaviour
         for (int i = Mathf.Max(0, lane - 1); i < Mathf.Min(NoteUtility.LANE_COUNT, lane + 2); i++)
         {
             // Remove judged and destroyed notes from queue
-            while (laneQueue[i].Count > 0)
+            while (!laneQueue[i].Empty())
             {
-                int key = laneQueue[i].Keys.First();
-                GameObject obj = laneQueue[i][key];
+                NoteBase obj = laneQueue[i].Top();
                 bool nullObj = obj == null;
-                if (nullObj || obj.GetComponent<NoteBase>().judgeTime != int.MinValue)
+                if (nullObj || obj.judgeTime != int.MinValue)
                 {
-                    laneQueue[i].Remove(key);
+                    laneQueue[i].Pop();
                 }
                 else
                 {
@@ -135,9 +134,9 @@ public class NoteController : MonoBehaviour
                 }
             }
             // Try to judge the front of the queue
-            if (laneQueue[i].Count > 0)
+            if (!laneQueue[i].Empty())
             {
-                NoteBase note = laneQueue[i][laneQueue[i].Keys.First()].GetComponent<NoteBase>();
+                NoteBase note = laneQueue[i].Top();
                 JudgeResult result = note.TryJudge(audioTime, touch);
                 if (result != JudgeResult.None)
                 {
@@ -194,7 +193,7 @@ public class NoteController : MonoBehaviour
         note.type = gameNote.type;
         note.isGray = LiveSetting.grayNoteEnabled ? gameNote.isGray : false;
         note.InitNote();
-        laneQueue[note.lane].Add(note.time, noteObj);
+        laneQueue[note.lane].Push(note.time, note);
         // Add sync line
         if (LiveSetting.syncLineEnabled && note.type != GameNoteType.SlideTick)
         {
@@ -301,10 +300,10 @@ public class NoteController : MonoBehaviour
         Application.targetFrameRate = 120;
         
         scoreDisplay = GameObject.Find("Grades").GetComponent<GradeColorChange>();
-        laneQueue = new SortedDictionary<int, GameObject>[NoteUtility.LANE_COUNT];
+        laneQueue = new PriorityQueue<int, NoteBase>[NoteUtility.LANE_COUNT];
         for (int i = 0; i < NoteUtility.LANE_COUNT; i++)
         {
-            laneQueue[i] = new SortedDictionary<int, GameObject>();
+            laneQueue[i] = new PriorityQueue<int, NoteBase>();
         }
         controller = this;
         // Load chart

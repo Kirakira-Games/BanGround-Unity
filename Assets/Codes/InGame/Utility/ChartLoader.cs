@@ -98,18 +98,24 @@ public static class ChartLoader
             return null;
         }
         List<GameNoteData> gameNotes = new List<GameNoteData>();
-        notes.Sort(new NoteComparer());
+        //notes.Sort(new NoteComparer());
         var tickStackTable = new Dictionary<int, GameNoteData>();
 
         // Compute actual time of each note
         float currentBpm = 120;
         float startDash = 0;
         float startTime = chart.offset / 1000f;
+        float prevBeat = -1e9f;
         // Create game notes
         foreach (Note note in notes)
         {
             NormalizeBeat(note.beat);
             float beat = GetFloatingPointBeat(note.beat);
+            if (prevBeat - beat > NoteUtility.EPS)
+            {
+                Debug.LogError(BeatToString(note.beat) + "Incorrect order of notes!");
+            }
+            prevBeat = beat;
             if (note.type == NoteType.BPM)
             {
                 // Note is a timing point
