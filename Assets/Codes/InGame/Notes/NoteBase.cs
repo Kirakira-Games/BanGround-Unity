@@ -84,7 +84,7 @@ public abstract class NoteBase : MonoBehaviour
         int diff = Mathf.Abs(offset);
         for (int i = 0; i < (int)JudgeResult.Miss; i++)
         {
-            if (diff <= judgeRange[i])
+            if (diff <= judgeRange[i] * LiveSetting.SpeedCompensationSum)
             {
                 return (JudgeResult)i;
             }
