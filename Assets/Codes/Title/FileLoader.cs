@@ -17,11 +17,9 @@ public class FileLoader : MonoBehaviour
     {
 
 #if UNITY_ANDROID && !UNITY_EDITOR
-        //InitCharts();
         StartCoroutine(InitCharts());
 #else
-        //StartCoroutine(InitCharts());
-        LoadSongListFromFile(Application.streamingAssetsPath + "/SongList.json");
+        LoadSongListFromFile(Application.streamingAssetsPath + "/SongList.bin");
 #endif
         LoadLiveSettingFile();
 
@@ -46,11 +44,12 @@ public class FileLoader : MonoBehaviour
 
     void LoadSongListFromFile(string path)
     {
-        string songListJson;
+        //string songListJson;
         if (File.Exists(path))
         {
-            songListJson = File.ReadAllText(path);
-            LiveSetting.songList = JsonConvert.DeserializeObject<SongList>(songListJson);
+            //songListJson = File.ReadAllText(path);
+            //LiveSetting.songList = JsonConvert.DeserializeObject<SongList>(songListJson);
+            LiveSetting.songList = ProtobufHelper.Load<SongList>(path);
             print("SongList Loaded");
         }
         else
@@ -75,51 +74,76 @@ public class FileLoader : MonoBehaviour
 
     private IEnumerator InitCharts()
     {
-        SongList list;
-        UnityWebRequest webRequest = UnityWebRequest.Get(Application.streamingAssetsPath + "/SongList.json");
+        //Load List From StreamingAssetsPath And Copy a Temp Version to PersistentDataPath
+        UnityWebRequest webRequest = UnityWebRequest.Get(Application.streamingAssetsPath + "/SongList.bin");
         yield return webRequest.SendWebRequest();
-        string newJson = webRequest.downloadHandler.text;
-        list = JsonConvert.DeserializeObject<SongList>(newJson);
-        string fileVersion = list.GenerateDate;//read from streaming assets
-        string songListJsonOLD;
+        byte[] songData = webRequest.downloadHandler.data;
+        File.WriteAllBytes(Application.persistentDataPath + "/SongList.bin.tmp", songData);
+
+        //Load List
+        SongList newList = ProtobufHelper.Load<SongList>(Application.persistentDataPath + "/SongList.bin.tmp");
+        SongList oldList= ProtobufHelper.Load<SongList>(Application.persistentDataPath + "/SongList.bin");
+        LiveSetting.songList = oldList;
         
-        if (File.Exists(Application.persistentDataPath + "/SongList.json"))
-        {
-            songListJsonOLD = File.ReadAllText(Application.persistentDataPath + "/SongList.json");
-            list = JsonConvert.DeserializeObject<SongList>(songListJsonOLD);
-            if (list.GenerateDate == fileVersion)
-            {
-                LiveSetting.songList = list;
-                yield break;
-            }
-        }
-
-        yield return StartCoroutine(CopyFileFromStreamingAssetsToPersistentDataPath("/SongList.json"));
-
-        songListJsonOLD = File.ReadAllText(Application.persistentDataPath + "/SongList.json");
-        list = JsonConvert.DeserializeObject<SongList>(songListJsonOLD);
-        if (list.GenerateDate == fileVersion)
-        {
-            LiveSetting.songList = list;
-            print("songList updated");
-        }
+        if (newList.GenerateDate == oldList.GenerateDate) yield break;
+        //need update
         else
         {
-            Debug.LogError("NMSL");
-        }
+            //Update : Write New SongList
+            File.WriteAllBytes(Application.persistentDataPath + "/SongList.bin", songData);
+            LiveSetting.songList = newList;
 
-        List<string> files = new List<string>();
-        foreach(Header h in LiveSetting.songList.songs)
-        {
-            files.Add("/TestCharts/" + h.DirName + "/header.json");
-            files.Add("/TestCharts/" + h.DirName + "/bgm.ogg");
-            files.Add("/TestCharts/" + h.DirName + "/preview.wav");
-            foreach (Chart c in h.charts)
+            //Prepare FileList
+            List<string> files = new List<string>();
+            foreach (Header h in LiveSetting.songList.songs)
             {
-                files.Add("/TestCharts/" + h.DirName + "/" + c.fileName + ".json");
-                if(!string.IsNullOrWhiteSpace(c.backgroundFile)) files.Add("/TestCharts/" + h.DirName + "/" + c.fileName + ".jpg");
+                files.Add("/TestCharts/" + h.DirName + "/header.json");
+                files.Add("/TestCharts/" + h.DirName + "/bgm.ogg");
+                foreach (Chart c in h.charts)
+                {
+                    files.Add("/TestCharts/" + h.DirName + "/" + c.fileName + ".json");
+                    if (!string.IsNullOrWhiteSpace(c.backgroundFile)) files.Add("/TestCharts/" + h.DirName + "/" + c.fileName + ".jpg");
+                }
+            }
+
+            //Copy File
+            for (int i = 0; i < files.Count; i++)
+            {
+                if (!File.Exists(Application.persistentDataPath + files[i]))
+                    StartCoroutine(CopyFileFromStreamingAssetsToPersistentDataPath(files[i]));
             }
         }
+
+        //string newJson = webRequest.downloadHandler.text;
+        //list = JsonConvert.DeserializeObject<SongList>(newJson);
+        //string fileVersion = list.GenerateDate;//read from streaming assets
+        //string songListJsonOLD;
+
+        //if (File.Exists(Application.persistentDataPath + "/SongList.bin"))
+        //{
+        //    songListJsonOLD = File.ReadAllText(Application.persistentDataPath + "/SongList.bin");
+        //    list = JsonConvert.DeserializeObject<SongList>(songListJsonOLD);
+        //    if (list.GenerateDate == fileVersion)
+        //    {
+        //        LiveSetting.songList = list;
+        //        yield break;
+        //    }
+        //}
+
+        //yield return StartCoroutine(CopyFileFromStreamingAssetsToPersistentDataPath("/SongList.bin"));
+
+        //songListJsonOLD = File.ReadAllText(Application.persistentDataPath + "/SongList.bin");
+        //list = JsonConvert.DeserializeObject<SongList>(songListJsonOLD);
+        //if (list.GenerateDate == fileVersion)
+        //{
+        //    LiveSetting.songList = list;
+        //    print("songList updated");
+        //}
+        //else
+        //{
+        //    Debug.LogError("NMSL");
+        //}
+
 
         /*string[] files =
         {
@@ -142,12 +166,7 @@ public class FileLoader : MonoBehaviour
             "/TestCharts/243/1.json",
         };
         */
-        for (int i = 0; i < files.Count; i++)
-        {
-            if (!File.Exists(Application.persistentDataPath + files[i])) 
-                StartCoroutine(CopyFileFromStreamingAssetsToPersistentDataPath(files[i]));
-        }
-        
+
     }
 
     private IEnumerator CopyFileFromStreamingAssetsToPersistentDataPath(string relativePath)

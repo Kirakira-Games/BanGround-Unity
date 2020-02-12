@@ -57,7 +57,7 @@ public static class LiveSetting
     public static Header CurrentHeader;
 
     public static readonly string settingsPath = Application.persistentDataPath + "/LiveSettings.json";
-    public static readonly string scoresPath = Application.persistentDataPath + "/Scores.json";
+    public static readonly string scoresPath = Application.persistentDataPath + "/Scores.bin";
 
     public static List<ModBase> attachedMods = new List<ModBase>();
     private static float SpeedCompensationSum = 1.0f;

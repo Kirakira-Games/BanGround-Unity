@@ -75,14 +75,11 @@ public static class ChartLoader
     public static Header LoadHeaderFromFile(string path)
     {
         if (!File.Exists(path)) return null;
-        //TextAsset headerText = Resources.Load<TextAsset>(path);
-        //if (headerText == null) return null;
         return JsonConvert.DeserializeObject<Header>(File.ReadAllText(path));
     }
 
     public static Chart LoadChartFromFile(string path)
     {
-        //TextAsset chartText = Resources.Load<TextAsset>(path);
         return JsonConvert.DeserializeObject<Chart>(File.ReadAllText(path));
     }
 

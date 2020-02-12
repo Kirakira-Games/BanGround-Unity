@@ -170,6 +170,8 @@ public partial class SongList : IExtensible
 
     [ProtoMember(2)]
     public System.Collections.Generic.List<Header> songs = new System.Collections.Generic.List<Header>();
+    
+    public SongList() { }
 
     public SongList(string date, List<Header> list)
     {
@@ -227,8 +229,7 @@ public partial class PlayRecords : IExtensible
     {
         if (File.Exists(LiveSetting.scoresPath))
         {
-            string json = File.ReadAllText(LiveSetting.scoresPath);
-            return JsonConvert.DeserializeObject<PlayRecords>(json);
+            return ProtobufHelper.Load<PlayRecords>(LiveSetting.scoresPath);
         }
         else
         {
@@ -238,9 +239,46 @@ public partial class PlayRecords : IExtensible
 
     public static string SaveRecord(PlayRecords a)
     {
+        ProtobufHelper.Save(a, LiveSetting.scoresPath);
         string json = JsonConvert.SerializeObject(a);
-        File.WriteAllText(LiveSetting.scoresPath,json);
+        //File.WriteAllText(LiveSetting.scoresPath,json);
         return json;
+    }
+}
+
+public static class ProtobufHelper
+{
+    public static void Save<T>(T data, string path) where T : IExtensible
+    {
+        if (File.Exists(path))
+        {
+            using (var file = new FileStream(path, FileMode.Truncate, FileAccess.Write, FileShare.None)) 
+            {
+                Serializer.Serialize(file, data);
+            }
+        }
+        else
+        {
+            using (var file = File.Create(path))
+            {
+                Serializer.Serialize(file, data);
+            }
+        }
+    }
+
+    public static T Load<T>(string path) where T : IExtensible
+    {
+        if (File.Exists(path))
+        {
+            using (var file = File.OpenRead(path))
+            {
+                return Serializer.Deserialize<T>(file);
+            }
+        }
+        else
+        {
+            return default(T);
+        }
     }
 }
 

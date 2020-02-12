@@ -49,7 +49,8 @@ public class ScanChartsToJson : MonoBehaviour
         string listJson = JsonConvert.SerializeObject(songList);
         print(listJson);
         Debug.LogWarning("Gennerrate Success");
-        File.WriteAllText(Application.streamingAssetsPath + "/SongList.json", listJson);
+        ProtobufHelper.Save(songList, Application.streamingAssetsPath + "/SongList.bin");
+        //File.WriteAllText(Application.streamingAssetsPath + "/SongList.json", listJson);
     }
 }
 
