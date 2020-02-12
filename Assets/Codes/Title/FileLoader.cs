@@ -54,7 +54,7 @@ public class FileLoader : MonoBehaviour
         }
         else
         {
-            Debug.LogError("SongList.json not found! pls gennerate it in editor");
+            Debug.LogError("SongList.bin not found! pls gennerate it in editor");
         }
     }
 
@@ -82,7 +82,10 @@ public class FileLoader : MonoBehaviour
 
         //Load List
         SongList newList = ProtobufHelper.Load<SongList>(Application.persistentDataPath + "/SongList.bin.tmp");
-        SongList oldList= ProtobufHelper.Load<SongList>(Application.persistentDataPath + "/SongList.bin");
+        SongList oldList;
+        if (File.Exists(Application.persistentDataPath + "/SongList.bin"))
+            oldList = ProtobufHelper.Load<SongList>(Application.persistentDataPath + "/SongList.bin");
+        else oldList = null;
         LiveSetting.songList = oldList;
 
         if (oldList != null && newList.GenerateDate == oldList.GenerateDate) yield break;

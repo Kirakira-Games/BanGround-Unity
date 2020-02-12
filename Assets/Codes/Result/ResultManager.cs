@@ -275,6 +275,8 @@ public class ResultManager : MonoBehaviour
         playResult.FolderName = LiveSetting.selectedFolder;
         PlayRecords pr = PlayRecords.OpenRecord();
 
+        Debug.Log(pr);
+
         var resultList = pr.resultsList.Where((x) => x.FolderName == LiveSetting.selectedFolder && x.ChartName == LiveSetting.selectedChart);
         if (resultList.Count() == 1) 
         {

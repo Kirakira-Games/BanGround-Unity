@@ -5,6 +5,7 @@ using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using ProtoBuf;
+using UnityEngine.Scripting;
 
 [JsonConverter(typeof(StringEnumConverter))]
 [ProtoContract()]
@@ -58,7 +59,7 @@ public enum Ranks
     F = 7,
 }
 
-
+[Preserve]
 [Serializable]
 [ProtoContract()]
 public partial class Note : IExtensible
@@ -85,6 +86,7 @@ public partial class Note : IExtensible
 
 }
 
+[Preserve]
 [ProtoContract()]
 public partial class Chart : IExtensible
 {
@@ -122,6 +124,7 @@ public partial class Chart : IExtensible
 
 }
 
+[Preserve]
 [ProtoContract()]
 public partial class Header : IExtensible
 {
@@ -157,6 +160,7 @@ public partial class Header : IExtensible
 
 }
 
+[Preserve]
 [ProtoContract()]
 public partial class SongList : IExtensible
 {
@@ -181,6 +185,7 @@ public partial class SongList : IExtensible
 
 }
 
+[Preserve]
 [ProtoContract()]
 public partial class PlayResult : IExtensible
 {
@@ -210,6 +215,7 @@ public partial class PlayResult : IExtensible
 
 }
 
+[Preserve]
 [ProtoContract()]
 public partial class PlayRecords : IExtensible
 {
@@ -246,6 +252,7 @@ public partial class PlayRecords : IExtensible
     }
 }
 
+[Preserve]
 public static class ProtobufHelper
 {
     public static void Save<T>(T data, string path) where T : IExtensible
@@ -277,7 +284,7 @@ public static class ProtobufHelper
         }
         else
         {
-            return default(T);
+            return default;
         }
     }
 }
