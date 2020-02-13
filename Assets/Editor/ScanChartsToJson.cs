@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 
 public class ScanChartsToJson : MonoBehaviour
 {
-    [MenuItem("BanGround/扫描谱面并写入Json")]
+    [MenuItem("BanGround/扫描谱面并写入SongList")]
     public static void ScanAndSave()
     {
         DirectoryInfo ChartDir = new DirectoryInfo(LiveSetting.ChartDir);

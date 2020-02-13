@@ -88,7 +88,8 @@ public class FileLoader : MonoBehaviour
         else oldList = null;
         LiveSetting.songList = oldList;
 
-        if (oldList != null && newList.GenerateDate == oldList.GenerateDate) yield break;
+
+        if (oldList != null && DateTime.Parse(newList.GenerateDate) >= DateTime.Parse(oldList.GenerateDate)) yield break;
         //need update
         else
         {
@@ -146,30 +147,6 @@ public class FileLoader : MonoBehaviour
         //{
         //    Debug.LogError("NMSL");
         //}
-
-
-        /*string[] files =
-        {
-
-            "/TestCharts/85/bgm.mp3",
-            "/TestCharts/85/header.json",
-            "/TestCharts/85/0.json",
-            "/TestCharts/85/1.json",
-            "/TestCharts/85/2.json",
-
-            //"/TestCharts/112/",
-
-            //"/TestCharts/128/",
-
-            //"/TestCharts/175/",
-
-            "/TestCharts/243/bgm.mp3",
-            "/TestCharts/243/header.json",
-            "/TestCharts/243/0.json",
-            "/TestCharts/243/1.json",
-        };
-        */
-
     }
 
     private IEnumerator CopyFileFromStreamingAssetsToPersistentDataPath(string relativePath)
