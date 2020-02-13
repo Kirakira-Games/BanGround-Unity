@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 public class TouchEvent : MonoBehaviour
 {
     private AsyncOperation operation;
+    private bool touched = false;
 
     private IEnumerator SwitchScene(string name)
     {
@@ -15,9 +16,14 @@ public class TouchEvent : MonoBehaviour
     }
     public void ChangeAnimation()
     {
-        GameObject.Find("Main Camera").GetComponent<Animator>().SetBool("Touched", true);
-        StartCoroutine(SwitchScene("Select"));
-        StartCoroutine(delayAndSwitch());
+        if (!touched)
+        {
+            touched = true;
+
+            GameObject.Find("Main Camera").GetComponent<Animator>().SetBool("Touched", true);
+            StartCoroutine(SwitchScene("Select"));
+            StartCoroutine(delayAndSwitch());
+        }
     }
     IEnumerator delayAndSwitch()
     {

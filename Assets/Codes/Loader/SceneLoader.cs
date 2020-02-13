@@ -30,6 +30,8 @@ public class SceneLoader : MonoBehaviour
 
     public void Load()
     {
+        AudioManager.Instanse.PauseBGM();
+
         StartCoroutine(LoadAsync());
         StartCoroutine(UnloadAsync());
         StartCoroutine(CountDown(4f));
@@ -62,5 +64,6 @@ public class SceneLoader : MonoBehaviour
             //open gate need 2f
             yield return new WaitForSeconds(2f);
         }
+
     }
 }

@@ -88,8 +88,7 @@ public class FileLoader : MonoBehaviour
         else oldList = null;
         LiveSetting.songList = oldList;
 
-
-        if (oldList != null && DateTime.Parse(newList.GenerateDate) >= DateTime.Parse(oldList.GenerateDate)) yield break;
+        if (oldList != null && DateTime.Parse(newList.GenerateDate) <= DateTime.Parse(oldList.GenerateDate)) yield break;
         //need update
         else
         {
