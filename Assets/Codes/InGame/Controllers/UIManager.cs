@@ -77,14 +77,16 @@ public class UIManager : MonoBehaviour
     {
         Time.timeScale = 1;
 
-        SceneManager.LoadScene("InGame");
+        //SceneManager.LoadScene("InGame");
+        SceneLoader.LoadScene("InGame", "InGame");
     }
 
     public void GameRetire()
     {
         Time.timeScale = 1;
 
-        SceneManager.LoadScene("Select");
+        //SceneManager.LoadScene("Select");
+        SceneLoader.LoadScene("InGame", "Select", true);
     }
 
     private void OnApplicationPause(bool pause)
@@ -129,6 +131,7 @@ public class UIManager : MonoBehaviour
         GameObject.Find("GateCanvas").GetComponent<Animator>().Play("GateClose");
         yield return new WaitForSeconds(3);
         SceneManager.LoadSceneAsync("Result");
+        //SceneLoader.LoadScene("InGame", "Result", true);
     }
 
 }

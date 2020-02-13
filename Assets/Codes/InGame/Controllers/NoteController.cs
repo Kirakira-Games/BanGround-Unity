@@ -336,7 +336,7 @@ public class NoteController : MonoBehaviour
         SE_FLICK = audioMgr.PrecacheSound(Resources.Load<TextAsset>("SoundEffects/flick.wav"));
         SE_CLICK = audioMgr.PrecacheSound(Resources.Load<TextAsset>("SoundEffects/empty.wav"));
 
-        StartCoroutine(audioMgr.DelayPlayBGM(File.ReadAllBytes(LiveSetting.GetBGMPath), 2f));
+        StartCoroutine(audioMgr.DelayPlayBGM(File.ReadAllBytes(LiveSetting.GetBGMPath), 4f));
 
         background = GameObject.Find("Background").GetComponent<FixBackground>();
         if (File.Exists(LiveSetting.GetBackgroundPath))

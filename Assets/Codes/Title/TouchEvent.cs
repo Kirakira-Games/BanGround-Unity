@@ -5,18 +5,25 @@ using UnityEngine.SceneManagement;
 
 public class TouchEvent : MonoBehaviour
 {
-    public void SwitchScene(int i)
+    private AsyncOperation operation;
+
+    private IEnumerator SwitchScene(string name)
     {
-        SceneManager.LoadSceneAsync(i);
+        operation = SceneManager.LoadSceneAsync(name);
+        operation.allowSceneActivation = false;
+        yield return operation;
     }
     public void ChangeAnimation()
     {
         GameObject.Find("Main Camera").GetComponent<Animator>().SetBool("Touched", true);
+        StartCoroutine(SwitchScene("Select"));
         StartCoroutine(delayAndSwitch());
     }
     IEnumerator delayAndSwitch()
     {
-        yield return new WaitForSeconds(2f);
-        SwitchScene(1);
+        yield return new WaitForSeconds(1f);
+        //SwitchScene("Select");
+        //SceneLoader.LoadScene("Title", "Select", true);
+        operation.allowSceneActivation = true;
     }
 }

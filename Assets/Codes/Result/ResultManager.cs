@@ -134,14 +134,16 @@ public class ResultManager : MonoBehaviour
 
         button_back.onClick.AddListener(() =>
         {
-            anim.SetBool("FadeToBlue", true);
-            StartCoroutine("DelayLoadScene", "Select");
+            //anim.SetBool("FadeToBlue", true);
+            //StartCoroutine("DelayLoadScene", "Select");
+            SceneLoader.LoadScene("Result", "Select", true);
         });
 
         button_retry.onClick.AddListener(() =>
         {
-            anim.SetBool("FadeToBlack", true);
-            StartCoroutine("DelayLoadScene","InGame" ); 
+            //anim.SetBool("FadeToBlack", true);
+            //StartCoroutine("DelayLoadScene","InGame" ); 
+            SceneLoader.LoadScene("Result", "InGame");
         });
 
         button_cycleFrame.onClick.AddListener(() =>

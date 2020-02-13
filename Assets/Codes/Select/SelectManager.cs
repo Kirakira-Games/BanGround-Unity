@@ -478,8 +478,8 @@ public class SelectManager : MonoBehaviour
         }
         */
         //enter_Btn.interactable = false;
-        enterAniObj.SetActive(true);
-        scene_Animator.Play("OutPlay", -1, 0);
+        //enterAniObj.SetActive(true);
+        //scene_Animator.Play("OutPlay", -1, 0);
         CloseSetting();
         setting_Open_Btn.gameObject.SetActive(false);
 
@@ -493,6 +493,8 @@ public class SelectManager : MonoBehaviour
 
         float startVolume = lastPreviewStream.Volume;
 
+        SceneLoader.LoadScene("Select", "InGame");
+
         while (delay >= 0)
         {
             yield return new WaitForEndOfFrame();
@@ -503,7 +505,7 @@ public class SelectManager : MonoBehaviour
         lastPreviewStream.Dispose();
 
         //yield return new WaitForSeconds(2f);
-        SceneManager.LoadSceneAsync("InGame");
+        //SceneManager.LoadSceneAsync("InGame");
     }
 
     private void OnApplicationPause(bool pause)
