@@ -73,7 +73,7 @@ public class BassAudioSource : MonoBehaviour
 
     void OnDestroy()
     {
-        stream.Dispose();
+        stream?.Dispose();
     }
 
     void OnApplicationPause(bool pause)

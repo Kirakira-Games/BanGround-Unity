@@ -76,7 +76,9 @@ public class UIManager : MonoBehaviour
     public void GameRetry()
     {
         Time.timeScale = 1;
+        AudioManager.Instanse.StopAllCoroutines();
 
+        RemoveListener();
         //SceneManager.LoadScene("InGame");
         SceneLoader.LoadScene("InGame", "InGame");
     }
@@ -84,7 +86,9 @@ public class UIManager : MonoBehaviour
     public void GameRetire()
     {
         Time.timeScale = 1;
+        AudioManager.Instanse.StopAllCoroutines();
 
+        RemoveListener();
         //SceneManager.LoadScene("Select");
         SceneLoader.LoadScene("InGame", "Select", true);
     }
@@ -132,6 +136,14 @@ public class UIManager : MonoBehaviour
         yield return new WaitForSeconds(3);
         SceneManager.LoadSceneAsync("Result");
         //SceneLoader.LoadScene("InGame", "Result", true);
+    }
+
+    private void RemoveListener()
+    {
+        pause_Btn.onClick.RemoveAllListeners();
+        resume_Btn.onClick.RemoveAllListeners();
+        retire_Btn.onClick.RemoveAllListeners();
+        retry_Btn.onClick.RemoveAllListeners();
     }
 
 }

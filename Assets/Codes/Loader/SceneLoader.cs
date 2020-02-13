@@ -39,7 +39,7 @@ public class SceneLoader : MonoBehaviour
 
     private IEnumerator LoadAsync()
     {
-        operation = SceneManager.LoadSceneAsync(nextSceneName,LoadSceneMode.Single);
+        operation = SceneManager.LoadSceneAsync(nextSceneName);
         operation.allowSceneActivation = false;
         yield return operation;
     }

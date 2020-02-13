@@ -213,7 +213,7 @@ class AudioManager : MonoBehaviour
             if (!loading && !GetPlayStatus())
             {
                 loading = true;
-                GameObject.Find("UIManager").GetComponent<UIManager>().OnAudioFinish();
+                GameObject.Find("UIManager")?.GetComponent<UIManager>()?.OnAudioFinish();
             }
         }
     }
@@ -305,7 +305,7 @@ class AudioManager : MonoBehaviour
         return cid;
     }
 
-    public IEnumerator DelayPlayBGM(byte[] audioData, float seconds)
+    private IEnumerator DelayPlayBGM(byte[] audioData, float seconds)
     {
         BGMStream = StreamSound(audioData, BASSFlag.BASS_STREAM_DECODE);
         loading = true;
@@ -320,6 +320,11 @@ class AudioManager : MonoBehaviour
         BGMStream.Play();
         loading = false;
         lastPos = -999;
+    }
+
+    public void DelayPlay(byte[] audioData, float seconds)
+    {
+        StartCoroutine(DelayPlayBGM(audioData, seconds));
     }
 
     public int GetBGMPlaybackTime()

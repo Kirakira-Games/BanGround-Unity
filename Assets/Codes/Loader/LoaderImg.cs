@@ -5,13 +5,14 @@ using UnityEngine.UI;
 
 public class LoaderImg : MonoBehaviour
 {
-    [SerializeField] private Texture[] loaderSprite;
+    private Texture[] loaderSprite;
     private RawImage image;
     private bool play = false;
     private int spriteIndex = 0;
 
     void Start()
     {
+        loaderSprite = Resources.LoadAll<Texture>("Comic/");
         image = GetComponent<RawImage>();
         image.texture = loaderSprite[Random.Range(0, loaderSprite.Length)];
         image.SetNativeSize();

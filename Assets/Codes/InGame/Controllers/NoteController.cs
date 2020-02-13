@@ -336,7 +336,7 @@ public class NoteController : MonoBehaviour
         SE_FLICK = audioMgr.PrecacheSound(Resources.Load<TextAsset>("SoundEffects/flick.wav"));
         SE_CLICK = audioMgr.PrecacheSound(Resources.Load<TextAsset>("SoundEffects/empty.wav"));
 
-        StartCoroutine(audioMgr.DelayPlayBGM(File.ReadAllBytes(LiveSetting.GetBGMPath), 4f));
+        audioMgr.DelayPlay(File.ReadAllBytes(LiveSetting.GetBGMPath), 4f);
 
         background = GameObject.Find("Background").GetComponent<FixBackground>();
         if (File.Exists(LiveSetting.GetBackgroundPath))
@@ -349,12 +349,13 @@ public class NoteController : MonoBehaviour
     {
         int audioTime = audioMgr.GetBGMPlaybackTime();
 
-        Profiler.BeginSample("UpdateNotes");
+
+        if (audioMgr.GetPauseStatus() || !audioMgr.GetPlayStatus()) return;
+
+        Debug.Log("Update");
+
         // Create notes
         UpdateNotes(audioTime);
-        Profiler.EndSample();
-
-        if (audioMgr.GetPauseStatus()) return;
 
         // Trigger touch event
         UpdateTouch(audioTime);
