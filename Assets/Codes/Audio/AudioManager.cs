@@ -370,7 +370,7 @@ class AudioManager : MonoBehaviour
     public void PauseBGM()
     {
         print("pause");
-        BGMStream.Pause();
+        BGMStream?.Pause();
     }
 
     public void ResumeBGM()
@@ -380,7 +380,7 @@ class AudioManager : MonoBehaviour
 
     public void StopBGM()
     {
-        BGMStream.Stop();
+        BGMStream?.Stop();
     }
 
     void OnApplicationQuit()
