@@ -352,8 +352,6 @@ public class NoteController : MonoBehaviour
 
         if (audioMgr.GetPauseStatus() || !audioMgr.GetPlayStatus()) return;
 
-        Debug.Log("Update");
-
         // Create notes
         UpdateNotes(audioTime);
 
