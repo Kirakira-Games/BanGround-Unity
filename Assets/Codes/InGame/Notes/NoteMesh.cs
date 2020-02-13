@@ -21,6 +21,7 @@ public class NoteMesh
     };
 
     static readonly int[] indices = { 0, 2, 1, 2, 3, 1 };
+    const float deltaPerLane = 0.07f;
 
     public static MeshRenderer Create(GameObject note, int lane)
     {
@@ -29,7 +30,7 @@ public class NoteMesh
         meshRenderer.material = material;
 
         MeshFilter meshFilter = note.AddComponent<MeshFilter>();
-        float delta = (lane - 3) * 0.1f;
+        float delta = (lane - 3) * deltaPerLane;
         Vector3[] vertices = new Vector3[]
         {
             new Vector3(-1 + delta, -0.4f),

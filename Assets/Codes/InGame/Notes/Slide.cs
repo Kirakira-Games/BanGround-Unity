@@ -58,6 +58,30 @@ public class Slide : MonoBehaviour
         }
     }
 
+    private void UpdateNoteHead(int audioTime)
+    {
+        if (displayHead >= notes.Count)
+        {
+            NoteBase lastNote = notes[notes.Count - 1] as NoteBase;
+            noteHead.transform.position = NoteUtility.GetJudgePos(lastNote.lane);
+            noteHead.GetComponentInChildren<SlideMesh>().afterNoteTrans = lastNote.transform;
+        }
+        else
+        {
+            NoteBase next = notes[displayHead] as NoteBase;
+            NoteBase prev = notes[displayHead - 1] as NoteBase;
+            float percentage = (float)(audioTime - prev.time) / (next.time - prev.time);
+            percentage = Mathf.Max(0, percentage);
+            Vector3 prevPos = prev.judgePos;
+            Vector3 nextPos = next.judgePos;
+            noteHead.transform.position = (nextPos - prevPos) * percentage + prevPos;
+            SlideMesh mesh = noteHead.GetComponentInChildren<SlideMesh>();
+            mesh.afterNoteTrans = next.transform;
+            mesh.GetComponent<MeshRenderer>().enabled = displayHead == 1 || !prev.gameObject.activeSelf;
+        }
+        noteHead.gameObject.SetActive(touchId != -1 || LiveSetting.autoPlayEnabled);
+    }
+
     public void TraceTouch(int audioTime, Touch touch)
     {
         UpdateHead();
@@ -94,11 +118,13 @@ public class Slide : MonoBehaviour
     public void OnSlideUpdate(int audioTime)
     {
     	var _notes = GetComponentsInChildren<NoteBase>();
+
         // Update ticks
         foreach (NoteBase note in _notes)
         {
             note.OnNoteUpdate(audioTime);
         }
+
         // Update head
         UpdateHead();
         UpdateDisplayHead(audioTime);
@@ -107,32 +133,14 @@ public class Slide : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
         // Update position of noteHead
         if (noteHead.judgeResult != JudgeResult.None)
         {
-            if (displayHead >= notes.Count)
-            {
-                NoteBase lastNote = notes[notes.Count - 1] as NoteBase;
-                noteHead.transform.position = NoteUtility.GetJudgePos(lastNote.lane);
-                noteHead.GetComponentInChildren<SlideMesh>().afterNoteTrans = lastNote.transform;
-            }
-            else
-            {
-                NoteBase next = notes[displayHead] as NoteBase;
-                NoteBase prev = notes[displayHead - 1] as NoteBase;
-                float percentage = (float)(audioTime - prev.time) / (next.time - prev.time);
-                percentage = Mathf.Max(0, percentage);
-                Vector3 prevPos = prev.judgePos;
-                Vector3 nextPos = next.judgePos;
-                noteHead.transform.position = (nextPos - prevPos) * percentage + prevPos;
-                SlideMesh mesh = noteHead.GetComponentInChildren<SlideMesh>();
-                mesh.afterNoteTrans = next.transform;
-                mesh.GetComponent<MeshRenderer>().enabled = displayHead == 1 || !prev.gameObject.activeSelf;
-            }
-            noteHead.gameObject.SetActive(touchId != -1 || LiveSetting.autoPlayEnabled);
+            UpdateNoteHead(audioTime);
         }
+
         // Update mesh
-        
         foreach (NoteBase note in _notes)
         {
             note.GetComponentInChildren<SlideMesh>()?.OnUpdate();
@@ -152,6 +160,7 @@ public class Slide : MonoBehaviour
             noteHead = note as SlideStart;
         }
         notes.Add(note);
+        (note as SlideNoteBase).InitSlideNote();
     }
 
     private void BindTouch(Touch? touch)

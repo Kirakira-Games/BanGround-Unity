@@ -45,16 +45,35 @@ public static class NoteUtility
     private static readonly float BANG_PERSPECTIVE_END = YTo3DXHelper(1);
     private static readonly float BANG_EXP_START = XToBanGYHelper(0);
 
-    public static readonly int[] TAP_JUDGE_RANGE = { 50, 100, 117, 133 };
-    public static readonly int[] SLIDE_END_JUDGE_RANGE = { 200, 250, 266, 283 };
-    public const int SLIDE_END_FLICK_JUDGE_RANGE = 100;
-    public const int SLIDE_TICK_JUDGE_RANGE = 200;
-    public const int AUTO_JUDGE_RANGE = 10;
+    private static readonly int[] TAP_JUDGE_RANGE_RAW = { 50, 100, 117, 133 };
+    private static readonly int[] SLIDE_END_JUDGE_RANGE_RAW = { 67, 117, 133, 150 };
+    private static readonly int[] SLIDE_END_TILT_JUDGE_RANGE_RAW = { -34, -84, -100, -117 };
+    private const int SLIDE_END_FLICK_JUDGE_RANGE_RAW = 100;
+    private const int SLIDE_TICK_JUDGE_RANGE_RAW = 200;
+    private const int AUTO_JUDGE_RANGE_RAW = 10;
+
+    public static readonly int[] TAP_JUDGE_RANGE = new int[4];
+    public static readonly int[] SLIDE_END_JUDGE_RANGE = new int[4];
+    public static readonly int[] SLIDE_END_TILT_JUDGE_RANGE = new int[4];
+    public static int SLIDE_END_FLICK_JUDGE_RANGE => (int)(SLIDE_END_FLICK_JUDGE_RANGE_RAW * LiveSetting.SpeedCompensationSum);
+    public static int SLIDE_TICK_JUDGE_RANGE => (int)(SLIDE_TICK_JUDGE_RANGE_RAW * LiveSetting.SpeedCompensationSum);
+    public static int AUTO_JUDGE_RANGE => (int)(AUTO_JUDGE_RANGE_RAW * LiveSetting.SpeedCompensationSum);
+
     public const float FLICK_JUDGE_DIST = 0.5f;
 
     public const int MOUSE_TOUCH_ID = -16;
 
     public const float EPS = 1e-4f;
+
+    public static void InitJudgeRange()
+    {
+        for (int i = 0; i < TAP_JUDGE_RANGE.Length; i++)
+        {
+            TAP_JUDGE_RANGE[i] = (int)(TAP_JUDGE_RANGE_RAW[i] * LiveSetting.SpeedCompensationSum);
+            SLIDE_END_JUDGE_RANGE[i] = (int)(SLIDE_END_JUDGE_RANGE_RAW[i] * LiveSetting.SpeedCompensationSum);
+            SLIDE_END_TILT_JUDGE_RANGE[i] = (int)(SLIDE_END_TILT_JUDGE_RANGE_RAW[i] * LiveSetting.SpeedCompensationSum);
+        }
+    }
 
     public static Vector3 GetInitPos(int lane)
     {

@@ -5,8 +5,14 @@ using UnityEngine;
 public abstract class SlideNoteBase : NoteBase
 {
     public bool IsTilt;
+    protected Slide parentSlide;
 
     protected abstract JudgeResult TrySlideJudge(int audioTime, Touch touch);
+
+    public void InitSlideNote()
+    {
+        parentSlide = GetComponentInParent<Slide>();
+    }
 
     protected override void OnDestroy()
     {
@@ -22,8 +28,8 @@ public abstract class SlideNoteBase : NoteBase
 
     public override JudgeResult TryJudge(int audioTime, Touch touch)
     {
-        if (judgeTime != int.MinValue || (GetComponentInParent<Slide>().GetTouchId() != -1 &&
-            GetComponentInParent<Slide>().GetTouchId() != touch.fingerId))
+        if (judgeTime != int.MinValue || (parentSlide.GetTouchId() != -1 &&
+            parentSlide.GetTouchId() != touch.fingerId))
         {
             return JudgeResult.None;
         }
@@ -33,7 +39,7 @@ public abstract class SlideNoteBase : NoteBase
     public override void RealJudge(int audioTime, JudgeResult result, Touch? touch)
     {
         if (judgeResult != JudgeResult.None) return;
-        if (GetComponentInParent<Slide>().Judge(gameObject, result, touch))
+        if (parentSlide.Judge(gameObject, result, touch))
         {
             judgeTime = audioTime;
             judgeResult = result;

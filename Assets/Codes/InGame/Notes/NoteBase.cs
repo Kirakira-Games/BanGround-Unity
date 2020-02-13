@@ -12,8 +12,8 @@ public abstract class NoteBase : MonoBehaviour
 
     protected MeshRenderer mesh;
 
-    private Vector3 _cachedInitPos = Vector3.zero;
-    private Vector3 _cachedJudgePos = Vector3.zero;
+    protected Vector3 _cachedInitPos = Vector3.zero;
+    protected Vector3 _cachedJudgePos = Vector3.zero;
 
     public Vector3 initPos { get { return _cachedInitPos == Vector3.zero ? _cachedInitPos = NoteUtility.GetInitPos(lane) : _cachedInitPos; } }
     public Vector3 judgePos { get { return _cachedJudgePos == Vector3.zero ? _cachedJudgePos = NoteUtility.GetJudgePos(lane) : _cachedJudgePos; } }
@@ -92,7 +92,7 @@ public abstract class NoteBase : MonoBehaviour
         int diff = Mathf.Abs(offset);
         for (int i = 0; i < (int)JudgeResult.Miss; i++)
         {
-            if (diff <= judgeRange[i] * LiveSetting.SpeedCompensationSum)
+            if (diff <= judgeRange[i])
             {
                 return (JudgeResult)i;
             }

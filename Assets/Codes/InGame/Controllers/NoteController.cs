@@ -323,6 +323,9 @@ public class NoteController : MonoBehaviour
         }
         ComboManager.manager.Init(numNotes);
 
+        // Init JudgeRange
+        NoteUtility.InitJudgeRange();
+
         // Init AudioManager
         audioMgr = AudioManager.Instanse;
         audioMgr.isInGame = true;
