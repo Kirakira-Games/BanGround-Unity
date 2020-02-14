@@ -9,6 +9,36 @@ using UnityEngine.Scripting;
 
 [JsonConverter(typeof(StringEnumConverter))]
 [ProtoContract()]
+public enum Language
+{
+    English = 0,
+    SimplifiedChinese,
+    TraditionalChinese,
+    Japanese,
+    Bulgarion,
+    Czech,
+    Danish,
+    Dutch,
+    Finnish,
+    French,
+    German,
+    Greek,
+    Hungarian,
+    Italian,
+    Korean,
+    Koreana,
+    Norwegian,
+    Polish,
+    Portuguese,
+    Russian,
+    Spanish,
+    Swedish,
+    Thai,
+    Turkish
+}
+
+[JsonConverter(typeof(StringEnumConverter))]
+[ProtoContract()]
 public enum Difficulty
 {
     Easy = 0,

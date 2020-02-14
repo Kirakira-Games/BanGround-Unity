@@ -3,9 +3,30 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Newtonsoft.Json;
+using System.IO;
 
 public static class LiveSetting
 {
+    public static bool Loaded { get; private set; } = false;
+    public static void Load()
+    {
+        if (Loaded)
+            return;
+
+        Loaded = true;
+
+        if (File.Exists(settingsPath))
+        {
+            string sets = File.ReadAllText(settingsPath);
+            LiveSettingTemplate loaded = JsonConvert.DeserializeObject<LiveSettingTemplate>(sets);
+            loaded.ApplyToLiveSetting();
+        }
+        else
+        {
+            Debug.LogWarning("Live setting file not found");
+        }
+    }
+
     public static int judgeOffset = 0;
     public static int audioOffset = 0;
 
@@ -36,6 +57,8 @@ public static class LiveSetting
 
     private static float cachedSpeed = 0;
     private static int cachedScreenTime = 0;
+
+    public static Language language = Language.SimplifiedChinese;
 
 #if UNITY_ANDROID && !UNITY_EDITOR
     public static readonly string ChartDir = Application.persistentDataPath + "/TestCharts/";

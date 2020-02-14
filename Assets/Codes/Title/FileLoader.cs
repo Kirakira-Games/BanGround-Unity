@@ -13,17 +13,19 @@ public class FileLoader : MonoBehaviour
     public TextAsset titleMusic;
     public TextAsset voice;
 
-    private void Start()
+    private void Awake()
     {
+        LiveSetting.Load();
 
 #if UNITY_ANDROID && !UNITY_EDITOR
         StartCoroutine(InitCharts());
 #else
         LoadSongListFromFile(Application.streamingAssetsPath + "/SongList.bin");
 #endif
-        LoadLiveSettingFile();
+    }
 
-        GameObject.Find("AudioMgr").AddComponent<AudioManager>();
+    private void Start()
+    {
         StartCoroutine(PlayTitle());
     }
 
@@ -58,19 +60,6 @@ public class FileLoader : MonoBehaviour
         }
     }
 
-    void LoadLiveSettingFile()
-    {
-        if (File.Exists(LiveSetting.settingsPath))
-        {
-            string sets = File.ReadAllText(LiveSetting.settingsPath);
-            LiveSettingTemplate loaded = JsonConvert.DeserializeObject<LiveSettingTemplate>(sets);
-            loaded.ApplyToLiveSetting();
-        }
-        else
-        {
-            Debug.LogWarning("Live setting file not found");
-        }
-    }
 
     private IEnumerator InitCharts()
     {
