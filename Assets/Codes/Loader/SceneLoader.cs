@@ -8,7 +8,7 @@ public class SceneLoader : MonoBehaviour
     private AsyncOperation operation;
     private Animator animator;
 
-    //public static string currentSceneName;
+    public static string currentSceneName;
     private static string nextSceneName;
     private static bool needOpen;
 
@@ -27,7 +27,7 @@ public class SceneLoader : MonoBehaviour
         if (Loading) return;
         Loading = true;
 
-        //SceneLoader.currentSceneName = currentSceneName;
+        SceneLoader.currentSceneName = currentSceneName;
         SceneLoader.nextSceneName = nextSceneName;
         SceneLoader.needOpen = needOpen;
         SceneManager.LoadScene("Loader", LoadSceneMode.Additive);
@@ -46,8 +46,7 @@ public class SceneLoader : MonoBehaviour
     {
         //关门后再加载下一场景（实际关门时间2.16s）
         yield return new WaitForSeconds(2.3f);
-
-        operation = SceneManager.LoadSceneAsync(nextSceneName);
+        operation = SceneManager.LoadSceneAsync(nextSceneName, needOpen ? LoadSceneMode.Additive : LoadSceneMode.Single);
         operation.allowSceneActivation = false;
         yield return operation;
     }
@@ -63,6 +62,8 @@ public class SceneLoader : MonoBehaviour
         //开门时间（即loading播放时间） 应减去关门所需时间
         yield return new WaitForSeconds(seconds);
 
+        if (needOpen) SceneManager.UnloadSceneAsync(currentSceneName);
+
         operation.allowSceneActivation = true;
 
         if (needOpen)
@@ -70,6 +71,7 @@ public class SceneLoader : MonoBehaviour
             animator.Play("Opening");
             //open gate need 2f
             yield return new WaitForSeconds(2f);
+            SceneManager.UnloadSceneAsync("Loader");
         }
         Loading = false;
     }

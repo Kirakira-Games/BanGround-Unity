@@ -99,7 +99,8 @@ public class UIManager : MonoBehaviour
 
     public void OnAudioFinish()
     {
-        StartCoroutine(ShowResult());
+        if(!SceneLoader.Loading)
+            StartCoroutine(ShowResult());
     }
 
     IEnumerator DelayDisableGate()

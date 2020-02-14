@@ -150,7 +150,7 @@ public class SelectManager : MonoBehaviour
 
         Rank = GameObject.Find("Rank").GetComponent<RawImage>();
         clearMark = GameObject.Find("ClearMark").GetComponent<RawImage>();
-        score = GameObject.Find("ScoreText").GetComponent<Text>();
+        score = GameObject.Find("ScoreHistory").GetComponent<Text>();
         acc = GameObject.Find("AccText").GetComponent<Text>();
 
         difficultySelect = GameObject.Find("DifficultySelect").GetComponent<DifficultySelect>();
@@ -267,7 +267,7 @@ public class SelectManager : MonoBehaviour
         }
         difficultySelect.levels = diffs;
         difficultySelect.OnSongChange();
-        DisplayRecord();
+        //DisplayRecord();
         PlayPreview();
     }
 
