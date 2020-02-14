@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public enum GameNoteType
 {
     None = -1,
-    Normal = 0,
+    Single = 0,
     Flick = 1,
     SlideStart = 2,
     SlideTick = 3,

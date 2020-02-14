@@ -44,7 +44,7 @@ public static class ChartLoader
         {
             if (note.type == NoteType.Single)
             {
-                return GameNoteType.Normal;
+                return GameNoteType.Single;
             }
             if (note.type == NoteType.Flick)
             {
@@ -133,7 +133,7 @@ public static class ChartLoader
                 time = (int)(time * 1000),
                 lane = note.lane,
                 type = type,
-                isGray = type == GameNoteType.Normal && note.beat[2] > 2
+                isGray = type == GameNoteType.Single && note.beat[2] > 2
             };
             if (note.tickStack == -1)
             {
@@ -147,6 +147,13 @@ public static class ChartLoader
 #if UNITY_EDITOR
                 if (note.type != NoteType.Single)
                 {
+                    if (NoteUtility.IsSlideEnd(type))
+                    {
+                        Debug.LogWarning(BeatToString(note.beat) + "Slide without a start. Translated to single note.");
+                        gameNote.type = type == GameNoteType.SlideEnd ? GameNoteType.Single : GameNoteType.Flick;
+                        gameNotes.Add(gameNote);
+                        continue;
+                    }
                     Debug.LogWarning(BeatToString(note.beat) + "Start of a slide must be 'Single' instead of '" + note.type + "'.");
                 }
 #endif

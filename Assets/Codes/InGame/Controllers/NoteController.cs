@@ -151,7 +151,7 @@ public class NoteController : MonoBehaviour
         if (noteToJudge == null)
         {
             if (touch.phase == TouchPhase.Began)
-                EmitEffect(NoteUtility.GetJudgePos(lane), JudgeResult.None, GameNoteType.Normal);
+                EmitEffect(NoteUtility.GetJudgePos(lane), JudgeResult.None, GameNoteType.Single);
         }
         else
         {
@@ -166,7 +166,7 @@ public class NoteController : MonoBehaviour
         NoteBase note;
         switch (gameNote.type)
         {
-            case GameNoteType.Normal:
+            case GameNoteType.Single:
                 note = noteObj.AddComponent<TapNote>();
                 break;
             case GameNoteType.Flick:
