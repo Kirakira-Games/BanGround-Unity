@@ -374,7 +374,6 @@ class AudioManager : MonoBehaviour
 
     public void PauseBGM()
     {
-        print("pause");
         BGMStream?.Pause();
     }
 

@@ -54,8 +54,6 @@ public class UIManager : MonoBehaviour
 
     public void OnPauseButtonClick()
     {
-        //clickCount++;
-        //if (clickCount >= 2)
         if (Input.touches.Length >= 2) return;
         GamePause();
     }
@@ -95,6 +93,7 @@ public class UIManager : MonoBehaviour
 
     private void OnApplicationPause(bool pause)
     {
+        if (SceneLoader.Loading) return;
         GamePause();
     }
 

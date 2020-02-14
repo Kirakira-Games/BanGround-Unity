@@ -85,6 +85,7 @@ public class RectControl : MonoBehaviour
 
     private void OnEnterPressed()
     {
+        bt.onClick.RemoveAllListeners();
         bt.interactable = false;
         sm.OnEnterPressed();
     }

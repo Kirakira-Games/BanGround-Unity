@@ -136,6 +136,7 @@ public class ResultManager : MonoBehaviour
         {
             //anim.SetBool("FadeToBlue", true);
             //StartCoroutine("DelayLoadScene", "Select");
+            RemoveListener();
             SceneLoader.LoadScene("Result", "Select", true);
         });
 
@@ -143,6 +144,7 @@ public class ResultManager : MonoBehaviour
         {
             //anim.SetBool("FadeToBlack", true);
             //StartCoroutine("DelayLoadScene","InGame" ); 
+            RemoveListener();
             SceneLoader.LoadScene("Result", "InGame");
         });
 
@@ -260,7 +262,7 @@ public class ResultManager : MonoBehaviour
         difficultCard.sprite = Resources.Load<Sprite>("UI/DifficultyCards/Result/" + Enum.GetName(typeof(Difficulty), chart.difficulty));
     }
 
-    void ReadScores()
+    private void ReadScores()
     {
         float modScoreMultiplier = 1.0f;
 
@@ -274,8 +276,6 @@ public class ResultManager : MonoBehaviour
         playResult.ChartName = LiveSetting.selectedChart;
         playResult.FolderName = LiveSetting.selectedFolder;
         PlayRecords pr = PlayRecords.OpenRecord();
-
-        Debug.Log(pr);
 
         var resultList = pr.resultsList.Where((x) => x.FolderName == LiveSetting.selectedFolder && x.ChartName == LiveSetting.selectedChart);
         if (resultList.Count() == 1) 
@@ -320,6 +320,11 @@ public class ResultManager : MonoBehaviour
             print("Autoplay score not saved");
     }
 
+    private void RemoveListener()
+    {
+        button_back.onClick.RemoveAllListeners();
+        button_retry.onClick.RemoveAllListeners();
+    }
 }
 
 
