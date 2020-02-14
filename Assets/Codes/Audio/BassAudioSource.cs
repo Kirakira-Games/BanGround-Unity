@@ -76,12 +76,20 @@ public class BassAudioSource : MonoBehaviour
         stream?.Dispose();
     }
 
+    bool NeedsPlay = false;
+
     void OnApplicationPause(bool pause)
     {
-        if (pause)
+        if (pause && stream.Status == Un4seen.Bass.BASSActive.BASS_ACTIVE_PLAYING)
+        {
             Pause();
-        else
+            NeedsPlay = true;
+        }
+        else if(NeedsPlay)
+        {
             Play();
+            NeedsPlay = false;
+        }
     }
 
     void OnApplicationQuit()
