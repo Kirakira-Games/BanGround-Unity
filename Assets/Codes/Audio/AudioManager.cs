@@ -309,7 +309,7 @@ class AudioManager : MonoBehaviour
     {
         BGMStream = StreamSound(audioData, BASSFlag.BASS_STREAM_DECODE);
         loading = true;
-        lastPos = (int)((Time.time + seconds) * 1000);
+        lastPos = LiveSetting.audioOffset - (int)(seconds * 1000);
         yield return new WaitForSeconds(seconds);
         foreach(var mod in LiveSetting.attachedMods)
         {
@@ -329,8 +329,11 @@ class AudioManager : MonoBehaviour
 
     public int GetBGMPlaybackTime()
     {
-        if (loading) 
-            return (int)(Time.time * 1000) - lastPos + LiveSetting.audioOffset;
+        if (loading)
+        {
+            lastPos += Mathf.RoundToInt(Time.deltaTime * 1000);
+            return lastPos;
+        }
 
         var time = BGMStream.Position;
 
