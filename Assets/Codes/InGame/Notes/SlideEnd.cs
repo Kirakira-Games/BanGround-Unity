@@ -6,18 +6,13 @@ public class SlideEnd : SlideNoteBase
 {
     public override void UpdatePosition(int audioTime)
     {
-        int timeSub = time - audioTime;
-
-        Vector3 newPos = _cachedInitPos;
-        float ratio = 1 - (float)timeSub / LiveSetting.NoteScreenTime;
+        base.UpdatePosition(audioTime);
         if (parentSlide.GetTouchId() != -1)
         {
-            ratio = Mathf.Min(1f, ratio);
+            Vector3 position = transform.position;
+            position.z = Mathf.Max(transform.position.z, NoteUtility.NOTE_JUDGE_POS);
+            transform.position = position;
         }
-        if (LiveSetting.bangPerspective)
-            ratio = NoteUtility.GetBangPerspective(ratio);
-        newPos.z = initPos.z - (NoteUtility.NOTE_START_POS - NoteUtility.NOTE_JUDGE_POS) * ratio;
-        transform.position = newPos;
     }
 
     protected override JudgeResult TrySlideJudge(int audioTime, Touch touch)

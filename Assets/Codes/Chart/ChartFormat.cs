@@ -89,6 +89,21 @@ public enum Ranks
     F = 7,
 }
 
+
+[ProtoContract()]
+public partial class NoteAnim : IExtensible
+{
+    private IExtension __pbn__extensionData;
+    IExtension IExtensible.GetExtensionObject(bool createIfMissing)
+        => Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+
+    [ProtoMember(1, IsPacked = true)]
+    public int[] beat { get; set; }
+
+    [ProtoMember(2)]
+    public float speed { get; set; }
+}
+
 [Preserve]
 [Serializable]
 [ProtoContract()]
@@ -113,6 +128,9 @@ public partial class Note : IExtensible
 
     [ProtoMember(5)]
     public float value { get; set; }
+
+    [ProtoMember(6)]
+    public List<NoteAnim> anims { get; } = new List<NoteAnim>();
 
 }
 
@@ -150,8 +168,10 @@ public partial class Chart : IExtensible
     public int offset { get; set; }
 
     [ProtoMember(8)]
-    public System.Collections.Generic.List<Note> notes = new System.Collections.Generic.List<Note>();
+    public List<Note> notes = new List<Note>();
 
+    [ProtoMember(9)]
+    public int version { get; set; }
 }
 
 [Preserve]
@@ -203,7 +223,7 @@ public partial class SongList : IExtensible
     public string GenerateDate { get; set; } = "";
 
     [ProtoMember(2)]
-    public System.Collections.Generic.List<Header> songs = new System.Collections.Generic.List<Header>();
+    public List<Header> songs = new List<Header>();
     
     public SongList() { }
 

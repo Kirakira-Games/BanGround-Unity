@@ -4,19 +4,11 @@ using UnityEngine;
 using Newtonsoft.Json;
 using System.IO;
 
-class NoteComparer : Comparer<Note>
+class GameNoteComparer : Comparer<GameNoteData>
 {
-    public override int Compare(Note a, Note b)
+    public override int Compare(GameNoteData a, GameNoteData b)
     {
-        float t1 = ChartLoader.GetFloatingPointBeat(a.beat);
-        float t2 = ChartLoader.GetFloatingPointBeat(b.beat);
-        if (Mathf.Abs(t1-t2) <= NoteUtility.EPS)
-        {
-            int ta = a.type == NoteType.BPM ? 10 : (int)a.type;
-            int tb = b.type == NoteType.BPM ? 10 : (int)b.type;
-            return tb - ta;
-        }
-        return t1 < t2 ? -1: 1;
+        return a.appearTime - b.appearTime;
     }
 }
 
@@ -98,18 +90,21 @@ public static class ChartLoader
             return null;
         }
         List<GameNoteData> gameNotes = new List<GameNoteData>();
-        //notes.Sort(new NoteComparer());
         var tickStackTable = new Dictionary<int, GameNoteData>();
 
+        // AnalyzeNotes
+        foreach(Note note in notes)
+        {
+            NormalizeBeat(note.beat);
+        }
+        ChartTiming timing = new ChartTiming();
+        timing.AnalyzeNotes(notes, chart.offset);
+
         // Compute actual time of each note
-        float currentBpm = 120;
-        float startDash = 0;
-        float startTime = chart.offset / 1000f;
         float prevBeat = -1e9f;
         // Create game notes
         foreach (Note note in notes)
         {
-            NormalizeBeat(note.beat);
             float beat = GetFloatingPointBeat(note.beat);
             if (prevBeat - beat > NoteUtility.EPS)
             {
@@ -119,22 +114,21 @@ public static class ChartLoader
             if (note.type == NoteType.BPM)
             {
                 // Note is a timing point
-                float beatDuration = 60 / note.value;
-                startTime += (beat - startDash) * 60 / currentBpm;
-                startDash = GetFloatingPointBeat(note.beat);
-                currentBpm = note.value;
                 continue;
             }
             // Create game note
-            float time = startTime + (beat - startDash) * (60 / currentBpm);
+            float time = timing.GetTimeByBeat(beat);
             GameNoteType type = TranslateNoteType(note);
             GameNoteData gameNote = new GameNoteData
             {
-                time = (int)(time * 1000),
+                time = Mathf.RoundToInt(time * 1000),
                 lane = note.lane,
                 type = type,
                 isGray = type == GameNoteType.Single && note.beat[2] > 2
             };
+            timing.AddAnimation(note, gameNote);
+
+            // Check slide
             if (note.tickStack == -1)
             {
                 // Note is a single note or flick
@@ -144,7 +138,6 @@ public static class ChartLoader
             // Note is part of a slide
             if (!tickStackTable.ContainsKey(note.tickStack))
             {
-#if UNITY_EDITOR
                 if (note.type != NoteType.Single)
                 {
                     if (NoteUtility.IsSlideEnd(type))
@@ -156,10 +149,8 @@ public static class ChartLoader
                     }
                     Debug.LogWarning(BeatToString(note.beat) + "Start of a slide must be 'Single' instead of '" + note.type + "'.");
                 }
-#endif
                 GameNoteData tmp = new GameNoteData
                 {
-                    time = (int)(time * 1000),
                     type = GameNoteType.SlideStart,
                     seg = new List<GameNoteData>()
                 };
@@ -172,11 +163,16 @@ public static class ChartLoader
             tickStack.seg.Add(gameNote);
             if (NoteUtility.IsSlideEnd(type))
             {
+                tickStack.ComputeTime();
                 tickStackTable.Remove(note.tickStack);
             }
         }
         if (tickStackTable.Count > 0)
         {
+            foreach (var i in tickStackTable)
+            {
+                i.Value.ComputeTime();
+            }
             Debug.LogError("Some slides do not contain a tail. Ignored.");
         }
         /*
@@ -216,6 +212,9 @@ public static class ChartLoader
             }
         };
         */
+        // Sort notes by animation order
+        gameNotes.Sort(new GameNoteComparer());
+
         return gameNotes;
     }
 }
