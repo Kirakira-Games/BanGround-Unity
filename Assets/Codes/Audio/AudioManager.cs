@@ -311,6 +311,7 @@ class AudioManager : MonoBehaviour
         loading = true;
         lastPos = LiveSetting.audioOffset - (int)(seconds * 1000);
         yield return new WaitForSeconds(seconds);
+        yield return new WaitUntil(() => SceneLoader.Loading == false);
         foreach(var mod in LiveSetting.attachedMods)
         {
             if (mod is AudioMod)
