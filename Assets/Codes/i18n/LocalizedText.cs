@@ -8,13 +8,21 @@ public class LocalizedText : Text
 
     public static void ReloadAll()
     {
-        foreach(var text in localizedTexts)
+        for(int i = localizedTexts.Count - 1; i >= 0; i--)
         {
-            text.Localizify();
+            if(localizedTexts[i] == null)
+            {
+                localizedTexts.RemoveAt(i);
+            }
+            else
+            {
+                localizedTexts[i].Localizify();
+            }
         }
     }
 
     string originalText;
+    string cachedText;
 
     protected override void Start()
     {
@@ -36,6 +44,16 @@ public class LocalizedText : Text
     public void Localizify()
     {
         text = originalText.GetLocalized();
+        cachedText = text;
+    }
+
+    private void Update()
+    {
+        if(text != cachedText)
+        {
+            originalText = text;
+            Localizify();
+        }
     }
 }
 
