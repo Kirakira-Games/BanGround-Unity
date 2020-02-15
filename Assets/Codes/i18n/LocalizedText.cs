@@ -20,7 +20,15 @@ public class LocalizedText : Text
     {
         localizedTexts.Add(this);
         originalText = text;
+
+#if UNITY_EDITOR
+        if (UnityEditor.EditorApplication.isPlaying)
+        {
+            Localizify();
+        }
+#else
         Localizify();
+#endif
 
         base.Start();
     }

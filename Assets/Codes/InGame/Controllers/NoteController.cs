@@ -349,7 +349,7 @@ public class NoteController : MonoBehaviour
     {
         int audioTime = audioMgr.GetBGMPlaybackTime();
 
-        if (audioMgr.GetPauseStatus()) return;
+        if (audioMgr.GetPauseStatus() || !audioMgr.GetPlayStatus()) return;
 
         // Create notes
         UpdateNotes(audioTime);
