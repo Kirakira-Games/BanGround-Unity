@@ -6,7 +6,7 @@ public class NoteSyncLine : MonoBehaviour
 {
     public List<GameObject> syncNotes;
     private LineRenderer lineRenderer;
-    private const float lineWidth = 0.07f;
+    private const float lineWidth = 0.06f;
 
     private void Awake()
     {
