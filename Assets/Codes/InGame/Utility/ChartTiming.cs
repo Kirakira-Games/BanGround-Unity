@@ -60,13 +60,14 @@ public class ChartTiming
         return string.Format("[{0},{1}] {2}->{3}", anim.startT, anim.endT, anim.startZ, anim.endZ);
     }
 
-    public void GenerateAnimation(List<GameNoteAnim> raw, List<GameNoteAnim> output)
+    public void GenerateAnimation(List<GameNoteAnim> raw, List<GameNoteAnim> output, int judgeTime)
     {
         float totDist = 0;
         float curDist = 0;
         foreach (var anim in raw)
         {
             //Debug.Log("Raw anim: " + AnimToString(anim));
+            if (anim.startT - judgeTime >= -1) break;
             totDist += anim.endZ;
         }
         //Debug.Log("Tot dist=" + totDist);
@@ -177,20 +178,29 @@ public class ChartTiming
             beat = new int[]{0, -99, 1},
             speed = 1
         });
+        float beatStart, beatEnd, speed = 1;
         for (int i = 0; i < data.anims.Count; i++)
         {
             var anim = data.anims[i];
-            float beatStart = ChartLoader.GetFloatingPointBeat(anim.beat);
-            float beatEnd = ChartLoader.GetFloatingPointBeat(i == data.anims.Count - 1 ?
+            beatStart = ChartLoader.GetFloatingPointBeat(anim.beat);
+            beatEnd = ChartLoader.GetFloatingPointBeat(i == data.anims.Count - 1 ?
                 data.beat : data.anims[i+1].beat);
+            speed = anim.speed;
             if (beatStart > beatEnd - NoteUtility.EPS)
             {
                 Debug.LogError(ChartLoader.BeatToString(data.beat) + "Cannot add animation after judgeTime of a note.");
                 break;
             }
-            GenerateAnimationRawData(beatStart, beatEnd, anim.speed, tmpList);
+            GenerateAnimationRawData(beatStart, beatEnd, speed, tmpList);
         }
-        GenerateAnimation(tmpList, gameNote.anims);
+        beatStart = ChartLoader.GetFloatingPointBeat(data.beat);
+        beatEnd = beatStart;
+        while (GetTimeByBeat(beatEnd) - GetTimeByBeat(data.beat) <= NoteUtility.SLIDE_TICK_JUDGE_RANGE / 1000f)
+        {
+            beatEnd += 1f;
+        }
+        GenerateAnimationRawData(beatStart, beatEnd, speed, tmpList);
+        GenerateAnimation(tmpList, gameNote.anims, Mathf.RoundToInt(1000 * GetTimeByBeat(beatStart)));
         //Debug.Log("Appear time: " + gameNote.appearTime);
     }
 }
