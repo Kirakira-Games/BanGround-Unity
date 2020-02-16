@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
+
 public abstract class NoteBase : MonoBehaviour
 {
     public int lane;
@@ -6,6 +8,8 @@ public abstract class NoteBase : MonoBehaviour
     public int judgeTime = int.MinValue;
     public int touchId = -1;
     public bool isGray;
+    public GameNoteAnim[] anims;
+    private int animsHead;
 
     public GameNoteType type;
     public JudgeResult judgeResult = JudgeResult.None;
@@ -21,6 +25,7 @@ public abstract class NoteBase : MonoBehaviour
     public virtual void InitNote()
     {
         touchId = -1;
+        animsHead = 0;
         judgeTime = int.MinValue;
         judgeResult = JudgeResult.None;
         transform.position = initPos;
@@ -31,13 +36,17 @@ public abstract class NoteBase : MonoBehaviour
 
     public virtual void UpdatePosition(int audioTime)
     {
-        int timeSub = time - audioTime;
+        while (animsHead < anims.Length - 1 && audioTime > anims[animsHead].endT)
+            animsHead++;
+        var anim = anims[animsHead];
+        int timeSub = audioTime - anim.startT;
+        float ratio = (float)timeSub / (anim.endT - anim.startT);
+        float pos = ratio * (anim.endZ - anim.startZ) + anim.startZ;
 
         Vector3 newPos = _cachedInitPos;
-        float ratio = 1 - (float)timeSub / LiveSetting.NoteScreenTime;
         if (LiveSetting.bangPerspective)
-            ratio = NoteUtility.GetBangPerspective(ratio);
-        newPos.z = initPos.z - (NoteUtility.NOTE_START_POS - NoteUtility.NOTE_JUDGE_POS) * ratio;
+            pos = NoteUtility.GetBangPerspective(pos);
+        newPos.z = initPos.z - (NoteUtility.NOTE_START_POS - NoteUtility.NOTE_JUDGE_POS) * pos;
         transform.position = newPos;
     }
 

@@ -13,6 +13,14 @@ public enum GameNoteType
     SlideEndFlick = 5
 }
 
+public class GameNoteAnim
+{
+    public int startT;
+    public int endT;
+    public float startZ;
+    public float endZ;
+}
+
 public class GameNoteData
 {
     public int time;
@@ -20,6 +28,17 @@ public class GameNoteData
     public GameNoteType type;
     public bool isGray;
     public List<GameNoteData> seg;
+    public List<GameNoteAnim> anims;
+    public int appearTime => seg != null ? time : anims[0].startT;
+
+    public void ComputeTime()
+    {
+        time = seg[0].appearTime; // For slides, time is used as appearTime
+        foreach (var i in seg)
+        {
+            time = Mathf.Min(time, i.appearTime);
+        }
+    }
 }
 
 public enum JudgeResult

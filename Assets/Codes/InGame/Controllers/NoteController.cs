@@ -192,6 +192,7 @@ public class NoteController : MonoBehaviour
         note.lane = LiveSetting.mirrowEnabled ? NoteUtility.LANE_COUNT - gameNote.lane - 1 : gameNote.lane;
         note.type = gameNote.type;
         note.isGray = LiveSetting.grayNoteEnabled ? gameNote.isGray : false;
+        note.anims = gameNote.anims.ToArray();
         note.InitNote();
         laneQueue[note.lane].Push(note.time, note);
         // Add sync line
@@ -279,8 +280,7 @@ public class NoteController : MonoBehaviour
         while (noteHead < notes.Count)
         {
             GameNoteData note = notes[noteHead];
-            int appearTime = note.time - LiveSetting.NoteScreenTime;
-            if (audioTime <= appearTime) break;
+            if (audioTime <= note.appearTime) break;
             if (note.type == GameNoteType.SlideStart)
             {
                 CreateSlide(note.seg);
