@@ -2,16 +2,26 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+class GameObjectXComparer : IComparer<GameObject>
+{
+    public int Compare(GameObject lhs, GameObject rhs)
+    {
+        return (int)Mathf.Sign(lhs.transform.position.x - lhs.transform.position.x);
+    }
+}
+
 public class NoteSyncLine : MonoBehaviour
 {
     public List<GameObject> syncNotes;
-    private LineRenderer lineRenderer;
+    public List<LineRenderer> syncLines;
     private const float lineWidth = 0.07f;
+    private GameObjectXComparer comparer;
 
-    private void Awake()
+    private LineRenderer CreateLine()
     {
-        syncNotes = new List<GameObject>();
-        lineRenderer = gameObject.AddComponent<LineRenderer>();
+        GameObject obj = new GameObject("partialSyncLine");
+        obj.transform.SetParent(transform);
+        LineRenderer lineRenderer = obj.AddComponent<LineRenderer>();
         lineRenderer.useWorldSpace = false;
         lineRenderer.material = Resources.Load<Material>("TestAssets/Materials/sync_line");
         lineRenderer.startWidth = lineWidth * LiveSetting.noteSize;
@@ -19,65 +29,51 @@ public class NoteSyncLine : MonoBehaviour
         lineRenderer.startColor = Color.white;
         lineRenderer.endColor = Color.white;
         lineRenderer.rendererPriority = -1;
-        lineRenderer.enabled = false;
+        return lineRenderer;
+    }
+
+    private void Awake()
+    {
+        comparer = new GameObjectXComparer();
+        syncNotes = new List<GameObject>();
+        syncLines = new List<LineRenderer>();
     }
 
     public void OnSyncLineUpdate()
     {
-        GameObject prevObj = null;
         for (int i = syncNotes.Count - 1; i >= 0; i--)
         {
             GameObject obj = syncNotes[i];
-            if (obj == null || obj.GetComponent<NoteBase>().judgeResult != JudgeResult.None)
+            if (obj == null ||
+                obj.GetComponent<NoteBase>().judgeResult != JudgeResult.None ||
+                obj.GetComponent<SlideEndFlick>()?.IsStickEnd == true)
             {
                 syncNotes.RemoveAt(i);
-            }
-            else if (prevObj == null)
-            {
-                prevObj = obj;
-            }
-            else
-            {
-                float z = prevObj.transform.position.z;
-                if (Mathf.Abs(z - obj.transform.position.z) > NoteUtility.EPS)
-                {
-                    if (z > obj.transform.position.z)
-                    {
-                        syncNotes.Remove(prevObj);
-                        prevObj = obj;
-                    }
-                    else
-                    {
-                        syncNotes.RemoveAt(i);
-                    }
-                }
             }
         }
         if (syncNotes.Count == 0) {
             Destroy(gameObject);
             return;
         }
-        if (syncNotes.Count == 1)
+        while (syncLines.Count >= syncNotes.Count)
         {
-            lineRenderer.enabled = false;
-            return;
+            Destroy(syncLines[syncLines.Count - 1].gameObject);
+            syncLines.RemoveAt(syncLines.Count - 1);
         }
-        lineRenderer.enabled = true;
-        Vector3 start = Vector3.zero;
-        Vector3 end = Vector3.zero;
-        foreach (GameObject obj in syncNotes)
+        while (syncLines.Count < syncNotes.Count - 1)
         {
-            if (start == Vector3.zero || start.x > obj.transform.position.x)
-            {
-                start = obj.transform.position;
-            }
-            if (end == Vector3.zero || end.x < obj.transform.position.x)
-            {
-                end = obj.transform.position;
-            }
+            syncLines.Add(CreateLine());
         }
-        start.z += 0.01f;
-        end.z += 0.01f;
-        lineRenderer.SetPositions(new Vector3[] { start, end });
+        syncNotes.Sort(comparer);
+
+        for (int i = 0; i < syncLines.Count; i++)
+        {
+            var pos = new Vector3[2];
+            pos[0] = syncNotes[i].transform.position;
+            pos[1] = syncNotes[i + 1].transform.position;
+            pos[0].z += 0.01f;
+            pos[1].z += 0.01f;
+            syncLines[i].SetPositions(pos);
+        }
     }
 }

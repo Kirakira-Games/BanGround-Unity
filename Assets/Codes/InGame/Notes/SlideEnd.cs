@@ -7,11 +7,16 @@ public class SlideEnd : SlideNoteBase
     public override void UpdatePosition(int audioTime)
     {
         base.UpdatePosition(audioTime);
-        if (parentSlide.GetTouchId() != -1)
+        IsStickEnd = false;
+        if (parentSlide.GetTouchId() != -1 && audioTime >= time)
         {
-            Vector3 position = transform.position;
-            position.z = Mathf.Max(transform.position.z, NoteUtility.NOTE_JUDGE_POS);
-            transform.position = position;
+            if (transform.position.z < NoteUtility.NOTE_JUDGE_POS)
+            {
+                IsStickEnd = true;
+                Vector3 position = transform.position;
+                position.z = NoteUtility.NOTE_JUDGE_POS;
+                transform.position = position;
+            }
         }
     }
 

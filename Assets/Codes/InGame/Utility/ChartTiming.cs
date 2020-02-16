@@ -60,36 +60,18 @@ public class ChartTiming
         return string.Format("[{0},{1}] {2}->{3}", anim.startT, anim.endT, anim.startZ, anim.endZ);
     }
 
-    public void GenerateAnimationByInterval(float beatStart, float beatEnd, float speed, List<GameNoteAnim> output)
+    public void GenerateAnimation(List<GameNoteAnim> raw, List<GameNoteAnim> output)
     {
         float totDist = 0;
         float curDist = 0;
-        List<GameNoteAnim> tmpOutput = new List<GameNoteAnim>();
-        Debug.Log("Add anim: " + beatStart + " / " + beatEnd);
-
-        for (int i = GetPrevIndex(SpeedInfo, beatStart); i < SpeedInfo.Count; i++)
+        foreach (var anim in raw)
         {
-            var info = SpeedInfo[i];
-            if (info.beat >= beatEnd)
-                break;
-            Debug.Log("Speed: " + info.value + " / " + info.beat);
-            float timeS = beatStart > info.beat ? GetTimeByBeat(beatStart) : info.time;
-            float timeT = (i == SpeedInfo.Count - 1 || beatEnd < SpeedInfo[i + 1].beat) ?
-                GetTimeByBeat(beatEnd) : SpeedInfo[i + 1].time;
-            tmpOutput.Add(new GameNoteAnim {
-                startT = Mathf.RoundToInt(timeS * 1000),
-                endT = Mathf.RoundToInt(timeT * 1000),
-                endZ = (timeT - timeS) / totTime * info.value * speed
-            }); // endZ temporarily stores the distance traveled
-        }
-        foreach (var anim in tmpOutput)
-        {
-            Debug.Log("Raw anim: " + AnimToString(anim));
+            //Debug.Log("Raw anim: " + AnimToString(anim));
             totDist += anim.endZ;
         }
-        Debug.Log("Tot dist=" + totDist);
+        //Debug.Log("Tot dist=" + totDist);
         bool isStart = true;
-        foreach (var anim in tmpOutput)
+        foreach (var anim in raw)
         {
             anim.startZ = 1 - totDist + curDist;
             curDist += anim.endZ;
@@ -111,8 +93,29 @@ public class ChartTiming
                     }
                 }
             }
-            Debug.Log("Add anim: " + AnimToString(anim));
+            //Debug.Log("Add anim: " + AnimToString(anim));
             output.Add(anim);
+        }
+    }
+
+    public void GenerateAnimationRawData(float beatStart, float beatEnd, float speed, List<GameNoteAnim> output)
+    {
+        //Debug.Log("Anim: " + beatStart + " / " + beatEnd);
+
+        for (int i = GetPrevIndex(SpeedInfo, beatStart); i < SpeedInfo.Count; i++)
+        {
+            var info = SpeedInfo[i];
+            if (info.beat >= beatEnd)
+                break;
+            //Debug.Log("Speed: " + info.value + " / " + info.beat + " / " + speed);
+            float timeS = beatStart > info.beat ? GetTimeByBeat(beatStart) : info.time;
+            float timeT = (i == SpeedInfo.Count - 1 || beatEnd < SpeedInfo[i + 1].beat) ?
+                GetTimeByBeat(beatEnd) : SpeedInfo[i + 1].time;
+            output.Add(new GameNoteAnim {
+                startT = Mathf.RoundToInt(timeS * 1000),
+                endT = Mathf.RoundToInt(timeT * 1000),
+                endZ = (timeT - timeS) / totTime * info.value * speed
+            }); // endZ temporarily stores the distance traveled
         }
     }
 
@@ -167,6 +170,7 @@ public class ChartTiming
     public void AddAnimation(Note data, GameNoteData gameNote)
     {
         gameNote.anims = new List<GameNoteAnim>();
+        List<GameNoteAnim> tmpList = new List<GameNoteAnim>();
         // Generate default animation
         data.anims.Insert(0, new NoteAnim
         {
@@ -184,7 +188,9 @@ public class ChartTiming
                 Debug.LogError(ChartLoader.BeatToString(data.beat) + "Cannot add animation after judgeTime of a note.");
                 break;
             }
-            GenerateAnimationByInterval(beatStart, beatEnd, anim.speed, gameNote.anims);
+            GenerateAnimationRawData(beatStart, beatEnd, anim.speed, tmpList);
         }
+        GenerateAnimation(tmpList, gameNote.anims);
+        //Debug.Log("Appear time: " + gameNote.appearTime);
     }
 }

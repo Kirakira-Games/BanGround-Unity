@@ -5,6 +5,7 @@ using UnityEngine;
 public abstract class SlideNoteBase : NoteBase
 {
     public bool IsTilt;
+    public bool IsStickEnd;
     protected Slide parentSlide;
 
     protected abstract JudgeResult TrySlideJudge(int audioTime, Touch touch);
