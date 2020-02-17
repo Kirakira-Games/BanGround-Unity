@@ -21,7 +21,12 @@ public class ResultManager : MonoBehaviour
     private Text bad_Text;
     private Text miss_Text;
     private Text maxCombo_Text;
-    private Text offset_Text;
+
+    private GameObject offset_Obj;
+    private Text earlyCount_Text;
+    private Text earlyAvg_Text;
+    private Text lateCount_Text;
+    private Text lateAvg_Text;
 
     private Text level_Text;
     private Text songName_Text;
@@ -69,7 +74,11 @@ public class ResultManager : MonoBehaviour
         //var normal = ComboManager.JudgeOffsetResult.Count - miss - slide;
 
         Debug.Log($"total = {ComboManager.JudgeOffsetResult.Count}, early = {earlyCount}, late = {lateCount}");
-        offset_Text.text = $"E:{earlyCount}(avg:{earlyAverage})\nL:{lateCount}(avg:{lateAverage})";
+        //offset_Obj.text = $"E:{earlyCount}(avg:{earlyAverage})\nL:{lateCount}(avg:{lateAverage})";
+        earlyCount_Text.text = earlyCount.ToString();
+        earlyAvg_Text.text = earlyAverage.ToString() + "ms";
+        lateCount_Text.text = lateCount.ToString();
+        lateAvg_Text.text = Mathf.Abs(lateAverage).ToString() + "ms";
     }
 
     private void ShowBackground()
@@ -150,7 +159,7 @@ public class ResultManager : MonoBehaviour
 
         button_cycleFrame.onClick.AddListener(() =>
         {
-            offset_Text.gameObject.SetActive(!offset_Text.gameObject.activeSelf);
+            offset_Obj.gameObject.SetActive(!offset_Obj.gameObject.activeSelf);
         });
     }
 
@@ -170,7 +179,12 @@ public class ResultManager : MonoBehaviour
         bad_Text = GameObject.Find("Bad_count").GetComponent<Text>();
         miss_Text = GameObject.Find("Mis_count").GetComponent<Text>();
         maxCombo_Text = GameObject.Find("Mxm_Comb_count").GetComponent<Text>();
-        offset_Text = GameObject.Find("Offset").GetComponent<Text>();
+
+        offset_Obj = GameObject.Find("Offset");
+        earlyCount_Text = GameObject.Find("EarlyCount").GetComponent<Text>();
+        earlyAvg_Text = GameObject.Find("EarlyAvg").GetComponent<Text>();
+        lateCount_Text = GameObject.Find("LateCount").GetComponent<Text>();
+        lateAvg_Text = GameObject.Find("LateAvg").GetComponent<Text>();
 
         level_Text = GameObject.Find("Level").GetComponent<Text>();
         songName_Text = GameObject.Find("SongName").GetComponent<Text>();
@@ -180,7 +194,7 @@ public class ResultManager : MonoBehaviour
         markIcon = GameObject.Find("MarkIcon").GetComponent<RawImage>();
         difficultCard = GameObject.Find("LevelBG").GetComponent<Image>();
 
-        offset_Text.gameObject.SetActive(false);
+        offset_Obj.gameObject.SetActive(false);
     }
 
     public void ShowScore()
