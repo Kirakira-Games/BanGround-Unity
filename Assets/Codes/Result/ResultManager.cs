@@ -27,8 +27,8 @@ public class ResultManager : MonoBehaviour
     private Text songName_Text;
     private Text acc_Text;
 
-    private Chart chart;
-    private Header header;
+    private KiraPackOld.Chart chart;
+    private KiraPackOld.Header header;
 
     private RawImage rankIcon;
     private RawImage markIcon;

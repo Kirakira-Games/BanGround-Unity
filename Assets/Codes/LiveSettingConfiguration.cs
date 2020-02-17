@@ -60,24 +60,18 @@ public static class LiveSetting
 
     public static Language language = Language.SimplifiedChinese;
 
-#if UNITY_ANDROID && !UNITY_EDITOR
-    public static readonly string ChartDir = Application.persistentDataPath + "/TestCharts/";
-#else 
-    public static readonly string ChartDir = Application.streamingAssetsPath + "/TestCharts/";
-#endif
-
     public static string selectedChart = "0";//file name
     public static string selectedFolder = "";
     public static int selectedIndex = 0;
     public static int selectedDifficulty = (int)Difficulty.Easy;
 
-    public static SongList songList;
+    public static KiraPackOld.SongList songList;
 
-    public static string GetChartPath => ChartDir + selectedFolder + "/" + selectedChart + ".bin";
-    public static string GetBGMPath => ChartDir + selectedFolder + "/" + "bgm.ogg";
-    public static string GetHeaderPath => ChartDir + selectedFolder + "/" + "header.bin";
-    public static string GetBackgroundPath => ChartDir + selectedFolder + "/" + selectedChart + ".jpg";
-    public static Header CurrentHeader;
+    public static string GetChartPath => selectedFolder + "/" + selectedChart + ".bin";
+    public static string GetBGMPath => selectedFolder + "/" + "bgm.ogg";
+    public static string GetHeaderPath => selectedFolder + "/" + "header.bin";
+    public static string GetBackgroundPath => selectedFolder + "/" + selectedChart + ".jpg";
+    public static KiraPackOld.Header CurrentHeader;
 
     public static readonly string settingsPath = Application.persistentDataPath + "/LiveSettings.json";
     public static readonly string scoresPath = Application.persistentDataPath + "/Scores.bin";

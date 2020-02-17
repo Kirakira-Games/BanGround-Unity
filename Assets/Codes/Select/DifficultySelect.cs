@@ -64,7 +64,7 @@ public class DifficultySelect : MonoBehaviour
         difficultyText.text = Enum.GetName(typeof(Difficulty), selected).ToUpper();
         levelText.text = levels[selected].ToString();
 
-        foreach (Chart a in selectManager.songList[LiveSetting.selectedIndex].charts) {
+        foreach (KiraPackOld.Chart a in selectManager.songList[LiveSetting.selectedIndex].charts) {
             if ((int)a.difficulty == selected)
                 LiveSetting.selectedChart = a.fileName; //更新选择的难度的文件名
         }

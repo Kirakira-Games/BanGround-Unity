@@ -64,15 +64,15 @@ public static class ChartLoader
         Debug.LogError(BeatToString(note.beat) + "Cannot recognize NoteType " + note.type + " on slide notes.");
         return GameNoteType.None;
     }
-    public static Header LoadHeaderFromFile(string path)
+    public static KiraPackOld.Header LoadHeaderFromFile(string path)
     {
         if (!File.Exists(path)) return null;
-        return ProtobufHelper.Load<Header>(path);
+        return ProtobufHelper.Load<KiraPackOld.Header>(path);
     }
 
-    public static Chart LoadChartFromFile(string path)
+    public static KiraPackOld.Chart LoadChartFromFile(string path)
     {
-        return ProtobufHelper.Load<Chart>(path);
+        return ProtobufHelper.Load<KiraPackOld.Chart>(path);
     }
 
     public static float GetFloatingPointBeat(int[] beat)
@@ -82,7 +82,7 @@ public static class ChartLoader
 
     public static List<GameNoteData> LoadNotesFromFile(string path)
     {
-        Chart chart = LoadChartFromFile(path);
+        KiraPackOld.Chart chart = LoadChartFromFile(path);
         List<Note> notes = chart.notes;
         if (notes == null)
         {

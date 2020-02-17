@@ -89,7 +89,7 @@ public enum Ranks
     F = 7,
 }
 
-
+[Preserve]
 [ProtoContract()]
 public partial class NoteAnim : IExtensible
 {
@@ -136,6 +136,24 @@ public partial class Note : IExtensible
 
 [Preserve]
 [ProtoContract()]
+public partial class BackgroundFile : IExtensible
+{
+    private IExtension __pbn__extensionData;
+    IExtension IExtensible.GetExtensionObject(bool createIfMissing)
+        => Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+
+    [ProtoMember(1)]
+    [global::System.ComponentModel.DefaultValue("")]
+    public string pic { get; set; } = "";
+
+    [ProtoMember(2)]
+    [global::System.ComponentModel.DefaultValue("")]
+    public string vid { get; set; } = "";
+
+}
+
+[Preserve]
+[ProtoContract()]
 public partial class Chart : IExtensible
 {
     private IExtension __pbn__extensionData;
@@ -143,72 +161,86 @@ public partial class Chart : IExtensible
         => Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
     [ProtoMember(1)]
-    [System.ComponentModel.DefaultValue("")]
-    public string author { get; set; } = "";
+    public Difficulty Difficulty { get; set; }
 
     [ProtoMember(2)]
-    [System.ComponentModel.DefaultValue("")]
-    public string authorUnicode { get; set; } = "";
+    public int level { get; set; }
 
     [ProtoMember(3)]
-    [System.ComponentModel.DefaultValue("")]
-    public string backgroundFile { get; set; } = "";
-
-    [ProtoMember(4)]
-    public Difficulty difficulty { get; set; }
-
-    [ProtoMember(5)]
-    [System.ComponentModel.DefaultValue("")]
-    public string fileName { get; set; } = "";
-
-    [ProtoMember(6)]
-    public byte level { get; set; }
-
-    [ProtoMember(7)]
     public int offset { get; set; }
 
-    [ProtoMember(8)]
-    public List<Note> notes = new List<Note>();
 
-    [ProtoMember(9)]
-    public int version { get; set; }
+    [ProtoMember(4)]
+    public List<Note> notes { get; set; } = new List<Note>();
+
 }
 
 [Preserve]
 [ProtoContract()]
-public partial class Header : IExtensible
+public partial class cHeader : IExtensible
 {
     private IExtension __pbn__extensionData;
     IExtension IExtensible.GetExtensionObject(bool createIfMissing)
         => Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
     [ProtoMember(1)]
-    [System.ComponentModel.DefaultValue("")]
-    public string Title { get; set; } = "";
+    public int version { get; set; }
 
     [ProtoMember(2)]
-    [System.ComponentModel.DefaultValue("")]
-    public string Artist { get; set; } = "";
+    public int sid { get; set; }
 
     [ProtoMember(3)]
-    [System.ComponentModel.DefaultValue("")]
-    public string TitleUnicode { get; set; } = "";
+    public int mid { get; set; }
 
     [ProtoMember(4)]
-    [System.ComponentModel.DefaultValue("")]
-    public string ArtistUnicode { get; set; } = "";
+    [global::System.ComponentModel.DefaultValue("")]
+    public string author { get; set; } = "";
 
-    [ProtoMember(5, IsPacked = true)]
-    public float[] Preview { get; set; }
+    [ProtoMember(5)]
+    [global::System.ComponentModel.DefaultValue("")]
+    public string authorNick { get; set; } = "";
 
     [ProtoMember(6)]
-    [System.ComponentModel.DefaultValue("")]
-    public string DirName { get; set; } = "";
+    public BackgroundFile backgroundFile { get; set; }
 
-    [ProtoMember(7)]
-    public System.Collections.Generic.List<Chart> charts = new System.Collections.Generic.List<Chart>();
+    [ProtoMember(7, IsPacked = true)]
+    public float[] preview { get; set; }
+
+    [ProtoMember(8)]
+    public List<string> tag { get; set; } = new List<string>();
 
 }
+
+[Preserve]
+[ProtoContract()]
+public partial class mHeader : IExtensible
+{
+    private IExtension __pbn__extensionData;
+    IExtension IExtensible.GetExtensionObject(bool createIfMissing)
+        => Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
+
+    [ProtoMember(1)]
+    public int mid { get; set; }
+
+    [ProtoMember(2)]
+    [global::System.ComponentModel.DefaultValue("")]
+    public string title { get; set; } = "";
+
+    [ProtoMember(3)]
+    [global::System.ComponentModel.DefaultValue("")]
+    public string artist { get; set; } = "";
+
+    [ProtoMember(4, IsPacked = true)]
+    public float[] preview { get; set; }
+
+    [ProtoMember(5, IsPacked = true)]
+    public float[] BPM { get; set; }
+
+    [ProtoMember(6)]
+    public float length { get; set; }
+
+}
+
 
 [Preserve]
 [ProtoContract()]
@@ -219,19 +251,11 @@ public partial class SongList : IExtensible
         => Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
     [ProtoMember(1)]
-    [System.ComponentModel.DefaultValue("")]
+    [global::System.ComponentModel.DefaultValue("")]
     public string GenerateDate { get; set; } = "";
 
     [ProtoMember(2)]
-    public List<Header> songs = new List<Header>();
-    
-    public SongList() { }
-
-    public SongList(string date, List<Header> list)
-    {
-        songs = list;
-        GenerateDate = date;
-    }
+    public List<mHeader> mHeaders { get; set; } = new List<mHeader>();
 
 }
 
@@ -291,6 +315,7 @@ public partial class PlayRecords : IExtensible
         {
             return new PlayRecords();
         }
+        
     }
 
     public static string SaveRecord(PlayRecords a)

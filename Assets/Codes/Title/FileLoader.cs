@@ -51,7 +51,7 @@ public class FileLoader : MonoBehaviour
         {
             //songListJson = File.ReadAllText(path);
             //LiveSetting.songList = JsonConvert.DeserializeObject<SongList>(songListJson);
-            LiveSetting.songList = ProtobufHelper.Load<SongList>(path);
+            LiveSetting.songList = ProtobufHelper.Load<KiraPackOld.SongList>(path);
             print("SongList Loaded");
         }
         else
@@ -70,10 +70,10 @@ public class FileLoader : MonoBehaviour
         File.WriteAllBytes(Application.persistentDataPath + "/SongList.bin.tmp", songData);
 
         //Load List
-        SongList newList = ProtobufHelper.Load<SongList>(Application.persistentDataPath + "/SongList.bin.tmp");
-        SongList oldList;
+        KiraPackOld.SongList newList = ProtobufHelper.Load<KiraPackOld.SongList>(Application.persistentDataPath + "/SongList.bin.tmp");
+        KiraPackOld.SongList oldList;
         if (File.Exists(Application.persistentDataPath + "/SongList.bin"))
-            oldList = ProtobufHelper.Load<SongList>(Application.persistentDataPath + "/SongList.bin");
+            oldList = ProtobufHelper.Load<KiraPackOld.SongList>(Application.persistentDataPath + "/SongList.bin");
         else oldList = null;
         LiveSetting.songList = oldList;
 
@@ -87,11 +87,11 @@ public class FileLoader : MonoBehaviour
 
             //Prepare FileList
             List<string> files = new List<string>();
-            foreach (Header h in LiveSetting.songList.songs)
+            foreach (KiraPackOld.Header h in LiveSetting.songList.songs)
             {
                 files.Add("/TestCharts/" + h.DirName + "/header.bin");
                 files.Add("/TestCharts/" + h.DirName + "/bgm.ogg");
-                foreach (Chart c in h.charts)
+                foreach (KiraPackOld.Chart c in h.charts)
                 {
                     files.Add("/TestCharts/" + h.DirName + "/" + c.fileName + ".bin");
                     if (!string.IsNullOrWhiteSpace(c.backgroundFile)) files.Add("/TestCharts/" + h.DirName + "/" + c.fileName + ".jpg");

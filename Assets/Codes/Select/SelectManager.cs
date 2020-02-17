@@ -63,7 +63,7 @@ public class SelectManager : MonoBehaviour
 
     public GameObject songItemPrefab;
 
-    public List<Header> songList = new List<Header>();
+    public List<KiraPackOld.Header> songList = new List<KiraPackOld.Header>();
     List<GameObject> SelectButtons = new List<GameObject>();
 
     DifficultySelect difficultySelect;
@@ -261,7 +261,7 @@ public class SelectManager : MonoBehaviour
         LiveSetting.CurrentHeader = songList[LiveSetting.selectedIndex];
 
         int[] diffs = new int[5] { -1,-1,-1,-1,-114};
-        foreach(Chart a in songList[LiveSetting.selectedIndex].charts)
+        foreach(KiraPackOld.Chart a in songList[LiveSetting.selectedIndex].charts)
         {
             diffs[(int)a.difficulty] = a.level;
         }
