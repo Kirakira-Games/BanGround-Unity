@@ -536,9 +536,9 @@ public class SelectManager : MonoBehaviour
     private void OnApplicationPause(bool pause)
     {
         if (pause)
-            lastPreviewStream.Pause();
+            lastPreviewStream?.Pause();
         else
-            lastPreviewStream.Play();
+            lastPreviewStream?.Play();
     }
 }
 

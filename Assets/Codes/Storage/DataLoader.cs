@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using Newtonsoft.Json;
 
 public class DataLoader
@@ -23,15 +24,17 @@ public class DataLoader
     private static Dictionary<int, cHeader> chartDic;
     private static Dictionary<int, mHeader> musicDic;
 
+    private static readonly string TempDir = Application.persistentDataPath + "/temp/";
+    private static readonly string InboxDir = Application.persistentDataPath + "/Inbox/";
+
     public static void Init()
     {
-        RefreshSongList();
-        ReloadSongList();
+        LoadAllKiraPackFromInbox();
     }
 
     public static string GetMusicPath(int mid)
     {
-        return MusicDir + mid + "/bgm.ogg";
+        return MusicDir + mid + "/" + mid + ".ogg";
     }
 
     public static string GetChartPath(int sid, Difficulty difficulty)
@@ -155,5 +158,102 @@ public class DataLoader
         Debug.Log(JsonConvert.SerializeObject(newSongList));
         Debug.Log(Application.persistentDataPath);
         ProtobufHelper.Save(newSongList, SongListPath);
+    }
+
+    public static void ConvertJsonToBin(DirectoryInfo dir)
+    {
+        FileInfo[] files = dir.GetFiles();
+        foreach (FileInfo file in files)
+        {
+            if (file.Extension == ".json")
+            {
+                string json = File.ReadAllText(file.FullName);
+
+                if (file.Name == "cheader.json")
+                {
+                    cHeader header = JsonConvert.DeserializeObject<cHeader>(json);
+                    string des = file.FullName.Substring(0, file.FullName.Length - 5);
+                    ProtobufHelper.Save(header, des + ".bin");
+                }
+                else if (file.Name == "mheader.json")
+                {
+                    mHeader header = JsonConvert.DeserializeObject<mHeader>(json);
+                    string des = file.FullName.Substring(0, file.FullName.Length - 5);
+                    ProtobufHelper.Save(header, des + ".bin");
+                }
+                else
+                {
+                    Chart chart = JsonConvert.DeserializeObject<Chart>(json);
+                    string des = file.FullName.Substring(0, file.FullName.Length - 5);
+                    ProtobufHelper.Save(chart, des + ".bin");
+                }
+                File.Delete(file.FullName);
+            }
+        }
+    }
+
+    private static void ConvertBinAndCopy(string path, string dest)
+    {
+        if (!Directory.Exists(path)) return;
+        DirectoryInfo dir = new DirectoryInfo(path);
+        DirectoryInfo[] subdirs = dir.GetDirectories();
+        foreach (var cdir in subdirs)
+        {
+            ConvertJsonToBin(cdir);
+        }
+        foreach (var cdir in subdirs)
+        {
+            FileInfo[] files = cdir.GetFiles();
+            string id = cdir.Name;
+            if (!Directory.Exists(dest + id))
+            {
+                Directory.CreateDirectory(dest + id);
+            }
+            foreach (var file in files)
+            {
+                File.Copy(file.FullName, dest + id + "/" + file.Name, true);
+            }
+        }
+    }
+
+    public static void LoadKiraPack(string path)
+    {
+        if (!File.Exists(path)) return;
+        Debug.Log("Load kirapack: " + path);
+        using (ZipArchive zip = ZipFile.OpenRead(path))
+        {
+            if (Directory.Exists(TempDir))
+            {
+                Directory.Delete(TempDir, true);
+            }
+            zip.ExtractToDirectory(TempDir);
+        }
+
+        // Load charts
+        ConvertBinAndCopy(TempDir + "chart/", ChartDir);
+        // Load music
+        ConvertBinAndCopy(TempDir + "music/", MusicDir);
+        Directory.Delete(TempDir, true);
+    }
+
+    public static void LoadAllKiraPackFromInbox()
+    {
+        if (!Directory.Exists(InboxDir))
+        {
+            Debug.LogWarning("Inbox directory does not exist.");
+            return;
+        }
+        DirectoryInfo packDir = new DirectoryInfo(InboxDir);
+        FileInfo[] files = packDir.GetFiles();
+        foreach (var file in files)
+        {
+            if (file.Extension == ".kirapack")
+            {
+                LoadKiraPack(file.FullName);
+                File.Delete(file.FullName);
+            }
+        }
+        RefreshSongList();
+        ReloadSongList();
     }
 }

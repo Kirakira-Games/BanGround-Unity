@@ -3,17 +3,15 @@ using System.Collections.Generic;
 using System.Threading;
 using System.IO;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEditor;
+using Newtonsoft.Json;
+using Un4seen.Bass;
 
 #pragma warning disable CS0618 // Type or member is obsolete: KiraPackOld
 
 using Header = KiraPackOld.Header;
 using OldChart = KiraPackOld.Chart;
-using Un4seen.Bass;
 using System.Runtime.InteropServices;
-using Newtonsoft.Json;
-
 
 public class ScanChartsToJson : MonoBehaviour
 {
@@ -89,7 +87,7 @@ public class ScanChartsToJson : MonoBehaviour
                         File.Copy(b.FullName, DataLoader.ChartDir + musicHeader.mid + "/" + b.Name, true);
                     }
                 }
-                File.Copy(a.FullName + "/bgm.ogg", DataLoader.MusicDir + musicHeader.mid + "/bgm.ogg", true);
+                File.Copy(a.FullName + "/bgm.ogg", DataLoader.MusicDir + musicHeader.mid + "/" + musicHeader.mid + ".ogg", true);
                 ProtobufHelper.Save(chartHeader, DataLoader.ChartDir + chartHeader.sid + "/cheader.bin");
                 ProtobufHelper.Save(musicHeader, DataLoader.MusicDir + musicHeader.mid + "/mheader.bin");
             }
@@ -101,6 +99,7 @@ public class ScanChartsToJson : MonoBehaviour
         Bass.BASS_Free();
         Debug.LogWarning("Connverrt Success");
     }
+
     /*
     [MenuItem("BanGround/扫描谱面并写入SongList")]
     public static void ScanAndSave()
@@ -149,41 +148,6 @@ public class ScanChartsToJson : MonoBehaviour
         //File.WriteAllText(Application.streamingAssetsPath + "/SongList.json", listJson);
     }*/
 
-    private static void ConvertJsonHelper(DirectoryInfo dir)
-    {
-        FileInfo[] files = dir.GetFiles();
-        foreach (FileInfo file in files)
-        {
-            if (file.Extension == ".json")
-            {
-                string json = File.ReadAllText(file.FullName);
-
-                if (file.Name == "cheader.json")
-                {
-                    cHeader header = JsonConvert.DeserializeObject<cHeader>(json);
-                    string des = file.FullName.Substring(0, file.FullName.Length - 5);
-                    ProtobufHelper.Save(header, des + ".bin");
-                    Debug.Log(des + ".bin");
-                }
-                else if (file.Name == "mheader.json")
-                {
-                    mHeader header = JsonConvert.DeserializeObject<mHeader>(json);
-                    string des = file.FullName.Substring(0, file.FullName.Length - 5);
-                    ProtobufHelper.Save(header, des + ".bin");
-                    Debug.Log(des + ".bin");
-                }
-                else
-                {
-                    Chart chart = JsonConvert.DeserializeObject<Chart>(json);
-                    string des = file.FullName.Substring(0, file.FullName.Length - 5);
-                    ProtobufHelper.Save(chart, des + ".bin");
-                    Debug.Log(des + ".bin");
-                }
-                File.Delete(file.FullName);
-            }
-        }
-    }
-
     [MenuItem("BanGround/扫描json谱面并转为bin")]
     public static void ConvertJson2Bin()
     {
@@ -191,14 +155,14 @@ public class ScanChartsToJson : MonoBehaviour
         DirectoryInfo[] charts = ChartDir.GetDirectories();
         foreach (DirectoryInfo chart in charts)
         {
-            ConvertJsonHelper(chart);
+            DataLoader.ConvertJsonToBin(chart);
         }
 
         DirectoryInfo MusicDir = new DirectoryInfo(DataLoader.MusicDir);
         DirectoryInfo[] songs = MusicDir.GetDirectories();
         foreach (DirectoryInfo song in songs)
         {
-            ConvertJsonHelper(song);
+            DataLoader.ConvertJsonToBin(song);
         }
     }
 }
