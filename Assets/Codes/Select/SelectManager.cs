@@ -215,7 +215,7 @@ public class SelectManager : MonoBehaviour
         {
             yield return 0;
         }
-        print("select near");
+        //print("select near");
         rt_s.StopMovement();
         var destPos = 0 - rt.anchoredPosition.y - lg.padding.top - 100;
         float nearestDistance = 9999f;
