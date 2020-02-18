@@ -63,7 +63,7 @@ public class SelectManager : MonoBehaviour
 
     public GameObject songItemPrefab;
 
-    public List<Header> songList = new List<Header>();
+    public List<cHeader> chartList => DataLoader.chartList;
     List<GameObject> SelectButtons = new List<GameObject>();
 
     DifficultySelect difficultySelect;
@@ -164,38 +164,37 @@ public class SelectManager : MonoBehaviour
     //--------------------------------------------
     private void InitSongList()
     {
-        songList = LiveSetting.songList.songs;
-
-        for (int i = 0; i < songList.Count; i++)
+        for (int i = 0; i < chartList.Count; i++)
         {
             GameObject go = Instantiate(songItemPrefab, GameObject.Find("SongContent").transform);
             go.name = i.ToString();
             Text[] txt = go.GetComponentsInChildren<Text>();
-            string author = string.IsNullOrEmpty(songList[i].charts[0].authorUnicode) ? songList[i].charts[0].author : songList[i].charts[0].authorUnicode;
-            txt[0].text = songList[i].TitleUnicode;
-            txt[1].text = songList[i].ArtistUnicode +" / "+ author;
+
+            cHeader chart = chartList[i];
+            mHeader song = DataLoader.GetMusicHeader(chart.mid);
+            string author = chart.author;
+            txt[0].text = song.title;
+            txt[1].text = song.artist + " / " + author;
             go.GetComponent<RectControl>().index = i;
             SelectButtons.Add(go);
         }
 
         lg.padding = new RectOffset(0, 0, (int)((rt_v.sizeDelta.y / 2) - 100),0);
 
-        rt.sizeDelta = new Vector2(rt.sizeDelta.x, lg.padding.top * 2 + songList.Count * (116) + (songList.Count - 1) * lg.spacing + (200 - 116));
+        rt.sizeDelta = new Vector2(rt.sizeDelta.x, lg.padding.top * 2 + chartList.Count * (116) + (chartList.Count - 1) * lg.spacing + (200 - 116));
         StartCoroutine(SelectDefault());
     }
 
     IEnumerator SelectDefault()
     {
         var background = GameObject.Find("KirakiraBackground").GetComponent<FixBackground>();
-        if (File.Exists(LiveSetting.GetBackgroundPath))
-            background.UpdateBackground(LiveSetting.GetBackgroundPath);
-        else
-            background.UpdateBackground(null);
+        var path = DataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid);
+        background.UpdateBackground(path);
 
         yield return new WaitForEndOfFrame();
         try
         {
-            SelectSong(LiveSetting.selectedIndex);
+            SelectSong(LiveSetting.currentChart);
         }catch
         {
 
@@ -216,7 +215,7 @@ public class SelectManager : MonoBehaviour
         {
             yield return 0;
         }
-        print("select near");
+        //print("select near");
         rt_s.StopMovement();
         var destPos = 0 - rt.anchoredPosition.y - lg.padding.top - 100;
         float nearestDistance = 9999f;
@@ -253,19 +252,11 @@ public class SelectManager : MonoBehaviour
                 rc.OnSelect();
         }
 
-        LiveSetting.selectedIndex = index;
-        if (lastIndex == LiveSetting.selectedIndex) return;
-        else lastIndex = LiveSetting.selectedIndex;
+        LiveSetting.currentChart = index;
+        if (lastIndex == LiveSetting.currentChart) return;
+        else lastIndex = LiveSetting.currentChart;
 
-        LiveSetting.selectedFolder = songList[LiveSetting.selectedIndex].DirName;
-        LiveSetting.CurrentHeader = songList[LiveSetting.selectedIndex];
-
-        int[] diffs = new int[5] { -1,-1,-1,-1,-114};
-        foreach(Chart a in songList[LiveSetting.selectedIndex].charts)
-        {
-            diffs[(int)a.difficulty] = a.level;
-        }
-        difficultySelect.levels = diffs;
+        difficultySelect.levels = LiveSetting.CurrentHeader.difficultyLevel.ToArray();
         difficultySelect.OnSongChange();
         //DisplayRecord();
         PlayPreview();
@@ -273,19 +264,20 @@ public class SelectManager : MonoBehaviour
 
     public void UnselectSong()
     {
-        if (LiveSetting.selectedIndex >= 0)
+        if (LiveSetting.currentChart >= 0)
         {
-            SelectButtons[LiveSetting.selectedIndex].GetComponent<RectControl>().UnSelect();
+            SelectButtons[LiveSetting.currentChart].GetComponent<RectControl>().UnSelect();
         }
     }
 
     public void DisplayRecord()
     {
         int count = 0;
-        PlayResult a= new PlayResult();
+        PlayResult a = new PlayResult();
         for (int i = 0; i < playRecords.resultsList.Count; i++)
         {
-            if (playRecords.resultsList[i].FolderName == LiveSetting.selectedFolder && playRecords.resultsList[i].ChartName == LiveSetting.selectedChart)
+            if (playRecords.resultsList[i].ChartId == LiveSetting.CurrentHeader.sid &&
+                playRecords.resultsList[i].Difficulty == (Difficulty)LiveSetting.actualDifficulty)
             {
                 count++;
                 a = playRecords.resultsList[i];
@@ -372,8 +364,12 @@ public class SelectManager : MonoBehaviour
         //else lastIndex = LiveSetting.selectedIndex;
 
         LoopingBassMemStream.DisposeAll();
+        mHeader mheader = DataLoader.GetMusicHeader(LiveSetting.CurrentHeader.mid);
 
-        lastPreviewStream = audioManager.StreamLoopSound(File.ReadAllBytes(LiveSetting.GetBGMPath), LiveSetting.CurrentHeader.Preview[0], LiveSetting.CurrentHeader.Preview[1]);
+        lastPreviewStream = audioManager.StreamLoopSound(File.ReadAllBytes(
+            DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)),
+            mheader.preview[0],
+            mheader.preview[1]);
 
         lastPreviewStream.Play();
     }
@@ -540,9 +536,9 @@ public class SelectManager : MonoBehaviour
     private void OnApplicationPause(bool pause)
     {
         if (pause)
-            lastPreviewStream.Pause();
+            lastPreviewStream?.Pause();
         else
-            lastPreviewStream.Play();
+            lastPreviewStream?.Play();
     }
 }
 

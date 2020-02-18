@@ -94,6 +94,17 @@ public class BassMemStream : IDisposable
             Bass.BASS_ChannelSetAttribute(ID, BASSAttribute.BASS_ATTRIB_VOL, value);
         }
     }
+    
+    public double Length
+    {
+    	get
+        {
+        	var bytes = Bass.BASS_ChannelGetLength(ID);
+            var time = Bass.BASS_ChannelBytes2Seconds(ID, bytes);
+
+            return time;
+        }
+    }
 
     public int Position
     {

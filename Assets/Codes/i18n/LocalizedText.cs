@@ -30,7 +30,7 @@ public class LocalizedText : Text
         originalText = text;
 
 #if UNITY_EDITOR
-        Debug.LogWarning("Fuck Editor Start");
+        //Debug.LogWarning("Fuck Editor Start");
         if (UnityEditor.EditorApplication.isPlaying)
         {
             Localizify();
@@ -51,7 +51,7 @@ public class LocalizedText : Text
     private void Update()
     {
 #if UNITY_EDITOR
-        Debug.LogWarning("Fuck Editor Update");
+        //Debug.LogWarning("Fuck Editor Update");
         if (UnityEditor.EditorApplication.isPlaying)
         {
             if (text != cachedText)

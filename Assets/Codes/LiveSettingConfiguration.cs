@@ -60,24 +60,11 @@ public static class LiveSetting
 
     public static Language language = Language.SimplifiedChinese;
 
-#if UNITY_ANDROID && !UNITY_EDITOR
-    public static readonly string ChartDir = Application.persistentDataPath + "/TestCharts/";
-#else 
-    public static readonly string ChartDir = Application.streamingAssetsPath + "/TestCharts/";
-#endif
+    public static int currentChart = 0; // Chart set index
+    public static int currentDifficulty = (int)Difficulty.Easy;
+    public static int actualDifficulty = currentDifficulty; // These may differ if a chart set does not have currentDifficulty
 
-    public static string selectedChart = "0";//file name
-    public static string selectedFolder = "";
-    public static int selectedIndex = 0;
-    public static int selectedDifficulty = (int)Difficulty.Easy;
-
-    public static SongList songList;
-
-    public static string GetChartPath => ChartDir + selectedFolder + "/" + selectedChart + ".bin";
-    public static string GetBGMPath => ChartDir + selectedFolder + "/" + "bgm.ogg";
-    public static string GetHeaderPath => ChartDir + selectedFolder + "/" + "header.bin";
-    public static string GetBackgroundPath => ChartDir + selectedFolder + "/" + selectedChart + ".jpg";
-    public static Header CurrentHeader;
+    public static cHeader CurrentHeader => DataLoader.chartList[currentChart];
 
     public static readonly string settingsPath = Application.persistentDataPath + "/LiveSettings.json";
     public static readonly string scoresPath = Application.persistentDataPath + "/Scores.bin";
@@ -156,7 +143,8 @@ public class LiveSettingTemplate
 
     public bool enableAudioTrack = true;
 
-    public int selectedIndex = 0;
+    public int currentChart = 0;
+    public int currentDifficulty = 0;
 
     public LiveSettingTemplate()
     {
@@ -181,7 +169,8 @@ public class LiveSettingTemplate
 
         enableAudioTrack = LiveSetting.enableAudioTrack;
 
-        selectedIndex = LiveSetting.selectedIndex;
+        currentChart = LiveSetting.currentChart;
+        currentDifficulty = LiveSetting.currentDifficulty;
     }
     public void ApplyToLiveSetting()
     {
@@ -207,6 +196,7 @@ public class LiveSettingTemplate
 
         LiveSetting.enableAudioTrack = enableAudioTrack;
 
-        LiveSetting.selectedIndex = selectedIndex;
+        LiveSetting.currentChart = currentChart;
+        LiveSetting.currentDifficulty = currentDifficulty;
     }
 }
