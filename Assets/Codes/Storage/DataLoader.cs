@@ -6,11 +6,7 @@ using Newtonsoft.Json;
 
 public class DataLoader
 {
-#if !UNITY_EDITOR
     public static readonly string DataDir = Application.persistentDataPath + "/data/";
-#else 
-    public static readonly string DataDir = Application.streamingAssetsPath + "/data/";
-#endif
     public static readonly string ChartDir = DataDir + "chart/";
     public static readonly string MusicDir = DataDir + "music/";
     public static readonly string SongListPath = DataDir + "songlist.bin";
@@ -20,6 +16,7 @@ public class DataLoader
     public static List<cHeader> chartList => songList.cHeaders;
 
     public const int ChartVersion = 1;
+    private const int InitialChartVersion = 1;
 
     private static Dictionary<int, cHeader> chartDic;
     private static Dictionary<int, mHeader> musicDic;
@@ -29,6 +26,22 @@ public class DataLoader
 
     public static void Init()
     {
+        // Create directories
+        if (!Directory.Exists(ChartDir))
+        {
+            Directory.CreateDirectory(ChartDir);
+        }
+        if (!Directory.Exists(MusicDir))
+        {
+            Directory.CreateDirectory(MusicDir);
+        }
+        // Check first launch after updating initial charts
+        if (!File.Exists(SongListPath) || PlayerPrefs.GetInt("InitialChartVersion") != InitialChartVersion)
+        {
+            Debug.Log("Load initial charts...");
+            LoadKiraPack(Application.streamingAssetsPath + "/Initial.kirapack");
+            PlayerPrefs.SetInt("InitialChartVersion", InitialChartVersion);
+        }
         LoadAllKiraPackFromInbox();
     }
 
@@ -156,7 +169,6 @@ public class DataLoader
 
         // Save
         Debug.Log(JsonConvert.SerializeObject(newSongList));
-        Debug.Log(Application.persistentDataPath);
         ProtobufHelper.Save(newSongList, SongListPath);
     }
 
@@ -241,16 +253,18 @@ public class DataLoader
         if (!Directory.Exists(InboxDir))
         {
             Debug.LogWarning("Inbox directory does not exist.");
-            return;
         }
-        DirectoryInfo packDir = new DirectoryInfo(InboxDir);
-        FileInfo[] files = packDir.GetFiles();
-        foreach (var file in files)
+        else
         {
-            if (file.Extension == ".kirapack")
+            DirectoryInfo packDir = new DirectoryInfo(InboxDir);
+            FileInfo[] files = packDir.GetFiles();
+            foreach (var file in files)
             {
-                LoadKiraPack(file.FullName);
-                File.Delete(file.FullName);
+                if (file.Extension == ".kirapack")
+                {
+                    LoadKiraPack(file.FullName);
+                    File.Delete(file.FullName);
+                }
             }
         }
         RefreshSongList();
