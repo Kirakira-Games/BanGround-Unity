@@ -44,6 +44,7 @@ public class DataLoader
             yield return CopyFileFromStreamingAssetsToPersistentDataPath("/Initial.kirapack");
             LoadKiraPack(Application.persistentDataPath + "/Initial.kirapack");
             PlayerPrefs.SetInt("InitialChartVersion", InitialChartVersion);
+            File.Delete(Application.persistentDataPath + "/Initial.kirapack");
         }
         LoadAllKiraPackFromInbox();
     }
