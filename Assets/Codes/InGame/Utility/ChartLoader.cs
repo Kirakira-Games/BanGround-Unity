@@ -64,25 +64,14 @@ public static class ChartLoader
         Debug.LogError(BeatToString(note.beat) + "Cannot recognize NoteType " + note.type + " on slide notes.");
         return GameNoteType.None;
     }
-    public static Header LoadHeaderFromFile(string path)
-    {
-        if (!File.Exists(path)) return null;
-        return ProtobufHelper.Load<Header>(path);
-    }
-
-    public static Chart LoadChartFromFile(string path)
-    {
-        return ProtobufHelper.Load<Chart>(path);
-    }
 
     public static float GetFloatingPointBeat(int[] beat)
     {
         return beat[0] + (float)beat[1] / beat[2];
     }
 
-    public static List<GameNoteData> LoadNotesFromFile(string path)
+    public static List<GameNoteData> LoadChart(Chart chart)
     {
-        Chart chart = LoadChartFromFile(path);
         List<Note> notes = chart.notes;
         if (notes == null)
         {
