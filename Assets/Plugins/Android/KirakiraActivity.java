@@ -80,29 +80,4 @@ public class KirakiraActivity extends UnityPlayerActivity {
     public File getAndroidStorageFile() {
         return this.getFilesDir();
     }
-
-    // Notify Unity of the focus change.
-    @Override public void onWindowFocusChanged(boolean hasFocus)
-    {
-        super.onWindowFocusChanged(hasFocus);
-        mUnityPlayer.windowFocusChanged(hasFocus);
-        if(hasFocus){
-            hideSystemUI();
-        }
-    }
-
-    private void hideSystemUI() {
-        // 沉浸 SYSTEM_UI_FLAG_IMMERSIVE.
-        // 粘性沉浸 SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-        View decorView = getWindow().getDecorView();
-        decorView.setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                // 全屏 隐藏导航栏 隐藏状态栏
-                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_FULLSCREEN);
-    }
-
 }
