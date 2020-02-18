@@ -99,7 +99,7 @@ public class BassMemStream : IDisposable
     {
     	get
         {
-        	var bytes = Bass.ChannelGetLength(ID);
+        	var bytes = Bass.BASS_ChannelGetLength(ID);
             var time = Bass.BASS_ChannelBytes2Seconds(ID, bytes);
 
             return time;

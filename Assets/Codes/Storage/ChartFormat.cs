@@ -209,6 +209,9 @@ public partial class cHeader : IExtensible
     [ProtoMember(8)]
     public List<string> tag { get; set; } = new List<string>();
 
+    [ProtoMember(9)]
+    public List<int> difficultyLevel { get; set; } = new List<int>();
+
 }
 
 [Preserve]
@@ -251,12 +254,10 @@ public partial class SongList : IExtensible
         => Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
     [ProtoMember(1)]
-    [global::System.ComponentModel.DefaultValue("")]
-    public string GenerateDate { get; set; } = "";
+    public List<cHeader> cHeaders { get; set; } = new List<cHeader>();
 
     [ProtoMember(2)]
     public List<mHeader> mHeaders { get; set; } = new List<mHeader>();
-
 }
 
 [Preserve]
@@ -280,12 +281,10 @@ public partial class PlayResult : IExtensible
     public double Acc { get; set; }
 
     [ProtoMember(5)]
-    [System.ComponentModel.DefaultValue("")]
-    public string FolderName { get; set; } = "";
+    public int ChartId { get; set; }
 
     [ProtoMember(6)]
-    [System.ComponentModel.DefaultValue("")]
-    public string ChartName { get; set; } = "";
+    public Difficulty Difficulty { get; set; }
 
 }
 

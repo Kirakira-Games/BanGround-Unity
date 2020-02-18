@@ -39,7 +39,7 @@ public class DifficultySelect : MonoBehaviour
         enabledCards = new List<int>();
         for (int i = 0; i < cards.Length; i++) //找出需要被激活的卡片
         {
-            int index = (i + LiveSetting.selectedDifficulty) % cards.Length;
+            int index = (i + LiveSetting.currentDifficulty) % cards.Length;
             if (levels[index] < 0)
             {
                 cards[index].SetActive(false);
@@ -64,16 +64,11 @@ public class DifficultySelect : MonoBehaviour
         difficultyText.text = Enum.GetName(typeof(Difficulty), selected).ToUpper();
         levelText.text = levels[selected].ToString();
 
-        foreach (KiraPackOld.Chart a in selectManager.songList[LiveSetting.selectedIndex].charts) {
-            if ((int)a.difficulty == selected)
-                LiveSetting.selectedChart = a.fileName; //更新选择的难度的文件名
-        }
+        LiveSetting.actualDifficulty = selected;
         selectManager.DisplayRecord();
 
-        if (File.Exists(LiveSetting.GetBackgroundPath)) 
-            background.UpdateBackground(LiveSetting.GetBackgroundPath);
-        else
-            background.UpdateBackground(null);
+        string path = DataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid);
+        background.UpdateBackground(path);
         //LiveSetting.selectedDifficulty = (Difficulty)enabledCards[0];
         //print(Enum.GetName(typeof(Difficulty), LiveSetting.selectedDifficulty));
     }
@@ -89,7 +84,6 @@ public class DifficultySelect : MonoBehaviour
             enabledCards.Add(oldList[i]);
         }
         enabledCards.Add(oldList[0]);
-        LiveSetting.selectedDifficulty = enabledCards[0];
 
         StartCoroutine(SwipeOutAnimation());
     }
@@ -110,7 +104,10 @@ public class DifficultySelect : MonoBehaviour
             }
             yield return new WaitForEndOfFrame();
         }
+
         UpdateView();
+        LiveSetting.currentDifficulty = selected;
+
         float destPosition = Rects[no].anchoredPosition.x;
         Rects[no].anchoredPosition -= new Vector2(100, 0);
         while (Rects[no].anchoredPosition.x < destPosition)

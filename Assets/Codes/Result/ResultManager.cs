@@ -27,8 +27,8 @@ public class ResultManager : MonoBehaviour
     private Text songName_Text;
     private Text acc_Text;
 
-    private KiraPackOld.Chart chart;
-    private KiraPackOld.Header header;
+    private cHeader cheader;
+    private mHeader mheader;
 
     private RawImage rankIcon;
     private RawImage markIcon;
@@ -44,6 +44,8 @@ public class ResultManager : MonoBehaviour
     void Start()
     {
         AudioManager.Instanse.isInGame = false;
+        cheader = LiveSetting.CurrentHeader;
+        mheader = DataLoader.GetMusicHeader(cheader.mid);
         StartCoroutine(ReadRank());
         SetBtnObject();
         GetResultObjectAndComponent();
@@ -75,10 +77,8 @@ public class ResultManager : MonoBehaviour
     private void ShowBackground()
     {
         background = GameObject.Find("Background").GetComponent<FixBackground>();
-        if (File.Exists(LiveSetting.GetBackgroundPath))
-            background.UpdateBackground(LiveSetting.GetBackgroundPath);
-        else
-            background.UpdateBackground(null);
+        string path = DataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid);
+        background.UpdateBackground(path);
     }
 
     IEnumerator ReadRank()
@@ -252,14 +252,11 @@ public class ResultManager : MonoBehaviour
 
     private void ShowSongInfo()
     {
-        chart = ChartLoader.LoadChartFromFile(LiveSetting.GetChartPath);
-        header = ChartLoader.LoadHeaderFromFile(LiveSetting.GetHeaderPath);
-        
-
-        level_Text.text = Enum.GetName(typeof(Difficulty), chart.difficulty).ToUpper() + " " + chart.level.ToString();
-        songName_Text.text = header?.TitleUnicode;
+        level_Text.text = Enum.GetName(typeof(Difficulty), LiveSetting.actualDifficulty).ToUpper() + " " +
+            cheader.difficultyLevel[LiveSetting.actualDifficulty];
+        songName_Text.text = mheader.title;
         acc_Text.text = LiveSetting.autoPlayEnabled ? "AUTOPLAY" : string.Format("{0:P2}", Mathf.FloorToInt((float)playResult.Acc * 10000) / 10000f);
-        difficultCard.sprite = Resources.Load<Sprite>("UI/DifficultyCards/Result/" + Enum.GetName(typeof(Difficulty), chart.difficulty));
+        difficultCard.sprite = Resources.Load<Sprite>("UI/DifficultyCards/Result/" + Enum.GetName(typeof(Difficulty), LiveSetting.actualDifficulty));
     }
 
     private void ReadScores()
@@ -273,11 +270,11 @@ public class ResultManager : MonoBehaviour
         playResult.ranks = ResultsGetter.GetRanks();
         playResult.clearMark = ResultsGetter.GetClearMark();
         playResult.Acc = ResultsGetter.GetAcc();
-        playResult.ChartName = LiveSetting.selectedChart;
-        playResult.FolderName = LiveSetting.selectedFolder;
+        playResult.ChartId = cheader.sid;
+        playResult.Difficulty = (Difficulty)LiveSetting.actualDifficulty;
         PlayRecords pr = PlayRecords.OpenRecord();
 
-        var resultList = pr.resultsList.Where((x) => x.FolderName == LiveSetting.selectedFolder && x.ChartName == LiveSetting.selectedChart);
+        var resultList = pr.resultsList.Where((x) => x.ChartId == cheader.sid && x.Difficulty == (Difficulty)LiveSetting.actualDifficulty);
         if (resultList.Count() == 1) 
         {
             var result = resultList.First();
