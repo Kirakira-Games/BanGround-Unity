@@ -9,6 +9,7 @@ using UnityEngine.Scripting;
 
 namespace KiraPackOld
 {
+    [Obsolete("BanGround has migrated to new file structure. These old protobufs are not used anymore.")]
     [Preserve]
     [ProtoContract()]
     public partial class Chart : IExtensible
@@ -49,6 +50,7 @@ namespace KiraPackOld
         public int version { get; set; }
     }
 
+    [Obsolete("BanGround has migrated to new file structure. These old protobufs are not used anymore.")]
     [Preserve]
     [ProtoContract()]
     public partial class Header : IExtensible
@@ -85,6 +87,7 @@ namespace KiraPackOld
 
     }
 
+    [Obsolete("BanGround has migrated to new file structure. These old protobufs are not used anymore.")]
     [Preserve]
     [ProtoContract()]
     public partial class SongList : IExtensible

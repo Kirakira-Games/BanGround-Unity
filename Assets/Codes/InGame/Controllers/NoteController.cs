@@ -307,7 +307,8 @@ public class NoteController : MonoBehaviour
         }
         controller = this;
         // Load chart
-        notes = ChartLoader.LoadNotesFromFile(LiveSetting.GetChartPath);
+        int sid = LiveSetting.CurrentHeader.sid;
+        notes = ChartLoader.LoadChart(DataLoader.LoadChart(sid, (Difficulty)LiveSetting.actualDifficulty));
         noteHead = 0;
         // Compute number of notes
         numNotes = 0;
@@ -336,13 +337,10 @@ public class NoteController : MonoBehaviour
         SE_FLICK = audioMgr.PrecacheSound(Resources.Load<TextAsset>("SoundEffects/flick.wav"));
         SE_CLICK = audioMgr.PrecacheSound(Resources.Load<TextAsset>("SoundEffects/empty.wav"));
 
-        audioMgr.DelayPlay(File.ReadAllBytes(LiveSetting.GetBGMPath), 4f);
+        audioMgr.DelayPlay(File.ReadAllBytes(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), 4f);
 
         background = GameObject.Find("Background").GetComponent<FixBackground>();
-        if (File.Exists(LiveSetting.GetBackgroundPath))
-            background.UpdateBackground(LiveSetting.GetBackgroundPath);
-        else
-            background.UpdateBackground(null);
+        background.UpdateBackground(DataLoader.GetBackgroundPath(sid));
     }
 
     void Update()

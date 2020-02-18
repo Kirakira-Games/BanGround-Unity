@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -32,7 +33,7 @@ public class FixBackground : MonoBehaviour
 
     public void UpdateBackground(string path)
     {
-        if (path == null)
+        if (!File.Exists(path))
         {
             render.sprite = defaultSprite;
             UpdateScale();
