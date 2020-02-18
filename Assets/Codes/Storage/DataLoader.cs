@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 using System.IO;
 using System.IO.Compression;
 using Newtonsoft.Json;
+using UnityEngine.Networking;
 
 public class DataLoader
 {
@@ -24,7 +26,7 @@ public class DataLoader
     private static readonly string TempDir = Application.persistentDataPath + "/temp/";
     private static readonly string InboxDir = Application.persistentDataPath + "/Inbox/";
 
-    public static void Init()
+    public static IEnumerator Init()
     {
         // Create directories
         if (!Directory.Exists(ChartDir))
@@ -39,7 +41,8 @@ public class DataLoader
         if (!File.Exists(SongListPath) || PlayerPrefs.GetInt("InitialChartVersion") != InitialChartVersion)
         {
             Debug.Log("Load initial charts...");
-            LoadKiraPack(Application.streamingAssetsPath + "/Initial.kirapack");
+            yield return CopyFileFromStreamingAssetsToPersistentDataPath("/Initial.kirapack");
+            LoadKiraPack(Application.persistentDataPath + "/Initial.kirapack");
             PlayerPrefs.SetInt("InitialChartVersion", InitialChartVersion);
         }
         LoadAllKiraPackFromInbox();
@@ -270,4 +273,20 @@ public class DataLoader
         RefreshSongList();
         ReloadSongList();
     }
+
+    private static IEnumerator CopyFileFromStreamingAssetsToPersistentDataPath(string relativePath)
+    {
+        using (UnityWebRequest webRequest = UnityWebRequest.Get(Application.streamingAssetsPath + relativePath))
+        {
+            yield return webRequest.SendWebRequest();
+            string directory = Path.GetDirectoryName(Application.persistentDataPath + relativePath);
+            if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
+            using (var writer = File.Create(Application.persistentDataPath + relativePath))
+            {
+                writer.Write(webRequest.downloadHandler.data, 0, webRequest.downloadHandler.data.Length);
+            }
+            Debug.Log($"Copy File {relativePath} {!webRequest.isNetworkError}");
+        }
+    }
+
 }
