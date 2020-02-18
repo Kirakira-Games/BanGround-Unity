@@ -172,7 +172,7 @@ public class SelectManager : MonoBehaviour
 
             cHeader chart = chartList[i];
             mHeader song = DataLoader.GetMusicHeader(chart.mid);
-            string author = chart.author;
+            string author = chart.authorNick;
             txt[0].text = song.title;
             txt[1].text = song.artist + " / " + author;
             go.GetComponent<RectControl>().index = i;
