@@ -79,6 +79,8 @@ public class SelectManager : MonoBehaviour
         GetLiveSetting();
 
         audioManager.loading = false;
+
+        MessageBoxController.Instance.ShowMsg(0, "Load SongList Success");
     }
 
     private void InitComponent()
