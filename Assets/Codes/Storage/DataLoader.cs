@@ -281,6 +281,7 @@ public class DataLoader
                 if (file.Extension == ".kirapack")
                 {
                     LoadKiraPack(file.FullName);
+                    MessageBoxController.Instance.ShowMsg(0, "Loaded kirapack: " + file.Name);
                     File.Delete(file.FullName);
                 }
             }

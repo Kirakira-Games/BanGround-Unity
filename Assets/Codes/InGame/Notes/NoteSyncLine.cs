@@ -46,7 +46,7 @@ public class NoteSyncLine : MonoBehaviour
             GameObject obj = syncNotes[i];
             if (obj == null ||
                 obj.GetComponent<NoteBase>().judgeResult != JudgeResult.None ||
-                obj.GetComponent<SlideEndFlick>()?.IsStickEnd == true)
+                obj.GetComponent<SlideNoteBase>()?.IsStickEnd == true)
             {
                 syncNotes.RemoveAt(i);
             }
