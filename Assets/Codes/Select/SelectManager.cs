@@ -85,7 +85,7 @@ public class SelectManager : MonoBehaviour
 
         audioManager.loading = false;
 
-        MessageBoxController.Instance.ShowMsg(0, "Load SongList Success");
+        MessageBoxController.Instance.ShowMsg(LogLevel.INFO, "Load SongList Success");
     }
 
     private void InitComponent()
@@ -552,7 +552,8 @@ public class SelectManager : MonoBehaviour
     {
         if (focus)
         {
-            DataLoader.LoadAllKiraPackFromInbox();
+            bool success = DataLoader.LoadAllKiraPackFromInbox();
+            if(success) SceneManager.LoadScene("Select");
         }
     }
 }
