@@ -70,6 +70,11 @@ public class SelectManager : MonoBehaviour
 
     PlayRecords playRecords;
 
+    private void Awake()
+    {
+        DataLoader.LoadAllKiraPackFromInbox();
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -541,6 +546,14 @@ public class SelectManager : MonoBehaviour
             lastPreviewStream?.Pause();
         else
             lastPreviewStream?.Play();
+    }
+
+    private void OnApplicationFocus(bool focus)
+    {
+        if (focus)
+        {
+            DataLoader.LoadAllKiraPackFromInbox();
+        }
     }
 }
 

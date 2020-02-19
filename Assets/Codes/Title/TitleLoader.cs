@@ -15,7 +15,6 @@ public class TitleLoader : MonoBehaviour
 
     private void Awake()
     {
-        LiveSetting.Load();
         StartCoroutine(DataLoader.Init());
     }
 
