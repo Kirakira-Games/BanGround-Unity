@@ -28,7 +28,6 @@ public class KirakiraActivity extends UnityPlayerActivity {
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ImportFile();
     }
 
     private void InputStreamToFile(InputStream in, File file) {
@@ -95,6 +94,7 @@ public class KirakiraActivity extends UnityPlayerActivity {
 
         if (hasFocus){
             hideSystemUI();
+            ImportFile();
         }
     }
 
