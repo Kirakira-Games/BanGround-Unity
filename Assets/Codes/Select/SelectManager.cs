@@ -70,6 +70,11 @@ public class SelectManager : MonoBehaviour
 
     PlayRecords playRecords;
 
+    private void Awake()
+    {
+        DataLoader.LoadAllKiraPackFromInbox();
+    }
+
     // Start is called before the first frame update
     void Start()
     {

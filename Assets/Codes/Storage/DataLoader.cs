@@ -19,6 +19,7 @@ public class DataLoader
 
     public const int ChartVersion = 1;
     private const int InitialChartVersion = 1;
+    private const int GameVersion = 1;
 
     private static Dictionary<int, cHeader> chartDic;
     private static Dictionary<int, mHeader> musicDic;
@@ -28,6 +29,18 @@ public class DataLoader
 
     public static IEnumerator Init()
     {
+        // Delete save files of old versions
+        if (PlayerPrefs.GetInt("GameVersion") == 0)
+        {
+            Debug.Log("Remove old save files.");
+            var files = new DirectoryInfo(Application.persistentDataPath).GetFiles();
+            foreach (var file in files)
+            {
+                File.Delete(file.FullName);
+            }
+            PlayerPrefs.SetInt("GameVersion", GameVersion);
+        }
+        
         // Create directories
         if (!Directory.Exists(ChartDir))
         {
@@ -46,7 +59,8 @@ public class DataLoader
             PlayerPrefs.SetInt("InitialChartVersion", InitialChartVersion);
             File.Delete(Application.persistentDataPath + "/Initial.kirapack");
         }
-        LoadAllKiraPackFromInbox();
+
+        LiveSetting.Load();
     }
 
     public static string GetMusicPath(int mid)
