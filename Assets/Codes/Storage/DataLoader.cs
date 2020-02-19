@@ -305,7 +305,10 @@ public class DataLoader
 
     private static IEnumerator CopyFileFromStreamingAssetsToPersistentDataPath(string relativePath)
     {
-        using (UnityWebRequest webRequest = UnityWebRequest.Get(Application.streamingAssetsPath + relativePath))
+        string streamingPath = "file://" + Application.streamingAssetsPath + relativePath;
+        //string persistentPath = "file://"
+
+        using (UnityWebRequest webRequest = UnityWebRequest.Get(streamingPath))
         {
             yield return webRequest.SendWebRequest();
             string directory = Path.GetDirectoryName(Application.persistentDataPath + relativePath);
