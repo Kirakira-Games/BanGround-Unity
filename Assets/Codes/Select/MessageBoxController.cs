@@ -38,10 +38,10 @@ public class MessageBoxController : MonoBehaviour
     /// </summary>
     /// <param name="level"></param>
     /// <param name="content"></param>
-    public void ShowMsg(int level, string content, bool autoClose = true)
+    public void ShowMsg(LogLevel level, string content, bool autoClose = true)
     {
         //Set content
-        msgImg.sprite = msgSprite[level];
+        msgImg.sprite = msgSprite[(int)level];
         msgText.text = content;
         msgText.Localizify(content);
 
@@ -57,4 +57,9 @@ public class MessageBoxController : MonoBehaviour
         yield return new WaitForSeconds(3);
         animator.Play("MsgOut");
     }
+}
+
+public enum LogLevel
+{
+    INFO,OK,ERROR
 }

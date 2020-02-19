@@ -252,27 +252,40 @@ public class DataLoader
         Directory.Delete(TempDir, true);
     }
 
-    public static void LoadAllKiraPackFromInbox()
+    public static bool LoadAllKiraPackFromInbox()
     {
-        if (!Directory.Exists(InboxDir))
+        bool LoadSuccess = false;
+        try
         {
-            Debug.LogWarning("Inbox directory does not exist.");
-        }
-        else
-        {
-            DirectoryInfo packDir = new DirectoryInfo(InboxDir);
-            FileInfo[] files = packDir.GetFiles();
-            foreach (var file in files)
+            if (!Directory.Exists(InboxDir))
             {
-                if (file.Extension == ".kirapack")
+                Debug.LogWarning("Inbox directory does not exist.");
+            }
+            else
+            {
+                DirectoryInfo packDir = new DirectoryInfo(InboxDir);
+                FileInfo[] files = packDir.GetFiles();
+                foreach (var file in files)
                 {
-                    LoadKiraPack(file.FullName);
-                    File.Delete(file.FullName);
+                    if (file.Extension == ".kirapack")
+                    {
+                        LoadKiraPack(file.FullName);
+                        File.Delete(file.FullName);
+                        LoadSuccess = true;
+                    }
                 }
             }
         }
-        RefreshSongList();
-        ReloadSongList();
+        catch (System.Exception e)
+        {
+            MessageBoxController.Instance.ShowMsg(LogLevel.ERROR, e.Message, false);
+        }
+        if (LoadSuccess)
+        {
+            RefreshSongList();
+            ReloadSongList();
+        }
+        return LoadSuccess;
     }
 
     private static IEnumerator CopyFileFromStreamingAssetsToPersistentDataPath(string relativePath)
