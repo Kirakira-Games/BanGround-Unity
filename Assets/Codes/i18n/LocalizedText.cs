@@ -48,6 +48,12 @@ public class LocalizedText : Text
         cachedText = text;
     }
 
+    public void Localizify(string original)
+    {
+        originalText = original;
+        Localizify();
+    }
+
     private void Update()
     {
 #if UNITY_EDITOR
