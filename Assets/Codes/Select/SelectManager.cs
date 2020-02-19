@@ -72,7 +72,11 @@ public class SelectManager : MonoBehaviour
 
     private void Awake()
     {
-        DataLoader.LoadAllKiraPackFromInbox();
+        if (!DataLoader.LoadAllKiraPackFromInbox())
+        {
+            DataLoader.RefreshSongList();
+            DataLoader.ReloadSongList();
+        }
     }
 
     // Start is called before the first frame update
@@ -553,7 +557,7 @@ public class SelectManager : MonoBehaviour
         if (focus)
         {
             bool success = DataLoader.LoadAllKiraPackFromInbox();
-            if(success) SceneManager.LoadScene("Select");
+            if (success) SceneManager.LoadScene("Select");
         }
     }
 }
