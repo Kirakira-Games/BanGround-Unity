@@ -3,6 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+class MessageQueueItem
+{
+    public LogLevel level;
+    public string content;
+    public bool autoClose;
+}
+
 public class MessageBoxController : MonoBehaviour
 {
     public static MessageBoxController Instance { get; private set; }
@@ -13,9 +20,12 @@ public class MessageBoxController : MonoBehaviour
     private LocalizedText msgText;
     private Animator animator;
 
+    private Queue<MessageQueueItem> msgQueue;
+
     private void Awake()
     {
         Instance = this;
+        msgQueue = new Queue<MessageQueueItem>();
     }
 
     void Start()
@@ -33,6 +43,17 @@ public class MessageBoxController : MonoBehaviour
         });
     }
 
+    private void Update()
+    {
+        if (animator.GetCurrentAnimatorStateInfo(0).IsName("Outed"))
+        {
+            if (msgQueue.Count > 0)
+            {
+                ShowMsg(msgQueue.Dequeue());
+            }
+        }
+    }
+
     /// <summary>
     /// level: 0-info 1-ok 2-error
     /// </summary>
@@ -40,16 +61,27 @@ public class MessageBoxController : MonoBehaviour
     /// <param name="content"></param>
     public void ShowMsg(LogLevel level, string content, bool autoClose = true)
     {
+        msgQueue.Enqueue(new MessageQueueItem
+        {
+            level = level,
+            content = content,
+            autoClose = autoClose
+        });
+    }
+
+    private void ShowMsg(MessageQueueItem item)
+    {
+        int level = (int)item.level;
         //Set content
-        msgImg.sprite = msgSprite[(int)level];
-        msgText.text = content;
-        msgText.Localizify(content);
+        msgImg.sprite = msgSprite[level];
+        msgText.text = item.content;
+        msgText.Localizify(item.content);
 
         //Show Box
         animator.Play("MsgIn");
 
         //AutoClose
-        if (autoClose) StartCoroutine(AutoClose());
+        if (item.autoClose) StartCoroutine(AutoClose());
     }
 
     private IEnumerator AutoClose()
