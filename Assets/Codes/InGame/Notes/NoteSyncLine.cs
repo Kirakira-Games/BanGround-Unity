@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-class GameObjectXComparer : IComparer<GameObject>
+class NoteBaseXComparer : IComparer<NoteBase>
 {
-    public int Compare(GameObject lhs, GameObject rhs)
+    public int Compare(NoteBase lhs, NoteBase rhs)
     {
         return (int)Mathf.Sign(lhs.transform.position.x - lhs.transform.position.x);
     }
@@ -12,10 +12,12 @@ class GameObjectXComparer : IComparer<GameObject>
 
 public class NoteSyncLine : MonoBehaviour
 {
-    public List<GameObject> syncNotes;
-    public List<LineRenderer> syncLines;
+    private List<NoteBase> syncNotes;
+    private List<LineRenderer> syncLines;
     private const float lineWidth = 0.06f;
-    private GameObjectXComparer comparer;
+    private NoteBaseXComparer comparer;
+    private int totNotes;
+    private bool[] soundEffects;
 
     private LineRenderer CreateLine()
     {
@@ -34,28 +36,35 @@ public class NoteSyncLine : MonoBehaviour
 
     private void Awake()
     {
-        comparer = new GameObjectXComparer();
-        syncNotes = new List<GameObject>();
+        comparer = new NoteBaseXComparer();
+        syncNotes = new List<NoteBase>();
         syncLines = new List<LineRenderer>();
+        soundEffects = new bool[5];
+        totNotes = 0;
     }
 
     public void OnSyncLineUpdate()
     {
         for (int i = syncNotes.Count - 1; i >= 0; i--)
         {
-            GameObject obj = syncNotes[i];
+            NoteBase obj = syncNotes[i];
             if (obj == null ||
-                obj.GetComponent<NoteBase>().judgeResult != JudgeResult.None ||
+                obj.judgeResult != JudgeResult.None ||
                 obj.GetComponent<SlideNoteBase>()?.IsStickEnd == true)
             {
                 syncNotes.RemoveAt(i);
             }
         }
-        if (syncNotes.Count == 0) {
+        if (totNotes == 0)
+        {
             Destroy(gameObject);
             return;
         }
-        while (syncLines.Count >= syncNotes.Count)
+        if (!LiveSetting.syncLineEnabled)
+        {
+            return;
+        }
+        while (syncLines.Count >= syncNotes.Count && syncLines.Count != 0)
         {
             Destroy(syncLines[syncLines.Count - 1].gameObject);
             syncLines.RemoveAt(syncLines.Count - 1);
@@ -75,5 +84,27 @@ public class NoteSyncLine : MonoBehaviour
             pos[1].z += 0.01f;
             syncLines[i].SetPositions(pos);
         }
+    }
+
+    public void AddNote(NoteBase note)
+    {
+        totNotes++;
+        note.syncLine = this;
+        if (note.type == GameNoteType.SlideTick)
+        {
+            return;
+        }
+        syncNotes.Add(note);
+    }
+
+    public bool PlaySoundEffect(int se)
+    {
+        totNotes--;
+        if (se >= soundEffects.Length || soundEffects[se])
+        {
+            return false;
+        }
+        soundEffects[se] = true;
+        return true;
     }
 }

@@ -17,11 +17,7 @@ public class NoteController : MonoBehaviour
     private GradeColorChange scoreDisplay;
     private int numNotes;
     private AudioManager audioMgr;
-    private int SE_PERFECT;
-    private int SE_GREAT;
-    private int SE_GOOD;
-    private int SE_CLICK;
-    private int SE_FLICK;
+    private int[] soundEffects;
 
     private FixBackground background;
 
@@ -54,11 +50,12 @@ public class NoteController : MonoBehaviour
         return new Touch[] { touch };
     }
 
-    public void EmitEffect(Vector3 position, JudgeResult result, GameNoteType type)
+    public TapEffectType EmitEffect(Vector3 position, JudgeResult result, GameNoteType type)
     {
-        if (result == JudgeResult.Miss) return;
+        if (result == JudgeResult.Miss) return TapEffectType.None;
         var pos = new Vector3(position.x * 1.444f, -2.97f, 4);
         var effect = "Effects/effect_tap";
+        TapEffectType se = TapEffectType.None;
 
         if (NoteUtility.IsFlick(type))
         {
@@ -73,20 +70,21 @@ public class NoteController : MonoBehaviour
             effect += "_good";
 
         if (effect == "Effects/effect_tap")
-            audioMgr.PlaySE(SE_CLICK);
+            se = TapEffectType.Click;
         if (effect == "Effects/effect_tap_swipe")
-            audioMgr.PlaySE(SE_FLICK);
+            se = TapEffectType.Flick;
         else if (effect == "Effects/effect_tap_perfect")
-            audioMgr.PlaySE(SE_PERFECT);
+            se = TapEffectType.Perfect;
         else if (effect == "Effects/effect_tap_great")
-            audioMgr.PlaySE(SE_GREAT);
+            se = TapEffectType.Great;
         else if (effect == "Effects/effect_tap_good")
-            audioMgr.PlaySE(SE_GOOD);
+            se = TapEffectType.Good;
 
         var fx = Instantiate(Resources.Load(effect), pos, Quaternion.identity) as GameObject;
         fx.transform.localScale = Vector3.one * LiveSetting.noteSize * NoteUtility.NOTE_SCALE;
         //StartCoroutine(KillFX(fx, 0.5f));
         Destroy(fx, 0.5f);
+        return se;
     }
 
     public static IEnumerator KillFX(GameObject fx, float delaySeconds)
@@ -98,6 +96,7 @@ public class NoteController : MonoBehaviour
     // Judge a note as result
     public void Judge(GameObject note, JudgeResult result, Touch? touch)
     {
+        NoteBase notebase = note.GetComponent<NoteBase>();
         if (result == JudgeResult.None)
         {
             Debug.LogWarning("'None' cannot be final judge result. Recognized as 'Miss'.");
@@ -105,7 +104,13 @@ public class NoteController : MonoBehaviour
         }
 
         // Tap effect
-        EmitEffect(note.transform.position, result, note.GetComponent<NoteBase>().type);
+        int se = (int)EmitEffect(note.transform.position, result, notebase.type);
+
+        // Sound effect
+        if (notebase.syncLine.PlaySoundEffect(se))
+        {
+            audioMgr.PlaySE(soundEffects[se]);
+        }
 
         // Update score
         JudgeResultController.controller.DisplayJudgeResult(result);
@@ -151,7 +156,10 @@ public class NoteController : MonoBehaviour
         if (noteToJudge == null)
         {
             if (touch.phase == TouchPhase.Began)
-                EmitEffect(NoteUtility.GetJudgePos(lane), JudgeResult.None, GameNoteType.Single);
+            {
+                int se = (int)EmitEffect(NoteUtility.GetJudgePos(lane), JudgeResult.None, GameNoteType.Single);
+                audioMgr.PlaySE(soundEffects[se]);
+            }
         }
         else
         {
@@ -196,17 +204,15 @@ public class NoteController : MonoBehaviour
         note.InitNote();
         laneQueue[note.lane].Push(note.time, note);
         // Add sync line
-        if (LiveSetting.syncLineEnabled && note.type != GameNoteType.SlideTick)
+        if (!syncTable.ContainsKey(note.time) || syncTable[note.time] == null)
         {
-            if (!syncTable.ContainsKey(note.time))
-            {
-                GameObject syncLineObj = new GameObject("syncLine");
-                syncLineObj.transform.SetParent(transform);
-                syncTable.Add(note.time, syncLineObj.AddComponent<NoteSyncLine>());
-            }
-            NoteSyncLine syncLine = syncTable[note.time];
-            syncLine.syncNotes.Add(noteObj);
+            GameObject syncLineObj = new GameObject("syncLine");
+            syncLineObj.transform.SetParent(transform);
+            syncTable.Remove(note.time);
+            syncTable.Add(note.time, syncLineObj.AddComponent<NoteSyncLine>());
         }
+        syncTable[note.time].AddNote(note);
+
         return noteObj;
     }
 
@@ -298,7 +304,7 @@ public class NoteController : MonoBehaviour
         touchTable = new Dictionary<int, GameObject>();
         syncTable = new Dictionary<int, NoteSyncLine>();
         Application.targetFrameRate = 120;
-        
+
         scoreDisplay = GameObject.Find("Grades").GetComponent<GradeColorChange>();
         laneQueue = new PriorityQueue<int, NoteBase>[NoteUtility.LANE_COUNT];
         for (int i = 0; i < NoteUtility.LANE_COUNT; i++)
@@ -331,11 +337,14 @@ public class NoteController : MonoBehaviour
         audioMgr = AudioManager.Instanse;
         audioMgr.isInGame = true;
 
-        SE_PERFECT = audioMgr.PrecacheSound(Resources.Load<TextAsset>("SoundEffects/perfect.wav"));
-        SE_GREAT = audioMgr.PrecacheSound(Resources.Load<TextAsset>("SoundEffects/great.wav"));
-        SE_GOOD = audioMgr.PrecacheSound(Resources.Load<TextAsset>("SoundEffects/empty.wav"));
-        SE_FLICK = audioMgr.PrecacheSound(Resources.Load<TextAsset>("SoundEffects/flick.wav"));
-        SE_CLICK = audioMgr.PrecacheSound(Resources.Load<TextAsset>("SoundEffects/empty.wav"));
+        soundEffects = new int[5]
+        {
+            audioMgr.PrecacheSound(Resources.Load<TextAsset>("SoundEffects/perfect.wav")),
+            audioMgr.PrecacheSound(Resources.Load<TextAsset>("SoundEffects/great.wav")),
+            audioMgr.PrecacheSound(Resources.Load<TextAsset>("SoundEffects/empty.wav")),
+            audioMgr.PrecacheSound(Resources.Load<TextAsset>("SoundEffects/empty.wav")),
+            audioMgr.PrecacheSound(Resources.Load<TextAsset>("SoundEffects/flick.wav"))
+        };
 
         audioMgr.DelayPlay(File.ReadAllBytes(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), 4f);
 
