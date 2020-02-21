@@ -13,16 +13,11 @@ public class SlideMesh : MonoBehaviour
     public Transform afterNoteTrans;
     public const float BODY_WIDTH = 0.6f;
 
-    public static SlideMesh Create(Transform start, Transform after)
+    public static void Create(SlideMesh mesh, Transform after)
     {
-        GameObject slideMesh = new GameObject("SlideBody");
-        SlideMesh mesh = slideMesh.AddComponent<SlideMesh>();
-        mesh.transform.SetParent(start);
         mesh.transform.localPosition = new Vector3(0f, -0.01f);
         mesh.afterNoteTrans = after;
         mesh.InitMesh();
-        slideMesh.AddComponent<SortingGroup>().sortingLayerID = SortingLayer.NameToID("SlideBody");
-        return mesh;
     }
 
     readonly Vector2[] uv =

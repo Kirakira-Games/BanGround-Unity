@@ -158,7 +158,7 @@ public class Slide : MonoBehaviour
         note.transform.SetParent(transform);
         if (notes.Count > 0)
         {
-            SlideMesh.Create(notes[notes.Count - 1].transform, note.transform);
+            SlideMesh.Create(notes[notes.Count-1].GetComponentInChildren<SlideMesh>(), note.transform);
         }
         else
         {

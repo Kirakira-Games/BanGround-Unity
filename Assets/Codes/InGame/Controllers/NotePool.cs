@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System;
+using UnityEngine.Rendering;
 
 public class NotePool : MonoBehaviour
 {
@@ -16,6 +17,7 @@ public class NotePool : MonoBehaviour
         for (int j = 0; j < count; j++)
         {
             var obj = new GameObject(name + j);
+            obj.transform.SetParent(transform);
             switch (type)
             {
                 case GameNoteType.Single:
@@ -37,9 +39,16 @@ public class NotePool : MonoBehaviour
                     obj.AddComponent<SlideEndFlick>();
                     break;
             }
-            obj.SetActive(false);
             obj.AddComponent<MeshFilter>();
             obj.AddComponent<MeshRenderer>();
+            if (NoteUtility.IsSlide(type) && !NoteUtility.IsSlideEnd(type))
+            {
+                var mesh = new GameObject("SlideBody");
+                mesh.transform.SetParent(obj.transform);
+                mesh.AddComponent<SlideMesh>();
+                mesh.AddComponent<SortingGroup>().sortingLayerID = SortingLayer.NameToID("SlideBody");
+            }
+            obj.SetActive(false);
             Q.Enqueue(obj);
         }
     }
