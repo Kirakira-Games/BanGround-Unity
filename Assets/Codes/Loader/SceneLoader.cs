@@ -37,37 +37,25 @@ public class SceneLoader : MonoBehaviour
     {
         AudioManager.Instanse.PauseBGM();
 
-        StartCoroutine(LoadAsync());
-        //StartCoroutine(UnloadAsync());
-        
+        StartCoroutine(LoadAsync());        
     }
 
     private IEnumerator LoadAsync()
     {
-        //关门后再加载下一场景（实际关门时间2.16s）
+        //关门后再加载下一场景（实际关门动画40帧）
+        //WaitForSeconds内参数包括了：关门所需时间 + 显示loading小剧场的时间
         yield return new WaitForSeconds(2.3f);
-        //operation = SceneManager.LoadSceneAsync(nextSceneName, needOpen ? LoadSceneMode.Additive : LoadSceneMode.Single);
-        //operation.allowSceneActivation = false;
-        //yield return operation;
         SceneManager.LoadScene(nextSceneName, needOpen ? LoadSceneMode.Additive : LoadSceneMode.Single);
+
+        //开门动画39帧
+        //需要开门的话需要等开门动画播放完毕后再卸载Loader场景并重置Loading标志
         StartCoroutine(CountDown(2f));
     }
-
-    //private IEnumerator UnloadAsync()
-    //{
-    //    yield return new WaitForSeconds(2.3f);
-    //    SceneManager.UnloadSceneAsync(currentSceneName);
-    //}
 
     private IEnumerator CountDown(float seconds)
     {
         //开门时间（即loading播放时间） 应减去关门所需时间
-        //yield return new WaitForSeconds(seconds);
-
         if (needOpen) SceneManager.UnloadSceneAsync(currentSceneName);
-
-        //operation.allowSceneActivation = true;
-
         if (needOpen)
         {
             animator.Play("Opening");
