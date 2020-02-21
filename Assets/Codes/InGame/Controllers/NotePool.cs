@@ -9,7 +9,8 @@ public class NotePool : MonoBehaviour
 
     private Queue<GameObject>[] noteQueue;
     private Queue<GameObject> slideQueue;
-    private const int INIT_COUNT = NoteUtility.LANE_COUNT;
+    private static int unitCount;
+    private static readonly int[] weight = { 4, 1, 1, 2, 1, 1 };
 
     private void AddNote(Queue<GameObject> Q, GameNoteType type, int count)
     {
@@ -77,14 +78,15 @@ public class NotePool : MonoBehaviour
     {
         instance = this;
         noteQueue = new Queue<GameObject>[6];
+        unitCount = NoteUtility.LANE_COUNT * LiveSetting.NoteScreenTime / 1000;
         for (int i = 0; i < noteQueue.Length; i++)
         {
             noteQueue[i] = new Queue<GameObject>();
-            AddNote(noteQueue[i], (GameNoteType)i, INIT_COUNT);
+            AddNote(noteQueue[i], (GameNoteType)i, unitCount * weight[i]);
         }
 
         slideQueue = new Queue<GameObject>();
-        AddSlide(INIT_COUNT);
+        AddSlide(unitCount);
     }
 
     public GameObject GetSlide()
@@ -92,7 +94,7 @@ public class NotePool : MonoBehaviour
         if (slideQueue.Count == 0)
         {
             Debug.Log("Add Slides");
-            AddSlide(INIT_COUNT);
+            AddSlide(unitCount);
         }
         var slide = slideQueue.Dequeue();
         slide.SetActive(true);
@@ -110,7 +112,7 @@ public class NotePool : MonoBehaviour
         if (Q.Count == 0)
         {
             Debug.Log("Add notes");
-            AddNote(Q, type, INIT_COUNT);
+            AddNote(Q, type, unitCount);
         }
         var note = Q.Dequeue();
         note.SetActive(true);
