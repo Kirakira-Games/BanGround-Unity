@@ -295,16 +295,19 @@ public class NoteController : MonoBehaviour
         syncTable = new Dictionary<int, NoteSyncLine>();
         Application.targetFrameRate = 120;
 
+        // Create queue for each lane
         laneQueue = new PriorityQueue<int, NoteBase>[NoteUtility.LANE_COUNT];
         for (int i = 0; i < NoteUtility.LANE_COUNT; i++)
         {
             laneQueue[i] = new PriorityQueue<int, NoteBase>();
         }
         controller = this;
+
         // Load chart
         int sid = LiveSetting.CurrentHeader.sid;
         notes = ChartLoader.LoadChart(DataLoader.LoadChart(sid, (Difficulty)LiveSetting.actualDifficulty));
         noteHead = 0;
+
         // Compute number of notes
         numNotes = 0;
         foreach (GameNoteData note in notes)
@@ -318,6 +321,9 @@ public class NoteController : MonoBehaviour
             }
         }
         ComboManager.manager.Init(numNotes);
+
+        // Init notemesh
+        NoteMesh.Init();
 
         // Init JudgeRange
         NoteUtility.InitJudgeRange();
@@ -347,6 +353,7 @@ public class NoteController : MonoBehaviour
 
         audioMgr.DelayPlay(File.ReadAllBytes(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), 4f);
 
+        // Background
         background = GameObject.Find("Background").GetComponent<FixBackground>();
         background.UpdateBackground(DataLoader.GetBackgroundPath(sid));
     }
