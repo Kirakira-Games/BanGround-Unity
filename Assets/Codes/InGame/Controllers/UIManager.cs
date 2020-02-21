@@ -26,7 +26,7 @@ public class UIManager : MonoBehaviour
 
     void Start()
     {
-        bg_SR = GameObject.Find("Background").GetComponent<SpriteRenderer>();
+        bg_SR = GameObject.Find("ShabiBackground").GetComponent<SpriteRenderer>();
         lan_MR = GameObject.Find("LaneBackground").GetComponent<MeshRenderer>();
         
         var bgColor = LiveSetting.bgBrightness;

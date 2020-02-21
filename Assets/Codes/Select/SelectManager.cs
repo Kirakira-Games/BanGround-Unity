@@ -529,7 +529,7 @@ public class SelectManager : MonoBehaviour
 
         float startVolume = lastPreviewStream.Volume;
 
-        SceneLoader.LoadScene("Select", "InGame");
+        SceneLoader.LoadScene("Select", "InGame",true);
 
         while (delay >= 0)
         {

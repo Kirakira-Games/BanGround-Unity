@@ -16,7 +16,7 @@ public class SceneLoader : MonoBehaviour
 
     void Start()
     {
-        animator = GameObject.Find("GateCanvas").GetComponent<Animator>();
+        animator = GameObject.Find("GateCanvas2").GetComponent<Animator>();
         animator.Play("Closing");
         Load();
     }
@@ -39,16 +39,18 @@ public class SceneLoader : MonoBehaviour
 
         StartCoroutine(LoadAsync());
         //StartCoroutine(UnloadAsync());
-        StartCoroutine(CountDown(4f));
+        
     }
 
     private IEnumerator LoadAsync()
     {
         //关门后再加载下一场景（实际关门时间2.16s）
         yield return new WaitForSeconds(2.3f);
-        operation = SceneManager.LoadSceneAsync(nextSceneName, needOpen ? LoadSceneMode.Additive : LoadSceneMode.Single);
-        operation.allowSceneActivation = false;
-        yield return operation;
+        //operation = SceneManager.LoadSceneAsync(nextSceneName, needOpen ? LoadSceneMode.Additive : LoadSceneMode.Single);
+        //operation.allowSceneActivation = false;
+        //yield return operation;
+        SceneManager.LoadScene(nextSceneName, needOpen ? LoadSceneMode.Additive : LoadSceneMode.Single);
+        StartCoroutine(CountDown(2f));
     }
 
     //private IEnumerator UnloadAsync()
@@ -60,17 +62,17 @@ public class SceneLoader : MonoBehaviour
     private IEnumerator CountDown(float seconds)
     {
         //开门时间（即loading播放时间） 应减去关门所需时间
-        yield return new WaitForSeconds(seconds);
+        //yield return new WaitForSeconds(seconds);
 
         if (needOpen) SceneManager.UnloadSceneAsync(currentSceneName);
 
-        operation.allowSceneActivation = true;
+        //operation.allowSceneActivation = true;
 
         if (needOpen)
         {
             animator.Play("Opening");
             //open gate need 2f
-            yield return new WaitForSeconds(2f);
+            yield return new WaitForSeconds(0.4f);
             SceneManager.UnloadSceneAsync("Loader");
         }
         Loading = false;
