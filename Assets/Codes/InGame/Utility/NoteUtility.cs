@@ -51,6 +51,16 @@ public enum JudgeResult
     Miss
 }
 
+public enum TapEffectType
+{
+    Perfect,
+    Great,
+    Good,
+    Click,
+    Flick,
+    None
+}
+
 public static class NoteUtility
 {
     public const int LANE_COUNT = 7;

@@ -12,6 +12,7 @@ public abstract class NoteBase : MonoBehaviour
     private int animsHead;
 
     public GameNoteType type;
+    public NoteSyncLine syncLine;
     public JudgeResult judgeResult = JudgeResult.None;
 
     protected MeshRenderer mesh;
