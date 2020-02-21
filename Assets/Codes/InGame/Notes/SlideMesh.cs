@@ -53,8 +53,8 @@ public class SlideMesh : MonoBehaviour
 
     public void InitMesh()
     {
-        meshRenderer = gameObject.AddComponent<MeshRenderer>();
-        meshFilter = gameObject.AddComponent<MeshFilter>();
+        meshRenderer = gameObject.GetComponent<MeshRenderer>();
+        meshFilter = gameObject.GetComponent<MeshFilter>();
 
         meshVertices = new Vector3[]
         {
