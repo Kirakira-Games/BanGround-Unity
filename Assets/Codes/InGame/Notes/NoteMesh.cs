@@ -21,15 +21,15 @@ public class NoteMesh
     };
 
     static readonly int[] indices = { 0, 2, 1, 2, 3, 1 };
+    
     const float deltaPerLane = 0.07f;
 
-    public static MeshRenderer Create(GameObject note, int lane)
-    {
-        MeshRenderer meshRenderer = note.AddComponent<MeshRenderer>();
-        Material material = Resources.Load<Material>("TestAssets/Materials/note");
-        meshRenderer.material = material;
+    static private Mesh[] noteMesh;
+    static private int sortingLayerID;
+    static private Material mat;
 
-        MeshFilter meshFilter = note.AddComponent<MeshFilter>();
+    private static Mesh CreateMesh(int lane)
+    {
         float delta = (lane - 3) * deltaPerLane;
         Vector3[] vertices = new Vector3[]
         {
@@ -46,8 +46,29 @@ public class NoteMesh
             triangles = indices
         };
         mesh.RecalculateBounds();
-        meshFilter.mesh = mesh;
-        meshRenderer.sortingLayerID = SortingLayer.NameToID("Note");
+        return mesh;
+    }
+
+    public static void Init()
+    {
+        noteMesh = new Mesh[NoteUtility.LANE_COUNT];
+        for (int i = 0; i < noteMesh.Length; i++)
+        {
+            noteMesh[i] = CreateMesh(i);
+        }
+        sortingLayerID = SortingLayer.NameToID("Note");
+        mat = Resources.Load<Material>("TestAssets/Materials/note");
+    }
+
+    public static MeshRenderer Create(GameObject note, int lane)
+    {
+        MeshRenderer meshRenderer = note.AddComponent<MeshRenderer>();
+        meshRenderer.material = mat;
+
+        MeshFilter meshFilter = note.AddComponent<MeshFilter>();
+        meshFilter.mesh = noteMesh[lane];
+
+        meshRenderer.sortingLayerID = sortingLayerID;
         return meshRenderer;
     }
 }
