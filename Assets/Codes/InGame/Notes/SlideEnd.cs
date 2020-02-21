@@ -8,6 +8,7 @@ public class SlideEnd : SlideNoteBase
     {
         base.UpdatePosition(audioTime);
         IsStickEnd = false;
+        if (!parentSlide) Debug.LogWarning(name);
         if (parentSlide.GetTouchId() != -1 && audioTime >= time)
         {
             if (transform.position.z < NoteUtility.NOTE_JUDGE_POS)

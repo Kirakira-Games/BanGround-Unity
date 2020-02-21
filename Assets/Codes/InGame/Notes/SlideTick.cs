@@ -11,9 +11,9 @@ public class SlideTick : SlideNoteBase
         return JudgeResult.None;
     }
 
-    protected override void OnDestroy() 
+    public override void OnNoteDestroy() 
     {
-        JudgeResultController.controller.DisplayJudgeOffset(OffsetResult.None);
+        JudgeResultController.instance.DisplayJudgeOffset(OffsetResult.None);
     }
 
     public override void InitNote()

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class JudgeResultController : MonoBehaviour
 {
-    public static JudgeResultController controller;
+    public static JudgeResultController instance;
 
     private Sprite[] judges;
     private Sprite early;
@@ -16,7 +16,7 @@ public class JudgeResultController : MonoBehaviour
 
     private void Awake()
     {
-        controller = this;
+        instance = this;
         judges = new Sprite[(int)JudgeResult.Miss + 1];
         for (int i = 0; i <= (int)JudgeResult.Miss; i++)
         {

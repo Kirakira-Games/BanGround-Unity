@@ -103,7 +103,7 @@ public class NoteController : MonoBehaviour
         }
 
         // Update score
-        JudgeResultController.controller.DisplayJudgeResult(result);
+        JudgeResultController.instance.DisplayJudgeResult(result);
 
         // Update combo
         ComboManager.manager.UpdateCombo(result);
@@ -118,9 +118,9 @@ public class NoteController : MonoBehaviour
             while (!laneQueue[i].Empty())
             {
                 NoteBase obj = laneQueue[i].Top();
-                bool nullObj = obj == null;
-                if (nullObj || obj.judgeTime != int.MinValue)
+                if (obj.isDestroyed || obj.judgeTime != int.MinValue)
                 {
+                    NotePool.instance.RemoveFromJudgeQueue(obj);
                     laneQueue[i].Pop();
                 }
                 else
@@ -159,33 +159,9 @@ public class NoteController : MonoBehaviour
 
     private GameObject CreateNote(GameNoteData gameNote)
     {
-        var noteObj = new GameObject("Note");
+        var noteObj = NotePool.instance.GetNote(gameNote.type);
         noteObj.transform.SetParent(transform);
-        NoteBase note;
-        switch (gameNote.type)
-        {
-            case GameNoteType.Single:
-                note = noteObj.AddComponent<TapNote>();
-                break;
-            case GameNoteType.Flick:
-                note = noteObj.AddComponent<FlickNote>();
-                break;
-            case GameNoteType.SlideStart:
-                note = noteObj.AddComponent<SlideStart>();
-                break;
-            case GameNoteType.SlideTick:
-                note = noteObj.AddComponent<SlideTick>();
-                break;
-            case GameNoteType.SlideEnd:
-                note = noteObj.AddComponent<SlideEnd>();
-                break;
-            case GameNoteType.SlideEndFlick:
-                note = noteObj.AddComponent<SlideEndFlick>();
-                break;
-            default:
-                Debug.LogWarning("Cannot create GameNoteType: " + gameNote.type.ToString());
-                return null;
-        }
+        NoteBase note = noteObj.GetComponent<NoteBase>();
         note.time = gameNote.time;
         note.lane = LiveSetting.mirrowEnabled ? NoteUtility.LANE_COUNT - gameNote.lane - 1 : gameNote.lane;
         note.type = gameNote.type;
@@ -208,14 +184,15 @@ public class NoteController : MonoBehaviour
 
     public GameObject CreateSlide(List<GameNoteData> notes)
     {
-        GameObject obj = new GameObject("Slide");
+        GameObject obj = NotePool.instance.GetSlide();
         obj.transform.SetParent(transform);
-        Slide slide = obj.AddComponent<Slide>();
+        Slide slide = obj.GetComponent<Slide>();
         slide.InitSlide();
         foreach (GameNoteData note in notes)
         {
             slide.AddNote(CreateNote(note).GetComponent<NoteBase>());
         }
+        slide.FinalizeSlide();
         return obj;
     }
 

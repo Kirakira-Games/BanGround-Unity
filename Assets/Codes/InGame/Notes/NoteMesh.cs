@@ -62,10 +62,10 @@ public class NoteMesh
 
     public static MeshRenderer Create(GameObject note, int lane)
     {
-        MeshRenderer meshRenderer = note.AddComponent<MeshRenderer>();
+        MeshRenderer meshRenderer = note.GetComponent<MeshRenderer>();
         meshRenderer.material = mat;
 
-        MeshFilter meshFilter = note.AddComponent<MeshFilter>();
+        MeshFilter meshFilter = note.GetComponent<MeshFilter>();
         meshFilter.mesh = noteMesh[lane];
 
         meshRenderer.sortingLayerID = sortingLayerID;
