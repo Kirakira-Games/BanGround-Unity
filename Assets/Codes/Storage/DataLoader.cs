@@ -18,7 +18,7 @@ public class DataLoader
     public static List<cHeader> chartList => songList.cHeaders;
 
     public const int ChartVersion = 1;
-    private const int InitialChartVersion = 1;
+    private const int InitialChartVersion = 2;
     private const int GameVersion = 1;
 
     private static Dictionary<int, cHeader> chartDic;
@@ -305,8 +305,15 @@ public class DataLoader
 
     private static IEnumerator CopyFileFromStreamingAssetsToPersistentDataPath(string relativePath)
     {
-        string streamingPath = "file://" + Application.streamingAssetsPath + relativePath;
-        //string persistentPath = "file://"
+        string streamingPath;
+        if (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.WindowsPlayer) 
+        {
+            streamingPath = Application.streamingAssetsPath + relativePath;
+        }
+        else
+        {
+            streamingPath = "file://" + Application.streamingAssetsPath + relativePath;
+        }
 
         using (UnityWebRequest webRequest = UnityWebRequest.Get(streamingPath))
         {
