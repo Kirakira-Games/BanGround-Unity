@@ -14,9 +14,10 @@ public class NoteController : MonoBehaviour
     private Dictionary<int, NoteSyncLine> syncTable;
     private List<GameNoteData> notes;
     private int noteHead;
-    private GradeColorChange scoreDisplay;
     private int numNotes;
     private AudioManager audioMgr;
+
+    private Object[] tapEffects;
     private int[] soundEffects;
 
     private FixBackground background;
@@ -54,33 +55,22 @@ public class NoteController : MonoBehaviour
     {
         if (result == JudgeResult.Miss) return TapEffectType.None;
         var pos = new Vector3(position.x * 1.444f, -2.97f, 4);
-        var effect = "Effects/effect_tap";
-        TapEffectType se = TapEffectType.None;
+
+        TapEffectType se = TapEffectType.Click;
 
         if (NoteUtility.IsFlick(type))
         {
             if (result <= JudgeResult.Good)
-                effect += "_swipe";
+                se = TapEffectType.Flick;
         }
         else if (result == JudgeResult.Perfect)
-            effect += "_perfect";
-        else if (result == JudgeResult.Great)
-            effect += "_great";
-        else if (result == JudgeResult.Good)
-            effect += "_good";
-
-        if (effect == "Effects/effect_tap")
-            se = TapEffectType.Click;
-        if (effect == "Effects/effect_tap_swipe")
-            se = TapEffectType.Flick;
-        else if (effect == "Effects/effect_tap_perfect")
             se = TapEffectType.Perfect;
-        else if (effect == "Effects/effect_tap_great")
+        else if (result == JudgeResult.Great)
             se = TapEffectType.Great;
-        else if (effect == "Effects/effect_tap_good")
+        else if (result == JudgeResult.Good)
             se = TapEffectType.Good;
 
-        var fx = Instantiate(Resources.Load(effect), pos, Quaternion.identity) as GameObject;
+        var fx = Instantiate(tapEffects[(int)se], pos, Quaternion.identity) as GameObject;
         fx.transform.localScale = Vector3.one * LiveSetting.noteSize * NoteUtility.NOTE_SCALE;
         //StartCoroutine(KillFX(fx, 0.5f));
         Destroy(fx, 0.5f);
@@ -305,7 +295,6 @@ public class NoteController : MonoBehaviour
         syncTable = new Dictionary<int, NoteSyncLine>();
         Application.targetFrameRate = 120;
 
-        scoreDisplay = GameObject.Find("Grades").GetComponent<GradeColorChange>();
         laneQueue = new PriorityQueue<int, NoteBase>[NoteUtility.LANE_COUNT];
         for (int i = 0; i < NoteUtility.LANE_COUNT; i++)
         {
@@ -332,6 +321,16 @@ public class NoteController : MonoBehaviour
 
         // Init JudgeRange
         NoteUtility.InitJudgeRange();
+
+        // Load Tap Effects
+        tapEffects = new Object[]
+        {
+            Resources.Load("Effects/effect_tap_perfect"),
+            Resources.Load("Effects/effect_tap_great"),
+            Resources.Load("Effects/effect_tap_good"),
+            Resources.Load("Effects/effect_tap"),
+            Resources.Load("Effects/effect_tap_swipe")
+        };
 
         // Init AudioManager
         audioMgr = AudioManager.Instanse;
