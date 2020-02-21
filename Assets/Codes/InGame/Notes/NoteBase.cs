@@ -5,20 +5,22 @@ public abstract class NoteBase : MonoBehaviour
 {
     public int lane;
     public int time;
-    public int judgeTime = int.MinValue;
-    public int touchId = -1;
+    public int judgeTime;
+    public int touchId;
     public bool isGray;
+    public bool isDestroyed;
+    public bool inJudgeQueue;
     public GameNoteAnim[] anims;
     private int animsHead;
 
     public GameNoteType type;
     public NoteSyncLine syncLine;
-    public JudgeResult judgeResult = JudgeResult.None;
+    public JudgeResult judgeResult;
 
-    protected MeshRenderer mesh;
+    public MeshRenderer mesh;
 
-    protected Vector3 _cachedInitPos = Vector3.zero;
-    protected Vector3 _cachedJudgePos = Vector3.zero;
+    protected Vector3 _cachedInitPos;
+    protected Vector3 _cachedJudgePos;
 
     public Vector3 initPos { get { return _cachedInitPos == Vector3.zero ? _cachedInitPos = NoteUtility.GetInitPos(lane) : _cachedInitPos; } }
     public Vector3 judgePos { get { return _cachedJudgePos == Vector3.zero ? _cachedJudgePos = NoteUtility.GetJudgePos(lane) : _cachedJudgePos; } }
@@ -29,7 +31,11 @@ public abstract class NoteBase : MonoBehaviour
         animsHead = 0;
         judgeTime = int.MinValue;
         judgeResult = JudgeResult.None;
+        _cachedInitPos = Vector3.zero;
+        _cachedJudgePos = Vector3.zero;
         transform.position = initPos;
+        inJudgeQueue = false;
+        isDestroyed = false;
         transform.localScale = new Vector3(NoteUtility.NOTE_SCALE, NoteUtility.NOTE_SCALE, 1) * LiveSetting.noteSize;
 
         mesh = NoteMesh.Create(gameObject, lane);
@@ -51,7 +57,7 @@ public abstract class NoteBase : MonoBehaviour
         transform.position = newPos;
     }
 
-    protected virtual void OnDestroy()
+    public virtual void OnNoteDestroy()
     {
         if (touchId != -1)
         {
@@ -62,10 +68,10 @@ public abstract class NoteBase : MonoBehaviour
         if (result >= 1 && result <= 3)
         {
             ComboManager.JudgeOffsetResult.Add(time - judgeTime);
-            JudgeResultController.controller.DisplayJudgeOffset(time - judgeTime > 0 ? OffsetResult.Early : OffsetResult.Late);
+            JudgeResultController.instance.DisplayJudgeOffset(time - judgeTime > 0 ? OffsetResult.Early : OffsetResult.Late);
             return;
         }
-        JudgeResultController.controller.DisplayJudgeOffset(OffsetResult.None);
+        JudgeResultController.instance.DisplayJudgeOffset(OffsetResult.None);
     }
 
     protected virtual void OnNoteUpdateJudge(int audioTime)
@@ -127,11 +133,16 @@ public abstract class NoteBase : MonoBehaviour
         judgeTime = audioTime;
         judgeResult = result;
         NoteController.controller.Judge(gameObject, result, touch);
-        Destroy(gameObject);
+        NotePool.instance.DestroyNote(gameObject);
     }
 
     public virtual void Judge(int audioTime, JudgeResult result, Touch? touch)
     {
         RealJudge(audioTime, result, touch);
+    }
+
+    public void OnDestroy()
+    {
+        Debug.Log("note destroyed");
     }
 }
