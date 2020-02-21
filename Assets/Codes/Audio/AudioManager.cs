@@ -217,7 +217,7 @@ class AudioManager : MonoBehaviour
             else 
                 LoopingStreams[i].OnUpdate();
         }
-
+        
         //print(LoadedSound.Count);
         if (isInGame)
         {
