@@ -17,36 +17,46 @@ public class NotePool : MonoBehaviour
         for (int j = 0; j < count; j++)
         {
             var obj = new GameObject(name + j);
+            NoteBase note = null;
             obj.transform.SetParent(transform);
             switch (type)
             {
                 case GameNoteType.Single:
-                    obj.AddComponent<TapNote>();
+                    note = obj.AddComponent<TapNote>();
                     break;
                 case GameNoteType.Flick:
-                    obj.AddComponent<FlickNote>();
+                    note = obj.AddComponent<FlickNote>();
                     break;
                 case GameNoteType.SlideStart:
-                    obj.AddComponent<SlideStart>();
+                    note = obj.AddComponent<SlideStart>();
                     break;
                 case GameNoteType.SlideTick:
-                    obj.AddComponent<SlideTick>();
+                    note = obj.AddComponent<SlideTick>();
                     break;
                 case GameNoteType.SlideEnd:
-                    obj.AddComponent<SlideEnd>();
+                    note = obj.AddComponent<SlideEnd>();
                     break;
                 case GameNoteType.SlideEndFlick:
-                    obj.AddComponent<SlideEndFlick>();
+                    note = obj.AddComponent<SlideEndFlick>();
                     break;
             }
             obj.AddComponent<MeshFilter>();
             obj.AddComponent<MeshRenderer>();
+            note.isDestroyed = true;
+            note.transform.localScale = new Vector3(NoteUtility.NOTE_SCALE, NoteUtility.NOTE_SCALE, 1) * LiveSetting.noteSize;
             if (NoteUtility.IsSlide(type) && !NoteUtility.IsSlideEnd(type))
             {
                 var mesh = new GameObject("SlideBody");
                 mesh.transform.SetParent(obj.transform);
                 mesh.AddComponent<SlideMesh>();
+                mesh.AddComponent<MeshRenderer>();
+                mesh.AddComponent<MeshFilter>();
                 mesh.AddComponent<SortingGroup>().sortingLayerID = SortingLayer.NameToID("SlideBody");
+            }
+            if (type == GameNoteType.SlideStart)
+            {
+                var te = Instantiate(Resources.Load("Effects/effect_TapKeep"), obj.transform) as GameObject;
+                te.AddComponent<TapEffect>();
             }
             obj.SetActive(false);
             Q.Enqueue(obj);
@@ -110,6 +120,7 @@ public class NotePool : MonoBehaviour
     public void DestroySlide(GameObject obj)
     {
         obj.GetComponent<Slide>().OnNoteDestroy();
+        obj.transform.SetParent(transform);
         obj.SetActive(false);
         slideQueue.Enqueue(obj);
     }
@@ -119,6 +130,7 @@ public class NotePool : MonoBehaviour
         var note = obj.GetComponent<NoteBase>();
         var type = note.type;
         note.OnNoteDestroy();
+        obj.transform.SetParent(transform);
         note.isDestroyed = true;
         obj.SetActive(false);
         if (!note.inJudgeQueue)

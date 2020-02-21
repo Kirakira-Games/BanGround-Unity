@@ -40,6 +40,7 @@ public class Slide : MonoBehaviour
     public void FinalizeSlide()
     {
         noteHead.IsTilt = notes[1].lane != noteHead.lane;
+        noteHead.GetComponentInChildren<TapEffect>(true).gameObject.SetActive(false);
         SlideNoteBase lastNote = notes[notes.Count - 1] as SlideNoteBase;
         lastNote.IsTilt = notes[notes.Count - 2].lane != lastNote.lane;
     }
@@ -206,8 +207,7 @@ public class Slide : MonoBehaviour
         NoteController.controller.Judge(note, result, touch);
         if (judgeHead == 0)
         {
-            var obj = Instantiate(Resources.Load("Effects/effect_TapKeep"), noteHead.transform) as GameObject;
-            obj.AddComponent<TapEffect>();
+            noteHead.GetComponentInChildren<TapEffect>(true).gameObject.SetActive(true);
         }
         else
         {

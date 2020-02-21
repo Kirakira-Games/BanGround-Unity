@@ -36,7 +36,6 @@ public abstract class NoteBase : MonoBehaviour
         transform.position = initPos;
         inJudgeQueue = false;
         isDestroyed = false;
-        transform.localScale = new Vector3(NoteUtility.NOTE_SCALE, NoteUtility.NOTE_SCALE, 1) * LiveSetting.noteSize;
 
         mesh = NoteMesh.Create(gameObject, lane);
     }
