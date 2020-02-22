@@ -16,7 +16,7 @@ public class NotePool : MonoBehaviour
     private static int unitCount;
     private static readonly int[] weight = { 4, 1, 1, 2, 1, 1 };
 
-    private void AddNote(Queue<GameObject> Q, GameNoteType type, int count)
+    private void AddNote(Queue<GameObject> Q, GameNoteType type, int count = 1)
     {
         var name = Enum.GetName(typeof(GameNoteType), type);
         for (int j = 0; j < count; j++)
@@ -67,7 +67,7 @@ public class NotePool : MonoBehaviour
         }
     }
 
-    private void AddSlide(int count)
+    private void AddSlide(int count = 1)
     {
         for (int i = 0; i < count; i++)
         {
@@ -77,7 +77,7 @@ public class NotePool : MonoBehaviour
         }
     }
 
-    private void AddTapEffect(int effect, int count)
+    private void AddTapEffect(int effect, int count = 1)
     {
         for (int i = 0; i < count; i++)
         {
@@ -129,7 +129,7 @@ public class NotePool : MonoBehaviour
         if (slideQueue.Count == 0)
         {
             Debug.Log("Add Slides");
-            AddSlide(unitCount);
+            AddSlide();
         }
         var slide = slideQueue.Dequeue();
         slide.SetActive(true);
@@ -146,8 +146,8 @@ public class NotePool : MonoBehaviour
         var Q = noteQueue[(int)type];
         if (Q.Count == 0)
         {
-            Debug.Log("Add notes");
-            AddNote(Q, type, unitCount);
+            Debug.Log("Add notes: " + Enum.GetName(typeof(GameNoteType), type));
+            AddNote(Q, type);
         }
         var note = Q.Dequeue();
         note.SetActive(true);
@@ -191,7 +191,7 @@ public class NotePool : MonoBehaviour
         int ty = (int)type;
         if (teQueue[ty].Count == 0)
         {
-            AddTapEffect(ty, NoteUtility.LANE_COUNT);
+            AddTapEffect(ty);
         }
         var te = teQueue[ty].Dequeue();
         te.transform.position = pos;
