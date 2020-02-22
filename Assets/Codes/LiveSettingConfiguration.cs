@@ -38,6 +38,7 @@ public static class LiveSetting
 
     public static float bgmVolume = .7f;
     public static float seVolume = .7f;
+    public static int bufferSize = 128;
 
     public static bool syncLineEnabled = true;
     public static bool laneEffectEnabled = true;
@@ -129,6 +130,7 @@ public class LiveSettingTemplate
 
     public float bgmVolume = .7f;
     public float seVolume = .7f;
+    public int bufferSize = 128;
 
     public bool syncLineEnabled = true;
     public bool laneEffectEnabled = true;
@@ -156,6 +158,7 @@ public class LiveSettingTemplate
         meshOpacity = LiveSetting.meshOpacity;
         bgmVolume = LiveSetting.bgmVolume;
         seVolume = LiveSetting.seVolume;
+        bufferSize = LiveSetting.bufferSize;
         syncLineEnabled = LiveSetting.syncLineEnabled;
         laneEffectEnabled = LiveSetting.laneEffectEnabled;
         grayNoteEnabled = LiveSetting.grayNoteEnabled;
@@ -183,6 +186,7 @@ public class LiveSettingTemplate
         LiveSetting.meshOpacity = meshOpacity;
         LiveSetting.bgmVolume = bgmVolume;
         LiveSetting.seVolume = seVolume;
+        LiveSetting.bufferSize = bufferSize;
         LiveSetting.syncLineEnabled = syncLineEnabled;
         LiveSetting.laneEffectEnabled = laneEffectEnabled;
         LiveSetting.grayNoteEnabled = grayNoteEnabled;

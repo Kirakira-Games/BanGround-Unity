@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.IO;
 using Newtonsoft.Json;
+using System.Linq;
 
 public class SelectManager : MonoBehaviour
 {
@@ -43,10 +44,12 @@ public class SelectManager : MonoBehaviour
     private Slider long_Bright;
     private Slider seVolume_Input;
     private Slider bgmVolume_Input;
+    private Slider bufferSize_Input;
 
     private AudioManager audioManager;
 
     public GameObject enterAniObj;
+    public GameObject AndroidOnlyPanel;
 
     RectTransform rt ;
     RectTransform rt_v;
@@ -121,6 +124,7 @@ public class SelectManager : MonoBehaviour
         long_Bright = GameObject.Find("Long_Bri_Slider").GetComponent<Slider>();
         seVolume_Input = GameObject.Find("SeVolume_Input").GetComponent<Slider>();
         bgmVolume_Input = GameObject.Find("BGMVolume_Input").GetComponent<Slider>();
+        bufferSize_Input = GameObject.Find("BufferSize_Input").GetComponent<Slider>();
 
         auto_Tog = GameObject.Find("Autoplay_Toggle").GetComponent<Toggle>();
         half_Tog = GameObject.Find("Half_Toggle").GetComponent<Toggle>();
@@ -165,6 +169,8 @@ public class SelectManager : MonoBehaviour
         acc = GameObject.Find("AccText").GetComponent<Text>();
 
         difficultySelect = GameObject.Find("DifficultySelect").GetComponent<DifficultySelect>();
+        AndroidOnlyPanel = GameObject.Find("Android Only");
+        if (Application.platform != RuntimePlatform.Android) AndroidOnlyPanel.SetActive(false);
     }
     void LoadScoreRecord()
     {
@@ -415,6 +421,7 @@ public class SelectManager : MonoBehaviour
 
         seVolume_Input.value = LiveSetting.seVolume;
         bgmVolume_Input.value = LiveSetting.bgmVolume;
+        bufferSize_Input.value = HandleValue_buffer.bufferSize.FirstOrDefault(x => x.Value == LiveSetting.bufferSize).Key;
 
         audioTrack_Tog.isOn = LiveSetting.enableAudioTrack;
     }
@@ -460,6 +467,7 @@ public class SelectManager : MonoBehaviour
         LiveSetting.noteSize = float.Parse(size_Input.text);
         LiveSetting.seVolume = seVolume_Input.value;
         LiveSetting.bgmVolume = bgmVolume_Input.value;
+        LiveSetting.bufferSize = HandleValue_buffer.bufferSize[(int)bufferSize_Input.value];
         LiveSetting.syncLineEnabled = syncLine_Tog.isOn;
         LiveSetting.grayNoteEnabled = offBeat_Tog.isOn;
         LiveSetting.mirrowEnabled = mirrow_Tog.isOn;
