@@ -6,6 +6,7 @@ public abstract class SlideNoteBase : NoteBase
 {
     public bool IsTilt;
     public bool IsStickEnd;
+    public SlideMesh slideMesh;
     protected Slide parentSlide;
 
     protected abstract JudgeResult TrySlideJudge(int audioTime, Touch touch);
@@ -14,6 +15,11 @@ public abstract class SlideNoteBase : NoteBase
     {
         IsStickEnd = false;
         parentSlide = GetComponentInParent<Slide>();
+        if (!NoteUtility.IsSlideEnd(type))
+        {
+            slideMesh = GetComponentInChildren<SlideMesh>();
+            slideMesh.meshRenderer.enabled = true;
+        }
     }
 
     public override void OnNoteDestroy()

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Slide : MonoBehaviour
 {
-    private List<NoteBase> notes;
+    private List<SlideNoteBase> notes;
     private int judgeHead;
     private int displayHead;
     private int touchId;
@@ -30,7 +30,7 @@ public class Slide : MonoBehaviour
 
     public void InitSlide()
     {
-        notes = new List<NoteBase>();
+        notes = new List<SlideNoteBase>();
         touchId = -1;
         judgeHead = 0;
         displayHead = 1;
@@ -41,8 +41,12 @@ public class Slide : MonoBehaviour
     {
         noteHead.IsTilt = notes[1].lane != noteHead.lane;
         noteHead.GetComponentInChildren<TapEffect>(true).gameObject.SetActive(false);
-        SlideNoteBase lastNote = notes[notes.Count - 1] as SlideNoteBase;
+        SlideNoteBase lastNote = notes[notes.Count - 1];
         lastNote.IsTilt = notes[notes.Count - 2].lane != lastNote.lane;
+        foreach (var note in notes)
+        {
+            note.InitSlideNote();
+        }
     }
 
     private void UpdateHead()
@@ -68,22 +72,22 @@ public class Slide : MonoBehaviour
     {
         if (displayHead >= notes.Count)
         {
-            NoteBase lastNote = notes[notes.Count - 1];
+            var lastNote = notes[notes.Count - 1];
             noteHead.transform.position = NoteUtility.GetJudgePos(lastNote.lane);
             noteHead.GetComponentInChildren<SlideMesh>().afterNoteTrans = lastNote.transform;
         }
         else
         {
-            NoteBase next = notes[displayHead];
-            NoteBase prev = notes[displayHead - 1];
+            var next = notes[displayHead];
+            var prev = notes[displayHead - 1];
             float percentage = (float)(audioTime - prev.time) / (next.time - prev.time);
             percentage = Mathf.Max(0, percentage);
             Vector3 prevPos = prev.judgePos;
             Vector3 nextPos = next.judgePos;
             noteHead.transform.position = (nextPos - prevPos) * percentage + prevPos;
-            SlideMesh mesh = noteHead.GetComponentInChildren<SlideMesh>();
+            SlideMesh mesh = noteHead.slideMesh;
             mesh.afterNoteTrans = next.transform;
-            mesh.GetComponent<MeshRenderer>().enabled = displayHead == 1 || !prev.gameObject.activeSelf;
+            mesh.meshRenderer.enabled = displayHead == 1 || !prev.gameObject.activeSelf;
         }
         noteHead.gameObject.SetActive(touchId != -1 || LiveSetting.autoPlayEnabled);
     }
@@ -92,7 +96,7 @@ public class Slide : MonoBehaviour
     {
         UpdateHead();
         if (judgeHead >= notes.Count) return;
-        NoteBase note = notes[judgeHead];
+        var note = notes[judgeHead];
         if (note.touchId == touch.fingerId)
         {
             note.TraceTouch(audioTime, touch);
@@ -123,10 +127,10 @@ public class Slide : MonoBehaviour
 
     public void OnSlideUpdate(int audioTime)
     {
-    	var _notes = GetComponentsInChildren<NoteBase>();
+    	var _notes = GetComponentsInChildren<SlideNoteBase>();
 
         // Update ticks
-        foreach (NoteBase note in _notes)
+        foreach (var note in _notes)
         {
             note.OnNoteUpdate(audioTime);
         }
@@ -147,9 +151,9 @@ public class Slide : MonoBehaviour
         }
 
         // Update mesh
-        foreach (NoteBase note in _notes)
+        foreach (var note in _notes)
         {
-            note.GetComponentInChildren<SlideMesh>()?.OnUpdate();
+            note.slideMesh?.OnUpdate();
             note.GetComponentInChildren<TapEffect>()?.OnUpdate();
         }
     }
@@ -165,8 +169,7 @@ public class Slide : MonoBehaviour
         {
             noteHead = note as SlideStart;
         }
-        notes.Add(note);
-        (note as SlideNoteBase).InitSlideNote();
+        notes.Add((SlideNoteBase)note);
     }
 
     private void BindTouch(Touch? touch)
@@ -186,9 +189,9 @@ public class Slide : MonoBehaviour
     public bool Judge(GameObject note, JudgeResult result, Touch? touch)
     {
         // Must judge head
-        if (judgeHead >= notes.Count || !ReferenceEquals(note.GetComponent<NoteBase>(), notes[judgeHead]))
+        if (judgeHead >= notes.Count || !ReferenceEquals(note.GetComponent<SlideNoteBase>(), notes[judgeHead]))
         {
-            if (notes.IndexOf(note.GetComponent<NoteBase>()) < judgeHead)
+            if (notes.IndexOf(note.GetComponent<SlideNoteBase>()) < judgeHead)
             {
                 note.SetActive(false);
                 BindTouch(touch);
@@ -211,14 +214,9 @@ public class Slide : MonoBehaviour
         }
         else
         {
-            note.gameObject.SetActive(false);
+            note.SetActive(false);
         }
         judgeHead++;
         return true;
-    }
-
-    private void OnDestroy()
-    {
-        Debug.Log("Destory slide");
     }
 }

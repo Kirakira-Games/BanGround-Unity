@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine.Rendering;
+using Object = UnityEngine.Object;
+using System.Collections;
 
 public class NotePool : MonoBehaviour
 {
@@ -9,6 +11,8 @@ public class NotePool : MonoBehaviour
 
     private Queue<GameObject>[] noteQueue;
     private Queue<GameObject> slideQueue;
+    private Queue<GameObject>[] teQueue;
+    private Object[] tapEffects;
     private static int unitCount;
     private static readonly int[] weight = { 4, 1, 1, 2, 1, 1 };
 
@@ -41,10 +45,9 @@ public class NotePool : MonoBehaviour
                     note = obj.AddComponent<SlideEndFlick>();
                     break;
             }
-            obj.AddComponent<MeshFilter>();
-            obj.AddComponent<MeshRenderer>();
             note.isDestroyed = true;
             note.transform.localScale = new Vector3(NoteUtility.NOTE_SCALE, NoteUtility.NOTE_SCALE, 1) * LiveSetting.noteSize;
+            note.InitNote();
             if (NoteUtility.IsSlide(type) && !NoteUtility.IsSlideEnd(type))
             {
                 var mesh = new GameObject("SlideBody");
@@ -74,11 +77,27 @@ public class NotePool : MonoBehaviour
         }
     }
 
+    private void AddTapEffect(int effect, int count)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            var fx = Instantiate(tapEffects[effect], Vector3.zero, Quaternion.identity) as GameObject;
+            fx.transform.localScale = Vector3.one * LiveSetting.noteSize * NoteUtility.NOTE_SCALE;
+            fx.SetActive(false);
+            fx.transform.SetParent(transform);
+            teQueue[effect].Enqueue(fx);
+        }
+    }
+
     void Awake()
     {
         instance = this;
-        noteQueue = new Queue<GameObject>[6];
+
+        // Init notemesh
+        NoteMesh.Init();
         unitCount = NoteUtility.LANE_COUNT * LiveSetting.NoteScreenTime / 1000;
+
+        noteQueue = new Queue<GameObject>[6];
         for (int i = 0; i < noteQueue.Length; i++)
         {
             noteQueue[i] = new Queue<GameObject>();
@@ -87,6 +106,22 @@ public class NotePool : MonoBehaviour
 
         slideQueue = new Queue<GameObject>();
         AddSlide(unitCount);
+
+        // Load Tap Effects
+        tapEffects = new Object[]
+        {
+            Resources.Load("Effects/effect_tap_perfect"),
+            Resources.Load("Effects/effect_tap_great"),
+            Resources.Load("Effects/effect_tap_good"),
+            Resources.Load("Effects/effect_tap"),
+            Resources.Load("Effects/effect_tap_swipe")
+        };
+        teQueue = new Queue<GameObject>[5];
+        for (int i = 0; i < teQueue.Length; i++)
+        {
+            teQueue[i] = new Queue<GameObject>();
+            AddTapEffect(i, NoteUtility.LANE_COUNT);
+        }
     }
 
     public GameObject GetSlide()
@@ -148,5 +183,28 @@ public class NotePool : MonoBehaviour
         {
             noteQueue[(int)note.type].Enqueue(note.gameObject);
         }
+    }
+
+    public void PlayTapEffect(TapEffectType type, Vector3 pos)
+    {
+        if (type == TapEffectType.None) return;
+        int ty = (int)type;
+        if (teQueue[ty].Count == 0)
+        {
+            AddTapEffect(ty, NoteUtility.LANE_COUNT);
+        }
+        var te = teQueue[ty].Dequeue();
+        te.transform.position = pos;
+        te.GetComponent<ParticleSystem>().Play();
+        te.SetActive(true);
+        StartCoroutine(KillFX(te, ty, 0.5f));
+    }
+
+    private IEnumerator KillFX(GameObject fx, int type, float delaySeconds)
+    {
+        yield return new WaitForSeconds(delaySeconds);
+        fx.GetComponent<ParticleSystem>().Stop();
+        fx.SetActive(false);
+        teQueue[type].Enqueue(fx);
     }
 }
