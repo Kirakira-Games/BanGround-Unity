@@ -97,10 +97,10 @@ public class UIManager : MonoBehaviour
         GamePause();
     }
 
-    public void OnAudioFinish()
+    public void OnAudioFinish(bool restart)
     {
         if(!SceneLoader.Loading)
-            StartCoroutine(ShowResult());
+            StartCoroutine(ShowResult(restart));
     }
 
     IEnumerator DelayDisableGate()
@@ -109,7 +109,7 @@ public class UIManager : MonoBehaviour
         gateCanvas.SetActive(false);
     }
 
-    IEnumerator ShowResult()
+    IEnumerator ShowResult(bool restart)
     {
         gateCanvas.SetActive(true);
         Image gateImg = GameObject.Find("GateImg").GetComponent<Image>();
@@ -134,7 +134,8 @@ public class UIManager : MonoBehaviour
         }
         GameObject.Find("GateCanvas").GetComponent<Animator>().Play("GateClose");
         yield return new WaitForSeconds(3);
-        SceneManager.LoadSceneAsync("Result");
+        if (restart) SceneManager.LoadSceneAsync("InGame");
+        else SceneManager.LoadSceneAsync("Result");
         //SceneLoader.LoadScene("InGame", "Result", true);
     }
 
