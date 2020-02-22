@@ -73,6 +73,7 @@ public class NotePool : MonoBehaviour
         {
             var obj = new GameObject("Slide" + i);
             obj.AddComponent<Slide>();
+            obj.transform.SetParent(transform);
             slideQueue.Enqueue(obj);
         }
     }
