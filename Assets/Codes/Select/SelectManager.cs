@@ -545,6 +545,7 @@ public class SelectManager : MonoBehaviour
         CloseSetting();
         setting_Open_Btn.gameObject.SetActive(false);
 
+        GameObject.Find("milk").GetComponent<Animator>().Play("out", -1);
 
         StartCoroutine(DelayLoadScene());
 
