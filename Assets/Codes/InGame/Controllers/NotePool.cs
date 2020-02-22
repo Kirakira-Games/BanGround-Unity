@@ -73,6 +73,7 @@ public class NotePool : MonoBehaviour
         {
             var obj = new GameObject("Slide" + i);
             obj.AddComponent<Slide>();
+            obj.SetActive(false);
             obj.transform.SetParent(transform);
             slideQueue.Enqueue(obj);
         }
@@ -123,6 +124,7 @@ public class NotePool : MonoBehaviour
             teQueue[i] = new Queue<GameObject>();
             AddTapEffect(i, NoteUtility.LANE_COUNT);
         }
+        AddTapEffect(0, NoteUtility.LANE_COUNT * 4);
     }
 
     public GameObject GetSlide()
