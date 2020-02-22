@@ -196,15 +196,18 @@ class AudioManager : MonoBehaviour
         {
             flag |= BASSInit.BASS_DEVICE_AUDIOTRACK;
         }
-        if (AppPreLoader.init)
+        
+		if (AppPreLoader.init)
         {
             Bass.BASS_SetConfig(BASSConfig.BASS_CONFIG_BUFFER, LiveSetting.bufferSize);// AppPreLoader.bufferSize);
             Bass.BASS_SetConfig(BASSConfig.BASS_CONFIG_DEV_BUFFER, LiveSetting.bufferSize);// AppPreLoader.bufferSize);
             AudioSettings.Reset(new AudioConfiguration() { dspBufferSize = LiveSetting.bufferSize, speakerMode = AudioSpeakerMode.Stereo });
         }
-#endif
 
+        if (!Bass.BASS_Init(-1, AppPreLoader.init ? AppPreLoader.sampleRate : 48000, flag, IntPtr.Zero))
+#else
         if (!Bass.BASS_Init(-1, 48000, flag, IntPtr.Zero))
+#endif
         {
             throw new Exception(Bass.BASS_ErrorGetCode().ToString());
         }
