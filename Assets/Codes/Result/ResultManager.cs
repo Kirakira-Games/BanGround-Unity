@@ -363,7 +363,7 @@ static class ResultsGetter
     }
     public static Ranks GetRanks()
     {
-        double acc = ComboManager.acc / (double)ComboManager.maxAcc;
+        double acc = GetAcc();
         if (acc >= 0.998)
             return Ranks.SSS;
         else if (acc >= 0.99)
@@ -383,7 +383,7 @@ static class ResultsGetter
     }
     public static double GetAcc()
     {
-        double acc = ComboManager.acc / (double)ComboManager.maxAcc;
+        double acc = ComboManager.acc / (double)ComboManager.noteCount;
         return acc;
     }
 }

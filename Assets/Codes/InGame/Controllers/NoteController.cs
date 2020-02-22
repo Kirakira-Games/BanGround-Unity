@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Profiling;
+using UnityEngine.Events;
 
 public class NoteController : MonoBehaviour
 {
@@ -21,6 +22,8 @@ public class NoteController : MonoBehaviour
     private int[] soundEffects;
 
     private FixBackground background;
+
+    private UnityAction<JudgeResult> onJudge;
 
     public void RegisterTouch(int id, GameObject obj)
     {
@@ -86,6 +89,8 @@ public class NoteController : MonoBehaviour
     // Judge a note as result
     public void Judge(GameObject note, JudgeResult result, Touch? touch)
     {
+        onJudge?.Invoke(result);
+
         NoteBase notebase = note.GetComponent<NoteBase>();
         if (result == JudgeResult.None)
         {
@@ -356,6 +361,30 @@ public class NoteController : MonoBehaviour
         // Background
         background = GameObject.Find("dokidokiBackground").GetComponent<FixBackground>();
         background.UpdateBackground(DataLoader.GetBackgroundPath(sid));
+
+        //Set Play Mod Event
+        foreach (var mod in LiveSetting.attachedMods)
+        {
+            if (mod is SuddenDeathMod)
+                onJudge += ((JudgeResult result) =>
+                {
+                    if (result != JudgeResult.Perfect && result != JudgeResult.Great)
+                    {
+                        audioMgr.StopBGM();
+                        //audioMgr.restart = true;
+                    }
+                });
+
+            else if (mod is PerfectMod) 
+                onJudge += ((JudgeResult result) =>
+                {
+                    if (result != JudgeResult.Perfect)
+                    {
+                        audioMgr.StopBGM();
+                        audioMgr.restart = true;
+                    }
+                });
+        }
     }
 
     void Update()
@@ -393,18 +422,5 @@ public class NoteController : MonoBehaviour
         {
             noteSyncLine[i].OnSyncLineUpdate();
         }
-
-        //foreach (Transform child in transform)
-        //{
-        //    child.GetComponent<NoteBase>()?.OnNoteUpdate(audioTime);
-        //    child.GetComponent<Slide>()?.OnSlideUpdate(audioTime);
-        //}
-        //Profiler.EndSample();
-
-        //Profiler.BeginSample("UpdateSyncLineTransform");
-        //foreach (Transform child in transform)
-        //{
-        //    child.GetComponent<NoteSyncLine>()?.OnSyncLineUpdate();
-        //}
     }
 }
