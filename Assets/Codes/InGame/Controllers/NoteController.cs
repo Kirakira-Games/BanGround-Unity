@@ -100,25 +100,30 @@ public class NoteController : MonoBehaviour
         ComboManager.manager.UpdateCombo(result);
     }
 
+    private void UpdateLane(int i)
+    {
+        // Remove judged and destroyed notes from queue
+        while (!laneQueue[i].Empty())
+        {
+            NoteBase obj = laneQueue[i].Top();
+            if (obj.isDestroyed || obj.judgeTime != int.MinValue)
+            {
+                NotePool.instance.RemoveFromJudgeQueue(obj);
+                laneQueue[i].Pop();
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+
     private void OnTouch(int audioTime, int lane, Touch touch)
     {
         NoteBase noteToJudge = null;
         for (int i = Mathf.Max(0, lane - 1); i < Mathf.Min(NoteUtility.LANE_COUNT, lane + 2); i++)
         {
-            // Remove judged and destroyed notes from queue
-            while (!laneQueue[i].Empty())
-            {
-                NoteBase obj = laneQueue[i].Top();
-                if (obj.isDestroyed || obj.judgeTime != int.MinValue)
-                {
-                    NotePool.instance.RemoveFromJudgeQueue(obj);
-                    laneQueue[i].Pop();
-                }
-                else
-                {
-                    break;
-                }
-            }
+            UpdateLane(i);
             // Try to judge the front of the queue
             if (!laneQueue[i].Empty())
             {
@@ -323,6 +328,10 @@ public class NoteController : MonoBehaviour
 
         // Create notes
         UpdateNotes(audioTime);
+        for (int i = 0; i < NoteUtility.LANE_COUNT; i++)
+        {
+            UpdateLane(i);
+        }
 
         // Trigger touch event
         UpdateTouch(audioTime);
