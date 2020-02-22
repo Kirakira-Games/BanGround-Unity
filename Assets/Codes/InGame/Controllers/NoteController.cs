@@ -17,7 +17,6 @@ public class NoteController : MonoBehaviour
     private int numNotes;
     private AudioManager audioMgr;
 
-    private Object[] tapEffects;
     private int[] soundEffects;
 
     private FixBackground background;
@@ -70,17 +69,9 @@ public class NoteController : MonoBehaviour
         else if (result == JudgeResult.Good)
             se = TapEffectType.Good;
 
-        var fx = Instantiate(tapEffects[(int)se], pos, Quaternion.identity) as GameObject;
-        fx.transform.localScale = Vector3.one * LiveSetting.noteSize * NoteUtility.NOTE_SCALE;
-        //StartCoroutine(KillFX(fx, 0.5f));
-        Destroy(fx, 0.5f);
-        return se;
-    }
+        NotePool.instance.PlayTapEffect(se, pos);
 
-    public static IEnumerator KillFX(GameObject fx, float delaySeconds)
-    {
-        yield return new WaitForSeconds(delaySeconds);
-        Destroy(fx);
+        return se;
     }
 
     // Judge a note as result
@@ -167,7 +158,7 @@ public class NoteController : MonoBehaviour
         note.type = gameNote.type;
         note.isGray = LiveSetting.grayNoteEnabled ? gameNote.isGray : false;
         note.anims = gameNote.anims.ToArray();
-        note.InitNote();
+        note.ResetNote();
         laneQueue[note.lane].Push(note.time, note);
         // Add sync line
         if (!syncTable.ContainsKey(note.time) || syncTable[note.time] == null)
@@ -299,21 +290,8 @@ public class NoteController : MonoBehaviour
         }
         ComboManager.manager.Init(numNotes);
 
-        // Init notemesh
-        NoteMesh.Init();
-
         // Init JudgeRange
         NoteUtility.InitJudgeRange();
-
-        // Load Tap Effects
-        tapEffects = new Object[]
-        {
-            Resources.Load("Effects/effect_tap_perfect"),
-            Resources.Load("Effects/effect_tap_great"),
-            Resources.Load("Effects/effect_tap_good"),
-            Resources.Load("Effects/effect_tap"),
-            Resources.Load("Effects/effect_tap_swipe")
-        };
 
         // Init AudioManager
         audioMgr = AudioManager.Instanse;

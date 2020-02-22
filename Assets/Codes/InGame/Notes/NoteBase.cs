@@ -17,27 +17,28 @@ public abstract class NoteBase : MonoBehaviour
     public NoteSyncLine syncLine;
     public JudgeResult judgeResult;
 
-    public MeshRenderer mesh;
-
-    protected Vector3 _cachedInitPos;
-    protected Vector3 _cachedJudgePos;
-
-    public Vector3 initPos { get { return _cachedInitPos == Vector3.zero ? _cachedInitPos = NoteUtility.GetInitPos(lane) : _cachedInitPos; } }
-    public Vector3 judgePos { get { return _cachedJudgePos == Vector3.zero ? _cachedJudgePos = NoteUtility.GetJudgePos(lane) : _cachedJudgePos; } }
+    public Vector3 initPos;
+    public Vector3 judgePos;
 
     public virtual void InitNote()
+    {
+        NoteMesh.CreateMesh(gameObject);
+    }
+
+    public virtual void ResetNote()
     {
         touchId = -1;
         animsHead = 0;
         judgeTime = int.MinValue;
         judgeResult = JudgeResult.None;
-        _cachedInitPos = Vector3.zero;
-        _cachedJudgePos = Vector3.zero;
         transform.position = initPos;
-        inJudgeQueue = false;
+        inJudgeQueue = true;
         isDestroyed = false;
 
-        mesh = NoteMesh.Create(gameObject, lane);
+        initPos = NoteUtility.GetInitPos(lane);
+        judgePos = NoteUtility.GetJudgePos(lane);
+
+        NoteMesh.Reset(gameObject, lane);
     }
 
     public virtual void UpdatePosition(int audioTime)
@@ -49,7 +50,7 @@ public abstract class NoteBase : MonoBehaviour
         float ratio = (float)timeSub / (anim.endT - anim.startT);
         float pos = ratio * (anim.endZ - anim.startZ) + anim.startZ;
 
-        Vector3 newPos = _cachedInitPos;
+        Vector3 newPos = initPos;
         if (LiveSetting.bangPerspective)
             pos = NoteUtility.GetBangPerspective(pos);
         newPos.z = initPos.z - (NoteUtility.NOTE_START_POS - NoteUtility.NOTE_JUDGE_POS) * pos;
@@ -138,10 +139,5 @@ public abstract class NoteBase : MonoBehaviour
     public virtual void Judge(int audioTime, JudgeResult result, Touch? touch)
     {
         RealJudge(audioTime, result, touch);
-    }
-
-    public void OnDestroy()
-    {
-        Debug.Log("note destroyed");
     }
 }

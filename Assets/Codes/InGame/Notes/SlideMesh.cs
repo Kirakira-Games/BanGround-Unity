@@ -6,8 +6,8 @@ using UnityEngine.Rendering;
 // 绿条
 public class SlideMesh : MonoBehaviour
 {
-    private MeshRenderer meshRenderer;
-    private MeshFilter meshFilter;
+    public MeshRenderer meshRenderer;
+    public MeshFilter meshFilter;
     private Vector3[] meshVertices;
 
     public Transform afterNoteTrans;
