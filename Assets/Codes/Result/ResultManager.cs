@@ -194,7 +194,7 @@ public class ResultManager : MonoBehaviour
         markIcon = GameObject.Find("MarkIcon").GetComponent<RawImage>();
         difficultCard = GameObject.Find("LevelBG").GetComponent<Image>();
 
-        offset_Obj.gameObject.SetActive(false);
+        //offset_Obj.gameObject.SetActive(false);
     }
 
     public void ShowScore()
