@@ -15,6 +15,16 @@ public class AudioMod : ModBase
     public virtual void ApplyMod(BassMemStream stream){}
 }
 
+public class PlayMod : ModBase{ }
+public class SuddenDeathMod : PlayMod 
+{
+    public static SuddenDeathMod Instance = new SuddenDeathMod();
+}
+public class PerfectMod : PlayMod 
+{
+    public static PerfectMod Instance = new PerfectMod();
+}
+
 public class DoubleMod : AudioMod
 {
     public static DoubleMod Instanse = new DoubleMod();
@@ -22,7 +32,7 @@ public class DoubleMod : AudioMod
     public override Type[] IncompatibleMods => new Type[] { typeof(HalfMod) };
 
     public override float SpeedCompensation => 1.5f;
-    public override float ScoreMultiplier => 1.5f;
+    public override float ScoreMultiplier => 1.1f;
 
     public override void ApplyMod(BassMemStream stream)
     {
