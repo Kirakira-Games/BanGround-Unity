@@ -383,7 +383,7 @@ static class ResultsGetter
     }
     public static double GetAcc()
     {
-        double acc = ComboManager.acc / (double)ComboManager.noteCount;
+        double acc = ComboManager.acc / (double)ComboManager.noteCount * 10;
         return acc;
     }
 }
