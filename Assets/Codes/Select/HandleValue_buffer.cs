@@ -7,18 +7,17 @@ public class HandleValue_buffer : MonoBehaviour
 {
     private Slider slider;
     private Text valueText;
-    //private readonly int[] bufferSize = new int[] { 128, 256, 512, 1024, 2048 };
-    public static readonly Dictionary<int, int> bufferSize = new Dictionary<int, int> { { 0, 128 }, { 1, 256 }, { 2, 512 }, { 3, 1024 }, { 4, 2048 } };
+    private readonly float[] bufferSize = new float[] { 0.125f, 0.25f, 0.5f, 1, 2, 4, 8 };
 
     void Start()
     {
         slider = GetComponent<Slider>();
         valueText = transform.Find("Handle Slide Area/Handle/Value").GetComponent<Text>();
 
-        valueText.text = bufferSize[(int)slider.value].ToString();
+        valueText.text = (AppPreLoader.bufferSize * bufferSize[(int)slider.value]).ToString();
         slider.onValueChanged.AddListener((value) =>
         {
-            valueText.text = bufferSize[(int)slider.value].ToString();
+            valueText.text = (AppPreLoader.bufferSize * bufferSize[(int)slider.value]).ToString();
         });
     }
 
