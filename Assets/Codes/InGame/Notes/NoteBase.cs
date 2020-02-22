@@ -45,6 +45,8 @@ public abstract class NoteBase : MonoBehaviour
     {
         while (animsHead < anims.Length - 1 && audioTime > anims[animsHead].endT)
             animsHead++;
+        while (animsHead > 0 && audioTime < anims[animsHead].startT)
+            animsHead--;
         var anim = anims[animsHead];
         int timeSub = audioTime - anim.startT;
         float ratio = (float)timeSub / (anim.endT - anim.startT);
