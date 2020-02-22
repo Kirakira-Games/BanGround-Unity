@@ -50,7 +50,7 @@ public static class LiveSetting
     public static float laneBrightness = 0.84f;
     public static float longBrightness = .8f;
 
-    public static bool enableAudioTrack = true;
+    public static bool enableAudioTrack = false;
 
     public const string assetDirectory = "V2Assets";
     public const string IconPath = "UI/v3/";

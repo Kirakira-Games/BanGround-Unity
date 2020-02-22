@@ -306,7 +306,7 @@ public class DataLoader
     private static IEnumerator CopyFileFromStreamingAssetsToPersistentDataPath(string relativePath)
     {
         string streamingPath;
-        if (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.WindowsPlayer) 
+        if (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.Android)  
         {
             streamingPath = Application.streamingAssetsPath + relativePath;
         }
@@ -314,6 +314,8 @@ public class DataLoader
         {
             streamingPath = "file://" + Application.streamingAssetsPath + relativePath;
         }
+
+        Debug.Log(streamingPath);
 
         using (UnityWebRequest webRequest = UnityWebRequest.Get(streamingPath))
         {
