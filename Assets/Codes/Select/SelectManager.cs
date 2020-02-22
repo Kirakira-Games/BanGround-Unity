@@ -31,6 +31,10 @@ public class SelectManager : MonoBehaviour
     private Toggle double_Tog;
     // Half
     private Toggle half_Tog;
+    //Sudden Death
+    private Toggle suddenDeath_Tog;
+    //Perfect
+    private Toggle perfect_Tog;
 
     /* Mods End */
 
@@ -129,6 +133,8 @@ public class SelectManager : MonoBehaviour
         auto_Tog = GameObject.Find("Autoplay_Toggle").GetComponent<Toggle>();
         half_Tog = GameObject.Find("Half_Toggle").GetComponent<Toggle>();
         double_Tog = GameObject.Find("Double_Toggle").GetComponent<Toggle>();
+        suddenDeath_Tog = GameObject.Find("SuddenDeath_Toggle").GetComponent<Toggle>();
+        perfect_Tog = GameObject.Find("Perfect_Toggle").GetComponent<Toggle>();
 
         audioTrack_Tog = GameObject.Find("AudioTrack_Toggle").GetComponent<Toggle>();
 
@@ -394,7 +400,7 @@ public class SelectManager : MonoBehaviour
     //--------------------------------------------
     void OpenSetting()
     {
-        GetModStatus();
+        //GetModStatus();
         GameObject.Find("Setting_Canvas").GetComponent<Animator>().SetBool("Drop", true);
     }
     void CloseSetting()
@@ -424,11 +430,15 @@ public class SelectManager : MonoBehaviour
         bufferSize_Input.value = HandleValue_buffer.bufferSize.FirstOrDefault(x => x.Value == LiveSetting.bufferSize).Key;
 
         audioTrack_Tog.isOn = LiveSetting.enableAudioTrack;
+
+        GetModStatus();
     }
     void GetModStatus()
     {
         half_Tog.isOn = LiveSetting.attachedMods.Contains(HalfMod.Instanse);
         double_Tog.isOn = LiveSetting.attachedMods.Contains(DoubleMod.Instanse);
+        suddenDeath_Tog.isOn = LiveSetting.attachedMods.Contains(SuddenDeathMod.Instance);
+        perfect_Tog.isOn = LiveSetting.attachedMods.Contains(PerfectMod.Instance);
     }
 
     public void OnLanuageChanged(int value)
@@ -480,7 +490,7 @@ public class SelectManager : MonoBehaviour
 
         LiveSetting.enableAudioTrack = audioTrack_Tog.isOn;
 
-        if(!double_Tog.isOn)
+        if (!double_Tog.isOn)
             LiveSetting.RemoveMod(DoubleMod.Instanse);
 
         if(!half_Tog.isOn)
@@ -491,6 +501,13 @@ public class SelectManager : MonoBehaviour
 
         if (half_Tog.isOn)
             LiveSetting.AddMod(HalfMod.Instanse);
+
+        if (suddenDeath_Tog.isOn) LiveSetting.AddMod(SuddenDeathMod.Instance);
+        else LiveSetting.RemoveMod(SuddenDeathMod.Instance);
+
+        if (perfect_Tog.isOn) LiveSetting.AddMod(PerfectMod.Instance);
+        else LiveSetting.RemoveMod(PerfectMod.Instance);
+
     }
 
     public void OnDoubleModChange()

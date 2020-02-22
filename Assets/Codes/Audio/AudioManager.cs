@@ -178,6 +178,7 @@ class AudioManager : MonoBehaviour
 
     public bool loading = true;//bgm will not start untill the gate open
     public bool isInGame;
+    public bool restart = false;
 
     private int lastPos = -1;
     private float lastUpdateTime = -1;
@@ -230,7 +231,7 @@ class AudioManager : MonoBehaviour
             if (!loading && !GetPlayStatus())
             {
                 loading = true;
-                GameObject.Find("UIManager")?.GetComponent<UIManager>()?.OnAudioFinish();
+                GameObject.Find("UIManager")?.GetComponent<UIManager>()?.OnAudioFinish(restart);
             }
         }
     }
