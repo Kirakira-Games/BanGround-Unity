@@ -197,8 +197,9 @@ class AudioManager : MonoBehaviour
         }
         if (AppPreLoader.init)
         {
-            Bass.BASS_SetConfig(BASSConfig.BASS_CONFIG_BUFFER, AppPreLoader.bufferSize * 2);
-            Bass.BASS_SetConfig(BASSConfig.BASS_CONFIG_DEV_BUFFER, AppPreLoader.bufferSize * 2);
+            Bass.BASS_SetConfig(BASSConfig.BASS_CONFIG_BUFFER, LiveSetting.bufferSize);// AppPreLoader.bufferSize);
+            Bass.BASS_SetConfig(BASSConfig.BASS_CONFIG_DEV_BUFFER, LiveSetting.bufferSize);// AppPreLoader.bufferSize);
+            AudioSettings.Reset(new AudioConfiguration() { dspBufferSize = LiveSetting.bufferSize, speakerMode = AudioSpeakerMode.Stereo });
         }
 #endif
 
@@ -259,7 +260,7 @@ class AudioManager : MonoBehaviour
         return result;
     }
 
-    public BassMemStream StreamSound(byte[] file, BASSFlag flags = BASSFlag.BASS_DEFAULT)
+    public BassMemStream StreamSound(byte[] file, BASSFlag flags = BASSFlag.BASS_DEFAULT, float volume = 1f)
     {
         var pinnedObject = GCHandle.Alloc(file, GCHandleType.Pinned);
         var pinnedObjectPtr = pinnedObject.AddrOfPinnedObject();
@@ -272,6 +273,7 @@ class AudioManager : MonoBehaviour
             Bass.BASS_ChannelSetAttribute(id, BASSAttribute.BASS_ATTRIB_TEMPO_OPTION_USE_QUICKALGO, 1);
             Bass.BASS_ChannelSetAttribute(id, BASSAttribute.BASS_ATTRIB_TEMPO_OPTION_OVERLAP_MS, 4);
             Bass.BASS_ChannelSetAttribute(id, BASSAttribute.BASS_ATTRIB_TEMPO_OPTION_SEQUENCE_MS, 30);
+            Bass.BASS_ChannelSetAttribute(id, BASSAttribute.BASS_ATTRIB_VOL, volume);
         }
 
         return new BassMemStream(pinnedObject, id);
@@ -323,7 +325,7 @@ class AudioManager : MonoBehaviour
 
     private IEnumerator DelayPlayBGM(byte[] audioData, float seconds)
     {
-        BGMStream = StreamSound(audioData, BASSFlag.BASS_STREAM_DECODE);
+        BGMStream = StreamSound(audioData, BASSFlag.BASS_STREAM_DECODE, LiveSetting.bgmVolume);
         loading = true;
         lastPos = LiveSetting.audioOffset - (int)(seconds * 1000);
         yield return new WaitForSeconds(seconds);

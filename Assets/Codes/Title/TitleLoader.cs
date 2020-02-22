@@ -22,6 +22,7 @@ public class TitleLoader : MonoBehaviour
     {
         StartCoroutine(PlayTitle());
 
+        if (Application.platform != RuntimePlatform.Android) return;
         MessageBoxController.Instance.ShowMsg(LogLevel.INFO, "Load Device Audio Info Success");
         MessageBoxController.Instance.ShowMsg(LogLevel.INFO, "SampleRate: " + AppPreLoader.sampleRate.ToString() + "  BufferSize: " + AppPreLoader.bufferSize.ToString());
     }
