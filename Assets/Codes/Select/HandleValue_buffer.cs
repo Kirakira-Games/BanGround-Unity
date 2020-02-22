@@ -7,7 +7,7 @@ public class HandleValue_buffer : MonoBehaviour
 {
     private Slider slider;
     private Text valueText;
-    private readonly float[] bufferSize = new float[] { 0.125f, 0.25f, 0.5f, 1, 2, 4, 8 };
+    public static float[] bufferSize = new float[] { 0.125f, 0.25f, 0.5f, 1, 2, 4, 8 };
 
     void Start()
     {

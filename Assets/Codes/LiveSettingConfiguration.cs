@@ -38,7 +38,7 @@ public static class LiveSetting
 
     public static float bgmVolume = .7f;
     public static float seVolume = .7f;
-    public static int bufferSize = 128;
+    public static int bufferSize = -1;
 
     public static bool syncLineEnabled = true;
     public static bool laneEffectEnabled = true;
@@ -130,7 +130,7 @@ public class LiveSettingTemplate
 
     public float bgmVolume = .7f;
     public float seVolume = .7f;
-    public int bufferSize = 128;
+    public int bufferSize = -1;
 
     public bool syncLineEnabled = true;
     public bool laneEffectEnabled = true;

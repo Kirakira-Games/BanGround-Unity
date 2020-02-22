@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 using System.IO;
 using Newtonsoft.Json;
 using System.Linq;
+using System;
 
 public class SelectManager : MonoBehaviour
 {
@@ -427,7 +428,7 @@ public class SelectManager : MonoBehaviour
 
         seVolume_Input.value = LiveSetting.seVolume;
         bgmVolume_Input.value = LiveSetting.bgmVolume;
-        bufferSize_Input.value = HandleValue_buffer.bufferSize.FirstOrDefault(x => x.Value == LiveSetting.bufferSize).Key;
+        bufferSize_Input.value = Array.IndexOf(HandleValue_buffer.bufferSize, HandleValue_buffer.bufferSize.FirstOrDefault(x => x * AppPreLoader.bufferSize == LiveSetting.bufferSize));
 
         audioTrack_Tog.isOn = LiveSetting.enableAudioTrack;
 
@@ -477,7 +478,7 @@ public class SelectManager : MonoBehaviour
         LiveSetting.noteSize = float.Parse(size_Input.text);
         LiveSetting.seVolume = seVolume_Input.value;
         LiveSetting.bgmVolume = bgmVolume_Input.value;
-        LiveSetting.bufferSize = HandleValue_buffer.bufferSize[(int)bufferSize_Input.value];
+        LiveSetting.bufferSize = (int)HandleValue_buffer.bufferSize[(int)bufferSize_Input.value] * AppPreLoader.bufferSize;
         LiveSetting.syncLineEnabled = syncLine_Tog.isOn;
         LiveSetting.grayNoteEnabled = offBeat_Tog.isOn;
         LiveSetting.mirrowEnabled = mirrow_Tog.isOn;
