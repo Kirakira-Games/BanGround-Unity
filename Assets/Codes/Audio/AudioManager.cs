@@ -195,6 +195,11 @@ class AudioManager : MonoBehaviour
         {
             flag |= BASSInit.BASS_DEVICE_AUDIOTRACK;
         }
+        if (AppPreLoader.init)
+        {
+            Bass.BASS_SetConfig(BASSConfig.BASS_CONFIG_BUFFER, AppPreLoader.bufferSize * 2);
+            Bass.BASS_SetConfig(BASSConfig.BASS_CONFIG_DEV_BUFFER, AppPreLoader.bufferSize * 2);
+        }
 #endif
 
         if (!Bass.BASS_Init(-1, 48000, flag, IntPtr.Zero))
