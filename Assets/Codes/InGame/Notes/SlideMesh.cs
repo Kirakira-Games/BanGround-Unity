@@ -6,23 +6,18 @@ using UnityEngine.Rendering;
 // 绿条
 public class SlideMesh : MonoBehaviour
 {
-    private MeshRenderer meshRenderer;
-    private MeshFilter meshFilter;
+    public MeshRenderer meshRenderer;
+    public MeshFilter meshFilter;
     private Vector3[] meshVertices;
 
     public Transform afterNoteTrans;
     public const float BODY_WIDTH = 0.6f;
 
-    public static SlideMesh Create(Transform start, Transform after)
+    public static void Create(SlideMesh mesh, Transform after)
     {
-        GameObject slideMesh = new GameObject("SlideBody");
-        SlideMesh mesh = slideMesh.AddComponent<SlideMesh>();
-        mesh.transform.SetParent(start);
         mesh.transform.localPosition = new Vector3(0f, -0.01f);
         mesh.afterNoteTrans = after;
         mesh.InitMesh();
-        slideMesh.AddComponent<SortingGroup>().sortingLayerID = SortingLayer.NameToID("SlideBody");
-        return mesh;
     }
 
     readonly Vector2[] uv =
@@ -58,8 +53,8 @@ public class SlideMesh : MonoBehaviour
 
     public void InitMesh()
     {
-        meshRenderer = gameObject.AddComponent<MeshRenderer>();
-        meshFilter = gameObject.AddComponent<MeshFilter>();
+        meshRenderer = gameObject.GetComponent<MeshRenderer>();
+        meshFilter = gameObject.GetComponent<MeshFilter>();
 
         meshVertices = new Vector3[]
         {

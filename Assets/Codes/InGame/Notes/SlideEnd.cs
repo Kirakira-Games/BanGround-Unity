@@ -8,6 +8,7 @@ public class SlideEnd : SlideNoteBase
     {
         base.UpdatePosition(audioTime);
         IsStickEnd = false;
+        if (!parentSlide) Debug.LogWarning(name);
         if (parentSlide.GetTouchId() != -1 && audioTime >= time)
         {
             if (transform.position.z < NoteUtility.NOTE_JUDGE_POS)
@@ -46,7 +47,7 @@ public class SlideEnd : SlideNoteBase
     public override void InitNote()
     {
         base.InitNote();
-        mesh.material.SetTexture("_BaseMap", NoteUtility.LoadResource<Texture2D>("note_long_default"));
+        GetComponent<MeshRenderer>().material.SetTexture("_BaseMap", NoteUtility.LoadResource<Texture2D>("note_long_default"));
     }
 
     protected override void OnNoteUpdateJudge(int audioTime)

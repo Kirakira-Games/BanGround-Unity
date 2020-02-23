@@ -48,7 +48,7 @@ public class NoteSyncLine : MonoBehaviour
         for (int i = syncNotes.Count - 1; i >= 0; i--)
         {
             NoteBase obj = syncNotes[i];
-            if (obj == null ||
+            if (obj.isDestroyed ||
                 obj.judgeResult != JudgeResult.None ||
                 obj.GetComponent<SlideNoteBase>()?.IsStickEnd == true)
             {
