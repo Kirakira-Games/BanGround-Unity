@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class TapNote : NoteBase
 {
-    public override void InitNote()
+    public override void ResetNote()
     {
-        base.InitNote();
-        mesh.material.SetTexture("_BaseMap", NoteUtility.LoadResource<Texture2D>(
+        base.ResetNote();
+        GetComponent<MeshRenderer>().material.SetTexture("_BaseMap", NoteUtility.LoadResource<Texture2D>(
             isGray ? "note_single_grey" : "note_single_default"));
     }
 }

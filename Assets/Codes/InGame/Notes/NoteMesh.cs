@@ -24,51 +24,48 @@ public class NoteMesh
     
     const float deltaPerLane = 0.07f;
 
-    static private Mesh[] noteMesh;
     static private int sortingLayerID;
     static private Material mat;
 
-    private static Mesh CreateMesh(int lane)
+    public static void CreateMesh(GameObject note)
+    {
+        MeshFilter meshFilter = note.AddComponent<MeshFilter>();
+        MeshRenderer meshRenderer = note.AddComponent<MeshRenderer>();
+
+        meshRenderer.material = mat;
+        Mesh mesh = new Mesh
+        {
+            vertices = GetVertices(3),
+            uv = uv,
+            normals = normals,
+            triangles = indices
+        };
+        mesh.RecalculateBounds();
+
+        meshFilter.mesh = mesh;
+        meshRenderer.sortingLayerID = sortingLayerID;
+    }
+
+    private static Vector3[] GetVertices(int lane)
     {
         float delta = (lane - 3) * deltaPerLane;
-        Vector3[] vertices = new Vector3[]
+        return new Vector3[]
         {
             new Vector3(-1 + delta, -0.4f),
             new Vector3(1 + delta, -0.4f),
             new Vector3(-1 - delta, 0.4f),
             new Vector3(1 - delta, 0.4f)
         };
-        Mesh mesh = new Mesh
-        {
-            vertices = vertices,
-            uv = uv,
-            normals = normals,
-            triangles = indices
-        };
-        mesh.RecalculateBounds();
-        return mesh;
     }
 
     public static void Init()
     {
-        noteMesh = new Mesh[NoteUtility.LANE_COUNT];
-        for (int i = 0; i < noteMesh.Length; i++)
-        {
-            noteMesh[i] = CreateMesh(i);
-        }
         sortingLayerID = SortingLayer.NameToID("Note");
         mat = Resources.Load<Material>("TestAssets/Materials/note");
     }
 
-    public static MeshRenderer Create(GameObject note, int lane)
+    public static void Reset(GameObject note, int lane)
     {
-        MeshRenderer meshRenderer = note.AddComponent<MeshRenderer>();
-        meshRenderer.material = mat;
-
-        MeshFilter meshFilter = note.AddComponent<MeshFilter>();
-        meshFilter.mesh = noteMesh[lane];
-
-        meshRenderer.sortingLayerID = sortingLayerID;
-        return meshRenderer;
+        note.GetComponent<MeshFilter>().mesh.SetVertices(GetVertices(lane));
     }
 }
