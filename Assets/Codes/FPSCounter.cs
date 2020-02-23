@@ -25,6 +25,6 @@ public class FPSCounter : MonoBehaviour
         }
 
         frameInSec++;
-        text.text = $"{lastFPS} FPS\n{Mathf.Round(Time.deltaTime * 1000)}  ms";
+        text.text = $"{lastFPS} FPS";//\n{Mathf.Round(Time.deltaTime * 1000)}  ms";
     }
 }
