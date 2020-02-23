@@ -11,15 +11,15 @@ public class SlideTick : SlideNoteBase
         return JudgeResult.None;
     }
 
-    protected override void OnDestroy() 
+    public override void OnNoteDestroy() 
     {
-        JudgeResultController.controller.DisplayJudgeOffset(OffsetResult.None);
+        JudgeResultController.instance.DisplayJudgeOffset(OffsetResult.None);
     }
 
     public override void InitNote()
     {
         base.InitNote();
-        mesh.material.SetTexture("_BaseMap", NoteUtility.LoadResource<Texture2D>("note_tick_default"));
+        GetComponent<MeshRenderer>().material.SetTexture("_BaseMap", NoteUtility.LoadResource<Texture2D>("note_tick_default"));
     }
 
     public override void Judge(int audioTime, JudgeResult result, Touch? touch)

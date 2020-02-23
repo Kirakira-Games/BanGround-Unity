@@ -22,9 +22,8 @@ public class SlideEndFlick : SlideNoteBase
     public override void InitNote()
     {
         base.InitNote();
-        mesh.material.SetTexture("_BaseMap", NoteUtility.LoadResource<Texture2D>("note_flick_default"));
+        GetComponent<MeshRenderer>().material.SetTexture("_BaseMap", NoteUtility.LoadResource<Texture2D>("note_flick_default"));
         Instantiate(Resources.Load("V2Assets/FlickArrow"), transform);
-
     }
 
     public override void Judge(int audioTime, JudgeResult result, Touch? touch)
