@@ -14,7 +14,7 @@ public class FixBackground : MonoBehaviour
     private void Start()
     {
         mainCam = Camera.main;
-        float camHeight = mainCam.orthographicSize * 2;
+        float camHeight = 19.30f;
         camSize = new Vector2(mainCam.aspect * camHeight, camHeight);
 
         render = GetComponent<SpriteRenderer>();
