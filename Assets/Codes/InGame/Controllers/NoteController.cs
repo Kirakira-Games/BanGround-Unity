@@ -174,6 +174,7 @@ public class NoteController : MonoBehaviour
         if (!syncTable.ContainsKey(note.time) || syncTable[note.time] == null)
         {
             GameObject syncLineObj = new GameObject("syncLine");
+            syncLineObj.layer = 8;
             syncLineObj.transform.SetParent(transform);
             syncTable.Remove(note.time);
             syncTable.Add(note.time, syncLineObj.AddComponent<NoteSyncLine>());

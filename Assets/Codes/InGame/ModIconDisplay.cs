@@ -5,11 +5,11 @@ using UnityEngine.UI;
 
 public class ModIconDisplay : MonoBehaviour
 {
-    private Image[] icons;
+    [SerializeField] private Image[] icons;
 
     private void Start()
     {
-        icons = GetComponentsInChildren<Image>(true);
+        //icons = GetComponentsInChildren<Image>(true);
 
         foreach (var mod in LiveSetting.attachedMods)
         {
