@@ -6,16 +6,24 @@ using UnityEngine.Networking;
 
 public class FixBackground : MonoBehaviour
 {
-    SpriteRenderer render;
-    Sprite defaultSprite;
-    Camera mainCam;
-    Vector2 camSize;
+    protected SpriteRenderer render;
+    protected Sprite defaultSprite;
+    protected Camera mainCam;
+    protected Vector2 camSize;
 
-    private void Start()
+    float camHeight;
+    float camWidth;
+
+    protected virtual void Start()
     {
+        /*
+            Field of View / 2 == arctan(camheight / (2 * distance))
+         */
+
         mainCam = Camera.main;
-        float camHeight = 13f;
-        camSize = new Vector2(mainCam.aspect * camHeight, camHeight);
+        camHeight = Mathf.Tan(mainCam.fieldOfView / 2 * Mathf.Deg2Rad) * 2 * 10.35f;
+        camWidth = mainCam.aspect * camHeight;
+        //camSize = new Vector2(mainCam.aspect * camHeight, camHeight);
 
         render = GetComponent<SpriteRenderer>();
         defaultSprite = render.sprite;
@@ -23,10 +31,10 @@ public class FixBackground : MonoBehaviour
         UpdateScale();
     }
 
-    private void UpdateScale()
+    protected virtual void UpdateScale()
     {
         Vector2 spriteSize = render.sprite.bounds.size;
-        float scale = Mathf.Max(camSize.x / spriteSize.x, camSize.y / spriteSize.y);
+        float scale = Mathf.Max(camWidth / spriteSize.x, camHeight / spriteSize.y);
         //transform.localScale = new Vector3(camSize.x / spriteSize.x, camSize.y / spriteSize.y, 1);
         transform.localScale = Vector3.one * scale;
     }
