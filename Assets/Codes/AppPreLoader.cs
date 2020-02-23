@@ -35,7 +35,9 @@ public class AppPreLoader : MonoBehaviour
             success &= int.TryParse(bs, out bufferSize);
             init = success;
 
-            Debug.LogWarning($"Get Device Audio Info: {success}");
+            //Debug.LogWarning($"Get Device Audio Info: {success}");
+            MessageBoxController.ShowMsg(LogLevel.INFO, "Load Device Audio Info Success");
+            MessageBoxController.ShowMsg(LogLevel.INFO, "SampleRate: " + sampleRate.ToString() + "  BufferSize: " + bufferSize.ToString());
             SceneManager.LoadScene("Title");
         }
     }

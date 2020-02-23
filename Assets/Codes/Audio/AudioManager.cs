@@ -199,9 +199,14 @@ class AudioManager : MonoBehaviour
         
 		if (AppPreLoader.init)
         {
+            //Debug.Log("deafult buffer: " + Bass.BASS_GetConfig(BASSConfig.BASS_CONFIG_BUFFER));
+            //Debug.Log("deafult dev buffer: " + Bass.BASS_GetConfig(BASSConfig.BASS_CONFIG_DEV_BUFFER));
+            //Debug.Log("new buffer: " + (int)(AppPreLoader.bufferSize * HandleValue_buffer.bufferSize[LiveSetting.bufferSize]));
+            MessageBoxController.ShowMsg(LogLevel.INFO, "DEV_BUFFER: " + Bass.BASS_GetConfig(BASSConfig.BASS_CONFIG_DEV_BUFFER).ToString());
+            MessageBoxController.ShowMsg(LogLevel.INFO, "Set\"BUFFER\"To: " + (AppPreLoader.bufferSize * HandleValue_buffer.bufferSize[LiveSetting.bufferSize]).ToString());
             Bass.BASS_SetConfig(BASSConfig.BASS_CONFIG_BUFFER, (int)(AppPreLoader.bufferSize * HandleValue_buffer.bufferSize[LiveSetting.bufferSize]));
-            Bass.BASS_SetConfig(BASSConfig.BASS_CONFIG_DEV_BUFFER, (int)(AppPreLoader.bufferSize * HandleValue_buffer.bufferSize[LiveSetting.bufferSize]));
-            AudioSettings.Reset(new AudioConfiguration() { dspBufferSize = (int)(AppPreLoader.bufferSize * HandleValue_buffer.bufferSize[LiveSetting.bufferSize]), speakerMode = AudioSpeakerMode.Stereo });
+            //Bass.BASS_SetConfig(BASSConfig.BASS_CONFIG_DEV_BUFFER, (int)(AppPreLoader.bufferSize * HandleValue_buffer.bufferSize[LiveSetting.bufferSize]));
+            //AudioSettings.Reset(new AudioConfiguration() { dspBufferSize = (int)(AppPreLoader.bufferSize * HandleValue_buffer.bufferSize[LiveSetting.bufferSize]), speakerMode = AudioSpeakerMode.Stereo });
         }
 
         if (!Bass.BASS_Init(-1, AppPreLoader.init ? AppPreLoader.sampleRate : 48000, flag, IntPtr.Zero))
@@ -211,7 +216,6 @@ class AudioManager : MonoBehaviour
         {
             throw new Exception(Bass.BASS_ErrorGetCode().ToString());
         }
-
         Instanse = this;
         DontDestroyOnLoad(Instanse.gameObject);
     }

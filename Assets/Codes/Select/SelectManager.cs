@@ -97,7 +97,7 @@ public class SelectManager : MonoBehaviour
 
         audioManager.loading = false;
 
-        MessageBoxController.Instance.ShowMsg(LogLevel.INFO, "Load SongList Success");
+        MessageBoxController.ShowMsg(LogLevel.INFO, "Load SongList Success");
     }
 
     private void InitComponent()
