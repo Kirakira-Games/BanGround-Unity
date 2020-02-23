@@ -199,9 +199,9 @@ class AudioManager : MonoBehaviour
         
 		if (AppPreLoader.init)
         {
-            Bass.BASS_SetConfig(BASSConfig.BASS_CONFIG_BUFFER, LiveSetting.bufferSize);// AppPreLoader.bufferSize);
-            Bass.BASS_SetConfig(BASSConfig.BASS_CONFIG_DEV_BUFFER, LiveSetting.bufferSize);// AppPreLoader.bufferSize);
-            AudioSettings.Reset(new AudioConfiguration() { dspBufferSize = LiveSetting.bufferSize, speakerMode = AudioSpeakerMode.Stereo });
+            Bass.BASS_SetConfig(BASSConfig.BASS_CONFIG_BUFFER, (int)(AppPreLoader.bufferSize * HandleValue_buffer.bufferSize[LiveSetting.bufferSize]));
+            Bass.BASS_SetConfig(BASSConfig.BASS_CONFIG_DEV_BUFFER, (int)(AppPreLoader.bufferSize * HandleValue_buffer.bufferSize[LiveSetting.bufferSize]));
+            AudioSettings.Reset(new AudioConfiguration() { dspBufferSize = (int)(AppPreLoader.bufferSize * HandleValue_buffer.bufferSize[LiveSetting.bufferSize]), speakerMode = AudioSpeakerMode.Stereo });
         }
 
         if (!Bass.BASS_Init(-1, AppPreLoader.init ? AppPreLoader.sampleRate : 48000, flag, IntPtr.Zero))
