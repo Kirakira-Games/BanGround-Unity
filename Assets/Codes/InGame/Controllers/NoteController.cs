@@ -18,7 +18,6 @@ public class NoteController : MonoBehaviour
     private int numNotes;
     private AudioManager audioMgr;
 
-    private Object[] tapEffects;
     private int[] soundEffects;
 
     private FixBackground background;
@@ -73,17 +72,9 @@ public class NoteController : MonoBehaviour
         else if (result == JudgeResult.Good)
             se = TapEffectType.Good;
 
-        var fx = Instantiate(tapEffects[(int)se], pos, Quaternion.identity) as GameObject;
-        fx.transform.localScale = Vector3.one * LiveSetting.noteSize * NoteUtility.NOTE_SCALE;
-        //StartCoroutine(KillFX(fx, 0.5f));
-        Destroy(fx, 0.5f);
-        return se;
-    }
+        NotePool.instance.PlayTapEffect(se, pos);
 
-    public static IEnumerator KillFX(GameObject fx, float delaySeconds)
-    {
-        yield return new WaitForSeconds(delaySeconds);
-        Destroy(fx);
+        return se;
     }
 
     // Judge a note as result
@@ -108,10 +99,28 @@ public class NoteController : MonoBehaviour
         }
 
         // Update score
-        JudgeResultController.controller.DisplayJudgeResult(result);
+        JudgeResultController.instance.DisplayJudgeResult(result);
 
         // Update combo
         ComboManager.manager.UpdateCombo(result);
+    }
+
+    private void UpdateLane(int i)
+    {
+        // Remove judged and destroyed notes from queue
+        while (!laneQueue[i].Empty())
+        {
+            NoteBase obj = laneQueue[i].Top();
+            if (obj.isDestroyed || obj.judgeTime != int.MinValue)
+            {
+                NotePool.instance.RemoveFromJudgeQueue(obj);
+                laneQueue[i].Pop();
+            }
+            else
+            {
+                break;
+            }
+        }
     }
 
     private void OnTouch(int audioTime, int lane, Touch touch)
@@ -119,20 +128,7 @@ public class NoteController : MonoBehaviour
         NoteBase noteToJudge = null;
         for (int i = Mathf.Max(0, lane - 1); i < Mathf.Min(NoteUtility.LANE_COUNT, lane + 2); i++)
         {
-            // Remove judged and destroyed notes from queue
-            while (!laneQueue[i].Empty())
-            {
-                NoteBase obj = laneQueue[i].Top();
-                bool nullObj = obj == null;
-                if (nullObj || obj.judgeTime != int.MinValue)
-                {
-                    laneQueue[i].Pop();
-                }
-                else
-                {
-                    break;
-                }
-            }
+            UpdateLane(i);
             // Try to judge the front of the queue
             if (!laneQueue[i].Empty())
             {
@@ -164,39 +160,15 @@ public class NoteController : MonoBehaviour
 
     private GameObject CreateNote(GameNoteData gameNote)
     {
-        var noteObj = new GameObject("Note");
+        var noteObj = NotePool.instance.GetNote(gameNote.type);
         noteObj.transform.SetParent(transform);
-        NoteBase note;
-        switch (gameNote.type)
-        {
-            case GameNoteType.Single:
-                note = noteObj.AddComponent<TapNote>();
-                break;
-            case GameNoteType.Flick:
-                note = noteObj.AddComponent<FlickNote>();
-                break;
-            case GameNoteType.SlideStart:
-                note = noteObj.AddComponent<SlideStart>();
-                break;
-            case GameNoteType.SlideTick:
-                note = noteObj.AddComponent<SlideTick>();
-                break;
-            case GameNoteType.SlideEnd:
-                note = noteObj.AddComponent<SlideEnd>();
-                break;
-            case GameNoteType.SlideEndFlick:
-                note = noteObj.AddComponent<SlideEndFlick>();
-                break;
-            default:
-                Debug.LogWarning("Cannot create GameNoteType: " + gameNote.type.ToString());
-                return null;
-        }
+        NoteBase note = noteObj.GetComponent<NoteBase>();
         note.time = gameNote.time;
         note.lane = LiveSetting.mirrowEnabled ? NoteUtility.LANE_COUNT - gameNote.lane - 1 : gameNote.lane;
         note.type = gameNote.type;
         note.isGray = LiveSetting.grayNoteEnabled ? gameNote.isGray : false;
         note.anims = gameNote.anims.ToArray();
-        note.InitNote();
+        note.ResetNote();
         laneQueue[note.lane].Push(note.time, note);
         // Add sync line
         if (!syncTable.ContainsKey(note.time) || syncTable[note.time] == null)
@@ -213,14 +185,15 @@ public class NoteController : MonoBehaviour
 
     public GameObject CreateSlide(List<GameNoteData> notes)
     {
-        GameObject obj = new GameObject("Slide");
+        GameObject obj = NotePool.instance.GetSlide();
         obj.transform.SetParent(transform);
-        Slide slide = obj.AddComponent<Slide>();
+        Slide slide = obj.GetComponent<Slide>();
         slide.InitSlide();
         foreach (GameNoteData note in notes)
         {
             slide.AddNote(CreateNote(note).GetComponent<NoteBase>());
         }
+        slide.FinalizeSlide();
         return obj;
     }
 
@@ -327,21 +300,8 @@ public class NoteController : MonoBehaviour
         }
         ComboManager.manager.Init(numNotes);
 
-        // Init notemesh
-        NoteMesh.Init();
-
         // Init JudgeRange
         NoteUtility.InitJudgeRange();
-
-        // Load Tap Effects
-        tapEffects = new Object[]
-        {
-            Resources.Load("Effects/effect_tap_perfect"),
-            Resources.Load("Effects/effect_tap_great"),
-            Resources.Load("Effects/effect_tap_good"),
-            Resources.Load("Effects/effect_tap"),
-            Resources.Load("Effects/effect_tap_swipe")
-        };
 
         // Init AudioManager
         audioMgr = AudioManager.Instanse;
@@ -397,6 +357,10 @@ public class NoteController : MonoBehaviour
 
         // Create notes
         UpdateNotes(audioTime);
+        for (int i = 0; i < NoteUtility.LANE_COUNT; i++)
+        {
+            UpdateLane(i);
+        }
 
         // Trigger touch event
         UpdateTouch(audioTime);

@@ -6,25 +6,32 @@ public abstract class SlideNoteBase : NoteBase
 {
     public bool IsTilt;
     public bool IsStickEnd;
+    public SlideMesh slideMesh;
     protected Slide parentSlide;
 
     protected abstract JudgeResult TrySlideJudge(int audioTime, Touch touch);
 
     public void InitSlideNote()
     {
+        IsStickEnd = false;
         parentSlide = GetComponentInParent<Slide>();
+        if (!NoteUtility.IsSlideEnd(type))
+        {
+            slideMesh = GetComponentInChildren<SlideMesh>();
+            slideMesh.meshRenderer.enabled = true;
+        }
     }
 
-    protected override void OnDestroy()
+    public override void OnNoteDestroy()
     {
         int result = (int)judgeResult;
         if (result >= 1 && result <= 3)
         {
             ComboManager.JudgeOffsetResult.Add(time - judgeTime);
-            JudgeResultController.controller.DisplayJudgeOffset(time - judgeTime > 0 ? OffsetResult.Early : OffsetResult.Late);
+            JudgeResultController.instance.DisplayJudgeOffset(time - judgeTime > 0 ? OffsetResult.Early : OffsetResult.Late);
             return;
         }
-        JudgeResultController.controller.DisplayJudgeOffset(OffsetResult.None);
+        JudgeResultController.instance.DisplayJudgeOffset(OffsetResult.None);
     }
 
     public override JudgeResult TryJudge(int audioTime, Touch touch)
