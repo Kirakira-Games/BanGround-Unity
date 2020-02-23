@@ -172,7 +172,7 @@ public class BassMemStream : IDisposable
 class AudioManager : MonoBehaviour
 {
     internal List<int> LoadedSound = new List<int>();
-    private BassMemStream BGMStream;
+    internal BassMemStream BGMStream;
 
     private List<LoopingBassMemStream> LoopingStreams = new List<LoopingBassMemStream>();
 
@@ -180,7 +180,7 @@ class AudioManager : MonoBehaviour
     public bool isInGame;
     public bool restart = false;
 
-    private int lastPos = -1;
+    internal int lastPos = -1;
     private float lastUpdateTime = -1;
 
     public static AudioManager Instanse { get; private set; }
@@ -220,7 +220,6 @@ class AudioManager : MonoBehaviour
         DontDestroyOnLoad(Instanse.gameObject);
     }
 
-
     void Update()
     {
         for (int i = LoopingStreams.Count - 1; i >= 0; i--)
@@ -241,18 +240,6 @@ class AudioManager : MonoBehaviour
                 GameObject.Find("UIManager")?.GetComponent<UIManager>()?.OnAudioFinish(restart);
             }
         }
-    }
-
-    public int PrecacheBGM(TextAsset internalFile, BASSFlag flags = BASSFlag.BASS_DEFAULT)
-    {
-        var id = Bass.BASS_SampleLoad(internalFile.bytes, 0, internalFile.bytes.Length, 1, flags);
-
-        if (id == 0)
-        {
-            throw new Exception(Bass.BASS_ErrorGetCode().ToString());
-        }
-
-        return id;
     }
 
     public LoopingBassMemStream StreamLoopSound(byte[] file, float start = -1, float end = -1, bool fade = true, BASSFlag flags = BASSFlag.BASS_DEFAULT)
@@ -376,6 +363,12 @@ class AudioManager : MonoBehaviour
             {
                 return (int)((Time.time - lastUpdateTime) * 1000) + lastPos + LiveSetting.audioOffset;
 #else
+            if (BGMStream.Status == BASSActive.BASS_ACTIVE_PAUSED)
+            {
+                return lastPos + LiveSetting.audioOffset;
+            }      
+
+            lastPos = time;
             return time + LiveSetting.audioOffset;
 #endif
         }
@@ -399,7 +392,7 @@ class AudioManager : MonoBehaviour
     public bool GetPauseStatus()
     {
         var status = BGMStream.Status;
-        return status == BASSActive.BASS_ACTIVE_PAUSED;
+        return status == BASSActive.BASS_ACTIVE_PAUSED && UIManager.BitingTheDust;
     }
 
     public void PauseBGM()

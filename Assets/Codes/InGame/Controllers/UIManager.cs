@@ -67,8 +67,27 @@ public class UIManager : MonoBehaviour
     public void GameResume()
     {
         Time.timeScale = 1;
-        am.ResumeBGM();
         pause_Canvas.SetActive(false);
+
+        StartCoroutine(BiteTheDust());
+    }
+
+    public static bool BitingTheDust = false;
+
+    IEnumerator BiteTheDust()
+    {
+        am.BGMStream.Position -= LiveSetting.NoteScreenTime;
+
+        BitingTheDust = true;
+        int ms = LiveSetting.NoteScreenTime;
+
+        while((ms -= 10) > 0)
+        {
+            am.lastPos -= 10;
+            yield return new WaitForSeconds(0.01f);
+        }
+        BitingTheDust = false;
+        am.ResumeBGM();
     }
 
     public void GameRetry()
