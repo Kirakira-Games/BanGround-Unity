@@ -18,8 +18,8 @@ public class DataLoader
     public static List<cHeader> chartList => songList.cHeaders;
 
     public const int ChartVersion = 1;
-    private const int InitialChartVersion = 2;
-    private const int GameVersion = 1;
+    private const int InitialChartVersion = 3;
+    private const int GameVersion = 2;
 
     private static Dictionary<int, cHeader> chartDic;
     private static Dictionary<int, mHeader> musicDic;
