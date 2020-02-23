@@ -12,7 +12,7 @@ class MessageQueueItem
 
 public class MessageBoxController : MonoBehaviour
 {
-    public static MessageBoxController Instance { get; private set; }
+    //public static MessageBoxController Instance { get; private set; }
 
     private Sprite[] msgSprite;
     private Button msgBtn;
@@ -20,12 +20,12 @@ public class MessageBoxController : MonoBehaviour
     private LocalizedText msgText;
     private Animator animator;
 
-    private Queue<MessageQueueItem> msgQueue;
+    private static Queue<MessageQueueItem> msgQueue = new Queue<MessageQueueItem>();
 
     private void Awake()
     {
-        Instance = this;
-        msgQueue = new Queue<MessageQueueItem>();
+        //Instance = this;
+        //msgQueue = new Queue<MessageQueueItem>();
     }
 
     void Start()
@@ -59,7 +59,7 @@ public class MessageBoxController : MonoBehaviour
     /// </summary>
     /// <param name="level"></param>
     /// <param name="content"></param>
-    public void ShowMsg(LogLevel level, string content, bool autoClose = true)
+    public static void ShowMsg(LogLevel level, string content, bool autoClose = true)
     {
         msgQueue.Enqueue(new MessageQueueItem
         {
