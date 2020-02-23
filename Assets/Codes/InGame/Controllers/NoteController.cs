@@ -199,7 +199,7 @@ public class NoteController : MonoBehaviour
 
     public static int GetLaneByTouchPosition(Vector2 position)
     {
-        Collider2D[] cols = Physics2D.OverlapPointAll(Camera.main.ScreenToWorldPoint(position));
+        Collider2D[] cols = Physics2D.OverlapPointAll(Camera.main.ScreenToWorldPoint(new Vector3(position.x,position.y,8.35f)));
         foreach (Collider2D col in cols)
         {
             if (col.CompareTag("JudgeArea"))
