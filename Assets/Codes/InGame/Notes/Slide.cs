@@ -103,13 +103,17 @@ public class Slide : MonoBehaviour
         }
         else
         {
-            int lane = NoteController.GetLaneByTouchPosition(touch.position);
-            if (Mathf.Abs(lane - note.lane) <= 1)
+            int[] lanes = NoteController.GetLanesByTouchPosition(touch.position);
+            foreach (int lane in lanes)
             {
-                JudgeResult result = note.TryJudge(audioTime, touch);
-                if (result != JudgeResult.None)
+                if (Mathf.Abs(lane - note.lane) <= 1)
                 {
-                    note.Judge(audioTime, result, touch);
+                    JudgeResult result = note.TryJudge(audioTime, touch);
+                    if (result != JudgeResult.None)
+                    {
+                        note.Judge(audioTime, result, touch);
+                    }
+                    break;
                 }
             }
         }
