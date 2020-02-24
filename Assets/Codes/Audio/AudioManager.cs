@@ -316,10 +316,14 @@ class AudioManager : MonoBehaviour
     private IEnumerator DelayPlayBGM(byte[] audioData, float seconds)
     {
         BGMStream = StreamSound(audioData, BASSFlag.BASS_STREAM_DECODE, LiveSetting.bgmVolume);
+        BGMStream.Play();
+        BGMStream.Pause();
+        yield return new WaitUntil(() => SceneLoader.Loading == false);
+
         loading = true;
         lastPos = LiveSetting.audioOffset - (int)(seconds * 1000);
         yield return new WaitForSeconds(seconds);
-        yield return new WaitUntil(() => SceneLoader.Loading == false);
+
         foreach(var mod in LiveSetting.attachedMods)
         {
             if (mod is AudioMod)

@@ -352,7 +352,7 @@ public class NoteController : MonoBehaviour
     {
         if (SceneLoader.Loading) return;
 
-        if (audioMgr.GetPauseStatus())
+        if (audioMgr.GetPauseStatus() && !audioMgr.loading)
             return;
 
         int audioTime = audioMgr.GetBGMPlaybackTime();
