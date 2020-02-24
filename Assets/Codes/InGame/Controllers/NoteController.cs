@@ -123,7 +123,7 @@ public class NoteController : MonoBehaviour
         }
     }
 
-    private void OnTouch(int audioTime, int lane, Touch touch)
+    private NoteBase OnTouch(int audioTime, int lane, Touch touch)
     {
         NoteBase noteToJudge = null;
         for (int i = Mathf.Max(0, lane - 1); i < Mathf.Min(NoteUtility.LANE_COUNT, lane + 2); i++)
@@ -143,19 +143,7 @@ public class NoteController : MonoBehaviour
                 }
             }
         }
-        // A note to judge is found
-        if (noteToJudge == null)
-        {
-            if (touch.phase == TouchPhase.Began)
-            {
-                int se = (int)EmitEffect(NoteUtility.GetJudgePos(lane), JudgeResult.None, GameNoteType.Single);
-                audioMgr.PlaySE(soundEffects[se]);
-            }
-        }
-        else
-        {
-            noteToJudge.Judge(audioTime, noteToJudge.TryJudge(audioTime, touch), touch);
-        }
+        return noteToJudge;
     }
 
     private GameObject CreateNote(GameNoteData gameNote)
@@ -198,17 +186,18 @@ public class NoteController : MonoBehaviour
         return obj;
     }
 
-    public static int GetLaneByTouchPosition(Vector2 position)
+    public static int[] GetLanesByTouchPosition(Vector2 position)
     {
         Collider2D[] cols = Physics2D.OverlapPointAll(Camera.main.ScreenToWorldPoint(new Vector3(position.x,position.y,8.35f)));
+        List<int> lanes = new List<int>();
         foreach (Collider2D col in cols)
         {
             if (col.CompareTag("JudgeArea"))
             {
-                return col.name[0] - '0';
+                lanes.Add(col.name[0] - '0');
             }
         }
-        return -1;
+        return lanes.ToArray();
     }
 
     private void UpdateTouch(int audioTime)
@@ -242,10 +231,31 @@ public class NoteController : MonoBehaviour
                 obj.GetComponent<Slide>()?.TraceTouch(audioTime, touch);
                 continue;
             }
-            int lane = GetLaneByTouchPosition(touch.position);
-            if (lane != -1)
+            // Find lanes
+            int[] lanes = GetLanesByTouchPosition(touch.position);
+            if (lanes.Length == 0) continue;
+
+            // Find note to judge
+            NoteBase noteToJudge = null;
+            foreach (int lane in lanes) {
+                var ret = OnTouch(audioTime, lane, touch);
+                if (ret != null && (noteToJudge == null || noteToJudge.time > ret.time))
+                {
+                    noteToJudge = ret;
+                }
+            }
+            // A note to judge is found
+            if (noteToJudge == null)
             {
-                OnTouch(audioTime, lane, touch);
+                if (touch.phase == TouchPhase.Began)
+                {
+                    int se = (int)EmitEffect(NoteUtility.GetJudgePos(lanes[0]), JudgeResult.None, GameNoteType.Single);
+                    audioMgr.PlaySE(soundEffects[se]);
+                }
+            }
+            else
+            {
+                noteToJudge.Judge(audioTime, noteToJudge.TryJudge(audioTime, touch), touch);
             }
         }
     }
