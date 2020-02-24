@@ -22,7 +22,7 @@ public class NoteMesh
 
     static readonly int[] indices = { 0, 2, 1, 2, 3, 1 };
     
-    const float deltaPerLane = 0.07f;
+    const float deltaPerLane = 0.00f;
 
     static private int sortingLayerID;
     static private Material mat;
