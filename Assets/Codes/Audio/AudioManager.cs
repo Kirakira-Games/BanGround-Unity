@@ -315,6 +315,7 @@ class AudioManager : MonoBehaviour
 
     private IEnumerator DelayPlayBGM(byte[] audioData, float seconds)
     {
+        lastPos = int.MinValue;
         BGMStream = StreamSound(audioData, BASSFlag.BASS_STREAM_DECODE, LiveSetting.bgmVolume);
         BGMStream.Play();
         BGMStream.Pause();
