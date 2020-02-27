@@ -14,6 +14,8 @@ public class SelectManager : MonoBehaviour
     //private Button enter_Btn;
     private Button setting_Open_Btn;
     private Button setting_Close_Btn;
+    private Button mod_Open_Btn;
+    private Button mod_Close_Btn;
 
     private int lastIndex = -1;
 
@@ -56,10 +58,10 @@ public class SelectManager : MonoBehaviour
     public GameObject enterAniObj;
     public GameObject AndroidOnlyPanel;
 
-    RectTransform rt ;
+    RectTransform rt;
     RectTransform rt_v;
     ScrollRect rt_s;
-    VerticalLayoutGroup lg ;
+    VerticalLayoutGroup lg;
     DragHandler dh;
 
     RawImage Rank;
@@ -112,7 +114,9 @@ public class SelectManager : MonoBehaviour
 
         //enter_Btn = GameObject.Find("Enter_Btn").GetComponent<Button>();
         setting_Open_Btn = GameObject.Find("SettingOpenBtn").GetComponent<Button>();
-        setting_Close_Btn = GameObject.Find("Button_Close").GetComponent<Button>();
+        setting_Close_Btn = GameObject.Find("SettingButton_Close").GetComponent<Button>();
+        mod_Open_Btn = GameObject.Find("ModOpenBtn").GetComponent<Button>();
+        mod_Close_Btn = GameObject.Find("ModButton_Close").GetComponent<Button>();
 
         syncLine_Tog = GameObject.Find("Sync_Toggle").GetComponent<Toggle>();
         offBeat_Tog = GameObject.Find("Offbeat_Toggle").GetComponent<Toggle>();
@@ -142,6 +146,8 @@ public class SelectManager : MonoBehaviour
         //enter_Btn.onClick.AddListener(OnEnterPressed);
         setting_Open_Btn.onClick.AddListener(OpenSetting);
         setting_Close_Btn.onClick.AddListener(CloseSetting);
+        mod_Open_Btn.onClick.AddListener(OpenMod);
+        mod_Close_Btn.onClick.AddListener(CloseMod);
 
         GameObject.Find("Speed>").GetComponent<Button>().onClick.AddListener(() => { speed_Input.text = (float.Parse(speed_Input.text) + 0.1f).ToString(); });
         GameObject.Find("Speed<").GetComponent<Button>().onClick.AddListener(() => { speed_Input.text = (float.Parse(speed_Input.text) - 0.1f).ToString(); });
@@ -183,7 +189,7 @@ public class SelectManager : MonoBehaviour
     {
         playRecords = PlayRecords.OpenRecord();
     }
-    
+
 
     //--------------------------------------------
     private void InitSongList()
@@ -203,7 +209,7 @@ public class SelectManager : MonoBehaviour
             SelectButtons.Add(go);
         }
 
-        lg.padding = new RectOffset(0, 0, (int)((rt_v.sizeDelta.y / 2) - 100),0);
+        lg.padding = new RectOffset(0, 0, (int)((rt_v.sizeDelta.y / 2) - 100), 0);
 
         rt.sizeDelta = new Vector2(rt.sizeDelta.x, lg.padding.top * 2 + chartList.Count * (116) + (chartList.Count - 1) * lg.spacing + (200 - 116));
         StartCoroutine(SelectDefault());
@@ -219,7 +225,7 @@ public class SelectManager : MonoBehaviour
         try
         {
             SelectSong(LiveSetting.currentChart);
-        }catch
+        } catch
         {
 
         }
@@ -229,7 +235,7 @@ public class SelectManager : MonoBehaviour
     {
         //yield return new WaitForSeconds(1);
         RectTransform[] rts = new RectTransform[SelectButtons.Count];
-        for(int i =0;i<SelectButtons.Count;i++)
+        for (int i = 0; i < SelectButtons.Count; i++)
         {
             rts[i] = SelectButtons[i].GetComponent<RectTransform>();
         }
@@ -246,7 +252,7 @@ public class SelectManager : MonoBehaviour
         int nearstIndex = 0;
         for (int i = 0; i < SelectButtons.Count; i++)
         {
-            float distance =  Mathf.Abs( rts[i].anchoredPosition.y - destPos);
+            float distance = Mathf.Abs(rts[i].anchoredPosition.y - destPos);
             if (distance < nearestDistance)
             {
                 nearestDistance = distance;
@@ -305,7 +311,7 @@ public class SelectManager : MonoBehaviour
             {
                 count++;
                 a = playRecords.resultsList[i];
-                
+
             }
         }
         score.text = string.Format("{0:0000000}", a.Score);
@@ -322,8 +328,8 @@ public class SelectManager : MonoBehaviour
             Rank.enabled = true;
             clearMark.enabled = true;
         }
-        
-            
+
+
         var rank = new Texture2D(0, 0);
         switch (a.ranks)
         {
@@ -402,13 +408,22 @@ public class SelectManager : MonoBehaviour
     void OpenSetting()
     {
         //GetModStatus();
-        GameObject.Find("Setting_Canvas").GetComponent<Animator>().SetBool("Drop", true);
+        GameObject.Find("Setting_Canvas").GetComponent<Animator>().Play("DropDown");
     }
     void CloseSetting()
     {
-        GameObject.Find("Setting_Canvas").GetComponent<Animator>().SetBool("Drop", false);
+        GameObject.Find("Setting_Canvas").GetComponent<Animator>().Play("FlyUp");
         SetLiveSetting();
         File.WriteAllText(LiveSetting.settingsPath, JsonConvert.SerializeObject(new LiveSettingTemplate()));
+    }
+    void OpenMod()
+    {
+        GameObject.Find("Setting_Canvas").GetComponent<Animator>().Play("ModDropDown");
+    }
+    void CloseMod()
+    {
+        GameObject.Find("Setting_Canvas").GetComponent<Animator>().Play("ModFlyUp");
+        SetLiveSetting();
     }
     void GetLiveSetting()
     {
@@ -545,7 +560,7 @@ public class SelectManager : MonoBehaviour
         CloseSetting();
         setting_Open_Btn.gameObject.SetActive(false);
 
-        GameObject.Find("milk").GetComponent<Animator>().Play("out", -1);
+        //GameObject.Find("milk").GetComponent<Animator>().Play("out", -1);
 
         StartCoroutine(DelayLoadScene());
 
