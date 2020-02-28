@@ -557,7 +557,7 @@ public class SelectManager : MonoBehaviour
         //enter_Btn.interactable = false;
         //enterAniObj.SetActive(true);
         //scene_Animator.Play("OutPlay", -1, 0);
-        CloseSetting();
+        //CloseSetting();
         setting_Open_Btn.gameObject.SetActive(false);
 
         //GameObject.Find("milk").GetComponent<Animator>().Play("out", -1);
