@@ -183,7 +183,7 @@ public class SelectManager : MonoBehaviour
 
         difficultySelect = GameObject.Find("DifficultySelect").GetComponent<DifficultySelect>();
         AndroidOnlyPanel = GameObject.Find("Android Only");
-        if (Application.platform != RuntimePlatform.Android) AndroidOnlyPanel.SetActive(false);
+        /*if (Application.platform != RuntimePlatform.Android)*/ AndroidOnlyPanel.SetActive(false);
     }
     void LoadScoreRecord()
     {
