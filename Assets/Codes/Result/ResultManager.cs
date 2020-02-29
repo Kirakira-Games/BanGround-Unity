@@ -154,7 +154,7 @@ public class ResultManager : MonoBehaviour
             //anim.SetBool("FadeToBlack", true);
             //StartCoroutine("DelayLoadScene","InGame" ); 
             RemoveListener();
-            SceneLoader.LoadScene("Result", "InGame");
+            SceneLoader.LoadScene("Result", "InGame",true);
         });
 
         button_cycleFrame.onClick.AddListener(() =>

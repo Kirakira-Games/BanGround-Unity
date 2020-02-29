@@ -97,7 +97,7 @@ public class UIManager : MonoBehaviour
 
         RemoveListener();
         //SceneManager.LoadScene("InGame");
-        SceneLoader.LoadScene("InGame", "InGame");
+        SceneLoader.LoadScene("InGame", "InGame",true);
     }
 
     public void GameRetire()
