@@ -22,12 +22,13 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: TouchEffect
   m_Shader: {fileID: 4800000, guid: 5c97c19f00b0c7d4d99f101fbf55f378, type: 3}
-  m_ShaderKeywords: _ALPHATEST_ON _FLIPBOOKBLENDING_OFF _RECEIVE_SHADOWS_OFF
+  m_ShaderKeywords: _ALPHATEST_ON _RECEIVE_SHADOWS_OFF
   m_LightmapFlags: 6
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
+  m_CustomRenderQueue: 3050
+  stringTagMap:
+    RenderType: Transparent
   disabledShaderPasses:
   - SHADOWCASTER
   m_SavedProperties:
