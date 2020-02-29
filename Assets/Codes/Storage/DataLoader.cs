@@ -61,10 +61,10 @@ public class DataLoader
         }
 
         LiveSetting.Load();
-#if UNITY_ANDROID && !UNITY_EDITOR
-        if (LiveSetting.bufferSize == -1)
-            LiveSetting.bufferSize = AppPreLoader.bufferSize;
-#endif
+//#if UNITY_ANDROID && !UNITY_EDITOR
+//        if (LiveSetting.bufferSize == -1)
+//            LiveSetting.bufferSize = AppPreLoader.bufferSize;
+//#endif
     }
 
     public static string GetMusicPath(int mid)
