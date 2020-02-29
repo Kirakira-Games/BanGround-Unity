@@ -57,10 +57,12 @@ public class DifficultySelect : MonoBehaviour
     {
         for (int i = 0; i < enabledCards.Count; i++)
         {
-            Rects[enabledCards[i]].anchoredPosition = new Vector2(0 - (i * 10), 0); //图层 位置
+            //Rects[enabledCards[i]].anchoredPosition = new Vector2(0, 0); //图层 位置
             Rects[enabledCards[i]].SetAsFirstSibling();
+            cardImg[enabledCards[i]].color = new Color(1,1,1,0);
         }
         selected = enabledCards[0]; //最顶上一层
+        cardImg[selected].color = Color.white;
         difficultyText.text = Enum.GetName(typeof(Difficulty), selected).ToUpper();
         levelText.text = levels[selected].ToString();
 
@@ -91,32 +93,22 @@ public class DifficultySelect : MonoBehaviour
     {
         int last = enabledCards.Count - 1;
         int no = enabledCards[last];
-        while (Rects[no].anchoredPosition.x < 100)
+        while (cardImg[no].color.a > 0)
         {
-            Rects[no].anchoredPosition += new Vector2(10, 0);
             cardImg[no].color -= new Color(0, 0, 0, 0.1f);
-            for(int i = 0; i < enabledCards.Count; i++)
-            {
-                if (i != last)
-                {
-                    Rects[enabledCards[i]].anchoredPosition += new Vector2(1, 0);
-                }
-            }
             yield return new WaitForEndOfFrame();
         }
+        //cards[no].SetActive(false);
+        cardImg[no].color = Color.clear;
 
         UpdateView();
-        LiveSetting.currentDifficulty = selected;
-
-        float destPosition = Rects[no].anchoredPosition.x;
-        Rects[no].anchoredPosition -= new Vector2(100, 0);
-        while (Rects[no].anchoredPosition.x < destPosition)
+        cardImg[selected].color = new Color(1, 1, 1, 0);
+        while (cardImg[selected].color.a < 1)
         {
-            Rects[no].anchoredPosition += new Vector2(10, 0);
-            cardImg[no].color += new Color(0, 0, 0, 0.1f);
+            cardImg[selected].color += new Color(0, 0, 0, 0.1f);
             yield return new WaitForEndOfFrame();
         }
-        for(int i = 0; i < enabledCards.Count; i++)
-            cardImg[enabledCards[i]].color = new Color(1, 1, 1, 1);
+        cardImg[selected].color = Color.white;
+        LiveSetting.currentDifficulty = selected;
     }
 }
