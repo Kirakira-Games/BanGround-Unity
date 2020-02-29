@@ -183,7 +183,7 @@ public class SelectManager : MonoBehaviour
 
         difficultySelect = GameObject.Find("DifficultySelect").GetComponent<DifficultySelect>();
         AndroidOnlyPanel = GameObject.Find("Android Only");
-        /*if (Application.platform != RuntimePlatform.Android)*/ AndroidOnlyPanel.SetActive(false);
+        if (Application.platform != RuntimePlatform.Android) AndroidOnlyPanel.SetActive(false);
     }
     void LoadScoreRecord()
     {
@@ -443,7 +443,7 @@ public class SelectManager : MonoBehaviour
 
         seVolume_Input.value = LiveSetting.seVolume;
         bgmVolume_Input.value = LiveSetting.bgmVolume;
-        bufferSize_Input.value = LiveSetting.bufferSize;
+        //bufferSize_Input.value = LiveSetting.bufferSize;
 
         audioTrack_Tog.isOn = LiveSetting.enableAudioTrack;
 
@@ -493,7 +493,7 @@ public class SelectManager : MonoBehaviour
         LiveSetting.noteSize = float.Parse(size_Input.text);
         LiveSetting.seVolume = seVolume_Input.value;
         LiveSetting.bgmVolume = bgmVolume_Input.value;
-        LiveSetting.bufferSize = (int)bufferSize_Input.value;
+        //LiveSetting.bufferSize = (int)bufferSize_Input.value;
         LiveSetting.syncLineEnabled = syncLine_Tog.isOn;
         LiveSetting.grayNoteEnabled = offBeat_Tog.isOn;
         LiveSetting.mirrowEnabled = mirrow_Tog.isOn;
