@@ -191,23 +191,23 @@ class AudioManager : MonoBehaviour
 
         BASSInit flag = BASSInit.BASS_DEVICE_DEFAULT;
 
-#if UNITY_ANDROID && !UNITY_EDITOR
-        if (LiveSetting.enableAudioTrack)
-        {
-            flag |= BASSInit.BASS_DEVICE_AUDIOTRACK;
-        }
+//#if UNITY_ANDROID && !UNITY_EDITOR
+//        if (LiveSetting.enableAudioTrack)
+//        {
+//            flag |= BASSInit.BASS_DEVICE_AUDIOTRACK;
+//        }
         
-		if (AppPreLoader.init)
-        {
-            MessageBoxController.ShowMsg(LogLevel.INFO, "DEV_BUFFER: " + Bass.BASS_GetConfig(BASSConfig.BASS_CONFIG_DEV_BUFFER).ToString());
-            MessageBoxController.ShowMsg(LogLevel.INFO, "Set\"BUFFER\"To: " + (AppPreLoader.bufferSize * HandleValue_buffer.bufferSize[LiveSetting.bufferSize]).ToString());
-            Bass.BASS_SetConfig(BASSConfig.BASS_CONFIG_BUFFER, (int)(AppPreLoader.bufferSize * HandleValue_buffer.bufferSize[LiveSetting.bufferSize]));
-        }
+//		if (AppPreLoader.init)
+//        {
+//            MessageBoxController.ShowMsg(LogLevel.INFO, "DEV_BUFFER: " + Bass.BASS_GetConfig(BASSConfig.BASS_CONFIG_DEV_BUFFER).ToString());
+//            MessageBoxController.ShowMsg(LogLevel.INFO, "Set\"BUFFER\"To: " + (AppPreLoader.bufferSize * HandleValue_buffer.bufferSize[LiveSetting.bufferSize]).ToString());
+//            Bass.BASS_SetConfig(BASSConfig.BASS_CONFIG_BUFFER, (int)(AppPreLoader.bufferSize * HandleValue_buffer.bufferSize[LiveSetting.bufferSize]));
+//        }
 
-        if (!Bass.BASS_Init(-1, AppPreLoader.init ? AppPreLoader.sampleRate : 48000, flag, IntPtr.Zero))
-#else
+//        if (!Bass.BASS_Init(-1, AppPreLoader.init ? AppPreLoader.sampleRate : 48000, flag, IntPtr.Zero))
+//#else
         if (!Bass.BASS_Init(-1, 48000, flag, IntPtr.Zero))
-#endif
+//#endif
         {
             throw new Exception(Bass.BASS_ErrorGetCode().ToString());
         }
