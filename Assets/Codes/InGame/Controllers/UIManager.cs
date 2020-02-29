@@ -135,19 +135,19 @@ public class UIManager : MonoBehaviour
         switch (ResultsGetter.GetClearMark())
         {
             case ClearMarks.AP:
-                gateImg.sprite = Resources.Load<Sprite>("UI/SwitchUI/AllPerfect");
+                gateImg.sprite = Resources.Load<Sprite>("UI/ClearMark_Long/AllPerfect");
                 AudioManager.Instanse.StreamSound(APvoice).Play();
                 break;
             case ClearMarks.FC:
-                gateImg.sprite = Resources.Load<Sprite>("UI/SwitchUI/FullCombo");
+                gateImg.sprite = Resources.Load<Sprite>("UI/ClearMark_Long/FullCombo");
                 AudioManager.Instanse.StreamSound(FCvoice).Play();
                 break;
             case ClearMarks.CL:
-                gateImg.sprite = Resources.Load<Sprite>("UI/SwitchUI/Clear");
+                gateImg.sprite = Resources.Load<Sprite>("UI/ClearMark_Long/Clear");
                 AudioManager.Instanse.StreamSound(CLvoice).Play();
                 break;
             case ClearMarks.F:
-                gateImg.sprite = Resources.Load<Sprite>("UI/SwitchUI/Fail");
+                gateImg.sprite = Resources.Load<Sprite>("UI/ClearMark_Long/Fail");
                 AudioManager.Instanse.StreamSound(Fvoice).Play();
                 break;
         }

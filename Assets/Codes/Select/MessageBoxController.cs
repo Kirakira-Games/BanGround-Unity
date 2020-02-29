@@ -30,7 +30,7 @@ public class MessageBoxController : MonoBehaviour
 
     void Start()
     {
-        msgSprite = Resources.LoadAll<Sprite>("V2Assets/MsgBox");
+        msgSprite = Resources.LoadAll<Sprite>("UI/MsgBox");
         animator = GetComponent<Animator>();
         msgBtn = GetComponent<Button>();
         msgImg = GetComponent<Image>();
