@@ -54,7 +54,7 @@ public static class LiveSetting
     public static bool enableAudioTrack = false;
 
     public const string assetDirectory = "V2Assets";
-    public const string IconPath = "UI/v3/";
+    public const string IconPath = "UI/ClearMark/";
 
     private static float cachedSpeed = 0;
     private static int cachedScreenTime = 0;
