@@ -17,6 +17,11 @@ public class RectControl : MonoBehaviour
     Button bt;
 
     GameObject startImg;
+    Text title;
+    Image img;
+
+    public Color SelectedColor = Color.white;
+    public Color DisabledColor = Color.clear;
 
     bool select = false;
 
@@ -29,6 +34,8 @@ public class RectControl : MonoBehaviour
         rt_s = GameObject.Find("Song Scroll View").GetComponent<ScrollRect>();
         sm = GameObject.Find("SelectManager").GetComponent<SelectManager>();
         startImg = transform.Find("StartImg").gameObject;
+        img = GetComponent<Image>();
+        title = transform.Find("TextTitle").GetComponent<Text>();
 
         bt = GetComponent<Button>();
         rt = GetComponent<RectTransform>();
@@ -50,35 +57,53 @@ public class RectControl : MonoBehaviour
     }
 
     public void OnSelect()
-    {
-        StartCoroutine(OnSelectAnimation());
+    { startImg.SetActive(true);
+        select = true;
+        img.color = SelectedColor;
+        title.color = Color.white;
+        StartCoroutine(OnSelectAnimation1());
+        StartCoroutine(OnSelectAnimation2());
+        StartCoroutine(OnSelectAnimation3());
     }
 
-    IEnumerator OnSelectAnimation()
+    IEnumerator OnSelectAnimation1()
     {
         yield return new WaitForEndOfFrame();
-        startImg.SetActive(true);
-        select = true;
 
-        float destPos = 0 - rt.anchoredPosition.y - vg.padding.top -(rt.sizeDelta.y/2);
+        //滑动展开
+        float destPos = 0 - rt.anchoredPosition.y - vg.padding.top - (rt.sizeDelta.y / 2);
         while (Math.Abs(rt_m.anchoredPosition.y - destPos) > 1f || Math.Abs(rt_s.velocity.y) > 1f)
         {
             rt_m.anchoredPosition -= new Vector2(0, (rt_m.anchoredPosition.y - destPos) * 0.3f);
             yield return new WaitForEndOfFrame();
         }
         rt_m.anchoredPosition = new Vector2(rt_m.anchoredPosition.x, destPos);
-        while (Math.Abs(rt.sizeDelta.y - 200) > 1f)
+    }
+    IEnumerator OnSelectAnimation2()
+    {
+        while (Math.Abs(rt.sizeDelta.y - 190) > 1f)
         {
-            rt.sizeDelta -= new Vector2(0, (rt.sizeDelta.y - 200) * 0.3f);
+            rt.sizeDelta -= new Vector2(0, (rt.sizeDelta.y - 190) * 0.3f);
             yield return new WaitForEndOfFrame();
         }
-        rt.sizeDelta = new Vector2(rt.sizeDelta.x, 200);
+        rt.sizeDelta = new Vector2(rt.sizeDelta.x, 190);
+    }
+    IEnumerator OnSelectAnimation3()
+    {
+        while (rt.sizeDelta.x < 1000)
+        {
+            rt.sizeDelta += new Vector2((1000 - rt.sizeDelta.x) * 0.3f, 0f);
+            yield return new WaitForEndOfFrame();
+        }
+        rt.sizeDelta = new Vector2(1000, rt.sizeDelta.y);
     }
 
     public void UnSelect()
     {
         StopAllCoroutines();
-        rt.sizeDelta = new Vector2(rt.sizeDelta.x, 116);
+        rt.sizeDelta = new Vector2(890, 116);
+        img.color = DisabledColor;
+        title.color = Color.grey;
         startImg.SetActive(false);
         select = false;
     }
@@ -91,8 +116,9 @@ public class RectControl : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    /*void Update()
     {
+        
         var r = 2096 / 2;
         var position = rt.anchoredPosition.y + (rt_v.sizeDelta.y / 2);
         var deltaHeight = Math.Abs(rt_m.anchoredPosition.y + position);
@@ -100,10 +126,13 @@ public class RectControl : MonoBehaviour
         float width = (float)(deltaHeight / Math.Tan(angle));
 
         width -= 120f;
-
-        if (rt_m.anchoredPosition.y == 0 - rt.anchoredPosition.y - vg.padding.top - 100 || width <= 460 ||float.IsNaN(width))
-            width = 928;
+        
+        float width = 0f; 
+        if (rt_m.anchoredPosition.y == 0 - rt.anchoredPosition.y - vg.padding.top - 95 || float.IsNaN(width))
+            width = 1000;
+        else
+            width = 890;
 
         rt.sizeDelta = new Vector2(width, rt.sizeDelta.y);
-    }
+    }*/
 }
