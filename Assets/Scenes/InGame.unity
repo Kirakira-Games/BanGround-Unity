@@ -6339,7 +6339,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 941457292}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &506441010
 MonoBehaviour:
@@ -7367,7 +7367,6 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: -0.35}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 2107511033}
   - {fileID: 506441009}
   - {fileID: 1796637315}
   m_Father: {fileID: 0}
@@ -9394,6 +9393,7 @@ GameObject:
   - component: {fileID: 1796637314}
   - component: {fileID: 1796637313}
   - component: {fileID: 1796637312}
+  - component: {fileID: 1796637316}
   m_Layer: 0
   m_Name: NoteCam
   m_TagString: MainCamera
@@ -9507,8 +9507,20 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 941457292}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 31.261002, y: 0, z: 0}
+--- !u!114 &1796637316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1796637310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2a3a84999c8be44c84249d3b57802fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1796710112
 GameObject:
   m_ObjectHideFlags: 0
@@ -15026,6 +15038,7 @@ GameObject:
   - component: {fileID: 2027864058}
   - component: {fileID: 2027864057}
   - component: {fileID: 2027864056}
+  - component: {fileID: 2027864060}
   m_Layer: 0
   m_Name: LaneBackground
   m_TagString: Untagged
@@ -15102,12 +15115,24 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2027864055}
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 0, y: -0.1, z: 108.01}
-  m_LocalScale: {x: 1.825, y: 1, z: 20}
+  m_LocalPosition: {x: 0, y: -0.1, z: 103}
+  m_LocalScale: {x: 1.825, y: 1, z: 19}
   m_Children: []
   m_Father: {fileID: 1725179684}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
+--- !u!114 &2027864060
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2027864055}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7d8ac299c89b8d48b16865e56ef56c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2028556310
 GameObject:
   m_ObjectHideFlags: 0

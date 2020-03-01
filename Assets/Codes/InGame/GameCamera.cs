@@ -17,9 +17,10 @@ public class GameCamera : MonoBehaviour
 
     private void Awake()
     {
-        float Ratio = GetComponent<Camera>().aspect;
+        Camera camera = GetComponent<Camera>();
+        float Ratio = camera.aspect;
         float size = Ratio >= 16f/9 ?60f:(-33.3f*Ratio+119.3f );
         // (1,86) (1.78,60) 0.78 -26
-        GetComponent<Camera>().fieldOfView = size;
+        camera.fieldOfView = size;
     }
 }
