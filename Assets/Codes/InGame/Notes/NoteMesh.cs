@@ -22,7 +22,7 @@ public class NoteMesh
 
     static readonly int[] indices = { 0, 2, 1, 2, 3, 1 };
     
-    const float deltaPerLane = 0.07f;
+    const float deltaPerLane = 0.00f;
 
     static private int sortingLayerID;
     static private Material mat;
@@ -51,10 +51,10 @@ public class NoteMesh
         float delta = (lane - 3) * deltaPerLane;
         return new Vector3[]
         {
-            new Vector3(-1 + delta, -0.4f),
-            new Vector3(1 + delta, -0.4f),
-            new Vector3(-1 - delta, 0.4f),
-            new Vector3(1 - delta, 0.4f)
+            new Vector3(-1 + delta, -0.4f,-0.5f),
+            new Vector3(1 + delta, -0.4f,-0.5f),
+            new Vector3(-1 - delta, 0.4f,0.5f),
+            new Vector3(1 - delta, 0.4f,0.5f)
         };
     }
 
