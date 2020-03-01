@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 
 public class TouchEffect : MonoBehaviour
 {
@@ -28,6 +29,8 @@ public class TouchEffect : MonoBehaviour
 
     private void Update()
     {
+        if (SceneManager.GetActiveScene().name == "InGame") return;
+
         Touch[] touches = Input.touches;
         if (touches.Length == 0)
         {
