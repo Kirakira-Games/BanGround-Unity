@@ -1,18 +1,25 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 
 public class TouchEffect : MonoBehaviour
 {
     private RectTransform trans;
     private ParticleSystem touchEffect;
+    bool isEffectEnabled = true;
 
     private void Start()
     {
         trans = GetComponent<RectTransform>();
         touchEffect = GameObject.Find("ParRoot").GetComponent<ParticleSystem>();
+        SceneManager.activeSceneChanged += OnSceneChanged;
+    }
+
+    void OnSceneChanged(Scene s1, Scene s2)
+    {
+        isEffectEnabled = s2 == SceneManager.GetSceneByName("InGame") ? false : true;
     }
 
     // For debugging purpose only, simulate touch event from mouse event
@@ -29,21 +36,21 @@ public class TouchEffect : MonoBehaviour
 
     private void Update()
     {
-        if (SceneManager.GetActiveScene().name == "InGame") return;
-
-        Touch[] touches = Input.touches;
-        if (touches.Length == 0)
+        if (isEffectEnabled)
         {
-            if (Input.GetMouseButtonDown(0))
+            Touch[] touches = Input.touches;
+            if (touches.Length == 0)
             {
-                touches = SimulateMouseTouch(TouchPhase.Began);
+                if (Input.GetMouseButtonDown(0))
+                {
+                    touches = SimulateMouseTouch(TouchPhase.Began);
+                }
             }
-        }
-
-        foreach (var touch in touches)
-        {
-            trans.anchoredPosition = touch.position;
-            touchEffect.Play();
+            foreach (var touch in touches)
+            {
+                trans.anchoredPosition = touch.position;
+                touchEffect.Play();
+            }
         }
     }
 }
