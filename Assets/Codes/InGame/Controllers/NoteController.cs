@@ -355,6 +355,12 @@ public class NoteController : MonoBehaviour
                         audioMgr.restart = true;
                     }
                 });
+
+            else
+            {
+                onJudge = null;
+                audioMgr.restart = false;
+            }
         }
     }
 
