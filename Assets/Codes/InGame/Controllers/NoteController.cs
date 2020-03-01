@@ -125,25 +125,18 @@ public class NoteController : MonoBehaviour
 
     private NoteBase OnTouch(int audioTime, int lane, Touch touch)
     {
-        NoteBase noteToJudge = null;
-        for (int i = Mathf.Max(0, lane - 1); i < Mathf.Min(NoteUtility.LANE_COUNT, lane + 2); i++)
+        UpdateLane(lane);
+        // Try to judge the front of the queue
+        if (!laneQueue[lane].Empty())
         {
-            UpdateLane(i);
-            // Try to judge the front of the queue
-            if (!laneQueue[i].Empty())
+            NoteBase note = laneQueue[lane].Top();
+            JudgeResult result = note.TryJudge(audioTime, touch);
+            if (result != JudgeResult.None)
             {
-                NoteBase note = laneQueue[i].Top();
-                JudgeResult result = note.TryJudge(audioTime, touch);
-                if (result != JudgeResult.None)
-                {
-                    if (noteToJudge == null || noteToJudge.time > note.time - (i == lane ? 1 : 0))
-                    {
-                        noteToJudge = note;
-                    }
-                }
+                return note;
             }
         }
-        return noteToJudge;
+        return null;
     }
 
     private GameObject CreateNote(GameNoteData gameNote)
@@ -188,15 +181,27 @@ public class NoteController : MonoBehaviour
 
     public static int[] GetLanesByTouchPosition(Vector2 position)
     {
-        Collider2D[] cols = Physics2D.OverlapPointAll(Camera.main.ScreenToWorldPoint(new Vector3(position.x,position.y,8.35f)));
+        var ray = Camera.main.ScreenPointToRay(position);
+        var cols = Physics.RaycastAll(ray, NoteUtility.NOTE_JUDGE_POS * 4);
         List<int> lanes = new List<int>();
-        foreach (Collider2D col in cols)
+        float[] dists = new float[NoteUtility.LANE_COUNT];
+        foreach (var col in cols)
         {
-            if (col.CompareTag("JudgeArea"))
+            if (col.collider.CompareTag("JudgeArea"))
             {
-                lanes.Add(col.name[0] - '0');
+                int id = int.Parse(col.collider.name);
+                lanes.Add(id);
+                dists[id] = (col.collider.transform.position - col.point).sqrMagnitude;
+            }
+            else
+            {
+                Debug.Log("Touch hit unknown area: " + col.collider.name);
             }
         }
+        lanes.Sort((int lhs, int rhs) =>
+        {
+            return (int)Mathf.Sign(dists[lhs] - dists[rhs]);
+        });
         return lanes.ToArray();
     }
 
@@ -244,10 +249,10 @@ public class NoteController : MonoBehaviour
                     noteToJudge = ret;
                 }
             }
-            // A note to judge is found
+            // A note to judge is not found
             if (noteToJudge == null)
             {
-                if (touch.phase == TouchPhase.Began)
+                if (touch.phase == TouchPhase.Began && lanes.Length > 0)
                 {
                     int se = (int)EmitEffect(NoteUtility.GetJudgePos(lanes[0]), JudgeResult.None, GameNoteType.Single);
                     audioMgr.PlaySE(soundEffects[se]);
