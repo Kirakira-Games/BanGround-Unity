@@ -64,11 +64,11 @@ public enum TapEffectType
 public static class NoteUtility
 {
     public const int LANE_COUNT = 7;
-    public const float NOTE_START_POS = 365;
+    public const float NOTE_START_POS = 200;
     public const float NOTE_JUDGE_POS = 8;
     public const float NOTE_Y_POS = 0f;
     public const float LANE_WIDTH = 2f;
-    public const float NOTE_SCALE = 0.8f;
+    public const float NOTE_SCALE = 1.2f;
 
     private static readonly float BANG_PERSPECTIVE_START = YTo3DXHelper(0);
     private static readonly float BANG_PERSPECTIVE_END = YTo3DXHelper(1);
@@ -171,7 +171,7 @@ public static class NoteUtility
 
     private static float YTo3DXHelper(float x)
     {
-        return -1.02458329f / Mathf.Pow(3.90425367f * Mathf.Pow(x, 0.9f) + 0.99125229f, 2f) + 1.04274808f;
+        return -1.02321179f / (17.47616718f * x + 0.96943588f) + 1.05546995f;
     }
 
     private static float YTo3DX(float x)
