@@ -46,6 +46,7 @@ public class SelectManager : MonoBehaviour
     private InputField audio_Input;
     private InputField size_Input;
 
+    private Slider far_Clip;
     private Slider bg_Bright;
     private Slider lane_Bright;
     private Slider long_Bright;
@@ -128,6 +129,7 @@ public class SelectManager : MonoBehaviour
         audio_Input = GameObject.Find("Audio_Input").GetComponent<InputField>();
         size_Input = GameObject.Find("Size_Input").GetComponent<InputField>();
 
+        far_Clip = GameObject.Find("Far_Clip_Slider").GetComponent<Slider>();
         bg_Bright = GameObject.Find("BG_Bri_Slider").GetComponent<Slider>();
         lane_Bright = GameObject.Find("Lane_Bri_Slider").GetComponent<Slider>();
         long_Bright = GameObject.Find("Long_Bri_Slider").GetComponent<Slider>();
@@ -191,7 +193,7 @@ public class SelectManager : MonoBehaviour
     }
 
 
-    //--------------------------------------------
+    //Song Selection-------------------------------
     private void InitSongList()
     {
         for (int i = 0; i < chartList.Count; i++)
@@ -404,7 +406,7 @@ public class SelectManager : MonoBehaviour
         lastPreviewStream.Play();
     }
 
-    //--------------------------------------------
+    //Setting And Mod------------------------------
     void OpenSetting()
     {
         //GetModStatus();
@@ -437,6 +439,7 @@ public class SelectManager : MonoBehaviour
         auto_Tog.isOn = LiveSetting.autoPlayEnabled;
         persp_Tog.isOn = LiveSetting.bangPerspective;
 
+        far_Clip.value = LiveSetting.farClip;
         bg_Bright.value = LiveSetting.bgBrightness;
         lane_Bright.value = LiveSetting.laneBrightness;
         long_Bright.value = LiveSetting.longBrightness;
@@ -500,6 +503,7 @@ public class SelectManager : MonoBehaviour
         LiveSetting.autoPlayEnabled = auto_Tog.isOn;
         LiveSetting.bangPerspective = persp_Tog.isOn;
 
+        LiveSetting.farClip = far_Clip.value;
         LiveSetting.bgBrightness = bg_Bright.value;
         LiveSetting.laneBrightness = lane_Bright.value;
         LiveSetting.longBrightness = long_Bright.value;
