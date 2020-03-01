@@ -56,7 +56,7 @@ public class NoteController : MonoBehaviour
     public TapEffectType EmitEffect(Vector3 position, JudgeResult result, GameNoteType type)
     {
         if (result == JudgeResult.Miss) return TapEffectType.None;
-        var pos = new Vector3(position.x * 1.444f, -2.97f, 8);
+        var pos = new Vector3(position.x * 1f, 0, 8);
 
         TapEffectType se = TapEffectType.Click;
 
