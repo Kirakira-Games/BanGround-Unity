@@ -186,8 +186,6 @@ public class SelectManager : MonoBehaviour
         acc = GameObject.Find("AccText").GetComponent<Text>();
 
         difficultySelect = GameObject.Find("DifficultySelect").GetComponent<DifficultySelect>();
-        AndroidOnlyPanel = GameObject.Find("Android Only");
-        if (Application.platform != RuntimePlatform.Android) AndroidOnlyPanel.SetActive(false);
     }
     void LoadScoreRecord()
     {
@@ -495,8 +493,8 @@ public class SelectManager : MonoBehaviour
     void SetLiveSetting()
     {
         LiveSetting.noteSpeed = float.Parse(speed_Input.text);
-        LiveSetting.judgeOffset = int.Parse(judge_Input.text);
-        LiveSetting.audioOffset = int.Parse(audio_Input.text);
+        LiveSetting.judgeOffset = int.Parse(string.IsNullOrWhiteSpace(judge_Input.text) ? 0.ToString() : judge_Input.text);
+        LiveSetting.audioOffset = int.Parse(string.IsNullOrWhiteSpace(audio_Input.text) ? 0.ToString() : audio_Input.text);
         LiveSetting.noteSize = float.Parse(size_Input.text);
         LiveSetting.seVolume = seVolume_Input.value;
         LiveSetting.bgmVolume = bgmVolume_Input.value;
@@ -567,7 +565,7 @@ public class SelectManager : MonoBehaviour
         //enterAniObj.SetActive(true);
         //scene_Animator.Play("OutPlay", -1, 0);
         //CloseSetting();
-        setting_Open_Btn.gameObject.SetActive(false);
+        //setting_Open_Btn.gameObject.SetActive(false);
 
         SetLiveSetting();
         File.WriteAllText(LiveSetting.settingsPath, JsonConvert.SerializeObject(new LiveSettingTemplate()));
