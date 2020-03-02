@@ -24,8 +24,6 @@ public class SelectManager : MonoBehaviour
     private Toggle persp_Tog;
     private Toggle mirrow_Tog;
 
-    private Toggle audioTrack_Tog;
-
     /* Mods     */
 
     // Auto
@@ -144,7 +142,7 @@ public class SelectManager : MonoBehaviour
         suddenDeath_Tog = GameObject.Find("SuddenDeath_Toggle").GetComponent<Toggle>();
         perfect_Tog = GameObject.Find("Perfect_Toggle").GetComponent<Toggle>();
 
-        audioTrack_Tog = GameObject.Find("AudioTrack_Toggle").GetComponent<Toggle>();
+        //audioTrack_Tog = GameObject.Find("AudioTrack_Toggle").GetComponent<Toggle>();
 
         //enter_Btn.onClick.AddListener(OnEnterPressed);
         setting_Open_Btn.onClick.AddListener(OpenSetting);
@@ -447,7 +445,7 @@ public class SelectManager : MonoBehaviour
         bgmVolume_Input.value = LiveSetting.bgmVolume;
         //bufferSize_Input.value = LiveSetting.bufferSize;
 
-        audioTrack_Tog.isOn = LiveSetting.enableAudioTrack;
+        //audioTrack_Tog.isOn = LiveSetting.enableAudioTrack;
 
         GetModStatus();
     }
@@ -510,7 +508,7 @@ public class SelectManager : MonoBehaviour
         LiveSetting.laneBrightness = lane_Bright.value;
         LiveSetting.longBrightness = long_Bright.value;
 
-        LiveSetting.enableAudioTrack = audioTrack_Tog.isOn;
+        //LiveSetting.enableAudioTrack = audioTrack_Tog.isOn;
 
         if (!double_Tog.isOn)
             LiveSetting.RemoveMod(DoubleMod.Instanse);
