@@ -436,7 +436,6 @@ public class SelectManager : MonoBehaviour
         syncLine_Tog.isOn = LiveSetting.syncLineEnabled;
         offBeat_Tog.isOn = LiveSetting.grayNoteEnabled;
         mirrow_Tog.isOn = LiveSetting.mirrowEnabled;
-        auto_Tog.isOn = LiveSetting.autoPlayEnabled;
         persp_Tog.isOn = LiveSetting.bangPerspective;
 
         far_Clip.value = LiveSetting.farClip;
@@ -454,6 +453,8 @@ public class SelectManager : MonoBehaviour
     }
     void GetModStatus()
     {
+        auto_Tog.isOn = LiveSetting.autoPlayEnabled;
+
         half_Tog.isOn = LiveSetting.attachedMods.Contains(HalfMod.Instanse);
         double_Tog.isOn = LiveSetting.attachedMods.Contains(DoubleMod.Instanse);
         suddenDeath_Tog.isOn = LiveSetting.attachedMods.Contains(SuddenDeathMod.Instance);
@@ -563,6 +564,9 @@ public class SelectManager : MonoBehaviour
         //scene_Animator.Play("OutPlay", -1, 0);
         //CloseSetting();
         setting_Open_Btn.gameObject.SetActive(false);
+
+        SetLiveSetting();
+        File.WriteAllText(LiveSetting.settingsPath, JsonConvert.SerializeObject(new LiveSettingTemplate()));
 
         //GameObject.Find("milk").GetComponent<Animator>().Play("out", -1);
 

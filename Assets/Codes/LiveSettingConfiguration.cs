@@ -166,7 +166,7 @@ public class LiveSettingTemplate
         grayNoteEnabled = LiveSetting.grayNoteEnabled;
         mirrowEnabled = LiveSetting.mirrowEnabled;
         bangPerspective = LiveSetting.bangPerspective;
-        autoPlayEnabled = LiveSetting.autoPlayEnabled;
+        //autoPlayEnabled = LiveSetting.autoPlayEnabled;
 
         farClip = LiveSetting.farClip;
         bgBrightness = LiveSetting.bgBrightness;
@@ -195,7 +195,7 @@ public class LiveSettingTemplate
         LiveSetting.grayNoteEnabled = grayNoteEnabled;
         LiveSetting.mirrowEnabled = mirrowEnabled;
         LiveSetting.bangPerspective = bangPerspective;
-        LiveSetting.autoPlayEnabled = autoPlayEnabled;
+        //LiveSetting.autoPlayEnabled = autoPlayEnabled;
 
         LiveSetting.farClip = farClip;
         LiveSetting.bgBrightness = bgBrightness;
