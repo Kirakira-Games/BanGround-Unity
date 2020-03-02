@@ -339,6 +339,8 @@ public class NoteController : MonoBehaviour
         background.UpdateBackground(DataLoader.GetBackgroundPath(sid));
 
         //Set Play Mod Event
+        audioMgr.restart = false;
+        onJudge = null;
         foreach (var mod in LiveSetting.attachedMods)
         {
             if (mod is SuddenDeathMod)
@@ -347,7 +349,7 @@ public class NoteController : MonoBehaviour
                     if (result != JudgeResult.Perfect && result != JudgeResult.Great)
                     {
                         audioMgr.StopBGM();
-                        //audioMgr.restart = true;
+                        audioMgr.restart = false;
                     }
                 });
 
@@ -360,12 +362,6 @@ public class NoteController : MonoBehaviour
                         audioMgr.restart = true;
                     }
                 });
-
-            else
-            {
-                onJudge = null;
-                audioMgr.restart = false;
-            }
         }
     }
 
