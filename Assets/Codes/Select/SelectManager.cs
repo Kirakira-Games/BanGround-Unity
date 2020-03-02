@@ -46,6 +46,7 @@ public class SelectManager : MonoBehaviour
     private InputField audio_Input;
     private InputField size_Input;
 
+    private Slider judgeOffsetTransform;
     private Slider far_Clip;
     private Slider bg_Bright;
     private Slider lane_Bright;
@@ -129,6 +130,7 @@ public class SelectManager : MonoBehaviour
         audio_Input = GameObject.Find("Audio_Input").GetComponent<InputField>();
         size_Input = GameObject.Find("Size_Input").GetComponent<InputField>();
 
+        judgeOffsetTransform = GameObject.Find("Judge_Offset_Transform_Slider").GetComponent<Slider>();
         far_Clip = GameObject.Find("Far_Clip_Slider").GetComponent<Slider>();
         bg_Bright = GameObject.Find("BG_Bri_Slider").GetComponent<Slider>();
         lane_Bright = GameObject.Find("Lane_Bri_Slider").GetComponent<Slider>();
@@ -438,6 +440,7 @@ public class SelectManager : MonoBehaviour
         mirrow_Tog.isOn = LiveSetting.mirrowEnabled;
         persp_Tog.isOn = LiveSetting.bangPerspective;
 
+        judgeOffsetTransform.value = LiveSetting.offsetTransform;
         far_Clip.value = LiveSetting.farClip;
         bg_Bright.value = LiveSetting.bgBrightness;
         lane_Bright.value = LiveSetting.laneBrightness;
@@ -504,6 +507,7 @@ public class SelectManager : MonoBehaviour
         LiveSetting.autoPlayEnabled = auto_Tog.isOn;
         LiveSetting.bangPerspective = persp_Tog.isOn;
 
+        LiveSetting.offsetTransform = judgeOffsetTransform.value;
         LiveSetting.farClip = far_Clip.value;
         LiveSetting.bgBrightness = bg_Bright.value;
         LiveSetting.laneBrightness = lane_Bright.value;

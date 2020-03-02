@@ -28,7 +28,7 @@ public class JudgeResultController : MonoBehaviour
 
         animator = GetComponent<Animator>();
         resultRenderer = GetComponent<SpriteRenderer>();
-        offsetRenderer=transform.Find("JudgeOffset").GetComponent<SpriteRenderer>();
+        offsetRenderer=GameObject.Find("JudgeOffset").GetComponent<SpriteRenderer>();
     }
 
     public void DisplayJudgeResult(JudgeResult result)
