@@ -47,6 +47,7 @@ public static class LiveSetting
     public static bool bangPerspective = true;
     public static bool autoPlayEnabled = false;
 
+    public static float offsetTransform = 1f;
     public static float farClip = 169f;
     public static float bgBrightness = .7f;
     public static float laneBrightness = 0.84f;
@@ -140,6 +141,7 @@ public class LiveSettingTemplate
     public bool bangPerspective = true;
     public bool autoPlayEnabled = false;
 
+    public float offsetTransform = 1f;
     public float farClip = 169f;
     public float bgBrightness = .7f;
     public float laneBrightness = 0.84f;
@@ -168,6 +170,7 @@ public class LiveSettingTemplate
         bangPerspective = LiveSetting.bangPerspective;
         //autoPlayEnabled = LiveSetting.autoPlayEnabled;
 
+        offsetTransform = LiveSetting.offsetTransform;
         farClip = LiveSetting.farClip;
         bgBrightness = LiveSetting.bgBrightness;
         laneBrightness = LiveSetting.laneBrightness;
@@ -197,6 +200,7 @@ public class LiveSettingTemplate
         LiveSetting.bangPerspective = bangPerspective;
         //LiveSetting.autoPlayEnabled = autoPlayEnabled;
 
+        LiveSetting.offsetTransform = offsetTransform;
         LiveSetting.farClip = farClip;
         LiveSetting.bgBrightness = bgBrightness;
         LiveSetting.laneBrightness = laneBrightness;
