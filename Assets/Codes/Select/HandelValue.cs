@@ -15,10 +15,15 @@ public class HandelValue : MonoBehaviour
         valueText = transform.Find("Handle Slide Area/Handle/Value").GetComponent<Text>();
         if (needPercent)
         {
-            valueText.text = ((int)(slider.value * 100)).ToString() + "%";
+            //valueText.text = ((int)(slider.value * 100)).ToString() + "%";
+            //slider.onValueChanged.AddListener((value) =>
+            //{
+            //    valueText.text = ((int)(value * 100)).ToString() + "%";
+            //});
+            valueText.text = (int)((slider.value - slider.minValue) / (slider.maxValue - slider.minValue) * 100) + "%";
             slider.onValueChanged.AddListener((value) =>
             {
-                valueText.text = ((int)(value * 100)).ToString() + "%";
+                valueText.text = (int)((value - slider.minValue) / (slider.maxValue - slider.minValue) * 100) + "%";
             });
         }
         else

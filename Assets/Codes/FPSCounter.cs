@@ -11,6 +11,8 @@ public class FPSCounter : MonoBehaviour
     float lastClearTime = -1;
     int lastFPS = 0;
 
+    float lostFocusTime = 0;
+
     void Awake()
     {
         text = GetComponent<Text>();
@@ -24,6 +26,7 @@ public class FPSCounter : MonoBehaviour
             lastClearTime = Time.time;
         }
 
+        if (Time.timeScale == 0) return;
         frameInSec++;
         text.text = $"{lastFPS} FPS";//\n{Mathf.Round(Time.deltaTime * 1000)}  ms";
     }
