@@ -53,7 +53,7 @@ public static class LiveSetting
     public static float laneBrightness = 0.84f;
     public static float longBrightness = .8f;
 
-    public static bool enableAudioTrack = false;
+    //public static bool enableAudioTrack = false;
 
     public const string assetDirectory = "V2Assets";
     public const string IconPath = "UI/ClearMark/";
@@ -176,7 +176,7 @@ public class LiveSettingTemplate
         laneBrightness = LiveSetting.laneBrightness;
         longBrightness = LiveSetting.longBrightness;
 
-        enableAudioTrack = LiveSetting.enableAudioTrack;
+        //enableAudioTrack = LiveSetting.enableAudioTrack;
 
         currentChart = LiveSetting.currentChart;
         currentDifficulty = LiveSetting.currentDifficulty;
@@ -206,7 +206,7 @@ public class LiveSettingTemplate
         LiveSetting.laneBrightness = laneBrightness;
         LiveSetting.longBrightness = longBrightness;
 
-        LiveSetting.enableAudioTrack = enableAudioTrack;
+        //LiveSetting.enableAudioTrack = enableAudioTrack;
 
         LiveSetting.currentChart = currentChart;
         LiveSetting.currentDifficulty = currentDifficulty;
