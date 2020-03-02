@@ -53,7 +53,6 @@ public class SelectManager : MonoBehaviour
     private Slider long_Bright;
     private Slider seVolume_Input;
     private Slider bgmVolume_Input;
-    private Slider bufferSize_Input;
 
     private AudioManager audioManager;
 
@@ -137,7 +136,7 @@ public class SelectManager : MonoBehaviour
         long_Bright = GameObject.Find("Long_Bri_Slider").GetComponent<Slider>();
         seVolume_Input = GameObject.Find("SeVolume_Input").GetComponent<Slider>();
         bgmVolume_Input = GameObject.Find("BGMVolume_Input").GetComponent<Slider>();
-        bufferSize_Input = GameObject.Find("BufferSize_Input").GetComponent<Slider>();
+        //bufferSize_Input = GameObject.Find("BufferSize_Input").GetComponent<Slider>();
 
         auto_Tog = GameObject.Find("Autoplay_Toggle").GetComponent<Toggle>();
         half_Tog = GameObject.Find("Half_Toggle").GetComponent<Toggle>();
