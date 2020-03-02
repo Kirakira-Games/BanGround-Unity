@@ -92,6 +92,8 @@ public class UIManager : MonoBehaviour
 
     public void GameRetry()
     {
+        StopAllCoroutines();
+        AudioManager.Instanse.StopBGM();
         Time.timeScale = 1;
         AudioManager.Instanse.StopAllCoroutines();
 
@@ -102,6 +104,8 @@ public class UIManager : MonoBehaviour
 
     public void GameRetire()
     {
+        StopAllCoroutines();
+        AudioManager.Instanse.StopBGM();
         Time.timeScale = 1;
         AudioManager.Instanse.StopAllCoroutines();
 
