@@ -40,7 +40,7 @@ public class RectControl : MonoBehaviour
         bt = GetComponent<Button>();
         rt = GetComponent<RectTransform>();
         bt.onClick.AddListener(OnPressed);
-        rt.sizeDelta = new Vector2(900, 116);
+        rt.sizeDelta = new Vector2(980, 116);
     }
 
     void OnPressed()
@@ -90,18 +90,18 @@ public class RectControl : MonoBehaviour
     }
     IEnumerator OnSelectAnimation3()
     {
-        while (rt.sizeDelta.x < 1000)
+        while (rt.sizeDelta.x < 1050)
         {
-            rt.sizeDelta += new Vector2((1000 - rt.sizeDelta.x) * 0.3f, 0f);
+            rt.sizeDelta += new Vector2((1050 - rt.sizeDelta.x) * 0.3f, 0f);
             yield return new WaitForEndOfFrame();
         }
-        rt.sizeDelta = new Vector2(1000, rt.sizeDelta.y);
+        rt.sizeDelta = new Vector2(1050, rt.sizeDelta.y);
     }
 
     public void UnSelect()
     {
         StopAllCoroutines();
-        rt.sizeDelta = new Vector2(890, 116);
+        rt.sizeDelta = new Vector2(980, 116);
         img.color = DisabledColor;
         title.color = Color.grey;
         startImg.SetActive(false);
