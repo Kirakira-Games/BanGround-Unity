@@ -50,15 +50,17 @@ public class DataLoader
         {
             Directory.CreateDirectory(MusicDir);
         }
-        // Check first launch after updating initial charts
-        if (!File.Exists(SongListPath) || PlayerPrefs.GetInt("InitialChartVersion") != InitialChartVersion)
-        {
-            Debug.Log("Load initial charts...");
-            yield return CopyFileFromStreamingAssetsToPersistentDataPath("/Initial.kirapack");
-            LoadKiraPack(Application.persistentDataPath + "/Initial.kirapack");
-            PlayerPrefs.SetInt("InitialChartVersion", InitialChartVersion);
-            File.Delete(Application.persistentDataPath + "/Initial.kirapack");
-        }
+        //// Check first launch after updating initial charts
+        //if (!File.Exists(SongListPath) || PlayerPrefs.GetInt("InitialChartVersion") != InitialChartVersion)
+        //{
+        //    Debug.Log("Load initial charts...");
+        //    yield return CopyFileFromStreamingAssetsToPersistentDataPath("/Initial.kirapack");
+        //    LoadKiraPack(Application.persistentDataPath + "/Initial.kirapack");
+        //    PlayerPrefs.SetInt("InitialChartVersion", InitialChartVersion);
+        //    File.Delete(Application.persistentDataPath + "/Initial.kirapack");
+        //}
+
+        yield return new WaitForEndOfFrame();
 
         LiveSetting.Load();
 //#if UNITY_ANDROID && !UNITY_EDITOR
