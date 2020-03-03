@@ -83,9 +83,7 @@ public class Slide : MonoBehaviour
             prev.UpdatePosition(audioTime);
             Vector3 prevPos = prev.transform.position;
             Vector3 nextPos = next.transform.position;
-            float percentage = Mathf.Abs(nextPos.z - prevPos.z) <= NoteUtility.EPS ?
-                (audioTime - prev.time) / (next.time - prev.time) :
-                (NoteUtility.NOTE_JUDGE_POS - prevPos.z) / (nextPos.z - prevPos.z);
+            float percentage = (audioTime - prev.time) / (next.time - prev.time);
             percentage = Mathf.Max(0, percentage);
             noteHead.transform.position = (next.judgePos - prev.judgePos) * percentage + prev.judgePos;
             SlideMesh mesh = noteHead.slideMesh;
