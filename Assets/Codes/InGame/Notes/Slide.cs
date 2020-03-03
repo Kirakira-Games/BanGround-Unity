@@ -80,11 +80,14 @@ public class Slide : MonoBehaviour
         {
             var next = notes[displayHead];
             var prev = notes[displayHead - 1];
-            float percentage = (float)(audioTime - prev.time) / (next.time - prev.time);
+            prev.UpdatePosition(audioTime);
+            Vector3 prevPos = prev.transform.position;
+            Vector3 nextPos = next.transform.position;
+            float percentage = Mathf.Abs(nextPos.z - prevPos.z) <= NoteUtility.EPS ?
+                (audioTime - prev.time) / (next.time - prev.time) :
+                (NoteUtility.NOTE_JUDGE_POS - prevPos.z) / (nextPos.z - prevPos.z);
             percentage = Mathf.Max(0, percentage);
-            Vector3 prevPos = prev.judgePos;
-            Vector3 nextPos = next.judgePos;
-            noteHead.transform.position = (nextPos - prevPos) * percentage + prevPos;
+            noteHead.transform.position = (next.judgePos - prev.judgePos) * percentage + prev.judgePos;
             SlideMesh mesh = noteHead.slideMesh;
             mesh.afterNoteTrans = next.transform;
             mesh.meshRenderer.enabled = displayHead == 1 || !prev.gameObject.activeSelf;
