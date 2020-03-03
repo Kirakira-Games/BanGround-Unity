@@ -191,7 +191,8 @@ public class DataLoader
             newSongList.mHeaders.Add(musicHeader);
         }
 
-        // Save
+        // Sort And Save
+        newSongList.cHeaders.Sort(new cHeaderComparer());
         Debug.Log(JsonConvert.SerializeObject(newSongList));
         ProtobufHelper.Save(newSongList, SongListPath);
     }

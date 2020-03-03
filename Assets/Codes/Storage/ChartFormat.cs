@@ -364,3 +364,11 @@ public static class ProtobufHelper
 }
 
 #pragma warning restore CS1591, CS0612, CS3021, IDE1006
+
+public class cHeaderComparer : IComparer<cHeader>
+{
+    public int Compare(cHeader x, cHeader y)
+    {
+        return x.sid - y.sid;
+    }
+}
