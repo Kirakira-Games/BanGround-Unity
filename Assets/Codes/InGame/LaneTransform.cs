@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class LaneTransform : MonoBehaviour
 {
-    // Start is called before the first frame update
     void Start()
     {
         transform.localScale = new Vector3(transform.localScale.x, 1, LiveSetting.farClip * 0.11838f - 1.00623f);
@@ -13,7 +12,6 @@ public class LaneTransform : MonoBehaviour
 
     //8.5,0   169,19 160.5
 
-    // Update is called once per frame
     void Update()
     {
         
