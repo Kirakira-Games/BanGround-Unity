@@ -1,4 +1,5 @@
-﻿using System;
+﻿#pragma warning disable CS0414
+using System;
 using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
@@ -6,6 +7,7 @@ using Un4seen.Bass;
 using Un4seen.Bass.AddOn.Fx;
 using System.Runtime.InteropServices;
 
+[Obsolete("Fuck Audio")]
 public class LoopingBassMemStream : BassMemStream
 {
     public int LoopStart;
@@ -74,6 +76,7 @@ public class LoopingBassMemStream : BassMemStream
     }
 }
 
+[Obsolete("Fuck Audio")]
 public class BassMemStream : IDisposable
 {
     int id;
@@ -169,6 +172,7 @@ public class BassMemStream : IDisposable
     }
 }
 
+[Obsolete("Fuck Audio")]
 class AudioManager : MonoBehaviour
 {
     internal List<int> LoadedSound = new List<int>();

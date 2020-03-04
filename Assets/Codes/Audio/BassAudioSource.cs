@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
+[Obsolete("Fuck Audio")]
 public class BassAudioSource : MonoBehaviour
 {
     private AudioManager audioMgr;
