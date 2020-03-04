@@ -16,6 +16,7 @@ public class SelectManager : MonoBehaviour
     private Button setting_Close_Btn;
     private Button mod_Open_Btn;
     private Button mod_Close_Btn;
+    private Button sort_Button;
 
     private int lastIndex = -1;
 
@@ -104,6 +105,9 @@ public class SelectManager : MonoBehaviour
     private void InitComponent()
     {
         scene_Animator = GameObject.Find("SceneAnimator").GetComponent<Animator>();
+        sort_Button = GameObject.Find("Sort_Button").GetComponent<Button>();
+        sort_Button.onClick.AddListener(SwitchSort);
+
         rt = GameObject.Find("SongContent").GetComponent<RectTransform>();
         rt_v = GameObject.Find("Song Scroll View").GetComponent<RectTransform>();
         rt_s = GameObject.Find("Song Scroll View").GetComponent<ScrollRect>();
@@ -188,7 +192,16 @@ public class SelectManager : MonoBehaviour
     {
         playRecords = PlayRecords.OpenRecord();
     }
-
+    //---------------------------------------------
+    bool isSortOpen = false;
+    void SwitchSort()
+    {
+        if (isSortOpen)
+            scene_Animator.Play("SortOut");
+        else
+            scene_Animator.Play("SortIn");
+        isSortOpen = !isSortOpen;
+    }
 
     //Song Selection-------------------------------
     private void InitSongList()
