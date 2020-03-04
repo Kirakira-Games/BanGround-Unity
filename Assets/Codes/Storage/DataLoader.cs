@@ -60,6 +60,11 @@ public class DataLoader
         //    File.Delete(Application.persistentDataPath + "/Initial.kirapack");
         //}
 
+#if UNITY_ANDROID && !UNITY_EDITOR
+        AndroidJavaObject pluginClass = new AndroidJavaObject("fun.banground.game.KirakiraActivity");
+        pluginClass.Call("registerFileImportCallback", new AndroidCallback());
+#endif
+
         yield return new WaitForEndOfFrame();
 
         LiveSetting.Load();
@@ -301,11 +306,6 @@ public class DataLoader
         catch (System.Exception e)
         {
             MessageBoxController.ShowMsg(LogLevel.ERROR, e.Message, false);
-        }
-        if (LoadSuccess)
-        {
-            RefreshSongList();
-            ReloadSongList();
         }
         return LoadSuccess;
     }
