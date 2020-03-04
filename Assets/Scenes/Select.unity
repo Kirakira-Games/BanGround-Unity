@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 1
+  m_UseShadowmask: 0
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -3200,7 +3200,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 1a3507779b771784a8e1755ef1545384, type: 3}
+  m_Texture: {fileID: 2800000, guid: 8316253d9be64aa42944e3766ccc7d35, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -12831,6 +12831,7 @@ GameObject:
   - component: {fileID: 864537239}
   - component: {fileID: 864537238}
   - component: {fileID: 864537237}
+  - component: {fileID: 864537240}
   m_Layer: 5
   m_Name: Sort_Panel
   m_TagString: Untagged
@@ -12859,7 +12860,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 2701, y: -0}
+  m_AnchoredPosition: {x: 1669, y: -0}
   m_SizeDelta: {x: 2058.75, y: 2096}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &864537237
@@ -12879,7 +12880,7 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 3
+  m_ChildAlignment: 0
   m_Spacing: 20
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
@@ -12900,7 +12901,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.5707547, g: 0.97855914, b: 1, a: 0.8509804}
+  m_Color: {r: 0, g: 0, b: 0, a: 0}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -12923,6 +12924,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 864537235}
   m_CullTransparentMesh: 0
+--- !u!114 &864537240
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 864537235}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_FirstSelected: {fileID: 0}
+  m_sendNavigationEvents: 1
+  m_DragThreshold: 10
 --- !u!1 &866462884
 GameObject:
   m_ObjectHideFlags: 0
@@ -15880,8 +15896,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -35, y: 584}
-  m_SizeDelta: {x: 107.5, y: 92.400024}
+  m_AnchoredPosition: {x: 1015, y: 1364}
+  m_SizeDelta: {x: 150, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1084982301
 MonoBehaviour:
@@ -15944,7 +15960,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 9cdb7ab7364db4857845b84935f5fb5a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: c470391089c7549c7a20972fc45fcfe0, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -16718,7 +16734,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u5E8F"
+  m_Text: 
 --- !u!222 &1123165468
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -18871,7 +18887,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u8BF7\u5BFC\u5165kirapack\n>\u22C1<"
+  m_Text: "\u8BF7\u5BFC\u5165kirapack\n>v<"
 --- !u!222 &1294601516
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -24387,7 +24403,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 93dc82a80a9c55f4684ec8d3755cfda9, type: 3}
+  m_Texture: {fileID: 2800000, guid: 8316253d9be64aa42944e3766ccc7d35, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
