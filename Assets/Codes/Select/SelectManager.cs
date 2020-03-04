@@ -81,11 +81,11 @@ public class SelectManager : MonoBehaviour
 
     private void Awake()
     {
-        if (!DataLoader.LoadAllKiraPackFromInbox())
-        {
-            DataLoader.RefreshSongList();
-            DataLoader.ReloadSongList();
-        }
+#if !UNITY_ANDROID || UNITY_EDITOR
+        DataLoader.LoadAllKiraPackFromInbox();
+#endif
+        DataLoader.RefreshSongList();
+        DataLoader.ReloadSongList();
     }
 
     // Start is called before the first frame update
@@ -601,6 +601,7 @@ public class SelectManager : MonoBehaviour
             lastPreviewStream?.Play();
     }
 
+#if !UNITY_ANDROID || UNITY_EDITOR
     private void OnApplicationFocus(bool focus)
     {
         if (focus)
@@ -609,5 +610,6 @@ public class SelectManager : MonoBehaviour
             if (success) SceneManager.LoadScene("Select");
         }
     }
+#endif
 }
 
