@@ -35,7 +35,7 @@ public abstract class NoteBase : MonoBehaviour
         inJudgeQueue = true;
         isDestroyed = false;
 
-        initPos = NoteUtility.GetInitPos(lane);
+        initPos = NoteUtility.GetInitPos(anims.Length > 0 ? anims[0].startLane : lane);
         judgePos = NoteUtility.GetJudgePos(lane);
 
         NoteMesh.Reset(gameObject, lane);
@@ -47,12 +47,16 @@ public abstract class NoteBase : MonoBehaviour
             animsHead++;
         while (animsHead > 0 && audioTime < anims[animsHead].startT)
             animsHead--;
+
+        // Compute ratio of current animation
         var anim = anims[animsHead];
         int timeSub = audioTime - anim.startT;
         float ratio = (float)timeSub / (anim.endT - anim.startT);
         float pos = ratio * (anim.endZ - anim.startZ) + anim.startZ;
 
+        // Update position
         Vector3 newPos = initPos;
+        newPos.x = NoteUtility.GetXPos(anim.startLane * (1 - ratio) + anim.endLane * ratio);
         if (LiveSetting.bangPerspective)
             pos = NoteUtility.GetBangPerspective(pos);
         newPos.z = initPos.z - (NoteUtility.NOTE_START_POS - NoteUtility.NOTE_JUDGE_POS) * pos;
