@@ -30,6 +30,7 @@ public static class LiveSetting
         {
             switch(Application.systemLanguage)
             {
+                case SystemLanguage.Chinese:
                 case SystemLanguage.ChineseSimplified:
                     language = Language.SimplifiedChinese;
                     break;
@@ -46,6 +47,7 @@ public static class LiveSetting
                     language = Language.English;
                     break;
             }
+            Debug.Log(language);
         }
     }
 
