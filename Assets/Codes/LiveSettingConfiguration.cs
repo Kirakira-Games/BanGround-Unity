@@ -25,6 +25,28 @@ public static class LiveSetting
         {
             Debug.LogWarning("Live setting file not found");
         }
+
+        if(language == Language.AutoDetect)
+        {
+            switch(Application.systemLanguage)
+            {
+                case SystemLanguage.ChineseSimplified:
+                    language = Language.SimplifiedChinese;
+                    break;
+                case SystemLanguage.ChineseTraditional:
+                    language = Language.TraditionalChinese;
+                    break;
+                case SystemLanguage.Japanese:
+                    language = Language.Japanese;
+                    break;
+                case SystemLanguage.Korean:
+                    language = Language.Korean;
+                    break;
+                default:
+                    language = Language.English;
+                    break;
+            }
+        }
     }
 
     public static int judgeOffset = 0;
@@ -61,7 +83,7 @@ public static class LiveSetting
     private static float cachedSpeed = 0;
     private static int cachedScreenTime = 0;
 
-    public static Language language = Language.SimplifiedChinese;
+    public static Language language = Language.AutoDetect;
 
     public static int currentChart = 0; // Chart set index
     public static int currentDifficulty = (int)Difficulty.Easy;
@@ -152,6 +174,8 @@ public class LiveSettingTemplate
     public int currentChart = 0;
     public int currentDifficulty = 0;
 
+    public Language language = Language.AutoDetect;
+
     public LiveSettingTemplate()
     {
         judgeOffset = LiveSetting.judgeOffset;
@@ -180,6 +204,8 @@ public class LiveSettingTemplate
 
         currentChart = LiveSetting.currentChart;
         currentDifficulty = LiveSetting.currentDifficulty;
+
+        language = LiveSetting.language;
     }
     public void ApplyToLiveSetting()
     {
@@ -210,5 +236,7 @@ public class LiveSettingTemplate
 
         LiveSetting.currentChart = currentChart;
         LiveSetting.currentDifficulty = currentDifficulty;
+
+        LiveSetting.language = language;
     }
 }
