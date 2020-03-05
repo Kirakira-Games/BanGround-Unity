@@ -15,8 +15,8 @@ public class AppPreLoader : MonoBehaviour
     {
         if (Application.platform != RuntimePlatform.Android) 
         {
-            sampleRate = 48000;
-            bufferSize = 64;
+            sampleRate = -1;
+            bufferSize = -1;
             SceneManager.LoadScene("Title");
         }
         else
