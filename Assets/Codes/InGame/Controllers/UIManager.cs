@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using AudioProvider;
 
 public class UIManager : MonoBehaviour
 {
     SpriteRenderer bg_SR;
     MeshRenderer lan_MR;
 
-    AudioManager am;
     GameObject pause_Canvas;
 
     Button pause_Btn;
@@ -23,6 +23,7 @@ public class UIManager : MonoBehaviour
     public TextAsset Fvoice;
     GameObject gateCanvas;
 
+    private ISoundEffect resultVoice;
 
     void Start()
     {
@@ -46,8 +47,6 @@ public class UIManager : MonoBehaviour
         pause_Canvas = GameObject.Find("PauseCanvas");
         pause_Canvas.SetActive(false);
 
-        am = AudioManager.Instanse;
-
         gateCanvas = GameObject.Find("GateCanvas");
         StartCoroutine(DelayDisableGate());
     }
@@ -59,8 +58,9 @@ public class UIManager : MonoBehaviour
     }
     public void GamePause()
     {
+        AudioManager.Instance.isInGame = false;
         Time.timeScale = 0;
-        am.PauseBGM();
+        AudioManager.Instance.gameBGM.Pause();
         pause_Canvas.SetActive(true);
     }
 
@@ -69,47 +69,51 @@ public class UIManager : MonoBehaviour
         Time.timeScale = 1;
         pause_Canvas.SetActive(false);
 
-        StartCoroutine(BiteTheDust());
+        //StartCoroutine(BiteTheDust());
+        AudioManager.Instance.gameBGM.Play();
+        AudioManager.Instance.isInGame = true;
     }
 
     public static bool BitingTheDust = false;
+    public static uint biteTime = 0;
 
     IEnumerator BiteTheDust()
     {
-        am.BGMStream.Position -= LiveSetting.NoteScreenTime;
+        ISoundTrack bgm = AudioManager.Instance.gameBGM;
 
         BitingTheDust = true;
+        uint pos = bgm.GetPlaybackTime();
+        if (pos < LiveSetting.NoteScreenTime) pos = 0;
+        else pos -= (uint)LiveSetting.NoteScreenTime;
+        bgm.SetPlaybackTime(pos);
+
         int ms = LiveSetting.NoteScreenTime;
 
         while((ms -= 10) > 0)
         {
-            am.lastPos -= 10;
+            pos -= 10;
+            biteTime = pos;
             yield return new WaitForSeconds(0.01f);
         }
         BitingTheDust = false;
-        am.ResumeBGM();
+        bgm.Play();
+        AudioManager.Instance.isInGame = true;
     }
 
     public void GameRetry()
     {
-        StopAllCoroutines();
-        AudioManager.Instanse.StopBGM();
         Time.timeScale = 1;
-        AudioManager.Instanse.StopAllCoroutines();
 
-        RemoveListener();
+        OnStopPlaying();
         //SceneManager.LoadScene("InGame");
         SceneLoader.LoadScene("InGame", "InGame",true);
     }
 
     public void GameRetire()
     {
-        StopAllCoroutines();
-        AudioManager.Instanse.StopBGM();
         Time.timeScale = 1;
-        AudioManager.Instanse.StopAllCoroutines();
 
-        RemoveListener();
+        OnStopPlaying();
         //SceneManager.LoadScene("Select");
         SceneLoader.LoadScene("InGame", "Select", true);
     }
@@ -122,8 +126,8 @@ public class UIManager : MonoBehaviour
 
     public void OnAudioFinish(bool restart)
     {
-        if(!SceneLoader.Loading)
-            StartCoroutine(ShowResult(restart));
+        if (SceneLoader.Loading) return;
+        StartCoroutine(ShowResult(restart));
     }
 
     IEnumerator DelayDisableGate()
@@ -140,19 +144,23 @@ public class UIManager : MonoBehaviour
         {
             case ClearMarks.AP:
                 gateImg.sprite = Resources.Load<Sprite>("UI/ClearMark_Long/AllPerfect");
-                AudioManager.Instanse.StreamSound(APvoice).Play();
+                resultVoice = AudioManager.Instance.PrecacheSE(APvoice.bytes);
+                resultVoice.PlayOneShot();
                 break;
             case ClearMarks.FC:
                 gateImg.sprite = Resources.Load<Sprite>("UI/ClearMark_Long/FullCombo");
-                AudioManager.Instanse.StreamSound(FCvoice).Play();
+                resultVoice = AudioManager.Instance.PrecacheSE(FCvoice.bytes);
+                resultVoice.PlayOneShot();
                 break;
             case ClearMarks.CL:
                 gateImg.sprite = Resources.Load<Sprite>("UI/ClearMark_Long/Clear");
-                AudioManager.Instanse.StreamSound(CLvoice).Play();
+                resultVoice = AudioManager.Instance.PrecacheSE(CLvoice.bytes);
+                resultVoice.PlayOneShot();
                 break;
             case ClearMarks.F:
                 gateImg.sprite = Resources.Load<Sprite>("UI/ClearMark_Long/Fail");
-                AudioManager.Instanse.StreamSound(Fvoice).Play();
+                resultVoice = AudioManager.Instance.PrecacheSE(Fvoice.bytes);
+                resultVoice.PlayOneShot();
                 break;
         }
         GameObject.Find("GateCanvas").GetComponent<Animator>().Play("GateClose");
@@ -162,12 +170,28 @@ public class UIManager : MonoBehaviour
         //SceneLoader.LoadScene("InGame", "Result", true);
     }
 
-    private void RemoveListener()
+    private void OnStopPlaying()
     {
+        AudioManager.Instance.gameBGM?.Pause();
+        AudioManager.Instance.StopAllCoroutines();
+
         pause_Btn.onClick.RemoveAllListeners();
         resume_Btn.onClick.RemoveAllListeners();
         retire_Btn.onClick.RemoveAllListeners();
         retry_Btn.onClick.RemoveAllListeners();
     }
 
+    private void Update()
+    {
+        if (AudioManager.Instance.isInGame && AudioManager.Instance.gameBGM.GetStatus() != PlaybackStatus.Playing)
+        {
+            AudioManager.Instance.isInGame = false;
+            OnAudioFinish(false);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        resultVoice?.Dispose();
+    }
 }

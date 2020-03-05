@@ -5,7 +5,7 @@ using System;
 [Obsolete("Fuck Audio")]
 public class BassAudioSource : MonoBehaviour
 {
-    private AudioManager audioMgr;
+    private AudioManagerOld audioMgr;
     private BassMemStream stream;
     private float _volume;
 
@@ -38,7 +38,7 @@ public class BassAudioSource : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        audioMgr = AudioManager.Instanse;
+        audioMgr = AudioManagerOld.Instanse;
 
         Clip = clip;
 

@@ -7,6 +7,7 @@ using System.IO;
 using Newtonsoft.Json;
 using System.Linq;
 using System;
+using AudioProvider;
 
 public class SelectManager : MonoBehaviour
 {
@@ -53,7 +54,6 @@ public class SelectManager : MonoBehaviour
     private Slider seVolume_Input;
     private Slider bgmVolume_Input;
 
-    private AudioManager audioManager;
 
     public GameObject enterAniObj;
     public GameObject AndroidOnlyPanel;
@@ -80,6 +80,8 @@ public class SelectManager : MonoBehaviour
 
     PlayRecords playRecords;
 
+    ISoundTrack previewSound;
+
     private void Awake()
     {
 #if !UNITY_ANDROID || UNITY_EDITOR
@@ -97,8 +99,6 @@ public class SelectManager : MonoBehaviour
         InitSongList();
         GetLiveSetting();
 
-        audioManager.loading = false;
-
         MessageBoxController.ShowMsg(LogLevel.INFO, "Load SongList Success");
     }
 
@@ -113,7 +113,6 @@ public class SelectManager : MonoBehaviour
         rt_s = GameObject.Find("Song Scroll View").GetComponent<ScrollRect>();
         dh = GameObject.Find("Song Scroll View").GetComponent<DragHandler>();
         lg = GameObject.Find("SongContent").GetComponent<VerticalLayoutGroup>();
-        audioManager = AudioManager.Instanse;
 
         //enter_Btn = GameObject.Find("Enter_Btn").GetComponent<Button>();
         setting_Open_Btn = GameObject.Find("SettingOpenBtn").GetComponent<Button>();
@@ -398,22 +397,21 @@ public class SelectManager : MonoBehaviour
         clearMark.texture = mark;
     }
 
-    LoopingBassMemStream lastPreviewStream = null;
 
     void PlayPreview()
     {
-        //if (lastIndex == LiveSetting.selectedIndex) return;
-        //else lastIndex = LiveSetting.selectedIndex;
-
-        LoopingBassMemStream.DisposeAll();
         mHeader mheader = DataLoader.GetMusicHeader(LiveSetting.CurrentHeader.mid);
 
-        lastPreviewStream = audioManager.StreamLoopSound(File.ReadAllBytes(
-            DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)),
-            mheader.preview[0],
-            mheader.preview[1]);
-
-        lastPreviewStream.Play();
+        if (previewSound != null) previewSound.Dispose();
+        previewSound = AudioManager.Instance.PlayLoopMusic(File.ReadAllBytes(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)),
+            new uint[]
+            {
+                (uint)(mheader.preview[0] * 1000),
+                (uint)(mheader.preview[1] * 1000)
+            });
+        //previewSound = AudioManager.Provider.StreamTrack(File.ReadAllBytes(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)));
+        //previewSound.SetLoopingPoint((uint)(mheader.preview[0] * 1000), (uint)(mheader.preview[1] * 1000), false);
+        //previewSound.Play();
     }
 
     //Setting And Mod------------------------------
@@ -582,36 +580,31 @@ public class SelectManager : MonoBehaviour
 
         //GameObject.Find("milk").GetComponent<Animator>().Play("out", -1);
 
-        StartCoroutine(DelayLoadScene());
-
+        //StartCoroutine(DelayLoadScene());
+        SceneLoader.LoadScene("Select", "InGame", true);
     }
-    IEnumerator DelayLoadScene()
-    {
-        float delay = 1.2f;
+    //IEnumerator DelayLoadScene()
+    //{
+    //    float delay = 1.2f;
 
-        float startVolume = lastPreviewStream.Volume;
+    //    //float startVolume = lastPreviewStream.Volume;
 
-        SceneLoader.LoadScene("Select", "InGame",true);
+    //    SceneLoader.LoadScene("Select", "InGame", true);
 
-        while (delay >= 0)
-        {
-            yield return new WaitForEndOfFrame();
-            delay -= Time.deltaTime;
-            lastPreviewStream.Volume = startVolume * (delay / 1.2f);
-        }
-
-        lastPreviewStream.Dispose();
-
-        //yield return new WaitForSeconds(2f);
-        //SceneManager.LoadSceneAsync("InGame");
-    }
+    //    while (delay >= 0)
+    //    {
+    //        yield return new WaitForEndOfFrame();
+    //        delay -= Time.deltaTime;
+    //        lastPreviewStream.Volume = startVolume * (delay / 1.2f);
+    //    }
+    //}
 
     private void OnApplicationPause(bool pause)
     {
         if (pause)
-            lastPreviewStream?.Pause();
+            previewSound.Pause();
         else
-            lastPreviewStream?.Play();
+            previewSound.Play();
     }
 
 #if !UNITY_ANDROID || UNITY_EDITOR
@@ -622,6 +615,11 @@ public class SelectManager : MonoBehaviour
             bool success = DataLoader.LoadAllKiraPackFromInbox();
             if (success) SceneManager.LoadScene("Select");
         }
+    }
+
+    private void OnDestroy()
+    {
+        previewSound.Dispose();
     }
 #endif
 }

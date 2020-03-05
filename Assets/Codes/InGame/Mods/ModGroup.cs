@@ -2,6 +2,7 @@
 using System.Collections;
 using Un4seen.Bass;
 using System;
+using AudioProvider;
 
 public class ModBase
 {
@@ -12,7 +13,7 @@ public class ModBase
 public class AudioMod : ModBase
 {
     public virtual float SpeedCompensation => 1.0f;
-    public virtual void ApplyMod(BassMemStream stream){}
+    public virtual void ApplyMod(ISoundTrack soundTrack){}
 }
 
 public class PlayMod : ModBase{ }
@@ -34,9 +35,9 @@ public class DoubleMod : AudioMod
     public override float SpeedCompensation => 1.5f;
     public override float ScoreMultiplier => 1.1f;
 
-    public override void ApplyMod(BassMemStream stream)
+    public override void ApplyMod(ISoundTrack soundTrack)
     {
-        Bass.BASS_ChannelSetAttribute(stream.ID, BASSAttribute.BASS_ATTRIB_TEMPO, 50.0f);
+        soundTrack.SetTimeScale(1.5f, true);
     }
 }
 
@@ -49,8 +50,8 @@ public class HalfMod : AudioMod
     public override float SpeedCompensation => 0.75f;
     public override float ScoreMultiplier => 0.75f;
 
-    public override void ApplyMod(BassMemStream stream)
+    public override void ApplyMod(ISoundTrack soundTrack)
     {
-        Bass.BASS_ChannelSetAttribute(stream.ID, BASSAttribute.BASS_ATTRIB_TEMPO, -25.0f);
+        soundTrack.SetTimeScale(0.75f, true);
     }
 }
