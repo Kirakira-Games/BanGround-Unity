@@ -6,6 +6,7 @@ public abstract class SlideNoteBase : NoteBase
 {
     public bool IsTilt;
     public bool IsStickEnd;
+    public bool IsJudging => parentSlide && parentSlide.GetTouchId() != -1;
     public SlideMesh slideMesh;
     protected Slide parentSlide;
 
@@ -36,7 +37,7 @@ public abstract class SlideNoteBase : NoteBase
 
     public override JudgeResult TryJudge(int audioTime, Touch touch)
     {
-        if (judgeTime != int.MinValue || (parentSlide.GetTouchId() != -1 &&
+        if (judgeTime != int.MinValue || (IsJudging &&
             parentSlide.GetTouchId() != touch.fingerId))
         {
             return JudgeResult.None;
