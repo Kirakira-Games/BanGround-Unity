@@ -34,7 +34,8 @@ public enum Language
     Spanish,
     Swedish,
     Thai,
-    Turkish
+    Turkish,
+    AutoDetect = -1 
 }
 
 [JsonConverter(typeof(StringEnumConverter))]
