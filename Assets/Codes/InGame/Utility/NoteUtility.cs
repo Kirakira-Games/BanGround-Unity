@@ -74,8 +74,8 @@ public static class NoteUtility
     private static readonly float BANG_PERSPECTIVE_END = YTo3DXHelper(1);
     private static readonly float BANG_EXP_START = XToBanGYHelper(0);
 
-    private static readonly int[] TAP_JUDGE_RANGE_RAW = { 50, 100, 117, 133 };
-    private static readonly int[] SLIDE_END_JUDGE_RANGE_RAW = { 67, 117, 133, 150 };
+    private static readonly int[] TAP_JUDGE_RANGE_RAW = { 40, 90, 111, 133 };
+    private static readonly int[] SLIDE_END_JUDGE_RANGE_RAW = { 57, 107, 128, 150 };
     private static readonly int[] SLIDE_END_TILT_JUDGE_RANGE_RAW = { -34, -84, -100, -117 };
     private const int SLIDE_END_FLICK_JUDGE_RANGE_RAW = 100;
     private const int SLIDE_TICK_JUDGE_RANGE_RAW = 200;
@@ -88,7 +88,7 @@ public static class NoteUtility
     public static int SLIDE_TICK_JUDGE_RANGE => (int)(SLIDE_TICK_JUDGE_RANGE_RAW * LiveSetting.SpeedCompensationSum);
     public static int AUTO_JUDGE_RANGE => (int)(AUTO_JUDGE_RANGE_RAW * LiveSetting.SpeedCompensationSum);
 
-    public const float FLICK_JUDGE_DIST = 0.5f;
+    public const float FLICK_JUDGE_DIST = 0.4f;
 
     public const int MOUSE_TOUCH_ID = -16;
 
