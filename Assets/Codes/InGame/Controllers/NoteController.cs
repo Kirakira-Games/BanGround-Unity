@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.Events;
+using AudioProvider;
 
 public class NoteController : MonoBehaviour
 {
@@ -18,11 +19,13 @@ public class NoteController : MonoBehaviour
     private int numNotes;
     private AudioManager audioMgr;
 
-    private int[] soundEffects;
+    private ISoundEffect[] soundEffects;
 
     private FixBackground background;
 
     private UnityAction<JudgeResult> onJudge;
+
+    private const int WARM_UP_SECOND = 4;
 
     public void RegisterTouch(int id, GameObject obj)
     {
@@ -328,26 +331,25 @@ public class NoteController : MonoBehaviour
         NoteUtility.InitJudgeRange();
 
         // Init AudioManager
-        audioMgr = AudioManager.Instanse;
-        audioMgr.isInGame = true;
+        audioMgr = AudioManager.Instance;
 
-        soundEffects = new int[5]
+        soundEffects = new ISoundEffect[5]
         {
-            audioMgr.PrecacheSound(Resources.Load<TextAsset>("SoundEffects/perfect.wav")),
-            audioMgr.PrecacheSound(Resources.Load<TextAsset>("SoundEffects/great.wav")),
-            audioMgr.PrecacheSound(Resources.Load<TextAsset>("SoundEffects/empty.wav")),
-            audioMgr.PrecacheSound(Resources.Load<TextAsset>("SoundEffects/empty.wav")),
-            audioMgr.PrecacheSound(Resources.Load<TextAsset>("SoundEffects/flick.wav"))
+            audioMgr.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/perfect.wav").bytes),
+            audioMgr.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/great.wav").bytes),
+            audioMgr.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/empty.wav").bytes),
+            audioMgr.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/empty.wav").bytes),
+            audioMgr.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/flick.wav").bytes)
         };
 
-        audioMgr.DelayPlay(File.ReadAllBytes(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), 4f);
+        audioMgr.DelayPlayInGameBGM(File.ReadAllBytes(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), WARM_UP_SECOND);
 
         // Background
         background = GameObject.Find("dokidokiBackground").GetComponent<FixBackground>();
         background.UpdateBackground(DataLoader.GetBackgroundPath(sid));
 
         //Set Play Mod Event
-        audioMgr.restart = false;
+        //audioMgr.restart = false;
         onJudge = null;
         foreach (var mod in LiveSetting.attachedMods)
         {
@@ -357,7 +359,7 @@ public class NoteController : MonoBehaviour
                     if (result != JudgeResult.Perfect && result != JudgeResult.Great)
                     {
                         audioMgr.StopBGM();
-                        audioMgr.restart = false;
+                        //audioMgr.restart = false;
                     }
                 });
 
@@ -367,7 +369,7 @@ public class NoteController : MonoBehaviour
                     if (result != JudgeResult.Perfect)
                     {
                         audioMgr.StopBGM();
-                        audioMgr.restart = true;
+                        //audioMgr.restart = true;
                     }
                 });
         }
@@ -377,10 +379,10 @@ public class NoteController : MonoBehaviour
     {
         if (SceneLoader.Loading) return;
 
-        if (audioMgr.GetPauseStatus() && !audioMgr.loading)
-            return;
-
-        int audioTime = audioMgr.GetBGMPlaybackTime();
+        int audioTime;
+        if (warmUp) audioTime = GetWarmUp();
+        else if (UIManager.BitingTheDust) audioTime = (int)UIManager.biteTime;
+        else audioTime = (int)audioMgr.gameBGM.GetPlaybackTime();
 
         // Create notes
         UpdateNotes(audioTime);
@@ -413,5 +415,23 @@ public class NoteController : MonoBehaviour
         {
             noteSyncLine[i].OnSyncLineUpdate();
         }
+    }
+
+    int black = -1000 * WARM_UP_SECOND;
+    bool warmUp = true;
+    int GetWarmUp()
+    {
+        int audioTime;
+        if (black < 0)
+        {
+            black += (int)(Time.deltaTime * 1000);
+            audioTime = black;
+        }
+        else
+        {
+            audioTime = 0;
+            warmUp = false;
+        }
+        return audioTime;
     }
 }

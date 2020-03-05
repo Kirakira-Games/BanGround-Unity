@@ -24,6 +24,7 @@ namespace AudioProvider
         void SetLoopingPoint(uint start, uint end, bool noFade);
         void SetTimeScale(float scale, bool noPitchShift);
         void SetPlaybackTime(uint time);
+        void SetVolume(float volume);
 
         uint GetPlaybackTime();
         uint GetLength();

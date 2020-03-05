@@ -8,11 +8,15 @@ using UnityEngine.Networking;
 using Newtonsoft.Json;
 using UnityEngine;
 using Un4seen.Bass;
+using AudioProvider;
 
 public class TitleLoader : MonoBehaviour
 {
     public TextAsset titleMusic;
     public TextAsset voice;
+
+    private ISoundTrack music;
+    private ISoundEffect banGround;
 
     private void Awake()
     {
@@ -29,16 +33,18 @@ public class TitleLoader : MonoBehaviour
     IEnumerator PlayTitle()
     {
         yield return new WaitForSeconds(0.5f);
-        var music = gameObject.AddComponent<BassAudioSource>();
-        music.clip = titleMusic;
-        music.loop = true;
-        music.playOnAwake = true;
+        music = AudioManager.Instance.PlayLoopMusic(titleMusic.bytes);
 
         yield return new WaitForSeconds(3f);
 
-        var banGround = gameObject.AddComponent<BassAudioSource>();
-        banGround.clip = voice;
-        banGround.playOnAwake = true;
+        banGround = AudioManager.Instance.PrecacheSE(voice.bytes);
+        banGround.PlayOneShot();
+    }
+
+    private void OnDestroy()
+    {
+        music.Dispose();
+        banGround.Dispose();
     }
 
     private void OnDestroy()

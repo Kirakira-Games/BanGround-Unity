@@ -20,6 +20,7 @@ namespace AudioProvider
     public class FmodSoundTrack : ISoundTrack
     {
         internal static ChannelGroup stGroup;
+        internal byte[] bytes;
 
         Sound _internalSound;
         Channel _internalChannel;
@@ -28,6 +29,8 @@ namespace AudioProvider
         FmodAudioProvider parent;
 
         bool isLooping, noFade;
+
+        float volume = 1.0f;
 
         internal FmodSoundTrack(Sound sound, FMOD.System system, FmodAudioProvider provider)
         {
@@ -179,9 +182,19 @@ namespace AudioProvider
         }
 
         ulong fadeStartClock = 0, fadeEndClock = 0;
+        uint lastTime = 0;
         internal void Update()
         {
-            if (!isLooping || noFade || GetStatus() != PlaybackStatus.Playing)
+            var status = GetStatus();
+
+            if(!isLooping && status == PlaybackStatus.Playing)
+            {
+                uint time = GetPlaybackTime();
+                if (time < lastTime) Pause();
+                else lastTime = time;
+            }
+
+            if (!isLooping || noFade || status != PlaybackStatus.Playing)
                 return;
 
             if (fadeStartClock == 0 && GetPlaybackTime() > loopingEnd - 1500)
@@ -213,18 +226,25 @@ namespace AudioProvider
 
         internal void VolumeChanged()
         {
-            _internalChannel.setVolume(parent.masterVolume * parent.trackVolume);
+            _internalChannel.setVolume(parent.masterVolume * parent.trackVolume * volume);
         }
 
         internal void Unload()
         {
             Dispose();
         }
+
+        public void SetVolume(float volume)
+        {
+            this.volume = volume;
+            VolumeChanged();
+        }
     }
 
     class FmodSoundEffect : ISoundEffect
     {
         internal static ChannelGroup seGroup;
+        internal byte[] bytes;
 
         Sound _internalSound;
         FMOD.System _internalSystem;
@@ -300,6 +320,7 @@ namespace AudioProvider
             );
 
             var result = new FmodSoundEffect(sound, fmodSystem, this);
+            result.bytes = audio;
 
             OnVolumeChanged += result.VolumeChanged;
             result.VolumeChanged();
@@ -318,13 +339,13 @@ namespace AudioProvider
         public void SetSoundEffectVolume(float volume)
         {
             effectVolume = volume;
-            OnVolumeChanged();
+            OnVolumeChanged?.Invoke();
         }
 
         public void SetSoundTrackVolume(float volume)
         {
             trackVolume = volume;
-            OnVolumeChanged();
+            OnVolumeChanged?.Invoke();
         }
 
         public ISoundTrack StreamTrack(byte[] audio)
@@ -338,6 +359,7 @@ namespace AudioProvider
             );
             var result = new FmodSoundTrack(sound, fmodSystem, this);
 
+            result.bytes = audio;
             OnUpdate += result.Update;
             OnVolumeChanged += result.VolumeChanged;
             OnUnload += result.Unload;
@@ -349,14 +371,14 @@ namespace AudioProvider
 
         public void Unload()
         {
-            OnUnload();
+            OnUnload?.Invoke();
             FMODUtil.ErrCheck(fmodSystem.release());
         }
 
         public void Update()
         {
             FMODUtil.ErrCheck(fmodSystem.update());
-            OnUpdate();
+            OnUpdate?.Invoke();
         }
     }
 }

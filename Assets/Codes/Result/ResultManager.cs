@@ -48,7 +48,6 @@ public class ResultManager : MonoBehaviour
 
     void Start()
     {
-        AudioManager.Instanse.isInGame = false;
         cheader = LiveSetting.CurrentHeader;
         mheader = DataLoader.GetMusicHeader(cheader.mid);
         StartCoroutine(ReadRank());
@@ -93,10 +92,11 @@ public class ResultManager : MonoBehaviour
     IEnumerator ReadRank()
     {
         yield return new WaitForSeconds(0.8f);
-        var audioSource = gameObject.AddComponent<BassAudioSource>();
-        audioSource.clip = voices[0];
-        audioSource.playOnAwake = true;
-        //print("read");
+
+        var rankPlayer = AudioManager.Instance.PrecacheSE(voices[0].bytes);
+        rankPlayer.PlayOneShot();
+
+        TextAsset resultVoice;
 
         yield return new WaitForSeconds(1);
         
@@ -104,31 +104,33 @@ public class ResultManager : MonoBehaviour
         switch (ResultsGetter.GetRanks())
         {
             case Ranks.SSS:
-                audioSource.Clip = voices[1];
+                resultVoice = voices[1];
                 break;
             case Ranks.SS:
-                audioSource.Clip = voices[2];
+                resultVoice = voices[2];
                 break;
             case Ranks.S:
-                audioSource.Clip = voices[3];
+                resultVoice = voices[3];
                 break;
             case Ranks.A:
-                audioSource.Clip = voices[4];
+                resultVoice = voices[4];
                 break;
             case Ranks.B:
-                audioSource.Clip = voices[5];
+                resultVoice = voices[5];
                 break;
             case Ranks.C:
-                audioSource.Clip = voices[6];
+                resultVoice = voices[6];
                 break;
             case Ranks.D:
-                audioSource.Clip = voices[7];
+                resultVoice = voices[7];
                 break;
             default:
-                audioSource.Clip = voices[8];
+                resultVoice = voices[8];
                 break;
         }
-        audioSource.Play();
+
+        var resultPlayer = AudioManager.Instance.PrecacheSE(resultVoice.bytes);
+        resultPlayer.PlayOneShot();
 
         yield return new WaitForSeconds(1);
     }
@@ -161,12 +163,6 @@ public class ResultManager : MonoBehaviour
         {
             offset_Obj.gameObject.SetActive(!offset_Obj.gameObject.activeSelf);
         });
-    }
-
-    IEnumerator DelayLoadScene(string name)
-    {
-        yield return new WaitForSeconds(2);
-        SceneManager.LoadSceneAsync(name);
     }
 
     private void GetResultObjectAndComponent()

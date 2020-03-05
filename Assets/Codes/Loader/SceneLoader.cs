@@ -35,7 +35,7 @@ public class SceneLoader : MonoBehaviour
 
     public void Load()
     {
-        AudioManager.Instanse.PauseBGM();
+        //AudioManagerOld.Instanse.PauseBGM();
 
         StartCoroutine(LoadAsync());        
     }
@@ -49,20 +49,24 @@ public class SceneLoader : MonoBehaviour
 
         //开门动画39帧
         //需要开门的话需要等开门动画播放完毕后再卸载Loader场景并重置Loading标志
-        StartCoroutine(CountDown(2f));
+        if (needOpen)
+        {
+            StartCoroutine(CountDown(2f));
+        }
+        else
+        {
+            Loading = false;
+        }
     }
 
     private IEnumerator CountDown(float seconds)
     {
         //开门时间（即loading播放时间） 应减去关门所需时间
-        if (needOpen) SceneManager.UnloadSceneAsync(currentSceneName);
-        if (needOpen)
-        {
-            animator.Play("Opening");
-            //open gate need 2f
-            yield return new WaitForSeconds(0.4f);
-            SceneManager.UnloadSceneAsync("Loader");
-        }
+        SceneManager.UnloadSceneAsync(currentSceneName);
+        animator.Play("Opening");
+        //open gate need 2f
+        yield return new WaitForSeconds(0.4f);
+        SceneManager.UnloadSceneAsync("Loader");
         Loading = false;
     }
 }
