@@ -66,10 +66,6 @@ public class DataLoader
 #endif
 
         LiveSetting.Load();
-//#if UNITY_ANDROID && !UNITY_EDITOR
-//        if (LiveSetting.bufferSize == -1)
-//            LiveSetting.bufferSize = AppPreLoader.bufferSize;
-//#endif
     }
 
     public static string GetMusicPath(int mid)
@@ -127,6 +123,7 @@ public class DataLoader
         chartDic = new Dictionary<int, cHeader>();
         musicDic = new Dictionary<int, mHeader>();
         songList = ProtobufHelper.Load<SongList>(SongListPath);
+
         foreach (var music in songList.mHeaders)
         {
             musicDic[music.mid] = music;
@@ -194,8 +191,6 @@ public class DataLoader
             newSongList.mHeaders.Add(musicHeader);
         }
 
-        // Sort And Save
-        newSongList.cHeaders.Sort(new cHeaderComparer());
         Debug.Log(JsonConvert.SerializeObject(newSongList));
         ProtobufHelper.Save(newSongList, SongListPath);
     }
