@@ -6,10 +6,17 @@ public class PriorityQueue<K, V> where K: IComparable
     private List<K> mKeys;
     private List<V> mValues;
 
+    public int Count => mKeys.Count;
+
     public PriorityQueue()
     {
         mKeys = new List<K>();
         mValues = new List<V>();
+    }
+
+    public V Get(int index)
+    {
+        return mValues[index];
     }
 
     public V Top()

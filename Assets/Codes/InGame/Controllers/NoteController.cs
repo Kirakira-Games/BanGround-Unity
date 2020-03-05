@@ -127,13 +127,21 @@ public class NoteController : MonoBehaviour
     {
         UpdateLane(lane);
         // Try to judge the front of the queue
-        if (!laneQueue[lane].Empty())
+        for (int i = 0; i < laneQueue[lane].Count; i++)
         {
-            NoteBase note = laneQueue[lane].Top();
+            NoteBase note = laneQueue[lane].Get(i);
+            if (NoteUtility.IsSlide(note.type) && (note as SlideNoteBase).IsJudging)
+            {
+                continue;
+            }
             JudgeResult result = note.TryJudge(audioTime, touch);
             if (result != JudgeResult.None)
             {
                 return note;
+            }
+            else
+            {
+                return null;
             }
         }
         return null;
