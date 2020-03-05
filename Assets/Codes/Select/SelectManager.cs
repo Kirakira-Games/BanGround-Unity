@@ -195,6 +195,11 @@ public class SelectManager : MonoBehaviour
         acc = GameObject.Find("AccText").GetComponent<Text>();
 
         difficultySelect = GameObject.Find("DifficultySelect").GetComponent<DifficultySelect>();
+
+        GameObject.Find("ButtonName").GetComponent<Button>().onClick.AddListener(() => { LiveSetting.sort = Sorter.SongName; InitSongList(); });
+        GameObject.Find("ButtonArtist").GetComponent<Button>().onClick.AddListener(() => { LiveSetting.sort = Sorter.SongArtist; InitSongList(); });
+        GameObject.Find("ButtonCharter").GetComponent<Button>().onClick.AddListener(() => { LiveSetting.sort = Sorter.ChartAuthor; InitSongList(); });
+        GameObject.Find("ButtonLevel").GetComponent<Button>().onClick.AddListener(() => { LiveSetting.sort = Sorter.ChartDif; InitSongList(); });
     }
     void LoadScoreRecord()
     {
@@ -214,6 +219,39 @@ public class SelectManager : MonoBehaviour
     //Song Selection-------------------------------
     private void InitSongList()
     {
+        //Save Sid
+        int sid = DataLoader.chartList[LiveSetting.currentChart].sid;
+
+        // Sort SongList
+        IComparer<cHeader> compare;
+        switch (LiveSetting.sort)
+        {
+            case Sorter.ChartDif:
+                compare = new ChartDifSort();
+                break;
+            case Sorter.SongName:
+                compare = new SongNameSort();
+                break;
+            case Sorter.SongArtist:
+                compare = new SongArtistSort();
+                break;
+            case Sorter.ChartAuthor:
+                compare = new ChartAuthorSort();
+                break;
+            default:
+                compare = new SongNameSort();
+                break;
+        }
+        chartList.Sort(compare);
+
+        //Remove Old SongItem
+        for (int i = SelectButtons.Count - 1; i >= 0; i--) 
+        {
+            Destroy(SelectButtons[i].gameObject);
+        }
+        SelectButtons.Clear();
+
+        //Spawn New SongItem
         for (int i = 0; i < chartList.Count; i++)
         {
             GameObject go = Instantiate(songItemPrefab, GameObject.Find("SongContent").transform);
@@ -232,6 +270,9 @@ public class SelectManager : MonoBehaviour
         lg.padding = new RectOffset(0, 0, (int)((rt_v.sizeDelta.y / 2) - 100), 0);
 
         rt.sizeDelta = new Vector2(rt.sizeDelta.x, lg.padding.top * 2 + chartList.Count * (116) + (chartList.Count - 1) * lg.spacing + (200 - 116));
+
+        LiveSetting.currentChart = DataLoader.chartList.IndexOf(DataLoader.chartList.First(x => x.sid == sid));
+
         StartCoroutine(SelectDefault());
     }
 

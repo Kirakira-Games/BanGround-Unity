@@ -88,6 +88,7 @@ public static class LiveSetting
     private static int cachedScreenTime = 0;
 
     public static Language language = Language.AutoDetect;
+    public static Sorter sort = Sorter.SongName;
 
     public static int currentChart = 0; // Chart set index
     public static int currentDifficulty = (int)Difficulty.Easy;
@@ -179,6 +180,7 @@ public class LiveSettingTemplate
     public int currentDifficulty = 0;
 
     public Language language = Language.AutoDetect;
+    public Sorter sort = Sorter.SongName;
 
     public LiveSettingTemplate()
     {
@@ -210,6 +212,7 @@ public class LiveSettingTemplate
         currentDifficulty = LiveSetting.currentDifficulty;
 
         language = LiveSetting.language;
+        sort = LiveSetting.sort;
     }
     public void ApplyToLiveSetting()
     {
@@ -242,5 +245,6 @@ public class LiveSettingTemplate
         LiveSetting.currentDifficulty = currentDifficulty;
 
         LiveSetting.language = language;
+        LiveSetting.sort = sort;
     }
 }
