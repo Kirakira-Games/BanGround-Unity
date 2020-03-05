@@ -16,7 +16,7 @@ public class TitleLoader : MonoBehaviour
 
     private void Awake()
     {
-        StartCoroutine(DataLoader.Init());
+        DataLoader.Init();
     }
 
     private void Start()
@@ -39,5 +39,12 @@ public class TitleLoader : MonoBehaviour
         var banGround = gameObject.AddComponent<BassAudioSource>();
         banGround.clip = voice;
         banGround.playOnAwake = true;
+    }
+
+    private void OnDestroy()
+    {
+        LocalizedStrings.Instanse.ReloadLanguageFile(LiveSetting.language);
+        LocalizedText.ReloadAll();
+
     }
 }

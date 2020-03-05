@@ -27,7 +27,7 @@ public class DataLoader
     private static readonly string TempDir = Application.persistentDataPath + "/temp/";
     private static readonly string InboxDir = Application.persistentDataPath + "/Inbox/";
 
-    public static IEnumerator Init()
+    public static void Init()
     {
         // Delete save files of old versions
         if (PlayerPrefs.GetInt("GameVersion") == 0)
@@ -64,8 +64,6 @@ public class DataLoader
         AndroidJavaObject pluginClass = new AndroidJavaObject("fun.banground.game.KirakiraActivity");
         pluginClass.Call("registerFileImportCallback", new AndroidCallback());
 #endif
-
-        yield return new WaitForEndOfFrame();
 
         LiveSetting.Load();
 //#if UNITY_ANDROID && !UNITY_EDITOR
