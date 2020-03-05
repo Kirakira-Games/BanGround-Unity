@@ -101,8 +101,13 @@ public partial class NoteAnim : IExtensible
     [ProtoMember(1, IsPacked = true)]
     public int[] beat { get; set; }
 
-    [ProtoMember(2)]
-    public float speed { get; set; }
+    [ProtoMember(2, IsRequired = false)]
+    [System.ComponentModel.DefaultValue(float.NaN)]
+    public float speed { get; set; } = float.NaN;
+
+    [ProtoMember(3, IsRequired = false)]
+    [System.ComponentModel.DefaultValue(float.NaN)]
+    public float lane { get; set; } = float.NaN;
 }
 
 [Preserve]

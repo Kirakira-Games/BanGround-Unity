@@ -60,16 +60,26 @@ public class ChartTiming
         return string.Format("[{0},{1}] {2}->{3}", anim.startT, anim.endT, anim.startZ, anim.endZ);
     }
 
-    public void GenerateAnimation(List<GameNoteAnim> raw, List<GameNoteAnim> output, int judgeTime)
+    public void GenerateAnimation(List<GameNoteAnim> raw, List<GameNoteAnim> output, GameNoteData note)
     {
+        if (raw.Count == 0)
+        {
+            return;
+        }
         float totDist = 0;
         float curDist = 0;
         foreach (var anim in raw)
         {
             //Debug.Log("Raw anim: " + AnimToString(anim));
-            if (anim.startT - judgeTime >= -1) break;
+            if (anim.startT - note.time >= -1) break;
             totDist += anim.endZ;
         }
+        // Compute lane animation
+        for (int i = 0; i < raw.Count - 1; i++)
+        {
+            raw[i].endLane = raw[i + 1].startLane;
+        }
+        raw[raw.Count - 1].endLane = note.lane;
         //Debug.Log("Tot dist=" + totDist);
         bool isStart = true;
         foreach (var anim in raw)
@@ -99,24 +109,31 @@ public class ChartTiming
         }
     }
 
-    public void GenerateAnimationRawData(float beatStart, float beatEnd, float speed, List<GameNoteAnim> output)
+    public void GenerateAnimationRawData(NoteAnim anim, float beatStart, float beatEnd, float nextlane, List<GameNoteAnim> output)
     {
         //Debug.Log("Anim: " + beatStart + " / " + beatEnd);
-
+        float timeStart = GetTimeByBeat(beatStart);
+        float timeEnd = GetTimeByBeat(beatEnd);
         for (int i = GetPrevIndex(SpeedInfo, beatStart); i < SpeedInfo.Count; i++)
         {
             var info = SpeedInfo[i];
             if (info.beat >= beatEnd)
                 break;
-            //Debug.Log("Speed: " + info.value + " / " + info.beat + " / " + speed);
-            float timeS = beatStart > info.beat ? GetTimeByBeat(beatStart) : info.time;
+            //Debug.Log("Speed: " + info.value + " / " + info.beat + " / " + anim.speed);
+            float timeS = beatStart > info.beat ? timeStart : info.time;
             float timeT = (i == SpeedInfo.Count - 1 || beatEnd < SpeedInfo[i + 1].beat) ?
-                GetTimeByBeat(beatEnd) : SpeedInfo[i + 1].time;
-            output.Add(new GameNoteAnim {
+                timeEnd : SpeedInfo[i + 1].time;
+            if (timeT < timeS) continue;
+
+            float ratio = (timeS - timeStart) / (timeEnd - timeStart);
+            var newAnim = new GameNoteAnim
+            {
                 startT = Mathf.RoundToInt(timeS * 1000),
                 endT = Mathf.RoundToInt(timeT * 1000),
-                endZ = (timeT - timeS) / totTime * info.value * speed
-            }); // endZ temporarily stores the distance traveled
+                endZ = (timeT - timeS) / totTime * info.value * anim.speed,
+                startLane = ratio * nextlane + (1 - ratio) * anim.lane
+            };
+            output.Add(newAnim); // endZ temporarily stores the distance traveled
         }
     }
 
@@ -139,6 +156,7 @@ public class ChartTiming
             });
             foreach (NoteAnim anim in note.anims)
             {
+                Debug.Assert(!float.IsNaN(anim.speed));
                 SpeedInfo.Add(new BeatInfo
                 {
                     beat = ChartLoader.GetFloatingPointBeat(anim.beat),
@@ -173,25 +191,76 @@ public class ChartTiming
         gameNote.anims = new List<GameNoteAnim>();
         List<GameNoteAnim> tmpList = new List<GameNoteAnim>();
         // Generate default animation
-        data.anims.Insert(0, new NoteAnim
+        var initAnim = new NoteAnim
         {
-            beat = new int[]{0, -99, 1},
-            speed = 1
-        });
-        float beatStart, beatEnd, speed = 1;
+            beat = new int[] { 0, -99, 1 },
+            speed = 1,
+            lane = data.lane
+        };
+
+        foreach (var i in data.anims)
+        {
+            if (!float.IsNaN(i.speed))
+            {
+                initAnim.speed = i.speed;
+                break;
+            }
+            if (!float.IsNaN(i.lane))
+            {
+                initAnim.lane = i.lane;
+                break;
+            }
+        }
+        data.anims.Insert(0, initAnim);
+
+        // Override missing animation properties
+        for (int i = 1; i < data.anims.Count; i++)
+        {
+            // Speed - direct propagate
+            if (float.IsNaN(data.anims[i].speed))
+            {
+                data.anims[i].speed = data.anims[i - 1].speed;
+            }
+            // Lane - interpolation
+            if (float.IsNaN(data.anims[i].lane))
+            {
+                float t0 = GetTimeByBeat(data.anims[i - 1].beat);
+                float ti = GetTimeByBeat(data.anims[i].beat);
+                for (int j = i + 1; j < data.anims.Count; j++)
+                {
+                    if (!float.IsNaN(data.anims[j].lane))
+                    {
+                        float tj = GetTimeByBeat(data.anims[j].beat);
+                        float ratio = (ti - t0) / (tj - t0);
+                        data.anims[i].lane = ratio * data.anims[j].lane + (1 - ratio) * data.anims[i - 1].lane;
+                    }
+                }
+                if (float.IsNaN(data.anims[i].lane))
+                {
+                    float tj = GetTimeByBeat(data.beat);
+                    float ratio = (ti - t0) / (tj - t0);
+                    data.anims[i].lane = ratio * data.lane + (1 - ratio) * data.anims[i - 1].lane;
+                }
+            }
+        }
+
+        // Compute appear time and animation
+        float beatStart, beatEnd;
+        NoteAnim anim = null;
         for (int i = 0; i < data.anims.Count; i++)
         {
-            var anim = data.anims[i];
+            anim = data.anims[i];
             beatStart = ChartLoader.GetFloatingPointBeat(anim.beat);
             beatEnd = ChartLoader.GetFloatingPointBeat(i == data.anims.Count - 1 ?
                 data.beat : data.anims[i+1].beat);
-            speed = anim.speed;
             if (beatStart > beatEnd - NoteUtility.EPS)
             {
                 Debug.LogError(ChartLoader.BeatToString(data.beat) + "Cannot add animation after judgeTime of a note.");
                 break;
             }
-            GenerateAnimationRawData(beatStart, beatEnd, speed, tmpList);
+            GenerateAnimationRawData(anim, beatStart, beatEnd,
+                i == data.anims.Count - 1 ? data.lane : data.anims[i + 1].lane,
+                tmpList);
         }
         beatStart = ChartLoader.GetFloatingPointBeat(data.beat);
         beatEnd = beatStart;
@@ -199,8 +268,12 @@ public class ChartTiming
         {
             beatEnd += 1f;
         }
-        GenerateAnimationRawData(beatStart, beatEnd, speed, tmpList);
-        GenerateAnimation(tmpList, gameNote.anims, Mathf.RoundToInt(1000 * GetTimeByBeat(beatStart)));
+        GenerateAnimationRawData(new NoteAnim
+        {
+            speed = anim.speed,
+            lane = data.lane
+        }, beatStart, beatEnd, data.lane, tmpList);
+        GenerateAnimation(tmpList, gameNote.anims, gameNote);
         //Debug.Log("Appear time: " + gameNote.appearTime);
     }
 }

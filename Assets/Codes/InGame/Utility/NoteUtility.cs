@@ -19,6 +19,8 @@ public class GameNoteAnim
     public int endT;
     public float startZ;
     public float endZ;
+    public float startLane;
+    public float endLane;
 }
 
 public class GameNoteData
@@ -104,12 +106,12 @@ public static class NoteUtility
         }
     }
 
-    public static Vector3 GetInitPos(int lane)
+    public static Vector3 GetInitPos(float lane)
     {
         return new Vector3((lane - 3) * LANE_WIDTH, NOTE_Y_POS, NOTE_START_POS);
     }
 
-    public static Vector3 GetJudgePos(int lane)
+    public static Vector3 GetJudgePos(float lane)
     {
         return new Vector3((lane - 3) * LANE_WIDTH, NOTE_Y_POS, NOTE_JUDGE_POS);
     }
@@ -183,5 +185,10 @@ public static class NoteUtility
     {
         if (x <= 0) return 0;
         return YTo3DX(XToBanGY(x));
+    }
+
+    public static float GetXPos(float lane)
+    {
+        return (lane - 3) * LANE_WIDTH;
     }
 }
