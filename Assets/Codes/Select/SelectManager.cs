@@ -669,11 +669,10 @@ public class SelectManager : MonoBehaviour
             if (success) SceneManager.LoadScene("Select");
         }
     }
-
+#endif
     private void OnDestroy()
     {
         previewSound.Dispose();
     }
-#endif
 }
 
