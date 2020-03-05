@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 1
+  m_UseShadowmask: 0
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -1219,6 +1219,7 @@ GameObject:
   - component: {fileID: 317904297}
   - component: {fileID: 317904299}
   - component: {fileID: 317904298}
+  - component: {fileID: 317904300}
   m_Layer: 5
   m_Name: Score
   m_TagString: Untagged
@@ -1285,6 +1286,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 317904296}
   m_CullTransparentMesh: 0
+--- !u!114 &317904300
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 317904296}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.29803923}
+  m_EffectDistance: {x: 10, y: -5}
+  m_UseGraphicAlpha: 1
 --- !u!1 &319087914
 GameObject:
   m_ObjectHideFlags: 0
@@ -1532,6 +1548,7 @@ GameObject:
   - component: {fileID: 404434952}
   - component: {fileID: 404434954}
   - component: {fileID: 404434953}
+  - component: {fileID: 404434955}
   m_Layer: 5
   m_Name: SongName
   m_TagString: Untagged
@@ -1579,7 +1596,7 @@ MonoBehaviour:
   m_FontData:
     m_Font: {fileID: 12800000, guid: 6fac5348696f1c44680413589e1bf8d1, type: 3}
     m_FontSize: 45
-    m_FontStyle: 1
+    m_FontStyle: 0
     m_BestFit: 1
     m_MinSize: 10
     m_MaxSize: 45
@@ -1598,6 +1615,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 404434951}
   m_CullTransparentMesh: 0
+--- !u!114 &404434955
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 404434951}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.29803923}
+  m_EffectDistance: {x: 5, y: -5}
+  m_UseGraphicAlpha: 1
 --- !u!1 &404973513
 GameObject:
   m_ObjectHideFlags: 0
@@ -2380,6 +2412,7 @@ GameObject:
   - component: {fileID: 554598806}
   - component: {fileID: 554598808}
   - component: {fileID: 554598807}
+  - component: {fileID: 554598809}
   m_Layer: 5
   m_Name: Acc
   m_TagString: Untagged
@@ -2446,6 +2479,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 554598805}
   m_CullTransparentMesh: 0
+--- !u!114 &554598809
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 554598805}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.29803923}
+  m_EffectDistance: {x: 5, y: -5}
+  m_UseGraphicAlpha: 1
 --- !u!43 &558316765
 Mesh:
   m_ObjectHideFlags: 0
@@ -8832,6 +8880,7 @@ GameObject:
   - component: {fileID: 1571655702}
   - component: {fileID: 1571655704}
   - component: {fileID: 1571655703}
+  - component: {fileID: 1571655705}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -8900,6 +8949,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1571655701}
   m_CullTransparentMesh: 0
+--- !u!114 &1571655705
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1571655701}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.29803923}
+  m_EffectDistance: {x: 5, y: -5}
+  m_UseGraphicAlpha: 1
 --- !u!43 &1629061698
 Mesh:
   m_ObjectHideFlags: 0
