@@ -47,8 +47,10 @@ public static class LiveSetting
                     language = Language.English;
                     break;
             }
-            Debug.Log(language);
         }
+
+        AudioManager.Provider.SetSoundEffectVolume(seVolume);
+        AudioManager.Provider.SetSoundTrackVolume(bgmVolume);
     }
 
     public static int judgeOffset = 0;

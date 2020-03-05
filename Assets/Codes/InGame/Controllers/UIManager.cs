@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using AudioProvider;
+using System;
 
 public class UIManager : MonoBehaviour
 {
@@ -21,6 +22,7 @@ public class UIManager : MonoBehaviour
     public TextAsset FCvoice;
     public TextAsset CLvoice;
     public TextAsset Fvoice;
+    [SerializeField] private TextAsset[] startVoices;
     GameObject gateCanvas;
 
     private ISoundEffect resultVoice;
@@ -49,6 +51,15 @@ public class UIManager : MonoBehaviour
 
         gateCanvas = GameObject.Find("GateCanvas");
         StartCoroutine(DelayDisableGate());
+
+        PlayVoices();
+    }
+
+    private void PlayVoices()
+    {
+        AudioManager.Instance.PrecacheSE(startVoices[0].bytes).PlayOneShot();
+        AudioManager.Instance.PrecacheSE(startVoices[1].bytes).PlayOneShot();
+        AudioManager.Instance.PrecacheSE(startVoices[1].bytes).PlayOneShot();
     }
 
     public void OnPauseButtonClick()

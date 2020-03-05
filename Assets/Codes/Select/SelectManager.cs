@@ -72,6 +72,7 @@ public class SelectManager : MonoBehaviour
     private Animator scene_Animator;
 
     public GameObject songItemPrefab;
+    [SerializeField] private TextAsset[] voices;
 
     public List<cHeader> chartList => DataLoader.chartList;
     List<GameObject> SelectButtons = new List<GameObject>();
@@ -99,7 +100,15 @@ public class SelectManager : MonoBehaviour
         InitSongList();
         GetLiveSetting();
 
+        PlayVoices();
+
         MessageBoxController.ShowMsg(LogLevel.INFO, "Load SongList Success");
+    }
+
+    private void PlayVoices()
+    {
+        AudioManager.Instance.PrecacheSE(voices[0].bytes).PlayOneShot();
+        AudioManager.Instance.PrecacheSE(voices[1].bytes).PlayOneShot();
     }
 
     private void InitComponent()
@@ -425,6 +434,9 @@ public class SelectManager : MonoBehaviour
         GameObject.Find("Setting_Canvas").GetComponent<Animator>().Play("FlyUp");
         SetLiveSetting();
         File.WriteAllText(LiveSetting.settingsPath, JsonConvert.SerializeObject(new LiveSettingTemplate()));
+
+        AudioManager.Provider.SetSoundEffectVolume(LiveSetting.seVolume);
+        AudioManager.Provider.SetSoundTrackVolume(LiveSetting.bgmVolume);
     }
     void OpenMod()
     {

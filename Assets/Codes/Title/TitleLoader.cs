@@ -45,12 +45,7 @@ public class TitleLoader : MonoBehaviour
     {
         music.Dispose();
         banGround.Dispose();
-    }
-
-    private void OnDestroy()
-    {
         LocalizedStrings.Instanse.ReloadLanguageFile(LiveSetting.language);
         LocalizedText.ReloadAll();
-
     }
 }
