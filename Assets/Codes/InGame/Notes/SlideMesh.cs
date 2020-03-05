@@ -78,7 +78,7 @@ public class SlideMesh : MonoBehaviour
         meshFilter.mesh = mesh;
         Material material = Resources.Load<Material>("TestAssets/Materials/note_body");
         material.mainTexture = NoteUtility.LoadResource<Texture2D>("long_note_mask");
-        material.SetColor("_BaseColor", new Color(0.2971698f, 1f, 0.2971698f, LiveSetting.longBrightness));
+        material.SetColor("_BaseColor", new Color(0.5843137f, 0.9019607f, 0.3019607f, LiveSetting.longBrightness));
         meshRenderer.material = material;
     }
 }
