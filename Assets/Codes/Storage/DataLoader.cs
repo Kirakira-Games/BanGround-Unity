@@ -147,6 +147,7 @@ public class DataLoader
     public static void RefreshSongList()
     {
         var newSongList = new SongList();
+        HashSet<string> referencedSongs = new HashSet<string>();
 
         // Scan charts
         DirectoryInfo chartDirectory = new DirectoryInfo(ChartDir);
@@ -161,6 +162,7 @@ public class DataLoader
             }
             cHeader chartHeader = ProtobufHelper.Load<cHeader>(headerPath);
             // Update difficulty
+            referencedSongs.Add(chartHeader.mid.ToString());
             chartHeader.difficultyLevel = new List<int>();
             for (int diff = 0; diff <= (int)Difficulty.Special; diff++)
             {
@@ -182,6 +184,12 @@ public class DataLoader
         DirectoryInfo[] songs = musicDirectory.GetDirectories();
         foreach (var song in songs)
         {
+            if (!referencedSongs.Contains(song.Name))
+            {
+                Debug.Log(string.Format("Song {0} is not referenced anymore. GC!", song.Name));
+                Directory.Delete(song.FullName, true);
+                continue;
+            }
             string headerPath = song.FullName + "/mheader.bin";
             if (!File.Exists(headerPath))
             {
