@@ -72,6 +72,7 @@ public static class LiveSetting
     public static bool mirrowEnabled = false;
     public static bool bangPerspective = true;
     public static bool autoPlayEnabled = false;
+    public static bool displayELP = false;
 
     public static float offsetTransform = 1f;
     public static float farClip = 169f;
@@ -167,6 +168,7 @@ public class LiveSettingTemplate
     public bool mirrowEnabled = false;
     public bool bangPerspective = true;
     public bool autoPlayEnabled = false;
+    public bool displayELP = false;
 
     public float offsetTransform = 1f;
     public float farClip = 169f;
@@ -198,6 +200,7 @@ public class LiveSettingTemplate
         grayNoteEnabled = LiveSetting.grayNoteEnabled;
         mirrowEnabled = LiveSetting.mirrowEnabled;
         bangPerspective = LiveSetting.bangPerspective;
+        displayELP = LiveSetting.displayELP;
         //autoPlayEnabled = LiveSetting.autoPlayEnabled;
 
         offsetTransform = LiveSetting.offsetTransform;
@@ -231,6 +234,7 @@ public class LiveSettingTemplate
         LiveSetting.grayNoteEnabled = grayNoteEnabled;
         LiveSetting.mirrowEnabled = mirrowEnabled;
         LiveSetting.bangPerspective = bangPerspective;
+        LiveSetting.displayELP = displayELP;
         //LiveSetting.autoPlayEnabled = autoPlayEnabled;
 
         LiveSetting.offsetTransform = offsetTransform;

@@ -25,6 +25,7 @@ public class SelectManager : MonoBehaviour
     private Toggle offBeat_Tog;
     private Toggle persp_Tog;
     private Toggle mirrow_Tog;
+    private Toggle ELP_Tog;
 
     /* Mods     */
 
@@ -133,6 +134,7 @@ public class SelectManager : MonoBehaviour
         offBeat_Tog = GameObject.Find("Offbeat_Toggle").GetComponent<Toggle>();
         mirrow_Tog = GameObject.Find("Mirrow_Toggle").GetComponent<Toggle>();
         persp_Tog = GameObject.Find("Perspective_Toggle").GetComponent<Toggle>();
+        ELP_Tog = GameObject.Find("ELP_Toggle").GetComponent<Toggle>();
 
         speed_Input = GameObject.Find("Speed_Input").GetComponent<InputField>();
         judge_Input = GameObject.Find("Judge_Input").GetComponent<InputField>();
@@ -508,6 +510,7 @@ public class SelectManager : MonoBehaviour
         offBeat_Tog.isOn = LiveSetting.grayNoteEnabled;
         mirrow_Tog.isOn = LiveSetting.mirrowEnabled;
         persp_Tog.isOn = LiveSetting.bangPerspective;
+        ELP_Tog.isOn = LiveSetting.displayELP;
 
         judgeOffsetTransform.value = LiveSetting.offsetTransform;
         far_Clip.value = LiveSetting.farClip;
@@ -575,6 +578,7 @@ public class SelectManager : MonoBehaviour
         LiveSetting.mirrowEnabled = mirrow_Tog.isOn;
         LiveSetting.autoPlayEnabled = auto_Tog.isOn;
         LiveSetting.bangPerspective = persp_Tog.isOn;
+        LiveSetting.displayELP = ELP_Tog.isOn;
 
         LiveSetting.offsetTransform = judgeOffsetTransform.value;
         LiveSetting.farClip = far_Clip.value;

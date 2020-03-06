@@ -52,6 +52,7 @@ public class JudgeResultController : MonoBehaviour
                 offsetRenderer.sprite = late;
                 break;
             default:
+                offsetRenderer.sprite = null;
                 break;
         }
     }
