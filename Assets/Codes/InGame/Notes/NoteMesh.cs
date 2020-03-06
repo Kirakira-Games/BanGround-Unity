@@ -31,6 +31,7 @@ public class NoteMesh
     {
         MeshFilter meshFilter = note.AddComponent<MeshFilter>();
         MeshRenderer meshRenderer = note.AddComponent<MeshRenderer>();
+        
 
         meshRenderer.material = mat;
         Mesh mesh = new Mesh
@@ -51,10 +52,10 @@ public class NoteMesh
         float delta = (lane - 3) * deltaPerLane;
         return new Vector3[]
         {
-            new Vector3(-1 + delta, -0.4f,-0.5f),
-            new Vector3(1 + delta, -0.4f,-0.5f),
-            new Vector3(-1 - delta, 0.4f,0.5f),
-            new Vector3(1 - delta, 0.4f,0.5f)
+            new Vector3(-1 + delta, 0,-1f),
+            new Vector3(1 + delta, 0,-1f),
+            new Vector3(-1 - delta, 0,1f),
+            new Vector3(1 - delta, 0,1f)
         };
     }
 
