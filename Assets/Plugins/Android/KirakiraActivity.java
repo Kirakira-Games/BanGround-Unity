@@ -39,12 +39,14 @@ public class KirakiraActivity extends UnityPlayerActivity {
     
     public static FileImportCallback fileImportCallback;
 
-    public void registerFileImportCallback(FileImportCallback callback) {
+    public static void registerFileImportCallback(FileImportCallback callback) {
         fileImportCallback = callback;
     }
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        ImportFile();
     }
 
     private void InputStreamToFile(InputStream in, File file) {
@@ -58,7 +60,7 @@ public class KirakiraActivity extends UnityPlayerActivity {
             }
             out.close();
 
-            new CallbackThread().run();
+            new CallbackThread().start();
         } catch (Exception e) {
             Log.e("MainActivity", "InputStreamToFile exception: " + e.getMessage());
         }
@@ -106,15 +108,21 @@ public class KirakiraActivity extends UnityPlayerActivity {
     public File getAndroidStorageFile() {
         return this.getExternalFilesDir(null);
     }
-
+    
     @Override public void onWindowFocusChanged(boolean hasFocus)
     {
         super.onWindowFocusChanged(hasFocus);
 
-        if (hasFocus){
+        if (hasFocus) {
             hideSystemUI();
-            ImportFile();
         }
+    }
+
+    @Override public void onNewIntent(Intent intent)
+    {
+        super.onNewIntent(intent);
+
+        ImportFile();
     }
 
     private void hideSystemUI() {
