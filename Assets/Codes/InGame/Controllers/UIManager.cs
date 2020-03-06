@@ -81,13 +81,15 @@ public class UIManager : MonoBehaviour
         pause_Canvas.SetActive(false);
 
         //StartCoroutine(BiteTheDust());
-        AudioManager.Instance.gameBGM.Play();
+        if (!AudioManager.Instance.isLoading)
+            AudioManager.Instance.gameBGM.Play();
         AudioManager.Instance.isInGame = true;
     }
 
     public static bool BitingTheDust = false;
     public static uint biteTime = 0;
 
+    /*
     IEnumerator BiteTheDust()
     {
         ISoundTrack bgm = AudioManager.Instance.gameBGM;
@@ -110,6 +112,7 @@ public class UIManager : MonoBehaviour
         bgm.Play();
         AudioManager.Instance.isInGame = true;
     }
+    */
 
     public void GameRetry()
     {
@@ -137,7 +140,7 @@ public class UIManager : MonoBehaviour
 
     public void OnAudioFinish(bool restart)
     {
-        if (SceneLoader.Loading) return;
+        if (SceneLoader.Loading || AudioManager.Instance.isLoading) return;
         StartCoroutine(ShowResult(restart));
     }
 
