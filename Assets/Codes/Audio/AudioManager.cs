@@ -83,7 +83,7 @@ public class AudioManager : MonoBehaviour
         if (times != null)
         {
             start = times[0];
-            end = times[1];
+            end = times[1] == 0 ? soundTrack.GetLength() : times[1];
         }
 
         soundTrack.SetLoopingPoint(start, end, true);

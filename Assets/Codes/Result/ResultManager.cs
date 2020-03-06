@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 using System;
 using System.IO;
 using System.Linq;
+using AudioProvider;
 
 public class ResultManager : MonoBehaviour
 {
@@ -43,8 +44,10 @@ public class ResultManager : MonoBehaviour
     double lastScore = 0;
 
     public TextAsset[] voices = new TextAsset[9];
+    public TextAsset bgmVoice;
 
     private FixBackground background;
+    private ISoundTrack bgmST;
 
     void Start()
     {
@@ -59,6 +62,8 @@ public class ResultManager : MonoBehaviour
         ShowSongInfo();
         ShowBackground();
         ShowOffset();
+
+        bgmST = AudioManager.Instance.PlayLoopMusic(bgmVoice.bytes);
     }
 
     private void ShowOffset()
@@ -332,6 +337,17 @@ public class ResultManager : MonoBehaviour
     {
         button_back.onClick.RemoveAllListeners();
         button_retry.onClick.RemoveAllListeners();
+    }
+
+    private void OnDestroy()
+    {
+        bgmST.Dispose();
+    }
+
+    private void OnApplicationPause(bool pause)
+    {
+        if (!pause) bgmST?.Resume();
+        else bgmST?.Pause();
     }
 }
 

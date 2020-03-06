@@ -141,6 +141,7 @@ public class UIManager : MonoBehaviour
     public void OnAudioFinish(bool restart)
     {
         if (SceneLoader.Loading || AudioManager.Instance.isLoading) return;
+        AudioManager.Instance.gameBGM?.Dispose();
         StartCoroutine(ShowResult(restart));
     }
 

@@ -48,4 +48,10 @@ public class TitleLoader : MonoBehaviour
         LocalizedStrings.Instanse.ReloadLanguageFile(LiveSetting.language);
         LocalizedText.ReloadAll();
     }
+
+    private void OnApplicationPause(bool pause)
+    {
+        if (!pause) music?.Resume();
+        else music?.Pause();
+    }
 }

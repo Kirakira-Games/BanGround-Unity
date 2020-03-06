@@ -101,6 +101,13 @@ namespace AudioProvider
             );
         }
 
+        public void Resume()
+        {
+            FMODUtil.ErrCheck(
+                _internalChannel.setPaused(false)
+            );
+        }
+
         public void Play()
         {
             if (isLooping)
