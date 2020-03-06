@@ -17,7 +17,6 @@ public class NoteController : MonoBehaviour
     private List<GameNoteData> notes;
     private int noteHead;
     private int numNotes;
-    private AudioManager audioMgr;
 
     private ISoundEffect[] soundEffects;
 
@@ -98,7 +97,7 @@ public class NoteController : MonoBehaviour
         // Sound effect
         if (notebase.syncLine.PlaySoundEffect(se))
         {
-            audioMgr.PlaySE(soundEffects[se]);
+            AudioManager.Instance.PlaySE(soundEffects[se]);
         }
 
         // Update score
@@ -266,7 +265,7 @@ public class NoteController : MonoBehaviour
                 if (touch.phase == TouchPhase.Began && lanes.Length > 0)
                 {
                     int se = (int)EmitEffect(NoteUtility.GetJudgePos(lanes[0]), JudgeResult.None, GameNoteType.Single);
-                    audioMgr.PlaySE(soundEffects[se]);
+                    AudioManager.Instance.PlaySE(soundEffects[se]);
                 }
             }
             else
@@ -330,26 +329,23 @@ public class NoteController : MonoBehaviour
         // Init JudgeRange
         NoteUtility.InitJudgeRange();
 
-        // Init AudioManager
-        audioMgr = AudioManager.Instance;
-
         soundEffects = new ISoundEffect[5]
         {
-            audioMgr.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/perfect.wav").bytes),
-            audioMgr.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/great.wav").bytes),
-            audioMgr.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/empty.wav").bytes),
-            audioMgr.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/empty.wav").bytes),
-            audioMgr.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/flick.wav").bytes)
+            AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/perfect.wav").bytes),
+            AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/great.wav").bytes),
+            AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/empty.wav").bytes),
+            AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/empty.wav").bytes),
+            AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/flick.wav").bytes)
         };
 
-        audioMgr.DelayPlayInGameBGM(File.ReadAllBytes(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), WARM_UP_SECOND);
+        AudioManager.Instance.DelayPlayInGameBGM(File.ReadAllBytes(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), WARM_UP_SECOND);
 
         // Background
         background = GameObject.Find("dokidokiBackground").GetComponent<FixBackground>();
         background.UpdateBackground(DataLoader.GetBackgroundPath(sid));
 
         //Set Play Mod Event
-        //audioMgr.restart = false;
+        //AudioManager.Instance.restart = false;
         onJudge = null;
         foreach (var mod in LiveSetting.attachedMods)
         {
@@ -358,8 +354,10 @@ public class NoteController : MonoBehaviour
                 {
                     if (result != JudgeResult.Perfect && result != JudgeResult.Great)
                     {
-                        audioMgr.StopBGM();
-                        //audioMgr.restart = false;
+                        shutdown = true;
+                        AudioManager.Instance.isInGame = false;
+                        AudioManager.Instance.StopBGM();
+                        GameObject.Find("UIManager").GetComponent<UIManager>().OnAudioFinish(false);
                     }
                 });
 
@@ -368,16 +366,20 @@ public class NoteController : MonoBehaviour
                 {
                     if (result != JudgeResult.Perfect)
                     {
-                        audioMgr.StopBGM();
-                        //audioMgr.restart = true;
+                        shutdown = true;
+                        AudioManager.Instance.isInGame = false;
+                        AudioManager.Instance.StopBGM();
+                        GameObject.Find("UIManager").GetComponent<UIManager>().OnAudioFinish(true);
                     }
                 });
         }
     }
 
+    bool shutdown = false;
+
     void Update()
     {
-        if (SceneLoader.Loading) return;
+        if (SceneLoader.Loading || shutdown) return;
 
         float rawTime = AudioTimelineSync.instance.GetTimeInS() + LiveSetting.audioOffset / 1000f;
 
@@ -392,7 +394,7 @@ public class NoteController : MonoBehaviour
         /*
         if (warmUp) audioTime = GetWarmUp();
         else if (UIManager.BitingTheDust) audioTime = (int)UIManager.biteTime;
-        else audioTime = (int)audioMgr.gameBGM.GetPlaybackTime();
+        else audioTime = (int)AudioManager.Instance.gameBGM.GetPlaybackTime();
         */
 
         // Create notes

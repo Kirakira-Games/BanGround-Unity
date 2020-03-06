@@ -667,7 +667,7 @@ public class SelectManager : MonoBehaviour
         if (pause)
             previewSound?.Pause();
         else
-            previewSound?.Play();
+            previewSound?.Resume();
     }
 
 #if !UNITY_ANDROID || UNITY_EDITOR
@@ -680,6 +680,7 @@ public class SelectManager : MonoBehaviour
         }
     }
 #endif
+
     private void OnDestroy()
     {
         previewSound.Dispose();

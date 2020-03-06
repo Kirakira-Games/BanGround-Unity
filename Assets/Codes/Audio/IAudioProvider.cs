@@ -18,6 +18,7 @@ namespace AudioProvider
     {
         void Play();
         void Pause();
+        void Resume();
         void Stop();
         void Restart();
 
