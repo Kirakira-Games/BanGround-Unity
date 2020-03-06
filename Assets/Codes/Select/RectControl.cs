@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System;
 
-public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
+public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerClickHandler
 {
     RectTransform rt_m;
     RectTransform rt_v;
@@ -130,7 +130,9 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (entering) return;
         progress = GetComponentInChildren<Slider>();
         pointerDown = true;
-        Debug.Log("Down");
+        longClick = false;
+        clickTime = 0.8f;
+        boomTime = 2f;
     }
 
     public void OnPointerUp(PointerEventData eventData)
@@ -142,10 +144,15 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
         else
         {
-            OnPressed();
+            //OnPressed();
         }
-        Debug.Log("Up");
     }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (!entering && !longClick) OnPressed();
+    }
+
 
     private void Update()
     {
@@ -171,7 +178,11 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     private void OnDelete()
     {
-        Debug.Log("Delete");
+        var file = DataLoader.GetChartPath(LiveSetting.CurrentHeader.sid, (Difficulty)LiveSetting.actualDifficulty);
+        var path = new System.IO.FileInfo(file).Directory.FullName;
+        //Debug.Log(path);
+        System.IO.Directory.Delete(path, true);
+        UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Select");
     }
 
     // Update is called once per frame
