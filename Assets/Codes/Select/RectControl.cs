@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using System;
 
-public class RectControl : MonoBehaviour
+public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
     RectTransform rt_m;
     RectTransform rt_v;
@@ -14,7 +15,7 @@ public class RectControl : MonoBehaviour
 
     SelectManager sm;
     public int index;
-    Button bt;
+    //Button bt;
 
     GameObject startImg;
     Text title;
@@ -37,9 +38,9 @@ public class RectControl : MonoBehaviour
         img = GetComponent<Image>();
         title = transform.Find("TextTitle").GetComponent<Text>();
 
-        bt = GetComponent<Button>();
+        //bt = GetComponent<Button>();
         rt = GetComponent<RectTransform>();
-        bt.onClick.AddListener(OnPressed);
+        //bt.onClick.AddListener(OnPressed);
         rt.sizeDelta = new Vector2(980, 116);
     }
 
@@ -57,7 +58,8 @@ public class RectControl : MonoBehaviour
     }
 
     public void OnSelect()
-    { startImg.SetActive(true);
+    { 
+        startImg.SetActive(true);
         select = true;
         img.color = SelectedColor;
         title.color = Color.white;
@@ -108,11 +110,68 @@ public class RectControl : MonoBehaviour
         select = false;
     }
 
+    bool entering = false;
     private void OnEnterPressed()
     {
-        bt.onClick.RemoveAllListeners();
-        bt.interactable = false;
+        entering = true;
+        //bt.onClick.RemoveAllListeners();
+        //bt.interactable = false;
         sm.OnEnterPressed();
+    }
+
+    float clickTime = 0.8f;
+    float boomTime = 2f;
+    bool pointerDown = false;
+    bool longClick = false;
+    Slider progress;
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        if (entering) return;
+        progress = GetComponentInChildren<Slider>();
+        pointerDown = true;
+        Debug.Log("Down");
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        pointerDown = false;
+        if (longClick)
+        {
+            progress.value = 0;
+        }
+        else
+        {
+            OnPressed();
+        }
+        Debug.Log("Up");
+    }
+
+    private void Update()
+    {
+        if (pointerDown)
+        {
+            if (clickTime >= 0)
+            {
+                clickTime -= Time.deltaTime;
+            }
+            else if (boomTime >= 0) 
+            {
+                longClick = true;
+                boomTime -= Time.deltaTime;
+                progress.value = 2 - boomTime;
+            }
+            else
+            {
+                OnPointerUp(null);
+                OnDelete();
+            }
+        }
+    }
+
+    private void OnDelete()
+    {
+        Debug.Log("Delete");
     }
 
     // Update is called once per frame
