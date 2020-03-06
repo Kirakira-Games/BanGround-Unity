@@ -52,10 +52,10 @@ public class NoteMesh
         float delta = (lane - 3) * deltaPerLane;
         return new Vector3[]
         {
-            new Vector3(-1 + delta, 0,-1f),
-            new Vector3(1 + delta, 0,-1f),
-            new Vector3(-1 - delta, 0,1f),
-            new Vector3(1 - delta, 0,1f)
+            new Vector3(-1 + delta, 0,-0.8f),
+            new Vector3(1 + delta, 0,-0.8f),
+            new Vector3(-1 - delta, 0,0.8f),
+            new Vector3(1 - delta, 0,0.8f)
         };
     }
 
