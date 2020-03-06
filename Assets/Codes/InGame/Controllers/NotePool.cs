@@ -25,6 +25,7 @@ public class NotePool : MonoBehaviour
             obj.layer = 8;
             NoteBase note = null;
             obj.transform.SetParent(transform);
+            obj.AddComponent<NoteRotation>();
             switch (type)
             {
                 case GameNoteType.Single:
@@ -47,7 +48,7 @@ public class NotePool : MonoBehaviour
                     break;
             }
             note.isDestroyed = true;
-            note.transform.localScale = new Vector3(NoteUtility.NOTE_SCALE, NoteUtility.NOTE_SCALE, 1) * LiveSetting.noteSize;
+            note.transform.localScale = new Vector3(NoteUtility.NOTE_SCALE, 1, 1) * LiveSetting.noteSize;
             note.InitNote();
             if (NoteUtility.IsSlide(type) && !NoteUtility.IsSlideEnd(type))
             {
@@ -57,6 +58,7 @@ public class NotePool : MonoBehaviour
                 mesh.AddComponent<SlideMesh>();
                 mesh.AddComponent<MeshRenderer>();
                 mesh.AddComponent<MeshFilter>();
+                mesh.AddComponent<NoteRotation>().needRot = false;
                 mesh.AddComponent<SortingGroup>().sortingLayerID = SortingLayer.NameToID("SlideBody");
             }
             if (type == GameNoteType.SlideStart)
