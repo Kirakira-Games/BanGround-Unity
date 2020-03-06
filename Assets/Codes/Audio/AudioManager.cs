@@ -14,7 +14,7 @@ public class AudioManager : MonoBehaviour
     public static IAudioProvider Provider { get; private set; }
 
     public bool isInGame = false;
-    //public bool loading = false;
+    public bool isLoading = false;
     //public bool restart = false;
 
     public ISoundTrack gameBGM { get; private set; }
@@ -45,11 +45,15 @@ public class AudioManager : MonoBehaviour
     }
     private IEnumerator DelayPlayBGM(byte[] audio, float seconds)
     {
+        isLoading = true;
         gameBGM = Provider.StreamTrack(audio);
         gameBGM.Play();
         gameBGM.Pause();
 
         yield return new WaitUntil(() => SceneLoader.Loading == false);
+
+        AudioTimelineSync.instance.Seek(-seconds - 0.05f);
+        AudioTimelineSync.instance.Play();
         yield return new WaitForSeconds(seconds);
 
         foreach (var mod in LiveSetting.attachedMods)
@@ -60,6 +64,14 @@ public class AudioManager : MonoBehaviour
 
         gameBGM.Play();
         isInGame = true;
+        isLoading = false;
+
+        while (gameBGM.GetPlaybackTime() == 0)
+        {
+            AudioTimelineSync.instance.Seek(0);
+            yield return new WaitForEndOfFrame();
+        }
+        AudioTimelineSync.instance.Seek(gameBGM.GetPlaybackTime() / 1000f);
     }
     public void StopBGM() => gameBGM.Stop();
     public ISoundTrack PlayLoopMusic(byte[] audio, uint[] times = null)

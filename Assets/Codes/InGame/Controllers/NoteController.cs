@@ -379,10 +379,21 @@ public class NoteController : MonoBehaviour
     {
         if (SceneLoader.Loading) return;
 
-        int audioTime;
+        float rawTime = AudioTimelineSync.instance.GetTimeInS() + LiveSetting.audioOffset / 1000f;
+
+        foreach (var mod in LiveSetting.attachedMods)
+        {
+            if (mod is AudioMod)
+                rawTime *= (mod as AudioMod).SpeedCompensation;
+        }
+
+        int audioTime = Mathf.RoundToInt(rawTime * 1000f);
+
+        /*
         if (warmUp) audioTime = GetWarmUp();
         else if (UIManager.BitingTheDust) audioTime = (int)UIManager.biteTime;
         else audioTime = (int)audioMgr.gameBGM.GetPlaybackTime();
+        */
 
         // Create notes
         UpdateNotes(audioTime);
@@ -416,7 +427,7 @@ public class NoteController : MonoBehaviour
             noteSyncLine[i].OnSyncLineUpdate();
         }
     }
-
+    /*
     int black = -1000 * WARM_UP_SECOND;
     bool warmUp = true;
     int GetWarmUp()
@@ -434,4 +445,5 @@ public class NoteController : MonoBehaviour
         }
         return audioTime;
     }
+    */
 }
