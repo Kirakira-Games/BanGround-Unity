@@ -61,8 +61,7 @@ public class DataLoader
         //}
 
 #if UNITY_ANDROID && !UNITY_EDITOR
-        AndroidJavaObject pluginClass = new AndroidJavaObject("fun.banground.game.KirakiraActivity");
-        pluginClass.Call("registerFileImportCallback", new AndroidCallback());
+        AndroidCallback.Init();
 #endif
 
         LiveSetting.Load();

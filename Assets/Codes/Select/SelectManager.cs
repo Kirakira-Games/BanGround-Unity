@@ -655,9 +655,9 @@ public class SelectManager : MonoBehaviour
     private void OnApplicationPause(bool pause)
     {
         if (pause)
-            previewSound.Pause();
+            previewSound?.Pause();
         else
-            previewSound.Play();
+            previewSound?.Play();
     }
 
 #if !UNITY_ANDROID || UNITY_EDITOR
