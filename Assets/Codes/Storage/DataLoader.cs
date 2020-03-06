@@ -20,7 +20,7 @@ public class DataLoader
 
     public const int ChartVersion = 1;
     private const int InitialChartVersion = 3;
-    private const int GameVersion = 2;
+    private const int GameVersion = 3;
 
     private static Dictionary<int, cHeader> chartDic;
     private static Dictionary<int, mHeader> musicDic;
@@ -32,10 +32,10 @@ public class DataLoader
     {
         LastImportedSid = -1;
         // Delete save files of old versions
-        if (PlayerPrefs.GetInt("GameVersion") == 0)
+        if (PlayerPrefs.GetInt("GameVersion") != GameVersion)
         {
             Debug.Log("Remove old save files.");
-            var files = new DirectoryInfo(Application.persistentDataPath).GetFiles();
+            var files = new DirectoryInfo(Application.persistentDataPath).GetFiles("*.*", SearchOption.AllDirectories);
             foreach (var file in files)
             {
                 File.Delete(file.FullName);
