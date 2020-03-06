@@ -271,6 +271,13 @@ public class SelectManager : MonoBehaviour
 
         rt.sizeDelta = new Vector2(rt.sizeDelta.x, lg.padding.top * 2 + chartList.Count * (116) + (chartList.Count - 1) * lg.spacing + (200 - 116));
 
+        // After import, select imported chart
+        if (DataLoader.LastImportedSid != -1)
+        {
+            sid = DataLoader.LastImportedSid;
+            saveSid = true;
+            DataLoader.LastImportedSid = -1;
+        }
         if (saveSid)
         {
             LiveSetting.currentChart = DataLoader.chartList.IndexOf(DataLoader.chartList.First(x => x.sid == sid));
