@@ -12,6 +12,7 @@ public class DataLoader
     public static readonly string ChartDir = DataDir + "chart/";
     public static readonly string MusicDir = DataDir + "music/";
     public static readonly string SongListPath = DataDir + "songlist.bin";
+    public static int LastImportedSid = -1;
 
     public static SongList songList;
     public static List<mHeader> musicList => songList.mHeaders;
@@ -29,6 +30,7 @@ public class DataLoader
 
     public static void Init()
     {
+        LastImportedSid = -1;
         // Delete save files of old versions
         if (PlayerPrefs.GetInt("GameVersion") == 0)
         {
@@ -226,9 +228,10 @@ public class DataLoader
         }
     }
 
-    private static void ConvertBinAndCopy(string path, string dest)
+    private static int ConvertBinAndCopy(string path, string dest)
     {
-        if (!Directory.Exists(path)) return;
+        if (!Directory.Exists(path)) return -1;
+        int ret = -1;
         DirectoryInfo dir = new DirectoryInfo(path);
         DirectoryInfo[] subdirs = dir.GetDirectories();
         foreach (var cdir in subdirs)
@@ -239,6 +242,10 @@ public class DataLoader
         {
             FileInfo[] files = cdir.GetFiles();
             string id = cdir.Name;
+            if (int.TryParse(id, out int result))
+            {
+                ret = result;
+            }
             if (!Directory.Exists(dest + id))
             {
                 Directory.CreateDirectory(dest + id);
@@ -248,11 +255,12 @@ public class DataLoader
                 File.Copy(file.FullName, dest + id + "/" + file.Name, true);
             }
         }
+        return ret;
     }
 
-    public static void LoadKiraPack(string path)
+    public static int LoadKiraPack(string path)
     {
-        if (!File.Exists(path)) return;
+        if (!File.Exists(path)) return -1;
         Debug.Log("Load kirapack: " + path);
         using (ZipArchive zip = ZipFile.OpenRead(path))
         {
@@ -264,10 +272,12 @@ public class DataLoader
         }
 
         // Load charts
-        ConvertBinAndCopy(TempDir + "chart/", ChartDir);
+        int ret = ConvertBinAndCopy(TempDir + "chart/", ChartDir);
         // Load music
         ConvertBinAndCopy(TempDir + "music/", MusicDir);
         Directory.Delete(TempDir, true);
+
+        return ret;
     }
 
     public static bool LoadAllKiraPackFromInbox()
@@ -287,10 +297,14 @@ public class DataLoader
                 {
                     if (file.Extension == ".kirapack")
                     {
-                        LoadKiraPack(file.FullName);
-                        MessageBoxController.ShowMsg(LogLevel.INFO, "Loaded kirapack: ".GetLocalized() + file.Name);
+                        int tmp = LoadKiraPack(file.FullName);
+                        if (tmp != -1)
+                        {
+                            LastImportedSid = tmp;
+                            LoadSuccess = true;
+                        }
+                        MessageBoxController.ShowMsg(LogLevel.OK, "Loaded kirapack: ".GetLocalized() + file.Name);
                         File.Delete(file.FullName);
-                        LoadSuccess = true;
                     }
                 }
             }
