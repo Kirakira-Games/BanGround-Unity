@@ -65,7 +65,7 @@ public class SceneLoader : MonoBehaviour
         SceneManager.UnloadSceneAsync(currentSceneName);
         animator.Play("Opening");
         //open gate need 2f
-        yield return new WaitForSeconds(0.4f);
+        yield return new WaitForSeconds(1f);
         SceneManager.UnloadSceneAsync("Loader");
         Loading = false;
     }
