@@ -97,7 +97,7 @@ public class SelectManager : MonoBehaviour
     {
         InitComponent();
         LoadScoreRecord();
-        InitSongList();
+        InitSongList(false);
         GetLiveSetting();
 
         PlayVoices();
@@ -217,7 +217,7 @@ public class SelectManager : MonoBehaviour
     }
 
     //Song Selection-------------------------------
-    private void InitSongList()
+    private void InitSongList(bool saveSid = true)
     {
         //Save Sid
         int sid = DataLoader.chartList[LiveSetting.currentChart].sid;
@@ -271,7 +271,10 @@ public class SelectManager : MonoBehaviour
 
         rt.sizeDelta = new Vector2(rt.sizeDelta.x, lg.padding.top * 2 + chartList.Count * (116) + (chartList.Count - 1) * lg.spacing + (200 - 116));
 
-        LiveSetting.currentChart = DataLoader.chartList.IndexOf(DataLoader.chartList.First(x => x.sid == sid));
+        if (saveSid)
+        {
+            LiveSetting.currentChart = DataLoader.chartList.IndexOf(DataLoader.chartList.First(x => x.sid == sid));
+        }
 
         StartCoroutine(SelectDefault());
     }
@@ -655,9 +658,9 @@ public class SelectManager : MonoBehaviour
     private void OnApplicationPause(bool pause)
     {
         if (pause)
-            previewSound.Pause();
+            previewSound?.Pause();
         else
-            previewSound.Play();
+            previewSound?.Play();
     }
 
 #if !UNITY_ANDROID || UNITY_EDITOR
@@ -669,11 +672,10 @@ public class SelectManager : MonoBehaviour
             if (success) SceneManager.LoadScene("Select");
         }
     }
-
+#endif
     private void OnDestroy()
     {
         previewSound.Dispose();
     }
-#endif
 }
 
