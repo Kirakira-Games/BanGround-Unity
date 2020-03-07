@@ -470,10 +470,8 @@ public class SelectManager : MonoBehaviour
             {
                 (uint)(mheader.preview[0] * 1000),
                 (uint)(mheader.preview[1] * 1000)
-            });
-        //previewSound = AudioManager.Provider.StreamTrack(File.ReadAllBytes(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)));
-        //previewSound.SetLoopingPoint((uint)(mheader.preview[0] * 1000), (uint)(mheader.preview[1] * 1000), false);
-        //previewSound.Play();
+            },
+            false);
     }
 
     //Setting And Mod------------------------------
