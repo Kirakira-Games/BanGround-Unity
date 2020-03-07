@@ -310,6 +310,7 @@ public class NoteController : MonoBehaviour
         // Load chart
         int sid = LiveSetting.CurrentHeader.sid;
         notes = ChartLoader.LoadChart(DataLoader.LoadChart(sid, (Difficulty)LiveSetting.actualDifficulty));
+        NotePool.instance.Init(notes);
         noteHead = 0;
 
         // Compute number of notes
@@ -319,7 +320,8 @@ public class NoteController : MonoBehaviour
             if (note.type == GameNoteType.SlideStart)
             {
                 numNotes += note.seg.Count;
-            } else
+            }
+            else
             {
                 numNotes++;
             }
@@ -383,11 +385,7 @@ public class NoteController : MonoBehaviour
 
         float rawTime = AudioTimelineSync.instance.GetTimeInS() + LiveSetting.audioOffset / 1000f;
 
-        foreach (var mod in LiveSetting.attachedMods)
-        {
-            if (mod is AudioMod)
-                rawTime *= (mod as AudioMod).SpeedCompensation;
-        }
+        rawTime *= LiveSetting.SpeedCompensationSum;
 
         int audioTime = Mathf.RoundToInt(rawTime * 1000f);
 
