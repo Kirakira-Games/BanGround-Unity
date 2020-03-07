@@ -312,11 +312,6 @@ namespace AudioProvider
             fmodSystem.setDSPBufferSize(bufferLength, 4);
             fmodSystem.setSoftwareFormat(sampleRate, SPEAKERMODE.DEFAULT, 0);
 
-            fmodSystem.getDSPBufferSize(out uint initBufferSize, out _);
-            fmodSystem.getSoftwareFormat(out int initSampleRate, out _, out _);
-
-            MessageBoxController.ShowMsg(LogLevel.OK, $"Init SampleRate: {initSampleRate}, Init Buffer: {initBufferSize}");
-
             FMODUtil.ErrCheck(
                 fmodSystem.init(512, INITFLAGS.NORMAL, IntPtr.Zero)
             );
