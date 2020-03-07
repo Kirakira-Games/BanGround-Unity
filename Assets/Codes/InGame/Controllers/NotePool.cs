@@ -5,6 +5,38 @@ using UnityEngine.Rendering;
 using Object = UnityEngine.Object;
 using System.Collections;
 
+class NoteEvent : IComparable<NoteEvent>
+{
+    public GameNoteType type;
+    public int time;
+    public int delta;
+
+    public int CompareTo(NoteEvent other)
+    {
+        if (time != other.time)
+            return time - other.time;
+        return other.delta - delta;
+    }
+}
+
+class NoteEventProcessor
+{
+    public int Count;
+    public int Max;
+    public NoteEventProcessor() {
+        Clear();
+    }
+    public void Process(int delta)
+    {
+        Count += delta;
+        Max = Mathf.Max(Max, Count);
+    }
+    public void Clear()
+    {
+        Count = Max = 0;
+    }
+}
+
 public class NotePool : MonoBehaviour
 {
     public static NotePool instance;
@@ -13,8 +45,6 @@ public class NotePool : MonoBehaviour
     private Queue<GameObject> slideQueue;
     private Queue<GameObject>[] teQueue;
     private Object[] tapEffects;
-    private static int unitCount;
-    private static readonly int[] weight = { 4, 1, 1, 2, 1, 1 };
 
     private void AddNote(Queue<GameObject> Q, GameNoteType type, int count = 1)
     {
@@ -96,23 +126,103 @@ public class NotePool : MonoBehaviour
         }
     }
 
+    private void AddEvent(List<NoteEvent> events, GameNoteData note, int range = -1)
+    {
+        if (note.seg?.Count > 0)
+        {
+            foreach (var i in note.seg)
+            {
+                AddEvent(events, i);
+            }
+        }
+        else
+        {
+            events.Add(new NoteEvent
+            {
+                type = note.type,
+                time = range == -1 ? note.appearTime : note.time - range,
+                delta = 1
+            });
+            events.Add(new NoteEvent
+            {
+                type = note.type,
+                time = range == -1 ? note.time + NoteUtility.SLIDE_TICK_JUDGE_RANGE : note.time + range,
+                delta = -1
+            });
+        }
+    }
+
+    public void Init(List<GameNoteData> notes)
+    {
+        var count = new NoteEventProcessor[(int)GameNoteType.SlideEndFlick + 1];
+        for (int i = 0; i < count.Length; i++)
+        {
+            count[i] = new NoteEventProcessor();
+        }
+        var slide = new NoteEventProcessor();
+        var total = new NoteEventProcessor();
+        var events = new List<NoteEvent>();
+        // create events
+        foreach (var note in notes)
+        {
+            AddEvent(events, note);
+        }
+        events.Sort();
+        // compute data
+        foreach (var e in events) {
+            int type = (int)e.type;
+            count[type].Process(e.delta);
+            total.Process(e.delta);
+            if (e.type == GameNoteType.SlideStart && e.delta > 0)
+            {
+                slide.Process(e.delta);
+            }
+            if (NoteUtility.IsSlideEnd(e.type) && e.delta < 0)
+            {
+                slide.Process(e.delta);
+            }
+        }
+        for (int i = 0; i < count.Length; i++)
+        {
+            AddNote(noteQueue[i], (GameNoteType)i, count[i].Max + 3);
+        }
+        AddSlide(slide.Max + 3);
+
+        // Tap effects
+        events.Clear();
+        total.Clear();
+        int deltaTime = Mathf.RoundToInt(500 * LiveSetting.SpeedCompensationSum + NoteUtility.SLIDE_END_FLICK_JUDGE_RANGE);
+        // create events
+        foreach (var note in notes)
+        {
+            AddEvent(events, note, deltaTime);
+        }
+        events.Sort();
+        // compute data
+        foreach (var e in events)
+        {
+            total.Process(e.delta);
+        }
+        for (int i = 0; i < teQueue.Length; i++)
+        {
+            AddTapEffect(i, total.Max / (i == 0 ? 1 : 2));
+        }
+    }
+
     void Awake()
     {
         instance = this;
 
         // Init notemesh
         NoteMesh.Init();
-        unitCount = NoteUtility.LANE_COUNT * LiveSetting.NoteScreenTime / 1000;
 
         noteQueue = new Queue<GameObject>[6];
         for (int i = 0; i < noteQueue.Length; i++)
         {
             noteQueue[i] = new Queue<GameObject>();
-            AddNote(noteQueue[i], (GameNoteType)i, unitCount * weight[i]);
         }
 
         slideQueue = new Queue<GameObject>();
-        AddSlide(unitCount);
 
         // Load Tap Effects
         tapEffects = new Object[]
@@ -127,9 +237,7 @@ public class NotePool : MonoBehaviour
         for (int i = 0; i < teQueue.Length; i++)
         {
             teQueue[i] = new Queue<GameObject>();
-            AddTapEffect(i, NoteUtility.LANE_COUNT);
         }
-        AddTapEffect(0, NoteUtility.LANE_COUNT * 4);
     }
 
     public GameObject GetSlide()
@@ -199,6 +307,7 @@ public class NotePool : MonoBehaviour
         int ty = (int)type;
         if (teQueue[ty].Count == 0)
         {
+            Debug.Log("Add TapEffect");
             AddTapEffect(ty);
         }
         var te = teQueue[ty].Dequeue();
