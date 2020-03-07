@@ -346,7 +346,7 @@ public class ResultManager : MonoBehaviour
 
     private void OnApplicationPause(bool pause)
     {
-        if (!pause) bgmST?.Resume();
+        if (!pause) bgmST?.Play();
         else bgmST?.Pause();
     }
 }

@@ -7,7 +7,6 @@ using System.IO;
 using UnityEngine.Networking;
 using Newtonsoft.Json;
 using UnityEngine;
-using Un4seen.Bass;
 using AudioProvider;
 
 public class TitleLoader : MonoBehaviour
@@ -43,15 +42,15 @@ public class TitleLoader : MonoBehaviour
 
     private void OnDestroy()
     {
-        music.Dispose();
-        banGround.Dispose();
+        music?.Dispose();
+        banGround?.Dispose();
         LocalizedStrings.Instanse.ReloadLanguageFile(LiveSetting.language);
         LocalizedText.ReloadAll();
     }
 
     private void OnApplicationPause(bool pause)
     {
-        if (!pause) music?.Resume();
+        if (!pause) music?.Play();
         else music?.Pause();
     }
 }

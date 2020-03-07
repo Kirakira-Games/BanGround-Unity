@@ -5,7 +5,6 @@ using System.IO;
 using UnityEngine;
 using UnityEditor;
 using Newtonsoft.Json;
-using Un4seen.Bass;
 
 #pragma warning disable CS0618 // Type or member is obsolete: KiraPackOld
 
@@ -15,90 +14,90 @@ using System.Runtime.InteropServices;
 
 public class ScanChartsToJson : MonoBehaviour
 {
-    [MenuItem("BanGround/扫描谱面并更新至新格式")]
-    public static void ScanAndConvert()
-    {
-        Bass.BASS_Init(-1, 44100, BASSInit.BASS_DEVICE_DEFAULT, default);
-        DirectoryInfo OldDir = new DirectoryInfo(Application.streamingAssetsPath + "/TestCharts/");
-        DirectoryInfo[] songDir = OldDir.GetDirectories();
+    //[MenuItem("BanGround/扫描谱面并更新至新格式")]
+    //public static void ScanAndConvert()
+    //{
+    //    Bass.BASS_Init(-1, 44100, BASSInit.BASS_DEVICE_DEFAULT, default);
+    //    DirectoryInfo OldDir = new DirectoryInfo(Application.streamingAssetsPath + "/TestCharts/");
+    //    DirectoryInfo[] songDir = OldDir.GetDirectories();
 
-        foreach (DirectoryInfo a in songDir)
-        {
-            if (File.Exists(a.FullName + "/header.bin"))
-            {
-                mHeader musicHeader = new mHeader();
-                cHeader chartHeader = null;
-                Header header = ProtobufHelper.Load<Header>(a.FullName + "/header.bin");
-                Debug.Log("Scan: " + header.TitleUnicode + " in " + a.Name);
+    //    foreach (DirectoryInfo a in songDir)
+    //    {
+    //        if (File.Exists(a.FullName + "/header.bin"))
+    //        {
+    //            mHeader musicHeader = new mHeader();
+    //            cHeader chartHeader = null;
+    //            Header header = ProtobufHelper.Load<Header>(a.FullName + "/header.bin");
+    //            Debug.Log("Scan: " + header.TitleUnicode + " in " + a.Name);
 
-                musicHeader.mid = int.Parse(a.Name);
-                musicHeader.artist = header.ArtistUnicode ?? header.Artist;
-                musicHeader.title = header.TitleUnicode ?? header.Title;
-                musicHeader.preview = header.Preview;
-                var music = File.ReadAllBytes(a.FullName + "/bgm.ogg");
-                var pinnedObject = GCHandle.Alloc(music, GCHandleType.Pinned);
-                var pinnedObjectPtr = pinnedObject.AddrOfPinnedObject();
+    //            musicHeader.mid = int.Parse(a.Name);
+    //            musicHeader.artist = header.ArtistUnicode ?? header.Artist;
+    //            musicHeader.title = header.TitleUnicode ?? header.Title;
+    //            musicHeader.preview = header.Preview;
+    //            var music = File.ReadAllBytes(a.FullName + "/bgm.ogg");
+    //            var pinnedObject = GCHandle.Alloc(music, GCHandleType.Pinned);
+    //            var pinnedObjectPtr = pinnedObject.AddrOfPinnedObject();
 
-                var stream = Bass.BASS_StreamCreateFile(pinnedObjectPtr, 0, music.Length, BASSFlag.BASS_DEFAULT);
-                var length = Bass.BASS_ChannelGetLength(stream);
-                var time = Bass.BASS_ChannelBytes2Seconds(stream, length);
-                musicHeader.length = (float)time;
-                Bass.BASS_StreamFree(stream);
+    //            var stream = Bass.BASS_StreamCreateFile(pinnedObjectPtr, 0, music.Length, BASSFlag.BASS_DEFAULT);
+    //            var length = Bass.BASS_ChannelGetLength(stream);
+    //            var time = Bass.BASS_ChannelBytes2Seconds(stream, length);
+    //            musicHeader.length = (float)time;
+    //            Bass.BASS_StreamFree(stream);
 
-                if (!Directory.Exists(DataLoader.ChartDir + musicHeader.mid))
-                    Directory.CreateDirectory(DataLoader.ChartDir + musicHeader.mid);
-                if (!Directory.Exists(DataLoader.MusicDir + musicHeader.mid))
-                    Directory.CreateDirectory(DataLoader.MusicDir + musicHeader.mid);
+    //            if (!Directory.Exists(DataLoader.ChartDir + musicHeader.mid))
+    //                Directory.CreateDirectory(DataLoader.ChartDir + musicHeader.mid);
+    //            if (!Directory.Exists(DataLoader.MusicDir + musicHeader.mid))
+    //                Directory.CreateDirectory(DataLoader.MusicDir + musicHeader.mid);
 
-                FileInfo[] files = a.GetFiles();
+    //            FileInfo[] files = a.GetFiles();
 
-                foreach (FileInfo b in files)
-                {
-                    if (b.Extension == ".bin" && b.Name != "header.bin")
-                    {
-                        OldChart oldChart = ProtobufHelper.Load<OldChart>(b.FullName);
-                        if (chartHeader == null)
-                        {
-                            // Create cHeaders from old chart
-                            chartHeader = new cHeader();
-                            chartHeader.author = oldChart.authorUnicode ?? oldChart.author;
-                            chartHeader.authorNick = chartHeader.author;
-                            chartHeader.backgroundFile = new BackgroundFile
-                            {
-                                pic = oldChart.backgroundFile
-                            };
-                            chartHeader.mid = musicHeader.mid;
-                            chartHeader.sid = musicHeader.mid;
-                            chartHeader.preview = musicHeader.preview;
-                            chartHeader.version = DataLoader.ChartVersion;
-                        }
+    //            foreach (FileInfo b in files)
+    //            {
+    //                if (b.Extension == ".bin" && b.Name != "header.bin")
+    //                {
+    //                    OldChart oldChart = ProtobufHelper.Load<OldChart>(b.FullName);
+    //                    if (chartHeader == null)
+    //                    {
+    //                        // Create cHeaders from old chart
+    //                        chartHeader = new cHeader();
+    //                        chartHeader.author = oldChart.authorUnicode ?? oldChart.author;
+    //                        chartHeader.authorNick = chartHeader.author;
+    //                        chartHeader.backgroundFile = new BackgroundFile
+    //                        {
+    //                            pic = oldChart.backgroundFile
+    //                        };
+    //                        chartHeader.mid = musicHeader.mid;
+    //                        chartHeader.sid = musicHeader.mid;
+    //                        chartHeader.preview = musicHeader.preview;
+    //                        chartHeader.version = DataLoader.ChartVersion;
+    //                    }
 
-                        // Create chart from old chart
-                        Chart chart = new Chart();
-                        chart.Difficulty = oldChart.difficulty;
-                        chart.level = oldChart.level;
-                        chart.notes = oldChart.notes;
-                        chart.offset = oldChart.offset;
-                        ProtobufHelper.Save(chart, DataLoader.ChartDir + chartHeader.sid + "/" +
-                            chart.Difficulty.ToString("G").ToLower() + ".bin");
-                    }
-                    else if (b.Extension != ".ogg" && b.Extension != ".bin")
-                    {
-                        File.Copy(b.FullName, DataLoader.ChartDir + musicHeader.mid + "/" + b.Name, true);
-                    }
-                }
-                File.Copy(a.FullName + "/bgm.ogg", DataLoader.MusicDir + musicHeader.mid + "/" + musicHeader.mid + ".ogg", true);
-                ProtobufHelper.Save(chartHeader, DataLoader.ChartDir + chartHeader.sid + "/cheader.bin");
-                ProtobufHelper.Save(musicHeader, DataLoader.MusicDir + musicHeader.mid + "/mheader.bin");
-            }
-            else
-            {
-                Debug.LogWarning("NO HEADER IN DIR " + a.Name);
-            }
-        }
-        Bass.BASS_Free();
-        Debug.LogWarning("Connverrt Success");
-    }
+    //                    // Create chart from old chart
+    //                    Chart chart = new Chart();
+    //                    chart.Difficulty = oldChart.difficulty;
+    //                    chart.level = oldChart.level;
+    //                    chart.notes = oldChart.notes;
+    //                    chart.offset = oldChart.offset;
+    //                    ProtobufHelper.Save(chart, DataLoader.ChartDir + chartHeader.sid + "/" +
+    //                        chart.Difficulty.ToString("G").ToLower() + ".bin");
+    //                }
+    //                else if (b.Extension != ".ogg" && b.Extension != ".bin")
+    //                {
+    //                    File.Copy(b.FullName, DataLoader.ChartDir + musicHeader.mid + "/" + b.Name, true);
+    //                }
+    //            }
+    //            File.Copy(a.FullName + "/bgm.ogg", DataLoader.MusicDir + musicHeader.mid + "/" + musicHeader.mid + ".ogg", true);
+    //            ProtobufHelper.Save(chartHeader, DataLoader.ChartDir + chartHeader.sid + "/cheader.bin");
+    //            ProtobufHelper.Save(musicHeader, DataLoader.MusicDir + musicHeader.mid + "/mheader.bin");
+    //        }
+    //        else
+    //        {
+    //            Debug.LogWarning("NO HEADER IN DIR " + a.Name);
+    //        }
+    //    }
+    //    Bass.BASS_Free();
+    //    Debug.LogWarning("Connverrt Success");
+    //}
 
     /*
     [MenuItem("BanGround/扫描谱面并写入SongList")]

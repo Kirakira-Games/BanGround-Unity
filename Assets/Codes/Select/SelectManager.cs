@@ -671,7 +671,7 @@ public class SelectManager : MonoBehaviour
         if (pause)
             previewSound?.Pause();
         else
-            previewSound?.Resume();
+            previewSound?.Play();
     }
 
 #if !UNITY_ANDROID || UNITY_EDITOR

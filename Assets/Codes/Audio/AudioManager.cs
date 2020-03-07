@@ -21,16 +21,34 @@ public class AudioManager : MonoBehaviour
 
     private void Awake()
     {
-        int bufferIndex = PlayerPrefs.GetInt("BufferIndex", -1);
-        if (bufferIndex == -1)
+        int bufferIndex;
+        string engine = PlayerPrefs.GetString("AudioEngine", "Bass");
+        if (engine == "Bass") 
         {
-            PlayerPrefs.SetInt("BufferIndex", 4);
-            bufferIndex = 4;
+            bufferIndex = PlayerPrefs.GetInt("BassBufferIndex", -1);
+            if (bufferIndex == -1)
+            {
+                PlayerPrefs.SetInt("BassBufferIndex", 5);
+                bufferIndex = 5;
+            }
+            Provider = new BassAudioProvider();
+            Provider.Init(AppPreLoader.sampleRate, (uint)(AppPreLoader.bufferSize * HandelValue_Buffer.BassBufferScale[bufferIndex]));
+            MessageBoxController.ShowMsg(LogLevel.INFO, $"Init {engine} with SampleRate: {AppPreLoader.sampleRate}, Buffer: {(int)(AppPreLoader.bufferSize * HandelValue_Buffer.BassBufferScale[bufferIndex])}");
+        }
+        else
+        {
+            bufferIndex = PlayerPrefs.GetInt("FmodBufferIndex", -1);
+            if (bufferIndex == -1)
+            {
+                PlayerPrefs.SetInt("FmodBufferIndex", 4);
+                bufferIndex = 4;
+            }
+            Provider = new FmodAudioProvider();
+            Provider.Init(AppPreLoader.sampleRate, (uint)(AppPreLoader.bufferSize / HandelValue_Buffer.FmodBufferScale[bufferIndex]));
+            MessageBoxController.ShowMsg(LogLevel.INFO, $"Init {engine} with SampleRate: {AppPreLoader.sampleRate}, Buffer: {AppPreLoader.bufferSize / HandelValue_Buffer.FmodBufferScale[bufferIndex]}");
         }
 
         Instance = this;
-        Provider = new FmodAudioProvider();
-        Provider.Init(AppPreLoader.sampleRate, (uint)(AppPreLoader.bufferSize / HandelValue_Buffer.BufferScale[bufferIndex]));
         DontDestroyOnLoad(gameObject);
     }
 
