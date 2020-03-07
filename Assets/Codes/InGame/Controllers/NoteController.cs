@@ -379,7 +379,7 @@ public class NoteController : MonoBehaviour
 
     void Update()
     {
-        if (SceneLoader.Loading || shutdown) return;
+        if (SceneLoader.Loading || shutdown || Time.timeScale == 0) return;
 
         float rawTime = AudioTimelineSync.instance.GetTimeInS() + LiveSetting.audioOffset / 1000f;
 

@@ -65,12 +65,17 @@ public class UIManager : MonoBehaviour
     public void OnPauseButtonClick()
     {
         if (Input.touches.Length >= 2) return;
-        GamePause();
+        StartCoroutine(GamePause());
     }
-    public void GamePause()
+    public IEnumerator GamePause()
     {
-        AudioManager.Instance.isInGame = false;
+        while (BitingTheDust)
+        {
+            yield return new WaitForEndOfFrame();
+        }
         Time.timeScale = 0;
+        AudioTimelineSync.instance.Pause();
+        AudioManager.Instance.isInGame = false;
         AudioManager.Instance.gameBGM.Pause();
         pause_Canvas.SetActive(true);
     }
@@ -80,39 +85,42 @@ public class UIManager : MonoBehaviour
         Time.timeScale = 1;
         pause_Canvas.SetActive(false);
 
-        //StartCoroutine(BiteTheDust());
         if (!AudioManager.Instance.isLoading)
-            AudioManager.Instance.gameBGM.Play();
-        AudioManager.Instance.isInGame = true;
+            StartCoroutine(BiteTheDust());
     }
 
     public static bool BitingTheDust = false;
-    public static uint biteTime = 0;
+    private const float BiteTime = 2;
 
-    /*
     IEnumerator BiteTheDust()
     {
         ISoundTrack bgm = AudioManager.Instance.gameBGM;
-
         BitingTheDust = true;
-        uint pos = bgm.GetPlaybackTime();
-        if (pos < LiveSetting.NoteScreenTime) pos = 0;
-        else pos -= (uint)LiveSetting.NoteScreenTime;
-        bgm.SetPlaybackTime(pos);
+        float currentTime = AudioTimelineSync.instance.GetTimeInS();
+        float targetTime = Mathf.Max(0, currentTime - BiteTime);
 
-        int ms = LiveSetting.NoteScreenTime;
-
-        while((ms -= 10) > 0)
+        // rewind
+        bgm.SetPlaybackTime((uint)Mathf.RoundToInt(targetTime * 1000));
+        while (currentTime > targetTime)
         {
-            pos -= 10;
-            biteTime = pos;
-            yield return new WaitForSeconds(0.01f);
+            currentTime -= Time.deltaTime;
+            AudioTimelineSync.instance.Seek(currentTime);
+            yield return new WaitForEndOfFrame();
         }
-        BitingTheDust = false;
+
+        // play
+        uint pauseTime = bgm.GetPlaybackTime();
         bgm.Play();
+        while (bgm.GetPlaybackTime() == pauseTime)
+        {
+            yield return new WaitForEndOfFrame();
+        }
+
+        AudioTimelineSync.instance.Seek(bgm.GetPlaybackTime() / 1000f);
+        AudioTimelineSync.instance.Play();
         AudioManager.Instance.isInGame = true;
+        BitingTheDust = false;
     }
-    */
 
     public void GameRetry()
     {
@@ -135,7 +143,7 @@ public class UIManager : MonoBehaviour
     private void OnApplicationPause(bool pause)
     {
         if (SceneLoader.Loading) return;
-        GamePause();
+        StartCoroutine(GamePause());
     }
 
     public void OnAudioFinish(bool restart)

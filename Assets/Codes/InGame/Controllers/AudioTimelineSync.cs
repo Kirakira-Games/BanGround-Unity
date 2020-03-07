@@ -29,19 +29,19 @@ public class AudioTimelineSync : MonoBehaviour
     {
         if (float.IsNaN(pauseTime))
         {
-            return Time.time - startTime;
+            return Time.realtimeSinceStartup - startTime;
         }
         return pauseTime;
     }
 
     public int GetTimeInMs()
     {
-        return Mathf.RoundToInt(GetTimeInS());
+        return Mathf.RoundToInt(GetTimeInS() / 1000f);
     }
 
     public void Seek(float targetTime)
     {
-        startTime = Time.time - targetTime;
+        startTime = Time.realtimeSinceStartup - targetTime;
         if (!float.IsNaN(pauseTime))
         {
             pauseTime = targetTime;
