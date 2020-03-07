@@ -23,7 +23,7 @@ public class SwitchEngine : MonoBehaviour
             if (on) PlayerPrefs.SetString("AudioEngine", "Fmod");
         });
 
-        bool bass = PlayerPrefs.GetString("AudioEngine") == "Bass";
+        bool bass = PlayerPrefs.GetString("AudioEngine", "Bass") == "Bass";
         engineTgs[0].isOn = bass;
         engineTgs[1].isOn = !bass;
     }
