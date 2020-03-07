@@ -36,7 +36,7 @@ public class AudioTimelineSync : MonoBehaviour
 
     public int GetTimeInMs()
     {
-        return Mathf.RoundToInt(GetTimeInS() / 1000f);
+        return Mathf.RoundToInt(GetTimeInS() * 1000f);
     }
 
     public void Seek(float targetTime)

@@ -99,19 +99,19 @@ public class AudioManager : MonoBehaviour
         AudioTimelineSync.instance.Seek(gameBGM.GetPlaybackTime() / 1000f);
     }
     public void StopBGM() => gameBGM.Stop();
-    public ISoundTrack PlayLoopMusic(byte[] audio, uint[] times = null)
+    public ISoundTrack PlayLoopMusic(byte[] audio, uint[] times = null, bool noFade = true)
     {
         ISoundTrack soundTrack = Provider.StreamTrack(audio);
 
         uint start = 0;
-        uint end = soundTrack.GetLength();
+        uint end = soundTrack.GetLength() - 1;
         if (times != null)
         {
             start = times[0];
-            end = times[1] == 0 ? soundTrack.GetLength() : times[1];
+            end = times[1] == 0 ? soundTrack.GetLength() - 1 : times[1];
         }
 
-        soundTrack.SetLoopingPoint(start, end, true);
+        soundTrack.SetLoopingPoint(start, end, noFade);
         soundTrack.Play();
         return soundTrack;
     }

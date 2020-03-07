@@ -383,11 +383,13 @@ public class NoteController : MonoBehaviour
     {
         if (SceneLoader.Loading || shutdown || Time.timeScale == 0) return;
 
-        float rawTime = AudioTimelineSync.instance.GetTimeInS() + LiveSetting.audioOffset / 1000f;
+        //float rawTime = AudioTimelineSync.instance.GetTimeInS() + LiveSetting.audioOffset / 1000f;
 
-        rawTime *= LiveSetting.SpeedCompensationSum;
+        //rawTime *= LiveSetting.SpeedCompensationSum;
 
-        int audioTime = Mathf.RoundToInt(rawTime * 1000f);
+        //int audioTime = Mathf.RoundToInt(rawTime * 1000f);
+
+        int audioTime = Mathf.RoundToInt(LiveSetting.SpeedCompensationSum * (AudioTimelineSync.instance.GetTimeInMs() + LiveSetting.audioOffset));
 
         /*
         if (warmUp) audioTime = GetWarmUp();
