@@ -21,9 +21,16 @@ public class AudioManager : MonoBehaviour
 
     private void Awake()
     {
+        int bufferIndex = PlayerPrefs.GetInt("BufferIndex", -1);
+        if (bufferIndex == -1)
+        {
+            PlayerPrefs.SetInt("BufferIndex", 4);
+            bufferIndex = 4;
+        }
+
         Instance = this;
         Provider = new FmodAudioProvider();
-        Provider.Init(AppPreLoader.sampleRate, (uint)AppPreLoader.bufferSize);
+        Provider.Init(AppPreLoader.sampleRate, (uint)(AppPreLoader.bufferSize / HandelValue_Buffer.BufferScale[bufferIndex]));
         DontDestroyOnLoad(gameObject);
     }
 
