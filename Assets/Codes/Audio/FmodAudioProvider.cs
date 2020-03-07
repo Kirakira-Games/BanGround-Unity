@@ -155,6 +155,7 @@ namespace AudioProvider
             FMODUtil.ErrCheck(
                 _internalChannel.setPosition(time, TIMEUNIT.MS)
             );
+            lastTime = time;
         }
 
         public void SetTimeScale(float scale, bool noPitchShift)
