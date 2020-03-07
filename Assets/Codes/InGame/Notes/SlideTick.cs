@@ -6,8 +6,14 @@ public class SlideTick : SlideNoteBase
 {
     protected override JudgeResult TrySlideJudge(int audioTime, Touch touch)
     {
-        if (!IsJudging && touch.phase != TouchPhase.Began)
+        if (!IsJudging)
+        {
+            if (touch.phase != TouchPhase.Began)
+                return JudgeResult.None;
+            if (audioTime >= time - NoteUtility.SLIDE_TICK_JUDGE_RANGE && audioTime <= time + NoteUtility.SLIDE_TICK_JUDGE_RANGE)
+                return JudgeResult.Perfect;
             return JudgeResult.None;
+        }
         if (audioTime >= time && audioTime <= time + NoteUtility.SLIDE_TICK_JUDGE_RANGE)
             return JudgeResult.Perfect;
         return JudgeResult.None;

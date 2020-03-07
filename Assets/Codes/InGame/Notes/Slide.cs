@@ -19,7 +19,7 @@ public class Slide : MonoBehaviour
     {
         if (touchId != -1)
         {
-            NoteController.controller.UnregisterTouch(touchId, gameObject);
+            NoteController.instance.UnregisterTouch(touchId, gameObject);
             touchId = -1;
         }
         foreach (var note in notes)
@@ -89,16 +89,16 @@ public class Slide : MonoBehaviour
 
     private void UpdateNoteHead(int audioTime)
     {
+        SlideMesh mesh = noteHead.slideMesh;
         if (displayHead >= notes.Count)
         {
             var lastNote = notes[notes.Count - 1];
             noteHead.transform.position = NoteUtility.GetJudgePos(lastNote.lane);
-            noteHead.GetComponentInChildren<SlideMesh>().afterNoteTrans = lastNote.transform;
+            mesh.afterNoteTrans = lastNote.transform;
         }
         else
         {
-            bool enableBody = true;
-            SlideMesh mesh = noteHead.slideMesh;
+            bool enableBody;
             var next = notes[displayHead];
             var prev = notes[displayHead - 1];
             mesh.afterNoteTrans = next.transform;
@@ -153,7 +153,7 @@ public class Slide : MonoBehaviour
             UpdateHead();
             if (judgeHead < notes.Count)
             {
-                NoteController.controller.Judge(note.gameObject, JudgeResult.Miss, touch);
+                note.RealJudge(audioTime, JudgeResult.Miss, null);
                 judgeHead++;
             }
             UnbindTouch();
@@ -211,17 +211,17 @@ public class Slide : MonoBehaviour
     {
         if (LiveSetting.autoPlayEnabled || !touch.HasValue) return;
         touchId = touch.Value.fingerId;
-        NoteController.controller.RegisterTouch(touchId, gameObject);
+        NoteController.instance.RegisterTouch(touchId, gameObject);
     }
 
     private void UnbindTouch()
     {
         if (touchId == -1) return;
-        NoteController.controller.UnregisterTouch(touchId, gameObject);
+        NoteController.instance.UnregisterTouch(touchId, gameObject);
         touchId = -1;
     }
 
-    public bool Judge(GameObject note, JudgeResult result, Touch? touch)
+    public int Judge(GameObject note, JudgeResult result, Touch? touch)
     {
         // Must judge head
         if (judgeHead >= notes.Count || !ReferenceEquals(note.GetComponent<SlideNoteBase>(), notes[judgeHead]))
@@ -230,9 +230,9 @@ public class Slide : MonoBehaviour
             {
                 note.SetActive(false);
                 BindTouch(touch);
-                return true;
+                return -1; // judge miss
             }
-            return false;
+            return 0;
         }
         if (result == JudgeResult.Miss)
         {
@@ -242,7 +242,7 @@ public class Slide : MonoBehaviour
         {
             BindTouch(touch);
         }
-        NoteController.controller.Judge(note, result, touch);
+        NoteController.instance.Judge(note, result, touch);
         if (judgeHead == 0)
         {
             noteHead.GetComponentInChildren<TapEffect>(true).gameObject.SetActive(true);
@@ -252,6 +252,6 @@ public class Slide : MonoBehaviour
             note.SetActive(false);
         }
         judgeHead++;
-        return true;
+        return 1;
     }
 }
