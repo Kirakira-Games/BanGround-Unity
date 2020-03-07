@@ -308,7 +308,9 @@ namespace AudioProvider
                 Factory.System_Create(out fmodSystem)
             );
 
+#if UNITY_ANDROID && !UNITY_EDITOR
             fmodSystem.setDSPBufferSize(bufferLength, 4);
+#endif
 
             FMODUtil.ErrCheck(
                 fmodSystem.init(512, INITFLAGS.NORMAL, IntPtr.Zero)
