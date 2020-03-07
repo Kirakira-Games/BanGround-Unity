@@ -274,7 +274,9 @@ public class ChartTiming
             lane = data.lane
         }, beatStart, beatEnd, data.lane, tmpList);
         GenerateAnimation(tmpList, gameNote.anims, gameNote);
-        //Debug.Log("Appear time: " + gameNote.appearTime);
+
+        gameNote.appearTime = gameNote.anims[0].startT;
+
         // Check mirror
         if (LiveSetting.mirrowEnabled)
         {

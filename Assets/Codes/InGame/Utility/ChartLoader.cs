@@ -127,7 +127,6 @@ public static class ChartLoader
             // Note is part of a slide
             if (!tickStackTable.ContainsKey(note.tickStack))
             {
-//#if UNITY_EDITOR
                 if (note.type != NoteType.Single)
                 {
                     if (NoteUtility.IsSlideEnd(type))
@@ -139,7 +138,6 @@ public static class ChartLoader
                     }
                     Debug.LogWarning(BeatToString(note.beat) + "Start of a slide must be 'Single' instead of '" + note.type + "'.");
                 }
-//#endif
                 GameNoteData tmp = new GameNoteData
                 {
                     type = GameNoteType.SlideStart,

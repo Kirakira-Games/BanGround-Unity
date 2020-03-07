@@ -132,7 +132,18 @@ public class NotePool : MonoBehaviour
         {
             foreach (var i in note.seg)
             {
-                AddEvent(events, i);
+                events.Add(new NoteEvent
+                {
+                    type = i.type,
+                    time = range == -1 ? note.appearTime : note.time - range,
+                    delta = 1
+                });
+                events.Add(new NoteEvent
+                {
+                    type = i.type,
+                    time = range == -1 ? note.time + NoteUtility.SLIDE_TICK_JUDGE_RANGE : note.time + range,
+                    delta = -1
+                });
             }
         }
         else

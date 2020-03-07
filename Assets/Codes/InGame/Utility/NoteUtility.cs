@@ -31,14 +31,15 @@ public class GameNoteData
     public bool isGray;
     public List<GameNoteData> seg;
     public List<GameNoteAnim> anims;
-    public int appearTime => seg != null ? time : anims[0].startT;
+    public int appearTime;
 
     public void ComputeTime()
     {
-        time = seg[0].appearTime; // For slides, time is used as appearTime
+        appearTime = seg[0].appearTime;
         foreach (var i in seg)
         {
-            time = Mathf.Min(time, i.appearTime);
+            appearTime = Mathf.Min(appearTime, i.appearTime);
+            time = i.time;
         }
     }
 }
@@ -190,5 +191,17 @@ public static class NoteUtility
     public static float GetXPos(float lane)
     {
         return (lane - 3) * LANE_WIDTH;
+    }
+
+    public static float Interpolate(float ratio, float outS, float outT)
+    {
+        return (outT * ratio) + outS * (1 - ratio);
+    }
+
+    public static float Interpolate(float inS, float inT, float inP, float outS, float outT)
+    {
+        if (inS == inT) return outS;
+        float ratio = (inP - inS) / (inT - inS);
+        return Interpolate(ratio, outS, outT);
     }
 }
