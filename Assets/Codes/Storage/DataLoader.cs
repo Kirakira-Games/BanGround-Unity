@@ -138,6 +138,10 @@ public class DataLoader
                 Debug.LogWarning(string.Format("Chart {0} does not have corresponding music {1}.", chart.sid, chart.mid));
             }
         }
+        if (LiveSetting.currentChart >= songList.cHeaders.Count)
+        {
+            LiveSetting.currentChart = Mathf.Max(0, songList.cHeaders.Count - 1);
+        }
     }
 
     /// <summary>
