@@ -11,7 +11,7 @@ public class AudioTimelineSync : MonoBehaviour
     private void Awake()
     {
         instance = this;
-        startTime = Time.time + 1e9f;
+        startTime = Time.realtimeSinceStartup + 1e9f;
         pauseTime = -1e9f;
     }
 
