@@ -4,15 +4,15 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using ManagedBass;
-using ManagedBass.Fx;
+using Un4seen.Bass;
+using Un4seen.Bass.AddOn.Fx;
 
 namespace AudioProvider
 {
     public class BassSoundTrack : ISoundTrack
     {
         int _internalChannelID;
-        byte[] _audioInstanse;
+        GCHandle pinnedObject;
         BassAudioProvider _provider;
 
         bool _isLooping, noFade;
@@ -20,17 +20,17 @@ namespace AudioProvider
 
         float _volume = 1.0f;
 
-        internal BassSoundTrack(int id, byte[] audio, BassAudioProvider provider)
+        internal BassSoundTrack(int id, GCHandle audio, BassAudioProvider provider)
         {
             _internalChannelID = id;
-            _audioInstanse = audio;
+            pinnedObject = audio;
             _provider = provider;
         }
 
         public uint GetLength()
         {
-            var b = Bass.ChannelGetLength(_internalChannelID, PositionFlags.Bytes);
-            var s = Bass.ChannelBytes2Seconds(_internalChannelID, b);
+            var b = Bass.BASS_ChannelGetLength(_internalChannelID, BASSMode.BASS_POS_BYTES);
+            var s = Bass.BASS_ChannelBytes2Seconds(_internalChannelID, b);
             var ms = s * 1000;
 
             return (uint)ms;
@@ -38,8 +38,8 @@ namespace AudioProvider
 
         public uint GetPlaybackTime()
         {
-            var b = Bass.ChannelGetPosition(_internalChannelID, PositionFlags.Bytes);
-            var s = Bass.ChannelBytes2Seconds(_internalChannelID, b);
+            var b = Bass.BASS_ChannelGetPosition(_internalChannelID, BASSMode.BASS_POS_BYTES);
+            var s = Bass.BASS_ChannelBytes2Seconds(_internalChannelID, b);
             var ms = s * 1000;
 
             return (uint)ms;
@@ -47,13 +47,13 @@ namespace AudioProvider
 
         public PlaybackStatus GetStatus()
         {
-            var status = Bass.ChannelIsActive(_internalChannelID);
+            var status = Bass.BASS_ChannelIsActive(_internalChannelID);
 
-            switch(status)
+            switch (status)
             {
-                case PlaybackState.Paused:
+                case BASSActive.BASS_ACTIVE_PAUSED:
                     return PlaybackStatus.Paused;
-                case PlaybackState.Playing:
+                case BASSActive.BASS_ACTIVE_PLAYING:
                     return PlaybackStatus.Playing;
                 default:
                     return PlaybackStatus.Stopped;
@@ -62,20 +62,20 @@ namespace AudioProvider
 
         public void Pause()
         {
-            Bass.ChannelPause(_internalChannelID);
+            Bass.BASS_ChannelPause(_internalChannelID);
         }
 
         public void Play()
         {
-            Bass.ChannelPlay(_internalChannelID, false);
+            Bass.BASS_ChannelPlay(_internalChannelID, false);
         }
 
         public void Restart()
         {
             if (_isLooping)
-                Bass.ChannelSetPosition(_internalChannelID, _loopstart);
+                Bass.BASS_ChannelSetPosition(_internalChannelID, _loopstart);
             else
-                Bass.ChannelSetPosition(_internalChannelID, 0);
+                Bass.BASS_ChannelSetPosition(_internalChannelID, 0);
 
             Play();
         }
@@ -88,36 +88,36 @@ namespace AudioProvider
 
         public void SetLoopingPoint(uint start, uint end, bool noFade)
         {
-            _loopstart = Bass.ChannelSeconds2Bytes(_internalChannelID, start / 1000.0);
-            _loopend = Bass.ChannelSeconds2Bytes(_internalChannelID, end / 1000.0);
+            _loopstart = Bass.BASS_ChannelSeconds2Bytes(_internalChannelID, start / 1000.0);
+            _loopend = Bass.BASS_ChannelSeconds2Bytes(_internalChannelID, end / 1000.0);
             _loopendms = end;
             _isLooping = true;
             this.noFade = noFade;
 
-            Bass.ChannelSetPosition(_internalChannelID, _loopstart);
+            Bass.BASS_ChannelSetPosition(_internalChannelID, _loopstart);
         }
 
         public void SetPlaybackTime(uint time)
         {
-            var b = Bass.ChannelSeconds2Bytes(_internalChannelID, time / 1000.0);
-            Bass.ChannelSetPosition(_internalChannelID, b);
+            var b = Bass.BASS_ChannelSeconds2Bytes(_internalChannelID, time / 1000.0);
+            Bass.BASS_ChannelSetPosition(_internalChannelID, b);
         }
 
         public void SetTimeScale(float scale, bool noPitchShift)
         {
-            var info = Bass.ChannelGetInfo(_internalChannelID);
+            var info = Bass.BASS_ChannelGetInfo(_internalChannelID);
 
-            Bass.ChannelSetAttribute(_internalChannelID, ChannelAttribute.Tempo, 0);
-            Bass.ChannelSetAttribute(_internalChannelID, ChannelAttribute.TempoFrequency, info.Frequency);
+            Bass.BASS_ChannelSetAttribute(_internalChannelID, BASSAttribute.BASS_ATTRIB_TEMPO, 0);
+            Bass.BASS_ChannelSetAttribute(_internalChannelID, BASSAttribute.BASS_ATTRIB_TEMPO_FREQ, info.freq);
 
-            if(noPitchShift)
+            if (noPitchShift)
             {
                 var variable = (scale - 1) * 100;
-                Bass.ChannelSetAttribute(_internalChannelID, ChannelAttribute.Tempo, variable);
+                Bass.BASS_ChannelSetAttribute(_internalChannelID, BASSAttribute.BASS_ATTRIB_TEMPO, variable);
             }
             else
             {
-                Bass.ChannelSetAttribute(_internalChannelID, ChannelAttribute.TempoFrequency, info.Frequency * scale);
+                Bass.BASS_ChannelSetAttribute(_internalChannelID, BASSAttribute.BASS_ATTRIB_TEMPO_FREQ, info.freq * scale);
             }
         }
 
@@ -129,13 +129,13 @@ namespace AudioProvider
 
         public void Stop()
         {
-            Bass.ChannelStop(_internalChannelID);
+            Bass.BASS_ChannelStop(_internalChannelID);
         }
 
         public void Dispose()
         {
             Stop();
-            Bass.StreamFree(_internalChannelID);
+            Bass.BASS_StreamFree(_internalChannelID);
 
             _provider.OnUnload -= Dispose;
             _provider.OnUpdate -= Update;
@@ -151,26 +151,26 @@ namespace AudioProvider
 
             if (diff < 2000)
             {
-                if(!noFade)
+                if (!noFade)
                 {
                     float volume = Math.Max(diff, 0) / 2000.0f;
-                    Bass.ChannelSetAttribute(_internalChannelID, ChannelAttribute.Volume, volume * _volume * _provider.trackVolume * _provider.masterVolume);
+                    Bass.BASS_ChannelSetAttribute(_internalChannelID, BASSAttribute.BASS_ATTRIB_VOL, volume * _volume * _provider.trackVolume * _provider.masterVolume);
                 }
-                
+
 
                 if (diff < -750)
                 {
                     if (!noFade)
                         VolumeChanged();
 
-                    Bass.ChannelSetPosition(_internalChannelID, _loopstart);
+                    Bass.BASS_ChannelSetPosition(_internalChannelID, _loopstart);
                 }
             }
         }
 
         internal void VolumeChanged()
         {
-            Bass.ChannelSetAttribute(_internalChannelID, ChannelAttribute.Volume, _volume * _provider.trackVolume * _provider.masterVolume);
+            Bass.BASS_ChannelSetAttribute(_internalChannelID, BASSAttribute.BASS_ATTRIB_VOL, _volume * _provider.trackVolume * _provider.masterVolume);
         }
     }
 
@@ -189,16 +189,16 @@ namespace AudioProvider
 
         public void Dispose()
         {
-            Bass.SampleFree(_internalSound);
+            Bass.BASS_SampleFree(_internalSound);
 
             _provider.OnUnload -= Dispose;
         }
 
         public void PlayOneShot()
         {
-            var channel = Bass.SampleGetChannel(_internalSound);
-            Bass.ChannelSetAttribute(channel, ChannelAttribute.Volume, _provider.effectVolume * _provider.masterVolume);
-            Bass.ChannelPlay(channel);
+            var channel = Bass.BASS_SampleGetChannel(_internalSound, false);
+            Bass.BASS_ChannelSetAttribute(channel, BASSAttribute.BASS_ATTRIB_VOL, _provider.effectVolume * _provider.masterVolume);
+            Bass.BASS_ChannelPlay(channel, false);
         }
     }
 
@@ -215,22 +215,25 @@ namespace AudioProvider
 
         public void Init(int sampleRate, uint bufferLength)
         {
-            Bass.Init(-1, sampleRate);
+            Bass.BASS_Init(-1, sampleRate, BASSInit.BASS_DEVICE_DEFAULT, IntPtr.Zero);
 
             if (bufferLength != 0) 
-                Bass.Configure(Configuration.MixerBufferLength, (int)bufferLength);
-        }          
+                Bass.BASS_SetConfig(BASSConfig.BASS_CONFIG_BUFFER, (int)bufferLength);
+        }
 
         public ISoundTrack StreamTrack(byte[] audio)
         {
-            var id = Bass.CreateStream(audio, 0, audio.Length, BassFlags.Decode | BassFlags.Prescan);
-            var fxid = BassFx.TempoCreate(id, BassFlags.FxFreeSource);
+            var pinnedObject = GCHandle.Alloc(audio, GCHandleType.Pinned);
+            var pinnedObjectPtr = pinnedObject.AddrOfPinnedObject();
 
-            Bass.ChannelSetAttribute(id, ChannelAttribute.TempoUseQuickAlgorithm, 1);
-            Bass.ChannelSetAttribute(id, ChannelAttribute.TempoOverlapMilliseconds, 4);
-            Bass.ChannelSetAttribute(id, ChannelAttribute.TempoSequenceMilliseconds, 30);
+            var id = Bass.BASS_StreamCreateFile(pinnedObjectPtr, 0, audio.Length, BASSFlag.BASS_STREAM_DECODE | BASSFlag.BASS_STREAM_PRESCAN);
+            var fxid = BassFx.BASS_FX_TempoCreate(id, BASSFlag.BASS_FX_FREESOURCE);
 
-            var st = new BassSoundTrack(fxid, audio, this);
+            Bass.BASS_ChannelSetAttribute(id, BASSAttribute.BASS_ATTRIB_TEMPO_OPTION_USE_QUICKALGO, 1);
+            Bass.BASS_ChannelSetAttribute(id, BASSAttribute.BASS_ATTRIB_TEMPO_OPTION_OVERLAP_MS, 4);
+            Bass.BASS_ChannelSetAttribute(id, BASSAttribute.BASS_ATTRIB_TEMPO_OPTION_SEQUENCE_MS, 30);
+
+            var st = new BassSoundTrack(fxid, pinnedObject, this);
 
             OnUpdate += st.Update;
             OnVolumeChanged += st.VolumeChanged;
@@ -243,7 +246,7 @@ namespace AudioProvider
 
         public ISoundEffect PrecacheSE(byte[] audio)
         {
-            var id = Bass.SampleLoad(audio, 0, audio.Length, 128, BassFlags.Default);
+            var id = Bass.BASS_SampleLoad(audio, 0, audio.Length, 128, BASSFlag.BASS_DEFAULT);
             var se = new BassSoundEffect(id, audio, this);
 
             OnUnload += se.Dispose;
