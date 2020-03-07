@@ -155,7 +155,7 @@ public class NoteController : MonoBehaviour
         noteObj.transform.SetParent(transform);
         NoteBase note = noteObj.GetComponent<NoteBase>();
         note.time = gameNote.time;
-        note.lane = LiveSetting.mirrowEnabled ? NoteUtility.LANE_COUNT - gameNote.lane - 1 : gameNote.lane;
+        note.lane = gameNote.lane;
         note.type = gameNote.type;
         note.isGray = LiveSetting.grayNoteEnabled ? gameNote.isGray : false;
         note.anims = gameNote.anims.ToArray();

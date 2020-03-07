@@ -275,5 +275,15 @@ public class ChartTiming
         }, beatStart, beatEnd, data.lane, tmpList);
         GenerateAnimation(tmpList, gameNote.anims, gameNote);
         //Debug.Log("Appear time: " + gameNote.appearTime);
+        // Check mirror
+        if (LiveSetting.mirrowEnabled)
+        {
+            gameNote.lane = 6 - gameNote.lane;
+            foreach (var i in gameNote.anims)
+            {
+                i.endLane = 6 - i.endLane;
+                i.startLane = 6 - i.startLane;
+            }
+        }
     }
 }
