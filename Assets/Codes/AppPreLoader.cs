@@ -17,7 +17,7 @@ public class AppPreLoader : MonoBehaviour
         {
             sampleRate = 44100;
             if (PlayerPrefs.GetString("AudioEngine", "Bass") == "Bass")
-                bufferSize = 11;
+                bufferSize = 0;
             else
                 bufferSize = 512;
             SceneManager.LoadScene("Title");
@@ -41,8 +41,8 @@ public class AppPreLoader : MonoBehaviour
             init = success;
 
             //Debug.LogWarning($"Get Device Audio Info: {success}");
-            MessageBoxController.ShowMsg(LogLevel.INFO, "Load Device Audio Info Success");
-            MessageBoxController.ShowMsg(LogLevel.INFO, "SampleRate: " + sampleRate.ToString() + "  BufferSize: " + bufferSize.ToString());
+            //MessageBoxController.ShowMsg(LogLevel.INFO, "Load Device Audio Info Success");
+            //MessageBoxController.ShowMsg(LogLevel.INFO, "SampleRate: " + sampleRate.ToString() + "  BufferSize: " + bufferSize.ToString());
             SceneManager.LoadScene("Title");
         }
     }
