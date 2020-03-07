@@ -33,8 +33,12 @@ public abstract class SlideNoteBase : NoteBase
         
         int result = (int)judgeResult;
         int deltaTime = time - judgeTime;
-        if ((result >= 1 || LiveSetting.displayELP) && result <= 3 && deltaTime != 0)
+        if (result >= (LiveSetting.displayELP ? 0 : 1) && result <= 3 && deltaTime != 0)
         {
+            if (Mathf.Abs(deltaTime) > 200)
+            {
+                Debug.Log(time + "/" + judgeTime);
+            }
             ComboManager.JudgeOffsetResult.Add(deltaTime);
             JudgeResultController.instance.DisplayJudgeOffset(deltaTime > 0 ? OffsetResult.Early : OffsetResult.Late);
             return;
@@ -55,10 +59,16 @@ public abstract class SlideNoteBase : NoteBase
     public override void RealJudge(int audioTime, JudgeResult result, Touch? touch)
     {
         if (judgeResult != JudgeResult.None) return;
-        if (parentSlide.Judge(gameObject, result, touch))
+        int ret = parentSlide.Judge(gameObject, result, touch);
+        if (ret == 1) // judge
         {
             judgeTime = audioTime;
             judgeResult = result;
+        }
+        else if (ret == -1) // judge miss
+        {
+            judgeTime = audioTime;
+            judgeResult = JudgeResult.Miss;
         }
     }
 }

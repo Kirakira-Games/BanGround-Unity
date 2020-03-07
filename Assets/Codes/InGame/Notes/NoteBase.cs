@@ -67,7 +67,7 @@ public abstract class NoteBase : MonoBehaviour
     {
         if (touchId != -1)
         {
-            NoteController.controller.UnregisterTouch(touchId, gameObject);
+            NoteController.instance.UnregisterTouch(touchId, gameObject);
         }
 
         if (LiveSetting.autoPlayEnabled)
@@ -78,7 +78,7 @@ public abstract class NoteBase : MonoBehaviour
 
         int result = (int)judgeResult;
         int deltaTime = time - judgeTime;
-        if ((result >= 1 || LiveSetting.displayELP) && result <= 3 && deltaTime != 0)
+        if (result >= (LiveSetting.displayELP ? 0 : 1) && result <= 3 && deltaTime != 0)
         {
             ComboManager.JudgeOffsetResult.Add(deltaTime);
             JudgeResultController.instance.DisplayJudgeOffset(deltaTime > 0 ? OffsetResult.Early : OffsetResult.Late);
@@ -151,7 +151,7 @@ public abstract class NoteBase : MonoBehaviour
         if (judgeResult != JudgeResult.None) return;
         judgeTime = audioTime;
         judgeResult = result;
-        NoteController.controller.Judge(gameObject, result, touch);
+        NoteController.instance.Judge(gameObject, result, touch);
         NotePool.instance.DestroyNote(gameObject);
     }
 

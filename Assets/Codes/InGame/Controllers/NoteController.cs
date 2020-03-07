@@ -9,7 +9,7 @@ using AudioProvider;
 
 public class NoteController : MonoBehaviour
 {
-    public static NoteController controller;
+    public static NoteController instance;
     private PriorityQueue<int, NoteBase>[] laneQueue;
 
     private Dictionary<int, GameObject> touchTable;
@@ -305,7 +305,7 @@ public class NoteController : MonoBehaviour
         {
             laneQueue[i] = new PriorityQueue<int, NoteBase>();
         }
-        controller = this;
+        instance = this;
 
         // Load chart
         int sid = LiveSetting.CurrentHeader.sid;
@@ -388,7 +388,6 @@ public class NoteController : MonoBehaviour
         //rawTime *= LiveSetting.SpeedCompensationSum;
 
         //int audioTime = Mathf.RoundToInt(rawTime * 1000f);
-
         int audioTime = Mathf.RoundToInt(LiveSetting.SpeedCompensationSum * (AudioTimelineSync.instance.GetTimeInMs() + LiveSetting.audioOffset));
 
         /*
