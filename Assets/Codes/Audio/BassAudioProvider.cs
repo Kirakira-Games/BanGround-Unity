@@ -165,7 +165,6 @@ namespace AudioProvider
 
                     Bass.BASS_ChannelSetPosition(_internalChannelID, _loopstart);
                 }
-                else if (diff <= 0) Bass.BASS_ChannelSetPosition(_internalChannelID, _loopstart);
             }
         }
 

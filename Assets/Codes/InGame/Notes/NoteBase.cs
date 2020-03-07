@@ -78,12 +78,18 @@ public abstract class NoteBase : MonoBehaviour
 
         int result = (int)judgeResult;
         int deltaTime = time - judgeTime;
-        if (((result >= 1 && result <= 3) || (LiveSetting.displayELP)) && deltaTime != 0)
+        if ((result >= 1 || LiveSetting.displayELP) && result <= 3 && deltaTime != 0)
         {
             ComboManager.JudgeOffsetResult.Add(deltaTime);
             JudgeResultController.instance.DisplayJudgeOffset(deltaTime > 0 ? OffsetResult.Early : OffsetResult.Late);
             return;
         }
+        //else if (result >= 1 && result <= 3)
+        //{
+        //    ComboManager.JudgeOffsetResult.Add(deltaTime);
+        //    JudgeResultController.instance.DisplayJudgeOffset(deltaTime > 0 ? OffsetResult.Early : OffsetResult.Late);
+        //    return;
+        //}
         JudgeResultController.instance.DisplayJudgeOffset(OffsetResult.None);
     }
 

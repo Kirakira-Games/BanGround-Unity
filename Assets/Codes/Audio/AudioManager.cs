@@ -104,11 +104,11 @@ public class AudioManager : MonoBehaviour
         ISoundTrack soundTrack = Provider.StreamTrack(audio);
 
         uint start = 0;
-        uint end = soundTrack.GetLength() - 1;
+        uint end = soundTrack.GetLength();
         if (times != null)
         {
             start = times[0];
-            end = times[1] == 0 ? soundTrack.GetLength() - 1 : times[1];
+            end = times[1] == 0 ? soundTrack.GetLength() : times[1];
         }
 
         soundTrack.SetLoopingPoint(start, end, noFade);
