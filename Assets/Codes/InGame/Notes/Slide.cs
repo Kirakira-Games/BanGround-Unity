@@ -68,6 +68,25 @@ public class Slide : MonoBehaviour
         }
     }
 
+    private float FindSlideIntersection()
+    {
+        for (int i = displayHead + 1; i < notes.Count; i++)
+        {
+            var next = notes[i];
+            var prev = notes[i - 1];
+            if ((next.transform.position.z > NoteUtility.NOTE_JUDGE_POS &&
+                prev.transform.position.z < NoteUtility.NOTE_JUDGE_POS) ||
+                (next.transform.position.z < NoteUtility.NOTE_JUDGE_POS &&
+                prev.transform.position.z > NoteUtility.NOTE_JUDGE_POS))
+            {
+                return NoteUtility.Interpolate(prev.transform.position.z,
+                    next.transform.position.z, NoteUtility.NOTE_JUDGE_POS,
+                    prev.transform.position.x, next.transform.position.x);
+            }
+        }
+        return float.NaN;
+    }
+
     private void UpdateNoteHead(int audioTime)
     {
         if (displayHead >= notes.Count)
@@ -78,14 +97,28 @@ public class Slide : MonoBehaviour
         }
         else
         {
+            bool enableBody = true;
+            SlideMesh mesh = noteHead.slideMesh;
             var next = notes[displayHead];
             var prev = notes[displayHead - 1];
-            float percentage = (float)(audioTime - prev.time) / (next.time - prev.time);
-            percentage = Mathf.Max(0, percentage);
-            noteHead.transform.position = (next.judgePos - prev.judgePos) * percentage + prev.judgePos;
-            SlideMesh mesh = noteHead.slideMesh;
             mesh.afterNoteTrans = next.transform;
-            mesh.meshRenderer.enabled = displayHead == 1 || !prev.gameObject.activeSelf;
+
+            float intersect = FindSlideIntersection();
+            if (float.IsNaN(intersect))
+            {
+                float percentage = (float)(audioTime - prev.time) / (next.time - prev.time);
+                percentage = Mathf.Max(0, percentage);
+                noteHead.transform.position = (next.judgePos - prev.judgePos) * percentage + prev.judgePos;
+                enableBody = displayHead == 1 || !prev.gameObject.activeSelf;
+            }
+            else
+            {
+                Vector3 pos = noteHead.judgePos;
+                pos.x = intersect;
+                noteHead.transform.position = pos;
+                enableBody = false;
+            }
+            mesh.meshRenderer.enabled = enableBody;
         }
         noteHead.gameObject.SetActive(touchId != -1 || LiveSetting.autoPlayEnabled);
     }
