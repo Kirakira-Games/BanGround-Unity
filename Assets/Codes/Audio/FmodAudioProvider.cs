@@ -308,9 +308,13 @@ namespace AudioProvider
                 Factory.System_Create(out fmodSystem)
             );
 
-#if UNITY_ANDROID && !UNITY_EDITOR
             fmodSystem.setDSPBufferSize(bufferLength, 4);
-#endif
+            fmodSystem.setSoftwareFormat(sampleRate, SPEAKERMODE.DEFAULT, 0);
+
+            fmodSystem.getDSPBufferSize(out uint initBufferSize, out _);
+            fmodSystem.getSoftwareFormat(out int initSampleRate, out _, out _);
+
+            MessageBoxController.ShowMsg(LogLevel.OK, $"Init SampleRate: {initSampleRate}, Init Buffer: {initBufferSize}");
 
             FMODUtil.ErrCheck(
                 fmodSystem.init(512, INITFLAGS.NORMAL, IntPtr.Zero)
@@ -326,7 +330,7 @@ namespace AudioProvider
             exinfo.length = (uint)audio.Length;
 
             FMODUtil.ErrCheck(
-                fmodSystem.createSound(audio, MODE.OPENMEMORY, ref exinfo, out Sound sound)
+                fmodSystem.createSound(audio, MODE.OPENMEMORY | MODE.CREATESAMPLE, ref exinfo, out Sound sound)
             );
 
             var result = new FmodSoundEffect(sound, fmodSystem, this);
