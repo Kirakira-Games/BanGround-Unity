@@ -38,6 +38,7 @@ public class DataLoader
             var files = new DirectoryInfo(Application.persistentDataPath).GetFiles("*.*", SearchOption.AllDirectories);
             foreach (var file in files)
             {
+                if(file.Name != "Player.log")
                 File.Delete(file.FullName);
             }
             PlayerPrefs.SetInt("GameVersion", GameVersion);
