@@ -15,7 +15,7 @@ public class AppPreLoader : MonoBehaviour
     {
         if (Application.platform != RuntimePlatform.Android) 
         {
-            sampleRate = 44100;
+            sampleRate = 48000;
             if (PlayerPrefs.GetString("AudioEngine", "Bass") == "Bass")
                 bufferSize = 0;
             else
