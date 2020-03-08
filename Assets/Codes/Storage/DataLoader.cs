@@ -270,26 +270,35 @@ public class DataLoader
         return ret;
     }
 
-    public static int LoadKiraPack(string path)
+    public static int LoadKiraPack(FileInfo file)
     {
+        string path = file.FullName;
         if (!File.Exists(path)) return -1;
         Debug.Log("Load kirapack: " + path);
-        using (ZipArchive zip = ZipFile.OpenRead(path))
+        try
         {
-            if (Directory.Exists(TempDir))
+            using (ZipArchive zip = ZipFile.OpenRead(path))
             {
-                Directory.Delete(TempDir, true);
+                if (Directory.Exists(TempDir))
+                {
+                    Directory.Delete(TempDir, true);
+                }
+                zip.ExtractToDirectory(TempDir);
             }
-            zip.ExtractToDirectory(TempDir);
+
+            // Load charts
+            int ret = ConvertBinAndCopy(TempDir + "chart/", ChartDir);
+            // Load music
+            ConvertBinAndCopy(TempDir + "music/", MusicDir);
+            Directory.Delete(TempDir, true);
+            return ret;
         }
-
-        // Load charts
-        int ret = ConvertBinAndCopy(TempDir + "chart/", ChartDir);
-        // Load music
-        ConvertBinAndCopy(TempDir + "music/", MusicDir);
-        Directory.Delete(TempDir, true);
-
-        return ret;
+        catch (System.Exception e)
+        {
+            MessageBoxController.ShowMsg(LogLevel.ERROR,
+                string.Format("Cannot Load {0}: {1}", file.Name, e.Message));
+            return -1;
+        }
     }
 
     public static bool LoadAllKiraPackFromInbox()
@@ -309,13 +318,13 @@ public class DataLoader
                 {
                     if (file.Extension == ".kirapack")
                     {
-                        int tmp = LoadKiraPack(file.FullName);
+                        int tmp = LoadKiraPack(file);
                         if (tmp != -1)
                         {
                             LastImportedSid = tmp;
                             LoadSuccess = true;
+                            MessageBoxController.ShowMsg(LogLevel.OK, "Loaded kirapack: ".GetLocalized() + file.Name);
                         }
-                        MessageBoxController.ShowMsg(LogLevel.OK, "Loaded kirapack: ".GetLocalized() + file.Name);
                         File.Delete(file.FullName);
                     }
                 }
