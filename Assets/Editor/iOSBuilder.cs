@@ -55,6 +55,7 @@ public static class iOSBuilder
         plist.SetBoolean("UIFileSharingEnabled", true);
 
         document.WriteToFile(Path.Combine(path, "info.plist"));
+        Debug.Log("Write Plist Succeed!");
     }
 }
 #endif
