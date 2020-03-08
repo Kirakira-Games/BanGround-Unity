@@ -88,13 +88,20 @@ namespace AudioProvider
 
         public void SetLoopingPoint(uint start, uint end, bool noFade)
         {
-            _loopstart = Bass.BASS_ChannelSeconds2Bytes(_internalChannelID, start / 1000.0);
-            _loopend = Bass.BASS_ChannelSeconds2Bytes(_internalChannelID, end / 1000.0);
-            _loopendms = end;
-            _isLooping = true;
-            this.noFade = noFade;
+            if (start == 0 && end == GetLength()) 
+            {
+                Bass.BASS_ChannelFlags(_internalChannelID, BASSFlag.BASS_SAMPLE_LOOP, BASSFlag.BASS_SAMPLE_LOOP);
+            }
+            else
+            {
+                _loopstart = Bass.BASS_ChannelSeconds2Bytes(_internalChannelID, start / 1000.0);
+                _loopend = Bass.BASS_ChannelSeconds2Bytes(_internalChannelID, end / 1000.0);
+                _loopendms = end;
+                _isLooping = true;
+                this.noFade = noFade;
 
-            Bass.BASS_ChannelSetPosition(_internalChannelID, _loopstart);
+                Bass.BASS_ChannelSetPosition(_internalChannelID, _loopstart);
+            }
         }
 
         public void SetPlaybackTime(uint time)
