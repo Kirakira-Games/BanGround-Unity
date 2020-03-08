@@ -198,6 +198,7 @@ namespace AudioProvider
         {
             var channel = Bass.BASS_SampleGetChannel(_internalSound, false);
             Bass.BASS_ChannelSetAttribute(channel, BASSAttribute.BASS_ATTRIB_VOL, _provider.effectVolume * _provider.masterVolume);
+            Bass.BASS_ChannelSetAttribute(channel, BASSAttribute.BASS_ATTRIB_NOBUFFER, 1);
             Bass.BASS_ChannelPlay(channel, false);
         }
     }
@@ -215,10 +216,16 @@ namespace AudioProvider
 
         public void Init(int sampleRate, uint bufferLength)
         {
-            Bass.BASS_Init(-1, sampleRate, BASSInit.BASS_DEVICE_DEFAULT, IntPtr.Zero);
+            Bass.BASS_Init(-1, sampleRate, BASSInit.BASS_DEVICE_DEFAULT | BASSInit.BASS_DEVICE_LATENCY, IntPtr.Zero);
 
-            if (bufferLength != 0) 
-                Bass.BASS_SetConfig(BASSConfig.BASS_CONFIG_BUFFER, (int)bufferLength);
+            //if (bufferLength != 0)
+            //    Bass.BASS_SetConfig(BASSConfig.BASS_CONFIG_BUFFER, (int)bufferLength);
+            //Bass.BASS_Init(-1, 48000, BASSInit.BASS_DEVICE_DEFAULT, IntPtr.Zero);
+            var info = Bass.BASS_GetInfo();
+            MessageBoxController.ShowMsg(LogLevel.OK, $"minbuf: {info.minbuf}, latency:{info.latency}");
+
+            Bass.BASS_SetConfig(BASSConfig.BASS_CONFIG_BUFFER, info.minbuf);
+            Bass.BASS_SetConfig(BASSConfig.BASS_CONFIG_UPDATEPERIOD, 5);
         }
 
         public ISoundTrack StreamTrack(byte[] audio)
@@ -246,7 +253,7 @@ namespace AudioProvider
 
         public ISoundEffect PrecacheSE(byte[] audio)
         {
-            var id = Bass.BASS_SampleLoad(audio, 0, audio.Length, 128, BASSFlag.BASS_DEFAULT);
+            var id = Bass.BASS_SampleLoad(audio, 0, audio.Length, 65535, BASSFlag.BASS_DEFAULT);
             var se = new BassSoundEffect(id, audio, this);
 
             OnUnload += se.Dispose;
