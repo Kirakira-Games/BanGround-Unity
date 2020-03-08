@@ -8,6 +8,24 @@ public class AudioTimelineSync : MonoBehaviour
     float startTime;
     float pauseTime;
 
+    public static float BGMTimeToRealtime(float t)
+    {
+        return t / LiveSetting.SpeedCompensationSum;
+    }
+    public static int BGMTimeToRealtime(int t)
+    {
+        return Mathf.RoundToInt(t / LiveSetting.SpeedCompensationSum);
+    }
+
+    public static float RealTimeToBGMTime(float t)
+    {
+        return t * LiveSetting.SpeedCompensationSum;
+    }
+    public static int RealTimeToBGMTime(int t)
+    {
+        return Mathf.RoundToInt(t * LiveSetting.SpeedCompensationSum);
+    }
+
     private void Awake()
     {
         instance = this;
@@ -29,7 +47,7 @@ public class AudioTimelineSync : MonoBehaviour
     {
         if (float.IsNaN(pauseTime))
         {
-            return Time.realtimeSinceStartup - startTime;
+            return RealTimeToBGMTime(Time.realtimeSinceStartup - startTime);
         }
         return pauseTime;
     }
@@ -41,6 +59,7 @@ public class AudioTimelineSync : MonoBehaviour
 
     public void Seek(float targetTime)
     {
+        targetTime = BGMTimeToRealtime(targetTime);
         startTime = Time.realtimeSinceStartup - targetTime;
         if (!float.IsNaN(pauseTime))
         {

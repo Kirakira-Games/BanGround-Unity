@@ -77,9 +77,12 @@ public class AudioManager : MonoBehaviour
 
         yield return new WaitUntil(() => SceneLoader.Loading == false);
 
-        AudioTimelineSync.instance.Seek(-seconds - 0.05f);
+        AudioTimelineSync.instance.Seek(-seconds);
         AudioTimelineSync.instance.Play();
-        yield return new WaitForSeconds(seconds);
+        while (AudioTimelineSync.instance.GetTimeInS() < -0.05)
+        {
+            yield return new WaitForEndOfFrame();
+        }
 
         foreach (var mod in LiveSetting.attachedMods)
         {
