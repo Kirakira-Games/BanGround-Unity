@@ -26,6 +26,7 @@ public class SelectManager : MonoBehaviour
     private Toggle persp_Tog;
     private Toggle mirrow_Tog;
     private Toggle ELP_Tog;
+    private ToggleGroup noteToggles;
 
     /* Mods     */
 
@@ -133,6 +134,7 @@ public class SelectManager : MonoBehaviour
         mirrow_Tog = GameObject.Find("Mirrow_Toggle").GetComponent<Toggle>();
         persp_Tog = GameObject.Find("Perspective_Toggle").GetComponent<Toggle>();
         ELP_Tog = GameObject.Find("ELP_Toggle").GetComponent<Toggle>();
+        noteToggles = GameObject.Find("Note_Group").GetComponent<ToggleGroup>();
 
         speed_Input = GameObject.Find("Speed_Input").GetComponent<InputField>();
         judge_Input = GameObject.Find("Judge_Input").GetComponent<InputField>();
@@ -516,6 +518,7 @@ public class SelectManager : MonoBehaviour
         seVolume_Input.value = LiveSetting.seVolume;
         bgmVolume_Input.value = LiveSetting.bgmVolume;
 
+        noteToggles.GetComponentsInChildren<Toggle>()[(int)LiveSetting.noteStyle].isOn = true;
         language_Dropdown.value = (int)LiveSetting.language;
 
         GetModStatus();
@@ -557,6 +560,9 @@ public class SelectManager : MonoBehaviour
         LiveSetting.bgBrightness = bg_Bright.value;
         LiveSetting.laneBrightness = lane_Bright.value;
         LiveSetting.longBrightness = long_Bright.value;
+
+        LiveSetting.noteStyle = noteToggles.ActiveToggles().ToList()[0].name == "Note_Circle" ? NoteStyle.Circle : NoteStyle.Cube;
+        print(LiveSetting.noteStyle);
 
         if (!double_Tog.isOn)
             LiveSetting.RemoveMod(DoubleMod.Instanse);
