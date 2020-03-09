@@ -30,7 +30,7 @@ public class SceneLoader : MonoBehaviour
         SceneLoader.currentSceneName = currentSceneName;
         SceneLoader.nextSceneName = nextSceneName;
         SceneLoader.needOpen = needOpen;
-        SceneManager.LoadScene("Loader", LoadSceneMode.Additive);
+        SceneManager.LoadSceneAsync("Loader", LoadSceneMode.Additive);
     }
 
     public void Load()
@@ -45,7 +45,7 @@ public class SceneLoader : MonoBehaviour
         //关门后再加载下一场景（实际关门动画40帧）
         //WaitForSeconds内参数包括了：关门所需时间 + 显示loading小剧场的时间
         yield return new WaitForSeconds(2.3f);
-        SceneManager.LoadScene(nextSceneName, needOpen ? LoadSceneMode.Additive : LoadSceneMode.Single);
+        SceneManager.LoadSceneAsync(nextSceneName, needOpen ? LoadSceneMode.Additive : LoadSceneMode.Single);
 
         //开门动画39帧
         //需要开门的话需要等开门动画播放完毕后再卸载Loader场景并重置Loading标志
