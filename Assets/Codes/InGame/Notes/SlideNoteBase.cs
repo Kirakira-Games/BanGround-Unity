@@ -59,7 +59,7 @@ public abstract class SlideNoteBase : NoteBase
     public override void RealJudge(int audioTime, JudgeResult result, Touch? touch)
     {
         if (judgeResult != JudgeResult.None) return;
-        int ret = parentSlide.Judge(gameObject, result, touch);
+        int ret = parentSlide.Judge(this, result, touch);
         if (ret == 1) // judge
         {
             judgeTime = audioTime;
