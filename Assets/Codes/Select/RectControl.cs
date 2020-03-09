@@ -5,13 +5,15 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System;
 
-public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerClickHandler
+public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerClickHandler, IPointerExitHandler
 {
     RectTransform rt_m;
     RectTransform rt_v;
     RectTransform rt;
     ScrollRect rt_s;
     VerticalLayoutGroup vg;
+
+    [SerializeField] private Animator deleteAni;
 
     SelectManager sm;
     public int index;
@@ -119,59 +121,58 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         sm.OnEnterPressed();
     }
 
-    float clickTime = 0.8f;
-    float boomTime = 2f;
-    bool pointerDown = false;
+    bool down = false;
+    float time = 0;
+    const float longClickTime = 0.25f;
+    const float deleteTime = 2f;
     bool longClick = false;
-    Slider progress;
-
     public void OnPointerDown(PointerEventData eventData)
     {
         if (entering) return;
-        progress = GetComponentInChildren<Slider>();
-        pointerDown = true;
+        down = true;
         longClick = false;
-        clickTime = 0.8f;
-        boomTime = 2f;
+        time = 0;
+        rt_s.enabled = false;
+
+        Debug.Log("Down");
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        pointerDown = false;
-        if (longClick)
-        {
-            progress.value = 0;
-        }
-        else
-        {
-            //OnPressed();
-        }
+        down = false;
+        rt_s.enabled = true;
+        deleteAni.Play("DeleteIdle");
+        Debug.Log("Up");
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (!entering && !longClick) OnPressed();
+        if (entering) return;
+        Debug.Log("Click");
+        if (!longClick) OnPressed();
+        else if (time >= longClickTime + deleteTime) OnDelete();
     }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        down = false;
+        longClick = false;
+        time = 0;
+        rt_s.enabled = true;
+        deleteAni.Play("DeleteIdle");
+    }
+
 
 
     private void Update()
     {
-        if (pointerDown)
+        if (down)
         {
-            if (clickTime >= 0)
-            {
-                clickTime -= Time.deltaTime;
-            }
-            else if (boomTime >= 0) 
+            time += Time.deltaTime;
+            if (time >= longClickTime && !longClick) 
             {
                 longClick = true;
-                boomTime -= Time.deltaTime;
-                progress.value = 2 - boomTime;
-            }
-            else
-            {
-                OnPointerUp(null);
-                OnDelete();
+                deleteAni.Play("delete");
             }
         }
     }
