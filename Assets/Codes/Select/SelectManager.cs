@@ -55,9 +55,7 @@ public class SelectManager : MonoBehaviour
     private Slider seVolume_Input;
     private Slider bgmVolume_Input;
 
-
-    public GameObject enterAniObj;
-    public GameObject AndroidOnlyPanel;
+    private Dropdown language_Dropdown;
 
     RectTransform rt;
     RectTransform rt_v;
@@ -148,7 +146,6 @@ public class SelectManager : MonoBehaviour
         long_Bright = GameObject.Find("Long_Bri_Slider").GetComponent<Slider>();
         seVolume_Input = GameObject.Find("SeVolume_Input").GetComponent<Slider>();
         bgmVolume_Input = GameObject.Find("BGMVolume_Input").GetComponent<Slider>();
-        //bufferSize_Input = GameObject.Find("BufferSize_Input").GetComponent<Slider>();
 
         auto_Tog = GameObject.Find("Autoplay_Toggle").GetComponent<Toggle>();
         half_Tog = GameObject.Find("Half_Toggle").GetComponent<Toggle>();
@@ -156,9 +153,9 @@ public class SelectManager : MonoBehaviour
         suddenDeath_Tog = GameObject.Find("SuddenDeath_Toggle").GetComponent<Toggle>();
         perfect_Tog = GameObject.Find("Perfect_Toggle").GetComponent<Toggle>();
 
-        //audioTrack_Tog = GameObject.Find("AudioTrack_Toggle").GetComponent<Toggle>();
+        language_Dropdown = GameObject.Find("Language_Dropdown").GetComponent<Dropdown>();
+        language_Dropdown.onValueChanged.AddListener(OnLanuageChanged);
 
-        //enter_Btn.onClick.AddListener(OnEnterPressed);
         setting_Open_Btn.onClick.AddListener(OpenSetting);
         setting_Close_Btn.onClick.AddListener(CloseSetting);
         mod_Open_Btn.onClick.AddListener(OpenMod);
@@ -518,9 +515,8 @@ public class SelectManager : MonoBehaviour
 
         seVolume_Input.value = LiveSetting.seVolume;
         bgmVolume_Input.value = LiveSetting.bgmVolume;
-        //bufferSize_Input.value = LiveSetting.bufferSize;
 
-        //audioTrack_Tog.isOn = LiveSetting.enableAudioTrack;
+        language_Dropdown.value = (int)LiveSetting.language;
 
         GetModStatus();
     }
@@ -536,28 +532,28 @@ public class SelectManager : MonoBehaviour
 
     public void OnLanuageChanged(int value)
     {
-        switch (value)
-        {
-            case 0:
-                LiveSetting.language = Language.English;
-                break;
-            case 1:
-                LiveSetting.language = Language.SimplifiedChinese;
-                break;
-            case 2:
-                LiveSetting.language = Language.TraditionalChinese;
-                break;
-            case 3:
-                LiveSetting.language = Language.Japanese;
-                break;
-            case 4:
-                LiveSetting.language = Language.Korean;
-                break;
-            default:
-                Debug.LogError("爪巴~");
-                break;
-        }
-
+        //switch (value)
+        //{
+        //    case 0:
+        //        LiveSetting.language = Language.English;
+        //        break;
+        //    case 1:
+        //        LiveSetting.language = Language.SimplifiedChinese;
+        //        break;
+        //    case 2:
+        //        LiveSetting.language = Language.TraditionalChinese;
+        //        break;
+        //    case 3:
+        //        LiveSetting.language = Language.Japanese;
+        //        break;
+        //    case 4:
+        //        LiveSetting.language = Language.Korean;
+        //        break;
+        //    default:
+        //        Debug.LogError("爪巴~");
+        //        break;
+        //}
+        LiveSetting.language = (Language)value;
         LocalizedStrings.Instanse.ReloadLanguageFile(LiveSetting.language);
         LocalizedText.ReloadAll();
     }
@@ -570,7 +566,6 @@ public class SelectManager : MonoBehaviour
         LiveSetting.noteSize = float.Parse(size_Input.text);
         LiveSetting.seVolume = seVolume_Input.value;
         LiveSetting.bgmVolume = bgmVolume_Input.value;
-        //LiveSetting.bufferSize = (int)bufferSize_Input.value;
         LiveSetting.syncLineEnabled = syncLine_Tog.isOn;
         LiveSetting.grayNoteEnabled = offBeat_Tog.isOn;
         LiveSetting.mirrowEnabled = mirrow_Tog.isOn;
@@ -583,8 +578,6 @@ public class SelectManager : MonoBehaviour
         LiveSetting.bgBrightness = bg_Bright.value;
         LiveSetting.laneBrightness = lane_Bright.value;
         LiveSetting.longBrightness = long_Bright.value;
-
-        //LiveSetting.enableAudioTrack = audioTrack_Tog.isOn;
 
         if (!double_Tog.isOn)
             LiveSetting.RemoveMod(DoubleMod.Instanse);

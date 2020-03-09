@@ -28,7 +28,7 @@ public class JudgeResultController : MonoBehaviour
 
         animator = GetComponent<Animator>();
         resultRenderer = GetComponent<SpriteRenderer>();
-        offsetRenderer=GameObject.Find("JudgeOffset").GetComponent<SpriteRenderer>();
+        offsetRenderer = GameObject.Find("JudgeOffset").GetComponent<SpriteRenderer>();
     }
 
     public void DisplayJudgeResult(JudgeResult result)
@@ -37,24 +37,33 @@ public class JudgeResultController : MonoBehaviour
         animator.Play("Play", -1, 0);
     }
 
-    public void DisplayJudgeOffset(OffsetResult result)
+    public void DisplayJudgeOffset(NoteBase note, int result)
     {
         if (offsetRenderer == null) return;
-        switch (result)
+        if (note is SlideTick) return;
+
+        int deltaTime = note.time - note.judgeTime;
+        if (result >= (LiveSetting.displayELP ? 0 : 1) && result <= 3 && deltaTime != 0)
         {
-            case OffsetResult.None:
-                offsetRenderer.sprite = null;
-                break;
-            case OffsetResult.Early:
-                offsetRenderer.sprite = early;
-                break;
-            case OffsetResult.Late:
-                offsetRenderer.sprite = late;
-                break;
-            default:
-                offsetRenderer.sprite = null;
-                break;
+            ComboManager.JudgeOffsetResult.Add(deltaTime);
+            OffsetResult offset = deltaTime > 0 ? OffsetResult.Early : OffsetResult.Late;
+            switch (offset)
+            {
+                case OffsetResult.None:
+                    offsetRenderer.sprite = null;
+                    break;
+                case OffsetResult.Early:
+                    offsetRenderer.sprite = early;
+                    break;
+                case OffsetResult.Late:
+                    offsetRenderer.sprite = late;
+                    break;
+                default:
+                    offsetRenderer.sprite = null;
+                    break;
+            }
         }
+
     }
 
 }

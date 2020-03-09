@@ -20,7 +20,7 @@ public class HandelValue_Buffer : MonoBehaviour
         {
             if (Application.platform != RuntimePlatform.Android)
             {
-                GameObject.Find("BufferSize").SetActive(false);
+                GameObject.Find("BufferSize_Text").SetActive(false);
                 GameObject.Find("BufferSize_Input").SetActive(false);
                 return;
             }
