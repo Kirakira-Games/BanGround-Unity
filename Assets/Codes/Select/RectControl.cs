@@ -12,6 +12,7 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     RectTransform rt;
     ScrollRect rt_s;
     VerticalLayoutGroup vg;
+    DragHandler dh;
 
     [SerializeField] private Animator deleteAni;
 
@@ -40,6 +41,7 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         img = GetComponent<Image>();
         title = transform.Find("TextTitle").GetComponent<Text>();
 
+        dh = GameObject.Find("Song Scroll View").GetComponent<DragHandler>();
         //bt = GetComponent<Button>();
         rt = GetComponent<RectTransform>();
         //bt.onClick.AddListener(OnPressed);
@@ -132,7 +134,6 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         down = true;
         longClick = false;
         time = 0;
-        rt_s.enabled = false;
 
         Debug.Log("Down");
     }
@@ -140,7 +141,6 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public void OnPointerUp(PointerEventData eventData)
     {
         down = false;
-        rt_s.enabled = true;
         deleteAni.Play("DeleteIdle");
         Debug.Log("Up");
     }
@@ -158,7 +158,6 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         down = false;
         longClick = false;
         time = 0;
-        rt_s.enabled = true;
         deleteAni.Play("DeleteIdle");
     }
 
