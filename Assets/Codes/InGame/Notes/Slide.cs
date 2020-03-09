@@ -221,14 +221,14 @@ public class Slide : MonoBehaviour
         touchId = -1;
     }
 
-    public int Judge(GameObject note, JudgeResult result, Touch? touch)
+    public int Judge(NoteBase note, JudgeResult result, Touch? touch)
     {
         // Must judge head
         if (judgeHead >= notes.Count || !ReferenceEquals(note.GetComponent<SlideNoteBase>(), notes[judgeHead]))
         {
             if (notes.IndexOf(note.GetComponent<SlideNoteBase>()) < judgeHead)
             {
-                note.SetActive(false);
+                note.gameObject.SetActive(false);
                 BindTouch(touch);
                 return -1; // judge miss
             }
@@ -249,7 +249,7 @@ public class Slide : MonoBehaviour
         }
         else
         {
-            note.SetActive(false);
+            note.gameObject.SetActive(false);
         }
         judgeHead++;
         return 1;

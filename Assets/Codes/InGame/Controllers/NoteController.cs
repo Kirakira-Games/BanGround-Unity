@@ -80,11 +80,12 @@ public class NoteController : MonoBehaviour
     }
 
     // Judge a note as result
-    public void Judge(GameObject note, JudgeResult result, Touch? touch)
+    public void Judge(NoteBase notebase, JudgeResult result, Touch? touch)
     {
+        GameObject note = notebase.gameObject;
+
         onJudge?.Invoke(result);
 
-        NoteBase notebase = note.GetComponent<NoteBase>();
         if (result == JudgeResult.None)
         {
             Debug.LogWarning("'None' cannot be final judge result. Recognized as 'Miss'.");

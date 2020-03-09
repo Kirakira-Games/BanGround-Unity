@@ -151,7 +151,7 @@ public abstract class NoteBase : MonoBehaviour
         if (judgeResult != JudgeResult.None) return;
         judgeTime = audioTime;
         judgeResult = result;
-        NoteController.instance.Judge(gameObject, result, touch);
+        NoteController.instance.Judge(this, result, touch);
         NotePool.instance.DestroyNote(gameObject);
     }
 
