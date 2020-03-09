@@ -63,7 +63,6 @@ public class AudioManager : MonoBehaviour
     }
 
     public ISoundEffect PrecacheSE(byte[] data) => Provider.PrecacheSE(data);
-    public void PlaySE(ISoundEffect se) => se.PlayOneShot();
     public void DelayPlayInGameBGM(byte[] audio, float seconds)
     {
         StartCoroutine(DelayPlayBGM(audio, seconds));

@@ -25,25 +25,25 @@ public abstract class SlideNoteBase : NoteBase
 
     public override void OnNoteDestroy()
     {
-        if (LiveSetting.autoPlayEnabled)
-        {
-            JudgeResultController.instance.DisplayJudgeOffset(OffsetResult.None);
-            return;
-        }
+        //if (LiveSetting.autoPlayEnabled)
+        //{
+        //    JudgeResultController.instance.DisplayJudgeOffset(OffsetResult.None);
+        //    return;
+        //}
         
-        int result = (int)judgeResult;
-        int deltaTime = time - judgeTime;
-        if (result >= (LiveSetting.displayELP ? 0 : 1) && result <= 3 && deltaTime != 0)
-        {
-            if (Mathf.Abs(deltaTime) > 200)
-            {
-                Debug.Log(time + "/" + judgeTime);
-            }
-            ComboManager.JudgeOffsetResult.Add(deltaTime);
-            JudgeResultController.instance.DisplayJudgeOffset(deltaTime > 0 ? OffsetResult.Early : OffsetResult.Late);
-            return;
-        }
-        JudgeResultController.instance.DisplayJudgeOffset(OffsetResult.None);
+        //int result = (int)judgeResult;
+        //int deltaTime = time - judgeTime;
+        //if (result >= (LiveSetting.displayELP ? 0 : 1) && result <= 3 && deltaTime != 0)
+        //{
+        //    if (Mathf.Abs(deltaTime) > 200)
+        //    {
+        //        Debug.Log(time + "/" + judgeTime);
+        //    }
+        //    ComboManager.JudgeOffsetResult.Add(deltaTime);
+        //    JudgeResultController.instance.DisplayJudgeOffset(deltaTime > 0 ? OffsetResult.Early : OffsetResult.Late);
+        //    return;
+        //}
+        //JudgeResultController.instance.DisplayJudgeOffset(OffsetResult.None);
     }
 
     public override JudgeResult TryJudge(int audioTime, Touch touch)

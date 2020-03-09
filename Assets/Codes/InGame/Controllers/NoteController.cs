@@ -98,7 +98,7 @@ public class NoteController : MonoBehaviour
         // Sound effect
         if (notebase.syncLine.PlaySoundEffect(se))
         {
-            AudioManager.Instance.PlaySE(soundEffects[se]);
+            soundEffects[se].PlayOneShot();
         }
 
         // Update score
@@ -106,6 +106,9 @@ public class NoteController : MonoBehaviour
 
         // Update combo
         ComboManager.manager.UpdateCombo(result);
+
+        //Update EL
+        JudgeResultController.instance.DisplayJudgeOffset(notebase, (int)result);
     }
 
     private void UpdateLane(int i)
@@ -266,7 +269,7 @@ public class NoteController : MonoBehaviour
                 if (touch.phase == TouchPhase.Began && lanes.Length > 0)
                 {
                     int se = (int)EmitEffect(NoteUtility.GetJudgePos(lanes[0]), JudgeResult.None, GameNoteType.Single);
-                    AudioManager.Instance.PlaySE(soundEffects[se]);
+                    soundEffects[se].PlayOneShot();
                 }
             }
             else
