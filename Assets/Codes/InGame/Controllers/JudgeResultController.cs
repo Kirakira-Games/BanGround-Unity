@@ -39,7 +39,8 @@ public class JudgeResultController : MonoBehaviour
 
     public void DisplayJudgeOffset(NoteBase note, int result)
     {
-        if (offsetRenderer == null) return;
+        //if (offsetRenderer == null) return;
+        if (LiveSetting.autoPlayEnabled) return;
         if (note is SlideTick) return;
 
         int deltaTime = note.time - note.judgeTime;

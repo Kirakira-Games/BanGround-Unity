@@ -532,27 +532,6 @@ public class SelectManager : MonoBehaviour
 
     public void OnLanuageChanged(int value)
     {
-        //switch (value)
-        //{
-        //    case 0:
-        //        LiveSetting.language = Language.English;
-        //        break;
-        //    case 1:
-        //        LiveSetting.language = Language.SimplifiedChinese;
-        //        break;
-        //    case 2:
-        //        LiveSetting.language = Language.TraditionalChinese;
-        //        break;
-        //    case 3:
-        //        LiveSetting.language = Language.Japanese;
-        //        break;
-        //    case 4:
-        //        LiveSetting.language = Language.Korean;
-        //        break;
-        //    default:
-        //        Debug.LogError("爪巴~");
-        //        break;
-        //}
         LiveSetting.language = (Language)value;
         LocalizedStrings.Instanse.ReloadLanguageFile(LiveSetting.language);
         LocalizedText.ReloadAll();
