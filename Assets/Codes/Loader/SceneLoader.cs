@@ -8,7 +8,7 @@ public class SceneLoader : MonoBehaviour
     private AsyncOperation operation;
     private Animator animator;
 
-    public static string currentSceneName;
+    public static Scene currentSceneName;
     private static string nextSceneName;
     private static bool needOpen;
 
@@ -27,7 +27,7 @@ public class SceneLoader : MonoBehaviour
         if (Loading) return;
         Loading = true;
 
-        SceneLoader.currentSceneName = currentSceneName;
+        SceneLoader.currentSceneName = SceneManager.GetActiveScene();
         SceneLoader.nextSceneName = nextSceneName;
         SceneLoader.needOpen = needOpen;
         SceneManager.LoadSceneAsync("Loader", LoadSceneMode.Additive);
@@ -42,20 +42,22 @@ public class SceneLoader : MonoBehaviour
 
     private IEnumerator LoadAsync()
     {
-        //关门后再加载下一场景（实际关门动画40帧）
+        //关门后再加载下一场景（实际关门动画55帧）
         //WaitForSeconds内参数包括了：关门所需时间 + 显示loading小剧场的时间
         yield return new WaitForSeconds(2.3f);
-        SceneManager.LoadSceneAsync(nextSceneName, needOpen ? LoadSceneMode.Additive : LoadSceneMode.Single);
+        operation = SceneManager.LoadSceneAsync(nextSceneName, needOpen ? LoadSceneMode.Additive : LoadSceneMode.Single);
+        operation.allowSceneActivation = false;
 
         //开门动画39帧
         //需要开门的话需要等开门动画播放完毕后再卸载Loader场景并重置Loading标志
         if (needOpen)
         {
-            StartCoroutine(CountDown(2f));
+            StartCoroutine(CountDown(1f));
         }
         else
         {
             Loading = false;
+            operation.allowSceneActivation = true;
         }
     }
 
@@ -63,9 +65,10 @@ public class SceneLoader : MonoBehaviour
     {
         //开门时间（即loading播放时间） 应减去关门所需时间
         SceneManager.UnloadSceneAsync(currentSceneName);
+        operation.allowSceneActivation = true;
         animator.Play("Opening");
-        //open gate need 2f
-        yield return new WaitForSeconds(1f);
+        //open gate need 1f
+        yield return new WaitForSeconds(seconds);
         SceneManager.UnloadSceneAsync("Loader");
         Loading = false;
     }

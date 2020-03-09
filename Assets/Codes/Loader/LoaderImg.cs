@@ -5,16 +5,17 @@ using UnityEngine.UI;
 
 public class LoaderImg : MonoBehaviour
 {
-    private Texture[] loaderSprite;
+    const int ComicCount = 215;
+    //private Texture[] loaderSprite;
     private RawImage image;
     private bool play = false;
     private int spriteIndex = 0;
 
     void Start()
     {
-        loaderSprite = Resources.LoadAll<Texture>("Comic/");
         image = GetComponent<RawImage>();
-        image.texture = loaderSprite[Random.Range(0, loaderSprite.Length)];
+        int index = Random.Range(1, ComicCount);
+        image.texture = Resources.Load<Texture>("Comic/" + index.ToString().PadLeft(5, '0'));
         image.SetNativeSize();
         //StartCoroutine(DelayPlay(0.5f));
     }
