@@ -111,6 +111,7 @@ public static class LiveSetting
 
     public static bool AddMod(ModBase mod)
     {
+        if (mod == null) return false;
         if (!attachedMods.Contains(mod))
         {
             if (attachedMods.Any(c => c.IncompatibleMods.Any(m => m.IsInstanceOfType(mod))))

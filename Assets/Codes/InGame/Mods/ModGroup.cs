@@ -40,6 +40,15 @@ public class DoubleMod : AudioMod
     }
 }
 
+public class NightCoreMod : DoubleMod
+{
+    public new static NightCoreMod Instanse = new NightCoreMod();
+    public override void ApplyMod(ISoundTrack soundTrack)
+    {
+        soundTrack.SetTimeScale(1.5f, false);
+    }
+}
+
 public class HalfMod : AudioMod
 {
     public static HalfMod Instanse = new HalfMod();
@@ -52,5 +61,14 @@ public class HalfMod : AudioMod
     public override void ApplyMod(ISoundTrack soundTrack)
     {
         soundTrack.SetTimeScale(0.75f, true);
+    }
+}
+
+public class DayCoreMod: HalfMod
+{
+    public new static DayCoreMod Instanse = new DayCoreMod();
+    public override void ApplyMod(ISoundTrack soundTrack)
+    {
+        soundTrack.SetTimeScale(0.75f, false);
     }
 }

@@ -26,16 +26,16 @@ public class SelectManager : MonoBehaviour
     private Toggle persp_Tog;
     private Toggle mirrow_Tog;
     private Toggle ELP_Tog;
-    private ToggleGroup noteToggles;
+    private NoteStyleToggleGroup noteToggles;
 
     /* Mods     */
 
     // Auto
     private Toggle auto_Tog;
     // Double
-    private Toggle double_Tog;
+    private StepToggle speedUp_Tog;
     // Half
-    private Toggle half_Tog;
+    private StepToggle speedDown_Tog;
     //Sudden Death
     private Toggle suddenDeath_Tog;
     //Perfect
@@ -134,7 +134,7 @@ public class SelectManager : MonoBehaviour
         mirrow_Tog = GameObject.Find("Mirrow_Toggle").GetComponent<Toggle>();
         persp_Tog = GameObject.Find("Perspective_Toggle").GetComponent<Toggle>();
         ELP_Tog = GameObject.Find("ELP_Toggle").GetComponent<Toggle>();
-        noteToggles = GameObject.Find("Note_Group").GetComponent<ToggleGroup>();
+        noteToggles = GameObject.Find("Note_Group").GetComponent<NoteStyleToggleGroup>();
 
         speed_Input = GameObject.Find("Speed_Input").GetComponent<InputField>();
         judge_Input = GameObject.Find("Judge_Input").GetComponent<InputField>();
@@ -150,8 +150,8 @@ public class SelectManager : MonoBehaviour
         bgmVolume_Input = GameObject.Find("BGMVolume_Input").GetComponent<Slider>();
 
         auto_Tog = GameObject.Find("Autoplay_Toggle").GetComponent<Toggle>();
-        half_Tog = GameObject.Find("Half_Toggle").GetComponent<Toggle>();
-        double_Tog = GameObject.Find("Double_Toggle").GetComponent<Toggle>();
+        speedDown_Tog = GameObject.Find("Half_Toggle").GetComponent<StepToggle>();
+        speedUp_Tog = GameObject.Find("Double_Toggle").GetComponent<StepToggle>();
         suddenDeath_Tog = GameObject.Find("SuddenDeath_Toggle").GetComponent<Toggle>();
         perfect_Tog = GameObject.Find("Perfect_Toggle").GetComponent<Toggle>();
 
@@ -525,7 +525,7 @@ public class SelectManager : MonoBehaviour
         seVolume_Input.value = LiveSetting.seVolume;
         bgmVolume_Input.value = LiveSetting.bgmVolume;
 
-        noteToggles.GetComponentsInChildren<Toggle>()[(int)LiveSetting.noteStyle].isOn = true;
+        noteToggles.SetStyle(LiveSetting.noteStyle);
         language_Dropdown.value = (int)LiveSetting.language;
 
         GetModStatus();
@@ -534,8 +534,8 @@ public class SelectManager : MonoBehaviour
     {
         auto_Tog.isOn = LiveSetting.autoPlayEnabled;
 
-        half_Tog.isOn = LiveSetting.attachedMods.Contains(HalfMod.Instanse);
-        double_Tog.isOn = LiveSetting.attachedMods.Contains(DoubleMod.Instanse);
+        speedDown_Tog.SetStep(LiveSetting.attachedMods);
+        speedUp_Tog.SetStep(LiveSetting.attachedMods);
         suddenDeath_Tog.isOn = LiveSetting.attachedMods.Contains(SuddenDeathMod.Instance);
         perfect_Tog.isOn = LiveSetting.attachedMods.Contains(PerfectMod.Instance);
     }
@@ -568,86 +568,39 @@ public class SelectManager : MonoBehaviour
         LiveSetting.laneBrightness = lane_Bright.value;
         LiveSetting.longBrightness = long_Bright.value;
 
-        LiveSetting.noteStyle = noteToggles.ActiveToggles().ToList()[0].name == "Note_Circle" ? NoteStyle.Circle : NoteStyle.Cube;
-        print(LiveSetting.noteStyle);
+        LiveSetting.noteStyle = noteToggles.GetStyle();
 
-        if (!double_Tog.isOn)
-            LiveSetting.RemoveMod(DoubleMod.Instanse);
+        LiveSetting.attachedMods.Clear();
+        LiveSetting.AddMod(speedUp_Tog.GetStep());
+        LiveSetting.AddMod(speedDown_Tog.GetStep());
+        //if (!double_Tog.isOn)
+        //    LiveSetting.RemoveMod(DoubleMod.Instanse);
 
-        if(!half_Tog.isOn)
-            LiveSetting.RemoveMod(HalfMod.Instanse);
+        //if(!half_Tog.isOn)
+        //    LiveSetting.RemoveMod(HalfMod.Instanse);
 
-        if (double_Tog.isOn)
-            LiveSetting.AddMod(DoubleMod.Instanse);
+        //if (double_Tog.isOn)
+        //    LiveSetting.AddMod(DoubleMod.Instanse);
 
-        if (half_Tog.isOn)
-            LiveSetting.AddMod(HalfMod.Instanse);
+        //if (half_Tog.isOn)
+        //    LiveSetting.AddMod(HalfMod.Instanse);
 
         if (suddenDeath_Tog.isOn) LiveSetting.AddMod(SuddenDeathMod.Instance);
-        else LiveSetting.RemoveMod(SuddenDeathMod.Instance);
+        //else LiveSetting.RemoveMod(SuddenDeathMod.Instance);
 
         if (perfect_Tog.isOn) LiveSetting.AddMod(PerfectMod.Instance);
-        else LiveSetting.RemoveMod(PerfectMod.Instance);
+        //else LiveSetting.RemoveMod(PerfectMod.Instance);
 
     }
 
-    public void OnDoubleModChange()
-    {
-        if (double_Tog.isOn)
-            half_Tog.isOn = false;
-    }
-
-    public void OnHalfModChange()
-    {
-        if (half_Tog.isOn)
-            double_Tog.isOn = false;
-    }
     //============================================
     public void OnEnterPressed()
     {
-        /*if (!isSettingOpened)
-        {
-            OpenSetting();
-            return;
-        }
-        */
-        /*
-        var toggles = selectGroup.ActiveToggles();
-        foreach (var seleted in toggles)
-        {
-            //Debug.Log(seleted.name);
-            LiveSetting.selected = seleted.name;
-        }
-        */
-        //enter_Btn.interactable = false;
-        //enterAniObj.SetActive(true);
-        //scene_Animator.Play("OutPlay", -1, 0);
-        //CloseSetting();
-        //setting_Open_Btn.gameObject.SetActive(false);
 
         SetLiveSetting();
         File.WriteAllText(LiveSetting.settingsPath, JsonConvert.SerializeObject(new LiveSettingTemplate()));
-
-        //GameObject.Find("milk").GetComponent<Animator>().Play("out", -1);
-
-        //StartCoroutine(DelayLoadScene());
         SceneLoader.LoadScene("Select", "InGame", true);
     }
-    //IEnumerator DelayLoadScene()
-    //{
-    //    float delay = 1.2f;
-
-    //    //float startVolume = lastPreviewStream.Volume;
-
-    //    SceneLoader.LoadScene("Select", "InGame", true);
-
-    //    while (delay >= 0)
-    //    {
-    //        yield return new WaitForEndOfFrame();
-    //        delay -= Time.deltaTime;
-    //        lastPreviewStream.Volume = startVolume * (delay / 1.2f);
-    //    }
-    //}
 
     private void OnApplicationPause(bool pause)
     {
