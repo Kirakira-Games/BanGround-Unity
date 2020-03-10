@@ -85,7 +85,9 @@ public class UIManager : MonoBehaviour
         Time.timeScale = 1;
         pause_Canvas.SetActive(false);
 
-        if (!AudioManager.Instance.isLoading)
+        if (AudioManager.Instance.isLoading)
+            AudioTimelineSync.instance.Play();
+        else
             StartCoroutine(BiteTheDust());
     }
 

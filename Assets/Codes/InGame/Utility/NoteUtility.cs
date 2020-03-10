@@ -13,6 +13,13 @@ public enum GameNoteType
     SlideEndFlick = 5
 }
 
+public class GameBeatInfo
+{
+    public float beat;
+    public float time;
+    public float value;
+}
+
 public class GameNoteAnim
 {
     public int startT;
@@ -42,6 +49,13 @@ public class GameNoteData
             time = i.time;
         }
     }
+}
+
+public class GameChartData
+{
+    public List<GameNoteData> notes;
+    public List<GameBeatInfo> speed;
+    public List<GameBeatInfo> bpm;
 }
 
 public enum JudgeResult

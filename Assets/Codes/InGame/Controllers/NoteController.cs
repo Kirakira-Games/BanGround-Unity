@@ -14,13 +14,16 @@ public class NoteController : MonoBehaviour
 
     private Dictionary<int, GameObject> touchTable;
     private Dictionary<int, NoteSyncLine> syncTable;
-    private List<GameNoteData> notes;
+
+    private GameChartData chart;
+    private List<GameNoteData> notes => chart.notes;
     private int noteHead;
     private int numNotes;
 
     private ISoundEffect[] soundEffects;
 
     private FixBackground background;
+    private LaneEffects laneEffects;
 
     private UnityAction<JudgeResult> onJudge;
 
@@ -313,7 +316,7 @@ public class NoteController : MonoBehaviour
 
         // Load chart
         int sid = LiveSetting.CurrentHeader.sid;
-        notes = ChartLoader.LoadChart(DataLoader.LoadChart(sid, (Difficulty)LiveSetting.actualDifficulty));
+        chart = ChartLoader.LoadChart(DataLoader.LoadChart(sid, (Difficulty)LiveSetting.actualDifficulty));
         NotePool.instance.Init(notes);
         noteHead = 0;
 
@@ -349,6 +352,9 @@ public class NoteController : MonoBehaviour
         // Background
         background = GameObject.Find("dokidokiBackground").GetComponent<FixBackground>();
         background.UpdateBackground(DataLoader.GetBackgroundPath(sid));
+        // Lane Effects
+        laneEffects = GameObject.Find("Effects").GetComponent<LaneEffects>();
+        laneEffects.Init(chart.bpm, chart.speed);
 
         //Set Play Mod Event
         //AudioManager.Instance.restart = false;
@@ -420,24 +426,8 @@ public class NoteController : MonoBehaviour
         {
             noteSyncLine[i].OnSyncLineUpdate();
         }
+
+        // Update lane effects
+        laneEffects.UpdateLaneEffects(audioTime);
     }
-    /*
-    int black = -1000 * WARM_UP_SECOND;
-    bool warmUp = true;
-    int GetWarmUp()
-    {
-        int audioTime;
-        if (black < 0)
-        {
-            black += (int)(Time.deltaTime * 1000);
-            audioTime = black;
-        }
-        else
-        {
-            audioTime = 0;
-            warmUp = false;
-        }
-        return audioTime;
-    }
-    */
 }
