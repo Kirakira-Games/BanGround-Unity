@@ -570,26 +570,14 @@ public class SelectManager : MonoBehaviour
 
         LiveSetting.noteStyle = noteToggles.GetStyle();
 
+        LiveSetting.RemoveAllMods();
         LiveSetting.attachedMods.Clear();
         LiveSetting.AddMod(speedUp_Tog.GetStep());
         LiveSetting.AddMod(speedDown_Tog.GetStep());
-        //if (!double_Tog.isOn)
-        //    LiveSetting.RemoveMod(DoubleMod.Instanse);
-
-        //if(!half_Tog.isOn)
-        //    LiveSetting.RemoveMod(HalfMod.Instanse);
-
-        //if (double_Tog.isOn)
-        //    LiveSetting.AddMod(DoubleMod.Instanse);
-
-        //if (half_Tog.isOn)
-        //    LiveSetting.AddMod(HalfMod.Instanse);
 
         if (suddenDeath_Tog.isOn) LiveSetting.AddMod(SuddenDeathMod.Instance);
-        //else LiveSetting.RemoveMod(SuddenDeathMod.Instance);
 
         if (perfect_Tog.isOn) LiveSetting.AddMod(PerfectMod.Instance);
-        //else LiveSetting.RemoveMod(PerfectMod.Instance);
 
     }
 
