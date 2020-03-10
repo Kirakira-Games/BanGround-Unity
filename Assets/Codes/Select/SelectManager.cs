@@ -463,7 +463,14 @@ public class SelectManager : MonoBehaviour
     {
         mHeader mheader = DataLoader.GetMusicHeader(LiveSetting.CurrentHeader.mid);
 
-        if (previewSound != null) previewSound.Dispose();
+        if (previewSound != null) {
+            previewSound.Dispose();
+            previewSound = null;
+        }
+        if (!DataLoader.MusicExists(LiveSetting.CurrentHeader.mid))
+        {
+            return;
+        }
         previewSound = AudioManager.Instance.PlayLoopMusic(File.ReadAllBytes(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)),
             new uint[]
             {
