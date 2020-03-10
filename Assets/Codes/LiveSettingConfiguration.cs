@@ -140,6 +140,17 @@ public static class LiveSetting
         }
     }
 
+    public static void RemoveAllMods()
+    {
+        foreach (var mod in attachedMods)
+        {
+            if (mod is AudioMod)
+            {
+                SpeedCompensationSum /= (mod as AudioMod).SpeedCompensation;
+            }
+        }
+    }
+
     public static int NoteScreenTime
     {
         get

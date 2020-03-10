@@ -40,9 +40,14 @@ public class DoubleMod : AudioMod
     }
 }
 
-public class NightCoreMod : DoubleMod
+public class NightCoreMod : AudioMod
 {
-    public new static NightCoreMod Instanse = new NightCoreMod();
+    public static NightCoreMod Instanse = new NightCoreMod();
+
+    public override Type[] IncompatibleMods => new Type[] { typeof(HalfMod), typeof(DoubleMod), typeof(DayCoreMod) };
+    public override float SpeedCompensation => 1.5f;
+    public override float ScoreMultiplier => 1.1f;
+
     public override void ApplyMod(ISoundTrack soundTrack)
     {
         soundTrack.SetTimeScale(1.5f, false);
@@ -64,9 +69,14 @@ public class HalfMod : AudioMod
     }
 }
 
-public class DayCoreMod: HalfMod
+public class DayCoreMod: AudioMod
 {
-    public new static DayCoreMod Instanse = new DayCoreMod();
+    public static DayCoreMod Instanse = new DayCoreMod();
+    public override Type[] IncompatibleMods => new Type[] { typeof(DoubleMod), typeof(HalfMod), typeof(NightCoreMod) };
+
+    public override float SpeedCompensation => 0.75f;
+    public override float ScoreMultiplier => 0.75f;
+
     public override void ApplyMod(ISoundTrack soundTrack)
     {
         soundTrack.SetTimeScale(0.75f, false);
