@@ -60,15 +60,9 @@ public abstract class SlideNoteBase : NoteBase
     {
         if (judgeResult != JudgeResult.None) return;
         int ret = parentSlide.Judge(this, result, touch);
-        if (ret == 1) // judge
-        {
+        if (ret == 0) return;
+        if (judgeTime == int.MinValue)
             judgeTime = audioTime;
-            judgeResult = result;
-        }
-        else if (ret == -1) // judge miss
-        {
-            judgeTime = audioTime;
-            judgeResult = JudgeResult.Miss;
-        }
+        judgeResult = ret == 1 ? result : JudgeResult.Miss;
     }
 }
