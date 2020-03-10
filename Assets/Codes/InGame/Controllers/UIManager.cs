@@ -130,7 +130,7 @@ public class UIManager : MonoBehaviour
 
         OnStopPlaying();
         //SceneManager.LoadScene("InGame");
-        SceneLoader.LoadScene("InGame", "InGame",true);
+        SceneLoader.LoadScene("InGame", "InGame", true);
     }
 
     public void GameRetire()

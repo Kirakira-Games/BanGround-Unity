@@ -5,8 +5,8 @@ using UnityEngine.SceneManagement;
 
 public class SceneLoader : MonoBehaviour
 {
-    private AsyncOperation operation;
     private Animator animator;
+    private Camera loaderCamera;
 
     public static Scene currentSceneName;
     private static string nextSceneName;
@@ -18,6 +18,7 @@ public class SceneLoader : MonoBehaviour
     {
         animator = GameObject.Find("GateCanvas2").GetComponent<Animator>();
         animator.Play("Closing");
+        loaderCamera = GameObject.Find("LoaderCamera").GetComponent<Camera>();
         Load();
     }
 
@@ -45,8 +46,11 @@ public class SceneLoader : MonoBehaviour
         //关门后再加载下一场景（实际关门动画55帧）
         //WaitForSeconds内参数包括了：关门所需时间 + 显示loading小剧场的时间
         yield return new WaitForSeconds(2.3f);
-        operation = SceneManager.LoadSceneAsync(nextSceneName, needOpen ? LoadSceneMode.Additive : LoadSceneMode.Single);
-        operation.allowSceneActivation = false;
+        yield return SceneManager.UnloadSceneAsync(currentSceneName);
+
+        loaderCamera.enabled = true;
+
+        SceneManager.LoadSceneAsync(nextSceneName, needOpen ? LoadSceneMode.Additive : LoadSceneMode.Single);
 
         //开门动画39帧
         //需要开门的话需要等开门动画播放完毕后再卸载Loader场景并重置Loading标志
@@ -57,15 +61,12 @@ public class SceneLoader : MonoBehaviour
         else
         {
             Loading = false;
-            operation.allowSceneActivation = true;
         }
     }
 
     private IEnumerator CountDown(float seconds)
     {
         //开门时间（即loading播放时间） 应减去关门所需时间
-        SceneManager.UnloadSceneAsync(currentSceneName);
-        operation.allowSceneActivation = true;
         animator.Play("Opening");
         //open gate need 1f
         yield return new WaitForSeconds(seconds);
