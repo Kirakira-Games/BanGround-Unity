@@ -70,7 +70,7 @@ public static class ChartLoader
         return beat[0] + (float)beat[1] / beat[2];
     }
 
-    public static List<GameNoteData> LoadChart(Chart chart)
+    public static GameChartData LoadChart(Chart chart)
     {
         List<Note> notes = chart.notes;
         if (notes == null)
@@ -204,6 +204,11 @@ public static class ChartLoader
         // Sort notes by animation order
         gameNotes.Sort(new GameNoteComparer());
 
-        return gameNotes;
+        return new GameChartData
+        {
+            notes = gameNotes,
+            speed = timing.SpeedInfo,
+            bpm = timing.BPMInfo
+        };
     }
 }

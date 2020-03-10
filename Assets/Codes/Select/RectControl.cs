@@ -135,20 +135,20 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         longClick = false;
         time = 0;
 
-        Debug.Log("Down");
+        //Debug.Log("Down");
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
         down = false;
         deleteAni.Play("DeleteIdle");
-        Debug.Log("Up");
+        //Debug.Log("Up");
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
         if (entering) return;
-        Debug.Log("Click");
+        //Debug.Log("Click");
         if (!longClick) OnPressed();
         else if (time >= longClickTime + deleteTime) OnDelete();
     }

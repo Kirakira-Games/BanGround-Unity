@@ -1,16 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-class BeatInfo
+class BeatInfoComparer : IComparer<GameBeatInfo>
 {
-    public float beat;
-    public float time;
-    public float value;
-}
-
-class BeatInfoComparer : IComparer<BeatInfo>
-{
-    public int Compare(BeatInfo lhs, BeatInfo rhs)
+    public int Compare(GameBeatInfo lhs, GameBeatInfo rhs)
     {
         if (lhs.beat == rhs.beat) return 0;
         return lhs.beat > rhs.beat ? 1 : -1;
@@ -19,18 +12,18 @@ class BeatInfoComparer : IComparer<BeatInfo>
 
 public class ChartTiming
 {
-    private List<BeatInfo> BPMInfo;
-    private List<BeatInfo> SpeedInfo;
+    public List<GameBeatInfo> BPMInfo { get; }
+    public List<GameBeatInfo> SpeedInfo { get; }
     private float totTime;
 
     public ChartTiming()
     {
-        BPMInfo = new List<BeatInfo>();
-        SpeedInfo = new List<BeatInfo>();
+        BPMInfo = new List<GameBeatInfo>();
+        SpeedInfo = new List<GameBeatInfo>();
         totTime = LiveSetting.NoteScreenTime / 1000f;
     }
 
-    private int GetPrevIndex(List<BeatInfo> list, float beat)
+    private int GetPrevIndex(List<GameBeatInfo> list, float beat)
     {
         int l = 0, r = list.Count - 1;
         while (r > l)
@@ -139,7 +132,7 @@ public class ChartTiming
 
     public void AnalyzeNotes(List<Note> notes, int offset)
     {
-        SpeedInfo.Add(new BeatInfo
+        SpeedInfo.Add(new GameBeatInfo
         {
             beat = -100,
             time = -50f,
@@ -149,7 +142,7 @@ public class ChartTiming
         {
             if (note.type != NoteType.BPM)
                 continue;
-            BPMInfo.Add(new BeatInfo
+            BPMInfo.Add(new GameBeatInfo
             {
                 beat = ChartLoader.GetFloatingPointBeat(note.beat),
                 value = note.value
@@ -157,7 +150,7 @@ public class ChartTiming
             foreach (NoteAnim anim in note.anims)
             {
                 Debug.Assert(!float.IsNaN(anim.speed));
-                SpeedInfo.Add(new BeatInfo
+                SpeedInfo.Add(new GameBeatInfo
                 {
                     beat = ChartLoader.GetFloatingPointBeat(anim.beat),
                     value = anim.speed
@@ -173,14 +166,14 @@ public class ChartTiming
         float currentBpm = 120;
         float startDash = 0;
         float startTime = offset / 1000f;
-        foreach (BeatInfo info in BPMInfo)
+        foreach (GameBeatInfo info in BPMInfo)
         {
             startTime += (info.beat - startDash) * 60 / currentBpm;
             startDash = info.beat;
             currentBpm = info.value;
             info.time = startTime;
         }
-        foreach (BeatInfo info in SpeedInfo)
+        foreach (GameBeatInfo info in SpeedInfo)
         {
             info.time = GetTimeByBeat(info.beat);
         }
