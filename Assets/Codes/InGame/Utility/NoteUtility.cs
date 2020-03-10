@@ -149,7 +149,11 @@ public static class NoteUtility
 
     public static T LoadResource<T>(string name) where T: Object
     {
-        return Resources.Load<T>(LiveSetting.assetDirectory + "/" + name);
+        return Resources.Load<T>(LiveSetting.assetDirectory + "/" + System.Enum.GetName(typeof(NoteStyle), LiveSetting.noteStyle) +"/"+ name);
+    }
+    public static Object LoadResource(string name) 
+    {
+        return Resources.Load(LiveSetting.assetDirectory + "/" + System.Enum.GetName(typeof(NoteStyle), LiveSetting.noteStyle) + "/" + name);
     }
 
     public static bool IsTouchContinuing(Touch touch)

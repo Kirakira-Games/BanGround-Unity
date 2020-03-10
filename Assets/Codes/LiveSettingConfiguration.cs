@@ -87,6 +87,7 @@ public static class LiveSetting
 
     //public static bool enableAudioTrack = false;
 
+    public static NoteStyle noteStyle = NoteStyle.Circle;
     public const string assetDirectory = "V2Assets";
     public const string IconPath = "UI/ClearMark/";
 
@@ -153,6 +154,13 @@ public static class LiveSetting
     }
 }
 
+public enum NoteStyle
+{
+    Circle,
+    Cube,
+    Custom
+}
+
 public class LiveSettingTemplate
 {
     public int judgeOffset = 0;
@@ -186,6 +194,7 @@ public class LiveSettingTemplate
     public int currentChart = 0;
     public int currentDifficulty = 0;
 
+    public NoteStyle noteStyle = NoteStyle.Circle;
     public Language language = Language.AutoDetect;
     public Sorter sort = Sorter.SongName;
 
@@ -219,6 +228,7 @@ public class LiveSettingTemplate
         currentChart = LiveSetting.currentChart;
         currentDifficulty = LiveSetting.currentDifficulty;
 
+        noteStyle = LiveSetting.noteStyle;
         language = LiveSetting.language;
         sort = LiveSetting.sort;
     }
@@ -253,6 +263,7 @@ public class LiveSettingTemplate
         LiveSetting.currentChart = currentChart;
         LiveSetting.currentDifficulty = currentDifficulty;
 
+        LiveSetting.noteStyle = noteStyle;
         LiveSetting.language = language;
         LiveSetting.sort = sort;
     }
