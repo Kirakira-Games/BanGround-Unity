@@ -75,6 +75,11 @@ public class DataLoader
         return MusicDir + mid + "/" + mid + ".ogg";
     }
 
+    public static bool MusicExists(int mid)
+    {
+        return File.Exists(GetMusicPath(mid));
+    }
+
     public static string GetChartPath(int sid, Difficulty difficulty)
     {
         return ChartDir + sid + "/" + difficulty.ToString("G").ToLower() + ".bin";
@@ -133,11 +138,6 @@ public class DataLoader
         foreach (var chart in songList.cHeaders)
         {
             chartDic[chart.sid] = chart;
-            // Sanity check
-            if (!musicDic.ContainsKey(chart.mid))
-            {
-                Debug.LogWarning(string.Format("Chart {0} does not have corresponding music {1}.", chart.sid, chart.mid));
-            }
         }
         if (LiveSetting.currentChart >= songList.cHeaders.Count)
         {
@@ -152,11 +152,13 @@ public class DataLoader
     public static void RefreshSongList()
     {
         var newSongList = new SongList();
-        HashSet<string> referencedSongs = new HashSet<string>();
+        Dictionary<string, List<string>> referencedSongs = new Dictionary<string, List<string>>();
 
         // Scan charts
         DirectoryInfo chartDirectory = new DirectoryInfo(ChartDir);
         DirectoryInfo[] charts = chartDirectory.GetDirectories();
+
+        // First pass
         foreach (var chart in charts)
         {
             string headerPath = chart.FullName + "/cheader.bin";
@@ -166,8 +168,14 @@ public class DataLoader
                 continue;
             }
             cHeader chartHeader = ProtobufHelper.Load<cHeader>(headerPath);
+            // Update reference
+            string mid = chartHeader.mid.ToString();
+            if (!referencedSongs.ContainsKey(mid))
+            {
+                referencedSongs[mid] = new List<string>();
+            }
+            referencedSongs[mid].Add(chart.Name);
             // Update difficulty
-            referencedSongs.Add(chartHeader.mid.ToString());
             chartHeader.difficultyLevel = new List<int>();
             for (int diff = 0; diff <= (int)Difficulty.Special; diff++)
             {
@@ -189,12 +197,13 @@ public class DataLoader
         DirectoryInfo[] songs = musicDirectory.GetDirectories();
         foreach (var song in songs)
         {
-            if (!referencedSongs.Contains(song.Name))
+            if (!referencedSongs.ContainsKey(song.Name))
             {
-                Debug.Log(string.Format("Song {0} is not referenced anymore. GC!", song.Name));
+                Debug.LogWarning(string.Format("Song {0} is not referenced anymore. GC!", song.Name));
                 Directory.Delete(song.FullName, true);
                 continue;
             }
+            referencedSongs.Remove(song.Name);
             string headerPath = song.FullName + "/mheader.bin";
             if (!File.Exists(headerPath))
             {
@@ -203,6 +212,17 @@ public class DataLoader
             }
             mHeader musicHeader = ProtobufHelper.Load<mHeader>(headerPath);
             newSongList.mHeaders.Add(musicHeader);
+        }
+
+        // Second Pass
+        foreach (var song in referencedSongs)
+        {
+            foreach (var sid in song.Value)
+            {
+                Debug.LogWarning(string.Format("Chart {0} does not have corresponding song {1}. GC!", sid, song.Key));
+                Directory.Delete(ChartDir + sid + "/", true);
+                newSongList.cHeaders.Remove(newSongList.cHeaders.Find(header => header.sid.ToString() == sid));
+            }
         }
 
         Debug.Log(JsonConvert.SerializeObject(newSongList));

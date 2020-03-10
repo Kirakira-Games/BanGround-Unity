@@ -117,6 +117,11 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     bool entering = false;
     private void OnEnterPressed()
     {
+        if (!DataLoader.MusicExists(LiveSetting.CurrentHeader.mid))
+        {
+            MessageBoxController.ShowMsg(LogLevel.INFO, "Music missing. Please import it.");
+            return;
+        }
         entering = true;
         //bt.onClick.RemoveAllListeners();
         //bt.interactable = false;
