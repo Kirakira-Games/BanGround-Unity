@@ -149,7 +149,8 @@ public abstract class NoteBase : MonoBehaviour
     public virtual void RealJudge(int audioTime, JudgeResult result, Touch? touch)
     {
         if (judgeResult != JudgeResult.None) return;
-        judgeTime = audioTime;
+        if (judgeTime == int.MinValue)
+            judgeTime = audioTime;
         judgeResult = result;
         NoteController.instance.Judge(this, result, touch);
         NotePool.instance.DestroyNote(gameObject);
