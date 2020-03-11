@@ -13,6 +13,8 @@ public class SlideMesh : MonoBehaviour
     public Transform afterNoteTrans;
     public const float BODY_WIDTH = 0.9f;
 
+    public static Material cacheMat = null;
+
     public static void Create(SlideMesh mesh, Transform after)
     {
         mesh.transform.localPosition = new Vector3(0f, -0.01f);
@@ -76,9 +78,13 @@ public class SlideMesh : MonoBehaviour
         mesh.RecalculateBounds();
 
         meshFilter.mesh = mesh;
-        Material material = Resources.Load<Material>("TestAssets/Materials/note_body");
-        material.mainTexture = NoteUtility.LoadResource<Texture2D>("long_note_mask");
-        material.SetColor("_BaseColor", new Color(0.5843137f, 0.9019607f, 0.3019607f, LiveSetting.longBrightness));
-        meshRenderer.material = material;
+        if (cacheMat == null)
+        {
+            Material material = Resources.Load<Material>("TestAssets/Materials/note_body");
+            cacheMat = Instantiate(material);
+            cacheMat.mainTexture = NoteUtility.LoadResource<Texture2D>("long_note_mask");
+            cacheMat.SetColor("_BaseColor", new Color(0.5843137f, 0.9019607f, 0.3019607f, LiveSetting.longBrightness));
+        }
+        meshRenderer.material = cacheMat;
     }
 }

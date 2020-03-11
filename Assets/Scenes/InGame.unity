@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 3
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: 9fa8dd06786f96543a99a20b8a92ef22, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 0
+  m_UseShadowmask: 1
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -428,7 +428,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &104417507
 Transform:
   m_ObjectHideFlags: 0
@@ -6375,7 +6375,7 @@ Camera:
   m_GameObject: {fileID: 506441006}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 4
+  m_ClearFlags: 1
   m_BackGroundColor: {r: 0.30891773, g: 0.56457585, b: 0.735849, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
@@ -6985,6 +6985,7 @@ GameObject:
   - component: {fileID: 756906881}
   - component: {fileID: 756906880}
   - component: {fileID: 756906882}
+  - component: {fileID: 756906883}
   m_Layer: 0
   m_Name: NoteController
   m_TagString: Untagged
@@ -7030,6 +7031,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e393e19161dd6244fac842ebd81fb581, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &756906883
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 756906879}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0bd2b038e5ecd074288c6bd8b5c65012, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bgSkybox: {fileID: 2100000, guid: 9fa8dd06786f96543a99a20b8a92ef22, type: 2}
 --- !u!1 &760167003
 GameObject:
   m_ObjectHideFlags: 0

@@ -350,8 +350,10 @@ public class NoteController : MonoBehaviour
         AudioManager.Instance.DelayPlayInGameBGM(File.ReadAllBytes(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), WARM_UP_SECOND);
 
         // Background
-        background = GameObject.Find("dokidokiBackground").GetComponent<FixBackground>();
-        background.UpdateBackground(DataLoader.GetBackgroundPath(sid));
+        var background = GetComponent<InGameBackground>();
+        background.SetBcakground(DataLoader.GetBackgroundPath(sid));
+        //background = GameObject.Find("dokidokiBackground").GetComponent<FixBackground>();
+        //background.UpdateBackground(DataLoader.GetBackgroundPath(sid));
         // Lane Effects
         laneEffects = GameObject.Find("Effects").GetComponent<LaneEffects>();
         laneEffects.Init(chart.bpm, chart.speed);
