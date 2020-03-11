@@ -20,7 +20,7 @@ public class TitleLoader : MonoBehaviour
 
     private void Awake()
     {
-        DataLoader.Init();
+        StartCoroutine(DataLoader.Init());
     }
 
     private void Start()
