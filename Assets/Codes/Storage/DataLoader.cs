@@ -20,7 +20,7 @@ public class DataLoader
     public static List<cHeader> chartList => songList.cHeaders;
 
     public const int ChartVersion = 1;
-    private const int InitialChartVersion = 3;
+    private const int InitialChartVersion = 4;
     private const int GameVersion = 3;
 
     private static Dictionary<int, cHeader> chartDic;
@@ -29,7 +29,7 @@ public class DataLoader
     private static readonly string TempDir = Application.persistentDataPath + "/temp/";
     private static readonly string InboxDir = Application.persistentDataPath + "/Inbox/";
 
-    public static void Init()
+    public static IEnumerator Init()
     {
         LastImportedSid = -1;
         // Delete save files of old versions
@@ -54,21 +54,23 @@ public class DataLoader
         {
             Directory.CreateDirectory(MusicDir);
         }
-        //// Check first launch after updating initial charts
-        //if (!File.Exists(SongListPath) || PlayerPrefs.GetInt("InitialChartVersion") != InitialChartVersion)
-        //{
-        //    Debug.Log("Load initial charts...");
-        //    yield return CopyFileFromStreamingAssetsToPersistentDataPath("/Initial.kirapack");
-        //    LoadKiraPack(Application.persistentDataPath + "/Initial.kirapack");
-        //    PlayerPrefs.SetInt("InitialChartVersion", InitialChartVersion);
-        //    File.Delete(Application.persistentDataPath + "/Initial.kirapack");
-        //}
+
+        LiveSetting.Load();
+
+        // Check first launch after updating initial charts
+        if (!File.Exists(SongListPath) || PlayerPrefs.GetInt("InitialChartVersion") != InitialChartVersion)
+        {
+            Debug.Log("Load initial charts...");
+            yield return CopyFileFromStreamingAssetsToPersistentDataPath("/Initial.kirapack");
+            LoadKiraPack(new FileInfo(Application.persistentDataPath + "/Initial.kirapack"));
+            PlayerPrefs.SetInt("InitialChartVersion", InitialChartVersion);
+            File.Delete(Application.persistentDataPath + "/Initial.kirapack");
+        }
 
 #if UNITY_ANDROID && !UNITY_EDITOR
         AndroidCallback.Init();
 #endif
 
-        LiveSetting.Load();
     }
 
     public static string GetMusicPath(int mid)
