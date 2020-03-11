@@ -29,11 +29,11 @@ public class UIManager : MonoBehaviour
 
     void Start()
     {
-        bg_SR = GameObject.Find("dokidokiBackground").GetComponent<SpriteRenderer>();
+        //bg_SR = GameObject.Find("dokidokiBackground").GetComponent<SpriteRenderer>();
         lan_MR = GameObject.Find("LaneBackground").GetComponent<MeshRenderer>();
         
-        var bgColor = LiveSetting.bgBrightness;
-        bg_SR.color = new Color(bgColor, bgColor, bgColor);
+        //var bgColor = LiveSetting.bgBrightness;
+        //bg_SR.color = new Color(bgColor, bgColor, bgColor);
         lan_MR.material.SetColor("_BaseColor", new Color(1f, 1f, 1f, LiveSetting.laneBrightness));
 
         pause_Btn = GameObject.Find("Pause_Btn").GetComponent<Button>();
