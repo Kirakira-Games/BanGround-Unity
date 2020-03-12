@@ -326,7 +326,7 @@ namespace AudioProvider
             exinfo.length = (uint)audio.Length;
 
             FMODUtil.ErrCheck(
-                fmodSystem.createSound(audio, MODE.OPENMEMORY | MODE.CREATESAMPLE, ref exinfo, out Sound sound)
+                fmodSystem.createSound(audio, MODE.OPENMEMORY | MODE.CREATESAMPLE | MODE.LOOP_OFF, ref exinfo, out Sound sound)
             );
 
             var result = new FmodSoundEffect(sound, fmodSystem, this);
