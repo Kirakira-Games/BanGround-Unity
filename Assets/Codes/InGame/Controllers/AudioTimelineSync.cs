@@ -59,8 +59,7 @@ public class AudioTimelineSync : MonoBehaviour
 
     public void Seek(float targetTime)
     {
-        targetTime = BGMTimeToRealtime(targetTime);
-        startTime = Time.realtimeSinceStartup - targetTime;
+        startTime = Time.realtimeSinceStartup - BGMTimeToRealtime(targetTime);
         if (!float.IsNaN(pauseTime))
         {
             pauseTime = targetTime;
