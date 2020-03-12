@@ -102,6 +102,7 @@ namespace AudioProvider
             );
         }
 
+        [Obsolete]
         public void Resume()
         {
             FMODUtil.ErrCheck(
@@ -111,9 +112,6 @@ namespace AudioProvider
 
         public void Play()
         {
-            if (isLooping)
-                _internalChannel.setPosition(loopingStart, TIMEUNIT.MS);
-
             FMODUtil.ErrCheck(
                 _internalChannel.setPaused(false)
             );
@@ -121,9 +119,18 @@ namespace AudioProvider
 
         public void Restart()
         {
-            FMODUtil.ErrCheck(
-                _internalChannel.setPosition(0, TIMEUNIT.MS)
-            );
+            if (isLooping)
+            {
+                FMODUtil.ErrCheck(
+                    _internalChannel.setPosition(loopingStart, TIMEUNIT.MS)
+                    );
+            }
+            else
+            {
+                FMODUtil.ErrCheck(
+                    _internalChannel.setPosition(0, TIMEUNIT.MS)
+                );
+            }
 
             FMODUtil.ErrCheck(
                 _internalChannel.setPaused(false)
