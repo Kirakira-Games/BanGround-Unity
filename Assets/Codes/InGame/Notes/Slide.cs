@@ -242,7 +242,6 @@ public class Slide : MonoBehaviour
         {
             BindTouch(touch);
         }
-        NoteController.instance.Judge(note, result, touch);
         if (judgeHead == 0)
         {
             noteHead.GetComponentInChildren<TapEffect>(true).gameObject.SetActive(true);
