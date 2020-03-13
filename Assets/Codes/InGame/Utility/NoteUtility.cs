@@ -85,7 +85,7 @@ public static class NoteUtility
     public const float NOTE_JUDGE_POS = 8;
     public const float NOTE_Y_POS = 0f;
     public const float LANE_WIDTH = 2f;
-    public const float NOTE_SCALE = 1.2f;
+    public const float NOTE_SCALE = 1f;
 
     private static readonly float BANG_PERSPECTIVE_START = YTo3DXHelper(0);
     private static readonly float BANG_PERSPECTIVE_END = YTo3DXHelper(1);
