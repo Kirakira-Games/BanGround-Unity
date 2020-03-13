@@ -155,6 +155,9 @@ namespace AudioProvider
                     _internalChannel.setLoopPoints(start, TIMEUNIT.MS, end, TIMEUNIT.MS)
                 );
             }
+            FMODUtil.ErrCheck(
+                    _internalChannel.setPosition(loopingStart, TIMEUNIT.MS)
+                    );
         }
 
         public void SetPlaybackTime(uint time)
