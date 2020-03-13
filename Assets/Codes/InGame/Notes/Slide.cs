@@ -17,11 +17,7 @@ public class Slide : MonoBehaviour
 
     public void OnNoteDestroy()
     {
-        if (touchId != -1)
-        {
-            NoteController.instance.UnregisterTouch(touchId, gameObject);
-            touchId = -1;
-        }
+        UnbindTouch();
         foreach (var note in notes)
         {
             NotePool.instance.DestroyNote(note.gameObject);
@@ -209,13 +205,13 @@ public class Slide : MonoBehaviour
     {
         if (LiveSetting.autoPlayEnabled || !touch.HasValue) return;
         touchId = touch.Value.fingerId;
-        NoteController.instance.RegisterTouch(touchId, gameObject);
+        TouchManager.instance.RegisterTouch(touchId, gameObject);
     }
 
     private void UnbindTouch()
     {
         if (touchId == -1) return;
-        NoteController.instance.UnregisterTouch(touchId, gameObject);
+        TouchManager.instance.UnregisterTouch(touchId, gameObject);
         touchId = -1;
     }
 

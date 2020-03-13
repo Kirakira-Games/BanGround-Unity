@@ -6,7 +6,6 @@ using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.Events;
 using AudioProvider;
-
 using JudgeQueue = PriorityQueue<int, NoteBase>;
 
 public class NoteController : MonoBehaviour
@@ -16,8 +15,6 @@ public class NoteController : MonoBehaviour
 
     private JudgeQueue noteQueue;
     private JudgeQueue[] laneQueue;
-
-    private Dictionary<int, GameObject> touchTable;
     private Dictionary<int, NoteSyncLine> syncTable;
 
     private GameChartData chart;
@@ -33,23 +30,6 @@ public class NoteController : MonoBehaviour
     private UnityAction<JudgeResult> onJudge;
 
     private const int WARM_UP_SECOND = 4;
-
-    public void RegisterTouch(int id, GameObject obj)
-    {
-        touchTable[id] = obj;
-    }
-
-    public void UnregisterTouch(int id, GameObject obj)
-    {
-        if (ReferenceEquals(touchTable[id], obj))
-        {
-            touchTable.Remove(id);
-        }
-        else
-        {
-            Debug.LogWarning("Invalid removal from touchTable: " + id);
-        }
-    }
 
     // For debugging purpose only, simulate touch event from mouse event
     static private Touch[] SimulateMouseTouch(TouchPhase phase)
@@ -138,11 +118,12 @@ public class NoteController : MonoBehaviour
 
     private float GetTouchDistance(Touch touch, Vector3 pos)
     {
-        Vector3 delta = new Vector3(-1, -1);
-        Debug.DrawLine(pos - delta, pos + delta);
-        delta.x = 1;
-        Debug.DrawLine(pos - delta, pos + delta);
-        return 0;
+        var ray = mainCamera.ScreenPointToRay(touch.position);
+        if (NoteUtility.JudgePlane.Raycast(ray, out float dist))
+        {
+            return Vector3.Distance(ray.GetPoint(dist), pos);
+        }
+        return float.PositiveInfinity;
     }
 
     private NoteBase OnTouch(int audioTime, JudgeQueue Q, Touch touch)
@@ -269,11 +250,9 @@ public class NoteController : MonoBehaviour
         }
         foreach (Touch touch in touches)
         {
-            if (touchTable.ContainsKey(touch.fingerId))
+            if (TouchManager.instance.IsTracing(touch.fingerId))
             {
-                GameObject obj = touchTable[touch.fingerId];
-                obj.GetComponent<NoteBase>()?.TraceTouch(audioTime, touch);
-                obj.GetComponent<Slide>()?.TraceTouch(audioTime, touch);
+                TouchManager.instance.TraceTouch(audioTime, touch);
                 continue;
             }
             // Find lanes
@@ -282,7 +261,7 @@ public class NoteController : MonoBehaviour
 
             // Find note to judge - non-fuwafuwa
             NoteBase noteToJudge = null;
-            NoteBase ret = null;
+            NoteBase ret;
             foreach (int lane in lanes) {
                 ret = OnTouch(audioTime, laneQueue[lane], touch);
                 if (ret != null && (noteToJudge == null || noteToJudge.time > ret.time))
@@ -341,7 +320,6 @@ public class NoteController : MonoBehaviour
         NoteUtility.Init(mainCamera.transform.forward);
 
         // Create tables for fast lookup
-        touchTable = new Dictionary<int, GameObject>();
         syncTable = new Dictionary<int, NoteSyncLine>();
         Application.targetFrameRate = 120;
 
