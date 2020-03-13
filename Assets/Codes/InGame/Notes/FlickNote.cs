@@ -45,7 +45,7 @@ public class FlickNote : NoteBase
     public override void Judge(int audioTime, JudgeResult result, Touch? touch)
     {
         touchId = touch.Value.fingerId;
-        NoteController.instance.RegisterTouch(touchId, gameObject);
+        TouchManager.instance.RegisterTouch(touchId, gameObject);
         touchPosition = touch.Value.position;
         judgeTime = audioTime;
     }
