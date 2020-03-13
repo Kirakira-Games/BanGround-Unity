@@ -78,7 +78,7 @@ public class Slide : MonoBehaviour
             Ray ray = new Ray(prev.transform.position, dir);
             if (NoteUtility.JudgePlane.Raycast(ray, out float dist))
             {
-                if (dist > dir.magnitude + NoteUtility.EPS)
+                if (dist < dir.magnitude - NoteUtility.EPS)
                 {
                     return ray.GetPoint(dist);
                 }
