@@ -89,9 +89,15 @@ public class ChartTiming
                     }
                 }
             }
-            Debug.Log("Add anim: " + anim);
             if (anim.S.t < anim.T.t)
                 output.Add(anim);
+        }
+        // Compute vectors in world space
+        foreach (var anim in output)
+        {
+            anim.S.p = NoteUtility.ProjectVectorToParallelPlane(anim.S.p, true);
+            anim.T.p = NoteUtility.ProjectVectorToParallelPlane(anim.T.p, true);
+            Debug.Log("Add anim: " + anim);
         }
     }
 
@@ -113,6 +119,7 @@ public class ChartTiming
 
             float ratioS = (timeS - timeStart) / (timeEnd - timeStart);
             float ratioT = (timeT - timeStart) / (timeEnd - timeStart);
+
             var newAnim = new GameNoteAnim
             {
                 S = new GameNoteAnimState
@@ -325,7 +332,8 @@ public class ChartTiming
         // Check mirror
         if (LiveSetting.mirrowEnabled)
         {
-            gameNote.lane = 6 - gameNote.lane;
+            if (gameNote.lane != -1)
+                gameNote.lane = 6 - gameNote.lane;
             gameNote.pos.x *= -1;
             foreach (var i in gameNote.anims)
             {

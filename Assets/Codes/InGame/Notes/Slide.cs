@@ -40,7 +40,7 @@ public class Slide : MonoBehaviour
     public void FinalizeSlide()
     {
         noteHead.IsTilt = Vector3.Distance(notes[1].judgePos, noteHead.judgePos) >= NoteUtility.EPS;
-        noteHead.GetComponentInChildren<TapEffect>(true).gameObject.SetActive(false);
+        noteHead.tapEffect.gameObject.SetActive(false);
         SlideNoteBase lastNote = notes[notes.Count - 1];
         lastNote.IsTilt = Vector3.Distance(notes[notes.Count - 2].judgePos, lastNote.judgePos) >= NoteUtility.EPS;
         foreach (var note in notes)
@@ -68,23 +68,23 @@ public class Slide : MonoBehaviour
         }
     }
 
-    private float FindSlideIntersection()
+    private Vector3? FindSlideIntersection()
     {
         for (int i = displayHead + 1; i < notes.Count; i++)
         {
             var next = notes[i];
             var prev = notes[i - 1];
-            if ((next.transform.position.z > NoteUtility.NOTE_JUDGE_Z_POS &&
-                prev.transform.position.z < NoteUtility.NOTE_JUDGE_Z_POS) ||
-                (next.transform.position.z < NoteUtility.NOTE_JUDGE_Z_POS &&
-                prev.transform.position.z > NoteUtility.NOTE_JUDGE_Z_POS))
+            var dir = next.transform.position - prev.transform.position;
+            Ray ray = new Ray(prev.transform.position, dir);
+            if (NoteUtility.JudgePlane.Raycast(ray, out float dist))
             {
-                return NoteUtility.Interpolate(prev.transform.position.z,
-                    next.transform.position.z, NoteUtility.NOTE_JUDGE_Z_POS,
-                    prev.transform.position.x, next.transform.position.x);
+                if (dist > dir.magnitude + NoteUtility.EPS)
+                {
+                    return ray.GetPoint(dist);
+                }
             }
         }
-        return float.NaN;
+        return null;
     }
 
     private void UpdateNoteHead(int audioTime)
@@ -103,24 +103,23 @@ public class Slide : MonoBehaviour
             var prev = notes[displayHead - 1];
             mesh.afterNoteTrans = next.transform;
 
-            float intersect = FindSlideIntersection();
-            if (float.IsNaN(intersect))
+            var intersect = FindSlideIntersection();
+            if (!intersect.HasValue)
             {
                 float percentage = (float)(audioTime - prev.time) / (next.time - prev.time);
                 percentage = Mathf.Max(0, percentage);
-                noteHead.transform.position = (next.judgePos - prev.judgePos) * percentage + prev.judgePos;
+                noteHead.transform.position = Vector3.LerpUnclamped(prev.judgePos, next.judgePos, percentage);
                 enableBody = displayHead == 1 || !prev.gameObject.activeSelf;
             }
             else
             {
-                Vector3 pos = noteHead.judgePos;
-                pos.x = intersect;
-                noteHead.transform.position = pos;
+                noteHead.transform.position = intersect.Value;
                 enableBody = false;
             }
             mesh.meshRenderer.enabled = enableBody;
         }
         noteHead.gameObject.SetActive(touchId != -1 || LiveSetting.autoPlayEnabled);
+        noteHead.tapEffect.OnUpdate();
     }
 
     public void TraceTouch(int audioTime, Touch touch)
@@ -189,7 +188,6 @@ public class Slide : MonoBehaviour
         foreach (var note in _notes)
         {
             note.slideMesh?.OnUpdate();
-            note.GetComponentInChildren<TapEffect>()?.OnUpdate();
         }
     }
 
@@ -245,7 +243,7 @@ public class Slide : MonoBehaviour
         NoteController.instance.Judge(note, result, touch);
         if (judgeHead == 0)
         {
-            noteHead.GetComponentInChildren<TapEffect>(true).gameObject.SetActive(true);
+            noteHead.tapEffect.gameObject.SetActive(true);
         }
         else
         {

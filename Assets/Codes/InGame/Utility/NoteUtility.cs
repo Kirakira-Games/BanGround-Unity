@@ -129,6 +129,7 @@ public static class NoteUtility
     public const float LANE_WIDTH = 2f;
     public const float NOTE_SCALE = 1.2f;
     public const float FUWAFUWA_RADIUS = 3f;
+    public static Plane JudgePlane;
 
     private static readonly float BANG_PERSPECTIVE_START = YTo3DXHelper(0);
     private static readonly float BANG_PERSPECTIVE_END = YTo3DXHelper(1);
@@ -154,8 +155,9 @@ public static class NoteUtility
 
     public const float EPS = 1e-4f;
 
-    public static void InitJudgeRange()
+    public static void Init(Vector3 planeNormal)
     {
+        JudgePlane = new Plane(planeNormal.normalized, new Vector3(0, 0, NOTE_JUDGE_Z_POS));
         for (int i = 0; i < TAP_JUDGE_RANGE.Length; i++)
         {
             TAP_JUDGE_RANGE[i] = (int)(TAP_JUDGE_RANGE_RAW[i] * LiveSetting.SpeedCompensationSum);
@@ -172,6 +174,18 @@ public static class NoteUtility
     public static Vector3 GetJudgePos(float lane)
     {
         return new Vector3((lane - 3) * LANE_WIDTH, NOTE_Y_POS, NOTE_JUDGE_Z_POS);
+    }
+
+    public static Vector3 ProjectVectorToParallelPlane(Vector3 position, bool isZNormalized = false)
+    {
+        JudgePlane.Raycast(new Ray(
+            new Vector3(position.x, position.y, 0),
+            new Vector3(0, 0, 1)), out float dist);
+        dist -= NOTE_JUDGE_Z_POS;
+        if (isZNormalized)
+            dist /= (NOTE_START_Z_POS - NOTE_JUDGE_Z_POS);
+        position.z += dist;
+        return position;
     }
 
     public static bool IsFlick(GameNoteType type)
