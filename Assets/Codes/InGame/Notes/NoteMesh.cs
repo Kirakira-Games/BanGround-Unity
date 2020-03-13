@@ -21,8 +21,6 @@ public class NoteMesh
     };
 
     static readonly int[] indices = { 0, 2, 1, 2, 3, 1 };
-    
-    const float deltaPerLane = 0.00f;
 
     static private int sortingLayerID;
     static private Material mat;
@@ -36,7 +34,7 @@ public class NoteMesh
         meshRenderer.material = mat;
         Mesh mesh = new Mesh
         {
-            vertices = GetVertices(3),
+            vertices = GetVertices(),
             uv = uv,
             normals = normals,
             triangles = indices
@@ -47,15 +45,14 @@ public class NoteMesh
         meshRenderer.sortingLayerID = sortingLayerID;
     }
 
-    private static Vector3[] GetVertices(int lane)
+    private static Vector3[] GetVertices()
     {
-        float delta = (lane - 3) * deltaPerLane;
         return new Vector3[]
         {
-            new Vector3(-1 + delta, 0,-0.8f),
-            new Vector3(1 + delta, 0,-0.8f),
-            new Vector3(-1 - delta, 0,0.8f),
-            new Vector3(1 - delta, 0,0.8f)
+            new Vector3(-1, 0, -0.8f),
+            new Vector3(1, 0, -0.8f),
+            new Vector3(-1, 0, 0.8f),
+            new Vector3(1, 0, 0.8f)
         };
     }
 
@@ -65,8 +62,8 @@ public class NoteMesh
         mat = Resources.Load<Material>("TestAssets/Materials/note");
     }
 
-    public static void Reset(GameObject note, int lane)
+    public static void Reset(GameObject note)
     {
-        note.GetComponent<MeshFilter>().mesh.SetVertices(GetVertices(lane));
+        note.GetComponent<MeshFilter>().mesh.SetVertices(GetVertices());
     }
 }

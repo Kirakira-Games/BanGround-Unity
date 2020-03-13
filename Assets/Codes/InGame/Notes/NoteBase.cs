@@ -3,11 +3,12 @@ using System.Collections.Generic;
 
 public abstract class NoteBase : MonoBehaviour
 {
-    public int lane;
     public int time;
+    public int lane;
     public int judgeTime;
     public int touchId;
     public bool isGray;
+    public bool isFuwafuwa => lane == -1;
     public bool isDestroyed;
     public bool inJudgeQueue;
     public GameNoteAnim[] anims;
@@ -25,7 +26,7 @@ public abstract class NoteBase : MonoBehaviour
         NoteMesh.CreateMesh(gameObject);
     }
 
-    public virtual void ResetNote()
+    public virtual void ResetNote(GameNoteData data)
     {
         touchId = -1;
         animsHead = 0;
@@ -34,32 +35,40 @@ public abstract class NoteBase : MonoBehaviour
         transform.position = initPos;
         inJudgeQueue = true;
         isDestroyed = false;
+        
+        time = data.time;
+        lane = data.lane;
+        type = data.type;
+        isGray = LiveSetting.grayNoteEnabled ? data.isGray : false;
+        anims = data.anims.ToArray();
 
-        initPos = NoteUtility.GetInitPos(anims.Length > 0 ? anims[0].startLane : lane);
-        judgePos = NoteUtility.GetJudgePos(lane);
+        initPos = anims[0].S.p;
+        judgePos = data.pos;
 
-        NoteMesh.Reset(gameObject, lane);
+        NoteMesh.Reset(gameObject);
     }
 
     public virtual void UpdatePosition(int audioTime)
     {
-        while (animsHead < anims.Length - 1 && audioTime > anims[animsHead].endT)
+        while (animsHead < anims.Length - 1 && audioTime > anims[animsHead].T.t)
             animsHead++;
-        while (animsHead > 0 && audioTime < anims[animsHead].startT)
+        while (animsHead > 0 && audioTime < anims[animsHead].S.t)
             animsHead--;
 
         // Compute ratio of current animation
         var anim = anims[animsHead];
-        int timeSub = audioTime - anim.startT;
-        float ratio = (float)timeSub / (anim.endT - anim.startT);
-        float pos = ratio * (anim.endZ - anim.startZ) + anim.startZ;
+        int timeSub = audioTime - anim.S.t;
+        float ratio = (float)timeSub / (anim.T.t - anim.S.t);
+        float pos = Mathf.Lerp(anim.S.p.z, anim.T.p.z, ratio);
+        //Debug.Log(anim + ", head = " + animsHead + ", ratio = " + ratio);
 
         // Update position
-        Vector3 newPos = initPos;
-        newPos.x = NoteUtility.GetXPos(anim.startLane * (1 - ratio) + anim.endLane * ratio);
+        Vector3 newPos = Vector3.Lerp(anim.S.p, anim.T.p, ratio);
         if (LiveSetting.bangPerspective)
+        {
             pos = NoteUtility.GetBangPerspective(pos);
-        newPos.z = initPos.z - (NoteUtility.NOTE_START_POS - NoteUtility.NOTE_JUDGE_POS) * pos;
+        }
+        newPos.z = Mathf.LerpUnclamped(NoteUtility.NOTE_START_Z_POS, NoteUtility.NOTE_JUDGE_Z_POS, pos);
         transform.position = newPos;
     }
 

@@ -41,7 +41,11 @@ public class JudgeResultController : MonoBehaviour
     {
         //if (offsetRenderer == null) return;
         if (LiveSetting.autoPlayEnabled) return;
-        if (note is SlideTick) return;
+        if (note is SlideTick)
+        {
+            offsetRenderer.sprite = null;
+            return;
+        }
 
         int deltaTime = note.time - note.judgeTime;
         if (result >= (LiveSetting.displayELP ? 0 : 1) && result <= 3 && deltaTime != 0)
@@ -64,7 +68,10 @@ public class JudgeResultController : MonoBehaviour
                     break;
             }
         }
-
+        else
+        {
+            offsetRenderer.sprite = null;
+        }
     }
 
 }
