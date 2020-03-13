@@ -5,12 +5,14 @@ using System.IO;
 using System.IO.Compression;
 using Newtonsoft.Json;
 using UnityEngine.Networking;
+using System;
 
 public class DataLoader
 {
     public static readonly string DataDir = Application.persistentDataPath + "/data/";
     public static readonly string ChartDir = DataDir + "chart/";
     public static readonly string MusicDir = DataDir + "music/";
+    public static readonly string SkinDir = DataDir + "skin/";
     public static readonly string SongListPath = DataDir + "songlist.bin";
     public static int LastImportedSid = -1;
 
@@ -19,7 +21,7 @@ public class DataLoader
     public static List<cHeader> chartList => songList.cHeaders;
 
     public const int ChartVersion = 1;
-    private const int InitialChartVersion = 3;
+    private const int InitialChartVersion = 4;
     private const int GameVersion = 3;
 
     private static Dictionary<int, cHeader> chartDic;
@@ -28,7 +30,7 @@ public class DataLoader
     private static readonly string TempDir = Application.persistentDataPath + "/temp/";
     private static readonly string InboxDir = Application.persistentDataPath + "/Inbox/";
 
-    public static void Init()
+    public static IEnumerator Init()
     {
         LastImportedSid = -1;
         // Delete save files of old versions
@@ -53,21 +55,23 @@ public class DataLoader
         {
             Directory.CreateDirectory(MusicDir);
         }
-        //// Check first launch after updating initial charts
-        //if (!File.Exists(SongListPath) || PlayerPrefs.GetInt("InitialChartVersion") != InitialChartVersion)
-        //{
-        //    Debug.Log("Load initial charts...");
-        //    yield return CopyFileFromStreamingAssetsToPersistentDataPath("/Initial.kirapack");
-        //    LoadKiraPack(Application.persistentDataPath + "/Initial.kirapack");
-        //    PlayerPrefs.SetInt("InitialChartVersion", InitialChartVersion);
-        //    File.Delete(Application.persistentDataPath + "/Initial.kirapack");
-        //}
+
+        LiveSetting.Load();
+
+        // Check first launch after updating initial charts
+        if (!File.Exists(SongListPath) || PlayerPrefs.GetInt("InitialChartVersion") != InitialChartVersion)
+        {
+            Debug.Log("Load initial charts...");
+            yield return CopyFileFromStreamingAssetsToPersistentDataPath("/Initial.kirapack");
+            LoadKiraPack(new FileInfo(Application.persistentDataPath + "/Initial.kirapack"));
+            PlayerPrefs.SetInt("InitialChartVersion", InitialChartVersion);
+            File.Delete(Application.persistentDataPath + "/Initial.kirapack");
+        }
 
 #if UNITY_ANDROID && !UNITY_EDITOR
         AndroidCallback.Init();
 #endif
 
-        LiveSetting.Load();
     }
 
     public static string GetMusicPath(int mid)
@@ -311,6 +315,8 @@ public class DataLoader
             int ret = ConvertBinAndCopy(TempDir + "chart/", ChartDir);
             // Load music
             ConvertBinAndCopy(TempDir + "music/", MusicDir);
+            //Load Skin
+            CopyFolder(TempDir + "skin", SkinDir);
             Directory.Delete(TempDir, true);
             return ret;
         }
@@ -325,6 +331,9 @@ public class DataLoader
     public static bool LoadAllKiraPackFromInbox()
     {
         bool LoadSuccess = false;
+        if(DateTime.Now.Month == 4 && DateTime.Now.Day == 1 && !Directory.Exists($"{Application.persistentDataPath}/data/chart/233333"))
+            SelectManager.letTheBassKick = true;
+
         try
         {
             if (!Directory.Exists(InboxDir))
@@ -382,6 +391,26 @@ public class DataLoader
                 writer.Write(webRequest.downloadHandler.data, 0, webRequest.downloadHandler.data.Length);
             }
             Debug.Log($"Copy File {relativePath} {!webRequest.isNetworkError}");
+        }
+    }
+
+    private static void CopyFolder(string src, string des)
+    {
+        if (!Directory.Exists(src)) return;
+        DirectoryInfo dir = new DirectoryInfo(src);
+        DirectoryInfo[] subdirs = dir.GetDirectories();
+        foreach (var cdir in subdirs)
+        {
+            FileInfo[] files = cdir.GetFiles();
+            string id = cdir.Name;
+            if (!Directory.Exists(des + id))
+            {
+                Directory.CreateDirectory(des + id);
+            }
+            foreach (var file in files)
+            {
+                File.Copy(file.FullName, des + id + "/" + file.Name, true);
+            }
         }
     }
 
