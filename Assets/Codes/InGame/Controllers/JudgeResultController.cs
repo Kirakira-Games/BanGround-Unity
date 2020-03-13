@@ -23,7 +23,7 @@ public class JudgeResultController : MonoBehaviour
             judges[i] = NoteUtility.LoadResource<Sprite>("judge_" + i);
         }
 
-        early = NoteUtility.LoadResource<Sprite>("early"); 
+        early = NoteUtility.LoadResource<Sprite>("early");
         late = NoteUtility.LoadResource<Sprite>("late");
 
         animator = GetComponent<Animator>();

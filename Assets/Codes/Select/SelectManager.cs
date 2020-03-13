@@ -11,6 +11,7 @@ using AudioProvider;
 
 public class SelectManager : MonoBehaviour
 {
+    internal static bool letTheBassKick = false;
     public const float scroll_Min_Speed = 50f;
     //private Button enter_Btn;
     private Button setting_Open_Btn;
@@ -103,6 +104,27 @@ public class SelectManager : MonoBehaviour
         PlayVoices();
 
         MessageBoxController.ShowMsg(LogLevel.INFO, "Load SongList Success");
+
+        if(letTheBassKick)
+        {
+            StartCoroutine(KickBass());
+        }
+    }
+
+    IEnumerator KickBass()
+    {
+        yield return new WaitForEndOfFrame();
+
+        for (var i = 0; i < DataLoader.chartList.Count; i++)
+        {
+            var chart = DataLoader.chartList[i];
+
+            if (chart.mid == 233333)
+            {
+                SelectSong(i);
+                OnEnterPressed();
+            }
+        }
     }
 
     private void PlayVoices()
@@ -584,7 +606,6 @@ public class SelectManager : MonoBehaviour
     //============================================
     public void OnEnterPressed()
     {
-
         SetLiveSetting();
         File.WriteAllText(LiveSetting.settingsPath, JsonConvert.SerializeObject(new LiveSettingTemplate()));
         SceneLoader.LoadScene("Select", "InGame", true);

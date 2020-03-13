@@ -63,6 +63,14 @@ public abstract class SlideNoteBase : NoteBase
         if (ret == 0) return;
         if (judgeTime == int.MinValue)
             judgeTime = audioTime;
-        judgeResult = ret == 1 ? result : JudgeResult.Miss;
+        if (ret == -1)
+        {
+            judgeResult = JudgeResult.Miss;
+        }
+        else
+        {
+            judgeResult = result;
+            NoteController.instance.Judge(this, result, touch);
+        }
     }
 }

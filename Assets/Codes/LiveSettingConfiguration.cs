@@ -23,11 +23,6 @@ public static class LiveSetting
         }
         else
         {
-#if UNITY_STANDALONE_WIN
-            System.Diagnostics.ProcessStartInfo info = new System.Diagnostics.ProcessStartInfo(Application.streamingAssetsPath + "\\KiraOpener.exe");
-            info.Verb = "runas";
-            System.Diagnostics.Process.Start(info);
-#endif
             Debug.LogWarning("Live setting file not found");
         }
 

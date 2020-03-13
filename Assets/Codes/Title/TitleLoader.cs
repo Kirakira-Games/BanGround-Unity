@@ -8,6 +8,7 @@ using UnityEngine.Networking;
 using Newtonsoft.Json;
 using UnityEngine;
 using AudioProvider;
+using UnityEngine.UI;
 
 public class TitleLoader : MonoBehaviour
 {
@@ -19,11 +20,16 @@ public class TitleLoader : MonoBehaviour
 
     private void Awake()
     {
-        DataLoader.Init();
+        StartCoroutine(DataLoader.Init());
     }
 
     private void Start()
     {
+        if (DateTime.Now.Month == 4 && DateTime.Now.Day == 1)
+        {
+            voice = Resources.Load<TextAsset>("Sound/voice/LetTheBassKick");
+        }
+
         StartCoroutine(PlayTitle());
 
         //if (Application.platform != RuntimePlatform.Android) return;
@@ -38,6 +44,18 @@ public class TitleLoader : MonoBehaviour
 
         banGround = AudioManager.Instance.PrecacheSE(voice.bytes);
         banGround.PlayOneShot();
+
+        if(DateTime.Now.Month == 4 && DateTime.Now.Day == 1)
+        {
+            GameObject.Find("Title").GetComponent<Text>().text = "Let the bass kick!";
+            var e = GameObject.Find("TouchStart").transform.GetEnumerator();
+            e.MoveNext();
+            (e.Current as Transform).gameObject.GetComponent<Text>().text = "Bass Bass Kick Kick Bass Kick Kick";
+            if (!Directory.Exists($"{Application.persistentDataPath}/Inbox"))
+                Directory.CreateDirectory($"{Application.persistentDataPath}/Inbox");
+            if (!Directory.Exists($"{Application.persistentDataPath}/data/chart/233333"))
+                File.WriteAllBytes($"{Application.persistentDataPath}/Inbox/BBKKBKK_Min_Commit_c8ecd6fa71.kirapack", Resources.Load<TextAsset>("BBKKBKK_Min_Commit_c8ecd6fa71.kirapack").bytes);
+        }
     }
 
     private void OnDestroy()
