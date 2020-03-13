@@ -4,14 +4,28 @@ using UnityEngine;
 
 public class NoteRotation : MonoBehaviour
 {
-    // Start is called before the first frame update
     public bool needRot = true;
-    // Update is called once per frame
+    private float mainCamY;
+    private float mainCamZ;
+
+    private void Start()
+    {
+        mainCamY = Camera.main.transform.position.y;
+        mainCamZ = Camera.main.transform.position.z;
+    }
+
     void Update()
     {
         if (needRot)
-            transform.rotation = Quaternion.Euler(800f / (transform.localPosition.x + 27f) - 54f + Mathf.Pow(2f, 0.024f * transform.localPosition.x), 0f, 0f);
+        {
+            //transform.rotation = Quaternion.Euler(800f / (transform.localPosition.x + 27f) - 54f + Mathf.Pow(2f, 0.024f * transform.localPosition.x), 0f, 0f);
+            Vector3 dir = new Vector3(0, mainCamY, mainCamZ - transform.position.z);//new Vector3(transform.position.x, mainCamY, mainCamZ) - transform.position;
+            float abs = Mathf.Abs(dir.z);
+            if (abs > 8) abs = 8;
+            dir.z = abs;
+            transform.rotation = Quaternion.LookRotation(dir);
+        }
         else
-            transform.forward = new Vector3(0,0,1);
+            transform.forward = new Vector3(0, 0, 1);
     }
 }
