@@ -176,14 +176,12 @@ public static class NoteUtility
         return new Vector3((lane - 3) * LANE_WIDTH, NOTE_Y_POS, NOTE_JUDGE_Z_POS);
     }
 
-    public static Vector3 ProjectVectorToParallelPlane(Vector3 position, bool isZNormalized = false)
+    public static Vector3 ProjectVectorToParallelPlane(Vector3 position)
     {
         JudgePlane.Raycast(new Ray(
             new Vector3(position.x, position.y, 0),
             new Vector3(0, 0, 1)), out float dist);
         dist -= NOTE_JUDGE_Z_POS;
-        if (isZNormalized)
-            dist /= (NOTE_START_Z_POS - NOTE_JUDGE_Z_POS);
         position.z += dist;
         return position;
     }

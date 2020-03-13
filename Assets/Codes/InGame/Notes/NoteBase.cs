@@ -69,6 +69,7 @@ public abstract class NoteBase : MonoBehaviour
             pos = NoteUtility.GetBangPerspective(pos);
         }
         newPos.z = Mathf.LerpUnclamped(NoteUtility.NOTE_START_Z_POS, NoteUtility.NOTE_JUDGE_Z_POS, pos);
+        newPos = NoteUtility.ProjectVectorToParallelPlane(newPos);
         transform.position = newPos;
     }
 

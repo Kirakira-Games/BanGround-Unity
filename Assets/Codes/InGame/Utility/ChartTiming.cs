@@ -92,13 +92,12 @@ public class ChartTiming
             if (anim.S.t < anim.T.t)
                 output.Add(anim);
         }
-        // Compute vectors in world space
+        /*
         foreach (var anim in output)
         {
-            anim.S.p = NoteUtility.ProjectVectorToParallelPlane(anim.S.p, true);
-            anim.T.p = NoteUtility.ProjectVectorToParallelPlane(anim.T.p, true);
             Debug.Log("Add anim: " + anim);
         }
+        */
     }
 
     public void GenerateAnimationRawData(NoteAnim anim, float beatStart, float beatEnd, float nextlane, float nextY, List<GameNoteAnim> output)
