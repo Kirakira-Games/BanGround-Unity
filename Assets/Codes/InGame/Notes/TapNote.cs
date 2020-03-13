@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class TapNote : NoteBase
 {
-    public override void ResetNote()
+    public override void ResetNote(GameNoteData data)
     {
-        base.ResetNote();
+        base.ResetNote(data);
         GetComponent<MeshRenderer>().material.SetTexture("_BaseMap", NoteUtility.LoadResource<Texture2D>(
             isGray ? "note_single_grey" : "note_single_default"));
     }

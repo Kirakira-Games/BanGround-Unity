@@ -11,13 +11,8 @@ public class SlideEnd : SlideNoteBase
         if (!parentSlide) Debug.LogWarning(name);
         if (IsJudging && audioTime >= time)
         {
-            if (transform.position.z < NoteUtility.NOTE_JUDGE_POS)
-            {
-                IsStickEnd = true;
-                Vector3 position = transform.position;
-                position.z = NoteUtility.NOTE_JUDGE_POS;
-                transform.position = position;
-            }
+            IsStickEnd = true;
+            transform.position = judgePos;
         }
     }
 

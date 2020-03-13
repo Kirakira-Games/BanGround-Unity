@@ -21,6 +21,6 @@ public class TapEffect : MonoBehaviour
             if (effect.isPlaying)
                 effect.Pause();
         }
-        transform.position = new Vector3(transform.parent.position.x * 1f, 0, 8);
+        transform.position = new Vector3(transform.parent.position.x, transform.parent.position.y, NoteUtility.NOTE_JUDGE_Z_POS);
     }
 }

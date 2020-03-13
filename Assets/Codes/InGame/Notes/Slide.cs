@@ -39,10 +39,10 @@ public class Slide : MonoBehaviour
 
     public void FinalizeSlide()
     {
-        noteHead.IsTilt = notes[1].lane != noteHead.lane;
+        noteHead.IsTilt = Vector3.Distance(notes[1].judgePos, noteHead.judgePos) >= NoteUtility.EPS;
         noteHead.GetComponentInChildren<TapEffect>(true).gameObject.SetActive(false);
         SlideNoteBase lastNote = notes[notes.Count - 1];
-        lastNote.IsTilt = notes[notes.Count - 2].lane != lastNote.lane;
+        lastNote.IsTilt = Vector3.Distance(notes[notes.Count - 2].judgePos, lastNote.judgePos) >= NoteUtility.EPS;
         foreach (var note in notes)
         {
             note.InitSlideNote();
@@ -74,13 +74,13 @@ public class Slide : MonoBehaviour
         {
             var next = notes[i];
             var prev = notes[i - 1];
-            if ((next.transform.position.z > NoteUtility.NOTE_JUDGE_POS &&
-                prev.transform.position.z < NoteUtility.NOTE_JUDGE_POS) ||
-                (next.transform.position.z < NoteUtility.NOTE_JUDGE_POS &&
-                prev.transform.position.z > NoteUtility.NOTE_JUDGE_POS))
+            if ((next.transform.position.z > NoteUtility.NOTE_JUDGE_Z_POS &&
+                prev.transform.position.z < NoteUtility.NOTE_JUDGE_Z_POS) ||
+                (next.transform.position.z < NoteUtility.NOTE_JUDGE_Z_POS &&
+                prev.transform.position.z > NoteUtility.NOTE_JUDGE_Z_POS))
             {
                 return NoteUtility.Interpolate(prev.transform.position.z,
-                    next.transform.position.z, NoteUtility.NOTE_JUDGE_POS,
+                    next.transform.position.z, NoteUtility.NOTE_JUDGE_Z_POS,
                     prev.transform.position.x, next.transform.position.x);
             }
         }
@@ -93,7 +93,7 @@ public class Slide : MonoBehaviour
         if (displayHead >= notes.Count)
         {
             var lastNote = notes[notes.Count - 1];
-            noteHead.transform.position = NoteUtility.GetJudgePos(lastNote.lane);
+            noteHead.transform.position = lastNote.judgePos;
             mesh.afterNoteTrans = lastNote.transform;
         }
         else

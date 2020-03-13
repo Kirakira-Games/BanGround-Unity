@@ -20,22 +20,63 @@ public class GameBeatInfo
     public float value;
 }
 
+public class GameNoteAnimState
+{
+    public int t;
+    public Vector3 p;
+
+    public override string ToString()
+    {
+        return string.Format("[{0}]: {1}", t, p);
+    }
+}
+
 public class GameNoteAnim
 {
-    public int startT;
-    public int endT;
-    public float startZ;
-    public float endZ;
-    public float startLane;
-    public float endLane;
+    public GameNoteAnimState S;
+    public GameNoteAnimState T;
+
+    public GameNoteAnimState Interpolate(float ratio)
+    {
+        return new GameNoteAnimState
+        {
+            t = Mathf.RoundToInt(Mathf.Lerp(S.t, T.t, ratio)),
+            p = Vector3.Lerp(S.p, T.p, ratio)
+        };
+    }
+
+    public GameNoteAnimState GetState(int t)
+    {
+        float ratio;
+        if (t <= S.t)
+        {
+            ratio = 0;
+        }
+        else if (t >= T.t)
+        {
+            ratio = 1;
+        }
+        else
+        {
+            ratio = (float)(t - S.t) / (T.t - S.t);
+        }
+        return Interpolate(ratio);
+    }
+
+    public override string ToString()
+    {
+        return string.Format("S: {0} => T: {1}", S, T);
+    }
 }
 
 public class GameNoteData
 {
     public int time;
     public int lane;
+    public Vector3 pos;
     public GameNoteType type;
     public bool isGray;
+    public bool isFuwafuwa => lane == -1;
     public List<GameNoteData> seg;
     public List<GameNoteAnim> anims;
     public int appearTime;
@@ -81,11 +122,13 @@ public enum TapEffectType
 public static class NoteUtility
 {
     public const int LANE_COUNT = 7;
-    public const float NOTE_START_POS = 200;
-    public const float NOTE_JUDGE_POS = 8;
+    public const float NOTE_START_Z_POS = 200;
+    public const float NOTE_JUDGE_Z_POS = 8;
     public const float NOTE_Y_POS = 0f;
+    public const float NOTE_Y_MAX = 4f;
     public const float LANE_WIDTH = 2f;
     public const float NOTE_SCALE = 1.2f;
+    public const float FUWAFUWA_RADIUS = 3f;
 
     private static readonly float BANG_PERSPECTIVE_START = YTo3DXHelper(0);
     private static readonly float BANG_PERSPECTIVE_END = YTo3DXHelper(1);
@@ -123,12 +166,12 @@ public static class NoteUtility
 
     public static Vector3 GetInitPos(float lane)
     {
-        return new Vector3((lane - 3) * LANE_WIDTH, NOTE_Y_POS, NOTE_START_POS);
+        return new Vector3((lane - 3) * LANE_WIDTH, NOTE_Y_POS, NOTE_START_Z_POS);
     }
 
     public static Vector3 GetJudgePos(float lane)
     {
-        return new Vector3((lane - 3) * LANE_WIDTH, NOTE_Y_POS, NOTE_JUDGE_POS);
+        return new Vector3((lane - 3) * LANE_WIDTH, NOTE_Y_POS, NOTE_JUDGE_Z_POS);
     }
 
     public static bool IsFlick(GameNoteType type)
@@ -211,15 +254,15 @@ public static class NoteUtility
         return (lane - 3) * LANE_WIDTH;
     }
 
-    public static float Interpolate(float ratio, float outS, float outT)
+    public static float GetYPos(float y)
     {
-        return (outT * ratio) + outS * (1 - ratio);
+        return Mathf.LerpUnclamped(NOTE_Y_POS, NOTE_Y_MAX, y);
     }
 
     public static float Interpolate(float inS, float inT, float inP, float outS, float outT)
     {
         if (inS == inT) return outS;
         float ratio = (inP - inS) / (inT - inS);
-        return Interpolate(ratio, outS, outT);
+        return Mathf.Lerp(outS, outT, ratio);
     }
 }

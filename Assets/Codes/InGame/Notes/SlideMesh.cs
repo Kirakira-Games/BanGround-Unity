@@ -46,8 +46,8 @@ public class SlideMesh : MonoBehaviour
         {
             new Vector3(-width, 0, 0),
             new Vector3(width, 0, 0),
-            new Vector3(delta.x - width, 0, delta.z),
-            new Vector3(delta.x + width, 0, delta.z)
+            new Vector3(delta.x - width, delta.y, delta.z),
+            new Vector3(delta.x + width, delta.y, delta.z)
         };
         meshFilter.mesh.vertices = vertices;
         meshFilter.mesh.RecalculateBounds();
