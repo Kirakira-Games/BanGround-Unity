@@ -12,6 +12,7 @@ public class DataLoader
     public static readonly string DataDir = Application.persistentDataPath + "/data/";
     public static readonly string ChartDir = DataDir + "chart/";
     public static readonly string MusicDir = DataDir + "music/";
+    public static readonly string SkinDir = DataDir + "skin/";
     public static readonly string SongListPath = DataDir + "songlist.bin";
     public static int LastImportedSid = -1;
 
@@ -314,6 +315,8 @@ public class DataLoader
             int ret = ConvertBinAndCopy(TempDir + "chart/", ChartDir);
             // Load music
             ConvertBinAndCopy(TempDir + "music/", MusicDir);
+            //Load Skin
+            CopyFolder(TempDir + "skin", SkinDir);
             Directory.Delete(TempDir, true);
             return ret;
         }
@@ -388,6 +391,26 @@ public class DataLoader
                 writer.Write(webRequest.downloadHandler.data, 0, webRequest.downloadHandler.data.Length);
             }
             Debug.Log($"Copy File {relativePath} {!webRequest.isNetworkError}");
+        }
+    }
+
+    private static void CopyFolder(string src, string des)
+    {
+        if (!Directory.Exists(src)) return;
+        DirectoryInfo dir = new DirectoryInfo(src);
+        DirectoryInfo[] subdirs = dir.GetDirectories();
+        foreach (var cdir in subdirs)
+        {
+            FileInfo[] files = cdir.GetFiles();
+            string id = cdir.Name;
+            if (!Directory.Exists(des + id))
+            {
+                Directory.CreateDirectory(des + id);
+            }
+            foreach (var file in files)
+            {
+                File.Copy(file.FullName, des + id + "/" + file.Name, true);
+            }
         }
     }
 
