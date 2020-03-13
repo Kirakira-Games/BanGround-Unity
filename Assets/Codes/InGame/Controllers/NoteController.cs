@@ -334,6 +334,12 @@ public class NoteController : MonoBehaviour
     {
         instance = this;
 
+        // Main camera
+        mainCamera = GameObject.Find("GameMainCamera").GetComponent<Camera>();
+
+        // Init JudgeRange
+        NoteUtility.Init(mainCamera.transform.forward);
+
         // Create tables for fast lookup
         touchTable = new Dictionary<int, GameObject>();
         syncTable = new Dictionary<int, NoteSyncLine>();
@@ -368,9 +374,7 @@ public class NoteController : MonoBehaviour
         }
         ComboManager.manager.Init(numNotes);
 
-        // Init JudgeRange
-        NoteUtility.InitJudgeRange();
-
+        // Sound effects
         soundEffects = new ISoundEffect[5]
         {
             AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/perfect.wav").bytes),
@@ -391,9 +395,6 @@ public class NoteController : MonoBehaviour
         // Lane Effects
         laneEffects = GameObject.Find("Effects").GetComponent<LaneEffects>();
         laneEffects.Init(chart.bpm, chart.speed);
-
-        // Main camera
-        mainCamera = GameObject.Find("GameMainCamera").GetComponent<Camera>();
 
         //Set Play Mod Event
         //AudioManager.Instance.restart = false;

@@ -94,7 +94,7 @@ public class NotePool : MonoBehaviour
             if (type == GameNoteType.SlideStart)
             {
                 var te = Instantiate(Resources.Load("Effects/effect_TapKeep"), obj.transform) as GameObject;
-                te.AddComponent<TapEffect>();
+                (note as SlideStart).tapEffect = te.AddComponent<TapEffect>();
             }
             obj.SetActive(false);
             Q.Enqueue(obj);

@@ -30,14 +30,6 @@ public class SlideMesh : MonoBehaviour
         new Vector2(1, 1)
     };
 
-    readonly Vector3[] normals =
-    {
-        Vector3.up,
-        Vector3.up,
-        Vector3.up,
-        Vector3.up
-    };
-
     public void OnUpdate()
     {
         Vector3 delta = afterNoteTrans.position - transform.parent.position;
@@ -51,6 +43,7 @@ public class SlideMesh : MonoBehaviour
         };
         meshFilter.mesh.vertices = vertices;
         meshFilter.mesh.RecalculateBounds();
+        meshFilter.mesh.RecalculateNormals();
     }
 
     public void InitMesh()
@@ -71,11 +64,11 @@ public class SlideMesh : MonoBehaviour
         Mesh mesh = new Mesh
         {
             vertices = meshVertices,
-            normals = normals,
             uv = uv,
             triangles = indices
         };
         mesh.RecalculateBounds();
+        mesh.RecalculateNormals();
 
         meshFilter.mesh = mesh;
         if (cacheMat == null)

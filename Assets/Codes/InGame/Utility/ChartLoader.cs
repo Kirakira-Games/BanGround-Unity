@@ -72,11 +72,12 @@ public static class ChartLoader
 
     public static Vector3 GetJudgePosFromRawNote(Note note)
     {
-        return new Vector3(
+        Vector3 vec = new Vector3(
             NoteUtility.GetXPos(note.lane == -1 ? note.x : note.lane),
             NoteUtility.GetYPos(note.y),
             NoteUtility.NOTE_JUDGE_Z_POS
         );
+        return NoteUtility.ProjectVectorToParallelPlane(vec);
     }
 
     public static GameChartData LoadChart(Chart chart)
