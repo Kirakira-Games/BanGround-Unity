@@ -185,6 +185,10 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
                 deleteAni.Play("delete");
                 dh.canDrag = false;
                 rt_s.enabled = false;
+                //upProtect = true;
+            }
+            if (time >= longClickTime + deleteTime)
+            {
                 upProtect = true;
             }
         }
