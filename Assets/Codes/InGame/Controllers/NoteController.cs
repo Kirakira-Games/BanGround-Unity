@@ -23,7 +23,7 @@ public class NoteController : MonoBehaviour
     private ISoundEffect[] soundEffects;
 
     private FixBackground background;
-    private LaneEffects laneEffects;
+    //private LaneEffects laneEffects;
 
     private UnityAction<JudgeResult> onJudge;
 
@@ -355,8 +355,8 @@ public class NoteController : MonoBehaviour
         //background = GameObject.Find("dokidokiBackground").GetComponent<FixBackground>();
         //background.UpdateBackground(DataLoader.GetBackgroundPath(sid));
         // Lane Effects
-        laneEffects = GameObject.Find("Effects").GetComponent<LaneEffects>();
-        laneEffects.Init(chart.bpm, chart.speed);
+        //laneEffects = GameObject.Find("Effects").GetComponent<LaneEffects>();
+        //laneEffects.Init(chart.bpm, chart.speed);
 
         //Set Play Mod Event
         //AudioManager.Instance.restart = false;
@@ -430,7 +430,7 @@ public class NoteController : MonoBehaviour
         }
 
         // Update lane effects
-        laneEffects.UpdateLaneEffects(audioTime);
+        //laneEffects.UpdateLaneEffects(audioTime);
     }
 
     private void OnDestroy()
