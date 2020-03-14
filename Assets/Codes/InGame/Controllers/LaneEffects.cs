@@ -54,13 +54,14 @@ public class LaneEffects : MonoBehaviour
 
     void Start()
     {
-        ps = GetComponentsInChildren<ParticleSystem>();
-        prevSpeed = ps[0].main.simulationSpeed;
-        rotation = new Quaternion[]
-        {
-            Quaternion.Euler(-90, 0, 0),
-            Quaternion.Euler(90, 0, 0)
-        };
+        gameObject.SetActive(false);
+        //ps = GetComponentsInChildren<ParticleSystem>();
+        //prevSpeed = ps[0].main.simulationSpeed;
+        //rotation = new Quaternion[]
+        //{
+        //    Quaternion.Euler(-90, 0, 0),
+        //    Quaternion.Euler(90, 0, 0)
+        //};
     }
 
     public void UpdateLaneEffects(int audioTime)
