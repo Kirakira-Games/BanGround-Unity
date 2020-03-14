@@ -20,6 +20,7 @@ public class TitleLoader : MonoBehaviour
 
     private void Awake()
     {
+        StartCoroutine(CheckUpdate());
         StartCoroutine(DataLoader.Init());
     }
 
@@ -31,8 +32,6 @@ public class TitleLoader : MonoBehaviour
         }
 
         StartCoroutine(PlayTitle());
-
-        //if (Application.platform != RuntimePlatform.Android) return;
     }
 
     IEnumerator PlayTitle()
@@ -55,6 +54,39 @@ public class TitleLoader : MonoBehaviour
                 Directory.CreateDirectory($"{Application.persistentDataPath}/Inbox");
             if (!Directory.Exists($"{Application.persistentDataPath}/data/chart/233333"))
                 File.WriteAllBytes($"{Application.persistentDataPath}/Inbox/BBKKBKK_Min_Commit_c8ecd6fa71.kirapack", Resources.Load<TextAsset>("BBKKBKK_Min_Commit_c8ecd6fa71.kirapack").bytes);
+        }
+    }
+
+    IEnumerator CheckUpdate()
+    {
+        MessageBoxController.ShowMsg(LogLevel.INFO, "Checking for Update · · · · · ·");
+        TouchEvent te = GameObject.Find("TouchStart").GetComponent<TouchEvent>();
+        var check = new VersionCheck("http://yapi.banground.fun/mock/28/");
+        yield return StartCoroutine(check.GetVersionInfo());
+
+        Debug.Log(check.version.data.version);
+        if (check.version == null) 
+        {
+            MessageBoxController.ShowMsg(LogLevel.ERROR, "Check Version ERROR!", false);
+            te.waitingUpdate = false;
+        } 
+        else if (check.version.data.version != VersionCheck.CurrentVersion)
+        {
+            if (check.version.data.forceUpdate)
+            {
+                MessageBoxController.ShowMsg(LogLevel.ERROR, $"You Must Update to Latest Version:{check.version.data.version}", false);
+                te.gameObject.SetActive(false);
+            }
+            else
+            {
+                MessageBoxController.ShowMsg(LogLevel.OK, $"Latest Version Found:{check.version.data.version}");
+                te.waitingUpdate = false;
+            }
+        }
+        else
+        {
+            MessageBoxController.ShowMsg(LogLevel.OK, $"You Have the Latest Version");
+            te.waitingUpdate = false;
         }
     }
 
