@@ -5,6 +5,7 @@ public class DragHandler : MonoBehaviour, IBeginDragHandler, IEndDragHandler
 {
     SelectManager sm;
     public bool isDragging = false;
+    public bool canDrag = true;
 
     public void Start()
     {
@@ -13,6 +14,7 @@ public class DragHandler : MonoBehaviour, IBeginDragHandler, IEndDragHandler
 
     public void OnBeginDrag(PointerEventData data)
     {
+        if (!canDrag) return;
         isDragging = true;
         sm.UnselectSong();
     }
