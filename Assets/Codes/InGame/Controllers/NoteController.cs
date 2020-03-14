@@ -340,11 +340,11 @@ public class NoteController : MonoBehaviour
 
         soundEffects = new ISoundEffect[5]
         {
-            AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/perfect.wav").bytes),
-            AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/great.wav").bytes),
-            AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/empty.wav").bytes),
-            AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/empty.wav").bytes),
-            AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/flick.wav").bytes)
+            AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), LiveSetting.seStyle) +"/perfect.wav").bytes),
+            AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), LiveSetting.seStyle) +"/great.wav").bytes),
+            AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), LiveSetting.seStyle) +"/empty.wav").bytes),
+            AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), LiveSetting.seStyle) +"/empty.wav").bytes),
+            AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), LiveSetting.seStyle) +"/flick.wav").bytes)
         };
 
         AudioManager.Instance.DelayPlayInGameBGM(File.ReadAllBytes(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), WARM_UP_SECOND);
@@ -431,5 +431,13 @@ public class NoteController : MonoBehaviour
 
         // Update lane effects
         laneEffects.UpdateLaneEffects(audioTime);
+    }
+
+    private void OnDestroy()
+    {
+        for (int i = 0; i < soundEffects.Length; i++)
+        {
+            soundEffects[i].Dispose();
+        }
     }
 }
