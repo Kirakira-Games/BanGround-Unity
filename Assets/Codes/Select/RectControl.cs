@@ -133,19 +133,22 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     const float longClickTime = 0.25f;
     const float deleteTime = 2f;
     bool longClick = false;
+    bool upProtect = false;
     public void OnPointerDown(PointerEventData eventData)
     {
         if (entering) return;
         down = true;
         longClick = false;
         time = 0;
-
         //Debug.Log("Down");
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
+        if (upProtect) return;
         down = false;
+        dh.canDrag = true;
+        rt_s.enabled = true;
         deleteAni.Play("DeleteIdle");
         //Debug.Log("Up");
     }
@@ -160,12 +163,15 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void OnPointerExit(PointerEventData eventData)
     {
+        upProtect = false;
         down = false;
         longClick = false;
+        dh.canDrag = true;
+        rt_s.enabled = true;
         time = 0;
         deleteAni.Play("DeleteIdle");
+        //Debug.Log("exit");
     }
-
 
 
     private void Update()
@@ -177,6 +183,9 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             {
                 longClick = true;
                 deleteAni.Play("delete");
+                dh.canDrag = false;
+                rt_s.enabled = false;
+                upProtect = true;
             }
         }
     }
