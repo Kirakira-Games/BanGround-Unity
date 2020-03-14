@@ -165,6 +165,7 @@ public enum NoteStyle
 {
     Circle,
     Cube,
+    Dark,
     Custom
 }
 

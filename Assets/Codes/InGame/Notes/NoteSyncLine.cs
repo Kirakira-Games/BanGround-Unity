@@ -24,6 +24,7 @@ public class NoteSyncLine : MonoBehaviour
         GameObject obj = new GameObject("partialSyncLine");
         obj.layer = 8;
         obj.transform.SetParent(transform);
+        obj.transform.localPosition = new Vector3(0, -0.05f, 0);
         LineRenderer lineRenderer = obj.AddComponent<LineRenderer>();
         lineRenderer.useWorldSpace = false;
         lineRenderer.material = Resources.Load<Material>("TestAssets/Materials/sync_line");

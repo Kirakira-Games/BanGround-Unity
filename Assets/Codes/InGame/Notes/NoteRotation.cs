@@ -19,9 +19,8 @@ public class NoteRotation : MonoBehaviour
         if (needRot)
         {
             //transform.rotation = Quaternion.Euler(800f / (transform.localPosition.x + 27f) - 54f + Mathf.Pow(2f, 0.024f * transform.localPosition.x), 0f, 0f);
-            Vector3 dir = new Vector3(0, mainCamY, mainCamZ - transform.position.z);//new Vector3(transform.position.x, mainCamY, mainCamZ) - transform.position;
+            Vector3 dir = new Vector3(0, mainCamY, mainCamZ - transform.position.z);
             float abs = Mathf.Abs(dir.z);
-            Debug.Log(abs);
             if (abs > 30) abs = 8;
             else if (abs < 15) abs = 30;
             else abs = 150 / (2 * abs - 24.2f) + 4;
