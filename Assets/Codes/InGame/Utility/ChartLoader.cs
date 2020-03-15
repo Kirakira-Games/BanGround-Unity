@@ -96,9 +96,12 @@ public static class ChartLoader
         {
             NormalizeBeat(note.beat);
             // Test new functionality
-            note.x = note.lane;
-            note.y = Random.Range(0f, 1f);
-            note.lane = -1;
+            if (LiveSetting.noteSize > 1.05f && LiveSetting.noteSize < 1.15f && Random.Range(0, 1) == 0)
+            {
+                note.x = note.lane;
+                note.y = Random.Range(0f, 1f);
+                note.lane = -1;
+            }
         }
         ChartTiming timing = new ChartTiming();
         timing.AnalyzeNotes(notes, chart.offset);
