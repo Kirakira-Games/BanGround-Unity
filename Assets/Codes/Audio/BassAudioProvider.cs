@@ -226,7 +226,10 @@ namespace AudioProvider
             Bass.BASS_Init(-1, sampleRate, BASSInit.BASS_DEVICE_DEFAULT, IntPtr.Zero);
 
             if (bufferLength != 0)
+            {
                 Bass.BASS_SetConfig(BASSConfig.BASS_CONFIG_BUFFER, (int)bufferLength);
+                Bass.BASS_SetConfig(BASSConfig.BASS_CONFIG_UPDATEPERIOD, 5);
+            }
             //Bass.BASS_Init(-1, 48000, BASSInit.BASS_DEVICE_DEFAULT, IntPtr.Zero);
             //#if UNITY_ANDROID && !UNITY_EDITOR
             //            var info = Bass.BASS_GetInfo();
