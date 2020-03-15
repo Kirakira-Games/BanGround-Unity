@@ -9,7 +9,7 @@ Shader "Unlit/NoteBillboard"
     }
     SubShader
     {
-        Tags { "Queue" = "Transparent" "IgnoreProjector" = "True"  "RenderType" = "Transparent" }
+        Tags { "Queue" = "Transparent" "IgnoreProjector" = "True"  "RenderType" = "Transparent" "DisableBatching" = "True" }
         LOD 100
 
         Pass
@@ -50,9 +50,8 @@ Shader "Unlit/NoteBillboard"
 
                 float3 normalDir = normalize(viewer - center);
 
-                float3 upDir = abs(normalDir.y) > 0.999 ? float3(0, 0, 1) : float3(0, 1, 0);
-                float3 rightDir = normalize(cross(upDir, normalDir));
-                upDir = normalize(cross(normalDir, rightDir));
+                float3 rightDir = float3(1,0,0);
+                float3 upDir = normalize(cross(normalDir, rightDir));
 
 
                 float3 centerOffs = v.vertex.xyz - center;

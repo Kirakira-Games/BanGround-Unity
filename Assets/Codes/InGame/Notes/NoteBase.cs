@@ -22,7 +22,7 @@ public abstract class NoteBase : MonoBehaviour
 
     public virtual void InitNote()
     {
-        NoteMesh.CreateMesh(gameObject);
+        NoteSprite.CreateMesh(gameObject);
     }
 
     public virtual void ResetNote()
@@ -37,8 +37,6 @@ public abstract class NoteBase : MonoBehaviour
 
         initPos = NoteUtility.GetInitPos(anims.Length > 0 ? anims[0].startLane : lane);
         judgePos = NoteUtility.GetJudgePos(lane);
-
-        NoteMesh.Reset(gameObject, lane);
     }
 
     public virtual void UpdatePosition(int audioTime)

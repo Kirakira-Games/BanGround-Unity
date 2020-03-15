@@ -225,7 +225,7 @@ public class NotePool : MonoBehaviour
         instance = this;
 
         // Init notemesh
-        NoteMesh.Init();
+        NoteSprite.Init();
 
         noteQueue = new Queue<GameObject>[6];
         for (int i = 0; i < noteQueue.Length; i++)
