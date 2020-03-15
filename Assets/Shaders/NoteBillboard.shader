@@ -12,9 +12,10 @@ Shader "Unlit/NoteBillboard"
         Tags { "Queue" = "Transparent" "IgnoreProjector" = "True"  "RenderType" = "Transparent" "DisableBatching" = "True" }
         LOD 100
 
+        Blend SrcAlpha OneMinusSrcAlpha
+        ZWrite Off
         Pass
         {
-            Blend SrcAlpha OneMinusSrcAlpha
             Cull Off
 
             CGPROGRAM
@@ -63,8 +64,9 @@ Shader "Unlit/NoteBillboard"
 
             fixed4 frag (v2f i) : SV_Target
             {
+                float2 uv = float2(i.uv.x, 1 - i.uv.y);
                 // sample the texture
-                fixed4 col = tex2D(_MainTex, i.uv);
+                fixed4 col = tex2D(_MainTex, uv);
                 // apply fog
                 UNITY_APPLY_FOG(i.fogCoord, col);
                 return col;
