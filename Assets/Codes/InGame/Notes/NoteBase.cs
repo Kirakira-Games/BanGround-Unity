@@ -126,7 +126,7 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
 
     public virtual JudgeResult TryJudge(KirakiraTouch touch)
     {
-        if (isTracingOrJudged || touch.current.phase != KirakiraTouchPhase.BEGAN)
+        if (isTracingOrJudged || touch.current.phase != KirakiraTouchPhase.Began)
         {
             return JudgeResult.None;
         }

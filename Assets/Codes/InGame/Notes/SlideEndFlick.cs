@@ -43,7 +43,7 @@ public class SlideEndFlick : SlideNoteBase
             return isTilt ? JudgeResult.Perfect :
                 TranslateTimeToJudge(NoteUtility.SLIDE_END_JUDGE_RANGE, touch.current.time);
         }
-        else if (touch.current.phase == KirakiraTouchPhase.ENDED)
+        else if (touch.current.phase == KirakiraTouchPhase.Ended)
         {
             return JudgeResult.Miss;
         }

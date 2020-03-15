@@ -19,7 +19,7 @@ public class FlickNote : NoteBase
             return JudgeResult.Miss;
         if (touch.hasMovedFlickDist)
             return TranslateTimeToJudge(NoteUtility.TAP_JUDGE_RANGE, touch.start.time);
-        return touch.current.phase == KirakiraTouchPhase.ENDED ? JudgeResult.Miss : JudgeResult.None;
+        return touch.current.phase == KirakiraTouchPhase.Ended ? JudgeResult.Miss : JudgeResult.None;
     }
 
     protected override void OnNoteUpdateJudge()
@@ -41,7 +41,7 @@ public class FlickNote : NoteBase
 
     public override void Judge(KirakiraTouch touch, JudgeResult result)
     {
-        TouchManager.instance.RegisterTouch(touchId, this);
+        TouchManager.instance.RegisterTouch(touch.touchId, this);
         judgeTime = touch.current.time;
     }
 }
