@@ -55,7 +55,7 @@ public class NotePool : MonoBehaviour
             obj.layer = 8;
             NoteBase note = null;
             obj.transform.SetParent(transform);
-            obj.AddComponent<NoteRotation>();
+            //obj.AddComponent<NoteRotation>();
             switch (type)
             {
                 case GameNoteType.Single:
@@ -88,8 +88,10 @@ public class NotePool : MonoBehaviour
                 mesh.AddComponent<SlideMesh>();
                 mesh.AddComponent<MeshRenderer>();
                 mesh.AddComponent<MeshFilter>();
-                mesh.AddComponent<NoteRotation>().needRot = false;
-                mesh.AddComponent<SortingGroup>().sortingLayerID = SortingLayer.NameToID("SlideBody");
+                //mesh.AddComponent<NoteRotation>().needRot = false;
+                var sg = mesh.AddComponent<SortingGroup>();
+                sg.sortingLayerID = SortingLayer.NameToID("SlideBody");
+                sg.sortingOrder = -1;
             }
             if (type == GameNoteType.SlideStart)
             {
@@ -225,7 +227,7 @@ public class NotePool : MonoBehaviour
         instance = this;
 
         // Init notemesh
-        NoteMesh.Init();
+        NoteSprite.Init();
 
         noteQueue = new Queue<GameObject>[6];
         for (int i = 0; i < noteQueue.Length; i++)
