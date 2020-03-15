@@ -512,6 +512,7 @@ public class SelectManager : MonoBehaviour
     }
     void CloseSetting()
     {
+        previewSound.Play();
         GameObject.Find("Setting_Canvas").GetComponent<Animator>().Play("FlyUp");
         SetLiveSetting();
         File.WriteAllText(LiveSetting.settingsPath, JsonConvert.SerializeObject(new LiveSettingTemplate()));
