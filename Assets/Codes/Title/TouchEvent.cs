@@ -22,7 +22,7 @@ public class TouchEvent : MonoBehaviour
         {
             touched = true;
 
-            GameObject.Find("Main Camera").GetComponent<Animator>().SetBool("Touched", true);
+            GameObject.Find("MainCanvas").GetComponent<Animator>().SetBool("Touched", true);
             StartCoroutine(SwitchScene("Select"));
             StartCoroutine(delayAndSwitch());
         }
