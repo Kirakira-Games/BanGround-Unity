@@ -91,11 +91,6 @@ public class NotePool : MonoBehaviour
                 mesh.AddComponent<NoteRotation>().needRot = false;
                 mesh.AddComponent<SortingGroup>().sortingLayerID = SortingLayer.NameToID("SlideBody");
             }
-            if (type == GameNoteType.SlideStart)
-            {
-                var te = Instantiate(Resources.Load("Effects/effect_TapKeep"), obj.transform) as GameObject;
-                (note as SlideStart).tapEffect = te.AddComponent<TapEffect>();
-            }
             obj.SetActive(false);
             Q.Enqueue(obj);
         }
@@ -120,7 +115,7 @@ public class NotePool : MonoBehaviour
         {
             var fx = Instantiate(tapEffects[effect], Vector3.zero, Quaternion.identity) as GameObject;
             fx.transform.localScale = Vector3.one * LiveSetting.noteSize * NoteUtility.NOTE_SCALE;
-            fx.SetActive(false);
+            //fx.SetActive(false);
             fx.transform.SetParent(transform);
             teQueue[effect].Enqueue(fx);
         }
@@ -216,7 +211,7 @@ public class NotePool : MonoBehaviour
         }
         for (int i = 0; i < teQueue.Length; i++)
         {
-            AddTapEffect(i, total.Max / (i == 0 ? 1 : 2));
+            AddTapEffect(i, Math.Max(NoteUtility.LANE_COUNT << 1, total.Max) / (i == 0 ? 1 : 2));
         }
     }
 
@@ -324,7 +319,7 @@ public class NotePool : MonoBehaviour
         var te = teQueue[ty].Dequeue();
         te.transform.position = pos;
         te.GetComponent<ParticleSystem>().Play();
-        te.SetActive(true);
+        //te.SetActive(true);
         StartCoroutine(KillFX(te, ty, 0.5f));
     }
 
@@ -332,7 +327,7 @@ public class NotePool : MonoBehaviour
     {
         yield return new WaitForSeconds(delaySeconds);
         fx.GetComponent<ParticleSystem>().Stop();
-        fx.SetActive(false);
+        //fx.SetActive(false);
         teQueue[type].Enqueue(fx);
     }
 }

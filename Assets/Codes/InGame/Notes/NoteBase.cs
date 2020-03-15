@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public abstract class NoteBase : MonoBehaviour
+public abstract class NoteBase : MonoBehaviour, KirakiraTracer
 {
     public int time;
     public int lane;
@@ -9,6 +9,7 @@ public abstract class NoteBase : MonoBehaviour
     public int touchId;
     public bool isGray;
     public bool isFuwafuwa => lane == -1;
+    public bool isTracingOrJudged => judgeTime != int.MinValue;
     public bool isDestroyed;
     public bool inJudgeQueue;
     public GameNoteAnim[] anims;
@@ -77,35 +78,35 @@ public abstract class NoteBase : MonoBehaviour
     {
         if (touchId != -1)
         {
-            TouchManager.instance.UnregisterTouch(touchId, gameObject);
+            TouchManager.instance.UnregisterTouch(touchId, this);
         }
     }
 
-    protected virtual void OnNoteUpdateJudge(int audioTime)
+    protected virtual void OnNoteUpdateJudge()
     {
-        if (audioTime > time + NoteUtility.TAP_JUDGE_RANGE[(int)JudgeResult.Bad])
+        if (NoteController.judgeTime > time + NoteUtility.TAP_JUDGE_RANGE[(int)JudgeResult.Bad])
         {
-            RealJudge(audioTime, JudgeResult.Miss, null);
+            RealJudge(null, JudgeResult.Miss);
         }
     }
 
     // This method should not be overriden
-    public void OnNoteUpdate(int audioTime)
+    public void OnNoteUpdate()
     {
         if (judgeResult == JudgeResult.None)
         {
-            UpdatePosition(audioTime);
+            UpdatePosition(NoteController.audioTime);
         }
         if (LiveSetting.autoPlayEnabled)
         {
-            if (audioTime >= time - NoteUtility.AUTO_JUDGE_RANGE)
+            if (NoteController.audioTime >= time - NoteUtility.AUTO_JUDGE_RANGE)
             {
-                RealJudge(audioTime, JudgeResult.Perfect, new Touch());
+                RealJudge(null, JudgeResult.Perfect);
             }
         }
         else
         {
-            OnNoteUpdateJudge(audioTime - LiveSetting.judgeOffset);
+            OnNoteUpdateJudge();
         }
     }
 
@@ -123,29 +124,52 @@ public abstract class NoteBase : MonoBehaviour
         return JudgeResult.None;
     }
 
-    public virtual JudgeResult TryJudge(int audioTime, Touch touch)
+    public virtual JudgeResult TryJudge(KirakiraTouch touch)
     {
-        if (judgeTime != int.MinValue || touch.phase != TouchPhase.Began)
+        if (isTracingOrJudged || touch.current.phase != KirakiraTouchPhase.BEGAN)
         {
             return JudgeResult.None;
         }
-        return TranslateTimeToJudge(NoteUtility.TAP_JUDGE_RANGE, audioTime);
+        return TranslateTimeToJudge(NoteUtility.TAP_JUDGE_RANGE, touch.current.time);
     }
 
     public virtual void TraceTouch(int audioTime, Touch touch) { }
 
-    public virtual void RealJudge(int audioTime, JudgeResult result, Touch? touch)
+    public virtual void RealJudge(KirakiraTouch touch, JudgeResult result)
     {
         if (judgeResult != JudgeResult.None) return;
-        if (judgeTime == int.MinValue)
-            judgeTime = audioTime;
+        if (!isTracingOrJudged)
+            judgeTime = touch == null ? NoteController.judgeTime : touch.current.time;
         judgeResult = result;
         NoteController.instance.Judge(this, result, touch);
         NotePool.instance.DestroyNote(gameObject);
     }
 
-    public virtual void Judge(int audioTime, JudgeResult result, Touch? touch)
+    public virtual void Judge(KirakiraTouch touch, JudgeResult result)
     {
-        RealJudge(audioTime, result, touch);
+        RealJudge(touch, result);
+    }
+
+    public virtual Vector2 GetPosition()
+    {
+        return judgePos;
+    }
+
+    public virtual JudgeResult TryTrace(KirakiraTouch touch)
+    {
+        return JudgeResult.None;
+    }
+
+    public virtual void Trace(KirakiraTouch touch, JudgeResult result)
+    {
+        if (result != JudgeResult.None)
+        {
+            RealJudge(touch, result);
+        }
+    }
+
+    public virtual void Assign(KirakiraTouch touch)
+    {
+        touchId = touch == null ? -1 : touch.touchId;
     }
 }

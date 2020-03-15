@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class FlickNote : NoteBase
 {
-    private Vector2 touchPosition;
     public override void InitNote()
     {
         base.InitNote();
@@ -12,41 +11,37 @@ public class FlickNote : NoteBase
         Instantiate(Resources.Load(LiveSetting.assetDirectory+"/FlickArrow"), transform);
     }
 
-    public override void TraceTouch(int audioTime, Touch touch)
+    public override JudgeResult TryTrace(KirakiraTouch touch)
     {
-        Vector2 dist = touch.position - touchPosition;
-        if (dist.magnitude * 2.54F >= Screen.dpi * NoteUtility.FLICK_JUDGE_DIST)
-        {
-            RealJudge(audioTime, TranslateTimeToJudge(NoteUtility.TAP_JUDGE_RANGE, judgeTime), touch);
-        }
-        else if (NoteUtility.IsTouchEnd(touch))
-        {
-            RealJudge(audioTime, JudgeResult.Miss, touch);
-        }
+        if (!TouchManager.TouchesNote(touch.start, this))
+            return JudgeResult.None;
+        if (touch.duration > NoteUtility.TAP_JUDGE_RANGE[(int)JudgeResult.Bad])
+            return JudgeResult.Miss;
+        if (touch.hasMovedFlickDist)
+            return TranslateTimeToJudge(NoteUtility.TAP_JUDGE_RANGE, touch.start.time);
+        return touch.current.phase == KirakiraTouchPhase.ENDED ? JudgeResult.Miss : JudgeResult.None;
     }
 
-    protected override void OnNoteUpdateJudge(int audioTime)
+    protected override void OnNoteUpdateJudge()
     {
-        if (judgeTime == int.MinValue)
+        if (!isTracingOrJudged)
         {
-            if (audioTime > time + NoteUtility.TAP_JUDGE_RANGE[(int)JudgeResult.Bad])
+            if (NoteController.judgeTime > time + NoteUtility.TAP_JUDGE_RANGE[(int)JudgeResult.Bad])
             {
-                RealJudge(audioTime, JudgeResult.Miss, null);
+                RealJudge(null, JudgeResult.Miss);
             }
         }
-        else if (audioTime >
+        else if (NoteController.judgeTime >
             Mathf.Max(time + NoteUtility.TAP_JUDGE_RANGE[(int)JudgeResult.Bad],
                       judgeTime + NoteUtility.SLIDE_END_FLICK_JUDGE_RANGE))
         {
-            RealJudge(audioTime, JudgeResult.Miss, null);
+            RealJudge(null, JudgeResult.Miss);
         }
     }
 
-    public override void Judge(int audioTime, JudgeResult result, Touch? touch)
+    public override void Judge(KirakiraTouch touch, JudgeResult result)
     {
-        touchId = touch.Value.fingerId;
-        TouchManager.instance.RegisterTouch(touchId, gameObject);
-        touchPosition = touch.Value.position;
-        judgeTime = audioTime;
+        TouchManager.instance.RegisterTouch(touchId, this);
+        judgeTime = touch.current.time;
     }
 }

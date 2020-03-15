@@ -4,17 +4,17 @@ using UnityEngine;
 
 public abstract class SlideNoteBase : NoteBase
 {
-    public bool IsTilt;
-    public bool IsStickEnd;
-    public bool IsJudging => parentSlide && parentSlide.GetTouchId() != -1;
+    public bool isTilt;
+    public bool isStickEnd;
+    public bool isJudging => parentSlide && parentSlide.isJudging;
     public SlideMesh slideMesh;
     protected Slide parentSlide;
 
-    protected abstract JudgeResult TrySlideJudge(int audioTime, Touch touch);
+    protected abstract JudgeResult TrySlideJudge(KirakiraTouch touch);
 
     public void InitSlideNote()
     {
-        IsStickEnd = false;
+        isStickEnd = false;
         parentSlide = GetComponentInParent<Slide>();
         if (!NoteUtility.IsSlideEnd(type))
         {
@@ -23,46 +23,24 @@ public abstract class SlideNoteBase : NoteBase
         }
     }
 
-    public override void OnNoteDestroy()
+    public override JudgeResult TryJudge(KirakiraTouch touch)
     {
-        //if (LiveSetting.autoPlayEnabled)
-        //{
-        //    JudgeResultController.instance.DisplayJudgeOffset(OffsetResult.None);
-        //    return;
-        //}
-        
-        //int result = (int)judgeResult;
-        //int deltaTime = time - judgeTime;
-        //if (result >= (LiveSetting.displayELP ? 0 : 1) && result <= 3 && deltaTime != 0)
-        //{
-        //    if (Mathf.Abs(deltaTime) > 200)
-        //    {
-        //        Debug.Log(time + "/" + judgeTime);
-        //    }
-        //    ComboManager.JudgeOffsetResult.Add(deltaTime);
-        //    JudgeResultController.instance.DisplayJudgeOffset(deltaTime > 0 ? OffsetResult.Early : OffsetResult.Late);
-        //    return;
-        //}
-        //JudgeResultController.instance.DisplayJudgeOffset(OffsetResult.None);
-    }
-
-    public override JudgeResult TryJudge(int audioTime, Touch touch)
-    {
-        if (judgeTime != int.MinValue || (IsJudging &&
-            parentSlide.GetTouchId() != touch.fingerId))
+        if (isTracingOrJudged)
         {
             return JudgeResult.None;
         }
-        return TrySlideJudge(audioTime, touch);
+        return TrySlideJudge(touch);
     }
 
-    public override void RealJudge(int audioTime, JudgeResult result, Touch? touch)
+    public override void RealJudge(KirakiraTouch touch, JudgeResult result)
     {
         if (judgeResult != JudgeResult.None) return;
         int ret = parentSlide.Judge(this, result, touch);
-        if (ret == 0) return;
-        if (judgeTime == int.MinValue)
-            judgeTime = audioTime;
+        if (ret == 0)
+        {
+            return;
+        }
+        judgeTime = touch == null ? NoteController.judgeTime : touch.current.time;
         if (ret == -1)
         {
             judgeResult = JudgeResult.Miss;
