@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -168,13 +169,16 @@ public class Slide : MonoBehaviour, KirakiraTracer
     private void BindTouch(KirakiraTouch touch)
     {
         if (LiveSetting.autoPlayEnabled || isJudging || touch == null) return;
+        if (touch.current.phase == KirakiraTouchPhase.Ended) return;
         TouchManager.instance.RegisterTouch(touch.touchId, this);
+        Debug.Assert(touchId == touch.touchId);
     }
 
     private void UnbindTouch()
     {
         if (!isJudging) return;
         TouchManager.instance.UnregisterTouch(touchId, this);
+        Debug.Assert(touchId == -1);
     }
 
     public int Judge(SlideNoteBase note, JudgeResult result, KirakiraTouch touch)
@@ -237,10 +241,14 @@ public class Slide : MonoBehaviour, KirakiraTracer
         {
             if (TouchManager.TouchesNote(touch.current, note))
             {
-                return note.TryJudge(touch);
+                var result = note.TryJudge(touch);
+                if (result != JudgeResult.None)
+                {
+                    return result;
+                }
             }
         }
-        return JudgeResult.None;
+        return touch.current.phase == KirakiraTouchPhase.Ended ? JudgeResult.Miss : JudgeResult.None;
     }
 
     public void Trace(KirakiraTouch touch, JudgeResult result)
@@ -251,16 +259,16 @@ public class Slide : MonoBehaviour, KirakiraTracer
         {
             note.Trace(touch, result);
         }
-        else
+        else if (note.TryJudge(touch) != JudgeResult.None)
         {
             note.Judge(touch, result);
         }
-        if (touch.current.phase == KirakiraTouchPhase.ENDED)
+        if (touch.current.phase == KirakiraTouchPhase.Ended)
         {
             UpdateHead();
             if (judgeHead < notes.Count)
             {
-                note.RealJudge(touch, JudgeResult.Miss);
+                NoteController.instance.Judge(notes[judgeHead], JudgeResult.Miss, touch);
                 judgeHead++;
             }
             UnbindTouch();

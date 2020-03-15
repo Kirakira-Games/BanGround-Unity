@@ -18,7 +18,7 @@ public class SlideEnd : SlideNoteBase
 
     protected override JudgeResult TrySlideJudge(KirakiraTouch touch)
     {
-        if (touch.current.phase != KirakiraTouchPhase.ENDED)
+        if (touch.current.phase != KirakiraTouchPhase.Ended)
         {
             return JudgeResult.None;
         }

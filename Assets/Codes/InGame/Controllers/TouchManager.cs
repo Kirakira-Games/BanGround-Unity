@@ -30,7 +30,7 @@ public interface KirakiraTracer
 
 public enum KirakiraTouchPhase
 {
-    NONE, BEGAN, ONGOING, ENDED
+    None, Began, Ongoing, Ended
 }
 
 public class KirakiraTouchState
@@ -59,6 +59,11 @@ public class KirakiraTouchState
     /// Phase of the touch.
     /// </summary>
     public KirakiraTouchPhase phase;
+
+    public override string ToString()
+    {
+        return string.Format("[{0}] At {1}, Phase = {2}", touchId, pos, Enum.GetName(typeof(KirakiraTouchPhase), phase));
+    }
 }
 
 public class KirakiraTouch
@@ -125,15 +130,15 @@ public class KirakiraTouch
         switch (phase)
         {
             case TouchPhase.Began:
-                return KirakiraTouchPhase.BEGAN;
+                return KirakiraTouchPhase.Began;
             case TouchPhase.Moved:
             case TouchPhase.Stationary:
-                return KirakiraTouchPhase.ONGOING;
+                return KirakiraTouchPhase.Ongoing;
             case TouchPhase.Ended:
             case TouchPhase.Canceled:
-                return KirakiraTouchPhase.ENDED;
+                return KirakiraTouchPhase.Ended;
             default:
-                return KirakiraTouchPhase.NONE;
+                return KirakiraTouchPhase.None;
         }
     }
 
@@ -160,6 +165,7 @@ public class KirakiraTouch
         if (start == null)
         {
             start = state;
+            touchId = state.touchId;
         }
         timeline.Push(state.time, state);
 
@@ -173,9 +179,9 @@ public class KirakiraTouch
         timeSinceFlick = INVALID_DURATION;
         for (var i = timeline.LastV; i != null; i = i.Previous)
         {
-            if (DistanceInCm(i.Value.screenPos, current.screenPos) <= NoteUtility.FLICK_JUDGE_DIST)
+            if (DistanceInCm(i.Value.screenPos, current.screenPos) >= NoteUtility.FLICK_JUDGE_DIST)
             {
-                timeSinceFlick = Mathf.RoundToInt(state.time * 1000) - i.Value.time;
+                timeSinceFlick = state.time - i.Value.time;
                 break;
             }
         }
@@ -243,15 +249,15 @@ public class TouchManager : MonoBehaviour
         {
             if (Input.GetMouseButtonDown(0))
             {
-                ret = SimulateMouseTouch(KirakiraTouchPhase.BEGAN);
+                ret = SimulateMouseTouch(KirakiraTouchPhase.Began);
             }
             else if (Input.GetMouseButton(0))
             {
-                ret = SimulateMouseTouch(KirakiraTouchPhase.ONGOING);
+                ret = SimulateMouseTouch(KirakiraTouchPhase.Ongoing);
             }
             else if (Input.GetMouseButtonUp(0))
             {
-                ret = SimulateMouseTouch(KirakiraTouchPhase.ENDED);
+                ret = SimulateMouseTouch(KirakiraTouchPhase.Ended);
             }
         }
         return ret;
@@ -262,15 +268,32 @@ public class TouchManager : MonoBehaviour
         if (!touchTable.ContainsKey(id))
         {
             var ret = new KirakiraTouch();
-            ret.touchId = id;
             touchTable.Add(id, ret);
         }
         return touchTable[id];
     }
 
+    public JudgeResult TryTrace(KirakiraTracer owner, int touchId)
+    {
+        return TryTrace(owner, GetTouchById(touchId));
+    }
+
+    public JudgeResult TryTrace(KirakiraTracer owner, KirakiraTouch touch)
+    {
+        Debug.Assert(touch.isValid);
+        var pair = (owner, touch.touchId);
+        if (!traceCache.ContainsKey(pair))
+        {
+            traceCache.Add(pair, owner.TryTrace(touch));
+        }
+        return traceCache[pair];
+    }
+
+
     public void RegisterTouch(int id, KirakiraTracer obj)
     {
         var touch = GetTouchById(id);
+        Debug.Assert(touch.isValid);
         Debug.Assert(touch.owner == null);
         touch.owner = obj;
         obj.Assign(touch);
@@ -279,6 +302,7 @@ public class TouchManager : MonoBehaviour
     public void UnregisterTouch(int id, KirakiraTracer obj)
     {
         var touch = GetTouchById(id);
+        Debug.Assert(touch.isValid);
         if (ReferenceEquals(touch.owner, obj))
         {
             touch.owner = null;
@@ -341,24 +365,15 @@ public class TouchManager : MonoBehaviour
         // Update touches that just starts
         foreach (var touch1 in touches)
         {
-            var tracer = GetTouchById(touch1.touchId);
-            if (touch1.phase == KirakiraTouchPhase.BEGAN)
-            {
-                tracer.Reset();
-                tracer.touchId = touch1.touchId;
-            }
-            tracer.OnUpdate(touch1);
+            GetTouchById(touch1.touchId).OnUpdate(touch1);
         }
 
         // Compute exchangable touches
         foreach (var touch1 in touches)
         {
             var tracer1 = GetTouchById(touch1.touchId);
-            if (!tracer1.isValid)
-            {
-                continue;
-            }
-            var owner1 = touchTable[touch1.touchId].owner;
+            Debug.Assert(tracer1.isValid);
+            var owner1 = tracer1.owner;
             // If exchangable, the touch must lie in both judge areas.
             if (owner1 == null || !TouchesNote(touch1, owner1.GetPosition()))
             {
@@ -382,21 +397,6 @@ public class TouchManager : MonoBehaviour
 
         // Try exchanging touches
         traceCache.Clear();
-        foreach (var entry in touchTable)
-        {
-            var tracer = entry.Value;
-            var owner = tracer.owner;
-            if (!tracer.isValid || owner == null)
-            {
-                continue;
-            }
-            foreach (var i in tracer.exchangable)
-            {
-                var tracer2 = GetTouchById(i);
-                Debug.Assert(tracer2.isValid);
-                traceCache.Add((owner, i), owner.TryTrace(tracer2));
-            }
-        }
         bool hasExchanged;
         do
         {
@@ -414,10 +414,10 @@ public class TouchManager : MonoBehaviour
                     var tracer2 = GetTouchById(i);
                     Debug.Assert(tracer2.isValid);
                     var owner2 = tracer2.owner;
-                    int prevVal = EvalResult(traceCache[(owner, entry.Key)]) +
-                        (owner2 == null ? 0 : EvalResult(traceCache[(owner2, i)]));
-                    int exchangeVal = EvalResult(traceCache[(owner, i)]) +
-                        (owner2 == null ? 0 : EvalResult(traceCache[(owner2, entry.Key)]));
+                    int prevVal = EvalResult(TryTrace(owner, tracer) +
+                        (owner2 == null ? 0 : EvalResult(TryTrace(owner2, tracer2))));
+                    int exchangeVal = EvalResult(TryTrace(owner, tracer2) +
+                        (owner2 == null ? 0 : EvalResult(TryTrace(owner2, tracer))));
                     if (exchangeVal > prevVal)
                     {
                         hasExchanged = true;
@@ -436,7 +436,7 @@ public class TouchManager : MonoBehaviour
             {
                 continue;
             }
-            tracer.owner.Trace(tracer, traceCache[(tracer.owner, entry.Key)]);
+            tracer.owner.Trace(tracer, TryTrace(tracer.owner, tracer));
         }
 
         // Process other touches
@@ -453,13 +453,13 @@ public class TouchManager : MonoBehaviour
         foreach (var touch1 in touches)
         {
             var tracer = GetTouchById(touch1.touchId);
-            if (touch1.phase == KirakiraTouchPhase.ENDED)
+            if (touch1.phase == KirakiraTouchPhase.Ended)
             {
                 foreach (var entry in touchTable)
                 {
                     entry.Value.exchangable.Remove(touch1.touchId);
                 }
-                tracer.touchId = -1;
+                tracer.Reset();
             }
         }
     }

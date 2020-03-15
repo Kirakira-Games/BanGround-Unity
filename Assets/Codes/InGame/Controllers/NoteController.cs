@@ -234,7 +234,7 @@ public class NoteController : MonoBehaviour
         // A note to judge is not found
         if (noteToJudge == null)
         {
-            if (touch.current.phase == KirakiraTouchPhase.BEGAN && lanes.Length > 0)
+            if (touch.current.phase == KirakiraTouchPhase.Began && lanes.Length > 0)
             {
                 int se = (int)EmitEffect(NoteUtility.GetJudgePos(lanes[0]), JudgeResult.None, GameNoteType.Single);
                 soundEffects[se].PlayOneShot();
