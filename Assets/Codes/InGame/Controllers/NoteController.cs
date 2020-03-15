@@ -207,19 +207,24 @@ public class NoteController : MonoBehaviour
 
         // Find note to judge - non-fuwafuwa
         NoteBase noteToJudge = null;
-        NoteBase ret;
-        foreach (int lane in lanes) {
-            ret = OnTouch(laneQueue[lane], touch);
+
+        if (!UIManager.BitingTheDust)
+        {
+            NoteBase ret;
+            foreach (int lane in lanes)
+            {
+                ret = OnTouch(laneQueue[lane], touch);
+                if (ret != null && (noteToJudge == null || noteToJudge.time > ret.time))
+                {
+                    noteToJudge = ret;
+                }
+            }
+            // Find note to judge - fuwafuwa
+            ret = OnTouch(noteQueue, touch);
             if (ret != null && (noteToJudge == null || noteToJudge.time > ret.time))
             {
                 noteToJudge = ret;
             }
-        }
-        // Find note to judge - fuwafuwa
-        ret = OnTouch(noteQueue, touch);
-        if (ret != null && (noteToJudge == null || noteToJudge.time > ret.time))
-        {
-            noteToJudge = ret;
         }
         // A note to judge is not found
         if (noteToJudge == null)
