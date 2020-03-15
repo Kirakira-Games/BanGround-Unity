@@ -36,9 +36,14 @@ public enum KirakiraTouchPhase
 public class KirakiraTouchState
 {
     /// <summary>
-    /// Time of receiving this touch.
+    /// Time of receiving this touch. (Judge time)
     /// </summary>
     public int time;
+
+    /// <summary>
+    /// Time that syncs with RealtimeSinceStartup
+    /// </summary>
+    public float realtime;
 
     /// <summary>
     /// Unique ID of this touch.
@@ -96,7 +101,7 @@ public class KirakiraTouch
     /// <summary>
     /// Whether current position of the touch is flick distance away from its initial position.
     /// </summary>
-    public bool hasMovedFlickDist => Vector3.Distance(current.screenPos, start.screenPos) >= NoteUtility.FLICK_JUDGE_DIST;
+    public bool hasMovedFlickDist => DistanceInCm(current.screenPos, start.screenPos) >= NoteUtility.FLICK_JUDGE_DIST;
 
     /// <summary>
     /// Current touch state.
@@ -113,7 +118,7 @@ public class KirakiraTouch
     /// </summary>
     public HashSet<int> exchangable;
 
-    private PriorityQueue<int, KirakiraTouchState> timeline;
+    private PriorityQueue<float, KirakiraTouchState> timeline;
     public static int INVALID_DURATION => NoteUtility.SLIDE_TICK_JUDGE_RANGE << 1;
     public static Vector3 INVALID_POSITION => new Vector3(0, 0, -1e3f);
 
@@ -144,7 +149,7 @@ public class KirakiraTouch
 
     public KirakiraTouch()
     {
-        timeline = new PriorityQueue<int, KirakiraTouchState>();
+        timeline = new PriorityQueue<float, KirakiraTouchState>();
         exchangable = new HashSet<int>();
         Reset();
     }
@@ -159,6 +164,11 @@ public class KirakiraTouch
         timeSinceFlick = INVALID_DURATION;
     }
 
+    public static int RealtimeToBGMMs(float t1, float t2)
+    {
+        return Mathf.RoundToInt(AudioTimelineSync.RealTimeToBGMTime(t2 - t1) * 1000);
+    }
+
     public void OnUpdate(KirakiraTouchState state)
     {
         // Add current touch
@@ -167,10 +177,11 @@ public class KirakiraTouch
             start = state;
             touchId = state.touchId;
         }
-        timeline.Push(state.time, state);
+        timeline.Push(state.realtime, state);
 
         // Remove unnecessary states
-        while (timeline.FirstV != null && current.time - timeline.FirstV.Value.time > NoteUtility.SLIDE_TICK_JUDGE_RANGE)
+        while (timeline.FirstV != null &&
+            RealtimeToBGMMs(timeline.FirstV.Value.realtime, current.realtime) > NoteUtility.SLIDE_TICK_JUDGE_RANGE)
         {
             timeline.RemoveFirst();
         }
@@ -181,7 +192,7 @@ public class KirakiraTouch
         {
             if (DistanceInCm(i.Value.screenPos, current.screenPos) >= NoteUtility.FLICK_JUDGE_DIST)
             {
-                timeSinceFlick = state.time - i.Value.time;
+                timeSinceFlick = RealtimeToBGMMs(i.Value.realtime, state.realtime);
                 break;
             }
         }
@@ -219,6 +230,7 @@ public class TouchManager : MonoBehaviour
             screenPos = Input.mousePosition,
             pos = pos,
             time = AudioTimelineSync.instance.GetTimeInMs(),
+            realtime = Time.realtimeSinceStartup,
             phase = phase
         };
         return new KirakiraTouchState[] { touch };
@@ -238,6 +250,7 @@ public class TouchManager : MonoBehaviour
             {
                 touchId = touch.touchId,
                 time = Mathf.RoundToInt(AudioTimelineSync.instance.TimeSinceStartupToBGMTime((float)touch.time) * 1000),
+                realtime = (float)touch.time,
                 screenPos = touch.screenPosition,
                 pos = pos,
                 phase = KirakiraTouch.Kirakira(touch.phase)
@@ -265,6 +278,7 @@ public class TouchManager : MonoBehaviour
 
     public KirakiraTouch GetTouchById(int id)
     {
+        Debug.Assert(id != -1);
         if (!touchTable.ContainsKey(id))
         {
             var ret = new KirakiraTouch();
@@ -431,11 +445,11 @@ public class TouchManager : MonoBehaviour
         // Actually trace touches
         foreach (var entry in touchTable)
         {
-            var tracer = entry.Value;
-            if (!tracer.isValid || tracer.owner == null)
+            if (!IsTracing(entry.Key))
             {
                 continue;
             }
+            var tracer = entry.Value;
             tracer.owner.Trace(tracer, TryTrace(tracer.owner, tracer));
         }
 
