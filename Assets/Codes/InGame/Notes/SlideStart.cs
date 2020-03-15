@@ -23,7 +23,7 @@ public class SlideStart : SlideNoteBase
     public override void InitNote()
     {
         base.InitNote();
-        GetComponent<MeshRenderer>().material.SetTexture("_BaseMap", NoteUtility.LoadResource<Texture2D>("note_long_default"));
+        GetComponent<SpriteRenderer>().sprite = NoteUtility.LoadResource<Sprite>("note_long_default");
     }
 
     protected override void OnNoteUpdateJudge(int audioTime)

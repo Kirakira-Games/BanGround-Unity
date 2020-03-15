@@ -2,6 +2,40 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public class NoteSprite
+{
+    const float deltaPerLane = 0.00f;
+
+    static private int sortingLayerID;
+    static private Material mat;
+
+    public static void CreateMesh(GameObject note)
+    {
+        var spriteRenderer = note.AddComponent<SpriteRenderer>();
+        spriteRenderer.material = mat;
+        spriteRenderer.sortingLayerID = sortingLayerID;
+    }
+
+    private static Vector3[] GetVertices(int lane)
+    {
+        float delta = (lane - 3) * deltaPerLane;
+        return new Vector3[]
+        {
+            new Vector3(-1 + delta, 0,-0.8f),
+            new Vector3(1 + delta, 0,-0.8f),
+            new Vector3(-1 - delta, 0,0.8f),
+            new Vector3(1 - delta, 0,0.8f)
+        };
+    }
+
+    public static void Init()
+    {
+        sortingLayerID = SortingLayer.NameToID("Note");
+        mat = Resources.Load<Material>("TestAssets/Materials/note");
+    }
+}
+
+/*
 public class NoteMesh
 {
     static readonly Vector2[] uv =
@@ -21,7 +55,7 @@ public class NoteMesh
     };
 
     static readonly int[] indices = { 0, 2, 1, 2, 3, 1 };
-    
+
     const float deltaPerLane = 0.00f;
 
     static private int sortingLayerID;
@@ -31,7 +65,7 @@ public class NoteMesh
     {
         MeshFilter meshFilter = note.AddComponent<MeshFilter>();
         MeshRenderer meshRenderer = note.AddComponent<MeshRenderer>();
-        
+
 
         meshRenderer.material = mat;
         Mesh mesh = new Mesh
@@ -70,3 +104,4 @@ public class NoteMesh
         note.GetComponent<MeshFilter>().mesh.SetVertices(GetVertices(lane));
     }
 }
+*/

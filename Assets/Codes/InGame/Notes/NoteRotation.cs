@@ -16,6 +16,8 @@ public class NoteRotation : MonoBehaviour
 
     void Update()
     {
+        return;
+
         if (needRot)
         {
             //transform.rotation = Quaternion.Euler(800f / (transform.localPosition.x + 27f) - 54f + Mathf.Pow(2f, 0.024f * transform.localPosition.x), 0f, 0f);
