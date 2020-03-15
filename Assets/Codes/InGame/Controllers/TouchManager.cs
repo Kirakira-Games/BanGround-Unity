@@ -237,7 +237,7 @@ public class TouchManager : MonoBehaviour
             ret[i] = new KirakiraTouchState
             {
                 touchId = touch.touchId,
-                time = Mathf.RoundToInt(AudioTimelineSync.RealTimeToBGMTime((float)touch.time) * 1000),
+                time = Mathf.RoundToInt(AudioTimelineSync.instance.TimeSinceStartupToBGMTime((float)touch.time) * 1000),
                 screenPos = touch.screenPosition,
                 pos = pos,
                 phase = KirakiraTouch.Kirakira(touch.phase)

@@ -26,6 +26,11 @@ public class AudioTimelineSync : MonoBehaviour
         return Mathf.RoundToInt(t * LiveSetting.SpeedCompensationSum);
     }
 
+    public float TimeSinceStartupToBGMTime(float t)
+    {
+        return RealTimeToBGMTime(t - startTime);
+    }
+
     private void Awake()
     {
         instance = this;

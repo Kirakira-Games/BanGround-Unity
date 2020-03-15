@@ -106,16 +106,6 @@ public class NoteController : MonoBehaviour
         }
     }
 
-    private float GetTouchDistance(Touch touch, Vector3 pos)
-    {
-        var ray = mainCamera.ScreenPointToRay(touch.position);
-        if (NoteUtility.JudgePlane.Raycast(ray, out float dist))
-        {
-            return Vector3.Distance(ray.GetPoint(dist), pos);
-        }
-        return float.PositiveInfinity;
-    }
-
     private NoteBase OnTouch(JudgeQueue Q, KirakiraTouch touch)
     {
         UpdateLane(Q);
