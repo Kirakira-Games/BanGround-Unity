@@ -45,5 +45,8 @@ public class AppPreLoader : MonoBehaviour
             //MessageBoxController.ShowMsg(LogLevel.INFO, "SampleRate: " + sampleRate.ToString() + "  BufferSize: " + bufferSize.ToString());
             SceneManager.LoadScene("Title");
         }
+
+        // Input system
+        UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
     }
 }

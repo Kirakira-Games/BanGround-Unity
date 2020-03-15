@@ -7,26 +7,26 @@ public class SlideEnd : SlideNoteBase
     public override void UpdatePosition(int audioTime)
     {
         base.UpdatePosition(audioTime);
-        IsStickEnd = false;
+        isStickEnd = false;
         if (!parentSlide) Debug.LogWarning(name);
-        if (IsJudging && audioTime >= time)
+        if (isJudging && audioTime >= time)
         {
-            IsStickEnd = true;
+            isStickEnd = true;
             transform.position = judgePos;
         }
     }
 
-    protected override JudgeResult TrySlideJudge(int audioTime, Touch touch)
+    protected override JudgeResult TrySlideJudge(KirakiraTouch touch)
     {
-        if (!NoteUtility.IsTouchEnd(touch))
+        if (touch.current.phase != KirakiraTouchPhase.ENDED)
         {
             return JudgeResult.None;
         }
-        if (IsTilt)
+        if (isTilt)
         {
             for (int i = 0; i < NoteUtility.SLIDE_END_TILT_JUDGE_RANGE.Length; i++)
             {
-                if (audioTime >= time + NoteUtility.SLIDE_END_TILT_JUDGE_RANGE[i])
+                if (touch.current.time >= time + NoteUtility.SLIDE_END_TILT_JUDGE_RANGE[i])
                 {
                     return (JudgeResult)i;
                 }
@@ -35,7 +35,7 @@ public class SlideEnd : SlideNoteBase
         }
         else
         {
-            return TranslateTimeToJudge(NoteUtility.TAP_JUDGE_RANGE, audioTime);
+            return TranslateTimeToJudge(NoteUtility.TAP_JUDGE_RANGE, touch.current.time);
         }
     }
 
@@ -45,13 +45,13 @@ public class SlideEnd : SlideNoteBase
         GetComponent<MeshRenderer>().material.SetTexture("_BaseMap", NoteUtility.LoadResource<Texture2D>("note_long_default"));
     }
 
-    protected override void OnNoteUpdateJudge(int audioTime)
+    protected override void OnNoteUpdateJudge()
     {
-        if (audioTime > time + (IsTilt ?
+        if (NoteController.judgeTime > time + (isTilt ?
             NoteUtility.SLIDE_TICK_JUDGE_RANGE :
             NoteUtility.TAP_JUDGE_RANGE[(int)JudgeResult.Bad]))
         {
-            RealJudge(audioTime, JudgeResult.Miss, null);
+            RealJudge(null, JudgeResult.Miss);
         }
     }
 }

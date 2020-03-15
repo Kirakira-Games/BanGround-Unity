@@ -51,7 +51,7 @@ public class NoteSyncLine : MonoBehaviour
             NoteBase obj = syncNotes[i];
             if (obj.isDestroyed ||
                 obj.judgeResult != JudgeResult.None ||
-                obj.GetComponent<SlideNoteBase>()?.IsStickEnd == true)
+                obj.GetComponent<SlideNoteBase>()?.isStickEnd == true)
             {
                 syncNotes.RemoveAt(i);
             }
