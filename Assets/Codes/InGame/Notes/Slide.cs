@@ -37,10 +37,18 @@ public class Slide : MonoBehaviour, KirakiraTracer
 
     public void FinalizeSlide()
     {
-        noteHead.isTilt = Vector3.Distance(notes[1].judgePos, noteHead.judgePos) >= NoteUtility.EPS;
+        bool isTilt = false;
+        for (int i = 1; i < notes.Count; i++)
+        {
+            if (notes[i].isFuwafuwa || notes[i].lane != notes[i - 1].lane)
+            {
+                isTilt = true;
+                break;
+            }
+        }
+        noteHead.isTilt = isTilt;
         noteHead.tapEffect.gameObject.SetActive(false);
-        SlideNoteBase lastNote = notes[notes.Count - 1];
-        lastNote.isTilt = Vector3.Distance(notes[notes.Count - 2].judgePos, lastNote.judgePos) >= NoteUtility.EPS;
+        notes[notes.Count - 1].isTilt = isTilt;
         foreach (var note in notes)
         {
             note.InitSlideNote();
