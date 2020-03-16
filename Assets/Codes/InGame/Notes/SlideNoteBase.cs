@@ -8,6 +8,7 @@ public abstract class SlideNoteBase : NoteBase
     public bool isStickEnd;
     public bool isJudging => parentSlide && parentSlide.isJudging;
     public SlideMesh slideMesh;
+    public FuwafuwaPillar pillar;
     protected Slide parentSlide;
 
     protected abstract JudgeResult TrySlideJudge(KirakiraTouch touch);
@@ -21,6 +22,7 @@ public abstract class SlideNoteBase : NoteBase
             slideMesh = GetComponentInChildren<SlideMesh>();
             slideMesh.meshRenderer.enabled = true;
         }
+        pillar.Init(this);
     }
 
     public override JudgeResult TryJudge(KirakiraTouch touch)

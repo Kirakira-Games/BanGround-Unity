@@ -80,16 +80,23 @@ public class NotePool : MonoBehaviour
             note.isDestroyed = true;
             note.transform.localScale = new Vector3(NoteUtility.NOTE_SCALE, 1, 1) * LiveSetting.noteSize;
             note.InitNote();
-            if (NoteUtility.IsSlide(type) && !NoteUtility.IsSlideEnd(type))
+            if (NoteUtility.IsSlide(type))
             {
-                var mesh = new GameObject("SlideBody");
-                mesh.layer = 8;
-                mesh.transform.SetParent(obj.transform);
-                mesh.AddComponent<SlideMesh>();
-                mesh.AddComponent<MeshRenderer>();
-                mesh.AddComponent<MeshFilter>();
-                mesh.AddComponent<NoteRotation>().needRot = false;
-                mesh.AddComponent<SortingGroup>().sortingLayerID = SortingLayer.NameToID("SlideBody");
+                var slideNote = note as SlideNoteBase;
+                var pillar = new GameObject("Pillar");
+                pillar.transform.SetParent(obj.transform);
+                slideNote.pillar = pillar.AddComponent<FuwafuwaPillar>();
+                if (!NoteUtility.IsSlideEnd(type))
+                {
+                    var mesh = new GameObject("SlideBody");
+                    mesh.layer = 8;
+                    mesh.transform.SetParent(obj.transform);
+                    mesh.AddComponent<SlideMesh>();
+                    mesh.AddComponent<MeshRenderer>();
+                    mesh.AddComponent<MeshFilter>();
+                    mesh.AddComponent<NoteRotation>().needRot = false;
+                    mesh.AddComponent<SortingGroup>().sortingLayerID = SortingLayer.NameToID("SlideBody");
+                }
             }
             obj.SetActive(false);
             Q.Enqueue(obj);

@@ -31,7 +31,7 @@ public class NoteSyncLine : MonoBehaviour
         lineRenderer.endWidth = lineWidth * LiveSetting.noteSize;
         lineRenderer.startColor = Color.white;
         lineRenderer.endColor = Color.white;
-        lineRenderer.rendererPriority = -1;
+        lineRenderer.rendererPriority = 1;
         return lineRenderer;
     }
 
