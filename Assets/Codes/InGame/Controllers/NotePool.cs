@@ -122,7 +122,7 @@ public class NotePool : MonoBehaviour
         {
             var fx = Instantiate(tapEffects[effect], Vector3.zero, Quaternion.identity) as GameObject;
             fx.transform.localScale = Vector3.one * LiveSetting.noteSize * NoteUtility.NOTE_SCALE;
-            fx.SetActive(false);
+            //fx.SetActive(false);
             fx.transform.SetParent(transform);
             teQueue[effect].Enqueue(fx);
         }
@@ -326,7 +326,7 @@ public class NotePool : MonoBehaviour
         var te = teQueue[ty].Dequeue();
         te.transform.position = pos;
         te.GetComponent<ParticleSystem>().Play();
-        te.SetActive(true);
+        //te.SetActive(true);
         StartCoroutine(KillFX(te, ty, 0.5f));
     }
 
@@ -334,7 +334,7 @@ public class NotePool : MonoBehaviour
     {
         yield return new WaitForSeconds(delaySeconds);
         fx.GetComponent<ParticleSystem>().Stop();
-        fx.SetActive(false);
+        //fx.SetActive(false);
         teQueue[type].Enqueue(fx);
     }
 }
