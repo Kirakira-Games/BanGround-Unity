@@ -145,7 +145,7 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        if (upProtect) return;
+        //if (upProtect) return;
         down = false;
         dh.canDrag = true;
         rt_s.enabled = true;
@@ -163,7 +163,7 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        upProtect = false;
+        //upProtect = false;
         down = false;
         longClick = false;
         dh.canDrag = true;
@@ -179,6 +179,7 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (down)
         {
             time += Time.deltaTime;
+            if (!select) return;
             if (time >= longClickTime && !longClick) 
             {
                 longClick = true;
@@ -189,7 +190,7 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             }
             if (time >= longClickTime + deleteTime)
             {
-                upProtect = true;
+                //upProtect = true;
             }
         }
     }
