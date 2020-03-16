@@ -178,12 +178,17 @@ public static class NoteUtility
 
     public static Vector3 ProjectVectorToParallelPlane(Vector3 position)
     {
+        position.z += GetDeltaZFromJudgePlane(position);
+        return position;
+    }
+
+    public static float GetDeltaZFromJudgePlane(Vector3 position)
+    {
         JudgePlane.Raycast(new Ray(
             new Vector3(position.x, position.y, 0),
             new Vector3(0, 0, 1)), out float dist);
         dist -= NOTE_JUDGE_Z_POS;
-        position.z += dist;
-        return position;
+        return dist;
     }
 
     public static bool IsFlick(GameNoteType type)
