@@ -128,9 +128,9 @@ public static class NoteUtility
     public const float NOTE_Y_MAX = 4f;
     public const float LANE_WIDTH = 2f;
     public const float LANE_JUDGE_WIDTH = 2.5f;
-    public const float LANE_JUDGE_HEIGHT = 3f;
+    public const float LANE_JUDGE_HEIGHT = 2.5f;
     public const float NOTE_SCALE = 1.2f;
-    public const float FUWAFUWA_RADIUS = 3f;
+    public const float FUWAFUWA_RADIUS = 2.5f;
     public static Plane JudgePlane;
 
     private static readonly float BANG_PERSPECTIVE_START = YTo3DXHelper(0);
