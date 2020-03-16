@@ -11,6 +11,9 @@ public class BipartiteMatching<LT, RT>
     public BipartiteMatching()
     {
         edges = new Dictionary<LT, HashSet<RT>>();
+        visited = new HashSet<LT>();
+        RtoL = new Dictionary<RT, LT>();
+        LtoR = new Dictionary<LT, RT>();
     }
 
     public void Clear(bool clearEdges = true)

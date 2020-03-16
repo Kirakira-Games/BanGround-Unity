@@ -2,8 +2,10 @@
 using System;
 using System.Collections.Generic;
 
-using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
-using TouchPhase = UnityEngine.InputSystem.TouchPhase;
+public interface KirakiraTouchProvider
+{
+    KirakiraTouchState[] GetTouches();
+}
 
 public interface KirakiraTracer
 {
@@ -130,23 +132,6 @@ public class KirakiraTouch
         return Vector2.Distance(p, q) * 2.54F / Screen.dpi;
     }
 
-    public static KirakiraTouchPhase Kirakira(TouchPhase phase)
-    {
-        switch (phase)
-        {
-            case TouchPhase.Began:
-                return KirakiraTouchPhase.Began;
-            case TouchPhase.Moved:
-            case TouchPhase.Stationary:
-                return KirakiraTouchPhase.Ongoing;
-            case TouchPhase.Ended:
-            case TouchPhase.Canceled:
-                return KirakiraTouchPhase.Ended;
-            default:
-                return KirakiraTouchPhase.None;
-        }
-    }
-
     public KirakiraTouch()
     {
         timeline = new PriorityQueue<float, KirakiraTouchState>();
@@ -202,6 +187,7 @@ public class KirakiraTouch
 public class TouchManager : MonoBehaviour
 {
     public static TouchManager instance;
+    public static KirakiraTouchProvider provider;
 
     private Dictionary<int, KirakiraTouch> touchTable;
     private Dictionary<(KirakiraTracer, int), JudgeResult> traceCache;
@@ -217,63 +203,6 @@ public class TouchManager : MonoBehaviour
             case JudgeResult.Perfect: return 4;
             default: return 0;
         }
-    }
-
-    // For debugging purpose only, simulate touch event from mouse event
-    public static KirakiraTouchState[] SimulateMouseTouch(KirakiraTouchPhase phase)
-    {
-        var ray = NoteController.mainCamera.ScreenPointToRay(Input.mousePosition);
-        var pos = NoteUtility.JudgePlane.Raycast(ray, out float dist) ? ray.GetPoint(dist) : KirakiraTouch.INVALID_POSITION;
-        KirakiraTouchState touch = new KirakiraTouchState
-        {
-            touchId = NoteUtility.MOUSE_TOUCH_ID,
-            screenPos = Input.mousePosition,
-            pos = pos,
-            time = AudioTimelineSync.instance.GetTimeInMs(),
-            realtime = Time.realtimeSinceStartup,
-            phase = phase
-        };
-        return new KirakiraTouchState[] { touch };
-    }
-
-    public static KirakiraTouchState[] GetTouches()
-    {
-        var touches = Touch.activeTouches;
-        KirakiraTouchState[] ret = new KirakiraTouchState[touches.Count];
-        for (int i = 0; i < touches.Count; i++)
-        {
-            var touch = touches[i];
-            var ray = NoteController.mainCamera.ScreenPointToRay(touch.screenPosition);
-            var pos = NoteUtility.JudgePlane.Raycast(ray, out float dist) ? ray.GetPoint(dist) : KirakiraTouch.INVALID_POSITION;
-
-            ret[i] = new KirakiraTouchState
-            {
-                touchId = touch.touchId,
-                time = Mathf.RoundToInt(AudioTimelineSync.instance.TimeSinceStartupToBGMTime((float)touch.time) * 1000) - LiveSetting.judgeOffset,
-                realtime = (float)touch.time,
-                screenPos = touch.screenPosition,
-                pos = pos,
-                phase = KirakiraTouch.Kirakira(touch.phase)
-            };
-        }
-
-        // Simulate touches with mouse
-        if (touches.Count == 0)
-        {
-            if (Input.GetMouseButtonDown(0))
-            {
-                ret = SimulateMouseTouch(KirakiraTouchPhase.Began);
-            }
-            else if (Input.GetMouseButton(0))
-            {
-                ret = SimulateMouseTouch(KirakiraTouchPhase.Ongoing);
-            }
-            else if (Input.GetMouseButtonUp(0))
-            {
-                ret = SimulateMouseTouch(KirakiraTouchPhase.Ended);
-            }
-        }
-        return ret;
     }
 
     public KirakiraTouch GetTouchById(int id)
@@ -339,6 +268,18 @@ public class TouchManager : MonoBehaviour
         instance = this;
         touchTable = new Dictionary<int, KirakiraTouch>();
         traceCache = new Dictionary<(KirakiraTracer, int), JudgeResult>();
+        if (LiveSetting.autoPlayEnabled)
+        {
+            provider = new AutoPlayTouchProvider();
+        }
+        else
+        {
+#if UNITY_EDITOR
+            provider = new MouseTouchProvider();
+#else
+            provider = new InputSystemTouchProvider();
+#endif
+        }
     }
 
     public static bool TouchesNote(KirakiraTouchState touch, Vector2 note)
@@ -374,11 +315,16 @@ public class TouchManager : MonoBehaviour
 
     public void OnUpdate()
     {
-        var touches = GetTouches();
+        var touches = provider.GetTouches();
 
         // Update touches that just starts
+        //if (touches.Length > 0)
+        //{
+        //    Debug.Log("===== Time: " + NoteController.audioTime);
+        //}
         foreach (var touch1 in touches)
         {
+            //Debug.Log(touch1);
             GetTouchById(touch1.touchId).OnUpdate(touch1);
         }
 
@@ -428,13 +374,14 @@ public class TouchManager : MonoBehaviour
                     var tracer2 = GetTouchById(i);
                     Debug.Assert(tracer2.isValid);
                     var owner2 = tracer2.owner;
-                    int prevVal = EvalResult(TryTrace(owner, tracer) +
-                        (owner2 == null ? 0 : EvalResult(TryTrace(owner2, tracer2))));
-                    int exchangeVal = EvalResult(TryTrace(owner, tracer2) +
-                        (owner2 == null ? 0 : EvalResult(TryTrace(owner2, tracer))));
+                    int prevVal = EvalResult(TryTrace(owner, tracer)) +
+                        (owner2 == null ? 0 : EvalResult(TryTrace(owner2, tracer2)));
+                    int exchangeVal = EvalResult(TryTrace(owner, tracer2)) +
+                        (owner2 == null ? 0 : EvalResult(TryTrace(owner2, tracer)));
                     if (exchangeVal > prevVal)
                     {
                         hasExchanged = true;
+                        Debug.Log("Exchange: " + tracer.touchId + " / " + tracer2.touchId);
                         ExchangeTouch(tracer, tracer2);
                         break;
                     }
