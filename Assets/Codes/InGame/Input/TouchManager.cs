@@ -279,14 +279,7 @@ public class TouchManager : MonoBehaviour
 #if UNITY_EDITOR
             provider = new MouseTouchProvider();
 #else
-            if (Mathf.RoundToInt(LiveSetting.noteSize * 10) % 2 == 1)
-            {
-                provider = new InputManagerTouchProvider();
-            }
-            else
-            {
-                provider = new InputSystemTouchProvider();
-            }
+            provider = new InputManagerTouchProvider();
 #endif
         }
     }
