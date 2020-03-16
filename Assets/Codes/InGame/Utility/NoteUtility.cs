@@ -128,7 +128,7 @@ public static class NoteUtility
     public const float NOTE_Y_MAX = 4f;
     public const float LANE_WIDTH = 2f;
     public const float LANE_JUDGE_WIDTH = 2.5f;
-    public const float LANE_JUDGE_HEIGHT = 2f;
+    public const float LANE_JUDGE_HEIGHT = 3f;
     public const float NOTE_SCALE = 1.2f;
     public const float FUWAFUWA_RADIUS = 3f;
     public static Plane JudgePlane;
@@ -142,14 +142,12 @@ public static class NoteUtility
     private static readonly int[] SLIDE_END_TILT_JUDGE_RANGE_RAW = { -34, -84, -100, -117 };
     private const int SLIDE_END_FLICK_JUDGE_RANGE_RAW = 100;
     private const int SLIDE_TICK_JUDGE_RANGE_RAW = 200;
-    private const int AUTO_JUDGE_RANGE_RAW = 10;
 
     public static readonly int[] TAP_JUDGE_RANGE = new int[4];
     public static readonly int[] SLIDE_END_JUDGE_RANGE = new int[4];
     public static readonly int[] SLIDE_END_TILT_JUDGE_RANGE = new int[4];
     public static int SLIDE_END_FLICK_JUDGE_RANGE => (int)(SLIDE_END_FLICK_JUDGE_RANGE_RAW * LiveSetting.SpeedCompensationSum);
     public static int SLIDE_TICK_JUDGE_RANGE => (int)(SLIDE_TICK_JUDGE_RANGE_RAW * LiveSetting.SpeedCompensationSum);
-    public static int AUTO_JUDGE_RANGE => (int)(AUTO_JUDGE_RANGE_RAW * LiveSetting.SpeedCompensationSum);
 
     public const float FLICK_JUDGE_DIST = 0.4f;
 

@@ -106,38 +106,6 @@ public class NoteController : MonoBehaviour
         }
     }
 
-    private NoteBase OnTouch(JudgeQueue Q, KirakiraTouch touch)
-    {
-        UpdateLane(Q);
-        // Try to judge the front of the queue
-        for (var i = Q.FirstV; i != null; i = i.Next)
-        {
-            NoteBase note = i.Value;
-            if (note.time > touch.current.time + NoteUtility.SLIDE_TICK_JUDGE_RANGE)
-            {
-                return null;
-            }
-            if (NoteUtility.IsSlide(note.type) && (note as SlideNoteBase).isJudging)
-            {
-                continue;
-            }
-            if (!TouchManager.TouchesNote(touch.current, note))
-            {
-                continue;
-            }
-            JudgeResult result = note.TryJudge(touch);
-            if (result != JudgeResult.None)
-            {
-                return note;
-            }
-            else
-            {
-                return null;
-            }
-        }
-        return null;
-    }
-
     private GameObject CreateNote(GameNoteData gameNote)
     {
         var noteObj = NotePool.instance.GetNote(gameNote.type);
@@ -199,18 +167,48 @@ public class NoteController : MonoBehaviour
         return lanes.ToArray();
     }
 
+    private NoteBase OnTouch(JudgeQueue Q, KirakiraTouch touch)
+    {
+        UpdateLane(Q);
+        // Try to judge the front of the queue
+        for (var i = Q.FirstV; i != null; i = i.Next)
+        {
+            NoteBase note = i.Value;
+            if (note.time > touch.current.time + NoteUtility.SLIDE_TICK_JUDGE_RANGE)
+            {
+                return null;
+            }
+            if (NoteUtility.IsSlide(note.type) && (note as SlideNoteBase).isJudging)
+            {
+                continue;
+            }
+            if (!TouchManager.TouchesNote(touch.current, note))
+            {
+                continue;
+            }
+            JudgeResult result = note.TryJudge(touch);
+            if (result != JudgeResult.None)
+            {
+                return note;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        return null;
+    }
+
     public void UpdateTouch(KirakiraTouch touch)
     {
-        //audioTime -= LiveSetting.judgeOffset;
         // Find lanes
         int[] lanes = GetLanesByTouchState(touch.current);
 
-        // Find note to judge - non-fuwafuwa
         NoteBase noteToJudge = null;
-
         if (!UIManager.BitingTheDust)
         {
             NoteBase ret;
+            // Find note to judge - non-fuwafuwa
             foreach (int lane in lanes)
             {
                 ret = OnTouch(laneQueue[lane], touch);
@@ -302,6 +300,12 @@ public class NoteController : MonoBehaviour
         }
         ComboManager.manager.Init(numNotes);
 
+        // Check AutoPlay
+        if (LiveSetting.autoPlayEnabled)
+        {
+            (TouchManager.provider as AutoPlayTouchProvider).Init(notes);
+        }
+
         // Sound effects
         soundEffects = new ISoundEffect[5]
         {
@@ -373,10 +377,7 @@ public class NoteController : MonoBehaviour
         UpdateLane(noteQueue);
 
         // Trigger touch event
-        if (!LiveSetting.autoPlayEnabled)
-        {
-            TouchManager.instance.OnUpdate();
-        }
+        TouchManager.instance.OnUpdate();
 
         // Update each note child
         var noteBase = transform.GetComponentsInChildren<NoteBase>();

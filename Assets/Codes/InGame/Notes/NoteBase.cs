@@ -97,17 +97,7 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
         {
             UpdatePosition(NoteController.audioTime);
         }
-        if (LiveSetting.autoPlayEnabled)
-        {
-            if (NoteController.audioTime >= time - NoteUtility.AUTO_JUDGE_RANGE)
-            {
-                RealJudge(null, JudgeResult.Perfect);
-            }
-        }
-        else
-        {
-            OnNoteUpdateJudge();
-        }
+        OnNoteUpdateJudge();
     }
 
     protected JudgeResult TranslateTimeToJudge(int[] judgeRange, int audioTime)

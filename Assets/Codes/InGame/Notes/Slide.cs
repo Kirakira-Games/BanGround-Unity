@@ -116,7 +116,7 @@ public class Slide : MonoBehaviour, KirakiraTracer
             }
             mesh.meshRenderer.enabled = enableBody;
         }
-        noteHead.gameObject.SetActive(isJudging || LiveSetting.autoPlayEnabled);
+        noteHead.gameObject.SetActive(isJudging);
         noteHead.tapEffect.OnUpdate();
     }
 
@@ -168,7 +168,7 @@ public class Slide : MonoBehaviour, KirakiraTracer
 
     private void BindTouch(KirakiraTouch touch)
     {
-        if (LiveSetting.autoPlayEnabled || isJudging || touch == null) return;
+        if (isJudging || touch == null) return;
         if (touch.current.phase == KirakiraTouchPhase.Ended) return;
         TouchManager.instance.RegisterTouch(touch.touchId, this);
         Debug.Assert(touchId == touch.touchId);
@@ -255,13 +255,15 @@ public class Slide : MonoBehaviour, KirakiraTracer
     {
         if (result == JudgeResult.None) return;
         var note = notes[judgeHead];
-        if (note.isTracingOrJudged)
-        {
-            note.Trace(touch, result);
-        }
-        else if (note.TryJudge(touch) != JudgeResult.None)
+        if (note.TryJudge(touch) != JudgeResult.None)
         {
             note.Judge(touch, result);
+        }
+        if (note.isTracingOrJudged)
+        {
+            var res = note.TryTrace(touch);
+            if (res != JudgeResult.None)
+                note.Trace(touch, res);
         }
         if (touch.current.phase == KirakiraTouchPhase.Ended)
         {
