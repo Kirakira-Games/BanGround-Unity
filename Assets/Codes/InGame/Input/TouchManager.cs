@@ -191,6 +191,7 @@ public class TouchManager : MonoBehaviour
 
     private Dictionary<int, KirakiraTouch> touchTable;
     private Dictionary<(KirakiraTracer, int), JudgeResult> traceCache;
+    private HashSet<KirakiraTouch> exchanged;
 
     public static int EvalResult(JudgeResult result)
     {
@@ -268,6 +269,7 @@ public class TouchManager : MonoBehaviour
         instance = this;
         touchTable = new Dictionary<int, KirakiraTouch>();
         traceCache = new Dictionary<(KirakiraTracer, int), JudgeResult>();
+        exchanged = new HashSet<KirakiraTouch>();
         if (LiveSetting.autoPlayEnabled)
         {
             provider = new AutoPlayTouchProvider();
@@ -277,7 +279,14 @@ public class TouchManager : MonoBehaviour
 #if UNITY_EDITOR
             provider = new MouseTouchProvider();
 #else
-            provider = new InputSystemTouchProvider();
+            if (Mathf.RoundToInt(LiveSetting.noteSize * 10) % 2 == 1)
+            {
+                provider = new InputManagerTouchProvider();
+            }
+            else
+            {
+                provider = new InputSystemTouchProvider();
+            }
 #endif
         }
     }
@@ -308,6 +317,8 @@ public class TouchManager : MonoBehaviour
 
     private void ExchangeTouch(KirakiraTouch touch1, KirakiraTouch touch2)
     {
+        exchanged.Add(touch1);
+        exchanged.Add(touch2);
         (touch1.owner, touch2.owner) = (touch2.owner, touch1.owner);
         touch1.owner?.Assign(touch1);
         touch2.owner?.Assign(touch2);
@@ -357,6 +368,7 @@ public class TouchManager : MonoBehaviour
 
         // Try exchanging touches
         traceCache.Clear();
+        exchanged.Clear();
         bool hasExchanged;
         do
         {
@@ -388,6 +400,10 @@ public class TouchManager : MonoBehaviour
                 }
             }
         } while (hasExchanged);
+        foreach (var e in exchanged)
+        {
+            e.exchangable.Clear();
+        }
 
         // Actually trace touches
         foreach (var entry in touchTable)
