@@ -97,7 +97,7 @@ public static class ChartLoader
             NormalizeBeat(note.beat);
             // Test new functionality
             /*
-            if (Random.Range(0, 1) == 0)
+            if (Random.Range(0, 2) == 0)
             {
                 note.x = note.lane;
                 note.y = Random.Range(0f, 1f);
