@@ -27,6 +27,8 @@ public class NoteSyncLine : MonoBehaviour
         obj.transform.localPosition = new Vector3(0, -0.05f, 0);
         LineRenderer lineRenderer = obj.AddComponent<LineRenderer>();
         lineRenderer.useWorldSpace = false;
+        lineRenderer.receiveShadows = false;
+        lineRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         lineRenderer.material = Resources.Load<Material>("TestAssets/Materials/sync_line");
         lineRenderer.startWidth = lineWidth * LiveSetting.noteSize;
         lineRenderer.endWidth = lineWidth * LiveSetting.noteSize;
