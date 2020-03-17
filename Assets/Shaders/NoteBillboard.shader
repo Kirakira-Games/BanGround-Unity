@@ -9,12 +9,13 @@ Shader "Unlit/NoteBillboard"
     }
     SubShader
     {
-        Tags { "Queue" = "Transparent" "IgnoreProjector" = "True"  "RenderType" = "Transparent" }
+        Tags { "Queue" = "Transparent" "IgnoreProjector" = "True"  "RenderType" = "Transparent" "DisableBatching" = "True" }
         LOD 100
 
+        Blend SrcAlpha OneMinusSrcAlpha
+        ZWrite Off
         Pass
         {
-            Blend SrcAlpha OneMinusSrcAlpha
             Cull Off
 
             CGPROGRAM
@@ -50,9 +51,8 @@ Shader "Unlit/NoteBillboard"
 
                 float3 normalDir = normalize(viewer - center);
 
-                float3 upDir = abs(normalDir.y) > 0.999 ? float3(0, 0, 1) : float3(0, 1, 0);
-                float3 rightDir = normalize(cross(upDir, normalDir));
-                upDir = normalize(cross(normalDir, rightDir));
+                float3 rightDir = float3(1,0,0);
+                float3 upDir = normalize(cross(normalDir, rightDir));
 
 
                 float3 centerOffs = v.vertex.xyz - center;
@@ -64,8 +64,9 @@ Shader "Unlit/NoteBillboard"
 
             fixed4 frag (v2f i) : SV_Target
             {
+                float2 uv = float2(i.uv.x, 1 - i.uv.y);
                 // sample the texture
-                fixed4 col = tex2D(_MainTex, i.uv);
+                fixed4 col = tex2D(_MainTex, uv);
                 // apply fog
                 UNITY_APPLY_FOG(i.fogCoord, col);
                 return col;

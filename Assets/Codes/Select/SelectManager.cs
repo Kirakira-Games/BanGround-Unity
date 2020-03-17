@@ -28,6 +28,7 @@ public class SelectManager : MonoBehaviour
     private Toggle mirrow_Tog;
     private Toggle ELP_Tog;
     private NoteStyleToggleGroup noteToggles;
+    private SESelector seSelector;
 
     /* Mods     */
 
@@ -82,7 +83,7 @@ public class SelectManager : MonoBehaviour
 
     PlayRecords playRecords;
 
-    ISoundTrack previewSound;
+    [HideInInspector] public ISoundTrack previewSound;
 
     private void Awake()
     {
@@ -157,6 +158,7 @@ public class SelectManager : MonoBehaviour
         persp_Tog = GameObject.Find("Perspective_Toggle").GetComponent<Toggle>();
         ELP_Tog = GameObject.Find("ELP_Toggle").GetComponent<Toggle>();
         noteToggles = GameObject.Find("Note_Group").GetComponent<NoteStyleToggleGroup>();
+        seSelector= GameObject.Find("SEGroup").GetComponent<SESelector>();
 
         speed_Input = GameObject.Find("Speed_Input").GetComponent<InputField>();
         judge_Input = GameObject.Find("Judge_Input").GetComponent<InputField>();
@@ -510,6 +512,7 @@ public class SelectManager : MonoBehaviour
     }
     void CloseSetting()
     {
+        previewSound.Play();
         GameObject.Find("Setting_Canvas").GetComponent<Animator>().Play("FlyUp");
         SetLiveSetting();
         File.WriteAllText(LiveSetting.settingsPath, JsonConvert.SerializeObject(new LiveSettingTemplate()));
@@ -548,6 +551,7 @@ public class SelectManager : MonoBehaviour
         bgmVolume_Input.value = LiveSetting.bgmVolume;
 
         noteToggles.SetStyle(LiveSetting.noteStyle);
+        seSelector.SetSE(LiveSetting.seStyle);
         language_Dropdown.value = (int)LiveSetting.language;
 
         GetModStatus();
@@ -591,6 +595,7 @@ public class SelectManager : MonoBehaviour
         LiveSetting.longBrightness = long_Bright.value;
 
         LiveSetting.noteStyle = noteToggles.GetStyle();
+        LiveSetting.seStyle = seSelector.GetSE();
 
         LiveSetting.RemoveAllMods();
         LiveSetting.attachedMods.Clear();

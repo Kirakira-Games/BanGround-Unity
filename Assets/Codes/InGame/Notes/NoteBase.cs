@@ -24,7 +24,7 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
 
     public virtual void InitNote()
     {
-        NoteMesh.CreateMesh(gameObject);
+        NoteSprite.CreateMesh(gameObject);
     }
 
     public virtual void ResetNote(GameNoteData data)
