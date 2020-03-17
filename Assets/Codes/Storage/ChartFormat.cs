@@ -109,6 +109,10 @@ public partial class NoteAnim : IExtensible
     [ProtoMember(3, IsRequired = false)]
     [System.ComponentModel.DefaultValue(float.NaN)]
     public float lane { get; set; } = float.NaN;
+
+    [ProtoMember(4, IsRequired = false)]
+    [System.ComponentModel.DefaultValue(float.NaN)]
+    public float y { get; set; } = float.NaN;
 }
 
 [Preserve]
@@ -139,6 +143,13 @@ public partial class Note : IExtensible
     [ProtoMember(6)]
     public List<NoteAnim> anims { get; } = new List<NoteAnim>();
 
+    [ProtoMember(7, IsRequired = false)]
+    [System.ComponentModel.DefaultValue(float.NaN)]
+    public float x { get; set; } = float.NaN;
+
+    [ProtoMember(8, IsRequired = false)]
+    [System.ComponentModel.DefaultValue(0)]
+    public float y { get; set; } = 0;
 }
 
 [Preserve]

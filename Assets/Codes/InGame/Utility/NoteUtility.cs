@@ -20,22 +20,63 @@ public class GameBeatInfo
     public float value;
 }
 
+public class GameNoteAnimState
+{
+    public int t;
+    public Vector3 p;
+
+    public override string ToString()
+    {
+        return string.Format("[{0}]: {1}", t, p);
+    }
+}
+
 public class GameNoteAnim
 {
-    public int startT;
-    public int endT;
-    public float startZ;
-    public float endZ;
-    public float startLane;
-    public float endLane;
+    public GameNoteAnimState S;
+    public GameNoteAnimState T;
+
+    public GameNoteAnimState Interpolate(float ratio)
+    {
+        return new GameNoteAnimState
+        {
+            t = Mathf.RoundToInt(Mathf.Lerp(S.t, T.t, ratio)),
+            p = Vector3.Lerp(S.p, T.p, ratio)
+        };
+    }
+
+    public GameNoteAnimState GetState(int t)
+    {
+        float ratio;
+        if (t <= S.t)
+        {
+            ratio = 0;
+        }
+        else if (t >= T.t)
+        {
+            ratio = 1;
+        }
+        else
+        {
+            ratio = (float)(t - S.t) / (T.t - S.t);
+        }
+        return Interpolate(ratio);
+    }
+
+    public override string ToString()
+    {
+        return string.Format("S: {0} => T: {1}", S, T);
+    }
 }
 
 public class GameNoteData
 {
     public int time;
     public int lane;
+    public Vector3 pos;
     public GameNoteType type;
     public bool isGray;
+    public bool isFuwafuwa => lane == -1;
     public List<GameNoteData> seg;
     public List<GameNoteAnim> anims;
     public int appearTime;
@@ -81,11 +122,16 @@ public enum TapEffectType
 public static class NoteUtility
 {
     public const int LANE_COUNT = 7;
-    public const float NOTE_START_POS = 200;
-    public const float NOTE_JUDGE_POS = 8;
+    public const float NOTE_START_Z_POS = 200;
+    public const float NOTE_JUDGE_Z_POS = 8;
     public const float NOTE_Y_POS = 0f;
+    public const float NOTE_Y_MAX = 3.5f;
     public const float LANE_WIDTH = 2f;
+    public const float LANE_JUDGE_WIDTH = 2.5f;
+    public const float LANE_JUDGE_HEIGHT = 2.5f;
     public const float NOTE_SCALE = 1f;
+    public const float FUWAFUWA_RADIUS = 2.5f;
+    public static Plane JudgePlane;
 
     private static readonly float BANG_PERSPECTIVE_START = YTo3DXHelper(0);
     private static readonly float BANG_PERSPECTIVE_END = YTo3DXHelper(1);
@@ -96,23 +142,22 @@ public static class NoteUtility
     private static readonly int[] SLIDE_END_TILT_JUDGE_RANGE_RAW = { -34, -84, -100, -117 };
     private const int SLIDE_END_FLICK_JUDGE_RANGE_RAW = 100;
     private const int SLIDE_TICK_JUDGE_RANGE_RAW = 200;
-    private const int AUTO_JUDGE_RANGE_RAW = 10;
 
     public static readonly int[] TAP_JUDGE_RANGE = new int[4];
     public static readonly int[] SLIDE_END_JUDGE_RANGE = new int[4];
     public static readonly int[] SLIDE_END_TILT_JUDGE_RANGE = new int[4];
     public static int SLIDE_END_FLICK_JUDGE_RANGE => (int)(SLIDE_END_FLICK_JUDGE_RANGE_RAW * LiveSetting.SpeedCompensationSum);
     public static int SLIDE_TICK_JUDGE_RANGE => (int)(SLIDE_TICK_JUDGE_RANGE_RAW * LiveSetting.SpeedCompensationSum);
-    public static int AUTO_JUDGE_RANGE => (int)(AUTO_JUDGE_RANGE_RAW * LiveSetting.SpeedCompensationSum);
 
-    public const float FLICK_JUDGE_DIST = 0.4f;
+    public const float FLICK_JUDGE_DIST = 0.5f;
 
     public const int MOUSE_TOUCH_ID = -16;
 
     public const float EPS = 1e-4f;
 
-    public static void InitJudgeRange()
+    public static void Init(Vector3 planeNormal)
     {
+        JudgePlane = new Plane(planeNormal.normalized, new Vector3(0, 0, NOTE_JUDGE_Z_POS));
         for (int i = 0; i < TAP_JUDGE_RANGE.Length; i++)
         {
             TAP_JUDGE_RANGE[i] = (int)(TAP_JUDGE_RANGE_RAW[i] * LiveSetting.SpeedCompensationSum);
@@ -123,12 +168,27 @@ public static class NoteUtility
 
     public static Vector3 GetInitPos(float lane)
     {
-        return new Vector3((lane - 3) * LANE_WIDTH, NOTE_Y_POS, NOTE_START_POS);
+        return new Vector3((lane - 3) * LANE_WIDTH, NOTE_Y_POS, NOTE_START_Z_POS);
     }
 
     public static Vector3 GetJudgePos(float lane)
     {
-        return new Vector3((lane - 3) * LANE_WIDTH, NOTE_Y_POS, NOTE_JUDGE_POS);
+        return new Vector3((lane - 3) * LANE_WIDTH, NOTE_Y_POS, NOTE_JUDGE_Z_POS);
+    }
+
+    public static Vector3 ProjectVectorToParallelPlane(Vector3 position)
+    {
+        position.z += GetDeltaZFromJudgePlane(position);
+        return position;
+    }
+
+    public static float GetDeltaZFromJudgePlane(Vector3 position)
+    {
+        JudgePlane.Raycast(new Ray(
+            new Vector3(position.x, position.y, 0),
+            new Vector3(0, 0, 1)), out float dist);
+        dist -= NOTE_JUDGE_Z_POS;
+        return dist;
     }
 
     public static bool IsFlick(GameNoteType type)
@@ -211,15 +271,15 @@ public static class NoteUtility
         return (lane - 3) * LANE_WIDTH;
     }
 
-    public static float Interpolate(float ratio, float outS, float outT)
+    public static float GetYPos(float y)
     {
-        return (outT * ratio) + outS * (1 - ratio);
+        return Mathf.LerpUnclamped(NOTE_Y_POS, NOTE_Y_MAX, y);
     }
 
     public static float Interpolate(float inS, float inT, float inP, float outS, float outT)
     {
         if (inS == inT) return outS;
         float ratio = (inP - inS) / (inT - inS);
-        return Interpolate(ratio, outS, outT);
+        return Mathf.Lerp(outS, outT, ratio);
     }
 }

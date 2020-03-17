@@ -4,16 +4,15 @@ using UnityEngine;
 
 public class SlideEndFlick : SlideNoteBase
 {
-    private Vector2 touchPosition;
-    protected override JudgeResult TrySlideJudge(int audioTime, Touch touch)
+    protected override JudgeResult TrySlideJudge(KirakiraTouch touch)
     {
-        if (IsTilt)
+        if (isTilt)
         {
-            return audioTime >= time ? JudgeResult.Perfect : JudgeResult.None;
+            return touch.current.time >= time ? JudgeResult.Perfect : JudgeResult.None;
         }
         else
         {
-            return audioTime >=
+            return touch.current.time >=
                 time - NoteUtility.SLIDE_END_JUDGE_RANGE[(int)JudgeResult.Bad] ?
                 JudgeResult.Perfect : JudgeResult.None;
         }
@@ -26,37 +25,40 @@ public class SlideEndFlick : SlideNoteBase
         Instantiate(Resources.Load(LiveSetting.assetDirectory + "/FlickArrow"), transform);
     }
 
-    public override void Judge(int audioTime, JudgeResult result, Touch? touch)
+    public override void Judge(KirakiraTouch touch, JudgeResult result)
     {
-        touchId = touch.Value.fingerId;
-        touchPosition = touch.Value.position;
-        judgeTime = audioTime;
+        judgeTime = touch.current.time;
     }
 
-    public override void TraceTouch(int audioTime, Touch touch)
+    public override JudgeResult TryTrace(KirakiraTouch touch)
     {
-        Vector2 dist = touch.position - touchPosition;
-        if (dist.magnitude * 2.54F >= Screen.dpi * NoteUtility.FLICK_JUDGE_DIST)
+        if (!isTracingOrJudged) return JudgeResult.None;
+
+        int judgeRange = isTilt ?
+            NoteUtility.SLIDE_END_FLICK_JUDGE_RANGE :
+            NoteUtility.SLIDE_END_JUDGE_RANGE[(int)JudgeResult.Bad];
+
+        if (touch.timeSinceFlick <= judgeRange)
         {
-            RealJudge(audioTime, IsTilt ?
-                JudgeResult.Perfect :
-                TranslateTimeToJudge(NoteUtility.SLIDE_END_JUDGE_RANGE, audioTime), touch);
+            return isTilt ? JudgeResult.Perfect :
+                TranslateTimeToJudge(NoteUtility.SLIDE_END_JUDGE_RANGE, touch.current.time);
         }
-        else if (NoteUtility.IsTouchEnd(touch))
+        else if (touch.current.phase == KirakiraTouchPhase.Ended)
         {
-            RealJudge(audioTime, JudgeResult.Miss, null);
+            return JudgeResult.Miss;
         }
+        return JudgeResult.None;
     }
 
-    protected override void OnNoteUpdateJudge(int audioTime)
+    protected override void OnNoteUpdateJudge()
     {
-        int judgeEndTime = time + (IsTilt ?
+        int judgeEndTime = time + (isTilt ?
             NoteUtility.SLIDE_END_FLICK_JUDGE_RANGE :
             NoteUtility.SLIDE_END_JUDGE_RANGE[(int)JudgeResult.Bad]);
 
-        if (audioTime > judgeEndTime)
+        if (NoteController.judgeTime > judgeEndTime)
         {
-            RealJudge(audioTime, JudgeResult.Miss, null);
+            RealJudge(null, JudgeResult.Miss);
         }
     }
 }

@@ -1,13 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public abstract class NoteBase : MonoBehaviour
+public abstract class NoteBase : MonoBehaviour, KirakiraTracer
 {
-    public int lane;
     public int time;
+    public int lane;
     public int judgeTime;
     public int touchId;
     public bool isGray;
+    public bool isFuwafuwa => lane == -1;
+    public bool isTracingOrJudged => judgeTime != int.MinValue;
     public bool isDestroyed;
     public bool inJudgeQueue;
     public GameNoteAnim[] anims;
@@ -25,7 +27,7 @@ public abstract class NoteBase : MonoBehaviour
         NoteSprite.CreateMesh(gameObject);
     }
 
-    public virtual void ResetNote()
+    public virtual void ResetNote(GameNoteData data)
     {
         touchId = -1;
         animsHead = 0;
@@ -34,30 +36,44 @@ public abstract class NoteBase : MonoBehaviour
         transform.position = initPos;
         inJudgeQueue = true;
         isDestroyed = false;
+        
+        time = data.time;
+        lane = data.lane;
+        type = data.type;
+        isGray = LiveSetting.grayNoteEnabled ? data.isGray : false;
+        anims = data.anims.ToArray();
 
-        initPos = NoteUtility.GetInitPos(anims.Length > 0 ? anims[0].startLane : lane);
-        judgePos = NoteUtility.GetJudgePos(lane);
+        initPos = anims[0].S.p;
+        judgePos = data.pos;
+
+        if (isFuwafuwa)
+        {
+            NoteController.numFuwafuwaNotes++;
+        }
     }
 
     public virtual void UpdatePosition(int audioTime)
     {
-        while (animsHead < anims.Length - 1 && audioTime > anims[animsHead].endT)
+        while (animsHead < anims.Length - 1 && audioTime > anims[animsHead].T.t)
             animsHead++;
-        while (animsHead > 0 && audioTime < anims[animsHead].startT)
+        while (animsHead > 0 && audioTime < anims[animsHead].S.t)
             animsHead--;
 
         // Compute ratio of current animation
         var anim = anims[animsHead];
-        int timeSub = audioTime - anim.startT;
-        float ratio = (float)timeSub / (anim.endT - anim.startT);
-        float pos = ratio * (anim.endZ - anim.startZ) + anim.startZ;
+        int timeSub = audioTime - anim.S.t;
+        float ratio = (float)timeSub / (anim.T.t - anim.S.t);
+        float pos = Mathf.Lerp(anim.S.p.z, anim.T.p.z, ratio);
+        //Debug.Log(anim + ", head = " + animsHead + ", ratio = " + ratio);
 
         // Update position
-        Vector3 newPos = initPos;
-        newPos.x = NoteUtility.GetXPos(anim.startLane * (1 - ratio) + anim.endLane * ratio);
+        Vector3 newPos = Vector3.Lerp(anim.S.p, anim.T.p, ratio);
         if (LiveSetting.bangPerspective)
+        {
             pos = NoteUtility.GetBangPerspective(pos);
-        newPos.z = initPos.z - (NoteUtility.NOTE_START_POS - NoteUtility.NOTE_JUDGE_POS) * pos;
+        }
+        newPos.z = Mathf.LerpUnclamped(NoteUtility.NOTE_START_Z_POS, NoteUtility.NOTE_JUDGE_Z_POS, pos);
+        newPos = NoteUtility.ProjectVectorToParallelPlane(newPos);
         transform.position = newPos;
     }
 
@@ -65,58 +81,30 @@ public abstract class NoteBase : MonoBehaviour
     {
         if (touchId != -1)
         {
-            NoteController.instance.UnregisterTouch(touchId, gameObject);
+            TouchManager.instance.UnregisterTouch(touchId, this);
         }
-
-        //if (LiveSetting.autoPlayEnabled)
-        //{
-        //    JudgeResultController.instance.DisplayJudgeOffset(OffsetResult.None);
-        //    return;
-        //}
-
-        //int result = (int)judgeResult;
-        //int deltaTime = time - judgeTime;
-        //if (result >= (LiveSetting.displayELP ? 0 : 1) && result <= 3 && deltaTime != 0)
-        //{
-        //    ComboManager.JudgeOffsetResult.Add(deltaTime);
-        //    JudgeResultController.instance.DisplayJudgeOffset(deltaTime > 0 ? OffsetResult.Early : OffsetResult.Late);
-        //    return;
-        //}
-        ////else if (result >= 1 && result <= 3)
-        ////{
-        ////    ComboManager.JudgeOffsetResult.Add(deltaTime);
-        ////    JudgeResultController.instance.DisplayJudgeOffset(deltaTime > 0 ? OffsetResult.Early : OffsetResult.Late);
-        ////    return;
-        ////}
-        //JudgeResultController.instance.DisplayJudgeOffset(OffsetResult.None);
+        if (isFuwafuwa)
+        {
+            NoteController.numFuwafuwaNotes--;
+        }
     }
 
-    protected virtual void OnNoteUpdateJudge(int audioTime)
+    protected virtual void OnNoteUpdateJudge()
     {
-        if (audioTime > time + NoteUtility.TAP_JUDGE_RANGE[(int)JudgeResult.Bad])
+        if (NoteController.judgeTime > time + NoteUtility.TAP_JUDGE_RANGE[(int)JudgeResult.Bad])
         {
-            RealJudge(audioTime, JudgeResult.Miss, null);
+            RealJudge(null, JudgeResult.Miss);
         }
     }
 
     // This method should not be overriden
-    public void OnNoteUpdate(int audioTime)
+    public void OnNoteUpdate()
     {
         if (judgeResult == JudgeResult.None)
         {
-            UpdatePosition(audioTime);
+            UpdatePosition(NoteController.audioTime);
         }
-        if (LiveSetting.autoPlayEnabled)
-        {
-            if (audioTime >= time - NoteUtility.AUTO_JUDGE_RANGE)
-            {
-                RealJudge(audioTime, JudgeResult.Perfect, new Touch());
-            }
-        }
-        else
-        {
-            OnNoteUpdateJudge(audioTime - LiveSetting.judgeOffset);
-        }
+        OnNoteUpdateJudge();
     }
 
     protected JudgeResult TranslateTimeToJudge(int[] judgeRange, int audioTime)
@@ -133,29 +121,52 @@ public abstract class NoteBase : MonoBehaviour
         return JudgeResult.None;
     }
 
-    public virtual JudgeResult TryJudge(int audioTime, Touch touch)
+    public virtual JudgeResult TryJudge(KirakiraTouch touch)
     {
-        if (judgeTime != int.MinValue || touch.phase != TouchPhase.Began)
+        if (isTracingOrJudged || touch.current.phase != KirakiraTouchPhase.Began)
         {
             return JudgeResult.None;
         }
-        return TranslateTimeToJudge(NoteUtility.TAP_JUDGE_RANGE, audioTime);
+        return TranslateTimeToJudge(NoteUtility.TAP_JUDGE_RANGE, touch.current.time);
     }
 
     public virtual void TraceTouch(int audioTime, Touch touch) { }
 
-    public virtual void RealJudge(int audioTime, JudgeResult result, Touch? touch)
+    public virtual void RealJudge(KirakiraTouch touch, JudgeResult result)
     {
         if (judgeResult != JudgeResult.None) return;
-        if (judgeTime == int.MinValue)
-            judgeTime = audioTime;
+        if (!isTracingOrJudged)
+            judgeTime = touch == null ? NoteController.judgeTime : touch.current.time;
         judgeResult = result;
         NoteController.instance.Judge(this, result, touch);
         NotePool.instance.DestroyNote(gameObject);
     }
 
-    public virtual void Judge(int audioTime, JudgeResult result, Touch? touch)
+    public virtual void Judge(KirakiraTouch touch, JudgeResult result)
     {
-        RealJudge(audioTime, result, touch);
+        RealJudge(touch, result);
+    }
+
+    public virtual Vector2 GetPosition()
+    {
+        return judgePos;
+    }
+
+    public virtual JudgeResult TryTrace(KirakiraTouch touch)
+    {
+        return JudgeResult.None;
+    }
+
+    public virtual void Trace(KirakiraTouch touch, JudgeResult result)
+    {
+        if (result != JudgeResult.None)
+        {
+            RealJudge(touch, result);
+        }
+    }
+
+    public virtual void Assign(KirakiraTouch touch)
+    {
+        touchId = touch == null ? -1 : touch.touchId;
     }
 }

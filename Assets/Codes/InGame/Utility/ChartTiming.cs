@@ -16,6 +16,9 @@ public class ChartTiming
     public List<GameBeatInfo> SpeedInfo { get; }
     private float totTime;
 
+    private delegate bool UnknownPredicate(NoteAnim anim);
+    private delegate void Lerp(NoteAnim S, NoteAnim T, NoteAnim i);
+
     public ChartTiming()
     {
         BPMInfo = new List<GameBeatInfo>();
@@ -48,11 +51,6 @@ public class ChartTiming
         return GetTimeByBeat(ChartLoader.GetFloatingPointBeat(beat));
     }
 
-    private string AnimToString(GameNoteAnim anim)
-    {
-        return string.Format("[{0},{1}] {2}->{3}", anim.startT, anim.endT, anim.startZ, anim.endZ);
-    }
-
     public void GenerateAnimation(List<GameNoteAnim> raw, List<GameNoteAnim> output, GameNoteData note)
     {
         if (raw.Count == 0)
@@ -64,45 +62,45 @@ public class ChartTiming
         foreach (var anim in raw)
         {
             //Debug.Log("Raw anim: " + AnimToString(anim));
-            if (anim.startT - note.time >= -1) break;
-            totDist += anim.endZ;
+            if (anim.S.t - note.time >= -1) break;
+            totDist += anim.T.p.z;
         }
-        // Compute lane animation
-        for (int i = 0; i < raw.Count - 1; i++)
-        {
-            raw[i].endLane = raw[i + 1].startLane;
-        }
-        raw[raw.Count - 1].endLane = note.lane;
         //Debug.Log("Tot dist=" + totDist);
         bool isStart = true;
         foreach (var anim in raw)
         {
-            anim.startZ = 1 - totDist + curDist;
-            curDist += anim.endZ;
-            anim.endZ += anim.startZ;
+            anim.S.p.z = 1 - totDist + curDist;
+            curDist += anim.T.p.z;
+            anim.T.p.z += anim.S.p.z;
             if (isStart)
             {
-                if (anim.startZ <= 0 && anim.endZ <= 0)
+                if (anim.S.p.z <= 0 && anim.T.p.z <= 0)
                 {
                     continue;
                 }
                 else
                 {
                     isStart = false;
-                    if (anim.startZ <= 0)
+                    if (anim.S.p.z <= 0)
                     {
-                        float incRatio = (0 - anim.startZ) / (anim.endZ - anim.startZ);
-                        anim.startZ = 0;
-                        anim.startT += Mathf.RoundToInt((anim.endT - anim.startT) * incRatio);
+                        float incRatio = (0 - anim.S.p.z) / (anim.T.p.z - anim.S.p.z);
+                        anim.S.p.z = 0;
+                        anim.S.t += Mathf.RoundToInt((anim.T.t - anim.S.t) * incRatio);
                     }
                 }
             }
-            //Debug.Log("Add anim: " + AnimToString(anim));
-            output.Add(anim);
+            if (anim.S.t < anim.T.t)
+                output.Add(anim);
         }
+        /*
+        foreach (var anim in output)
+        {
+            Debug.Log("Add anim: " + anim);
+        }
+        */
     }
 
-    public void GenerateAnimationRawData(NoteAnim anim, float beatStart, float beatEnd, float nextlane, List<GameNoteAnim> output)
+    public void GenerateAnimationRawData(NoteAnim anim, float beatStart, float beatEnd, float nextlane, float nextY, List<GameNoteAnim> output)
     {
         //Debug.Log("Anim: " + beatStart + " / " + beatEnd);
         float timeStart = GetTimeByBeat(beatStart);
@@ -118,15 +116,54 @@ public class ChartTiming
                 timeEnd : SpeedInfo[i + 1].time;
             if (timeT < timeS) continue;
 
-            float ratio = (timeS - timeStart) / (timeEnd - timeStart);
+            float ratioS = (timeS - timeStart) / (timeEnd - timeStart);
+            float ratioT = (timeT - timeStart) / (timeEnd - timeStart);
+
             var newAnim = new GameNoteAnim
             {
-                startT = Mathf.RoundToInt(timeS * 1000),
-                endT = Mathf.RoundToInt(timeT * 1000),
-                endZ = (timeT - timeS) / totTime * info.value * anim.speed,
-                startLane = ratio * nextlane + (1 - ratio) * anim.lane
+                S = new GameNoteAnimState
+                {
+                    t = Mathf.RoundToInt(timeS * 1000),
+                    p = new Vector3(
+                        NoteUtility.GetXPos(Mathf.Lerp(anim.lane, nextlane, ratioS)),
+                        NoteUtility.GetYPos(Mathf.Lerp(anim.y, nextY, ratioS)),
+                        0)
+                },
+                T = new GameNoteAnimState
+                {
+                    t = Mathf.RoundToInt(timeT * 1000),
+                    p = new Vector3(
+                        NoteUtility.GetXPos(Mathf.Lerp(anim.lane, nextlane, ratioT)),
+                        NoteUtility.GetYPos(Mathf.Lerp(anim.y, nextY, ratioT)),
+                        (timeT - timeS) / totTime * info.value * anim.speed)
+                }
             };
-            output.Add(newAnim); // endZ temporarily stores the distance traveled
+            output.Add(newAnim); // T.p.z temporarily stores the distance traveled
+        }
+    }
+
+    // Fill in unknown properties by interpolation
+    private void FillInUnknown(Note data, UnknownPredicate predicate, Lerp lerp, NoteAnim fallback)
+    {
+        for (int i = 1; i < data.anims.Count; i++)
+        {
+            if (predicate(data.anims[i]))
+            {
+                bool suc = false;
+                for (int j = i + 1; j < data.anims.Count; j++)
+                {
+                    if (!predicate(data.anims[j]))
+                    {
+                        lerp(data.anims[i - 1], data.anims[j], data.anims[i]);
+                        suc = true;
+                        break;
+                    }
+                }
+                if (!suc)
+                {
+                    lerp(data.anims[i - 1], fallback, data.anims[i]);
+                }
+            }
         }
     }
 
@@ -181,16 +218,17 @@ public class ChartTiming
 
     public void AddAnimation(Note data, GameNoteData gameNote)
     {
+        // Debug.Log("Add animation");
         gameNote.anims = new List<GameNoteAnim>();
-        List<GameNoteAnim> tmpList = new List<GameNoteAnim>();
         // Generate default animation
         var initAnim = new NoteAnim
         {
             beat = new int[] { 0, -99, 1 },
             speed = 1,
-            lane = data.lane
+            lane = data.lane == -1 ? data.x : data.lane,
+            y = data.y
         };
-
+        // Update default properties 
         foreach (var i in data.anims)
         {
             if (!float.IsNaN(i.speed))
@@ -198,9 +236,20 @@ public class ChartTiming
                 initAnim.speed = i.speed;
                 break;
             }
+        }
+        foreach (var i in data.anims)
+        {
             if (!float.IsNaN(i.lane))
             {
                 initAnim.lane = i.lane;
+                break;
+            }
+        }
+        foreach (var i in data.anims)
+        {
+            if (!float.IsNaN(i.y))
+            {
+                initAnim.y = i.y;
                 break;
             }
         }
@@ -214,35 +263,39 @@ public class ChartTiming
             {
                 data.anims[i].speed = data.anims[i - 1].speed;
             }
-            // Lane - interpolation
-            if (float.IsNaN(data.anims[i].lane))
-            {
-                float t0 = GetTimeByBeat(data.anims[i - 1].beat);
-                float ti = GetTimeByBeat(data.anims[i].beat);
-                for (int j = i + 1; j < data.anims.Count; j++)
-                {
-                    if (!float.IsNaN(data.anims[j].lane))
-                    {
-                        float tj = GetTimeByBeat(data.anims[j].beat);
-                        float ratio = (ti - t0) / (tj - t0);
-                        data.anims[i].lane = ratio * data.anims[j].lane + (1 - ratio) * data.anims[i - 1].lane;
-                    }
-                }
-                if (float.IsNaN(data.anims[i].lane))
-                {
-                    float tj = GetTimeByBeat(data.beat);
-                    float ratio = (ti - t0) / (tj - t0);
-                    data.anims[i].lane = ratio * data.lane + (1 - ratio) * data.anims[i - 1].lane;
-                }
-            }
         }
+
+        // Interpolation for unknown properties
+        var judgeAnim = new NoteAnim
+        {
+            beat = data.beat,
+            speed = data.anims[data.anims.Count - 1].speed,
+            lane = data.lane == -1 ? data.x : data.lane,
+            y = data.y
+        };
+        FillInUnknown(data, anim => float.IsNaN(anim.lane), (S, T, i) =>
+        {
+            float ts = GetTimeByBeat(S.beat);
+            float tt = GetTimeByBeat(T.beat);
+            float ti = GetTimeByBeat(i.beat);
+            float ratio = Mathf.InverseLerp(ts, tt, ti);
+            i.lane = Mathf.Lerp(S.lane, T.lane, ratio);
+        }, judgeAnim);
+        FillInUnknown(data, anim => float.IsNaN(anim.y), (S, T, i) =>
+        {
+            float ts = GetTimeByBeat(S.beat);
+            float tt = GetTimeByBeat(T.beat);
+            float ti = GetTimeByBeat(i.beat);
+            float ratio = Mathf.InverseLerp(ts, tt, ti);
+            i.y = Mathf.Lerp(S.y, T.y, ratio);
+        }, judgeAnim);
 
         // Compute appear time and animation
         float beatStart, beatEnd;
-        NoteAnim anim = null;
+        List<GameNoteAnim> tmpList = new List<GameNoteAnim>();
         for (int i = 0; i < data.anims.Count; i++)
         {
-            anim = data.anims[i];
+            var anim = data.anims[i];
             beatStart = ChartLoader.GetFloatingPointBeat(anim.beat);
             beatEnd = ChartLoader.GetFloatingPointBeat(i == data.anims.Count - 1 ?
                 data.beat : data.anims[i+1].beat);
@@ -251,9 +304,14 @@ public class ChartTiming
                 Debug.LogError(ChartLoader.BeatToString(data.beat) + "Cannot add animation after judgeTime of a note.");
                 break;
             }
-            GenerateAnimationRawData(anim, beatStart, beatEnd,
-                i == data.anims.Count - 1 ? data.lane : data.anims[i + 1].lane,
-                tmpList);
+            if (i == data.anims.Count - 1)
+            {
+                GenerateAnimationRawData(anim, beatStart, beatEnd, judgeAnim.lane, data.y, tmpList);
+            }
+            else
+            {
+                GenerateAnimationRawData(anim, beatStart, beatEnd, data.anims[i + 1].lane, data.anims[i + 1].y, tmpList);
+            }
         }
         beatStart = ChartLoader.GetFloatingPointBeat(data.beat);
         beatEnd = beatStart;
@@ -261,23 +319,25 @@ public class ChartTiming
         {
             beatEnd += 1f;
         }
-        GenerateAnimationRawData(new NoteAnim
-        {
-            speed = anim.speed,
-            lane = data.lane
-        }, beatStart, beatEnd, data.lane, tmpList);
+
+        // Judge time should split animation
+        GenerateAnimationRawData(judgeAnim, beatStart, beatEnd, judgeAnim.lane, data.y, tmpList);
+
         GenerateAnimation(tmpList, gameNote.anims, gameNote);
 
-        gameNote.appearTime = gameNote.anims[0].startT;
+        // Compute appear time for the note
+        gameNote.appearTime = gameNote.anims[0].S.t;
 
         // Check mirror
         if (LiveSetting.mirrowEnabled)
         {
-            gameNote.lane = 6 - gameNote.lane;
+            if (gameNote.lane != -1)
+                gameNote.lane = 6 - gameNote.lane;
+            gameNote.pos.x *= -1;
             foreach (var i in gameNote.anims)
             {
-                i.endLane = 6 - i.endLane;
-                i.startLane = 6 - i.startLane;
+                i.S.p.x *= -1;
+                i.T.p.x *= -1;
             }
         }
     }
