@@ -22,7 +22,9 @@ public class SlideEndFlick : SlideNoteBase
     {
         base.InitNote();
         GetComponent<SpriteRenderer>().sprite = NoteUtility.LoadResource<Sprite>("note_flick_default");
-        Instantiate(Resources.Load(LiveSetting.assetDirectory + "/FlickArrow"), transform);
+        var arrow = Instantiate(Resources.Load(LiveSetting.assetDirectory + "/FlickArrow"), transform) as GameObject;
+        var ps = arrow.GetComponentInChildren<ParticleSystem>().main;
+        ps.scalingMode = ParticleSystemScalingMode.Hierarchy;
     }
 
     public override void Judge(KirakiraTouch touch, JudgeResult result)
