@@ -13,6 +13,7 @@ public class AppPreLoader : MonoBehaviour
 
     void Start()
     {
+        Application.targetFrameRate = 120;
         if (Application.platform != RuntimePlatform.Android) 
         {
             sampleRate = 48000;
