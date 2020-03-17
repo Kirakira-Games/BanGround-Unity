@@ -38,17 +38,20 @@ public class Slide : MonoBehaviour, KirakiraTracer
     public void FinalizeSlide()
     {
         bool isTilt = false;
-        for (int i = 1; i < notes.Count; i++)
+        for (int i = 0; i < notes.Count; i++)
         {
-            if (notes[i].isFuwafuwa || notes[i].lane != notes[i - 1].lane)
+            if (notes[i].isFuwafuwa || (i > 0 && notes[i].lane != notes[i - 1].lane))
             {
                 isTilt = true;
-                break;
             }
         }
         noteHead.isTilt = isTilt;
         noteHead.tapEffect.gameObject.SetActive(false);
         notes[notes.Count - 1].isTilt = isTilt;
+        for (int i = 0; i < notes.Count - 1; i++)
+        {
+            SlideMesh.Create(notes[i].slideMesh, notes[i + 1].transform);
+        }
         foreach (var note in notes)
         {
             note.InitSlideNote();
@@ -157,17 +160,14 @@ public class Slide : MonoBehaviour, KirakiraTracer
         foreach (var note in _notes)
         {
             note.slideMesh?.OnUpdate();
+            note.pillar?.OnUpdate();
         }
     }
 
     public void AddNote(NoteBase note)
     {
         note.transform.SetParent(transform);
-        if (notes.Count > 0)
-        {
-            SlideMesh.Create(notes[notes.Count-1].GetComponentInChildren<SlideMesh>(), note.transform);
-        }
-        else
+        if (notes.Count == 0)
         {
             noteHead = note as SlideStart;
         }

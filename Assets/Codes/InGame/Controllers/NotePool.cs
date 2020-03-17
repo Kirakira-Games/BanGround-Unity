@@ -79,7 +79,7 @@ public class NotePool : MonoBehaviour
             }
             note.isDestroyed = true;
             note.transform.localScale = new Vector3(NoteUtility.NOTE_SCALE, 1, 1) * LiveSetting.noteSize;
-            note.InitNote();
+
             if (NoteUtility.IsSlide(type))
             {
                 var slideNote = note as SlideNoteBase;
@@ -87,12 +87,12 @@ public class NotePool : MonoBehaviour
                 pillar.transform.SetParent(obj.transform);
                 slideNote.pillar = pillar.AddComponent<FuwafuwaPillar>();
 
-                if (NoteUtility.IsSlideEnd(type))
+                if (!NoteUtility.IsSlideEnd(type))
                 {
                     var mesh = new GameObject("SlideBody");
                     mesh.layer = 8;
                     mesh.transform.SetParent(obj.transform);
-                    mesh.AddComponent<SlideMesh>();
+                    slideNote.slideMesh = mesh.AddComponent<SlideMesh>();
                     mesh.AddComponent<MeshRenderer>();
                     mesh.AddComponent<MeshFilter>();
                     //mesh.AddComponent<NoteRotation>().needRot = false;
@@ -100,13 +100,8 @@ public class NotePool : MonoBehaviour
                     sg.sortingLayerID = SortingLayer.NameToID("SlideBody");
                     sg.sortingOrder = -1;
                 }
-
             }
-            if (type == GameNoteType.SlideStart)
-            {
-                var te = Instantiate(Resources.Load("Effects/effect_TapKeep"), obj.transform) as GameObject;
-                te.AddComponent<TapEffect>();
-            }
+            note.InitNote();
             obj.SetActive(false);
             Q.Enqueue(obj);
         }
