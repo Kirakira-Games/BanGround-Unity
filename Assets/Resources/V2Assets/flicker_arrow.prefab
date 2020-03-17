@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4827387799016866919}
   - component: {fileID: 4827387799016866912}
   - component: {fileID: 4827387799016866913}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: flicker_arrow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -46,9 +46,9 @@ ParticleSystem:
   cullingMode: 0
   ringBufferMode: 0
   ringBufferLoopRange: {x: 0, y: 1}
-  looping: 0
-  prewarm: 0
-  playOnAwake: 0
+  looping: 1
+  prewarm: 1
+  playOnAwake: 1
   useUnscaledTime: 0
   autoRandomSeed: 1
   useRigidbodyForVelocity: 1
@@ -284,7 +284,7 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 1.5
+      scalar: 1
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -1599,7 +1599,7 @@ ParticleSystem:
     y:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 7
+      scalar: 2
       minScalar: 0
       maxCurve:
         serializedVersion: 2
