@@ -64,33 +64,37 @@ public class TitleLoader : MonoBehaviour
 
     IEnumerator CheckUpdate()
     {
-        MessageBoxController.ShowMsg(LogLevel.INFO, "Checking for Update · · · · · ·");
+        MessageBoxController.ShowMsg(LogLevel.INFO, VersionCheck.CheckUpdate);
         TouchEvent te = GameObject.Find("TouchStart").GetComponent<TouchEvent>();
-        var check = new VersionCheck("http://yapi.banground.fun/mock/28/");
+        var check = new VersionCheck();
         yield return StartCoroutine(check.GetVersionInfo());
 
-        Debug.Log(check.version.data.version);
-        if (check.version == null) 
+        if (check == null || check.version.status == false) 
         {
-            MessageBoxController.ShowMsg(LogLevel.ERROR, "Check Version ERROR!", false);
-            te.waitingUpdate = false;
-        } 
-        else if (check.version.data.version != VersionCheck.CurrentVersion)
+            //网络错误
+            MessageBoxController.ShowMsg(LogLevel.ERROR, VersionCheck.CheckError, false);
+        }
+        else if (check.version.data.has)
         {
-            if (check.version.data.forceUpdate)
+            //有更新
+            if (check.version.data.force)
             {
-                MessageBoxController.ShowMsg(LogLevel.ERROR, $"You Must Update to Latest Version:{check.version.data.version}", false);
-                te.gameObject.SetActive(false);
+                string result = string.Format(VersionCheck.UpdateForce, check.version.data.version);
+                //强制更新
+                MessageBoxController.ShowMsg(LogLevel.ERROR, result, false);
             }
             else
             {
-                MessageBoxController.ShowMsg(LogLevel.OK, $"Latest Version Found:{check.version.data.version}");
+                string result = string.Format(VersionCheck.UpdateNotForce, check.version.data.version);
+                //不强制更新
+                MessageBoxController.ShowMsg(LogLevel.OK, result, true);
                 te.waitingUpdate = false;
             }
         }
         else
         {
-            MessageBoxController.ShowMsg(LogLevel.OK, $"You Have the Latest Version");
+            //无更新
+            MessageBoxController.ShowMsg(LogLevel.OK, VersionCheck.NoUpdate, true);
             te.waitingUpdate = false;
         }
     }
