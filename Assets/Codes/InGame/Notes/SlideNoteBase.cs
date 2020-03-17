@@ -19,7 +19,6 @@ public abstract class SlideNoteBase : NoteBase
         parentSlide = GetComponentInParent<Slide>();
         if (!NoteUtility.IsSlideEnd(type))
         {
-            slideMesh = GetComponentInChildren<SlideMesh>();
             slideMesh.meshRenderer.enabled = true;
         }
         pillar.Init(this);

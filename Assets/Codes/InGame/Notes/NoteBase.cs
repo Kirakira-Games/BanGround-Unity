@@ -45,8 +45,6 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
 
         initPos = anims[0].S.p;
         judgePos = data.pos;
-
-        NoteMesh.Reset(gameObject);
     }
 
     public virtual void UpdatePosition(int audioTime)
