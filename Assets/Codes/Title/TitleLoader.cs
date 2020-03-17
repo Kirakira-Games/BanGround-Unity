@@ -66,7 +66,7 @@ public class TitleLoader : MonoBehaviour
     {
         MessageBoxController.ShowMsg(LogLevel.INFO, VersionCheck.CheckUpdate);
         TouchEvent te = GameObject.Find("TouchStart").GetComponent<TouchEvent>();
-        var check = new VersionCheck();
+        var check = VersionCheck.Disable;
         yield return StartCoroutine(check.GetVersionInfo());
 
         if (check == null || check.version.status == false) 

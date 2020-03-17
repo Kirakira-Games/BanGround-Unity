@@ -6,6 +6,7 @@ using System.IO.Compression;
 using Newtonsoft.Json;
 using UnityEngine.Networking;
 using System;
+using System.Linq;
 
 public class DataLoader
 {
@@ -343,11 +344,20 @@ public class DataLoader
             else
             {
                 DirectoryInfo packDir = new DirectoryInfo(InboxDir);
-                FileInfo[] files = packDir.GetFiles();
+                FileInfo[] files = packDir.GetFiles("*.kirapack", SearchOption.TopDirectoryOnly);
+
+                //iOS额外搜索沙盒根目录文件 临时解决导入问题
+                if (Application.platform == RuntimePlatform.IPhonePlayer)
+                {
+                    var packDir2 = new DirectoryInfo(Application.persistentDataPath);
+                    var files2 = packDir2.GetFiles("*.kirapack", SearchOption.TopDirectoryOnly);
+                    files = files.Concat(files2).ToArray();
+                }
+
                 foreach (var file in files)
                 {
-                    if (file.Extension == ".kirapack")
-                    {
+                    //if (file.Extension == ".kirapack")
+                    //{
                         int tmp = LoadKiraPack(file);
                         if (tmp != -1)
                         {
@@ -356,7 +366,7 @@ public class DataLoader
                             MessageBoxController.ShowMsg(LogLevel.OK, "Loaded kirapack: ".GetLocalized() + file.Name);
                         }
                         File.Delete(file.FullName);
-                    }
+                    //}
                 }
             }
         }

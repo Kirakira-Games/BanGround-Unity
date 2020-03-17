@@ -15,6 +15,17 @@ public class VersionCheck
     public const string NoUpdate = "当前客户端已经是最新版了";
 
     public VersionInfo version;
+    public static VersionCheck Disable = new VersionCheck
+    {
+        version = new VersionInfo
+        {
+            status = true,
+            data = new VersionData
+            {
+                has = false
+            }
+        }
+    };
 
     private const string Prefix = "https://tempapi.banground.fun";
     private const string API = "/update/0.3.3";
