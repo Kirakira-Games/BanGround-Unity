@@ -26,9 +26,11 @@ public class UIManager : MonoBehaviour
     GameObject gateCanvas;
 
     private ISoundEffect resultVoice;
+    private bool isFinished;
 
     void Start()
     {
+        isFinished = false;
         //bg_SR = GameObject.Find("dokidokiBackground").GetComponent<SpriteRenderer>();
         lan_MR = GameObject.Find("LaneBackground").GetComponent<MeshRenderer>();
         
@@ -69,6 +71,7 @@ public class UIManager : MonoBehaviour
     }
     public IEnumerator GamePause()
     {
+        if (isFinished) yield break;
         while (BitingTheDust)
         {
             yield return new WaitForEndOfFrame();
@@ -151,6 +154,7 @@ public class UIManager : MonoBehaviour
     public void OnAudioFinish(bool restart)
     {
         if (SceneLoader.Loading || AudioManager.Instance.isLoading) return;
+        isFinished = true;
         AudioManager.Instance.gameBGM?.Dispose();
         StartCoroutine(ShowResult(restart));
     }
