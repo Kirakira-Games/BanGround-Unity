@@ -96,12 +96,14 @@ public static class ChartLoader
         {
             NormalizeBeat(note.beat);
             // Test new functionality
+#if UNITY_EDITOR
             if (LiveSetting.noteSize > 1.05f && LiveSetting.noteSize < 1.15f)
             {
                 note.x = note.lane;
                 note.y = Random.Range(0f, 1f);
                 note.lane = -1;
             }
+#endif
         }
         ChartTiming timing = new ChartTiming();
         timing.AnalyzeNotes(notes, chart.offset);
