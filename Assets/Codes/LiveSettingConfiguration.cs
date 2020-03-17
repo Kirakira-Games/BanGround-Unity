@@ -83,6 +83,7 @@ public static class LiveSetting
     //public static bool enableAudioTrack = false;
 
     public static NoteStyle noteStyle = NoteStyle.Circle;
+    public static SEStyle seStyle = SEStyle.Drum;
     public const string assetDirectory = "V2Assets";
     public const string IconPath = "UI/ClearMark/";
 
@@ -165,6 +166,15 @@ public enum NoteStyle
 {
     Circle,
     Cube,
+    Dark,
+    Custom
+}
+
+public enum SEStyle
+{
+    None,
+    Drum,
+    Bbben,
     Custom
 }
 
@@ -202,6 +212,7 @@ public class LiveSettingTemplate
     public int currentDifficulty = 0;
 
     public NoteStyle noteStyle = NoteStyle.Circle;
+    public SEStyle seStyle = SEStyle.Drum;
     public Language language = Language.AutoDetect;
     public Sorter sort = Sorter.SongName;
 
@@ -236,6 +247,7 @@ public class LiveSettingTemplate
         currentDifficulty = LiveSetting.currentDifficulty;
 
         noteStyle = LiveSetting.noteStyle;
+        seStyle = LiveSetting.seStyle;
         language = LiveSetting.language;
         sort = LiveSetting.sort;
     }
@@ -270,6 +282,7 @@ public class LiveSettingTemplate
         LiveSetting.currentChart = currentChart;
         LiveSetting.currentDifficulty = currentDifficulty;
 
+        LiveSetting.seStyle = seStyle;
         LiveSetting.noteStyle = noteStyle;
         LiveSetting.language = language;
         LiveSetting.sort = sort;

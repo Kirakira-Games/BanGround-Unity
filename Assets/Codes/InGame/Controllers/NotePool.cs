@@ -55,7 +55,7 @@ public class NotePool : MonoBehaviour
             obj.layer = 8;
             NoteBase note = null;
             obj.transform.SetParent(transform);
-            obj.AddComponent<NoteRotation>();
+            //obj.AddComponent<NoteRotation>();
             switch (type)
             {
                 case GameNoteType.Single:
@@ -86,7 +86,8 @@ public class NotePool : MonoBehaviour
                 var pillar = new GameObject("Pillar");
                 pillar.transform.SetParent(obj.transform);
                 slideNote.pillar = pillar.AddComponent<FuwafuwaPillar>();
-                if (!NoteUtility.IsSlideEnd(type))
+
+                if (NoteUtility.IsSlideEnd(type))
                 {
                     var mesh = new GameObject("SlideBody");
                     mesh.layer = 8;
@@ -94,9 +95,17 @@ public class NotePool : MonoBehaviour
                     mesh.AddComponent<SlideMesh>();
                     mesh.AddComponent<MeshRenderer>();
                     mesh.AddComponent<MeshFilter>();
-                    mesh.AddComponent<NoteRotation>().needRot = false;
-                    mesh.AddComponent<SortingGroup>().sortingLayerID = SortingLayer.NameToID("SlideBody");
+                    //mesh.AddComponent<NoteRotation>().needRot = false;
+                    var sg = mesh.AddComponent<SortingGroup>();
+                    sg.sortingLayerID = SortingLayer.NameToID("SlideBody");
+                    sg.sortingOrder = -1;
                 }
+
+            }
+            if (type == GameNoteType.SlideStart)
+            {
+                var te = Instantiate(Resources.Load("Effects/effect_TapKeep"), obj.transform) as GameObject;
+                te.AddComponent<TapEffect>();
             }
             obj.SetActive(false);
             Q.Enqueue(obj);
@@ -227,7 +236,7 @@ public class NotePool : MonoBehaviour
         instance = this;
 
         // Init notemesh
-        NoteMesh.Init();
+        NoteSprite.Init();
 
         noteQueue = new Queue<GameObject>[6];
         for (int i = 0; i < noteQueue.Length; i++)

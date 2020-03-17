@@ -33,7 +33,7 @@ public class AudioManager : MonoBehaviour
             }
             Provider = new BassAudioProvider();
             Provider.Init(AppPreLoader.sampleRate, (uint)(AppPreLoader.bufferSize * HandelValue_Buffer.BassBufferScale[bufferIndex]));
-            MessageBoxController.ShowMsg(LogLevel.INFO, $"Init {engine} with SampleRate: {AppPreLoader.sampleRate}, Buffer: {(int)(AppPreLoader.bufferSize * HandelValue_Buffer.BassBufferScale[bufferIndex])}");
+            //MessageBoxController.ShowMsg(LogLevel.INFO, $"Init {engine} with SampleRate: {AppPreLoader.sampleRate}, Buffer: {(int)(AppPreLoader.bufferSize * HandelValue_Buffer.BassBufferScale[bufferIndex])}");
         }
         else
         {
@@ -45,7 +45,7 @@ public class AudioManager : MonoBehaviour
             }
             Provider = new FmodAudioProvider();
             Provider.Init(AppPreLoader.sampleRate, (uint)(AppPreLoader.bufferSize / HandelValue_Buffer.FmodBufferScale[bufferIndex]));
-            MessageBoxController.ShowMsg(LogLevel.INFO, $"Init {engine} with SampleRate: {AppPreLoader.sampleRate}, Buffer: {AppPreLoader.bufferSize / HandelValue_Buffer.FmodBufferScale[bufferIndex]}");
+            //MessageBoxController.ShowMsg(LogLevel.INFO, $"Init {engine} with SampleRate: {AppPreLoader.sampleRate}, Buffer: {AppPreLoader.bufferSize / HandelValue_Buffer.FmodBufferScale[bufferIndex]}");
         }
 
         Instance = this;
