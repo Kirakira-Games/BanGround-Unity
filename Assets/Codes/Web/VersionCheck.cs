@@ -8,24 +8,19 @@ using Newtonsoft.Json;
 
 public class VersionCheck
 {
+    public const string CheckUpdate = "正在检查更新";
+    public const string CheckError = "获取更新信息失败,你必须联网获取信息后才能进行游戏。";
+    public const string UpdateForce = "获取到有新的版本：{0}, 你需要更新到最新版才能进行游戏";
+    public const string UpdateNotForce = "建议更新到最新版{0}";
+    public const string NoUpdate = "当前客户端已经是最新版了";
+
     public VersionInfo version;
 
-    public const string CurrentVersion = "0.3.3";
-    private const string API = "/version/latest";
+    private const string Prefix = "https://tempapi.banground.fun";
+    private const string API = "/update/0.3.3";
 
-    private string FullAPI;
+    private string FullAPI = Prefix + API;
 
-    public VersionCheck(string url)
-    {
-        if (url.EndsWith("/"))
-        {
-            FullAPI = url.Substring(0, url.Length - 1) + API;
-        }
-        else
-        {
-            FullAPI = url + API;
-        }
-    }
 
     public IEnumerator GetVersionInfo()
     {
@@ -46,5 +41,6 @@ public class VersionInfo
 public class VersionData
 {
     public string version;
-    public bool forceUpdate;
+    public bool force;
+    public bool has;
 }
