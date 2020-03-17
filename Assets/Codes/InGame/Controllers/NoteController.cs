@@ -14,6 +14,8 @@ public class NoteController : MonoBehaviour
     public static Camera mainCamera;
     public static int audioTime { get; private set; }
     public static int judgeTime { get; private set; }
+    public static int numFuwafuwaNotes;
+    public static bool hasFuwafuwaNote => numFuwafuwaNotes > 0;
 
     private JudgeQueue noteQueue;
     private JudgeQueue[] laneQueue;
@@ -266,6 +268,10 @@ public class NoteController : MonoBehaviour
 
         // Init JudgeRange
         NoteUtility.Init(mainCamera.transform.forward);
+
+        // Init fuwafuwa lane
+        numFuwafuwaNotes = 0;
+        FuwafuwaLane.instance.Init();
 
         // Create tables for fast lookup
         syncTable = new Dictionary<int, NoteSyncLine>();

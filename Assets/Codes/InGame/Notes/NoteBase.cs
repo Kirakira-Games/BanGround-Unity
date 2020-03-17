@@ -45,6 +45,11 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
 
         initPos = anims[0].S.p;
         judgePos = data.pos;
+
+        if (isFuwafuwa)
+        {
+            NoteController.numFuwafuwaNotes++;
+        }
     }
 
     public virtual void UpdatePosition(int audioTime)
@@ -77,6 +82,10 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
         if (touchId != -1)
         {
             TouchManager.instance.UnregisterTouch(touchId, this);
+        }
+        if (isFuwafuwa)
+        {
+            NoteController.numFuwafuwaNotes--;
         }
     }
 
