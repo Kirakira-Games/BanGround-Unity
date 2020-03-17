@@ -30,14 +30,6 @@ public class SlideMesh : MonoBehaviour
         new Vector2(1, 1)
     };
 
-    readonly Vector3[] normals =
-    {
-        Vector3.up,
-        Vector3.up,
-        Vector3.up,
-        Vector3.up
-    };
-
     public void OnUpdate()
     {
         Vector3 delta = afterNoteTrans.position - transform.parent.position;
@@ -46,17 +38,18 @@ public class SlideMesh : MonoBehaviour
         {
             new Vector3(-width, 0, 0),
             new Vector3(width, 0, 0),
-            new Vector3(delta.x - width, 0, delta.z),
-            new Vector3(delta.x + width, 0, delta.z)
+            new Vector3(delta.x - width, delta.y, delta.z),
+            new Vector3(delta.x + width, delta.y, delta.z)
         };
         meshFilter.mesh.vertices = vertices;
         meshFilter.mesh.RecalculateBounds();
+        meshFilter.mesh.RecalculateNormals();
     }
 
     public void InitMesh()
     {
-        meshRenderer = gameObject.GetComponent<MeshRenderer>();
-        meshFilter = gameObject.GetComponent<MeshFilter>();
+        meshRenderer = GetComponent<MeshRenderer>();
+        meshFilter = GetComponent<MeshFilter>();
 
         meshVertices = new Vector3[]
         {
@@ -71,11 +64,11 @@ public class SlideMesh : MonoBehaviour
         Mesh mesh = new Mesh
         {
             vertices = meshVertices,
-            normals = normals,
             uv = uv,
             triangles = indices
         };
         mesh.RecalculateBounds();
+        mesh.RecalculateNormals();
 
         meshFilter.mesh = mesh;
         if (cacheMat == null)
