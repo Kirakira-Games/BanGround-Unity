@@ -79,25 +79,29 @@ public class NotePool : MonoBehaviour
             }
             note.isDestroyed = true;
             note.transform.localScale = new Vector3(NoteUtility.NOTE_SCALE, 1, 1) * LiveSetting.noteSize;
+
+            if (NoteUtility.IsSlide(type))
+            {
+                var slideNote = note as SlideNoteBase;
+                var pillar = new GameObject("Pillar");
+                pillar.transform.SetParent(obj.transform);
+                slideNote.pillar = pillar.AddComponent<FuwafuwaPillar>();
+
+                if (!NoteUtility.IsSlideEnd(type))
+                {
+                    var mesh = new GameObject("SlideBody");
+                    mesh.layer = 8;
+                    mesh.transform.SetParent(obj.transform);
+                    slideNote.slideMesh = mesh.AddComponent<SlideMesh>();
+                    mesh.AddComponent<MeshRenderer>();
+                    mesh.AddComponent<MeshFilter>();
+                    //mesh.AddComponent<NoteRotation>().needRot = false;
+                    var sg = mesh.AddComponent<SortingGroup>();
+                    sg.sortingLayerID = SortingLayer.NameToID("SlideBody");
+                    sg.sortingOrder = -1;
+                }
+            }
             note.InitNote();
-            if (NoteUtility.IsSlide(type) && !NoteUtility.IsSlideEnd(type))
-            {
-                var mesh = new GameObject("SlideBody");
-                mesh.layer = 8;
-                mesh.transform.SetParent(obj.transform);
-                mesh.AddComponent<SlideMesh>();
-                mesh.AddComponent<MeshRenderer>();
-                mesh.AddComponent<MeshFilter>();
-                //mesh.AddComponent<NoteRotation>().needRot = false;
-                var sg = mesh.AddComponent<SortingGroup>();
-                sg.sortingLayerID = SortingLayer.NameToID("SlideBody");
-                sg.sortingOrder = -1;
-            }
-            if (type == GameNoteType.SlideStart)
-            {
-                var te = Instantiate(Resources.Load("Effects/effect_TapKeep"), obj.transform) as GameObject;
-                te.AddComponent<TapEffect>();
-            }
             obj.SetActive(false);
             Q.Enqueue(obj);
         }
@@ -218,7 +222,7 @@ public class NotePool : MonoBehaviour
         }
         for (int i = 0; i < teQueue.Length; i++)
         {
-            AddTapEffect(i, total.Max / (i == 0 ? 1 : 2));
+            AddTapEffect(i, Math.Max(NoteUtility.LANE_COUNT << 1, total.Max) / (i == 0 ? 1 : 2));
         }
     }
 

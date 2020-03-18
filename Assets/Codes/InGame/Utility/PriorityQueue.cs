@@ -3,44 +3,59 @@ using System;
 
 public class PriorityQueue<K, V> where K: IComparable
 {
-    private List<K> mKeys;
-    private List<V> mValues;
+    private LinkedList<K> mKeys;
+    private LinkedList<V> mValues;
 
     public int Count => mKeys.Count;
+    public V Top => mValues.First.Value;
+    public bool Empty => Count == 0;
+    public LinkedListNode<V> FirstV => mValues.First;
+    public LinkedListNode<V> LastV => mValues.Last;
+    public LinkedListNode<K> FirstK => mKeys.First;
+    public LinkedListNode<K> LastK => mKeys.Last;
 
     public PriorityQueue()
     {
-        mKeys = new List<K>();
-        mValues = new List<V>();
-    }
-
-    public V Get(int index)
-    {
-        return mValues[index];
-    }
-
-    public V Top()
-    {
-        return mValues[0];
-    }
-
-    public bool Empty()
-    {
-        return mKeys.Count == 0;
+        mKeys = new LinkedList<K>();
+        mValues = new LinkedList<V>();
     }
 
     public void Push(K key, V value)
     {
-        int index = mKeys.Count - 1;
-        while (index >= 0 && mKeys[index].CompareTo(key) > 0)
-            index--;
-        mKeys.Insert(index + 1, key);
-        mValues.Insert(index + 1, value);
+        var keyPtr = mKeys.Last;
+        var valPtr = mValues.Last;
+        while (keyPtr != null && keyPtr.Value.CompareTo(key) > 0)
+        {
+            keyPtr = keyPtr.Previous;
+            valPtr = valPtr.Previous;
+        }
+        if (keyPtr == null)
+        {
+            mKeys.AddFirst(key);
+            mValues.AddFirst(value);
+        }
+        else
+        {
+            mKeys.AddAfter(keyPtr, key);
+            mValues.AddAfter(valPtr, value);
+        }
     }
 
-    public void Pop()
+    public void RemoveFirst()
     {
-        mKeys.RemoveAt(0);
-        mValues.RemoveAt(0);
+        mKeys.RemoveFirst();
+        mValues.RemoveFirst();
+    }
+
+    public void RemoveLast()
+    {
+        mKeys.RemoveLast();
+        mValues.RemoveLast();
+    }
+
+    public void Clear()
+    {
+        mKeys.Clear();
+        mValues.Clear();
     }
 }

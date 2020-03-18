@@ -4,24 +4,21 @@ using UnityEngine;
 
 public class SlideTick : SlideNoteBase
 {
-    protected override JudgeResult TrySlideJudge(int audioTime, Touch touch)
+    protected override JudgeResult TrySlideJudge(KirakiraTouch touch)
     {
-        if (!IsJudging)
+        if (!isJudging)
         {
-            if (touch.phase != TouchPhase.Began)
+            if (touch.current.phase != KirakiraTouchPhase.Began)
                 return JudgeResult.None;
-            if (audioTime >= time - NoteUtility.SLIDE_TICK_JUDGE_RANGE && audioTime <= time + NoteUtility.SLIDE_TICK_JUDGE_RANGE)
+            if (touch.current.time >= time - NoteUtility.SLIDE_TICK_JUDGE_RANGE &&
+                touch.current.time <= time + NoteUtility.SLIDE_TICK_JUDGE_RANGE)
                 return JudgeResult.Perfect;
             return JudgeResult.None;
         }
-        if (audioTime >= time && audioTime <= time + NoteUtility.SLIDE_TICK_JUDGE_RANGE)
+        if (touch.current.time >= time &&
+            touch.current.time <= time + NoteUtility.SLIDE_TICK_JUDGE_RANGE)
             return JudgeResult.Perfect;
         return JudgeResult.None;
-    }
-
-    public override void OnNoteDestroy() 
-    {
-        //JudgeResultController.instance.DisplayJudgeOffset(OffsetResult.None);
     }
 
     public override void InitNote()
@@ -30,16 +27,16 @@ public class SlideTick : SlideNoteBase
         GetComponent<SpriteRenderer>().sprite = NoteUtility.LoadResource<Sprite>("note_tick_default");
     }
 
-    public override void Judge(int audioTime, JudgeResult result, Touch? touch)
+    public override void Judge(KirakiraTouch touch, JudgeResult result)
     {
-        RealJudge(audioTime, result, touch);
+        RealJudge(touch, result);
     }
 
-    protected override void OnNoteUpdateJudge(int audioTime)
+    protected override void OnNoteUpdateJudge()
     {
-        if (audioTime > time + NoteUtility.SLIDE_TICK_JUDGE_RANGE)
+        if (NoteController.judgeTime > time + NoteUtility.SLIDE_TICK_JUDGE_RANGE)
         {
-            Judge(audioTime, JudgeResult.Miss, null);
+            Judge(null, JudgeResult.Miss);
         }
     }
 }

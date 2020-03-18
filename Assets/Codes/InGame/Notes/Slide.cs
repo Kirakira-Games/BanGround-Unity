@@ -1,14 +1,16 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Slide : MonoBehaviour
+public class Slide : MonoBehaviour, KirakiraTracer
 {
     private List<SlideNoteBase> notes;
     private int judgeHead;
     private int displayHead;
     private int touchId;
     private SlideStart noteHead;
+    public bool isJudging => touchId != -1;
 
     public int GetTouchId()
     {
@@ -17,11 +19,7 @@ public class Slide : MonoBehaviour
 
     public void OnNoteDestroy()
     {
-        if (touchId != -1)
-        {
-            NoteController.instance.UnregisterTouch(touchId, gameObject);
-            touchId = -1;
-        }
+        UnbindTouch();
         foreach (var note in notes)
         {
             NotePool.instance.DestroyNote(note.gameObject);
@@ -39,10 +37,21 @@ public class Slide : MonoBehaviour
 
     public void FinalizeSlide()
     {
-        noteHead.IsTilt = notes[1].lane != noteHead.lane;
-        noteHead.GetComponentInChildren<TapEffect>(true).gameObject.SetActive(false);
-        SlideNoteBase lastNote = notes[notes.Count - 1];
-        lastNote.IsTilt = notes[notes.Count - 2].lane != lastNote.lane;
+        bool isTilt = false;
+        for (int i = 0; i < notes.Count; i++)
+        {
+            if (notes[i].isFuwafuwa || (i > 0 && notes[i].lane != notes[i - 1].lane))
+            {
+                isTilt = true;
+            }
+        }
+        noteHead.isTilt = isTilt;
+        noteHead.tapEffect.gameObject.SetActive(false);
+        notes[notes.Count - 1].isTilt = isTilt;
+        for (int i = 0; i < notes.Count - 1; i++)
+        {
+            SlideMesh.Create(notes[i].slideMesh, notes[i + 1].transform);
+        }
         foreach (var note in notes)
         {
             note.InitSlideNote();
@@ -58,42 +67,42 @@ public class Slide : MonoBehaviour
         }
     }
 
-    private void UpdateDisplayHead(int audioTime)
+    private void UpdateDisplayHead()
     {
         while (displayHead < notes.Count &&
-            (audioTime >= notes[displayHead].time ||
+            (NoteController.audioTime >= notes[displayHead].time ||
              notes[displayHead].judgeResult != JudgeResult.None))
         {
             displayHead++;
         }
     }
 
-    private float FindSlideIntersection()
+    private Vector3? FindSlideIntersection()
     {
         for (int i = displayHead + 1; i < notes.Count; i++)
         {
             var next = notes[i];
             var prev = notes[i - 1];
-            if ((next.transform.position.z > NoteUtility.NOTE_JUDGE_POS &&
-                prev.transform.position.z < NoteUtility.NOTE_JUDGE_POS) ||
-                (next.transform.position.z < NoteUtility.NOTE_JUDGE_POS &&
-                prev.transform.position.z > NoteUtility.NOTE_JUDGE_POS))
+            var dir = next.transform.position - prev.transform.position;
+            Ray ray = new Ray(prev.transform.position, dir);
+            if (NoteUtility.JudgePlane.Raycast(ray, out float dist))
             {
-                return NoteUtility.Interpolate(prev.transform.position.z,
-                    next.transform.position.z, NoteUtility.NOTE_JUDGE_POS,
-                    prev.transform.position.x, next.transform.position.x);
+                if (dist < dir.magnitude - NoteUtility.EPS)
+                {
+                    return ray.GetPoint(dist);
+                }
             }
         }
-        return float.NaN;
+        return null;
     }
 
-    private void UpdateNoteHead(int audioTime)
+    private void UpdateNoteHead()
     {
         SlideMesh mesh = noteHead.slideMesh;
         if (displayHead >= notes.Count)
         {
             var lastNote = notes[notes.Count - 1];
-            noteHead.transform.position = NoteUtility.GetJudgePos(lastNote.lane);
+            noteHead.transform.position = lastNote.judgePos;
             mesh.afterNoteTrans = lastNote.transform;
         }
         else
@@ -103,76 +112,38 @@ public class Slide : MonoBehaviour
             var prev = notes[displayHead - 1];
             mesh.afterNoteTrans = next.transform;
 
-            float intersect = FindSlideIntersection();
-            if (float.IsNaN(intersect))
+            var intersect = FindSlideIntersection();
+            if (!intersect.HasValue)
             {
-                float percentage = (float)(audioTime - prev.time) / (next.time - prev.time);
+                float percentage = (float)(NoteController.audioTime - prev.time) / (next.time - prev.time);
                 percentage = Mathf.Max(0, percentage);
-                noteHead.transform.position = (next.judgePos - prev.judgePos) * percentage + prev.judgePos;
+                noteHead.transform.position = Vector3.LerpUnclamped(prev.judgePos, next.judgePos, percentage);
                 enableBody = displayHead == 1 || !prev.gameObject.activeSelf;
             }
             else
             {
-                Vector3 pos = noteHead.judgePos;
-                pos.x = intersect;
-                noteHead.transform.position = pos;
+                noteHead.transform.position = intersect.Value;
                 enableBody = false;
             }
             mesh.meshRenderer.enabled = enableBody;
         }
-        noteHead.gameObject.SetActive(touchId != -1 || LiveSetting.autoPlayEnabled);
+        noteHead.gameObject.SetActive(isJudging);
+        noteHead.tapEffect.OnUpdate();
     }
 
-    public void TraceTouch(int audioTime, Touch touch)
-    {
-        UpdateHead();
-        if (judgeHead >= notes.Count) return;
-        var note = notes[judgeHead];
-        if (note.touchId == touch.fingerId)
-        {
-            note.TraceTouch(audioTime, touch);
-        }
-        else
-        {
-            int[] lanes = NoteController.GetLanesByTouchPosition(touch.position);
-            foreach (int lane in lanes)
-            {
-                if (Mathf.Abs(lane - note.lane) <= 1)
-                {
-                    JudgeResult result = note.TryJudge(audioTime, touch);
-                    if (result != JudgeResult.None)
-                    {
-                        note.Judge(audioTime, result, touch);
-                    }
-                    break;
-                }
-            }
-        }
-        if (NoteUtility.IsTouchEnd(touch))
-        {
-            UpdateHead();
-            if (judgeHead < notes.Count)
-            {
-                note.RealJudge(audioTime, JudgeResult.Miss, null);
-                judgeHead++;
-            }
-            UnbindTouch();
-        }
-    }
-
-    public void OnSlideUpdate(int audioTime)
+    public void OnSlideUpdate()
     {
     	var _notes = GetComponentsInChildren<SlideNoteBase>();
 
         // Update ticks
         foreach (var note in _notes)
         {
-            note.OnNoteUpdate(audioTime);
+            note.OnNoteUpdate();
         }
 
         // Update head
         UpdateHead();
-        UpdateDisplayHead(audioTime);
+        UpdateDisplayHead();
         if (judgeHead >= notes.Count)
         {
             NotePool.instance.DestroySlide(gameObject);
@@ -182,46 +153,43 @@ public class Slide : MonoBehaviour
         // Update position of noteHead
         if (noteHead.judgeResult != JudgeResult.None)
         {
-            UpdateNoteHead(audioTime);
+            UpdateNoteHead();
         }
 
         // Update mesh
         foreach (var note in _notes)
         {
             note.slideMesh?.OnUpdate();
-            note.GetComponentInChildren<TapEffect>()?.OnUpdate();
+            note.pillar?.OnUpdate();
         }
     }
 
     public void AddNote(NoteBase note)
     {
         note.transform.SetParent(transform);
-        if (notes.Count > 0)
-        {
-            SlideMesh.Create(notes[notes.Count-1].GetComponentInChildren<SlideMesh>(), note.transform);
-        }
-        else
+        if (notes.Count == 0)
         {
             noteHead = note as SlideStart;
         }
         notes.Add((SlideNoteBase)note);
     }
 
-    private void BindTouch(Touch? touch)
+    private void BindTouch(KirakiraTouch touch)
     {
-        if (LiveSetting.autoPlayEnabled || !touch.HasValue) return;
-        touchId = touch.Value.fingerId;
-        NoteController.instance.RegisterTouch(touchId, gameObject);
+        if (isJudging || touch == null) return;
+        if (touch.current.phase == KirakiraTouchPhase.Ended) return;
+        TouchManager.instance.RegisterTouch(touch.touchId, this);
+        Debug.Assert(touchId == touch.touchId);
     }
 
     private void UnbindTouch()
     {
-        if (touchId == -1) return;
-        NoteController.instance.UnregisterTouch(touchId, gameObject);
-        touchId = -1;
+        if (!isJudging) return;
+        TouchManager.instance.UnregisterTouch(touchId, this);
+        Debug.Assert(touchId == -1);
     }
 
-    public int Judge(SlideNoteBase note, JudgeResult result, Touch? touch)
+    public int Judge(SlideNoteBase note, JudgeResult result, KirakiraTouch touch)
     {
         // Must judge head
         if (judgeHead >= notes.Count || !ReferenceEquals(note, notes[judgeHead]))
@@ -244,13 +212,81 @@ public class Slide : MonoBehaviour
         }
         if (judgeHead == 0)
         {
-            noteHead.GetComponentInChildren<TapEffect>(true).gameObject.SetActive(true);
+            noteHead.tapEffect.gameObject.SetActive(true);
         }
         else
         {
             note.gameObject.SetActive(false);
         }
         judgeHead++;
-        return 1;
+        return 1; // judge ok
+    }
+
+    public Vector2 GetPosition()
+    {
+        if (noteHead.judgeResult != JudgeResult.None)
+        {
+            return noteHead.transform.position;
+        }
+        else
+        {
+            return noteHead.judgePos;
+        }
+    }
+
+    public JudgeResult TryTrace(KirakiraTouch touch)
+    {
+        Debug.Assert(isJudging);
+        UpdateHead();
+        if (judgeHead >= notes.Count) return JudgeResult.None;
+        var note = notes[judgeHead];
+
+        if (note.isTracingOrJudged)
+        {
+            return note.TryTrace(touch);
+        }
+        else
+        {
+            if (TouchManager.TouchesNote(touch.current, note))
+            {
+                var result = note.TryJudge(touch);
+                if (result != JudgeResult.None)
+                {
+                    return result;
+                }
+            }
+        }
+        return touch.current.phase == KirakiraTouchPhase.Ended ? JudgeResult.Miss : JudgeResult.None;
+    }
+
+    public void Trace(KirakiraTouch touch, JudgeResult result)
+    {
+        if (result == JudgeResult.None) return;
+        var note = notes[judgeHead];
+        if (note.TryJudge(touch) != JudgeResult.None)
+        {
+            note.Judge(touch, result);
+        }
+        if (note.isTracingOrJudged)
+        {
+            var res = note.TryTrace(touch);
+            if (res != JudgeResult.None)
+                note.Trace(touch, res);
+        }
+        if (touch.current.phase == KirakiraTouchPhase.Ended)
+        {
+            UpdateHead();
+            if (judgeHead < notes.Count)
+            {
+                NoteController.instance.Judge(notes[judgeHead], JudgeResult.Miss, touch);
+                judgeHead++;
+            }
+            UnbindTouch();
+        }
+    }
+
+    public void Assign(KirakiraTouch touch)
+    {
+        touchId = touch == null ? -1 : touch.touchId;
     }
 }

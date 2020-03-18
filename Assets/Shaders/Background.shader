@@ -48,13 +48,27 @@
             {
                 float2 textureCoordinate = i.screenPosition.xy / i.screenPosition.w;
                 float aspect = _ScreenParams.x / _ScreenParams.y;
-                textureCoordinate.y = textureCoordinate.y / aspect;
-                textureCoordinate = TRANSFORM_TEX(textureCoordinate, _MainTex);
+                if(_TexRatio < aspect)
+                {
+                    textureCoordinate.y = textureCoordinate.y / aspect;
+                    textureCoordinate = TRANSFORM_TEX(textureCoordinate, _MainTex);
 
-                textureCoordinate.y = textureCoordinate.y * _TexRatio;
+                    textureCoordinate.y = textureCoordinate.y * _TexRatio;
 
-                float t = 1 / _TexRatio - 1 / aspect;
-                textureCoordinate.y += t;
+                    float t = 1 / _TexRatio - 1 / aspect;
+                    textureCoordinate.y += t / 2;
+                }
+                else
+                {
+                    textureCoordinate.x = textureCoordinate.x * aspect;
+                    textureCoordinate = TRANSFORM_TEX(textureCoordinate, _MainTex);
+
+                    textureCoordinate.x = textureCoordinate.x / _TexRatio;
+
+                    float t = _TexRatio - aspect;
+                    textureCoordinate.x += t / 2;
+                }
+                
 
                 return tex2D(_MainTex, textureCoordinate) * _Tint;
             }
