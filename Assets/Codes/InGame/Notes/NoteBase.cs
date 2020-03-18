@@ -45,6 +45,7 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
 
         initPos = anims[0].S.p;
         judgePos = data.pos;
+        gameObject.layer = isFuwafuwa ? 9 : 8;
 
         if (isFuwafuwa)
         {
