@@ -35,6 +35,8 @@ public class TitleLoader : MonoBehaviour
         }
 
         StartCoroutine(PlayTitle());
+
+        MessageBoxController.ShowMsg(LogLevel.INFO, SystemInfo.deviceUniqueIdentifier);
     }
 
     IEnumerator PlayTitle()
