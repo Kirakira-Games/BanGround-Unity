@@ -6,13 +6,19 @@ using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.Events;
 using AudioProvider;
+using JudgeQueue = PriorityQueue<int, NoteBase>;
 
 public class NoteController : MonoBehaviour
 {
     public static NoteController instance;
-    private PriorityQueue<int, NoteBase>[] laneQueue;
+    public static Camera mainCamera;
+    public static int audioTime { get; private set; }
+    public static int judgeTime { get; private set; }
+    public static int numFuwafuwaNotes;
+    public static bool hasFuwafuwaNote => numFuwafuwaNotes > 0;
 
-    private Dictionary<int, GameObject> touchTable;
+    private JudgeQueue noteQueue;
+    private JudgeQueue[] laneQueue;
     private Dictionary<int, NoteSyncLine> syncTable;
 
     private GameChartData chart;
@@ -29,39 +35,9 @@ public class NoteController : MonoBehaviour
 
     private const int WARM_UP_SECOND = 4;
 
-    public void RegisterTouch(int id, GameObject obj)
-    {
-        touchTable[id] = obj;
-    }
-
-    public void UnregisterTouch(int id, GameObject obj)
-    {
-        if (ReferenceEquals(touchTable[id], obj))
-        {
-            touchTable.Remove(id);
-        }
-        else
-        {
-            Debug.LogWarning("Invalid removal from touchTable: " + id);
-        }
-    }
-
-    // For debugging purpose only, simulate touch event from mouse event
-    static private Touch[] SimulateMouseTouch(TouchPhase phase)
-    {
-        Touch touch = new Touch
-        {
-            position = Input.mousePosition,
-            fingerId = NoteUtility.MOUSE_TOUCH_ID,
-            phase = phase
-        };
-        return new Touch[] { touch };
-    }
-
     public TapEffectType EmitEffect(Vector3 position, JudgeResult result, GameNoteType type)
     {
         if (result == JudgeResult.Miss) return TapEffectType.None;
-        var pos = new Vector3(position.x * 1f, 0, 8);
 
         TapEffectType se = TapEffectType.Click;
 
@@ -77,13 +53,13 @@ public class NoteController : MonoBehaviour
         else if (result == JudgeResult.Good)
             se = TapEffectType.Good;
 
-        NotePool.instance.PlayTapEffect(se, pos);
+        NotePool.instance.PlayTapEffect(se, position);
 
         return se;
     }
 
     // Judge a note as result
-    public void Judge(NoteBase notebase, JudgeResult result, Touch? touch)
+    public void Judge(NoteBase notebase, JudgeResult result, KirakiraTouch touch)
     {
         GameObject note = notebase.gameObject;
 
@@ -96,7 +72,7 @@ public class NoteController : MonoBehaviour
         }
 
         // Tap effect
-        int se = (int)EmitEffect(note.transform.position, result, notebase.type);
+        int se = (int)EmitEffect(notebase.judgePos, result, notebase.type);
 
         // Sound effect
         if (notebase.syncLine.PlaySoundEffect(se))
@@ -114,16 +90,16 @@ public class NoteController : MonoBehaviour
         JudgeResultController.instance.DisplayJudgeOffset(notebase, (int)result);
     }
 
-    private void UpdateLane(int i)
+    private void UpdateLane(JudgeQueue Q)
     {
         // Remove judged and destroyed notes from queue
-        while (!laneQueue[i].Empty())
+        while (!Q.Empty)
         {
-            NoteBase obj = laneQueue[i].Top();
-            if (obj.isDestroyed || obj.judgeTime != int.MinValue)
+            NoteBase obj = Q.Top;
+            if (obj.isDestroyed || obj.isTracingOrJudged)
             {
                 NotePool.instance.RemoveFromJudgeQueue(obj);
-                laneQueue[i].Pop();
+                Q.RemoveFirst();
             }
             else
             {
@@ -132,42 +108,20 @@ public class NoteController : MonoBehaviour
         }
     }
 
-    private NoteBase OnTouch(int audioTime, int lane, Touch touch)
-    {
-        UpdateLane(lane);
-        // Try to judge the front of the queue
-        for (int i = 0; i < laneQueue[lane].Count; i++)
-        {
-            NoteBase note = laneQueue[lane].Get(i);
-            if (NoteUtility.IsSlide(note.type) && (note as SlideNoteBase).IsJudging)
-            {
-                continue;
-            }
-            JudgeResult result = note.TryJudge(audioTime, touch);
-            if (result != JudgeResult.None)
-            {
-                return note;
-            }
-            else
-            {
-                return null;
-            }
-        }
-        return null;
-    }
-
     private GameObject CreateNote(GameNoteData gameNote)
     {
         var noteObj = NotePool.instance.GetNote(gameNote.type);
         noteObj.transform.SetParent(transform);
         NoteBase note = noteObj.GetComponent<NoteBase>();
-        note.time = gameNote.time;
-        note.lane = gameNote.lane;
-        note.type = gameNote.type;
-        note.isGray = LiveSetting.grayNoteEnabled ? gameNote.isGray : false;
-        note.anims = gameNote.anims.ToArray();
-        note.ResetNote();
-        laneQueue[note.lane].Push(note.time, note);
+        note.ResetNote(gameNote);
+        if (note.isFuwafuwa)
+        {
+            noteQueue.Push(note.time, note);
+        }
+        else
+        {
+            laneQueue[note.lane].Push(note.time, note);
+        }
         // Add sync line
         if (!syncTable.ContainsKey(note.time) || syncTable[note.time] == null)
         {
@@ -196,89 +150,94 @@ public class NoteController : MonoBehaviour
         return obj;
     }
 
-    public static int[] GetLanesByTouchPosition(Vector2 position)
+    public static int[] GetLanesByTouchState(KirakiraTouchState state)
     {
-        var ray = Camera.main.ScreenPointToRay(position);
-        var cols = Physics.RaycastAll(ray, NoteUtility.NOTE_JUDGE_POS * 4);
-        List<int> lanes = new List<int>();
-        float[] dists = new float[NoteUtility.LANE_COUNT];
-        foreach (var col in cols)
+        var lanes = new List<int>();
+        var dists = new float[NoteUtility.LANE_COUNT];
+        for (int i = 0; i < NoteUtility.LANE_COUNT; i++)
         {
-            if (col.collider.CompareTag("JudgeArea"))
+            if (TouchManager.TouchesNote(state, i))
             {
-                int id = int.Parse(col.collider.name);
-                lanes.Add(id);
-                dists[id] = (col.collider.transform.position - col.point).sqrMagnitude;
-            }
-            else
-            {
-                Debug.Log("Touch hit unknown area: " + col.collider.name);
+                lanes.Add(i);
+                dists[i] = Vector2.Distance(state.pos, NoteUtility.GetJudgePos(i));
             }
         }
         lanes.Sort((int lhs, int rhs) =>
         {
-            return (int)Mathf.Sign(dists[lhs] - dists[rhs]);
+            return dists[lhs].CompareTo(dists[rhs]);
         });
         return lanes.ToArray();
     }
 
-    private void UpdateTouch(int audioTime)
+    private NoteBase OnTouch(JudgeQueue Q, KirakiraTouch touch)
     {
-        if (LiveSetting.autoPlayEnabled) return;
-        audioTime -= LiveSetting.judgeOffset;
-        Touch[] touches = Input.touches;
-        //var touches = Touch.activeTouches;
-        if (touches.Length == 0)
+        UpdateLane(Q);
+        // Try to judge the front of the queue
+        for (var i = Q.FirstV; i != null; i = i.Next)
         {
-            //Simulate touches with mouse
-            if (Input.GetMouseButtonDown(0))
+            NoteBase note = i.Value;
+            if (note.time > touch.current.time + NoteUtility.SLIDE_TICK_JUDGE_RANGE)
             {
-                touches = SimulateMouseTouch(TouchPhase.Began);
+                return null;
             }
-            else if (Input.GetMouseButton(0))
+            if (NoteUtility.IsSlide(note.type) && (note as SlideNoteBase).isJudging)
             {
-                touches = SimulateMouseTouch(TouchPhase.Moved);
-            }
-            else if (Input.GetMouseButtonUp(0))
-            {
-                touches = SimulateMouseTouch(TouchPhase.Ended);
-            }
-        }
-        foreach (Touch touch in touches)
-        {
-            if (touchTable.ContainsKey(touch.fingerId))
-            {
-                GameObject obj = touchTable[touch.fingerId];
-                obj.GetComponent<NoteBase>()?.TraceTouch(audioTime, touch);
-                obj.GetComponent<Slide>()?.TraceTouch(audioTime, touch);
                 continue;
             }
-            // Find lanes
-            int[] lanes = GetLanesByTouchPosition(touch.position);
-            if (lanes.Length == 0) continue;
+            if (!TouchManager.TouchesNote(touch.current, note))
+            {
+                continue;
+            }
+            JudgeResult result = note.TryJudge(touch);
+            if (result != JudgeResult.None)
+            {
+                return note;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        return null;
+    }
 
-            // Find note to judge
-            NoteBase noteToJudge = null;
-            foreach (int lane in lanes) {
-                var ret = OnTouch(audioTime, lane, touch);
+    public void UpdateTouch(KirakiraTouch touch)
+    {
+        // Find lanes
+        int[] lanes = GetLanesByTouchState(touch.current);
+
+        NoteBase noteToJudge = null;
+        if (!UIManager.BitingTheDust)
+        {
+            NoteBase ret;
+            // Find note to judge - non-fuwafuwa
+            foreach (int lane in lanes)
+            {
+                ret = OnTouch(laneQueue[lane], touch);
                 if (ret != null && (noteToJudge == null || noteToJudge.time > ret.time))
                 {
                     noteToJudge = ret;
                 }
             }
-            // A note to judge is not found
-            if (noteToJudge == null)
+            // Find note to judge - fuwafuwa
+            ret = OnTouch(noteQueue, touch);
+            if (ret != null && (noteToJudge == null || noteToJudge.time > ret.time))
             {
-                if (touch.phase == TouchPhase.Began && lanes.Length > 0)
-                {
-                    int se = (int)EmitEffect(NoteUtility.GetJudgePos(lanes[0]), JudgeResult.None, GameNoteType.Single);
-                    soundEffects[se].PlayOneShot();
-                }
+                noteToJudge = ret;
             }
-            else
+        }
+        // A note to judge is not found
+        if (noteToJudge == null)
+        {
+            if (touch.current.phase == KirakiraTouchPhase.Began && lanes.Length > 0)
             {
-                noteToJudge.Judge(audioTime, noteToJudge.TryJudge(audioTime, touch), touch);
+                int se = (int)EmitEffect(NoteUtility.GetJudgePos(lanes[0]), JudgeResult.None, GameNoteType.Single);
+                soundEffects[se].PlayOneShot();
             }
+        }
+        else
+        {
+            noteToJudge.Judge(touch, noteToJudge.TryJudge(touch));
         }
     }
 
@@ -302,17 +261,29 @@ public class NoteController : MonoBehaviour
 
     void Start()
     {
-        touchTable = new Dictionary<int, GameObject>();
+        instance = this;
+
+        // Main camera
+        mainCamera = GameObject.Find("GameMainCamera").GetComponent<Camera>();
+
+        // Init JudgeRange
+        NoteUtility.Init(mainCamera.transform.forward);
+
+        // Init fuwafuwa lane
+        numFuwafuwaNotes = 0;
+        FuwafuwaLane.instance.Init();
+
+        // Create tables for fast lookup
         syncTable = new Dictionary<int, NoteSyncLine>();
         Application.targetFrameRate = 120;
 
         // Create queue for each lane
-        laneQueue = new PriorityQueue<int, NoteBase>[NoteUtility.LANE_COUNT];
+        laneQueue = new JudgeQueue[NoteUtility.LANE_COUNT];
         for (int i = 0; i < NoteUtility.LANE_COUNT; i++)
         {
-            laneQueue[i] = new PriorityQueue<int, NoteBase>();
+            laneQueue[i] = new JudgeQueue();
         }
-        instance = this;
+        noteQueue = new JudgeQueue();
 
         // Load chart
         int sid = LiveSetting.CurrentHeader.sid;
@@ -335,9 +306,13 @@ public class NoteController : MonoBehaviour
         }
         ComboManager.manager.Init(numNotes);
 
-        // Init JudgeRange
-        NoteUtility.InitJudgeRange();
+        // Check AutoPlay
+        if (LiveSetting.autoPlayEnabled)
+        {
+            (TouchManager.provider as AutoPlayTouchProvider).Init(notes);
+        }
 
+        // Sound effects
         soundEffects = new ISoundEffect[5]
         {
             AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), LiveSetting.seStyle) +"/perfect.wav").bytes),
@@ -354,6 +329,7 @@ public class NoteController : MonoBehaviour
         background.SetBcakground(DataLoader.GetBackgroundPath(sid));
         //background = GameObject.Find("dokidokiBackground").GetComponent<FixBackground>();
         //background.UpdateBackground(DataLoader.GetBackgroundPath(sid));
+
         // Lane Effects
         laneEffects = GameObject.Find("Effects").GetComponent<LaneEffects>();
         laneEffects.Init(chart.bpm, chart.speed);
@@ -395,17 +371,19 @@ public class NoteController : MonoBehaviour
     {
         if (SceneLoader.Loading || shutdown || Time.timeScale == 0) return;
 
-        int audioTime = AudioTimelineSync.instance.GetTimeInMs() + AudioTimelineSync.RealTimeToBGMTime(LiveSetting.audioOffset);
+        audioTime = AudioTimelineSync.instance.GetTimeInMs() + AudioTimelineSync.RealTimeToBGMTime(LiveSetting.audioOffset);
+        judgeTime = audioTime - LiveSetting.judgeOffset;
 
         // Create notes
         UpdateNotes(audioTime);
         for (int i = 0; i < NoteUtility.LANE_COUNT; i++)
         {
-            UpdateLane(i);
+            UpdateLane(laneQueue[i]);
         }
+        UpdateLane(noteQueue);
 
         // Trigger touch event
-        UpdateTouch(audioTime);
+        TouchManager.instance.OnUpdate();
 
         // Update each note child
         var noteBase = transform.GetComponentsInChildren<NoteBase>();
@@ -415,13 +393,13 @@ public class NoteController : MonoBehaviour
         Profiler.BeginSample("OnNoteUpdate");
         for (int i = 0; i < noteBase.Length; i++)
         {
-            noteBase[i].OnNoteUpdate(audioTime);
+            noteBase[i].OnNoteUpdate();
         }
         Profiler.EndSample();
 
         for (int i = 0; i < slide.Length; i++)
         {
-            slide[i].OnSlideUpdate(audioTime);
+            slide[i].OnSlideUpdate();
         }
 
         for (int i = 0; i < noteSyncLine.Length; i++)

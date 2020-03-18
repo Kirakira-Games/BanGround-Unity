@@ -70,6 +70,16 @@ public static class ChartLoader
         return beat[0] + (float)beat[1] / beat[2];
     }
 
+    public static Vector3 GetJudgePosFromRawNote(Note note)
+    {
+        Vector3 vec = new Vector3(
+            NoteUtility.GetXPos(note.lane == -1 ? note.x : note.lane),
+            NoteUtility.GetYPos(note.y),
+            NoteUtility.NOTE_JUDGE_Z_POS
+        );
+        return NoteUtility.ProjectVectorToParallelPlane(vec);
+    }
+
     public static GameChartData LoadChart(Chart chart)
     {
         List<Note> notes = chart.notes;
@@ -85,6 +95,15 @@ public static class ChartLoader
         foreach(Note note in notes)
         {
             NormalizeBeat(note.beat);
+            // Test new functionality
+#if UNITY_EDITOR
+            if (LiveSetting.noteSize > 1.05f && LiveSetting.noteSize < 1.15f)
+            {
+                note.x = note.lane;
+                note.y = Random.Range(0f, 1f);
+                note.lane = -1;
+            }
+#endif
         }
         ChartTiming timing = new ChartTiming();
         timing.AnalyzeNotes(notes, chart.offset);
@@ -112,6 +131,7 @@ public static class ChartLoader
             {
                 time = Mathf.RoundToInt(time * 1000),
                 lane = note.lane,
+                pos = GetJudgePosFromRawNote(note),
                 type = type,
                 isGray = type == GameNoteType.Single && note.beat[2] > 2
             };
@@ -164,43 +184,6 @@ public static class ChartLoader
             }
             Debug.LogError("Some slides do not contain a tail. Ignored.");
         }
-        /*
-        gameNotes = new List<GameNoteData>
-        {
-            new GameNoteData
-            {
-                time = 1000,
-                type = GameNoteType.SlideStart,
-                seg = new List<GameNoteData>()
-                {
-                    new GameNoteData
-                    {
-                        time = 1000,
-                        type = GameNoteType.SlideStart,
-                        lane = 0
-                    },
-                    new GameNoteData
-                    {
-                        time = 2000,
-                        type = GameNoteType.SlideTick,
-                        lane = 1
-                    },
-                    new GameNoteData
-                    {
-                        time = 3000,
-                        type = GameNoteType.SlideTick,
-                        lane = 2
-                    },
-                    new GameNoteData
-                    {
-                        time = 4000,
-                        type = GameNoteType.SlideEnd,
-                        lane = 3
-                    }
-                }
-            }
-        };
-        */
         // Sort notes by animation order
         gameNotes.Sort(new GameNoteComparer());
 
