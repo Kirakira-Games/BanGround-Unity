@@ -52,7 +52,6 @@ public class NotePool : MonoBehaviour
         for (int j = 0; j < count; j++)
         {
             var obj = new GameObject(name + j);
-            obj.layer = 8;
             NoteBase note = null;
             obj.transform.SetParent(transform);
             //obj.AddComponent<NoteRotation>();
@@ -90,7 +89,6 @@ public class NotePool : MonoBehaviour
                 if (!NoteUtility.IsSlideEnd(type))
                 {
                     var mesh = new GameObject("SlideBody");
-                    mesh.layer = 8;
                     mesh.transform.SetParent(obj.transform);
                     slideNote.slideMesh = mesh.AddComponent<SlideMesh>();
                     mesh.AddComponent<MeshRenderer>();
@@ -112,7 +110,6 @@ public class NotePool : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             var obj = new GameObject("Slide" + i);
-            obj.layer = 8;
             obj.AddComponent<Slide>();
             obj.SetActive(false);
             obj.transform.SetParent(transform);

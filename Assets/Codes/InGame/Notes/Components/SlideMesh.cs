@@ -15,11 +15,12 @@ public class SlideMesh : MonoBehaviour
 
     public static Material cacheMat = null;
 
-    public static void Create(SlideMesh mesh, Transform after)
+    public static void Create(SlideMesh mesh, Transform after, bool isFuwafuwa)
     {
         mesh.transform.localPosition = new Vector3(0f, -0.01f);
         mesh.afterNoteTrans = after;
         mesh.InitMesh();
+        mesh.SetFuwafuwa(isFuwafuwa);
     }
 
     readonly Vector2[] uv =
@@ -29,6 +30,11 @@ public class SlideMesh : MonoBehaviour
         new Vector2(0, 1),
         new Vector2(1, 1)
     };
+
+    public void SetFuwafuwa(bool isFuwafuwa)
+    {
+        gameObject.layer = isFuwafuwa ? 9 : 8;
+    }
 
     public void OnUpdate()
     {
