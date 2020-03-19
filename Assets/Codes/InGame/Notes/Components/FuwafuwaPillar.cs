@@ -20,6 +20,7 @@ public class FuwafuwaPillar : MonoBehaviour
         pillar.startColor = Color.white;
         pillar.endColor = Color.white;
         pillar.rendererPriority = 1;
+        gameObject.layer = 8; // note
     }
 
     public void Init(SlideNoteBase parent)
