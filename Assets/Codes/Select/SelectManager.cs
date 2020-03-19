@@ -496,7 +496,7 @@ public class SelectManager : MonoBehaviour
         {
             return;
         }
-        previewSound = AudioManager.Instance.PlayLoopMusic(File.ReadAllBytes(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)),
+        previewSound = AudioManager.Instance.PlayLoopMusic(File.ReadAllBytes(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)),true,
             new uint[]
             {
                 (uint)(mheader.preview[0] * 1000),
