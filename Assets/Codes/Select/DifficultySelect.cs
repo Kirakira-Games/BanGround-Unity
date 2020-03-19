@@ -8,6 +8,8 @@ using System.IO;
 public class DifficultySelect : MonoBehaviour
 {
     public GameObject[] cards = new GameObject[5];
+    public GameObject[] labels = new GameObject[5];
+    Text[] labelText = new Text[5];
     Image[] cardImg = new Image[5];
     RectTransform[] Rects = new RectTransform[5];
     public int[] levels = new int[5];
@@ -26,9 +28,13 @@ public class DifficultySelect : MonoBehaviour
         {
             cardImg[i] = cards[i].GetComponent<Image>();
             Rects[i] = cards[i].GetComponent<RectTransform>();
+            labelText[i] = labels[i].GetComponentInChildren<Text>();
+            labelText[i].text = "";
         }
         levelText = GameObject.Find("Text_SelectedLevel").GetComponent<Text>();
+        levelText.text = "";
         difficultyText = GameObject.Find("Text_SelectedDifficulty").GetComponent<Text>();
+        
         selectManager = GameObject.Find("SelectManager").GetComponent<SelectManager>();
         //OnSongChange();
         background = GameObject.Find("KirakiraBackground").GetComponent<FixBackground>();
@@ -40,14 +46,17 @@ public class DifficultySelect : MonoBehaviour
         for (int i = 0; i < cards.Length; i++) //找出需要被激活的卡片
         {
             int index = (i + LiveSetting.currentDifficulty) % cards.Length;
-            if (levels[index] < 0)
+            if (levels[index] < 0)//没有此难度的话
             {
                 cards[index].SetActive(false);
+                labels[index].SetActive(false);
             }
             else
             {
                 enabledCards.Add(index);
                 cards[index].SetActive(true);
+                labels[index].SetActive(true);
+                labelText[index].text = Enum.GetName(typeof(Difficulty), index).ToUpper() + " " + levels[index];
             }
         }
         UpdateView();
@@ -93,22 +102,24 @@ public class DifficultySelect : MonoBehaviour
     {
         int last = enabledCards.Count - 1;
         int no = enabledCards[last];
-        while (cardImg[no].color.a > 0)
+       /* while (cardImg[no].color.a > 0)
         {
             cardImg[no].color -= new Color(0, 0, 0, 0.1f);
             yield return new WaitForEndOfFrame();
         }
         //cards[no].SetActive(false);
-        cardImg[no].color = Color.clear;
+        */
+        //cardImg[no].color = Color.clear;
 
         UpdateView();
-        cardImg[selected].color = new Color(1, 1, 1, 0);
+        yield return new WaitForEndOfFrame();
+        /*cardImg[selected].color = new Color(1, 1, 1, 0);
         while (cardImg[selected].color.a < 1)
         {
             cardImg[selected].color += new Color(0, 0, 0, 0.1f);
             yield return new WaitForEndOfFrame();
         }
-        cardImg[selected].color = Color.white;
+        cardImg[selected].color = Color.white;*/
         LiveSetting.currentDifficulty = selected;
     }
 }
