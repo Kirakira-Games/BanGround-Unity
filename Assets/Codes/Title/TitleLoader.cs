@@ -41,8 +41,8 @@ public class TitleLoader : MonoBehaviour
 
     IEnumerator PlayTitle()
     {
-        yield return new WaitForSeconds(0.5f);
-        music = AudioManager.Instance.PlayLoopMusic(titleMusic.bytes);
+        //yield return new WaitForSeconds(0.5f);
+        music = AudioManager.Instance.PlayLoopMusic(titleMusic.bytes,false);
 
         yield return new WaitForSeconds(3f);
 

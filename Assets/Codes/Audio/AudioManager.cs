@@ -101,7 +101,7 @@ public class AudioManager : MonoBehaviour
         AudioTimelineSync.instance.Seek(gameBGM.GetPlaybackTime() / 1000f);
     }
     public void StopBGM() => gameBGM.Stop();
-    public ISoundTrack PlayLoopMusic(byte[] audio, uint[] times = null, bool noFade = true)
+    public ISoundTrack PlayLoopMusic(byte[] audio,bool needLoop = true, uint[] times = null, bool noFade = true)
     {
         ISoundTrack soundTrack = Provider.StreamTrack(audio);
 
@@ -113,7 +113,8 @@ public class AudioManager : MonoBehaviour
             end = times[1] == 0 ? soundTrack.GetLength() : times[1];
         }
 
-        soundTrack.SetLoopingPoint(start, end, noFade);
+        if (needLoop)
+            soundTrack.SetLoopingPoint(start, end, noFade);
         soundTrack.Play();
         return soundTrack;
     }
