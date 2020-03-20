@@ -40,7 +40,7 @@ public class Slide : MonoBehaviour, KirakiraTracer
         bool isTilt = false;
         for (int i = 0; i < notes.Count; i++)
         {
-            if (notes[i].isFuwafuwa || (i > 0 && notes[i].lane != notes[i - 1].lane))
+            if (notes[i].judgeFuwafuwa || (i > 0 && notes[i].lane != notes[i - 1].lane))
             {
                 isTilt = true;
             }
@@ -51,7 +51,7 @@ public class Slide : MonoBehaviour, KirakiraTracer
         for (int i = 0; i < notes.Count - 1; i++)
         {
             notes[i].slideMesh.ResetMesh(notes[i].transform, notes[i + 1].transform,
-                notes[i].isFuwafuwa || notes[i + 1].isFuwafuwa);
+                notes[i].judgeFuwafuwa || notes[i + 1].judgeFuwafuwa);
         }
         foreach (var note in notes)
         {
@@ -126,7 +126,7 @@ public class Slide : MonoBehaviour, KirakiraTracer
                 noteHead.transform.position = intersect.Value;
                 enableBody = false;
             }
-            mesh.SetFuwafuwa(prev.isFuwafuwa || next.isFuwafuwa);
+            mesh.SetFuwafuwa(prev.judgeFuwafuwa || next.judgeFuwafuwa);
             mesh.meshRenderer.enabled = enableBody;
         }
         noteHead.gameObject.SetActive(isJudging);

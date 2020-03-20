@@ -26,7 +26,7 @@ public class FuwafuwaPillar : MonoBehaviour
     public void Init(SlideNoteBase parent)
     {
         this.parent = parent;
-        pillar.enabled = parent.isFuwafuwa;
+        pillar.enabled = parent.judgeFuwafuwa;
     }
 
     public void OnUpdate()

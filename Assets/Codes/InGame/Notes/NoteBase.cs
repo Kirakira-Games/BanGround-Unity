@@ -8,7 +8,7 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
     public int judgeTime;
     public int touchId;
     public bool isGray;
-    public bool isFuwafuwa => lane == -1;
+    public bool judgeFuwafuwa => lane == -1;
     public bool isTracingOrJudged => judgeTime != int.MinValue;
     public bool isDestroyed;
     public bool inJudgeQueue;
@@ -46,9 +46,9 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
 
         initPos = anims[0].S.p;
         judgePos = data.pos;
-        gameObject.layer = isFuwafuwa ? 9 : 8;
+        gameObject.layer = judgeFuwafuwa ? 9 : 8;
 
-        if (isFuwafuwa)
+        if (judgeFuwafuwa)
         {
             NoteController.numFuwafuwaNotes++;
         }
@@ -85,7 +85,7 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
         {
             TouchManager.instance.UnregisterTouch(touchId, this);
         }
-        if (isFuwafuwa)
+        if (judgeFuwafuwa)
         {
             NoteController.numFuwafuwaNotes--;
         }

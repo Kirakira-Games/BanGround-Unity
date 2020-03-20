@@ -298,7 +298,7 @@ public class TouchManager : MonoBehaviour
 
     public static bool TouchesNote(KirakiraTouchState touch, NoteBase note)
     {
-        if (note.isFuwafuwa)
+        if (note.judgeFuwafuwa)
         {
             return TouchesNote(touch, note.judgePos);
         }
