@@ -47,6 +47,7 @@ public class NoteMesh : MonoBehaviour
     static private Material mat;
     static private float screenYStart;
     static private float screenYEnd;
+    static private float[] cachedLength;
 
     private MeshFilter meshFilter;
     private MeshRenderer meshRenderer;
@@ -63,9 +64,19 @@ public class NoteMesh : MonoBehaviour
         return (z - p.z) * 30;
     }
 
+    private static float GetCachedLength(float z)
+    {
+        float ratio = Mathf.InverseLerp(NoteUtility.NOTE_START_Z_POS, NoteUtility.NOTE_JUDGE_Z_POS, z);
+        if (ratio >= 1 - NoteUtility.EPS) return cachedLength[cachedLength.Length - 1];
+        ratio = Mathf.Max(0, ratio) * (cachedLength.Length - 1);
+        int index = (int)ratio;
+        ratio -= index;
+        return Mathf.Lerp(cachedLength[index], cachedLength[index+1], ratio);
+    }
+
     private static Vector3[] GetVertices(float z)
     {
-        float dz = GetLength(z);
+        float dz = GetCachedLength(z);
         return new Vector3[]
         {
             new Vector3(-1, 0, -dz),
@@ -84,6 +95,13 @@ public class NoteMesh : MonoBehaviour
             new Vector3(0, 0, NoteUtility.NOTE_START_Z_POS)).y;
         screenYEnd = NoteController.mainCamera.WorldToScreenPoint(
             new Vector3(0, 0, NoteUtility.NOTE_JUDGE_Z_POS)).y;
+
+        cachedLength = new float[64];
+        for (int i = 0; i < cachedLength.Length; i++)
+        {
+            float z = Mathf.Lerp(NoteUtility.NOTE_START_Z_POS, NoteUtility.NOTE_JUDGE_Z_POS, (float)i / (cachedLength.Length - 1));
+            cachedLength[i] = GetLength(z);
+        }
     }
 
     private void Awake()
