@@ -80,6 +80,26 @@ public static class ChartLoader
         return NoteUtility.ProjectVectorToParallelPlane(vec);
     }
 
+    public static bool IsNoteFuwafuwa(Note note)
+    {
+        if (note.lane == -1) return true;
+        foreach (var anim in note.anims)
+        {
+            if (anim.y > NoteUtility.EPS) return true;
+        }
+        return false;
+    }
+
+    public static bool IsChartFuwafuwa(List<Note> notes)
+    {
+        foreach (var note in notes)
+        {
+            if (note.type == NoteType.BPM) continue;
+            if (IsNoteFuwafuwa(note)) return true;
+        }
+        return false;
+    }
+
     public static GameChartData LoadChart(Chart chart)
     {
         List<Note> notes = chart.notes;
@@ -90,18 +110,22 @@ public static class ChartLoader
         }
         List<GameNoteData> gameNotes = new List<GameNoteData>();
         var tickStackTable = new Dictionary<int, GameNoteData>();
+        bool isFuwafuwa = IsChartFuwafuwa(notes);
 
         // AnalyzeNotes
         foreach(Note note in notes)
         {
             NormalizeBeat(note.beat);
-            // Test new functionality
 #if UNITY_EDITOR
+            // Test new functionality
             if (LiveSetting.noteSize > 1.05f && LiveSetting.noteSize < 1.15f)
             {
-                note.x = note.lane;
-                note.y = Random.Range(0f, 1f);
-                note.lane = -1;
+                if (!isFuwafuwa)
+                {
+                    note.x = note.lane;
+                    note.y = Random.Range(0f, 1f);
+                    note.lane = -1;
+                }
             }
 #endif
         }
@@ -133,6 +157,7 @@ public static class ChartLoader
                 lane = note.lane,
                 pos = GetJudgePosFromRawNote(note),
                 type = type,
+                isFuwafuwa = IsNoteFuwafuwa(note),
                 isGray = type == GameNoteType.Single && note.beat[2] > 2
             };
             timing.AddAnimation(note, gameNote);
@@ -189,6 +214,7 @@ public static class ChartLoader
 
         return new GameChartData
         {
+            isFuwafuwa = isFuwafuwa,
             notes = gameNotes,
             speed = timing.SpeedInfo,
             bpm = timing.BPMInfo

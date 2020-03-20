@@ -51,7 +51,7 @@ public class Slide : MonoBehaviour, KirakiraTracer
         for (int i = 0; i < notes.Count - 1; i++)
         {
             notes[i].slideMesh.ResetMesh(notes[i].transform, notes[i + 1].transform,
-                notes[i].judgeFuwafuwa || notes[i + 1].judgeFuwafuwa);
+                notes[i].displayFuwafuwa || notes[i + 1].displayFuwafuwa);
         }
         foreach (var note in notes)
         {
@@ -126,7 +126,7 @@ public class Slide : MonoBehaviour, KirakiraTracer
                 noteHead.transform.position = intersect.Value;
                 enableBody = false;
             }
-            mesh.SetFuwafuwa(prev.judgeFuwafuwa || next.judgeFuwafuwa);
+            mesh.SetFuwafuwa(prev.displayFuwafuwa || next.displayFuwafuwa);
             mesh.meshRenderer.enabled = enableBody;
         }
         noteHead.gameObject.SetActive(isJudging);

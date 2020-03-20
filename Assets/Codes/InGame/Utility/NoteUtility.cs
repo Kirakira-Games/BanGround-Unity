@@ -76,7 +76,7 @@ public class GameNoteData
     public Vector3 pos;
     public GameNoteType type;
     public bool isGray;
-    public bool isFuwafuwa => lane == -1;
+    public bool isFuwafuwa;
     public List<GameNoteData> seg;
     public List<GameNoteAnim> anims;
     public int appearTime;
@@ -94,6 +94,7 @@ public class GameNoteData
 
 public class GameChartData
 {
+    public bool isFuwafuwa;
     public List<GameNoteData> notes;
     public List<GameBeatInfo> speed;
     public List<GameBeatInfo> bpm;
