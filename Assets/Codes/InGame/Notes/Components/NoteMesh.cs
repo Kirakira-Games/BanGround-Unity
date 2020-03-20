@@ -56,7 +56,7 @@ public class NoteMesh : MonoBehaviour
     {
         Vector3 screenPos = NoteController.mainCamera.WorldToScreenPoint(new Vector3(0, 0, z));
         float ratio = Mathf.InverseLerp(screenYStart, screenYEnd, screenPos.y);
-        ratio = Mathf.Lerp(0.06f, 1f, ratio);
+        ratio = Mathf.Lerp(0.05f, 1f, ratio) * Mathf.Lerp(0.8f, 1f, ratio);
         screenPos.y = Mathf.Max(0, screenPos.y - ratio * (screenYStart - screenYEnd) / 16);
         Ray ray = NoteController.mainCamera.ScreenPointToRay(screenPos);
         float delta = -ray.origin.y / ray.direction.y;
