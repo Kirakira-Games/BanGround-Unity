@@ -66,7 +66,12 @@ public class ComboManager : MonoBehaviour
                 combo[i] = 0;
             }
         }
-        score += (double)accRate[intResult] / accRate[0] + combo[0] / 50 * 0.005 + combo[1] / 100 * 0.005;
+        double rate = combo[0] / 50 * 0.005 + combo[1] / 100 * 0.005;
+        if (rate > 0.1)
+        {
+            rate = 0.1;
+        }
+        score += (double)accRate[intResult] / accRate[0] + rate;
         if (score > maxScore)
         {
             score = maxScore;
@@ -112,6 +117,14 @@ public class ComboManager : MonoBehaviour
             return;
         }
         noteCount = numNotes;
-        maxScore = numNotes + Accumulate(50, 0.005, numNotes) + Accumulate(100, 0.005, numNotes);
+
+        if (numNotes > 700)
+        {
+            maxScore = numNotes + Accumulate(50, 0.005, 700) + Accumulate(100, 0.005, 700) + 0.1 * (numNotes - 700);
+        }
+        else
+        {
+            maxScore = numNotes + Accumulate(50, 0.005, numNotes) + Accumulate(100, 0.005, numNotes);
+        }
     }
 }
