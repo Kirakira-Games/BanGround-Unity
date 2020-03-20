@@ -23,8 +23,10 @@ public class LifeController : MonoBehaviour
         level = LiveSetting.CurrentHeader.difficultyLevel[LiveSetting.actualDifficulty];
     }
 
-    public void CaculateLife(JudgeResult jr)
+    public void CaculateLife(JudgeResult jr, GameNoteType type)
     {
+        if (type == GameNoteType.SlideTick && jr == JudgeResult.Miss)
+            jr = JudgeResult.Good;
         //print(level);
         switch (jr)
         {
