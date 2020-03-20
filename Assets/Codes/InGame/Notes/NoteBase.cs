@@ -17,6 +17,7 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
 
     public GameNoteType type;
     public NoteSyncLine syncLine;
+    public NoteMesh noteMesh;
     public JudgeResult judgeResult;
 
     public Vector3 initPos;
@@ -24,7 +25,7 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
 
     public virtual void InitNote()
     {
-        NoteSprite.CreateMesh(gameObject);
+        noteMesh = gameObject.AddComponent<NoteMesh>();
     }
 
     public virtual void ResetNote(GameNoteData data)

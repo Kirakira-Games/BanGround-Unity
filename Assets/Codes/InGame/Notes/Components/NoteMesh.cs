@@ -1,0 +1,113 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+/*
+public class NoteSprite
+{
+    static private int sortingLayerID;
+    static private Material mat;
+
+    public static void CreateMesh(GameObject note)
+    {
+        var spriteRenderer = note.AddComponent<SpriteRenderer>();
+        spriteRenderer.material = mat;
+        spriteRenderer.sortingLayerID = sortingLayerID;
+    }
+
+    public static void Init()
+    {
+        sortingLayerID = SortingLayer.NameToID("Note");
+        mat = Resources.Load<Material>("TestAssets/Materials/note");
+    }
+}
+*/
+
+public class NoteMesh : MonoBehaviour
+{
+    static readonly Vector2[] uv =
+    {
+        new Vector2(0, 0),
+        new Vector2(1, 0),
+        new Vector2(0, 1),
+        new Vector2(1, 1)
+    };
+
+    static readonly Vector3[] normals =
+    {
+        Vector3.up,
+        Vector3.up,
+        Vector3.up,
+        Vector3.up
+    };
+
+    static readonly int[] indices = { 0, 2, 1, 2, 3, 1 };
+
+    static private int sortingLayerID;
+    static private Material mat;
+    static private float screenYStart;
+    static private float screenYEnd;
+
+    private MeshFilter meshFilter;
+    private MeshRenderer meshRenderer;
+
+    private static float GetLength(float z)
+    {
+        Vector3 screenPos = NoteController.mainCamera.WorldToScreenPoint(new Vector3(0, 0, z));
+        float ratio = Mathf.InverseLerp(screenYStart, screenYEnd, screenPos.y);
+        ratio = Mathf.Lerp(0.06f, 1f, ratio);
+        screenPos.y = Mathf.Max(0, screenPos.y - ratio);
+        Ray ray = NoteController.mainCamera.ScreenPointToRay(screenPos);
+        float delta = -ray.origin.y / ray.direction.y;
+        Vector3 p = ray.GetPoint(delta);
+        return (z - p.z) * 30;
+    }
+
+    private static Vector3[] GetVertices(float z)
+    {
+        float dz = GetLength(z);
+        return new Vector3[]
+        {
+            new Vector3(-1, 0, -dz),
+            new Vector3(1, 0, -dz),
+            new Vector3(-1, 0, dz),
+            new Vector3(1, 0, dz)
+        };
+    }
+
+    public static void Init()
+    {
+        sortingLayerID = SortingLayer.NameToID("Note");
+        mat = Resources.Load<Material>("TestAssets/Materials/note");
+
+        screenYStart = NoteController.mainCamera.WorldToScreenPoint(
+            new Vector3(0, 0, NoteUtility.NOTE_START_Z_POS)).y;
+        screenYEnd = NoteController.mainCamera.WorldToScreenPoint(
+            new Vector3(0, 0, NoteUtility.NOTE_JUDGE_Z_POS)).y;
+    }
+
+    private void Awake()
+    {
+        meshFilter = gameObject.AddComponent<MeshFilter>();
+        meshRenderer = gameObject.AddComponent<MeshRenderer>();
+
+        meshRenderer.material = mat;
+        Mesh mesh = new Mesh
+        {
+            vertices = GetVertices(NoteUtility.NOTE_START_Z_POS),
+            uv = uv,
+            normals = normals,
+            triangles = indices
+        };
+        mesh.RecalculateBounds();
+
+        meshFilter.mesh = mesh;
+        meshRenderer.sortingLayerID = sortingLayerID;
+    }
+
+    private void Update()
+    {
+        meshFilter.mesh.SetVertices(GetVertices(transform.position.z));
+        meshFilter.mesh.RecalculateBounds();
+    }
+}

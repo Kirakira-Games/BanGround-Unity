@@ -24,7 +24,8 @@ public class SlideTick : SlideNoteBase
     public override void InitNote()
     {
         base.InitNote();
-        GetComponent<SpriteRenderer>().sprite = NoteUtility.LoadResource<Sprite>("note_tick_default");
+        GetComponent<MeshRenderer>().material.SetTexture("_BaseMap", NoteUtility.LoadResource<Texture2D>("note_tick_default"));
+        //GetComponent<SpriteRenderer>().sprite = NoteUtility.LoadResource<Sprite>("note_tick_default");
     }
 
     public override void Judge(KirakiraTouch touch, JudgeResult result)
