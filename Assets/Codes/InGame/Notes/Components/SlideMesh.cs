@@ -6,7 +6,7 @@ using UnityEngine.Rendering;
 // 绿条
 public class SlideMesh : MonoBehaviour
 {
-    public const float BODY_WIDTH = 0.9f;
+    public const float BODY_WIDTH = 0.8f;
 
     public MeshRenderer meshRenderer;
     public MeshFilter meshFilter;
