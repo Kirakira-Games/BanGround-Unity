@@ -77,7 +77,7 @@ public class NotePool : MonoBehaviour
                     break;
             }
             note.isDestroyed = true;
-            note.transform.localScale = new Vector3(NoteUtility.NOTE_SCALE, 1, 1) * LiveSetting.noteSize;
+            note.transform.localScale = Vector3.one * NoteUtility.NOTE_SCALE * LiveSetting.noteSize;
 
             if (NoteUtility.IsSlide(type))
             {
@@ -168,6 +168,33 @@ public class NotePool : MonoBehaviour
 
     public void Init(List<GameNoteData> notes)
     {
+        // Init notemesh
+        NoteMesh.Init();
+
+        noteQueue = new Queue<GameObject>[6];
+        for (int i = 0; i < noteQueue.Length; i++)
+        {
+            noteQueue[i] = new Queue<GameObject>();
+        }
+
+        slideQueue = new Queue<GameObject>();
+
+        // Load Tap Effects
+        tapEffects = new Object[]
+        {
+            Resources.Load("Effects/effect_tap_perfect"),
+            Resources.Load("Effects/effect_tap_great"),
+            Resources.Load("Effects/effect_tap_good"),
+            Resources.Load("Effects/effect_tap"),
+            Resources.Load("Effects/effect_tap_swipe")
+        };
+        teQueue = new Queue<GameObject>[5];
+        for (int i = 0; i < teQueue.Length; i++)
+        {
+            teQueue[i] = new Queue<GameObject>();
+        }
+
+        // Compute resource usage
         var count = new NoteEventProcessor[(int)GameNoteType.SlideEndFlick + 1];
         for (int i = 0; i < count.Length; i++)
         {
@@ -226,32 +253,6 @@ public class NotePool : MonoBehaviour
     void Awake()
     {
         instance = this;
-
-        // Init notemesh
-        NoteSprite.Init();
-
-        noteQueue = new Queue<GameObject>[6];
-        for (int i = 0; i < noteQueue.Length; i++)
-        {
-            noteQueue[i] = new Queue<GameObject>();
-        }
-
-        slideQueue = new Queue<GameObject>();
-
-        // Load Tap Effects
-        tapEffects = new Object[]
-        {
-            Resources.Load("Effects/effect_tap_perfect"),
-            Resources.Load("Effects/effect_tap_great"),
-            Resources.Load("Effects/effect_tap_good"),
-            Resources.Load("Effects/effect_tap"),
-            Resources.Load("Effects/effect_tap_swipe")
-        };
-        teQueue = new Queue<GameObject>[5];
-        for (int i = 0; i < teQueue.Length; i++)
-        {
-            teQueue[i] = new Queue<GameObject>();
-        }
     }
 
     public GameObject GetSlide()
