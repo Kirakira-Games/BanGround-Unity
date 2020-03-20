@@ -21,7 +21,7 @@ public class LifeController : MonoBehaviour
 
     public void CaculateLife(JudgeResult jr)
     {
-        print(level);
+        //print(level);
         switch (jr)
         {
             case JudgeResult.Perfect:
