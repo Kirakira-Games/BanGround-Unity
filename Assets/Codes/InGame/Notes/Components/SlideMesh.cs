@@ -6,21 +6,24 @@ using UnityEngine.Rendering;
 // 绿条
 public class SlideMesh : MonoBehaviour
 {
-    public MeshRenderer meshRenderer;
-    public MeshFilter meshFilter;
-    private Vector3[] meshVertices;
-
-    public Transform afterNoteTrans;
     public const float BODY_WIDTH = 0.9f;
 
-    public static Material cacheMat = null;
+    public MeshRenderer meshRenderer;
+    public MeshFilter meshFilter;
 
-    public static void Create(SlideMesh mesh, Transform after, bool isFuwafuwa)
+    public Transform transS;
+    public Transform transT;
+
+    public static Material cacheMat = null;
+    public static readonly Vector3 initPos = new Vector3(0, -0.01f);
+
+    public void ResetMesh(Transform S, Transform T, bool isFuwafuwa)
     {
-        mesh.transform.localPosition = new Vector3(0f, -0.01f);
-        mesh.afterNoteTrans = after;
-        mesh.InitMesh();
-        mesh.SetFuwafuwa(isFuwafuwa);
+        transform.SetParent(S);
+        transform.localPosition = initPos;
+        transS = S;
+        transT = T;
+        SetFuwafuwa(isFuwafuwa);
     }
 
     readonly Vector2[] uv =
@@ -38,7 +41,7 @@ public class SlideMesh : MonoBehaviour
 
     public void OnUpdate()
     {
-        Vector3 delta = afterNoteTrans.position - transform.parent.position;
+        Vector3 delta = transT.position - transform.parent.position;
         float width = BODY_WIDTH * LiveSetting.noteSize;
         Vector3[] vertices =
         {
@@ -54,10 +57,10 @@ public class SlideMesh : MonoBehaviour
 
     public void InitMesh()
     {
-        meshRenderer = GetComponent<MeshRenderer>();
-        meshFilter = GetComponent<MeshFilter>();
+        meshRenderer = gameObject.AddComponent<MeshRenderer>();
+        meshFilter = gameObject.AddComponent<MeshFilter>();
 
-        meshVertices = new Vector3[]
+        var meshVertices = new Vector3[]
         {
            Vector3.zero,
            Vector3.zero,

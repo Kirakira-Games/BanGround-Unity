@@ -91,12 +91,8 @@ public class NotePool : MonoBehaviour
                     var mesh = new GameObject("SlideBody");
                     mesh.transform.SetParent(obj.transform);
                     slideNote.slideMesh = mesh.AddComponent<SlideMesh>();
-                    mesh.AddComponent<MeshRenderer>();
-                    mesh.AddComponent<MeshFilter>();
+                    slideNote.slideMesh.InitMesh();
                     //mesh.AddComponent<NoteRotation>().needRot = false;
-                    var sg = mesh.AddComponent<SortingGroup>();
-                    sg.sortingLayerID = SortingLayer.NameToID("SlideBody");
-                    sg.sortingOrder = -1;
                 }
             }
             note.InitNote();
