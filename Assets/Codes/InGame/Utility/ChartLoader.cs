@@ -129,6 +129,8 @@ public static class ChartLoader
             }
 #endif
         }
+        isFuwafuwa = IsChartFuwafuwa(notes);
+
         ChartTiming timing = new ChartTiming();
         timing.AnalyzeNotes(notes, chart.offset);
 
