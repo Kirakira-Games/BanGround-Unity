@@ -9,6 +9,9 @@ public class LifeController : MonoBehaviour
 
     public float lifePoint { get; private set; }
 
+    public Gradient colors;
+
+    private Image fill;
     private int level;
     private Slider lifeSlider;
     private Text lifeTxt;
@@ -19,6 +22,7 @@ public class LifeController : MonoBehaviour
         lifePoint = 100f;
         lifeSlider = GetComponentInChildren<Slider>();
         lifeTxt = GetComponentInChildren<Text>();
+        fill = GameObject.Find("LifeFill").GetComponent<Image>();
         UpdateDisplay();
         level = LiveSetting.CurrentHeader.difficultyLevel[LiveSetting.actualDifficulty];
     }
@@ -53,6 +57,9 @@ public class LifeController : MonoBehaviour
     void UpdateDisplay()
     {
         lifeTxt.text = Mathf.RoundToInt(lifePoint).ToString();
-        lifeSlider.value = lifePoint / 100f;
+        var inOne = lifePoint / 100f;
+        lifeSlider.value = inOne;
+        fill.color = colors.Evaluate(inOne);
+        lifeTxt.color = colors.Evaluate(inOne);
     }
 }
