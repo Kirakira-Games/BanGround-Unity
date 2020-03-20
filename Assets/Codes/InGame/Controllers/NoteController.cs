@@ -83,6 +83,7 @@ public class NoteController : MonoBehaviour
         // Update score
         JudgeResultController.instance.DisplayJudgeResult(result);
 
+        LifeController.instance.CaculateLife(result);
         // Update combo
         ComboManager.manager.UpdateCombo(result);
 
