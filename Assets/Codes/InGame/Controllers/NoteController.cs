@@ -117,7 +117,7 @@ public class NoteController : MonoBehaviour
         noteObj.transform.SetParent(transform);
         NoteBase note = noteObj.GetComponent<NoteBase>();
         note.ResetNote(gameNote);
-        if (note.isFuwafuwa)
+        if (note.judgeFuwafuwa)
         {
             noteQueue.Push(note.time, note);
         }
