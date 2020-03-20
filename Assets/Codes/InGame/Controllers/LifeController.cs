@@ -6,13 +6,17 @@ using UnityEngine.UI;
 public class LifeController : MonoBehaviour
 {
     public static LifeController instance;
-    public static float lifePoint = 100;
-    int level;
-    Slider lifeSlider;
-    Text lifeTxt;
+
+    public float lifePoint { get; private set; }
+
+    private int level;
+    private Slider lifeSlider;
+    private Text lifeTxt;
+
     void Start()
     {
         instance = this;
+        lifePoint = 100f;
         lifeSlider = GetComponentInChildren<Slider>();
         lifeTxt = GetComponentInChildren<Text>();
         UpdateDisplay();
@@ -25,27 +29,28 @@ public class LifeController : MonoBehaviour
         switch (jr)
         {
             case JudgeResult.Perfect:
-                lifePoint += 100 / (level * 3f);
+                lifePoint += 20f / (level + 1);
                 break;
             case JudgeResult.Great:
-                lifePoint += 10 / (level * 3f);
+                lifePoint += 4f / (level + 1);
                 break;
             case JudgeResult.Good:
-                lifePoint -= lifePoint * 0.05f;
+                lifePoint -= lifePoint * 0.1f;
                 break;
             case JudgeResult.Bad:
-                lifePoint -= lifePoint * 0.08f;
+                lifePoint -= lifePoint * 0.2f;
                 break;
             case JudgeResult.Miss:
-                lifePoint -= lifePoint * 0.09f;
+                lifePoint -= lifePoint * 0.4f;
                 break;
         }
-        if (lifePoint < 0.5) lifePoint = 0;
+        if (lifePoint < 0.5f) lifePoint = 0;
+        if (lifePoint > 100f) lifePoint = 100f;
         UpdateDisplay();
     }
     void UpdateDisplay()
     {
-        lifeTxt.text = ((int)lifePoint).ToString();
+        lifeTxt.text = Mathf.RoundToInt(lifePoint).ToString();
         lifeSlider.value = lifePoint / 100f;
     }
 }
