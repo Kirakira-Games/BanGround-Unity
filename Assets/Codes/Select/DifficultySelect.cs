@@ -7,6 +7,7 @@ using System.IO;
 
 public class DifficultySelect : MonoBehaviour
 {
+    public static readonly string[] DIFFICULTY_ABBR = { "EZ", "NM", "HD", "EX", "SP" };
     public GameObject[] cards = new GameObject[5];
     public GameObject[] labels = new GameObject[5];
     Text[] labelText = new Text[5];
@@ -56,7 +57,7 @@ public class DifficultySelect : MonoBehaviour
                 enabledCards.Add(index);
                 cards[index].SetActive(true);
                 labels[index].SetActive(true);
-                labelText[index].text = Enum.GetName(typeof(Difficulty), index).ToUpper() + " " + levels[index];
+                labelText[index].text = DIFFICULTY_ABBR[index] + " " + levels[index];
             }
         }
         UpdateView();
