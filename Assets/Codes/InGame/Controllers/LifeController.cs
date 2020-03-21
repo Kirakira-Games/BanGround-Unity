@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class LifeController : MonoBehaviour
 {
     public static LifeController instance;
-
+    public static List<int> lifePerSecond;
     public float lifePoint { get; private set; }
 
     public Gradient colors;
@@ -19,12 +19,14 @@ public class LifeController : MonoBehaviour
     void Start()
     {
         instance = this;
+        lifePerSecond = new List<int>();
         lifePoint = 100f;
         lifeSlider = GetComponentInChildren<Slider>();
         lifeTxt = GetComponentInChildren<Text>();
         fill = GameObject.Find("LifeFill").GetComponent<Image>();
         UpdateDisplay();
         level = LiveSetting.CurrentHeader.difficultyLevel[LiveSetting.actualDifficulty];
+        StartCoroutine(LifeRecorder());
     }
 
     public void CaculateLife(JudgeResult jr, GameNoteType type)
@@ -54,6 +56,16 @@ public class LifeController : MonoBehaviour
         if (lifePoint > 100f) lifePoint = 100f;
         UpdateDisplay();
     }
+
+    IEnumerator LifeRecorder()
+    {
+        while (true)//不知道会不会在场景结束被destroy
+        {
+            lifePerSecond.Add((int)lifePoint);
+            yield return new WaitForSeconds(5f);
+        }
+    }
+
     void UpdateDisplay()
     {
         lifeTxt.text = Mathf.RoundToInt(lifePoint).ToString();
