@@ -14,6 +14,7 @@ public class TitleLoader : MonoBehaviour
 {
     public TextAsset titleMusic;
     public TextAsset voice;
+    public Text Title;
     public Text touchStart;
 
     private ISoundTrack music;
@@ -51,7 +52,7 @@ public class TitleLoader : MonoBehaviour
 
         if(IsAprilFool)
         {
-            GameObject.Find("Title").GetComponent<Text>().text = "Let the bass kick!";
+            Title.text = "Let the bass kick!";
             touchStart.text = "Bass Bass Kick Kick Bass Kick Kick";
             if (!Directory.Exists($"{Application.persistentDataPath}/Inbox"))
                 Directory.CreateDirectory($"{Application.persistentDataPath}/Inbox");
