@@ -16,7 +16,6 @@ public class FlickNote : NoteBase
 
     public override JudgeResult TryTrace(KirakiraTouch touch)
     {
-        Debug.Log(touch);
         if (!TouchManager.TouchesNote(touch.start, this))
             return JudgeResult.None;
         if (touch.duration > NoteUtility.TAP_JUDGE_RANGE[(int)JudgeResult.Bad])
