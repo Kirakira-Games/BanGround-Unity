@@ -12,7 +12,6 @@ public class ResultManager : MonoBehaviour
 {
     private Button button_back;
     private Button button_retry;
-    private Button button_cycleFrame;
 
     private Text score_Text;
     private Text score_delta_Text;
@@ -144,8 +143,6 @@ public class ResultManager : MonoBehaviour
     {
         button_back = GameObject.Find("Button_back").GetComponent<Button>();
         button_retry = GameObject.Find("Button_retry").GetComponent<Button>();
-        button_cycleFrame = GameObject.Find("CycleFrame").GetComponent<Button>();
-
         Animator anim = GameObject.Find("AnimationManager").GetComponent<Animator>();
 
         button_back.onClick.AddListener(() =>
@@ -164,10 +161,6 @@ public class ResultManager : MonoBehaviour
             SceneLoader.LoadScene("Result", "InGame",true);
         });
 
-        button_cycleFrame.onClick.AddListener(() =>
-        {
-            offset_Obj.gameObject.SetActive(!offset_Obj.gameObject.activeSelf);
-        });
     }
 
     private void GetResultObjectAndComponent()
