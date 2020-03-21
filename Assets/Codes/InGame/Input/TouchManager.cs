@@ -69,7 +69,7 @@ public class KirakiraTouchState
 
     public override string ToString()
     {
-        return string.Format("[{0}] At {1}, Phase = {2}", touchId, pos, Enum.GetName(typeof(KirakiraTouchPhase), phase));
+        return string.Format("[{0}] At {1} / {2}, Phase = {3}", touchId, pos, screenPos, Enum.GetName(typeof(KirakiraTouchPhase), phase));
     }
 }
 
@@ -123,13 +123,14 @@ public class KirakiraTouch
     private PriorityQueue<float, KirakiraTouchState> timeline;
     public static int INVALID_DURATION => NoteUtility.SLIDE_TICK_JUDGE_RANGE << 1;
     public static Vector3 INVALID_POSITION => new Vector3(0, 0, -1e3f);
+    public static float dpi;
 
     /// <summary>
     /// The distance between two screen points, converted to cm.
     /// </summary>
     public static float DistanceInCm(Vector2 p, Vector2 q)
     {
-        return Vector2.Distance(p, q) * 2.54F / Screen.dpi;
+        return Vector2.Distance(p, q) * 2.54F / dpi;
     }
 
     public KirakiraTouch()
@@ -181,6 +182,17 @@ public class KirakiraTouch
                 break;
             }
         }
+    }
+
+    public override string ToString()
+    {
+        string ret = "";
+        for (var i = timeline.FirstV; i != null; i = i.Next)
+        {
+            ret += i.Value + "\n";
+        }
+        ret += string.Format("dist = {0}, dpi = {1}", DistanceInCm(start.screenPos, current.screenPos), dpi);
+        return ret;
     }
 }
 
@@ -264,12 +276,30 @@ public class TouchManager : MonoBehaviour
         return touch.isValid && touch.owner != null;
     }
 
+    private static float GetDPI()
+    {
+#if UNITY_ANDROID
+        AndroidJavaClass activityClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+        AndroidJavaObject activity = activityClass.GetStatic<AndroidJavaObject>("currentActivity");
+
+        AndroidJavaObject metrics = new AndroidJavaObject("android.util.DisplayMetrics");
+        activity.Call<AndroidJavaObject>("getWindowManager").Call<AndroidJavaObject>("getDefaultDisplay").Call("getMetrics", metrics);
+
+        return (metrics.Get<float>("xdpi") + metrics.Get<float>("ydpi")) * 0.5f;
+#else
+        return Screen.dpi;
+#endif
+    }
+
     private void Awake()
     {
         instance = this;
         touchTable = new Dictionary<int, KirakiraTouch>();
         traceCache = new Dictionary<(KirakiraTracer, int), JudgeResult>();
         exchanged = new HashSet<KirakiraTouch>();
+        KirakiraTouch.dpi = GetDPI();
+
+        // Touch provider
         if (LiveSetting.autoPlayEnabled)
         {
             provider = new AutoPlayTouchProvider();
