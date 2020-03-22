@@ -153,7 +153,7 @@ RectTransform:
   m_Children:
   - {fileID: 943783575}
   m_Father: {fileID: 871703157}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 10}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -512,7 +512,7 @@ RectTransform:
   - {fileID: 554598806}
   - {fileID: 317904297}
   m_Father: {fileID: 871703157}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 10}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
@@ -821,14 +821,14 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 1457986750}
-  m_RootOrder: 17
+  m_Father: {fileID: 1853706005}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 996, y: -627.8}
-  m_SizeDelta: {x: 330, y: 200}
-  m_Pivot: {x: 0.7077831, y: 0.5}
+  m_AnchoredPosition: {x: 153.90564, y: -92.463745}
+  m_SizeDelta: {x: 302, y: 183.8}
+  m_Pivot: {x: 0.5000003, y: 0.5000002}
 --- !u!114 &123721673
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4327,6 +4327,7 @@ RectTransform:
   - {fileID: 789755415}
   - {fileID: 2143582673}
   - {fileID: 1041150050}
+  - {fileID: 1853706005}
   - {fileID: 1719841842}
   - {fileID: 24832257}
   - {fileID: 84017030}
@@ -8072,9 +8073,8 @@ RectTransform:
   - {fileID: 885287084}
   - {fileID: 1269424994}
   - {fileID: 1157284747}
-  - {fileID: 123721671}
   m_Father: {fileID: 871703157}
-  m_RootOrder: 7
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
@@ -9726,7 +9726,7 @@ RectTransform:
   m_Children:
   - {fileID: 1571655702}
   m_Father: {fileID: 871703157}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 10}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -10373,6 +10373,80 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1781037330}
+  m_CullTransparentMesh: 0
+--- !u!1 &1853706004
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1853706005}
+  - component: {fileID: 1853706007}
+  - component: {fileID: 1853706006}
+  m_Layer: 5
+  m_Name: lifebackImage
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1853706005
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1853706004}
+  m_LocalRotation: {x: 0, y: 0, z: 0.08715578, w: 0.9961947}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 123721671}
+  m_Father: {fileID: 871703157}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 10}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 783.83, y: -130.82}
+  m_SizeDelta: {x: 317.04, y: 188.22}
+  m_Pivot: {x: 0.50000006, y: 0.5}
+--- !u!114 &1853706006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1853706004}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.42352942, g: 0.42352942, b: 0.42352942, a: 0.2}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 9cdb7ab7364db4857845b84935f5fb5a, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1853706007
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1853706004}
   m_CullTransparentMesh: 0
 --- !u!43 &1868252647
 Mesh:
