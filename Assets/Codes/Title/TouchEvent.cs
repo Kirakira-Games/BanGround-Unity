@@ -7,18 +7,18 @@ using UnityEngine.UI;
 public class TouchEvent : MonoBehaviour
 {
     public bool waitingUpdate = true;
-    public Text keyInput;
-    private InputField inputField;
+    public InputField inputField;
     private AsyncOperation operation;
     private bool touched = false;
 
     private void Start()
     {
-        inputField = keyInput.GetComponentInParent<InputField>();
         if (PlayerPrefs.HasKey("key"))
         {
             inputField.SetTextWithoutNotify(PlayerPrefs.GetString("key"));
-            keyInput.transform.parent.gameObject.SetActive(false);
+            inputField.inputType = InputField.InputType.Password;
+            inputField.asteriskChar = '☆';
+            inputField.readOnly = true;
         }
     }
 
@@ -56,12 +56,12 @@ public class TouchEvent : MonoBehaviour
     IEnumerator GetAuthenticationResult()
     {
         string uuid = SystemInfo.deviceUniqueIdentifier;
-        string key = keyInput.text;
+        string key = inputField.text;
 #if UNITY_EDITOR
         uuid = "1145141919810";
 #endif
         bool usePrefKey = false;
-        if (PlayerPrefs.HasKey("key") && keyInput.text == PlayerPrefs.GetString("key"))
+        if (PlayerPrefs.HasKey("key") && inputField.text == PlayerPrefs.GetString("key"))
         {
             usePrefKey = true;
         }
@@ -81,6 +81,8 @@ public class TouchEvent : MonoBehaviour
             if (!Authenticate.isNetworkError || !usePrefKey)
             {
                 touched = false;
+                inputField.readOnly = false;
+                inputField.inputType = InputField.InputType.Standard;
                 yield break;
             }
         }
