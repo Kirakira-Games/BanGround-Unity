@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class LifeController : MonoBehaviour
 {
     public static LifeController instance;
-    public static List<int> lifePerSecond;
+    public static List<float> lifePerSecond;
     public float lifePoint { get; private set; }
 
     public Gradient colors;
@@ -19,7 +19,7 @@ public class LifeController : MonoBehaviour
     void Start()
     {
         instance = this;
-        lifePerSecond = new List<int>();
+        lifePerSecond = new List<float>();
         lifePoint = 100f;
         lifeSlider = GetComponentInChildren<Slider>();
         lifeTxt = GetComponentInChildren<Text>();
@@ -61,8 +61,8 @@ public class LifeController : MonoBehaviour
     {
         while (true)//不知道会不会在场景结束被destroy
         {
-            lifePerSecond.Add((int)lifePoint);
-            yield return new WaitForSeconds(5f);
+            lifePerSecond.Add(lifePoint / 100.0f);
+            yield return new WaitForSeconds(0.2f);
         }
     }
 

@@ -803,7 +803,6 @@ GameObject:
   - component: {fileID: 123721675}
   - component: {fileID: 123721674}
   - component: {fileID: 123721673}
-  - component: {fileID: 123721672}
   m_Layer: 5
   m_Name: LifeGraph
   m_TagString: Untagged
@@ -827,34 +826,9 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 929.5602, y: -619.55005}
+  m_AnchoredPosition: {x: 996, y: -627.8}
   m_SizeDelta: {x: 330, y: 200}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &123721672
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 123721670}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Padding:
-    m_Left: 0
-    m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
-  m_ChildAlignment: 7
-  m_Spacing: 0
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 1
-  m_ChildControlHeight: 0
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
+  m_Pivot: {x: 0.7077831, y: 0.5}
 --- !u!114 &123721673
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -867,7 +841,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69597ca0a80bc65439bbd2e03068cbc2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  color: {r: 0.4156863, g: 0.4156863, b: 0.4156863, a: 0.87058824}
+  mat: {fileID: 2100000, guid: e161c0bb38077e5488218bce93f755e9, type: 2}
 --- !u!114 &123721674
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -880,8 +854,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.9137255}
+  m_Material: {fileID: 2100000, guid: e161c0bb38077e5488218bce93f755e9, type: 2}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:

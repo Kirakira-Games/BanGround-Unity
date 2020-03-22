@@ -5,23 +5,23 @@ using UnityEngine.UI;
 
 public class DrawLifeGraph : MonoBehaviour
 {
-    public Color color;
+    public Material mat;
+    private Texture2D tex;
+    private Sprite spr;
     // Start is called before the first frame update
     void Start()
     {
-        StartCoroutine(DrawLines());
+        tex = new Texture2D(256, 1);
+        var step = LifeController.lifePerSecond.Count / 256;
+        for (int i = 0; i < 256; i++)
+            tex.SetPixel(i, 0, new Color(LifeController.lifePerSecond[step * i], LifeController.lifePerSecond[step * i], LifeController.lifePerSecond[step * i]));
+
+        tex.Apply();
+        spr = Sprite.Create(tex, new Rect(0, 0, 256, 1), new Vector2(0.5f, 0.5f));
+
+        GetComponent<Image>().overrideSprite = spr;
+
+        //StartCoroutine(DrawLines());
     }
-    
-    IEnumerator DrawLines()
-    {
-        yield return new WaitForSeconds(2f);
-        for(int i = 0;i<LifeController.lifePerSecond.Count;i++)
-        {
-            System.Type[] compoints = new System.Type[] { typeof(RectTransform), typeof(Image) };
-            GameObject gmobj = Instantiate(new GameObject(i + " value", compoints),transform);
-            gmobj.GetComponent<RectTransform>().sizeDelta = new Vector2(1, 2 * LifeController.lifePerSecond[i]);
-            gmobj.GetComponent<Image>().color = color;
-            yield return new WaitForSeconds(0.1f);
-        }
-    }
+
 }
