@@ -278,7 +278,7 @@ public class TouchManager : MonoBehaviour
 
     private static float GetDPI()
     {
-#if UNITY_ANDROID
+#if UNITY_ANDROID && !UNITY_EDITOR
         AndroidJavaClass activityClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
         AndroidJavaObject activity = activityClass.GetStatic<AndroidJavaObject>("currentActivity");
 
