@@ -52,7 +52,7 @@
             fixed4 frag (v2f i) : SV_Target
             {
                 // sample the texture
-                fixed4 col = float4(0.168, 0.623, 0.819, 0);
+                fixed4 col = float4(0.384, 0.843, 0.925, 0);
                 fixed4 health = tex2D(_MainTex, float2(i.uv.x, 0));
                 
                 if (i.uv1.y < health.x)
