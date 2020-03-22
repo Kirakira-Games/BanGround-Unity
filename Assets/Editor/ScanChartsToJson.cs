@@ -164,5 +164,11 @@ public class ScanChartsToJson : MonoBehaviour
             DataLoader.ConvertJsonToBin(song);
         }
     }
+
+    [MenuItem("BanGround/清除在Editor内储存的key")]
+    public static void ClearKey()
+    {
+        PlayerPrefs.DeleteKey("key");
+    }
 }
 

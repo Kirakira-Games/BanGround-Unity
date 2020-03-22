@@ -37,7 +37,7 @@ public class TitleLoader : MonoBehaviour
 
         StartCoroutine(PlayTitle());
 
-        MessageBoxController.ShowMsg(LogLevel.INFO, SystemInfo.deviceUniqueIdentifier);
+        //MessageBoxController.ShowMsg(LogLevel.INFO, SystemInfo.deviceUniqueIdentifier.Substring(0, 8));
     }
 
     IEnumerator PlayTitle()
@@ -73,10 +73,11 @@ public class TitleLoader : MonoBehaviour
         var check = VersionCheck.Disable;
         yield return StartCoroutine(check.GetVersionInfo());
 
-        if (check == null || check.version.status == false) 
+        if (check == null || check.version == null || check.version.status == false) 
         {
             //网络错误
             MessageBoxController.ShowMsg(LogLevel.ERROR, VersionCheck.CheckError, false);
+            te.waitingUpdate = false; // 椰叶先别强制更新罢
         }
         else if (check.version.data.has)
         {
