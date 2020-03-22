@@ -8,6 +8,8 @@ using System;
 
 public class UIManager : MonoBehaviour
 {
+    public static UIManager instance;
+
     SpriteRenderer bg_SR;
     MeshRenderer lan_MR;
 
@@ -26,10 +28,12 @@ public class UIManager : MonoBehaviour
     GameObject gateCanvas;
 
     private ISoundEffect resultVoice;
-    private bool isFinished;
+    public bool isFinished;
 
     void Start()
     {
+        instance = this;
+
         isFinished = false;
         //bg_SR = GameObject.Find("dokidokiBackground").GetComponent<SpriteRenderer>();
         lan_MR = GameObject.Find("LaneBackground").GetComponent<MeshRenderer>();

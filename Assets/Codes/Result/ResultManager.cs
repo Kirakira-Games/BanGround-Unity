@@ -133,8 +133,11 @@ public class ResultManager : MonoBehaviour
                 break;
         }
 
-        var resultPlayer = AudioManager.Instance.PrecacheSE(resultVoice.bytes);
-        resultPlayer.PlayOneShot();
+        if (resultVoice != null)
+        {
+            var resultPlayer = AudioManager.Instance.PrecacheSE(resultVoice.bytes);
+            resultPlayer.PlayOneShot();
+        }
 
         yield return new WaitForSeconds(1);
     }
