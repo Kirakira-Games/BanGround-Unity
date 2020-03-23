@@ -74,15 +74,15 @@ public class NoteMesh : MonoBehaviour
         return Mathf.Lerp(cachedLength[index], cachedLength[index+1], ratio);
     }
 
-    private static Vector3[] GetVertices(float z)
+    private static Vector3[] GetVertices(Vector3 p)
     {
-        float dz = GetCachedLength(z);
+        float dz = GetCachedLength(p.z);
         return new Vector3[]
         {
             new Vector3(-1, 0, -dz),
             new Vector3(1, 0, -dz),
-            new Vector3(-1, 0, dz),
-            new Vector3(1, 0, dz)
+            new Vector3(-1, 0.001f, dz),
+            new Vector3(1, 0.001f, dz)
         };
     }
 
@@ -112,7 +112,7 @@ public class NoteMesh : MonoBehaviour
         meshRenderer.material = mat;
         Mesh mesh = new Mesh
         {
-            vertices = GetVertices(NoteUtility.NOTE_START_Z_POS),
+            vertices = GetVertices(NoteUtility.GetInitPos(3)),
             uv = uv,
             normals = normals,
             triangles = indices
@@ -125,7 +125,7 @@ public class NoteMesh : MonoBehaviour
 
     private void Update()
     {
-        meshFilter.mesh.SetVertices(GetVertices(transform.position.z));
+        meshFilter.mesh.SetVertices(GetVertices(transform.position));
         meshFilter.mesh.RecalculateBounds();
     }
 }
