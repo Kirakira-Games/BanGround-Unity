@@ -19,6 +19,7 @@ public class TouchEvent : MonoBehaviour
             inputField.inputType = InputField.InputType.Password;
             inputField.asteriskChar = '☆';
             inputField.readOnly = true;
+            inputField.gameObject.SetActive(false);
         }
     }
 
@@ -83,6 +84,7 @@ public class TouchEvent : MonoBehaviour
                 touched = false;
                 inputField.readOnly = false;
                 inputField.inputType = InputField.InputType.Standard;
+                inputField.gameObject.SetActive(true);
                 yield break;
             }
         }
