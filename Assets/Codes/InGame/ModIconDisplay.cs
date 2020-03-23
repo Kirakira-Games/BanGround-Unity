@@ -17,6 +17,8 @@ public class ModIconDisplay : MonoBehaviour
             else if (mod is HalfMod) icons[1].gameObject.SetActive(true);
             else if (mod is SuddenDeathMod) icons[3].gameObject.SetActive(true);
             else if (mod is PerfectMod) icons[4].gameObject.SetActive(true);
+            else if (mod is NightCoreMod) icons[5].gameObject.SetActive(true);
+            else if (mod is DayCoreMod) icons[6].gameObject.SetActive(true);
         }
         if (LiveSetting.autoPlayEnabled) icons[2].gameObject.SetActive(true);
     }
