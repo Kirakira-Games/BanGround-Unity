@@ -32,15 +32,14 @@ public class VersionCheck
 
     private string FullAPI = Prefix + API;
 
-
     public IEnumerator GetVersionInfo()
     {
-        using (UnityWebRequest webRequest = UnityWebRequest.Get(FullAPI))
-        {
-            yield return webRequest.SendWebRequest();
-            if (webRequest.isNetworkError | webRequest.isHttpError) version = null;
-            else version = JsonConvert.DeserializeObject<VersionInfo>(webRequest.downloadHandler.text);
-        }
+        var req = new KirakiraWebRequest<VersionInfo>();
+        yield return req.Get(FullAPI);
+        if (req.isNetworkError)
+            version = null;
+        else
+            version = req.resp;
     }
 }
 
