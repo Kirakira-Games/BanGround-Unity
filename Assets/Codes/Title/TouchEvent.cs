@@ -58,9 +58,6 @@ public class TouchEvent : MonoBehaviour
     {
         string uuid = SystemInfo.deviceUniqueIdentifier;
         string key = inputField.text;
-#if UNITY_EDITOR
-        uuid = "1145141919810";
-#endif
         bool usePrefKey = false;
         if (PlayerPrefs.HasKey("key") && inputField.text == PlayerPrefs.GetString("key"))
         {
