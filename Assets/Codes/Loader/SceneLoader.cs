@@ -7,6 +7,7 @@ public class SceneLoader : MonoBehaviour
 {
     private Animator animator;
     private Camera loaderCamera;
+    private AsyncOperation loadOP;
 
     public static Scene currentSceneName;
     private static string nextSceneName;
@@ -28,7 +29,7 @@ public class SceneLoader : MonoBehaviour
         if (Loading) return;
         Loading = true;
 
-        SceneLoader.currentSceneName = SceneManager.GetActiveScene();
+        SceneLoader.currentSceneName = SceneManager.GetSceneByName(currentSceneName);
         SceneLoader.nextSceneName = nextSceneName;
         SceneLoader.needOpen = needOpen;
         SceneManager.LoadSceneAsync("Loader", LoadSceneMode.Additive);
@@ -50,7 +51,8 @@ public class SceneLoader : MonoBehaviour
 
         loaderCamera.enabled = true;
 
-        SceneManager.LoadSceneAsync(nextSceneName, needOpen ? LoadSceneMode.Additive : LoadSceneMode.Single);
+        loadOP = SceneManager.LoadSceneAsync(nextSceneName, needOpen ? LoadSceneMode.Additive : LoadSceneMode.Single);
+        loadOP.allowSceneActivation = false;
 
         //开门动画39帧
         //需要开门的话需要等开门动画播放完毕后再卸载Loader场景并重置Loading标志
@@ -60,12 +62,19 @@ public class SceneLoader : MonoBehaviour
         }
         else
         {
+            loadOP.allowSceneActivation = true;
             Loading = false;
         }
     }
 
     private IEnumerator CountDown(float seconds)
     {
+        while (loadOP.progress < 0.9f)
+        {
+            yield return new WaitForEndOfFrame();
+        }
+        loadOP.allowSceneActivation = true;
+
         //开门时间（即loading播放时间） 应减去关门所需时间
         animator.Play("Opening");
         //open gate need 1f

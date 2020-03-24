@@ -350,7 +350,7 @@ public class NoteController : MonoBehaviour
                         shutdown = true;
                         AudioManager.Instance.isInGame = false;
                         AudioManager.Instance.StopBGM();
-                        GameObject.Find("UIManager").GetComponent<UIManager>().OnAudioFinish(false);
+                        GameObject.Find("UIManager").GetComponent<UIManager>().OnAudioFinish(true);
                     }
                 });
 

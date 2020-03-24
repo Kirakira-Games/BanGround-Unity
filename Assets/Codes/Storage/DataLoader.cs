@@ -14,6 +14,7 @@ public class DataLoader
     public static readonly string ChartDir = DataDir + "chart/";
     public static readonly string MusicDir = DataDir + "music/";
     public static readonly string SkinDir = DataDir + "skin/";
+    public static readonly string InboxDir = Application.persistentDataPath + "/Inbox/";
     public static readonly string SongListPath = DataDir + "songlist.bin";
     public static int LastImportedSid = -1;
 
@@ -29,7 +30,6 @@ public class DataLoader
     private static Dictionary<int, mHeader> musicDic;
 
     private static readonly string TempDir = Application.persistentDataPath + "/temp/";
-    private static readonly string InboxDir = Application.persistentDataPath + "/Inbox/";
 
     public static IEnumerator Init()
     {

@@ -49,5 +49,20 @@ public class AppPreLoader : MonoBehaviour
 
         // Input system
         UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
+
+//#if UNITY_IOS
+        // iOS file import
+        Application.deepLinkActivated += (url) =>
+        {
+            //Debug.Log(url);
+            if (DataLoader.LoadAllKiraPackFromInbox())
+            {
+                if (SceneManager.GetActiveScene().name == "Select")
+                {
+                    SceneManager.LoadScene("Select");
+                }
+            }
+        };
+//#endif
     }
 }

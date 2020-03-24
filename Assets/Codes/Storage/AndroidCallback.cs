@@ -18,13 +18,13 @@ public class AndroidCallback : AndroidJavaProxy
 
     public void onFileImport()
     {
-        if (DataLoader.LoadAllKiraPackFromInbox())
-        {
-            if (SceneManager.GetActiveScene().name == "Select")
-            {
-                SceneManager.LoadScene("Select");
-            }
-        }
+        //if (DataLoader.LoadAllKiraPackFromInbox())
+        //{
+        //    if (SceneManager.GetActiveScene().name == "Select")
+        //    {
+        //        SceneManager.LoadScene("Select");
+        //    }
+        //}
     }
 }
 #endif

@@ -19,6 +19,7 @@ public class TouchEvent : MonoBehaviour
             inputField.inputType = InputField.InputType.Password;
             inputField.asteriskChar = '☆';
             inputField.readOnly = true;
+            inputField.gameObject.SetActive(false);
         }
     }
 
@@ -57,9 +58,6 @@ public class TouchEvent : MonoBehaviour
     {
         string uuid = SystemInfo.deviceUniqueIdentifier;
         string key = inputField.text;
-#if UNITY_EDITOR
-        uuid = "1145141919810";
-#endif
         bool usePrefKey = false;
         if (PlayerPrefs.HasKey("key") && inputField.text == PlayerPrefs.GetString("key"))
         {
@@ -83,6 +81,7 @@ public class TouchEvent : MonoBehaviour
                 touched = false;
                 inputField.readOnly = false;
                 inputField.inputType = InputField.InputType.Standard;
+                inputField.gameObject.SetActive(true);
                 yield break;
             }
         }
