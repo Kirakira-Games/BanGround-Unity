@@ -69,7 +69,7 @@ public class DataLoader
             File.Delete(Application.persistentDataPath + "/Initial.kirapack");
         }
 
-#if UNITY_ANDROID && !UNITY_EDITOR
+#if UNITY_ANDROID && false
         AndroidCallback.Init();
 #endif
 

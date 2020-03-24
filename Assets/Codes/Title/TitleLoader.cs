@@ -59,9 +59,6 @@ public class TitleLoader : MonoBehaviour
             if (!Directory.Exists($"{Application.persistentDataPath}/data/chart/233333"))
             {
                 File.WriteAllBytes($"{Application.persistentDataPath}/Inbox/BBKKBKK_Min_Commit_c8ecd6fa71.kirapack", Resources.Load<TextAsset>("BBKKBKK_23dead5111_V0.3.kirapack").bytes);
-#if UNITY_ANDROID
-                DataLoader.LoadAllKiraPackFromInbox();
-#endif
             }
         }
     }
