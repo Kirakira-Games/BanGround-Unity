@@ -78,11 +78,6 @@ public class TouchEvent : MonoBehaviour
             MessageBoxController.ShowMsg(LogLevel.ERROR, Authenticate.result.error);
             if (!Authenticate.isNetworkError || !usePrefKey)
             {
-                if (usePrefKey)
-                {
-                    PlayerPrefs.DeleteKey("key");
-                    PlayerPrefs.Save();
-                }
                 touched = false;
                 inputField.readOnly = false;
                 inputField.inputType = InputField.InputType.Standard;
