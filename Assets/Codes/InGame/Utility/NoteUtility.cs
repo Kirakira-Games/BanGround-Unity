@@ -128,7 +128,7 @@ public static class NoteUtility
     public const float NOTE_Y_POS = 0f;
     public const float NOTE_Y_MAX = 3.5f;
     public const float LANE_WIDTH = 2f;
-    public const float LANE_JUDGE_WIDTH = 2.5f;
+    public const float LANE_JUDGE_WIDTH = 2.8f;
     public const float LANE_JUDGE_HEIGHT = 2.5f;
     public const float NOTE_SCALE = 1f;
     public const float FUWAFUWA_RADIUS = 3f;
