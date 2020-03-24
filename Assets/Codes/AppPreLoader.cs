@@ -51,7 +51,7 @@ public class AppPreLoader : MonoBehaviour
         UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
 
 //#if UNITY_IOS
-        // iOS file import
+        // File import
         Application.deepLinkActivated += (url) =>
         {
             //Debug.Log(url);

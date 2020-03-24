@@ -20,6 +20,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+/*
 class CallbackThread extends Thread {
     public void run() {
         try {
@@ -30,19 +31,20 @@ class CallbackThread extends Thread {
         } catch (InterruptedException e) {}
     }
 }
+*/
 
 public class KirakiraActivity extends UnityPlayerActivity {
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
             "android.permission.READ_EXTERNAL_STORAGE",
             "android.permission.WRITE_EXTERNAL_STORAGE" };
-    
+    /*
     public static FileImportCallback fileImportCallback;
 
     public static void registerFileImportCallback(FileImportCallback callback) {
         fileImportCallback = callback;
     }
-
+    */
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -60,7 +62,7 @@ public class KirakiraActivity extends UnityPlayerActivity {
             }
             out.close();
 
-            new CallbackThread().start();
+            // new CallbackThread().start();
         } catch (Exception e) {
             Log.e("MainActivity", "InputStreamToFile exception: " + e.getMessage());
         }
