@@ -641,6 +641,7 @@ public class SelectManager : MonoBehaviour
     private void OnDestroy()
     {
         previewSound?.Dispose();
+        SlideMesh.cacheMat = null;
     }
 }
 
