@@ -46,7 +46,7 @@ public class KirakiraActivity extends UnityPlayerActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ImportFile();
+        ImportFile(getIntent());
     }
 
     private void InputStreamToFile(InputStream in, File file) {
@@ -66,13 +66,12 @@ public class KirakiraActivity extends UnityPlayerActivity {
         }
     }
 
-    public void ImportFile(){
+    public void ImportFile(Intent intent){
         while(checkSelfPermission("android.permission.WRITE_EXTERNAL_STORAGE") != PackageManager.PERMISSION_GRANTED)
         {
             requestPermissions(PERMISSIONS_STORAGE,REQUEST_EXTERNAL_STORAGE);
         }
 
-        Intent intent = getIntent();
         String action = intent.getAction();
 
         assert action != null;
@@ -120,9 +119,8 @@ public class KirakiraActivity extends UnityPlayerActivity {
 
     @Override public void onNewIntent(Intent intent)
     {
+        ImportFile(intent);
         super.onNewIntent(intent);
-
-        ImportFile();
     }
 
     private void hideSystemUI() {
