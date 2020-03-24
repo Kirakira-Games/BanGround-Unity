@@ -11,31 +11,35 @@
         <action android:name="android.intent.action.VIEW" />
 
         <category android:name="android.intent.category.DEFAULT" />
-        <category android:name="android.intent.category.BROWSABLE" />
 
         <data android:scheme="file" />
         <data android:scheme="content" />
-        <data android:mimeType="*/*" />
-        <data android:host="*" />
 
-        <!--
-             Work around Android's ugly primitive PatternMatcher
-             implementation that can't cope with finding a . early in
-             the path unless it's explicitly matched.
-        -->
-        <data android:pathPattern=".*\\.kirapack" />
-        <data android:pathPattern=".*\\..*\\.kirapack" />
-        <data android:pathPattern=".*\\..*\\..*\\.kirapack" />
-        <data android:pathPattern=".*\\..*\\..*\\..*\\.kirapack" />
-        <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.kirapack" />
-        <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.kirapack" />
-        <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.kirapack" />
-        <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.kirapack" />
-        <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.kirapack" />
+        <data android:pathPattern=".*//.kirapack" />
+
       </intent-filter>
+			<intent-filter
+				>
+				<data
+					android:scheme="file"
+					>
+				</data>
+				<action
+					android:name="android.intent.action.VIEW"
+					>
+				</action>
+				<category
+					android:name="android.intent.category.DEFAULT"
+					>
+				</category>
+				<data
+					android:mimeType="application/zip"
+					>
+				</data>
+			</intent-filter>
       <meta-data android:name="unityplayer.UnityActivity" android:value="true" />
     </activity>
-    <meta-data android:name="android.max_aspect" android:value="2.1" />
+    <meta-data android:name="android.max_aspect" android:value="2.2" />
   </application>
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
