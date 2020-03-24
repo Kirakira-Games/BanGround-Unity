@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="fun.BanGround.Game" xmlns:tools="http://schemas.android.com/tools" android:installLocation="preferExternal">
   <supports-screens android:smallScreens="true" android:normalScreens="true" android:largeScreens="true" android:xlargeScreens="true" android:anyDensity="true" />
-  <application android:label="@string/app_name" android:icon="@mipmap/app_icon">
+  <application 
+    android:label="@string/app_name" 
+    android:icon="@mipmap/app_icon"
+    android:allowBackup="true"
+		android:hardwareAccelerated="true"
+		android:isGame="true"
+    >
     <activity android:name="fun.banground.game.KirakiraActivity" android:theme="@style/UnityThemeSelector" android:screenOrientation="sensorLandscape" android:launchMode="singleTask" android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale|layoutDirection|density" android:hardwareAccelerated="false">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
@@ -18,11 +24,7 @@
         <data android:mimeType="*/*" />
         <data android:host="*" />
 
-        <!--
-             Work around Android's ugly primitive PatternMatcher
-             implementation that can't cope with finding a . early in
-             the path unless it's explicitly matched.
-        -->
+        <data android:pathPattern=".*//.kirapack" />
         <data android:pathPattern=".*\\.kirapack" />
         <data android:pathPattern=".*\\..*\\.kirapack" />
         <data android:pathPattern=".*\\..*\\..*\\.kirapack" />
@@ -32,10 +34,30 @@
         <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.kirapack" />
         <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.kirapack" />
         <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.kirapack" />
+        
       </intent-filter>
+			<intent-filter
+				>
+				<data
+					android:scheme="file"
+					>
+				</data>
+				<action
+					android:name="android.intent.action.VIEW"
+					>
+				</action>
+				<category
+					android:name="android.intent.category.DEFAULT"
+					>
+				</category>
+				<data
+					android:mimeType="application/zip"
+					>
+				</data>
+			</intent-filter>
       <meta-data android:name="unityplayer.UnityActivity" android:value="true" />
     </activity>
-    <meta-data android:name="android.max_aspect" android:value="2.1" />
+    <meta-data android:name="android.max_aspect" android:value="2.2" />
   </application>
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />

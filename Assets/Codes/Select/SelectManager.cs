@@ -87,9 +87,7 @@ public class SelectManager : MonoBehaviour
 
     private void Awake()
     {
-#if !UNITY_ANDROID || UNITY_EDITOR
         DataLoader.LoadAllKiraPackFromInbox();
-#endif
         DataLoader.RefreshSongList();
         DataLoader.ReloadSongList();
     }
@@ -629,7 +627,7 @@ public class SelectManager : MonoBehaviour
             previewSound?.Play();
     }
 
-#if !UNITY_ANDROID || UNITY_EDITOR
+#if UNITY_EDITOR
     private void OnApplicationFocus(bool focus)
     {
         if (focus)
@@ -643,6 +641,7 @@ public class SelectManager : MonoBehaviour
     private void OnDestroy()
     {
         previewSound?.Dispose();
+        SlideMesh.cacheMat = null;
     }
 }
 

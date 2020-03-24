@@ -70,7 +70,7 @@ public class TitleLoader : MonoBehaviour
     {
         MessageBoxController.ShowMsg(LogLevel.INFO, VersionCheck.CheckUpdate);
         TouchEvent te = GameObject.Find("TouchStart").GetComponent<TouchEvent>();
-        var check = VersionCheck.Disable;
+        var check = VersionCheck.Instance;
         yield return StartCoroutine(check.GetVersionInfo());
 
         if (check == null || check.version == null || check.version.status == false) 
