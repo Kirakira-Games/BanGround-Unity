@@ -27,6 +27,7 @@ public class SelectManager : MonoBehaviour
     private Toggle persp_Tog;
     private Toggle mirrow_Tog;
     private Toggle ELP_Tog;
+    private Toggle FS_Tog;
     private NoteStyleToggleGroup noteToggles;
     private SESelector seSelector;
 
@@ -156,6 +157,7 @@ public class SelectManager : MonoBehaviour
         mirrow_Tog = GameObject.Find("Mirrow_Toggle").GetComponent<Toggle>();
         persp_Tog = GameObject.Find("Perspective_Toggle").GetComponent<Toggle>();
         ELP_Tog = GameObject.Find("ELP_Toggle").GetComponent<Toggle>();
+        FS_Tog = GameObject.Find("Fullscreen_Toggle").GetComponent<Toggle>();
         noteToggles = GameObject.Find("Note_Group").GetComponent<NoteStyleToggleGroup>();
         seSelector= GameObject.Find("SEGroup").GetComponent<SESelector>();
 
@@ -224,6 +226,11 @@ public class SelectManager : MonoBehaviour
         GameObject.Find("ButtonArtist").GetComponent<Button>().onClick.AddListener(() => { LiveSetting.sort = Sorter.SongArtist; InitSongList(); });
         GameObject.Find("ButtonCharter").GetComponent<Button>().onClick.AddListener(() => { LiveSetting.sort = Sorter.ChartAuthor; InitSongList(); });
         GameObject.Find("ButtonLevel").GetComponent<Button>().onClick.AddListener(() => { LiveSetting.sort = Sorter.ChartDif; InitSongList(); });
+
+#if !(UNITY_STANDALONE || UNITY_WSA)
+        GameObject.Find("Fullscreen").SetActive(false);
+        GameObject.Find("Fullscreen_Toggle").SetActive(false);
+#endif
     }
     void LoadScoreRecord()
     {
@@ -543,6 +550,7 @@ public class SelectManager : MonoBehaviour
         mirrow_Tog.isOn = LiveSetting.mirrowEnabled;
         persp_Tog.isOn = LiveSetting.bangPerspective;
         ELP_Tog.isOn = LiveSetting.displayELP;
+        FS_Tog.isOn = Screen.fullScreen;
 
         judgeOffsetTransform.value = LiveSetting.offsetTransform;
         far_Clip.value = LiveSetting.farClip;
@@ -578,37 +586,57 @@ public class SelectManager : MonoBehaviour
 
     void SetLiveSetting()
     {
-        LiveSetting.noteSpeed = float.Parse(speed_Input.text);
-        LiveSetting.judgeOffset = int.Parse(string.IsNullOrWhiteSpace(judge_Input.text) ? 0.ToString() : judge_Input.text);
-        LiveSetting.audioOffset = int.Parse(string.IsNullOrWhiteSpace(audio_Input.text) ? 0.ToString() : audio_Input.text);
-        LiveSetting.noteSize = float.Parse(size_Input.text);
-        LiveSetting.seVolume = seVolume_Input.value;
-        LiveSetting.bgmVolume = bgmVolume_Input.value;
-        LiveSetting.syncLineEnabled = syncLine_Tog.isOn;
-        LiveSetting.grayNoteEnabled = offBeat_Tog.isOn;
-        LiveSetting.mirrowEnabled = mirrow_Tog.isOn;
-        LiveSetting.autoPlayEnabled = auto_Tog.isOn;
-        LiveSetting.bangPerspective = persp_Tog.isOn;
-        LiveSetting.displayELP = ELP_Tog.isOn;
+        try
+        {
+            LiveSetting.noteSpeed = float.Parse(speed_Input.text);
+            LiveSetting.judgeOffset = int.Parse(string.IsNullOrWhiteSpace(judge_Input.text) ? 0.ToString() : judge_Input.text);
+            LiveSetting.audioOffset = int.Parse(string.IsNullOrWhiteSpace(audio_Input.text) ? 0.ToString() : audio_Input.text);
+            LiveSetting.noteSize = float.Parse(size_Input.text);
+            LiveSetting.seVolume = seVolume_Input.value;
+            LiveSetting.bgmVolume = bgmVolume_Input.value;
+            LiveSetting.syncLineEnabled = syncLine_Tog.isOn;
+            LiveSetting.grayNoteEnabled = offBeat_Tog.isOn;
+            LiveSetting.mirrowEnabled = mirrow_Tog.isOn;
+            LiveSetting.autoPlayEnabled = auto_Tog.isOn;
+            LiveSetting.bangPerspective = persp_Tog.isOn;
+            LiveSetting.displayELP = ELP_Tog.isOn;
 
-        LiveSetting.offsetTransform = judgeOffsetTransform.value;
-        LiveSetting.farClip = far_Clip.value;
-        LiveSetting.bgBrightness = bg_Bright.value;
-        LiveSetting.laneBrightness = lane_Bright.value;
-        LiveSetting.longBrightness = long_Bright.value;
+            if(FS_Tog.isOn)
+            {
+                var r = Screen.resolutions[Screen.resolutions.Length - 1];
+                Screen.SetResolution(r.width, r.height, FullScreenMode.FullScreenWindow);
+                Screen.fullScreen = true;
+            }
+            else
+            {
+                var r = Screen.resolutions[Screen.resolutions.Length - 2];
+                Screen.SetResolution(r.width, r.height, FullScreenMode.Windowed);
+                Screen.fullScreen = false;
+            }
 
-        LiveSetting.noteStyle = noteToggles.GetStyle();
-        LiveSetting.seStyle = seSelector.GetSE();
+            LiveSetting.offsetTransform = judgeOffsetTransform.value;
+            LiveSetting.farClip = far_Clip.value;
+            LiveSetting.bgBrightness = bg_Bright.value;
+            LiveSetting.laneBrightness = lane_Bright.value;
+            LiveSetting.longBrightness = long_Bright.value;
 
-        LiveSetting.RemoveAllMods();
-        LiveSetting.attachedMods.Clear();
-        LiveSetting.AddMod(speedUp_Tog.GetStep());
-        LiveSetting.AddMod(speedDown_Tog.GetStep());
+            LiveSetting.noteStyle = noteToggles.GetStyle();
+            LiveSetting.seStyle = seSelector.GetSE();
 
-        if (suddenDeath_Tog.isOn) LiveSetting.AddMod(SuddenDeathMod.Instance);
+            LiveSetting.RemoveAllMods();
+            LiveSetting.attachedMods.Clear();
+            LiveSetting.AddMod(speedUp_Tog.GetStep());
+            LiveSetting.AddMod(speedDown_Tog.GetStep());
 
-        if (perfect_Tog.isOn) LiveSetting.AddMod(PerfectMod.Instance);
+            if (suddenDeath_Tog.isOn) LiveSetting.AddMod(SuddenDeathMod.Instance);
 
+            if (perfect_Tog.isOn) LiveSetting.AddMod(PerfectMod.Instance);
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e.Message);
+            throw e;
+        }
     }
 
     //============================================
