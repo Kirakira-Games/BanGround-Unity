@@ -197,10 +197,11 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     private void OnDelete()
     {
-        var file = DataLoader.GetChartPath(LiveSetting.CurrentHeader.sid, (Difficulty)LiveSetting.actualDifficulty);
+        /*var file = DataLoader.GetChartPath(LiveSetting.CurrentHeader.sid, (Difficulty)LiveSetting.actualDifficulty);
         var path = new System.IO.FileInfo(file).Directory.FullName;
         //Debug.Log(path);
-        System.IO.Directory.Delete(path, true);
+        System.IO.Directory.Delete(path, true);*/
+
         UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Select");
     }
 

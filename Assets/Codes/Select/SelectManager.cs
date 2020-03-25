@@ -326,10 +326,12 @@ public class SelectManager : MonoBehaviour
         background.UpdateBackground(path);
 
         yield return new WaitForEndOfFrame();
+
         try
         {
             SelectSong(LiveSetting.currentChart);
-        } catch
+        } 
+        catch
         {
 
         }
@@ -503,7 +505,7 @@ public class SelectManager : MonoBehaviour
         {
             return;
         }
-        previewSound = AudioManager.Instance.PlayLoopMusic(File.ReadAllBytes(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)),true,
+        previewSound = AudioManager.Instance.PlayLoopMusic(KiraFilesystem.Instance.Read(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)),true,
             new uint[]
             {
                 (uint)(mheader.preview[0] * 1000),

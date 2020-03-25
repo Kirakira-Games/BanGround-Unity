@@ -16,12 +16,14 @@ namespace System.IO
         // file, kirapack
         Dictionary<string, string> index;
         string indexFile;
-        public KiraFilesystem(string indexFile)
+        string root;
+        public KiraFilesystem(string indexFile, string filesystemRoot)
         {
             if (Instance == null)
                 Instance = this;
 
             this.indexFile = indexFile;
+            root = filesystemRoot;
 
             if (File.Exists(indexFile))
             {
@@ -52,14 +54,37 @@ namespace System.IO
                     }
                 }
             }
+
+            index.Add(kiraPack, kiraPack);
         }
 
         public void RemoveFromIndex(string kiraPack)
         {
-            var entries = (from x in index where x.Value == kiraPack select x.Key).ToArray<string>();
+            var entries = (from x in index where x.Value == kiraPack select x.Key).ToArray();
 
             foreach (var entry in entries)
                 index.Remove(entry);
+
+            index.Remove(kiraPack);
+        }
+
+        public void RemoveFileFromIndex(string fileName)
+        {
+            var path = Path.Combine(root, fileName);
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+
+            if(index.ContainsKey(fileName))
+            {
+                index.Remove(fileName);
+            }
+        }
+
+        public void CleanUnusedKirapack()
+        {
+
         }
 
         public void SaveIndex()
@@ -87,8 +112,55 @@ namespace System.IO
             }
         }
 
+        private void GetFiles(List<string> files, DirectoryInfo di)
+        {
+            var subfiles = from x in di.GetFiles()
+                        select x.FullName.Replace(root, "");
+
+            var subdirs = di.GetDirectories();
+
+            files.AddRange(subfiles);
+
+            foreach (var sdi in subdirs)
+                GetFiles(files, sdi);
+        }
+
+        public string[] ListFiles()
+        {
+            var files = index.Keys.ToList();
+            GetFiles(files, new DirectoryInfo(root));
+            return files.ToArray();
+        }
+
+        public bool Exists(string fileName)
+        {
+            if (File.Exists(Path.Combine(root, fileName)))
+                return true;
+
+            if (!index.ContainsKey(fileName))
+                return false;
+
+            var targetKirapack = index[fileName];
+
+            if (!File.Exists(targetKirapack))
+                return false;
+
+            using (var zip = ZipFile.OpenRead(targetKirapack))
+            {
+                if (zip.GetEntry(fileName) != null)
+                    return true;
+            }
+
+            return false;
+        }
+
         public byte[] Read(string fileName)
         {
+            if (File.Exists(Path.Combine(root, fileName)))
+            {
+                return File.ReadAllBytes(Path.Combine(root, fileName));
+            }
+
             if (!index.ContainsKey(fileName))
                 throw new FileNotFoundException($"File {fileName} not found in filesystem.");
 
@@ -96,25 +168,23 @@ namespace System.IO
 
             byte[] buffer;
 
-            using (var s = File.OpenRead(targetKirapack))
+            using (var zip = ZipFile.OpenRead(targetKirapack))
             {
-                using (var zip = new ZipArchive(s))
-                {
-                    var entry = zip.GetEntry(fileName);
-                    using (var stream = entry.Open())
-                    {
-                        using (var ms = new MemoryStream())
-                        {
-                            stream.CopyTo(ms);
+                var entry = zip.GetEntry(fileName);
 
-                            buffer = new byte[ms.Length];
-                            ms.Read(buffer, 0, buffer.Length);
-                        }
-                    }
+                using (var sr = new BinaryReader(entry.Open()))
+                {
+                    buffer = sr.ReadBytes((int)entry.Length);
                 }
             }
 
             return buffer;
+        }
+
+        public MemoryStream ReadStream(string fileName)
+        {
+            var bytes = Read(fileName);
+            return new MemoryStream(bytes);
         }
 
         public string ReadString(string fileName, Encoding encoding = null)

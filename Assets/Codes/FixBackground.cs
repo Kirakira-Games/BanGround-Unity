@@ -41,27 +41,20 @@ public class FixBackground : MonoBehaviour
 
     public void UpdateBackground(string path)
     {
-        if (!File.Exists(path))
+        if (!KiraFilesystem.Instance.Exists(path))
         {
             render.sprite = defaultSprite;
             UpdateScale();
             return;
         }
-        StartCoroutine(GetAndSetBG(path));
+
+        GetAndSetBG(path);
     }
 
-    IEnumerator GetAndSetBG(string path)
+    void GetAndSetBG(string path)
     {
-        //Debug.Log(path);
-//#if UNITY_ANDROID && !UNITY_EDITOR
-        path = "file://" + path;
-//#endif
-        using (UnityWebRequest webRequest = UnityWebRequestTexture.GetTexture(path)) 
-        {
-            yield return webRequest.SendWebRequest();
-            var tex = DownloadHandlerTexture.GetContent(webRequest);
-            render.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
-        }
+        var tex = KiraFilesystem.Instance.ReadTexture2D(path);
+        render.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
         UpdateScale();
     }
 }
