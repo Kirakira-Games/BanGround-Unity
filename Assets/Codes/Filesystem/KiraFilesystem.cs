@@ -15,6 +15,8 @@ namespace System.IO
 
         // file, kirapack
         Dictionary<string, string> index;
+        Dictionary<string, ZipArchive> openedArchive = new Dictionary<string, ZipArchive>();
+
         string indexFile;
         string root;
         public KiraFilesystem(string indexFile, string filesystemRoot)
@@ -145,11 +147,20 @@ namespace System.IO
             if (!File.Exists(targetKirapack))
                 return false;
 
-            using (var zip = ZipFile.OpenRead(targetKirapack))
+            ZipArchive zip = null;
+
+            if (openedArchive.ContainsKey(targetKirapack))
             {
-                if (zip.GetEntry(fileName) != null)
-                    return true;
+                zip = openedArchive[targetKirapack];
             }
+            else
+            {
+                zip = ZipFile.OpenRead(targetKirapack);
+                openedArchive.Add(targetKirapack, zip);
+            }
+
+            if (zip.GetEntry(fileName) != null)
+                return true;
 
             return false;
         }
@@ -166,16 +177,25 @@ namespace System.IO
 
             var targetKirapack = index[fileName];
 
+            ZipArchive zip = null;
+
+            if (openedArchive.ContainsKey(targetKirapack))
+            {
+                zip = openedArchive[targetKirapack];
+            }
+            else
+            {
+                zip = ZipFile.OpenRead(targetKirapack);
+                openedArchive.Add(targetKirapack, zip);
+            }
+
             byte[] buffer;
 
-            using (var zip = ZipFile.OpenRead(targetKirapack))
-            {
-                var entry = zip.GetEntry(fileName);
+            var entry = zip.GetEntry(fileName);
 
-                using (var sr = new BinaryReader(entry.Open()))
-                {
-                    buffer = sr.ReadBytes((int)entry.Length);
-                }
+            using (var sr = new BinaryReader(entry.Open()))
+            {
+                buffer = sr.ReadBytes((int)entry.Length);
             }
 
             return buffer;
