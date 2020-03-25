@@ -99,7 +99,6 @@ public class SelectManager : MonoBehaviour
         Screen.orientation = ScreenOrientation.AutoRotation;
         Screen.autorotateToLandscapeLeft = true;
         Screen.autorotateToLandscapeRight = true;
-        MessageBoxController.ShowMsg(LogLevel.INFO, Screen.orientation.ToString());
 
         InitComponent();
         LoadScoreRecord();
@@ -107,8 +106,6 @@ public class SelectManager : MonoBehaviour
         GetLiveSetting();
 
         PlayVoices();
-
-        MessageBoxController.ShowMsg(LogLevel.INFO, "Load SongList Success");
 
         if (letTheBassKick)
         {

@@ -71,7 +71,6 @@ public class UIManager : MonoBehaviour
                 Screen.autorotateToLandscapeRight = true;
                 break;
         }
-        MessageBoxController.ShowMsg(LogLevel.INFO, Screen.orientation.ToString());
 
         PlayVoices();
     }
