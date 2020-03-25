@@ -396,6 +396,7 @@ public class TouchManager : MonoBehaviour
         do
         {
             hasExchanged = false;
+            if (!hasExchanged) break; // Don't exchange
             foreach (var entry in touchTable)
             {
                 var tracer = entry.Value;
