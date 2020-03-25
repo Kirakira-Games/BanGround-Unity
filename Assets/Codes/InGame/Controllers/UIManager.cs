@@ -59,7 +59,7 @@ public class UIManager : MonoBehaviour
         StartCoroutine(DelayDisableGate());
 
         //Screen.orientation = ScreenOrientation.;
-        MessageBoxController.ShowMsg(LogLevel.INFO, Screen.orientation.ToString());
+        //MessageBoxController.ShowMsg(LogLevel.INFO, Screen.orientation.ToString());
         switch (Screen.orientation)
         {
             case ScreenOrientation.LandscapeLeft:
