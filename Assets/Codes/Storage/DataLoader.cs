@@ -11,9 +11,9 @@ using System.Linq;
 public class DataLoader
 {
     public static readonly string DataDir = Application.persistentDataPath + "/data/";
-    public static readonly string ChartDir = DataDir + "chart/";
-    public static readonly string MusicDir = DataDir + "music/";
-    public static readonly string SkinDir = DataDir + "skin/";
+    public static readonly string ChartDir = "chart/";
+    public static readonly string MusicDir = "music/";
+    public static readonly string SkinDir = "skin/";
     public static readonly string FSDir = DataDir + "filesystem/";
     public static readonly string FSIndex = DataDir + "filesystem/fsindex.bin";
     public static readonly string InboxDir = Application.persistentDataPath + "/Inbox/";
@@ -30,8 +30,6 @@ public class DataLoader
 
     private static Dictionary<int, cHeader> chartDic;
     private static Dictionary<int, mHeader> musicDic;
-
-    private static readonly string TempDir = Application.persistentDataPath + "/temp/";
 
     public static IEnumerator Init()
     {
@@ -63,7 +61,7 @@ public class DataLoader
             Directory.CreateDirectory(FSDir);
         }
 
-        new KiraFilesystem(FSIndex);
+        new KiraFilesystem(FSIndex, DataDir);
 
         LiveSetting.Load();
 
@@ -74,7 +72,6 @@ public class DataLoader
             yield return CopyFileFromStreamingAssetsToPersistentDataPath("/Initial.kirapack");
             LoadKiraPack(new FileInfo(Application.persistentDataPath + "/Initial.kirapack"));
             PlayerPrefs.SetInt("InitialChartVersion", InitialChartVersion);
-            File.Delete(Application.persistentDataPath + "/Initial.kirapack");
         }
 
 #if UNITY_ANDROID && false
@@ -90,7 +87,7 @@ public class DataLoader
 
     public static bool MusicExists(int mid)
     {
-        return File.Exists(GetMusicPath(mid));
+        return KiraFilesystem.Instance.Exists(GetMusicPath(mid));
     }
 
     public static string GetChartPath(int sid, Difficulty difficulty)
@@ -135,23 +132,19 @@ public class DataLoader
 
     public static Chart LoadChart(int sid, Difficulty difficulty)
     {
-        return ProtobufHelper.Load<Chart>(GetChartPath(sid, difficulty));
+        return ProtobufHelper.LoadFromKiraFs<Chart>(GetChartPath(sid, difficulty));
     }
 
     public static void ReloadSongList()
     {
-        chartDic = new Dictionary<int, cHeader>();
-        musicDic = new Dictionary<int, mHeader>();
         songList = ProtobufHelper.Load<SongList>(SongListPath);
 
         foreach (var music in songList.mHeaders)
-        {
             musicDic[music.mid] = music;
-        }
+        
         foreach (var chart in songList.cHeaders)
-        {
             chartDic[chart.sid] = chart;
-        }
+        
         if (LiveSetting.currentChart >= songList.cHeaders.Count)
         {
             LiveSetting.currentChart = Mathf.Max(0, songList.cHeaders.Count - 1);
@@ -164,81 +157,71 @@ public class DataLoader
     /// </summary>
     public static void RefreshSongList()
     {
+        chartDic = new Dictionary<int, cHeader>();
+        musicDic = new Dictionary<int, mHeader>();
+
         var newSongList = new SongList();
-        Dictionary<string, List<string>> referencedSongs = new Dictionary<string, List<string>>();
+        var referencedSongs = new Dictionary<string, List<string>>();
 
-        // Scan charts
-        DirectoryInfo chartDirectory = new DirectoryInfo(ChartDir);
-        DirectoryInfo[] charts = chartDirectory.GetDirectories();
+        var files = KiraFilesystem.Instance.ListFiles();
 
-        // First pass
-        foreach (var chart in charts)
+        var charts = from x in files
+                     where x.EndsWith("cheader.bin")
+                     select x;
+
+        foreach(var chart in charts)
         {
-            string headerPath = chart.FullName + "/cheader.bin";
-            if (!File.Exists(headerPath))
-            {
-                Debug.LogWarning("Missing chart header: " + headerPath);
-                continue;
-            }
-            cHeader chartHeader = ProtobufHelper.Load<cHeader>(headerPath);
+            cHeader chartHeader = ProtobufHelper.LoadFromKiraFs<cHeader>(chart);
             // Update reference
             string mid = chartHeader.mid.ToString();
+
             if (!referencedSongs.ContainsKey(mid))
             {
                 referencedSongs[mid] = new List<string>();
             }
-            referencedSongs[mid].Add(chart.Name);
-            // Update difficulty
+
+            referencedSongs[mid].Add(chart);
+
             chartHeader.difficultyLevel = new List<int>();
-            for (int diff = 0; diff <= (int)Difficulty.Special; diff++)
+
+            for (var diff = Difficulty.Easy; diff <= Difficulty.Special; diff++)
             {
-                var path = GetChartPath(chartHeader.sid, (Difficulty)diff);
-                if (File.Exists(path))
+                var path = chart.Replace("cheader.bin", $"{diff.ToString().ToLower()}.bin");
+                if (files.Contains(path))
                 {
-                    chartHeader.difficultyLevel.Add(ProtobufHelper.Load<Chart>(path).level);
+                    chartHeader.difficultyLevel.Add(ProtobufHelper.LoadFromKiraFs<Chart>(path).level);
                 }
                 else
                 {
                     chartHeader.difficultyLevel.Add(-1);
                 }
             }
+
             newSongList.cHeaders.Add(chartHeader);
         }
 
-        // Scan music
-        DirectoryInfo musicDirectory = new DirectoryInfo(MusicDir);
-        DirectoryInfo[] songs = musicDirectory.GetDirectories();
-        foreach (var song in songs)
+        var musics = from x in files
+                     where x.EndsWith("mheader.bin")
+                     select x;
+
+        foreach (var music in musics)
         {
-            if (!referencedSongs.ContainsKey(song.Name))
-            {
-                Debug.LogWarning(string.Format("Song {0} is not referenced anymore. GC!", song.Name));
-                Directory.Delete(song.FullName, true);
-                continue;
-            }
-            referencedSongs.Remove(song.Name);
-            string headerPath = song.FullName + "/mheader.bin";
-            if (!File.Exists(headerPath))
-            {
-                Debug.LogWarning("Missing song header: " + headerPath);
-                continue;
-            }
-            mHeader musicHeader = ProtobufHelper.Load<mHeader>(headerPath);
+            mHeader musicHeader = ProtobufHelper.LoadFromKiraFs<mHeader>(music);
+            referencedSongs.Remove(musicHeader.mid.ToString());
+            
             newSongList.mHeaders.Add(musicHeader);
         }
 
-        // Second Pass
         foreach (var song in referencedSongs)
         {
             foreach (var sid in song.Value)
             {
                 Debug.LogWarning(string.Format("Chart {0} does not have corresponding song {1}. GC!", sid, song.Key));
-                Directory.Delete(ChartDir + sid + "/", true);
                 newSongList.cHeaders.Remove(newSongList.cHeaders.Find(header => header.sid.ToString() == sid));
             }
         }
 
-        Debug.Log(JsonConvert.SerializeObject(newSongList));
+        Debug.Log(JsonConvert.SerializeObject(newSongList, Formatting.Indented));
         ProtobufHelper.Save(newSongList, SongListPath);
     }
 
@@ -274,31 +257,45 @@ public class DataLoader
         }
     }
 
-    private static int ConvertBinAndCopy(string path, string dest)
+    private static int ConvertBin(string kirapack)
     {
-        if (!Directory.Exists(path)) return -1;
+        if (!Directory.Exists(kirapack)) 
+            return -1;
+
         int ret = -1;
-        DirectoryInfo dir = new DirectoryInfo(path);
-        DirectoryInfo[] subdirs = dir.GetDirectories();
-        foreach (var cdir in subdirs)
+
+        var zip = ZipFile.OpenRead(kirapack);
+
+        var entries = (from x in zip.Entries
+                      where x.FullName.EndsWith(".json")
+                      select x).ToArray();
+
+        var binEntries = (from x in zip.Entries
+                         where x.FullName.EndsWith(".bin")
+                         select x.FullName).ToArray();
+
+        foreach (var entry in entries)
         {
-            ConvertJsonToBin(cdir);
-        }
-        foreach (var cdir in subdirs)
-        {
-            FileInfo[] files = cdir.GetFiles();
-            string id = cdir.Name;
-            if (int.TryParse(id, out int result))
+            if (binEntries.Contains(entry.FullName.Replace(".json", ".bin")))
+                continue;
+
+            var type = typeof(Chart);
+
+            if (entry.Name == "cheader.json")
+                type = typeof(cHeader);
+            else if (entry.Name == "mheader.json")
+                type = typeof(mHeader);
+
+            using(var sr = new StreamReader(entry.Open()))
             {
-                ret = result;
-            }
-            if (!Directory.Exists(dest + id))
-            {
-                Directory.CreateDirectory(dest + id);
-            }
-            foreach (var file in files)
-            {
-                File.Copy(file.FullName, dest + id + "/" + file.Name, true);
+                var json = sr.ReadToEnd();
+                var obj = JsonConvert.DeserializeObject(json, type);
+
+                var dir = Path.Combine(DataDir, entry.FullName.Replace(entry.Name, ""));
+                if (!Directory.Exists(dir))
+                    Directory.CreateDirectory(dir);
+
+                ProtobufHelper.Save(obj, Path.Combine(DataDir, entry.FullName.Replace(".json", ".bin")));
             }
         }
         return ret;
@@ -306,27 +303,21 @@ public class DataLoader
 
     public static int LoadKiraPack(FileInfo file)
     {
-        string path = file.FullName;
-        if (!File.Exists(path)) return -1;
-        Debug.Log("Load kirapack: " + path);
+        string path = Path.Combine(FSDir, file.Name);
+
+        if (!file.Exists) 
+            return -1;
+
+        Debug.Log($"Load kirapack: {file.FullName}");
+
         try
         {
-            using (ZipArchive zip = ZipFile.OpenRead(path))
-            {
-                if (Directory.Exists(TempDir))
-                {
-                    Directory.Delete(TempDir, true);
-                }
-                zip.ExtractToDirectory(TempDir);
-            }
+            File.Move(file.FullName, path);
+            KiraFilesystem.Instance.AddToIndex(path);
 
             // Load charts
-            int ret = ConvertBinAndCopy(TempDir + "chart/", ChartDir);
-            // Load music
-            ConvertBinAndCopy(TempDir + "music/", MusicDir);
-            //Load Skin
-            CopyFolder(TempDir + "skin", SkinDir);
-            Directory.Delete(TempDir, true);
+            int ret = ConvertBin(path);
+
             return ret;
         }
         catch (System.Exception e)
@@ -340,7 +331,7 @@ public class DataLoader
     public static bool LoadAllKiraPackFromInbox()
     {
         bool LoadSuccess = false;
-        if (TitleLoader.IsAprilFool && !Directory.Exists($"{Application.persistentDataPath}/data/chart/233333"))
+        if (TitleLoader.IsAprilFool && !KiraFilesystem.Instance.Exists($"data/chart/233333/special.bin"))
             SelectManager.letTheBassKick = true;
 
         try
@@ -375,12 +366,12 @@ public class DataLoader
                     LoadSuccess = true;
                     MessageBoxController.ShowMsg(LogLevel.OK, "Loaded kirapack: ".GetLocalized() + file.Name);
                 }
-                File.Delete(file.FullName);
+                //File.Delete(file.FullName);
                 //}
             }
             //}
         }
-        catch (System.Exception e)
+        catch (Exception e)
         {
             MessageBoxController.ShowMsg(LogLevel.ERROR, e.Message, false);
         }
@@ -413,25 +404,4 @@ public class DataLoader
             Debug.Log($"Copy File {relativePath} {!webRequest.isNetworkError}");
         }
     }
-
-    private static void CopyFolder(string src, string des)
-    {
-        if (!Directory.Exists(src)) return;
-        DirectoryInfo dir = new DirectoryInfo(src);
-        DirectoryInfo[] subdirs = dir.GetDirectories();
-        foreach (var cdir in subdirs)
-        {
-            FileInfo[] files = cdir.GetFiles();
-            string id = cdir.Name;
-            if (!Directory.Exists(des + id))
-            {
-                Directory.CreateDirectory(des + id);
-            }
-            foreach (var file in files)
-            {
-                File.Copy(file.FullName, des + id + "/" + file.Name, true);
-            }
-        }
-    }
-
 }

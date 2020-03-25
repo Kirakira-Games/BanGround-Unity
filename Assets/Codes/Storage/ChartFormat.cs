@@ -7,6 +7,7 @@ using Newtonsoft.Json.Converters;
 using ProtoBuf;
 using System.Linq;
 using UnityEngine.Scripting;
+using ProtoBuf.Meta;
 
 [JsonConverter(typeof(StringEnumConverter))]
 [ProtoContract()]
@@ -347,7 +348,7 @@ public partial class PlayRecords : IExtensible
 [Preserve]
 public static class ProtobufHelper
 {
-    public static void Save<T>(T data, string path) where T : IExtensible
+    public static void Save(object data, string path)
     {
         if (File.Exists(path))
         {
@@ -363,6 +364,12 @@ public static class ProtobufHelper
                 Serializer.Serialize(file, data);
             }
         }
+    }
+
+    public static T LoadFromKiraFs<T>(string path) where T : IExtensible
+    {
+        var stream = KiraFilesystem.Instance.ReadStream(path);
+        return Serializer.Deserialize<T>(stream);
     }
 
     public static T Load<T>(string path) where T : IExtensible
