@@ -104,6 +104,7 @@ public static class LiveSetting
 
     public static List<ModBase> attachedMods = new List<ModBase>();
     public static float SpeedCompensationSum = 1.0f;
+    //public static bool fullScreen;
 
     public static bool AddMod(ModBase mod)
     {
@@ -199,6 +200,7 @@ public class LiveSettingTemplate
     public bool bangPerspective = true;
     public bool autoPlayEnabled = false;
     public bool displayELP = false;
+    public bool fullScreen = true;
 
     public float offsetTransform = 1f;
     public float farClip = 169f;
@@ -233,6 +235,7 @@ public class LiveSettingTemplate
         mirrowEnabled = LiveSetting.mirrowEnabled;
         bangPerspective = LiveSetting.bangPerspective;
         displayELP = LiveSetting.displayELP;
+        //fullScreen = LiveSetting.fullScreen;
         //autoPlayEnabled = LiveSetting.autoPlayEnabled;
 
         offsetTransform = LiveSetting.offsetTransform;
@@ -269,6 +272,7 @@ public class LiveSettingTemplate
         LiveSetting.mirrowEnabled = mirrowEnabled;
         LiveSetting.bangPerspective = bangPerspective;
         LiveSetting.displayELP = displayELP;
+        //LiveSetting.fullScreen = fullScreen;
         //LiveSetting.autoPlayEnabled = autoPlayEnabled;
 
         LiveSetting.offsetTransform = offsetTransform;

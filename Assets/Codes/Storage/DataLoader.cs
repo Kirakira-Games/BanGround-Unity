@@ -14,6 +14,8 @@ public class DataLoader
     public static readonly string ChartDir = DataDir + "chart/";
     public static readonly string MusicDir = DataDir + "music/";
     public static readonly string SkinDir = DataDir + "skin/";
+    public static readonly string FSDir = DataDir + "filesystem/";
+    public static readonly string FSIndex = DataDir + "filesystem/fsindex.bin";
     public static readonly string InboxDir = Application.persistentDataPath + "/Inbox/";
     public static readonly string SongListPath = DataDir + "songlist.bin";
     public static int LastImportedSid = -1;
@@ -56,6 +58,12 @@ public class DataLoader
         {
             Directory.CreateDirectory(MusicDir);
         }
+        if (!Directory.Exists(FSDir))
+        {
+            Directory.CreateDirectory(FSDir);
+        }
+
+        new KiraFilesystem(FSIndex);
 
         LiveSetting.Load();
 
