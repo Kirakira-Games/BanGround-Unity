@@ -314,13 +314,14 @@ public class DataLoader
         {
             File.Move(file.FullName, path);
             KiraFilesystem.Instance.AddToIndex(path);
+            KiraFilesystem.Instance.SaveIndex();
 
             // Load charts
             int ret = ConvertBin(path);
 
             return ret;
         }
-        catch (System.Exception e)
+        catch (Exception e)
         {
             MessageBoxController.ShowMsg(LogLevel.ERROR,
                 string.Format("Cannot Load {0}: {1}", file.Name, e.Message));
