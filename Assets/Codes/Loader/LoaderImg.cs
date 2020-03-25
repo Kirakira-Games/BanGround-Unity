@@ -32,13 +32,29 @@ public class LoaderImg : MonoBehaviour
         if (list.isNetworkError || list.isHttpError)
         {
             Debug.LogError("Get meme list failed : " + list.error);
+            var LocalList = new DirectoryInfo(TempSav).GetFiles();
+            if (LocalList.Length > 0)
+            {
+                var randomIndex = Random.Range(0, LocalList.Length);
+                var imgReq = UnityWebRequest.Get(LocalList[randomIndex].FullName);
+                var dht = new DownloadHandlerTexture(true);
+                imgReq.downloadHandler = dht;
+                yield return imgReq.SendWebRequest();
+                if (imgReq.isHttpError)
+                    Debug.LogError("Get Local meme img failed : " + list.error);
+                else
+                {
+                    image.texture = dht.texture;
+                    image.SetNativeSize();
+                }
+            }
         }
         else
         {
             //Debug.Log(list.downloadHandler.text);
             listString = list.downloadHandler.text;
             string[] imgs = listString.Replace(" ","").Replace("\n", "").Split(',');
-            var randomIndex = Random.Range(1, imgs.Length);
+            var randomIndex = Random.Range(0, imgs.Length);
             var img = imgs[randomIndex];
             if (!File.Exists(TempSav + img))
             {
