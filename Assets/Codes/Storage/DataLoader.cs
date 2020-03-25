@@ -345,38 +345,40 @@ public class DataLoader
 
         try
         {
-            if (!Directory.Exists(InboxDir))
-            {
-                Debug.LogWarning("Inbox directory does not exist.");
-            }
-            else
-            {
-                DirectoryInfo packDir = new DirectoryInfo(InboxDir);
-                FileInfo[] files = packDir.GetFiles("*.kirapack", SearchOption.TopDirectoryOnly);
+            //if (!Directory.Exists(InboxDir))
+            //{
+            //    Debug.LogWarning("Inbox directory does not exist.");
+            //}
+            //else
+            //{
+            DirectoryInfo packDir = new DirectoryInfo(InboxDir);
+            FileInfo[] files = new FileInfo[] { };
+            if (packDir.Exists)
+                files = packDir.GetFiles("*.kirapack", SearchOption.TopDirectoryOnly);
 
-                //iOS额外搜索沙盒根目录文件 临时解决导入问题
-                if (Application.platform == RuntimePlatform.IPhonePlayer)
-                {
-                    var packDir2 = new DirectoryInfo(Application.persistentDataPath);
-                    var files2 = packDir2.GetFiles("*.kirapack", SearchOption.TopDirectoryOnly);
-                    files = files.Concat(files2).ToArray();
-                }
-
-                foreach (var file in files)
-                {
-                    //if (file.Extension == ".kirapack")
-                    //{
-                        int tmp = LoadKiraPack(file);
-                        if (tmp != -1)
-                        {
-                            LastImportedSid = tmp;
-                            LoadSuccess = true;
-                            MessageBoxController.ShowMsg(LogLevel.OK, "Loaded kirapack: ".GetLocalized() + file.Name);
-                        }
-                        File.Delete(file.FullName);
-                    //}
-                }
+            //iOS额外搜索沙盒根目录文件 临时解决导入问题
+            if (Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+                var packDir2 = new DirectoryInfo(Application.persistentDataPath);
+                var files2 = packDir2.GetFiles("*.kirapack", SearchOption.TopDirectoryOnly);
+                files = files.Concat(files2).ToArray();
             }
+
+            foreach (var file in files)
+            {
+                //if (file.Extension == ".kirapack")
+                //{
+                int tmp = LoadKiraPack(file);
+                if (tmp != -1)
+                {
+                    LastImportedSid = tmp;
+                    LoadSuccess = true;
+                    MessageBoxController.ShowMsg(LogLevel.OK, "Loaded kirapack: ".GetLocalized() + file.Name);
+                }
+                File.Delete(file.FullName);
+                //}
+            }
+            //}
         }
         catch (System.Exception e)
         {
