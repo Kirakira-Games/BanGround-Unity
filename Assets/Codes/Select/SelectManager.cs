@@ -605,8 +605,8 @@ public class SelectManager : MonoBehaviour
             LiveSetting.autoPlayEnabled = auto_Tog.isOn;
             LiveSetting.bangPerspective = persp_Tog.isOn;
             LiveSetting.displayELP = ELP_Tog.isOn;
-
-            if(FS_Tog.isOn)
+#if (UNITY_STANDALONE || UNITY_WSA)
+            if (FS_Tog.isOn)
             {
                 var r = Screen.resolutions[Screen.resolutions.Length - 1];
                 Screen.SetResolution(r.width, r.height, FullScreenMode.FullScreenWindow);
@@ -618,7 +618,7 @@ public class SelectManager : MonoBehaviour
                 Screen.SetResolution(r.width, r.height, FullScreenMode.Windowed);
                 Screen.fullScreen = false;
             }
-
+#endif
             LiveSetting.offsetTransform = judgeOffsetTransform.value;
             LiveSetting.farClip = far_Clip.value;
             LiveSetting.bgBrightness = bg_Bright.value;
