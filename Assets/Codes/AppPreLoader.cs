@@ -13,6 +13,8 @@ public class AppPreLoader : MonoBehaviour
 
     void Start()
     {
+        Screen.orientation = ScreenOrientation.AutoRotation;
+        print(Screen.orientation);
         Application.targetFrameRate = 120;
         if (Application.platform != RuntimePlatform.Android) 
         {

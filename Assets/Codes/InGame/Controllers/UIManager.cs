@@ -58,6 +58,21 @@ public class UIManager : MonoBehaviour
         gateCanvas = GameObject.Find("GateCanvas");
         StartCoroutine(DelayDisableGate());
 
+        //Screen.orientation = ScreenOrientation.;
+        MessageBoxController.ShowMsg(LogLevel.INFO, Screen.orientation.ToString());
+        switch (Screen.orientation)
+        {
+            case ScreenOrientation.LandscapeLeft:
+                Screen.autorotateToLandscapeLeft = true;
+                Screen.autorotateToLandscapeRight = false;
+                break;
+            case ScreenOrientation.LandscapeRight:
+                Screen.autorotateToLandscapeLeft = false;
+                Screen.autorotateToLandscapeRight = true;
+                break;
+        }
+        MessageBoxController.ShowMsg(LogLevel.INFO, Screen.orientation.ToString());
+
         PlayVoices();
     }
 
