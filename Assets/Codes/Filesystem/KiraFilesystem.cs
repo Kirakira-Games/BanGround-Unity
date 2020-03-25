@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace System.IO
 {
-    class KiraFilesystem
+    class KiraFilesystem : IDisposable
     {
         public static KiraFilesystem Instance;
 
@@ -223,6 +223,16 @@ namespace System.IO
             tex.LoadImage(Read(fileName));
 
             return tex;
+        }
+
+        public void Dispose()
+        {
+            foreach(var kv in openedArchive)
+            {
+                kv.Value.Dispose();
+            }
+
+            openedArchive = null;
         }
     }
 }
