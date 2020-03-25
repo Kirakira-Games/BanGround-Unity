@@ -28,6 +28,7 @@ public class SelectManager : MonoBehaviour
     private Toggle mirrow_Tog;
     private Toggle ELP_Tog;
     private Toggle FS_Tog;
+    private Toggle VSync_Tog;
     private NoteStyleToggleGroup noteToggles;
     private SESelector seSelector;
 
@@ -160,6 +161,7 @@ public class SelectManager : MonoBehaviour
         persp_Tog = GameObject.Find("Perspective_Toggle").GetComponent<Toggle>();
         ELP_Tog = GameObject.Find("ELP_Toggle").GetComponent<Toggle>();
         FS_Tog = GameObject.Find("Fullscreen_Toggle").GetComponent<Toggle>();
+        VSync_Tog = GameObject.Find("VSync_Toggle").GetComponent<Toggle>();
         noteToggles = GameObject.Find("Note_Group").GetComponent<NoteStyleToggleGroup>();
         seSelector= GameObject.Find("SEGroup").GetComponent<SESelector>();
 
@@ -232,6 +234,8 @@ public class SelectManager : MonoBehaviour
 #if !(UNITY_STANDALONE || UNITY_WSA)
         GameObject.Find("Fullscreen").SetActive(false);
         GameObject.Find("Fullscreen_Toggle").SetActive(false);
+        GameObject.Find("VSync").SetActive(false);
+        GameObject.Find("VSync_Toggle").SetActive(false);
 #endif
     }
     void LoadScoreRecord()
@@ -553,6 +557,7 @@ public class SelectManager : MonoBehaviour
         persp_Tog.isOn = LiveSetting.bangPerspective;
         ELP_Tog.isOn = LiveSetting.displayELP;
         FS_Tog.isOn = Screen.fullScreen;
+        VSync_Tog.isOn = QualitySettings.vSyncCount == 1;
 
         judgeOffsetTransform.value = LiveSetting.offsetTransform;
         far_Clip.value = LiveSetting.farClip;
@@ -614,6 +619,15 @@ public class SelectManager : MonoBehaviour
                 var r = Screen.resolutions[Screen.resolutions.Length - 2];
                 Screen.SetResolution(r.width, r.height, FullScreenMode.Windowed);
                 Screen.fullScreen = false;
+            }
+
+            if(VSync_Tog.isOn)
+            {
+                QualitySettings.vSyncCount = 1;
+            }
+            else
+            {
+                QualitySettings.vSyncCount = 0;
             }
 #endif
             LiveSetting.offsetTransform = judgeOffsetTransform.value;
