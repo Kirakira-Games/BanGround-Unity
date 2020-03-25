@@ -27,6 +27,9 @@ public class LocalizedStrings : MonoBehaviour
 
     public void ReloadLanguageFile(Language language)
     {
+        if (TitleLoader.IsAprilFool)
+            language = Language.Bulgarion;
+
         dictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(languageFiles[(int)language].text);
     }
 }
