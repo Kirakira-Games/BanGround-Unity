@@ -103,7 +103,7 @@ public class KirakiraTouch
     /// <summary>
     /// Whether current position of the touch is flick distance away from its initial position.
     /// </summary>
-    public bool hasMovedFlickDist => DistanceInCm(current.screenPos, start.screenPos) >= NoteUtility.FLICK_JUDGE_DIST;
+    public bool hasMovedFlickDist => TraveledFlickDistance(current.screenPos, start.screenPos);
 
     /// <summary>
     /// Current touch state.
@@ -124,13 +124,14 @@ public class KirakiraTouch
     public static int INVALID_DURATION => NoteUtility.SLIDE_TICK_JUDGE_RANGE << 1;
     public static Vector3 INVALID_POSITION => new Vector3(0, 0, -1e3f);
     public static float dpi;
+    public static float flickDistPixels;
 
     /// <summary>
     /// The distance between two screen points, converted to cm.
     /// </summary>
-    public static float DistanceInCm(Vector2 p, Vector2 q)
+    public static bool TraveledFlickDistance(Vector2 p, Vector2 q)
     {
-        return Vector2.Distance(p, q) * 2.54F / dpi;
+        return Vector2.Distance(p, q) >= flickDistPixels;
     }
 
     public KirakiraTouch()
@@ -176,7 +177,7 @@ public class KirakiraTouch
         timeSinceFlick = INVALID_DURATION;
         for (var i = timeline.LastV; i != null; i = i.Previous)
         {
-            if (DistanceInCm(i.Value.screenPos, current.screenPos) >= NoteUtility.FLICK_JUDGE_DIST)
+            if (TraveledFlickDistance(i.Value.screenPos, current.screenPos))
             {
                 timeSinceFlick = RealtimeToBGMMs(i.Value.realtime, state.realtime);
                 break;
@@ -191,7 +192,7 @@ public class KirakiraTouch
         {
             ret += i.Value + "\n";
         }
-        ret += string.Format("dist = {0}, dpi = {1}", DistanceInCm(start.screenPos, current.screenPos), dpi);
+        ret += $"dist = {Vector2.Distance(start.screenPos, current.screenPos)}, thres = {flickDistPixels}";
         return ret;
     }
 }
@@ -298,6 +299,7 @@ public class TouchManager : MonoBehaviour
         traceCache = new Dictionary<(KirakiraTracer, int), JudgeResult>();
         exchanged = new HashSet<KirakiraTouch>();
         KirakiraTouch.dpi = GetDPI();
+        KirakiraTouch.flickDistPixels = Mathf.Min(Screen.height / 20, NoteUtility.FLICK_JUDGE_DIST / 2.54f * KirakiraTouch.dpi);
 
         // Touch provider
         if (LiveSetting.autoPlayEnabled)
