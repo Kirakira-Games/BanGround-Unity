@@ -150,7 +150,7 @@ public static class NoteUtility
     public static int SLIDE_END_FLICK_JUDGE_RANGE => (int)(SLIDE_END_FLICK_JUDGE_RANGE_RAW * LiveSetting.SpeedCompensationSum);
     public static int SLIDE_TICK_JUDGE_RANGE => (int)(SLIDE_TICK_JUDGE_RANGE_RAW * LiveSetting.SpeedCompensationSum);
 
-    public const float FLICK_JUDGE_DIST = 0.4f;
+    public const float FLICK_JUDGE_DIST = 0.6f;
 
     public const int MOUSE_TOUCH_ID = -16;
 
