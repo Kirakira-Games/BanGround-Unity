@@ -48,13 +48,13 @@ public class DataLoader
         }
         
         // Create directories
-        if (!Directory.Exists(ChartDir))
+        if (!Directory.Exists(Path.Combine(DataDir, ChartDir)))
         {
-            Directory.CreateDirectory(ChartDir);
+            Directory.CreateDirectory(Path.Combine(DataDir, ChartDir));
         }
-        if (!Directory.Exists(MusicDir))
+        if (!Directory.Exists(Path.Combine(DataDir, MusicDir)))
         {
-            Directory.CreateDirectory(MusicDir);
+            Directory.CreateDirectory(Path.Combine(DataDir, MusicDir));
         }
         if (!Directory.Exists(FSDir))
         {
