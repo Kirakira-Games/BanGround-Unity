@@ -5,6 +5,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using System.Threading;
 using UnityEngine;
 
 namespace System.IO
@@ -15,10 +16,16 @@ namespace System.IO
 
         // file, kirapack
         Dictionary<string, string> index;
+
         Dictionary<string, ZipArchive> openedArchive = new Dictionary<string, ZipArchive>();
+        Dictionary<string, DateTime> lastAccessTime = new Dictionary<string, DateTime>();
+
+        Thread thread;
+        bool disposed = false;
 
         string indexFile;
         string root;
+
         public KiraFilesystem(string indexFile, string filesystemRoot)
         {
             if (Instance == null)
@@ -39,6 +46,21 @@ namespace System.IO
             {
                 index = new Dictionary<string, string>();
             }
+
+            thread = new Thread(() =>
+            {
+                while(true)
+                {
+                    if (disposed)
+                        break;
+
+                    ReleaseUnusedKirapacks();
+
+                    Thread.Sleep(1000);
+                }
+            });
+
+            thread.Start();
         }
 
         public void AddToIndex(string kiraPack)
@@ -78,7 +100,7 @@ namespace System.IO
                 File.Delete(path);
             }
 
-            if(index.ContainsKey(fileName))
+            if (index.ContainsKey(fileName))
             {
                 index.Remove(fileName);
             }
@@ -117,7 +139,7 @@ namespace System.IO
         private void GetFiles(List<string> files, DirectoryInfo di)
         {
             var subfiles = from x in di.GetFiles()
-                        select x.FullName.Replace(root, "");
+                           select x.FullName.Replace(root, "");
 
             var subdirs = di.GetDirectories();
 
@@ -159,6 +181,8 @@ namespace System.IO
                 openedArchive.Add(targetKirapack, zip);
             }
 
+            lastAccessTime[targetKirapack] = DateTime.Now;
+
             if (zip.GetEntry(fileName) != null)
                 return true;
 
@@ -188,6 +212,8 @@ namespace System.IO
                 zip = ZipFile.OpenRead(targetKirapack);
                 openedArchive.Add(targetKirapack, zip);
             }
+
+            lastAccessTime[targetKirapack] = DateTime.Now;
 
             byte[] buffer;
 
@@ -225,14 +251,58 @@ namespace System.IO
             return tex;
         }
 
+        public void ReleaseUnusedKirapacks() => (from x in openedArchive where DateTime.Now - lastAccessTime[x.Key] > TimeSpan.FromMinutes(1) select x.Key).All((key) =>
+        {
+            openedArchive[key].Dispose();
+            openedArchive.Remove(key);
+
+            lastAccessTime.Remove(key);
+            return true;
+        });
+
+        #region IDisposable Support
+        private bool disposedValue = false; // 要检测冗余调用
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    disposed = true;
+
+                    foreach (var kv in openedArchive)
+                    {
+                        kv.Value.Dispose();
+                    }
+
+                    openedArchive = null;
+                    lastAccessTime = null;
+
+                    SaveIndex();
+                    index = null;
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        // TODO: 仅当以上 Dispose(bool disposing) 拥有用于释放未托管资源的代码时才替代终结器。
+        // ~KiraFilesystem()
+        // {
+        //   // 请勿更改此代码。将清理代码放入以上 Dispose(bool disposing) 中。
+        //   Dispose(false);
+        // }
+
+        // 添加此代码以正确实现可处置模式。
         public void Dispose()
         {
-            foreach(var kv in openedArchive)
-            {
-                kv.Value.Dispose();
-            }
-
-            openedArchive = null;
+            // 请勿更改此代码。将清理代码放入以上 Dispose(bool disposing) 中。
+            Dispose(true);
+            // TODO: 如果在以上内容中替代了终结器，则取消注释以下行。
+            // GC.SuppressFinalize(this);
         }
+        #endregion
+
     }
 }
