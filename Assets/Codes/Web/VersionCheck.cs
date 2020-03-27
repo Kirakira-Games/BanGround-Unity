@@ -28,12 +28,11 @@ public class VersionCheck
     };
 
     private const string Prefix = "https://tempapi.banground.fun";
-    private const string API = "/update/0.4.1";
-
-    private string FullAPI = Prefix + API;
+    private readonly string API = "/update/" + Application.version;
 
     public IEnumerator GetVersionInfo()
     {
+        string FullAPI = Prefix + API;
         var req = new KirakiraWebRequest<VersionInfo>();
         yield return req.Get(FullAPI);
         if (req.isNetworkError)
