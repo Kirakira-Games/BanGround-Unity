@@ -28,7 +28,7 @@ public class VersionCheck
     };
 
     private const string Prefix = "https://tempapi.banground.fun";
-    private const string API = "/update/0.4.0";
+    private const string API = "/update/0.4.1";
 
     private string FullAPI = Prefix + API;
 
