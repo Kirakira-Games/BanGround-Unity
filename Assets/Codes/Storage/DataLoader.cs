@@ -257,48 +257,44 @@ public class DataLoader
         }
     }
 
-    private static int ConvertBin(string kirapack)
+    private static void ConvertBin(string kirapack)
     {
-        if (!Directory.Exists(kirapack)) 
-            return -1;
-
-        int ret = -1;
-
-        var zip = ZipFile.OpenRead(kirapack);
-
-        var entries = (from x in zip.Entries
-                      where x.FullName.EndsWith(".json")
-                      select x).ToArray();
-
-        var binEntries = (from x in zip.Entries
-                         where x.FullName.EndsWith(".bin")
-                         select x.FullName).ToArray();
-
-        foreach (var entry in entries)
+        using (var zip = ZipFile.OpenRead(kirapack))
         {
-            if (binEntries.Contains(entry.FullName.Replace(".json", ".bin")))
-                continue;
 
-            var type = typeof(Chart);
+            var entries = (from x in zip.Entries
+                           where x.FullName.EndsWith(".json")
+                           select x).ToArray();
 
-            if (entry.Name == "cheader.json")
-                type = typeof(cHeader);
-            else if (entry.Name == "mheader.json")
-                type = typeof(mHeader);
+            var binEntries = (from x in zip.Entries
+                              where x.FullName.EndsWith(".bin")
+                              select x.FullName).ToArray();
 
-            using(var sr = new StreamReader(entry.Open()))
+            foreach (var entry in entries)
             {
-                var json = sr.ReadToEnd();
-                var obj = JsonConvert.DeserializeObject(json, type);
+                if (binEntries.Contains(entry.FullName.Replace(".json", ".bin")))
+                    continue;
 
-                var dir = Path.Combine(DataDir, entry.FullName.Replace(entry.Name, ""));
-                if (!Directory.Exists(dir))
-                    Directory.CreateDirectory(dir);
+                var type = typeof(Chart);
 
-                ProtobufHelper.Save(obj, Path.Combine(DataDir, entry.FullName.Replace(".json", ".bin")));
+                if (entry.Name == "cheader.json")
+                    type = typeof(cHeader);
+                else if (entry.Name == "mheader.json")
+                    type = typeof(mHeader);
+
+                using (var sr = new StreamReader(entry.Open()))
+                {
+                    var json = sr.ReadToEnd();
+                    var obj = JsonConvert.DeserializeObject(json, type);
+
+                    var dir = Path.Combine(DataDir, entry.FullName.Replace(entry.Name, ""));
+                    if (!Directory.Exists(dir))
+                        Directory.CreateDirectory(dir);
+
+                    ProtobufHelper.Save(obj, Path.Combine(DataDir, entry.FullName.Replace(".json", ".bin")));
+                }
             }
         }
-        return ret;
     }
 
     public static int LoadKiraPack(FileInfo file)
@@ -317,7 +313,19 @@ public class DataLoader
             KiraFilesystem.Instance.SaveIndex();
 
             // Load charts
-            int ret = ConvertBin(path);
+            ConvertBin(path);
+
+            int ret = -1;
+            using (var zip = ZipFile.OpenRead(path))
+            {
+                foreach (var entry in zip.Entries)
+                {
+                    if (!entry.FullName.Contains("music") && int.TryParse(entry.Name.Replace(".json", "").Replace(".bin", ""), out ret))
+                    {
+                        break;
+                    }
+                }
+            }
 
             return ret;
         }
