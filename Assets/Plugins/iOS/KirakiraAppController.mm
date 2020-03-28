@@ -14,17 +14,16 @@ IMPL_APP_CONTROLLER_SUBCLASS (KirakiraAppController)
     if (url)
     {
         BOOL needChange = [url startAccessingSecurityScopedResource];
-        NSString *fileNameStr = [url lastPathComponent];
-        NSString *Doc = [[NSHomeDirectory() stringByAppendingPathComponent:@"Documents"] stringByAppendingPathComponent:fileNameStr];
-        NSString *path = [url path];
-        NSData *data = [[NSFileManager defaultManager] contentsAtPath:path];
-        [data writeToFile:Doc atomically:YES];
         if (needChange)
         {
+            NSString *fileNameStr = [url lastPathComponent];
+            NSString *Doc = [[NSHomeDirectory() stringByAppendingPathComponent:@"Documents"] stringByAppendingPathComponent:fileNameStr];
+            NSString *path = [url path];
+            NSData *data = [[NSFileManager defaultManager] contentsAtPath:path];
+            [data writeToFile:Doc atomically:YES];
             [url stopAccessingSecurityScopedResource];
         }
     }
-
 
     return [super application:app openURL:url options:options];
 }
