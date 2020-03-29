@@ -52,7 +52,7 @@ public class ResultManager : MonoBehaviour
     {
         cheader = LiveSetting.CurrentHeader;
         mheader = DataLoader.GetMusicHeader(cheader.mid);
-        StartCoroutine(ReadRank());
+        
         SetBtnObject();
         GetResultObjectAndComponent();
         ReadScores();
@@ -61,7 +61,7 @@ public class ResultManager : MonoBehaviour
         ShowSongInfo();
         ShowBackground();
         ShowOffset();
-
+        StartCoroutine(ReadRank());
         bgmST = AudioManager.Instance.PlayLoopMusic(bgmVoice.bytes);
     }
 
@@ -139,7 +139,47 @@ public class ResultManager : MonoBehaviour
             resultPlayer.PlayOneShot();
         }
 
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(1.2f);
+
+        TextAsset clearMarkVoice = null;
+        TextAsset commentVoice = null;
+        var lenth = 0f;
+
+        if (ResultsGetter.GetRanks() <= Ranks.A)
+        {
+            switch (ResultsGetter.GetClearMark())
+            {
+                case ClearMarks.AP:
+                    clearMarkVoice = voices[19];
+                    lenth = 1.8f;
+                    commentVoice = voices[12];
+                    break;
+                case ClearMarks.FC:
+                    clearMarkVoice = voices[20];
+                    lenth = 2.8f;
+                    commentVoice = voices[UnityEngine.Random.Range(10, 12)];
+                    break;
+                case ClearMarks.CL:
+                    clearMarkVoice = voices[9];
+                    lenth = 1f;
+                    commentVoice = voices[UnityEngine.Random.Range(13, 15)];
+                    break;
+            }
+        }
+        else
+        {
+            clearMarkVoice = voices[UnityEngine.Random.Range(15, 18)]; //lp：就这？
+        }
+
+        if (clearMarkVoice != null)
+        {
+            AudioManager.Instance.PrecacheSE(clearMarkVoice.bytes).PlayOneShot();
+        }
+        yield return new WaitForSeconds(lenth);
+        if (commentVoice != null)
+        {
+            AudioManager.Instance.PrecacheSE(commentVoice.bytes).PlayOneShot();
+        }
     }
 
     private void SetBtnObject()

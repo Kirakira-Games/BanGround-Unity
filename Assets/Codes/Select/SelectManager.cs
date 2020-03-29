@@ -106,7 +106,7 @@ public class SelectManager : MonoBehaviour
         InitSongList(false);
         GetLiveSetting();
 
-        PlayVoices();
+        PlayVoicesAtSceneIn();
 
         if (letTheBassKick)
         {
@@ -131,10 +131,15 @@ public class SelectManager : MonoBehaviour
         }
     }
 
-    private void PlayVoices()
+    private void PlayVoicesAtSceneIn()
     {
-        AudioManager.Instance.PrecacheSE(voices[0].bytes).PlayOneShot();
-        AudioManager.Instance.PrecacheSE(voices[1].bytes).PlayOneShot();
+        AudioManager.Instance.PrecacheSE(voices[UnityEngine.Random.Range(0,3)].bytes).PlayOneShot();
+    }
+
+    private void PlayVoicesAtSceneOut()
+    {
+        AudioManager.Instance.PrecacheSE(voices[UnityEngine.Random.Range(3, 7)].bytes).PlayOneShot();
+
     }
 
     private void InitComponent()
@@ -660,6 +665,7 @@ public class SelectManager : MonoBehaviour
     {
         SetLiveSetting();
         File.WriteAllText(LiveSetting.settingsPath, JsonConvert.SerializeObject(new LiveSettingTemplate()));
+        PlayVoicesAtSceneOut();
         SceneLoader.LoadScene("Select", "InGame", true);
     }
 
