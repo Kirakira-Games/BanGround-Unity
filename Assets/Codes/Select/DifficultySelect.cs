@@ -14,6 +14,10 @@ public class DifficultySelect : MonoBehaviour
     Image[] cardImg = new Image[5];
     RectTransform[] Rects = new RectTransform[5];
     public int[] levels = new int[5];
+    [SerializeField] private TextAsset[] voices;
+    AudioProvider.ISoundEffect[] processedVoices = new AudioProvider.ISoundEffect[5];
+
+
     List<int> enabledCards = new List<int>();
     int selected = 0;
     Text difficultyText;
@@ -31,7 +35,10 @@ public class DifficultySelect : MonoBehaviour
             Rects[i] = cards[i].GetComponent<RectTransform>();
             labelText[i] = labels[i].GetComponentInChildren<Text>();
             labelText[i].text = "";
+            processedVoices[i] = AudioManager.Instance.PrecacheSE(voices[i].bytes);
         }
+
+
         levelText = GameObject.Find("Text_SelectedLevel").GetComponent<Text>();
         levelText.text = "";
         difficultyText = GameObject.Find("Text_SelectedDifficulty").GetComponent<Text>();
@@ -122,5 +129,7 @@ public class DifficultySelect : MonoBehaviour
         }
         cardImg[selected].color = Color.white;*/
         LiveSetting.currentDifficulty = selected;
+        processedVoices[selected].PlayOneShot();
     }
+
 }

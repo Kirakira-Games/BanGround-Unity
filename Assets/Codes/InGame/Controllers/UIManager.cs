@@ -24,7 +24,7 @@ public class UIManager : MonoBehaviour
     public TextAsset FCvoice;
     public TextAsset CLvoice;
     public TextAsset Fvoice;
-    [SerializeField] private TextAsset[] startVoices;
+    [SerializeField] private TextAsset[] startVoices; //se
     GameObject gateCanvas;
 
     private ISoundEffect resultVoice;
