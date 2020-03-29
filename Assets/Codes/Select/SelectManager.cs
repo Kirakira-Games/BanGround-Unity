@@ -502,9 +502,7 @@ public class SelectManager : MonoBehaviour
     bool isFirstPlay = true;
     IEnumerator PlayPreview()
     {
-        if (isFirstPlay) yield return new WaitForSeconds(2.5f); //给语音留个地方
-
-        isFirstPlay = false;
+        
 
         mHeader mheader = DataLoader.GetMusicHeader(LiveSetting.CurrentHeader.mid);
 
@@ -521,6 +519,13 @@ public class SelectManager : MonoBehaviour
                 (uint)(mheader.preview[1] * 1000)
                 },
                 false);
+            if (isFirstPlay)
+            {
+                previewSound.Pause();
+                yield return new WaitForSeconds(2.2f); //给语音留个地方
+                previewSound.Play();
+            }
+            isFirstPlay = false;
         }
     }
 

@@ -132,7 +132,7 @@ public class ResultManager : MonoBehaviour
                 resultVoice = voices[7];
                 break;
             default:
-                resultVoice = voices[8];
+                resultVoice = null;
                 break;
         }
 
