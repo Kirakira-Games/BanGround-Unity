@@ -524,6 +524,15 @@ public class SelectManager : MonoBehaviour
         }
     }
 
+    IEnumerator PreviewFadeOut()
+    {
+        for (float i = 1f; i > 0; i -= 0.2f)
+        {
+            previewSound.SetVolume(i);
+            yield return new WaitForSeconds(0.2f);
+        }
+    }
+
     //Setting And Mod------------------------------
     void OpenSetting()
     {
@@ -666,6 +675,7 @@ public class SelectManager : MonoBehaviour
     //============================================
     public void OnEnterPressed()
     {
+        StartCoroutine(PreviewFadeOut());
         SetLiveSetting();
         File.WriteAllText(LiveSetting.settingsPath, JsonConvert.SerializeObject(new LiveSettingTemplate()));
         PlayVoicesAtSceneOut();
