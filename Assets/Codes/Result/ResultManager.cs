@@ -95,11 +95,13 @@ public class ResultManager : MonoBehaviour
 
     IEnumerator ReadRank()
     {
-        yield return new WaitForSeconds(0.8f);
+        if (ResultsGetter.GetRanks() != Ranks.F)
+        {
+            yield return new WaitForSeconds(0.8f);
 
-        var rankPlayer = AudioManager.Instance.PrecacheSE(voices[0].bytes);
-        rankPlayer.PlayOneShot();
-
+            var rankPlayer = AudioManager.Instance.PrecacheSE(voices[0].bytes);
+            rankPlayer.PlayOneShot();
+        }
         TextAsset resultVoice;
 
         yield return new WaitForSeconds(1);
@@ -160,8 +162,8 @@ public class ResultManager : MonoBehaviour
                     commentVoice = voices[UnityEngine.Random.Range(10, 12)];
                     break;
                 case ClearMarks.CL:
-                    clearMarkVoice = voices[9];
-                    lenth = 1f;
+                    //clearMarkVoice = voices[9];
+                    //lenth = 0f;
                     commentVoice = voices[UnityEngine.Random.Range(13, 15)];
                     break;
             }

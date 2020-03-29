@@ -13,7 +13,7 @@ using UnityEngine.UI;
 public class TitleLoader : MonoBehaviour
 {
     public TextAsset titleMusic;
-    public TextAsset voice;
+    public TextAsset[] voice;
     public Text Title;
     public Text touchStart;
 
@@ -32,7 +32,7 @@ public class TitleLoader : MonoBehaviour
     {
         if (IsAprilFool)
         {
-            voice = Resources.Load<TextAsset>("Sound/voice/LetTheBassKick");
+            voice[0] = Resources.Load<TextAsset>("Sound/voice/LetTheBassKick");
         }
 
         StartCoroutine(PlayTitle());
@@ -47,7 +47,7 @@ public class TitleLoader : MonoBehaviour
 
         yield return new WaitForSeconds(3f);
 
-        banGround = AudioManager.Instance.PrecacheSE(voice.bytes);
+        banGround = AudioManager.Instance.PrecacheSE(voice[UnityEngine.Random.Range(0,voice.Length)].bytes);
         banGround.PlayOneShot();
 
         if(IsAprilFool)
