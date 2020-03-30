@@ -51,7 +51,7 @@ public class AudioTimelineSync : MonoBehaviour
 
     public float GetTimeInS()
     {
-        return (float)(watch.Elapsed.TotalSeconds + deltaTime);
+        return (float)((watch.Elapsed.TotalSeconds + deltaTime) * LiveSetting.SpeedCompensationSum);
     }
 
     public int GetTimeInMs()
@@ -61,6 +61,6 @@ public class AudioTimelineSync : MonoBehaviour
 
     public void Seek(float targetTime)
     {
-        deltaTime = (float)(targetTime - watch.Elapsed.TotalSeconds);
+        deltaTime = (float)(targetTime / LiveSetting.SpeedCompensationSum - watch.Elapsed.TotalSeconds);
     }
 }
