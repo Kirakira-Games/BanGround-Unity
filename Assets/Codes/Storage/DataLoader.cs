@@ -320,7 +320,7 @@ public class DataLoader
             {
                 foreach (var entry in zip.Entries)
                 {
-                    if (!entry.FullName.Contains("music") && int.TryParse(entry.Name.Replace(".json", "").Replace(".bin", ""), out ret))
+                    if (!entry.FullName.Contains("music") && int.TryParse(entry.FullName.Replace("chart/", "").Replace("/" + entry.Name, ""), out ret))
                     {
                         break;
                     }
