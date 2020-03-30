@@ -13,13 +13,13 @@ public class InGameBackground : MonoBehaviour
 
     private void Start()
     {
-        Color color = new Color(LiveSetting.bgBrightness, LiveSetting.bgBrightness, LiveSetting.bgBrightness);
-        Material mat = Instantiate(bgSkybox);
-        mat.SetColor("_Tint", color);
-        RenderSettings.skybox = mat;
-        cacheMat = mat;
+        //Color color = new Color(LiveSetting.bgBrightness, LiveSetting.bgBrightness, LiveSetting.bgBrightness);
+        //Material mat = Instantiate(bgSkybox);
+        //mat.SetColor("_Tint", color);
+        //RenderSettings.skybox = mat;
+        //cacheMat = mat;
 
-        SceneManager.sceneUnloaded += UpdateBG;
+        //SceneManager.sceneUnloaded += UpdateBG;
     }
 
     private void UpdateBG(Scene s)
@@ -60,6 +60,6 @@ public class InGameBackground : MonoBehaviour
 
     private void OnDestroy()
     {
-        SceneManager.sceneUnloaded -= UpdateBG;
+        //SceneManager.sceneUnloaded -= UpdateBG;
     }
 }

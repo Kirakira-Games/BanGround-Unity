@@ -328,8 +328,8 @@ public class NoteController : MonoBehaviour
         AudioManager.Instance.DelayPlayInGameBGM(File.ReadAllBytes(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), WARM_UP_SECOND);
 
         // Background
-        var background = GetComponent<InGameBackground>();
-        background.SetBcakground(DataLoader.GetBackgroundPath(sid));
+        //var background = GetComponent<InGameBackground>();
+        //background.SetBcakground(DataLoader.GetBackgroundPath(sid));ai
         //background = GameObject.Find("dokidokiBackground").GetComponent<FixBackground>();
         //background.UpdateBackground(DataLoader.GetBackgroundPath(sid));
 
