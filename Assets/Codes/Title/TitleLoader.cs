@@ -44,7 +44,7 @@ public class TitleLoader : MonoBehaviour
     {
         //yield return new WaitForSeconds(0.5f);
         music = AudioManager.Instance.PlayLoopMusic(titleMusic.bytes,false);
-
+        music.SetVolume(0.7f);
         yield return new WaitForSeconds(3f);
 
         banGround = AudioManager.Instance.PrecacheSE(voice[UnityEngine.Random.Range(0,voice.Length)].bytes);
