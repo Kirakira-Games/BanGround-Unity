@@ -130,7 +130,7 @@ public class Slide : MonoBehaviour, KirakiraTracer
             mesh.meshRenderer.enabled = enableBody;
         }
         noteHead.gameObject.SetActive(isJudging);
-        noteHead.tapEffect.OnUpdate();
+        //noteHead.tapEffect.OnUpdate();
     }
 
     public void OnSlideUpdate()
