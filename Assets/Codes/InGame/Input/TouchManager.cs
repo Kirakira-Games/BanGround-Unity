@@ -299,7 +299,7 @@ public class TouchManager : MonoBehaviour
         traceCache = new Dictionary<(KirakiraTracer, int), JudgeResult>();
         exchanged = new HashSet<KirakiraTouch>();
         KirakiraTouch.dpi = GetDPI();
-        KirakiraTouch.flickDistPixels = Mathf.Min(Screen.height / 16, NoteUtility.FLICK_JUDGE_DIST / 2.54f * KirakiraTouch.dpi);
+        KirakiraTouch.flickDistPixels = Mathf.Min(Screen.height / 20, NoteUtility.FLICK_JUDGE_DIST / 2.54f * KirakiraTouch.dpi);
 
         // Touch provider
         if (LiveSetting.autoPlayEnabled)
