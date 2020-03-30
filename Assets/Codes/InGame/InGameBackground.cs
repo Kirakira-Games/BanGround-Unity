@@ -10,29 +10,34 @@ public class InGameBackground : MonoBehaviour
     //[SerializeField] private Texture defaultTex;
     [SerializeField] private Material bgSkybox;
     private Material cacheMat = null;
+    private MeshRenderer mesh;
 
     private void Start()
     {
+        mesh = GetComponent<MeshRenderer>();
+
         Color color = new Color(LiveSetting.bgBrightness, LiveSetting.bgBrightness, LiveSetting.bgBrightness);
         Material mat = Instantiate(bgSkybox);
         mat.SetColor("_Tint", color);
-        RenderSettings.skybox = mat;
+        //RenderSettings.skybox = mat;
+        mesh.sharedMaterial = mat;
         cacheMat = mat;
 
-        SceneManager.sceneUnloaded += UpdateBG;
+        //SceneManager.sceneUnloaded += UpdateBG;
     }
 
-    private void UpdateBG(Scene s)
-    {
-        if (cacheMat != null)
-            RenderSettings.skybox = cacheMat;
-    }
+    //private void UpdateBG(Scene s)
+    //{
+    //    if (cacheMat != null)
+    //        RenderSettings.skybox = cacheMat;
+    //}
 
     public void SetBcakground(string path)
     {
         if (!File.Exists(path))
         {
-            RenderSettings.skybox = bgSkybox;
+            //RenderSettings.skybox = bgSkybox;
+            mesh.sharedMaterial = bgSkybox;
             return;
         }
         else StartCoroutine(GetAndSetBG(path));
@@ -53,13 +58,15 @@ public class InGameBackground : MonoBehaviour
             mat.SetColor("_Tint", color);
             mat.SetFloat("_TexRatio", ratio);
 
-            RenderSettings.skybox = mat;
+            //RenderSettings.skybox = mat;
+            mesh.sharedMaterial = mat;
+            Destroy(cacheMat);
             cacheMat = mat;
         }
     }
 
-    private void OnDestroy()
-    {
-        SceneManager.sceneUnloaded -= UpdateBG;
-    }
+    //private void OnDestroy()
+    //{
+    //    SceneManager.sceneUnloaded -= UpdateBG;
+    //}
 }
