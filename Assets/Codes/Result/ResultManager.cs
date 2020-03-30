@@ -63,6 +63,7 @@ public class ResultManager : MonoBehaviour
         ShowOffset();
         StartCoroutine(ReadRank());
         bgmST = AudioManager.Instance.PlayLoopMusic(bgmVoice.bytes);
+        bgmST.SetVolume(0.7f);
     }
 
     private void ShowOffset()
@@ -131,7 +132,7 @@ public class ResultManager : MonoBehaviour
                 resultVoice = voices[7];
                 break;
             default:
-                resultVoice = voices[8];
+                resultVoice = null;
                 break;
         }
 
@@ -194,6 +195,7 @@ public class ResultManager : MonoBehaviour
         {
             //anim.SetBool("FadeToBlue", true);
             //StartCoroutine("DelayLoadScene", "Select");
+            StartCoroutine(BgmFadeOut());
             RemoveListener();
             SceneLoader.LoadScene("Result", "Select", true);
         });
@@ -202,11 +204,22 @@ public class ResultManager : MonoBehaviour
         {
             //anim.SetBool("FadeToBlack", true);
             //StartCoroutine("DelayLoadScene","InGame" ); 
+            StartCoroutine(BgmFadeOut());
             RemoveListener();
             SceneLoader.LoadScene("Result", "InGame",true);
         });
 
     }
+
+    IEnumerator BgmFadeOut()
+    {
+        for(float i = 0.7f; i > 0; i -= 0.1f)
+        {
+            bgmST.SetVolume(i);
+            yield return new WaitForSeconds(0.2f);
+        }
+    }
+
 
     private void GetResultObjectAndComponent()
     {

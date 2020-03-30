@@ -24,7 +24,6 @@ public class UIManager : MonoBehaviour
     public TextAsset FCvoice;
     public TextAsset CLvoice;
     public TextAsset Fvoice;
-    [SerializeField] private TextAsset[] startVoices; //se
     GameObject gateCanvas;
 
     private ISoundEffect resultVoice;
@@ -72,14 +71,6 @@ public class UIManager : MonoBehaviour
                 break;
         }
 
-        PlayVoices();
-    }
-
-    private void PlayVoices()
-    {
-        AudioManager.Instance.PrecacheSE(startVoices[0].bytes).PlayOneShot();
-        AudioManager.Instance.PrecacheSE(startVoices[1].bytes).PlayOneShot();
-        AudioManager.Instance.PrecacheSE(startVoices[1].bytes).PlayOneShot();
     }
 
     public void OnPauseButtonClick()

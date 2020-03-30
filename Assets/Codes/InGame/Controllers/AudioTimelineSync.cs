@@ -1,12 +1,13 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Diagnostics;
+using System;
 
 public class AudioTimelineSync : MonoBehaviour
 {
     public static AudioTimelineSync instance;
 
-    float startTime;
-    float pauseTime;
+    private Stopwatch watch;
+    private float deltaTime;
 
     public static float BGMTimeToRealtime(float t)
     {
@@ -28,46 +29,38 @@ public class AudioTimelineSync : MonoBehaviour
 
     public float TimeSinceStartupToBGMTime(float t)
     {
-        return RealTimeToBGMTime(t - startTime);
+        throw new NotImplementedException();
     }
 
     private void Awake()
     {
         instance = this;
-        startTime = Time.realtimeSinceStartup + 1e3f;
-        pauseTime = -1e3f;
+        watch = new Stopwatch();
+        deltaTime = -1e3f;
     }
 
     public void Play()
     {
-        pauseTime = float.NaN;
+        watch.Start();
     }
 
     public void Pause()
     {
-        pauseTime = GetTimeInS();
+        watch.Stop();
     }
 
     public float GetTimeInS()
     {
-        if (float.IsNaN(pauseTime))
-        {
-            return RealTimeToBGMTime(Time.realtimeSinceStartup - startTime);
-        }
-        return pauseTime;
+        return (float)((watch.Elapsed.TotalSeconds + deltaTime) * LiveSetting.SpeedCompensationSum);
     }
 
     public int GetTimeInMs()
     {
-        return Mathf.RoundToInt(GetTimeInS() * 1000f);
+        return Mathf.RoundToInt(GetTimeInS() * 1000);
     }
 
     public void Seek(float targetTime)
     {
-        startTime = Time.realtimeSinceStartup - BGMTimeToRealtime(targetTime);
-        if (!float.IsNaN(pauseTime))
-        {
-            pauseTime = targetTime;
-        }
+        deltaTime = (float)(targetTime / LiveSetting.SpeedCompensationSum - watch.Elapsed.TotalSeconds);
     }
 }
