@@ -31,12 +31,14 @@ public class LoaderImg : MonoBehaviour
         yield return list.SendWebRequest();
         if (list.isNetworkError || list.isHttpError)
         {
+            //没网的时候
             Debug.LogError("Get meme list failed : " + list.error);
             var LocalList = new DirectoryInfo(TempSav).GetFiles();
             if (LocalList.Length > 0)
             {
                 var randomIndex = Random.Range(0, LocalList.Length);
-                var imgReq = UnityWebRequest.Get(LocalList[randomIndex].FullName);
+                Debug.LogWarning("file://" + LocalList[randomIndex].FullName);
+                var imgReq = UnityWebRequest.Get("file://"+LocalList[randomIndex].FullName);
                 var dht = new DownloadHandlerTexture(true);
                 imgReq.downloadHandler = dht;
                 yield return imgReq.SendWebRequest();
@@ -73,7 +75,9 @@ public class LoaderImg : MonoBehaviour
             }
             else
             {
-                var imgReq = UnityWebRequest.Get(TempSav + img);
+                //已经保存的
+                Debug.LogWarning("file://" + TempSav + img);
+                var imgReq = UnityWebRequest.Get("file://"+ TempSav + img);
                 var dht = new DownloadHandlerTexture(true);
                 imgReq.downloadHandler = dht;
                 yield return imgReq.SendWebRequest();
