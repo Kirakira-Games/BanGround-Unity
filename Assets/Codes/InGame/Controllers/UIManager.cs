@@ -24,7 +24,6 @@ public class UIManager : MonoBehaviour
     public TextAsset FCvoice;
     public TextAsset CLvoice;
     public TextAsset Fvoice;
-    [SerializeField] private TextAsset[] startVoices;
     GameObject gateCanvas;
 
     private ISoundEffect resultVoice;
@@ -59,7 +58,7 @@ public class UIManager : MonoBehaviour
         StartCoroutine(DelayDisableGate());
 
         //Screen.orientation = ScreenOrientation.;
-        MessageBoxController.ShowMsg(LogLevel.INFO, Screen.orientation.ToString());
+        //MessageBoxController.ShowMsg(LogLevel.INFO, Screen.orientation.ToString());
         switch (Screen.orientation)
         {
             case ScreenOrientation.LandscapeLeft:
@@ -72,14 +71,6 @@ public class UIManager : MonoBehaviour
                 break;
         }
 
-        PlayVoices();
-    }
-
-    private void PlayVoices()
-    {
-        AudioManager.Instance.PrecacheSE(startVoices[0].bytes).PlayOneShot();
-        AudioManager.Instance.PrecacheSE(startVoices[1].bytes).PlayOneShot();
-        AudioManager.Instance.PrecacheSE(startVoices[1].bytes).PlayOneShot();
     }
 
     public void OnPauseButtonClick()
@@ -230,7 +221,7 @@ public class UIManager : MonoBehaviour
 
     private void Update()
     {
-        if (AudioManager.Instance.isInGame && AudioManager.Instance.gameBGM.GetStatus() != PlaybackStatus.Playing)
+        if (AudioManager.Instance.isInGame && AudioTimelineSync.instance.GetTimeInMs() > AudioManager.Instance.gameBGM.GetLength())
         {
             AudioManager.Instance.isInGame = false;
             OnAudioFinish(false);

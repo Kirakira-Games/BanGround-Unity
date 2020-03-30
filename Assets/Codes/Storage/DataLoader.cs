@@ -357,7 +357,7 @@ public class DataLoader
                 files = packDir.GetFiles("*.kirapack", SearchOption.TopDirectoryOnly);
 
             //iOS额外搜索沙盒根目录文件 临时解决导入问题
-            if (Application.platform == RuntimePlatform.IPhonePlayer)
+            if (Application.platform == RuntimePlatform.IPhonePlayer || true)
             {
                 var packDir2 = new DirectoryInfo(Application.persistentDataPath);
                 var files2 = packDir2.GetFiles("*.kirapack", SearchOption.TopDirectoryOnly);
