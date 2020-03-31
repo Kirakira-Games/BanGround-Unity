@@ -221,7 +221,7 @@ public class UIManager : MonoBehaviour
 
     private void Update()
     {
-        if (AudioManager.Instance.isInGame && AudioTimelineSync.instance.GetTimeInMs() > AudioManager.Instance.gameBGM.GetLength())
+        if (AudioManager.Instance.isInGame && AudioTimelineSync.instance.GetTimeInMs() > AudioManager.Instance.gameBGM.GetLength() + 1000)
         {
             AudioManager.Instance.isInGame = false;
             OnAudioFinish(false);
