@@ -1330,7 +1330,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 402058849}
   m_HandleRect: {fileID: 402058848}
   m_Direction: 2
-  m_Value: 0.99999964
+  m_Value: 0.9995784
   m_Size: 0.7058599
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -2390,9 +2390,9 @@ MonoBehaviour:
     m_Font: {fileID: 12800000, guid: 3eaa90b350bd062429bd2374b02b35c6, type: 3}
     m_FontSize: 30
     m_FontStyle: 1
-    m_BestFit: 0
+    m_BestFit: 1
     m_MinSize: 3
-    m_MaxSize: 40
+    m_MaxSize: 30
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
@@ -7286,6 +7286,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   needPercent: 0
+  canDisable: 0
 --- !u!114 &537591364
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8706,7 +8707,7 @@ GameObject:
   - component: {fileID: 602265182}
   - component: {fileID: 602265181}
   m_Layer: 5
-  m_Name: ELP_Toggle
+  m_Name: ELP_Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8747,6 +8748,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   needPercent: 0
+  canDisable: 1
 --- !u!114 &602265182
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8793,7 +8795,7 @@ MonoBehaviour:
   m_MinValue: 0
   m_MaxValue: 40
   m_WholeNumbers: 1
-  m_Value: 1
+  m_Value: 0
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -16835,7 +16837,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0.3095703}
   m_SizeDelta: {x: 0, y: 2498.3}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &768013508
@@ -17887,6 +17889,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   needPercent: 1
+  canDisable: 0
 --- !u!114 &817871723
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18720,7 +18723,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.00049591064}
+  m_AnchoredPosition: {x: 0, y: -0.0002593994}
   m_SizeDelta: {x: 0, y: 107.9}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!1 &887837340
@@ -21872,6 +21875,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   needPercent: 1
+  canDisable: 0
 --- !u!1 &1096713751
 GameObject:
   m_ObjectHideFlags: 0
@@ -22319,6 +22323,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   needPercent: 1
+  canDisable: 0
 --- !u!1 &1121440056
 GameObject:
   m_ObjectHideFlags: 0
@@ -22802,7 +22807,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1561925952}
   m_HandleRect: {fileID: 1561925951}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0.9977091
   m_Size: 0.8190234
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -25180,7 +25185,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 78, y: -0.00018799673}
+  m_AnchoredPosition: {x: 78, y: -0.00006870335}
   m_SizeDelta: {x: -78, y: 1740.3}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1279238188
@@ -25894,6 +25899,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   needPercent: 1
+  canDisable: 0
 --- !u!1 &1352790905
 GameObject:
   m_ObjectHideFlags: 0
@@ -27105,6 +27111,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   needPercent: 1
+  canDisable: 0
 --- !u!43 &1403562835
 Mesh:
   m_ObjectHideFlags: 0
@@ -28888,6 +28895,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   needPercent: 0
+  canDisable: 0
 --- !u!114 &1504761252
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -34922,7 +34930,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.0000596835}
+  m_AnchoredPosition: {x: 0, y: 0.8956923}
   m_SizeDelta: {x: 0, y: 2160.5}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1604994717

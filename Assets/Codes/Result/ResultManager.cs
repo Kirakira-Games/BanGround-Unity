@@ -79,7 +79,7 @@ public class ResultManager : MonoBehaviour
 
         //var normal = ComboManager.JudgeOffsetResult.Count - miss - slide;
 
-        Debug.Log($"total = {ComboManager.JudgeOffsetResult.Count}, early = {earlyCount}, late = {lateCount}");
+        //Debug.Log($"total = {ComboManager.JudgeOffsetResult.Count}, early = {earlyCount}, late = {lateCount}");
         //offset_Obj.text = $"E:{earlyCount}(avg:{earlyAverage})\nL:{lateCount}(avg:{lateAverage})";
         earlyCount_Text.text = earlyCount.ToString();
         earlyAvg_Text.text = earlyAverage.ToString() + "ms";
@@ -379,7 +379,7 @@ public class ResultManager : MonoBehaviour
         //    pr.resultsList.Add(playResult);
         //}
         if (!LiveSetting.autoPlayEnabled)
-            print("Record Saved: " + PlayRecords.SaveRecord(pr));
+            print("Record Saved");// + PlayRecords.SaveRecord(pr));
         else
             print("Autoplay score not saved");
     }
