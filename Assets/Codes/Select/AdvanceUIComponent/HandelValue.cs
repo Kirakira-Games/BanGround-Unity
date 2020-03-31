@@ -7,7 +7,8 @@ public class HandelValue : MonoBehaviour
 {
     private Slider slider;
     private Text valueText;
-    public bool needPercent = true ;
+    public bool needPercent = true;
+    public bool canDisable = false;
 
     void Start()
     {
@@ -24,6 +25,10 @@ public class HandelValue : MonoBehaviour
             slider.onValueChanged.AddListener((value) =>
             {
                 valueText.text = (int)((value - slider.minValue) / (slider.maxValue - slider.minValue) * 100) + "%";
+                if (canDisable)
+                {
+                    if (slider.value == 0) valueText.text = "Disable".GetLocalized();
+                }
             });
         }
         else
@@ -32,8 +37,13 @@ public class HandelValue : MonoBehaviour
             slider.onValueChanged.AddListener((value) =>
             {
                 valueText.text = ((int)(value)).ToString();
+                if (canDisable)
+                {
+                    if (slider.value == 0) valueText.text = "Disable".GetLocalized();
+                }
             });
         }
+
     }
 
 }

@@ -26,7 +26,7 @@ public class SelectManager : MonoBehaviour
     private Toggle offBeat_Tog;
     private Toggle persp_Tog;
     private Toggle mirrow_Tog;
-    private Slider ELP_Tog;
+    private Slider ELP_Slider;
     private Toggle FS_Tog;
     private Toggle VSync_Tog;
     private NoteStyleToggleGroup noteToggles;
@@ -164,7 +164,6 @@ public class SelectManager : MonoBehaviour
         offBeat_Tog = GameObject.Find("Offbeat_Toggle").GetComponent<Toggle>();
         mirrow_Tog = GameObject.Find("Mirrow_Toggle").GetComponent<Toggle>();
         persp_Tog = GameObject.Find("Perspective_Toggle").GetComponent<Toggle>();
-        ELP_Tog = GameObject.Find("ELP_Toggle").GetComponent<Slider>();
         FS_Tog = GameObject.Find("Fullscreen_Toggle").GetComponent<Toggle>();
         VSync_Tog = GameObject.Find("VSync_Toggle").GetComponent<Toggle>();
         noteToggles = GameObject.Find("Note_Group").GetComponent<NoteStyleToggleGroup>();
@@ -182,6 +181,7 @@ public class SelectManager : MonoBehaviour
         long_Bright = GameObject.Find("Long_Bri_Slider").GetComponent<Slider>();
         seVolume_Input = GameObject.Find("SeVolume_Input").GetComponent<Slider>();
         bgmVolume_Input = GameObject.Find("BGMVolume_Input").GetComponent<Slider>();
+        ELP_Slider = GameObject.Find("ELP_Slider").GetComponent<Slider>();
 
         auto_Tog = GameObject.Find("Autoplay_Toggle").GetComponent<Toggle>();
         speedDown_Tog = GameObject.Find("Half_Toggle").GetComponent<StepToggle>();
@@ -577,7 +577,7 @@ public class SelectManager : MonoBehaviour
         offBeat_Tog.isOn = LiveSetting.grayNoteEnabled;
         mirrow_Tog.isOn = LiveSetting.mirrowEnabled;
         persp_Tog.isOn = LiveSetting.bangPerspective;
-        ELP_Tog.value = LiveSetting.ELP;
+        ELP_Slider.value = LiveSetting.ELP;
         FS_Tog.isOn = Screen.fullScreen;
         VSync_Tog.isOn = QualitySettings.vSyncCount == 1;
 
@@ -628,7 +628,7 @@ public class SelectManager : MonoBehaviour
             LiveSetting.mirrowEnabled = mirrow_Tog.isOn;
             LiveSetting.autoPlayEnabled = auto_Tog.isOn;
             LiveSetting.bangPerspective = persp_Tog.isOn;
-            LiveSetting.ELP = ELP_Tog.value;
+            LiveSetting.ELP = ELP_Slider.value;
 #if (UNITY_STANDALONE || UNITY_WSA)
             if (FS_Tog.isOn)
             {
