@@ -109,8 +109,8 @@ public class AudioManager : MonoBehaviour
         uint end = soundTrack.GetLength();
         if (times != null)
         {
-            start = times[0];
-            end = times[1] == 0 ? soundTrack.GetLength() : times[1];
+            start = times[0] < 0 ? 0 :times[0];
+            end = times[1] <= 0 ? soundTrack.GetLength() : times[1];
         }
 
         if (needLoop)
