@@ -32,7 +32,7 @@ public class InputManagerTouchProvider : KirakiraTouchProvider
             ret[i] = new KirakiraTouchState
             {
                 touchId = touch.fingerId,
-                time = AudioTimelineSync.instance.GetTimeInMs() - LiveSetting.judgeOffset,
+                time = NoteController.audioTime - LiveSetting.judgeOffset,
                 realtime = Time.realtimeSinceStartup,
                 screenPos = touch.position,
                 pos = pos,
