@@ -14,7 +14,7 @@ public class MouseTouchProvider : KirakiraTouchProvider
             touchId = NoteUtility.MOUSE_TOUCH_ID,
             screenPos = Input.mousePosition,
             pos = pos,
-            time = NoteController.audioTime,
+            time = NoteController.judgeTime,
             realtime = Time.realtimeSinceStartup,
             phase = phase
         };
