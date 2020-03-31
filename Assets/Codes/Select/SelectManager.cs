@@ -428,7 +428,7 @@ public class SelectManager : MonoBehaviour
             }
         }
         score.text = string.Format("{0:0000000}", a.Score);
-        acc.text = string.Format("{0:P2}", a.Acc);
+        acc.text = string.Format("{0:P2}", Mathf.FloorToInt((float)a.Acc * 10000) / 10000f);
         //Set Rank
         if (count == 0)
         {
