@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using Newtonsoft.Json;
 using UnityEngine.Networking;
+using System;
 
 public class DataLoader
 {
@@ -325,6 +326,9 @@ public class DataLoader
     public static bool LoadAllKiraPackFromInbox()
     {
         bool LoadSuccess = false;
+        if(DateTime.Now.Month == 4 && DateTime.Now.Day == 1 && !Directory.Exists($"{Application.persistentDataPath}/data/chart/233333"))
+            SelectManager.letTheBassKick = true;
+
         try
         {
             if (!Directory.Exists(InboxDir))
