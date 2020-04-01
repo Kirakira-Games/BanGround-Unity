@@ -63,13 +63,13 @@ public class AutoPlayTouchProvider : KirakiraTouchProvider
         events.Add(touchS);
     }
 
-    private void AddTapMove(GameNoteData note)
+    private void AddTapMove(GameNoteData note, int dt = 0)
     {
         var pos = note.pos;
         var screenPos = NoteController.mainCamera.WorldToScreenPoint(pos);
         var touchS = new KirakiraTouchState
         {
-            time = note.time - 9,
+            time = note.time + dt,
             pos = pos,
             screenPos = screenPos,
             phase = KirakiraTouchPhase.Ongoing,
@@ -83,7 +83,8 @@ public class AutoPlayTouchProvider : KirakiraTouchProvider
         var pos = note.pos;
         if (NoteUtility.IsFlick(note.type))
         {
-            AddTapMove(note);
+            var last = events[events.Count - 1];
+            AddTapMove(note, -Mathf.Min(note.time - last.time - 1, 20));
             pos.y += 1;
         }
         var screenPos = NoteController.mainCamera.WorldToScreenPoint(pos);
