@@ -135,10 +135,8 @@ public class Slide : MonoBehaviour, KirakiraTracer
 
     public void OnSlideUpdate()
     {
-    	var _notes = GetComponentsInChildren<SlideNoteBase>();
-
         // Update ticks
-        foreach (var note in _notes)
+        foreach (var note in notes)
         {
             note.OnNoteUpdate();
         }
@@ -159,7 +157,7 @@ public class Slide : MonoBehaviour, KirakiraTracer
         }
 
         // Update mesh
-        foreach (var note in _notes)
+        foreach (var note in notes)
         {
             note.slideMesh?.OnUpdate();
             note.pillar?.OnUpdate();
