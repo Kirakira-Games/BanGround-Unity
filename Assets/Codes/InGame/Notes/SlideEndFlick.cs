@@ -42,7 +42,7 @@ public class SlideEndFlick : SlideNoteBase
             NoteUtility.SLIDE_END_FLICK_JUDGE_RANGE :
             NoteUtility.SLIDE_END_JUDGE_RANGE[(int)JudgeResult.Bad];
 
-        if (touch.timeSinceFlick <= judgeRange && touch.current.time - touch.timeSinceFlick >= judgeTime - 20)
+        if (touch.timeSinceFlick <= judgeRange && touch.current.time - touch.timeSinceFlick >= judgeTime + NoteUtility.SLIDE_END_TILT_JUDGE_RANGE[0])
         {
             return isTilt ? JudgeResult.Perfect :
                 TranslateTimeToJudge(NoteUtility.SLIDE_END_JUDGE_RANGE, touch.current.time);

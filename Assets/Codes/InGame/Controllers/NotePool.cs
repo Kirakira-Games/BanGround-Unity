@@ -140,7 +140,9 @@ public class NotePool : MonoBehaviour
                 events.Add(new NoteEvent
                 {
                     type = i.type,
-                    time = range == -1 ? note.time + NoteUtility.SLIDE_TICK_JUDGE_RANGE : note.time + range,
+                    time = range == -1 ?
+                        note.time + NoteUtility.SLIDE_TICK_JUDGE_RANGE + Mathf.Max(0, LiveSetting.judgeOffset) :
+                        note.time + range,
                     delta = -1
                 });
             }
@@ -156,7 +158,9 @@ public class NotePool : MonoBehaviour
             events.Add(new NoteEvent
             {
                 type = note.type,
-                time = range == -1 ? note.time + NoteUtility.SLIDE_TICK_JUDGE_RANGE : note.time + range,
+                time = range == -1 ?
+                    note.time + NoteUtility.SLIDE_TICK_JUDGE_RANGE + Mathf.Max(0, LiveSetting.judgeOffset) :
+                    note.time + range,
                 delta = -1
             });
         }
