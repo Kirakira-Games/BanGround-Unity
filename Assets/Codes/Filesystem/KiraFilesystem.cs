@@ -153,9 +153,10 @@ namespace System.IO
             }
         }
 
-        private void GetFiles(List<string> files, DirectoryInfo di)
+        private void GetFiles(List<string> files, DirectoryInfo di, Func<string, bool> func)
         {
             var subfiles = from x in di.GetFiles()
+                           where func(x.FullName)
                            select x.FullName.Replace(root, "");
 
             var subdirs = di.GetDirectories();
@@ -163,13 +164,16 @@ namespace System.IO
             files.AddRange(subfiles);
 
             foreach (var sdi in subdirs)
-                GetFiles(files, sdi);
+                GetFiles(files, sdi, func);
         }
 
-        public string[] ListFiles()
+        public string[] ListFiles(Func<string, bool> func = null)
         {
-            var files = index.Keys.ToList();
-            GetFiles(files, new DirectoryInfo(root));
+            if (func == null)
+                func = name => true;
+
+            var files = (from x in index where func(x.Key) select x.Key).ToList();
+            GetFiles(files, new DirectoryInfo(root), func);
             return files.ToArray();
         }
 
