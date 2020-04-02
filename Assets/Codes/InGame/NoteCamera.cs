@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class NoteCamera : MonoBehaviour
 {
-    Camera camera;
+    Camera noteCamera;
 
     void Awake()
     {
-        camera = GetComponent<Camera>();
-        camera.farClipPlane = LiveSetting.farClip;
+        noteCamera = GetComponent<Camera>();
+        noteCamera.farClipPlane = LiveSetting.farClip;
     }
 }

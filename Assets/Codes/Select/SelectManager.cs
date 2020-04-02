@@ -106,9 +106,10 @@ public class SelectManager : MonoBehaviour
 
         MessageBoxController.ShowMsg(LogLevel.INFO, "Load SongList Success");
 
-        if(letTheBassKick)
+        if (letTheBassKick)
         {
             StartCoroutine(KickBass());
+            letTheBassKick = false;
         }
     }
 
@@ -531,6 +532,10 @@ public class SelectManager : MonoBehaviour
     }
     void GetLiveSetting()
     {
+        if (letTheBassKick)
+        {
+            LiveSetting.farClip = 169f;
+        }
         speed_Input.text = LiveSetting.noteSpeed.ToString();
         judge_Input.text = LiveSetting.judgeOffset.ToString();
         audio_Input.text = LiveSetting.audioOffset.ToString();
