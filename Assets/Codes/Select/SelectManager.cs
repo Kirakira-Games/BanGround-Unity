@@ -26,8 +26,9 @@ public class SelectManager : MonoBehaviour
     private Toggle offBeat_Tog;
     private Toggle persp_Tog;
     private Toggle mirrow_Tog;
-    private Toggle ELP_Tog;
+    private Slider ELP_Tog;
     private Toggle FS_Tog;
+    private Toggle VSync_Tog;
     private NoteStyleToggleGroup noteToggles;
     private SESelector seSelector;
 
@@ -105,7 +106,7 @@ public class SelectManager : MonoBehaviour
         InitSongList(false);
         GetLiveSetting();
 
-        PlayVoices();
+        PlayVoicesAtSceneIn();
 
         if (letTheBassKick)
         {
@@ -130,10 +131,15 @@ public class SelectManager : MonoBehaviour
         }
     }
 
-    private void PlayVoices()
+    private void PlayVoicesAtSceneIn()
     {
-        AudioManager.Instance.PrecacheSE(voices[0].bytes).PlayOneShot();
-        AudioManager.Instance.PrecacheSE(voices[1].bytes).PlayOneShot();
+        AudioManager.Instance.PrecacheSE(voices[UnityEngine.Random.Range(0,3)].bytes).PlayOneShot();
+    }
+
+    private void PlayVoicesAtSceneOut()
+    {
+        AudioManager.Instance.PrecacheSE(voices[UnityEngine.Random.Range(3, 7)].bytes).PlayOneShot();
+
     }
 
     private void InitComponent()
@@ -158,8 +164,9 @@ public class SelectManager : MonoBehaviour
         offBeat_Tog = GameObject.Find("Offbeat_Toggle").GetComponent<Toggle>();
         mirrow_Tog = GameObject.Find("Mirrow_Toggle").GetComponent<Toggle>();
         persp_Tog = GameObject.Find("Perspective_Toggle").GetComponent<Toggle>();
-        ELP_Tog = GameObject.Find("ELP_Toggle").GetComponent<Toggle>();
+        ELP_Tog = GameObject.Find("ELP_Toggle").GetComponent<Slider>();
         FS_Tog = GameObject.Find("Fullscreen_Toggle").GetComponent<Toggle>();
+        VSync_Tog = GameObject.Find("VSync_Toggle").GetComponent<Toggle>();
         noteToggles = GameObject.Find("Note_Group").GetComponent<NoteStyleToggleGroup>();
         seSelector= GameObject.Find("SEGroup").GetComponent<SESelector>();
 
@@ -232,6 +239,8 @@ public class SelectManager : MonoBehaviour
 #if !(UNITY_STANDALONE || UNITY_WSA)
         GameObject.Find("Fullscreen").SetActive(false);
         GameObject.Find("Fullscreen_Toggle").SetActive(false);
+        GameObject.Find("VSync").SetActive(false);
+        GameObject.Find("VSync_Toggle").SetActive(false);
 #endif
     }
     void LoadScoreRecord()
@@ -395,7 +404,7 @@ public class SelectManager : MonoBehaviour
         difficultySelect.levels = LiveSetting.CurrentHeader.difficultyLevel.ToArray();
         difficultySelect.OnSongChange();
         //DisplayRecord();
-        PlayPreview();
+        StartCoroutine(PlayPreview());
     }
 
     public void UnselectSong()
@@ -492,26 +501,43 @@ public class SelectManager : MonoBehaviour
         clearMark.texture = mark;
     }
 
-
-    void PlayPreview()
+    bool isFirstPlay = true;
+    IEnumerator PlayPreview()
     {
+        
+
         mHeader mheader = DataLoader.GetMusicHeader(LiveSetting.CurrentHeader.mid);
 
         if (previewSound != null) {
             previewSound.Dispose();
             previewSound = null;
         }
-        if (!DataLoader.MusicExists(LiveSetting.CurrentHeader.mid))
+        if (DataLoader.MusicExists(LiveSetting.CurrentHeader.mid))
         {
-            return;
-        }
-        previewSound = AudioManager.Instance.PlayLoopMusic(KiraFilesystem.Instance.Read(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)),true,
-            new uint[]
-            {
+            previewSound = AudioManager.Instance.PlayLoopMusic(KiraFilesystem.Instance.Read(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), true,
+                new uint[]
+                {
                 (uint)(mheader.preview[0] * 1000),
                 (uint)(mheader.preview[1] * 1000)
-            },
-            false);
+                    },
+                    false);
+            if (isFirstPlay)
+            {
+                previewSound.Pause();
+                yield return new WaitForSeconds(2.2f); //给语音留个地方
+                previewSound.Play();
+            }
+            isFirstPlay = false;
+        }
+    }
+
+    IEnumerator PreviewFadeOut()
+    {
+        for (float i = 1f; i > 0; i -= 0.2f)
+        {
+            previewSound.SetVolume(i);
+            yield return new WaitForSeconds(0.2f);
+        }
     }
 
     //Setting And Mod------------------------------
@@ -553,8 +579,9 @@ public class SelectManager : MonoBehaviour
         offBeat_Tog.isOn = LiveSetting.grayNoteEnabled;
         mirrow_Tog.isOn = LiveSetting.mirrowEnabled;
         persp_Tog.isOn = LiveSetting.bangPerspective;
-        ELP_Tog.isOn = LiveSetting.displayELP;
+        ELP_Tog.value = LiveSetting.ELP;
         FS_Tog.isOn = Screen.fullScreen;
+        VSync_Tog.isOn = QualitySettings.vSyncCount == 1;
 
         judgeOffsetTransform.value = LiveSetting.offsetTransform;
         far_Clip.value = LiveSetting.farClip;
@@ -603,7 +630,7 @@ public class SelectManager : MonoBehaviour
             LiveSetting.mirrowEnabled = mirrow_Tog.isOn;
             LiveSetting.autoPlayEnabled = auto_Tog.isOn;
             LiveSetting.bangPerspective = persp_Tog.isOn;
-            LiveSetting.displayELP = ELP_Tog.isOn;
+            LiveSetting.ELP = ELP_Tog.value;
 #if (UNITY_STANDALONE || UNITY_WSA)
             if (FS_Tog.isOn)
             {
@@ -616,6 +643,15 @@ public class SelectManager : MonoBehaviour
                 var r = Screen.resolutions[Screen.resolutions.Length - 2];
                 Screen.SetResolution(r.width, r.height, FullScreenMode.Windowed);
                 Screen.fullScreen = false;
+            }
+
+            if(VSync_Tog.isOn)
+            {
+                QualitySettings.vSyncCount = 1;
+            }
+            else
+            {
+                QualitySettings.vSyncCount = 0;
             }
 #endif
             LiveSetting.offsetTransform = judgeOffsetTransform.value;
@@ -646,8 +682,10 @@ public class SelectManager : MonoBehaviour
     //============================================
     public void OnEnterPressed()
     {
+        StartCoroutine(PreviewFadeOut());
         SetLiveSetting();
         File.WriteAllText(LiveSetting.settingsPath, JsonConvert.SerializeObject(new LiveSettingTemplate()));
+        PlayVoicesAtSceneOut();
         SceneLoader.LoadScene("Select", "InGame", true);
     }
 

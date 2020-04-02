@@ -13,7 +13,7 @@ using UnityEngine.UI;
 public class TitleLoader : MonoBehaviour
 {
     public TextAsset titleMusic;
-    public TextAsset voice;
+    public TextAsset[] voice;
     public Text Title;
     public Text touchStart;
 
@@ -32,7 +32,7 @@ public class TitleLoader : MonoBehaviour
     {
         if (IsAprilFool)
         {
-            voice = Resources.Load<TextAsset>("Sound/voice/LetTheBassKick");
+            voice[0] = Resources.Load<TextAsset>("Sound/voice/LetTheBassKick");
         }
 
         StartCoroutine(PlayTitle());
@@ -44,21 +44,19 @@ public class TitleLoader : MonoBehaviour
     {
         //yield return new WaitForSeconds(0.5f);
         music = AudioManager.Instance.PlayLoopMusic(titleMusic.bytes,false);
-
+        music.SetVolume(0.7f);
         yield return new WaitForSeconds(3f);
 
-        banGround = AudioManager.Instance.PrecacheSE(voice.bytes);
+        banGround = AudioManager.Instance.PrecacheSE(voice[UnityEngine.Random.Range(0,voice.Length)].bytes);
         banGround.PlayOneShot();
 
         if(IsAprilFool)
         {
             Title.text = "Let the bass kick!";
             touchStart.text = "Bass Bass Kick Kick Bass Kick Kick";
-            if (!Directory.Exists($"{Application.persistentDataPath}/Inbox"))
-                Directory.CreateDirectory($"{Application.persistentDataPath}/Inbox");
             if (!Directory.Exists($"{Application.persistentDataPath}/data/chart/233333"))
             {
-                File.WriteAllBytes($"{Application.persistentDataPath}/Inbox/BBKKBKK_Min_Commit_c8ecd6fa71.kirapack", Resources.Load<TextAsset>("BBKKBKK_23dead5111_V0.3.kirapack").bytes);
+                File.WriteAllBytes($"{Application.persistentDataPath}/BBKKBKK_Min_Commit_c8ecd6fa71.kirapack", Resources.Load<TextAsset>("BBKKBKK_23dead5111_V0.3.kirapack").bytes);
             }
         }
     }

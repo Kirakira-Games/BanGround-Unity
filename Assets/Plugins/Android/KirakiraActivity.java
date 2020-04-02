@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.pm.PackageManager;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -69,11 +70,12 @@ public class KirakiraActivity extends UnityPlayerActivity {
     }
 
     public void ImportFile(Intent intent){
-        while(checkSelfPermission("android.permission.WRITE_EXTERNAL_STORAGE") != PackageManager.PERMISSION_GRANTED)
-        {
-            requestPermissions(PERMISSIONS_STORAGE,REQUEST_EXTERNAL_STORAGE);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            while(checkSelfPermission("android.permission.WRITE_EXTERNAL_STORAGE") != PackageManager.PERMISSION_GRANTED)
+            {
+                requestPermissions(PERMISSIONS_STORAGE,REQUEST_EXTERNAL_STORAGE);
+            }
         }
-
         String action = intent.getAction();
 
         assert action != null;
@@ -109,7 +111,7 @@ public class KirakiraActivity extends UnityPlayerActivity {
     public File getAndroidStorageFile() {
         return this.getExternalFilesDir(null);
     }
-    
+
     @Override public void onWindowFocusChanged(boolean hasFocus)
     {
         super.onWindowFocusChanged(hasFocus);
