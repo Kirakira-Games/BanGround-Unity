@@ -108,7 +108,24 @@ namespace System.IO
 
         public void CleanUnusedKirapack()
         {
+            var query = from x in index
+                        where x.Key.EndsWith(".kirapack") && (from y in index where y.Value == x.Key select y).Count() == 1
+                        select x.Key;
 
+            query.Any(kirapack =>
+            {
+                index.Remove(kirapack);
+                if(openedArchive.ContainsKey(kirapack))
+                {
+                    openedArchive[kirapack].Dispose();
+                    openedArchive.Remove(kirapack);
+                    lastAccessTime.Remove(kirapack);
+                }
+
+                File.Delete(kirapack);
+
+                return true;
+            });
         }
 
         public void SaveIndex()
