@@ -54,11 +54,9 @@ public class TitleLoader : MonoBehaviour
         {
             Title.text = "Let the bass kick!";
             touchStart.text = "Bass Bass Kick Kick Bass Kick Kick";
-            if (!Directory.Exists($"{Application.persistentDataPath}/Inbox"))
-                Directory.CreateDirectory($"{Application.persistentDataPath}/Inbox");
             if (!Directory.Exists($"{Application.persistentDataPath}/data/chart/233333"))
             {
-                File.WriteAllBytes($"{Application.persistentDataPath}/Inbox/BBKKBKK_Min_Commit_c8ecd6fa71.kirapack", Resources.Load<TextAsset>("BBKKBKK_23dead5111_V0.3.kirapack").bytes);
+                File.WriteAllBytes($"{Application.persistentDataPath}/BBKKBKK_Min_Commit_c8ecd6fa71.kirapack", Resources.Load<TextAsset>("BBKKBKK_23dead5111_V0.3.kirapack").bytes);
             }
         }
     }
