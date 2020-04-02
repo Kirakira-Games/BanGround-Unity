@@ -116,9 +116,8 @@ public static class ChartLoader
         foreach(Note note in notes)
         {
             NormalizeBeat(note.beat);
-#if UNITY_EDITOR
-            // Test new functionality
-            if (LiveSetting.noteSize > 1.05f && LiveSetting.noteSize < 1.15f)
+            // April fool
+            if (TitleLoader.IsAprilFool)
             {
                 if (!isFuwafuwa)
                 {
@@ -127,7 +126,6 @@ public static class ChartLoader
                     note.lane = -1;
                 }
             }
-#endif
         }
         isFuwafuwa = IsChartFuwafuwa(notes);
 
