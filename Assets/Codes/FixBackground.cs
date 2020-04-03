@@ -41,7 +41,7 @@ public class FixBackground : MonoBehaviour
 
     public void UpdateBackground(string path)
     {
-        if (!KiraFilesystem.Instance.Exists(path))
+        if (path == null || !KiraFilesystem.Instance.Exists(path))
         {
             render.sprite = defaultSprite;
             UpdateScale();
