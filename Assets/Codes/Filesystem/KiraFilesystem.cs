@@ -299,6 +299,7 @@ namespace System.IO
             }
             for (int i = 0; i < removeKey.Count; i++)
             {
+                //Debug.Log($"Release pack:{removeKey[i]}");
                 openedArchive[removeKey[i]].Dispose();
                 openedArchive.Remove(removeKey[i]);
                 lastAccessTime.Remove(removeKey[i]);
