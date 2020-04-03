@@ -84,6 +84,14 @@ namespace System.IO
 
         public void RemoveFromIndex(string kiraPack)
         {
+            if (openedArchive.ContainsKey(kiraPack))
+            {
+                openedArchive[kiraPack].Dispose();
+
+                openedArchive.Remove(kiraPack);
+                lastAccessTime.Remove(kiraPack);
+            }
+
             var entries = (from x in index where x.Value == kiraPack select x.Key).ToArray();
 
             foreach (var entry in entries)
