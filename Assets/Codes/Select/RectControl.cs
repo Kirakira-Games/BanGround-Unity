@@ -213,6 +213,8 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             return true;
         });
 
+        KiraFilesystem.Instance.SaveIndex();
+
         UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Select");
     }
 
