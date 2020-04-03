@@ -71,8 +71,8 @@ namespace System.IO
                 {
                     foreach (var entry in zip.Entries)
                     {
-                        if (index.ContainsKey(entry.FullName))
-                            index.Remove(entry.FullName);
+                        if (Exists(entry.FullName))
+                            RemoveFileFromIndex(entry.FullName);
 
                         index.Add(entry.FullName, kiraPack);
                     }
