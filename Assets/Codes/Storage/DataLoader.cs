@@ -299,7 +299,7 @@ public class DataLoader
 
     public static int LoadKiraPack(FileInfo file)
     {
-        string path = Path.Combine(FSDir, file.Name);
+        string path = Path.Combine(FSDir, Guid.NewGuid().ToString("N"));
 
         if (!file.Exists) 
             return -1;
