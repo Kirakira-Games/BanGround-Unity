@@ -272,14 +272,30 @@ namespace System.IO
             return tex;
         }
 
-        public void ReleaseUnusedKirapacks() => (from x in openedArchive where DateTime.Now - lastAccessTime[x.Key] > TimeSpan.FromMinutes(1) select x.Key).All((key) =>
-        {
-            openedArchive[key].Dispose();
-            openedArchive.Remove(key);
+        //public void ReleaseUnusedKirapacks() => (from x in openedArchive where DateTime.Now - lastAccessTime[x.Key] > TimeSpan.FromMinutes(1) select x.Key).All((key) =>
+        //{
+        //    openedArchive[key].Dispose();
+        //    openedArchive.Remove(key);
 
-            lastAccessTime.Remove(key);
-            return true;
-        });
+        //    lastAccessTime.Remove(key);
+        //    return true;
+        //});
+
+        public void ReleaseUnusedKirapacks()
+        {
+            List<string> removeKey = new List<string>();
+            foreach (var ar in openedArchive)
+            {
+                if (DateTime.Now - lastAccessTime[ar.Key] > TimeSpan.FromMinutes(1))
+                    removeKey.Add(ar.Key);
+            }
+            for (int i = 0; i < removeKey.Count; i++)
+            {
+                openedArchive[removeKey[i]].Dispose();
+                openedArchive.Remove(removeKey[i]);
+                lastAccessTime.Remove(removeKey[i]);
+            }
+        }
 
         #region IDisposable Support
         private bool disposedValue = false; // 要检测冗余调用
