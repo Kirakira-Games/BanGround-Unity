@@ -31,8 +31,8 @@ public class SESelector : MonoBehaviour
         });
         seInput.onValueChanged.AddListener(v =>
         {
-            if (int.Parse(seInput.text) < 1) seInput.text = "2";
-            if (int.Parse(seInput.text) > 2) seInput.text = "1";
+            if (int.Parse(seInput.text) < 1) seInput.text = "3";
+            if (int.Parse(seInput.text) > 3) seInput.text = "1";
             perfectSE?.Dispose();
             flickSE?.Dispose();
             perfectSE = AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)int.Parse(seInput.text)) + "/perfect.wav").bytes);

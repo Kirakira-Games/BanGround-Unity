@@ -176,6 +176,7 @@ public enum SEStyle
     None,
     Drum,
     Bbben,
+    Official,
     Custom
 }
 
