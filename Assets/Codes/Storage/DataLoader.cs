@@ -26,7 +26,7 @@ public class DataLoader
 
     public const int ChartVersion = 1;
     private const int InitialChartVersion = 4;
-    private const int GameVersion = 3;
+    private const int GameVersion = 4;
 
     private static Dictionary<int, cHeader> chartDic;
     private static Dictionary<int, mHeader> musicDic;
@@ -41,8 +41,8 @@ public class DataLoader
             var files = new DirectoryInfo(Application.persistentDataPath).GetFiles("*.*", SearchOption.AllDirectories);
             foreach (var file in files)
             {
-                if(file.Name != "Player.log")
-                File.Delete(file.FullName);
+                if(file.Name == "LiveSettings.json")
+                    File.Delete(file.FullName);
             }
             PlayerPrefs.SetInt("GameVersion", GameVersion);
         }
