@@ -37,7 +37,7 @@ public class GetDeviceInfo : MonoBehaviour
         sb.Append("System: ").AppendLine(SystemInfo.operatingSystem).AppendLine();
         sb.Append("CPU: ").AppendLine(SystemInfo.processorType).AppendLine();
         sb.Append("GPU: ").AppendLine(SystemInfo.graphicsDeviceName).AppendLine();
-        sb.Append("AudioProvider: ").AppendLine(PlayerPrefs.GetString("AudioEngine")).AppendLine();
+        sb.Append("AudioProvider: ").AppendLine(PlayerPrefs.GetString("AudioEngine", "Fmod")).AppendLine();
 #if UNITY_ANDROID && !UNITY_EDITOR
         sb.Append("SampleRate: ").AppendLine(AppPreLoader.sampleRate.ToString()).AppendLine();
         sb.Append("BufferSize: ").AppendLine(AppPreLoader.bufferSize.ToString()).AppendLine();

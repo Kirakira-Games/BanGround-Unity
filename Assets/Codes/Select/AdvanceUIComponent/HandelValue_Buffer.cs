@@ -23,7 +23,7 @@ public class HandelValue_Buffer : MonoBehaviour
             return;
         }
 
-        if (PlayerPrefs.GetString("AudioEngine", "Bass") == "Bass")
+        if (PlayerPrefs.GetString("AudioEngine", "Fmod") == "Bass")
         {
             slider.minValue = 0;
             slider.maxValue = 15;
