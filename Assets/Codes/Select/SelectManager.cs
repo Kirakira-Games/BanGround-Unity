@@ -545,6 +545,10 @@ public class SelectManager : MonoBehaviour
     {
         //GetModStatus();
         GameObject.Find("Setting_Canvas").GetComponent<Animator>().Play("DropDown");
+        if (GameObject.Find("Sound_Panel") != null)
+        {
+            previewSound?.Pause();
+        }
     }
     void CloseSetting()
     {
@@ -579,7 +583,7 @@ public class SelectManager : MonoBehaviour
         offBeat_Tog.isOn = LiveSetting.grayNoteEnabled;
         mirrow_Tog.isOn = LiveSetting.mirrowEnabled;
         persp_Tog.isOn = LiveSetting.bangPerspective;
-        ELP_Slider.value = LiveSetting.ELP;
+        ELP_Slider.value = LiveSetting.ELPValue;
         FS_Tog.isOn = Screen.fullScreen;
         VSync_Tog.isOn = QualitySettings.vSyncCount == 1;
 
@@ -630,7 +634,7 @@ public class SelectManager : MonoBehaviour
             LiveSetting.mirrowEnabled = mirrow_Tog.isOn;
             LiveSetting.autoPlayEnabled = auto_Tog.isOn;
             LiveSetting.bangPerspective = persp_Tog.isOn;
-            LiveSetting.ELP = ELP_Slider.value;
+            LiveSetting.ELPValue = ELP_Slider.value;
 #if (UNITY_STANDALONE || UNITY_WSA)
             if (FS_Tog.isOn)
             {

@@ -48,7 +48,7 @@ public class JudgeResultController : MonoBehaviour
         }
 
         int deltaTime = note.time - note.judgeTime;
-        if (result >= (LiveSetting.ELP == 0 ? 1 : 0) && result <= 3 && Mathf.Abs(deltaTime) >= LiveSetting.ELP)//
+        if (result >= (LiveSetting.ELPValue == 0 ? 1 : 0) && result <= 3 && Mathf.Abs(deltaTime) >= LiveSetting.ELPValue)//
         {
             ComboManager.JudgeOffsetResult.Add(deltaTime);
             OffsetResult offset = deltaTime > 0 ? OffsetResult.Early : OffsetResult.Late;

@@ -16,15 +16,15 @@ public class HandelValue_Buffer : MonoBehaviour
         slider = GetComponent<Slider>();
         valueText = transform.Find("Handle Slide Area/Handle/Value").GetComponent<Text>();
 
+        if (Application.platform != RuntimePlatform.Android)
+        {
+            GameObject.Find("BufferSize_Text").SetActive(false);
+            GameObject.Find("BufferSize_Input").SetActive(false);
+            return;
+        }
+
         if (PlayerPrefs.GetString("AudioEngine", "Bass") == "Bass")
         {
-            if (Application.platform != RuntimePlatform.Android)
-            {
-                GameObject.Find("BufferSize_Text").SetActive(false);
-                GameObject.Find("BufferSize_Input").SetActive(false);
-                return;
-            }
-
             slider.minValue = 0;
             slider.maxValue = 15;
             slider.wholeNumbers = true;

@@ -22,6 +22,7 @@ public class HandelValue : MonoBehaviour
             //    valueText.text = ((int)(value * 100)).ToString() + "%";
             //});
             valueText.text = (int)((slider.value - slider.minValue) / (slider.maxValue - slider.minValue) * 100) + "%";
+            if (slider.value == 0) valueText.text = "Disable".GetLocalized();
             slider.onValueChanged.AddListener((value) =>
             {
                 valueText.text = (int)((value - slider.minValue) / (slider.maxValue - slider.minValue) * 100) + "%";
@@ -34,6 +35,7 @@ public class HandelValue : MonoBehaviour
         else
         {
             valueText.text = ((int)(slider.value)).ToString();
+            if (slider.value == 0) valueText.text = "Disable".GetLocalized();
             slider.onValueChanged.AddListener((value) =>
             {
                 valueText.text = ((int)(value)).ToString();
