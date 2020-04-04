@@ -56,7 +56,7 @@ public static class LiveSetting
     public static int judgeOffset = 0;
     public static int audioOffset = 0;
 
-    public static float noteSpeed = 10.8f;
+    public static float noteSpeed = 10f;
     private static float trueNoteSpeed => noteSpeed;
     public static float noteSize = 1f;
     public static float meshSize = .75f;
@@ -185,7 +185,7 @@ public class LiveSettingTemplate
     public int judgeOffset = 0;
     public int audioOffset = 0;
 
-    public float noteSpeed = 10.8f;
+    public float noteSpeed = 10f;
     public float noteSize = 1f;
     public float meshSize = .75f;
     public float meshOpacity = .6f;
