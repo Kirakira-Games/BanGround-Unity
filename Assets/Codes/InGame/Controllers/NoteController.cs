@@ -329,7 +329,7 @@ public class NoteController : MonoBehaviour
 
         // Background
         var background = GameObject.Find("InGameBackground").GetComponent<InGameBackground>();
-        background.SetBcakground(DataLoader.GetBackgroundPath(sid));
+        background.SetBackground(DataLoader.GetBackgroundPath(sid));
          //background = GameObject.Find("dokidokiBackground").GetComponent<FixBackground>();
          //background.UpdateBackground(DataLoader.GetBackgroundPath(sid));
 
