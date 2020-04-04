@@ -319,8 +319,11 @@ namespace AudioProvider
                 Factory.System_Create(out fmodSystem)
             );
 
-            fmodSystem.setDSPBufferSize(bufferLength, 4);
-            fmodSystem.setSoftwareFormat(sampleRate, SPEAKERMODE.DEFAULT, 0);
+            if (bufferLength != 0)
+            {
+                fmodSystem.setDSPBufferSize(bufferLength, 4);
+                fmodSystem.setSoftwareFormat(sampleRate, SPEAKERMODE.DEFAULT, 0);
+            }
 
             FMODUtil.ErrCheck(
                 fmodSystem.init(512, INITFLAGS.NORMAL, IntPtr.Zero)

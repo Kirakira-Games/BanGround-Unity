@@ -230,14 +230,6 @@ namespace AudioProvider
                 Bass.BASS_SetConfig(BASSConfig.BASS_CONFIG_BUFFER, (int)bufferLength);
                 Bass.BASS_SetConfig(BASSConfig.BASS_CONFIG_UPDATEPERIOD, 5);
             }
-            //Bass.BASS_Init(-1, 48000, BASSInit.BASS_DEVICE_DEFAULT, IntPtr.Zero);
-            //#if UNITY_ANDROID && !UNITY_EDITOR
-            //            var info = Bass.BASS_GetInfo();
-            //            MessageBoxController.ShowMsg(LogLevel.OK, $"minbuf: {info.minbuf}, latency:{info.latency}");
-
-            //            Bass.BASS_SetConfig(BASSConfig.BASS_CONFIG_BUFFER, info.minbuf);
-            //            Bass.BASS_SetConfig(BASSConfig.BASS_CONFIG_UPDATEPERIOD, 5);
-            //#endif
         }
 
         public ISoundTrack StreamTrack(byte[] audio)

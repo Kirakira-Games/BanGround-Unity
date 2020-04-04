@@ -22,7 +22,7 @@ public class AudioManager : MonoBehaviour
     private void Awake()
     {
         int bufferIndex;
-        string engine = PlayerPrefs.GetString("AudioEngine", "Bass");
+        string engine = PlayerPrefs.GetString("AudioEngine", "Fmod");
         if (engine == "Bass") 
         {
             bufferIndex = PlayerPrefs.GetInt("BassBufferIndex", -1);
@@ -40,8 +40,8 @@ public class AudioManager : MonoBehaviour
             bufferIndex = PlayerPrefs.GetInt("FmodBufferIndex", -1);
             if (bufferIndex == -1)
             {
-                PlayerPrefs.SetInt("FmodBufferIndex", 4);
-                bufferIndex = 4;
+                PlayerPrefs.SetInt("FmodBufferIndex", 2);
+                bufferIndex = 2;
             }
             Provider = new FmodAudioProvider();
             Provider.Init(AppPreLoader.sampleRate, (uint)(AppPreLoader.bufferSize / HandelValue_Buffer.FmodBufferScale[bufferIndex]));
