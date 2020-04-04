@@ -325,7 +325,7 @@ public class NoteController : MonoBehaviour
             AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), LiveSetting.seStyle) +"/flick.wav").bytes)
         };
 
-        AudioManager.Instance.DelayPlayInGameBGM(File.ReadAllBytes(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), WARM_UP_SECOND);
+        AudioManager.Instance.DelayPlayInGameBGM(KiraFilesystem.Instance.Read(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), WARM_UP_SECOND);
 
         // Background
         var background = GameObject.Find("InGameBackground").GetComponent<InGameBackground>();

@@ -32,29 +32,23 @@ public class InGameBackground : MonoBehaviour
     //        RenderSettings.skybox = cacheMat;
     //}
 
-    public void SetBcakground(string path)
+    public void SetBackground(string path)
     {
-        if (!File.Exists(path))
+        if (!KiraFilesystem.Instance.Exists(path))
         {
             //RenderSettings.skybox = bgSkybox;
             mesh.sharedMaterial = bgSkybox;
             return;
         }
-        else StartCoroutine(GetAndSetBG(path));
-    }
-
-    IEnumerator GetAndSetBG(string path)
-    {
-        path = "file://" + path;
-        using (UnityWebRequest webRequest = UnityWebRequestTexture.GetTexture(path))
+        else
         {
-            yield return webRequest.SendWebRequest();
-            Texture tex = DownloadHandlerTexture.GetContent(webRequest);
+            var tex = KiraFilesystem.Instance.ReadTexture2D(path);
+
             Color color = new Color(LiveSetting.bgBrightness, LiveSetting.bgBrightness, LiveSetting.bgBrightness);
             float ratio = tex.width / (float)tex.height;
 
             Material mat = Instantiate(bgSkybox);
-            mat.SetTexture("_MainTex", tex); 
+            mat.SetTexture("_MainTex", tex);
             mat.SetColor("_Tint", color);
             mat.SetFloat("_TexRatio", ratio);
 

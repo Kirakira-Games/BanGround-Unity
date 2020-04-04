@@ -24,6 +24,7 @@ PluginImporter:
         Exclude OSXUniversal: 1
         Exclude Win: 0
         Exclude Win64: 0
+        Exclude WindowsStoreApps: 0
         Exclude iOS: 1
   - first:
       Android: Android
@@ -94,9 +95,13 @@ PluginImporter:
   - first:
       Windows Store Apps: WindowsStoreApps
     second:
-      enabled: 0
+      enabled: 1
       settings:
         CPU: AnyCPU
+        DontProcess: false
+        PlaceholderPath: 
+        SDK: AnySDK
+        ScriptingBackend: AnyScriptingBackend
   - first:
       iPhone: iOS
     second:

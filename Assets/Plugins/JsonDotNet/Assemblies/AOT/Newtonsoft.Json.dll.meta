@@ -21,6 +21,7 @@ PluginImporter:
         Exclude OSXUniversal: 0
         Exclude Win: 0
         Exclude Win64: 0
+        Exclude WindowsStoreApps: 0
   - first:
       : Linux
     second:
@@ -74,7 +75,7 @@ PluginImporter:
     second:
       enabled: 1
       settings:
-        CPU: x86_64
+        CPU: AnyCPU
   - first:
       Standalone: OSXUniversal
     second:
@@ -104,10 +105,10 @@ PluginImporter:
       enabled: 1
       settings:
         CPU: AnyCPU
-        DontProcess: False
-        PlaceholderPath: Assets/JsonDotNet/Assemblies/Standalone/Newtonsoft.Json.dll
+        DontProcess: false
+        PlaceholderPath: 
         SDK: AnySDK
-        ScriptingBackend: Il2Cpp
+        ScriptingBackend: AnyScriptingBackend
   - first:
       iPhone: iOS
     second:

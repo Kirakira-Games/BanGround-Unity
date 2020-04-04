@@ -335,10 +335,12 @@ public class SelectManager : MonoBehaviour
         background.UpdateBackground(path);
 
         yield return new WaitForEndOfFrame();
+
         try
         {
             SelectSong(LiveSetting.currentChart);
-        } catch
+        } 
+        catch
         {
 
         }
@@ -512,13 +514,13 @@ public class SelectManager : MonoBehaviour
         }
         if (DataLoader.MusicExists(LiveSetting.CurrentHeader.mid))
         {
-            previewSound = AudioManager.Instance.PlayLoopMusic(File.ReadAllBytes(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), true,
+            previewSound = AudioManager.Instance.PlayLoopMusic(KiraFilesystem.Instance.Read(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), true,
                 new uint[]
                 {
                 (uint)(mheader.preview[0] * 1000),
                 (uint)(mheader.preview[1] * 1000)
-                },
-                false);
+                    },
+                    false);
             if (isFirstPlay)
             {
                 previewSound.Pause();

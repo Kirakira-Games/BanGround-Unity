@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System;
+using System.IO;
+using System.Linq;
 
 public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerClickHandler, IPointerExitHandler
 {
@@ -197,10 +199,22 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     private void OnDelete()
     {
-        var file = DataLoader.GetChartPath(LiveSetting.CurrentHeader.sid, (Difficulty)LiveSetting.actualDifficulty);
+        /*var file = DataLoader.GetChartPath(LiveSetting.CurrentHeader.sid, (Difficulty)LiveSetting.actualDifficulty);
         var path = new System.IO.FileInfo(file).Directory.FullName;
         //Debug.Log(path);
-        System.IO.Directory.Delete(path, true);
+        System.IO.Directory.Delete(path, true);*/
+
+        var chartDir = $"chart/{LiveSetting.CurrentHeader.sid}";
+
+        var files = KiraFilesystem.Instance.ListFiles(name => name.Contains(chartDir));
+        files.All(item => 
+        {
+            KiraFilesystem.Instance.RemoveFileFromIndex(item);
+            return true;
+        });
+
+        KiraFilesystem.Instance.SaveIndex();
+
         UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Select");
     }
 
