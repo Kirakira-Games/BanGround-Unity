@@ -19,10 +19,7 @@ public class AppPreLoader : MonoBehaviour
         if (Application.platform != RuntimePlatform.Android) 
         {
             sampleRate = 48000;
-            if (PlayerPrefs.GetString("AudioEngine", "Bass") == "Bass")
-                bufferSize = 0;
-            else
-                bufferSize = 512;
+            bufferSize = 0;
             SceneManager.LoadScene("Title");
         }
         else
