@@ -21,7 +21,7 @@ public class SwitchToggle : MonoBehaviour
         toggle.onValueChanged.AddListener((active) =>
         {
             panelObject.SetActive(active);
-            if(panel== "Sound_Panel")
+            if(panel == "Sound_Panel")
             {
                 if (active) sm.previewSound?.Pause();
                 else sm.previewSound?.Play();

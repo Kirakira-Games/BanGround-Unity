@@ -72,7 +72,7 @@ public static class LiveSetting
     public static bool mirrowEnabled = false;
     public static bool bangPerspective = true;
     public static bool autoPlayEnabled = false;
-    public static float ELP = 40;
+    public static float ELPValue = 0;
 
     public static float offsetTransform = 1f;
     public static float farClip = 169f;
@@ -234,7 +234,7 @@ public class LiveSettingTemplate
         grayNoteEnabled = LiveSetting.grayNoteEnabled;
         mirrowEnabled = LiveSetting.mirrowEnabled;
         bangPerspective = LiveSetting.bangPerspective;
-        ELP = LiveSetting.ELP;
+        ELP = LiveSetting.ELPValue;
         //fullScreen = LiveSetting.fullScreen;
         //autoPlayEnabled = LiveSetting.autoPlayEnabled;
 
@@ -271,7 +271,7 @@ public class LiveSettingTemplate
         LiveSetting.grayNoteEnabled = grayNoteEnabled;
         LiveSetting.mirrowEnabled = mirrowEnabled;
         LiveSetting.bangPerspective = bangPerspective;
-        LiveSetting.ELP = ELP;
+        LiveSetting.ELPValue = ELP;
         //LiveSetting.fullScreen = fullScreen;
         //LiveSetting.autoPlayEnabled = autoPlayEnabled;
 
