@@ -34,7 +34,7 @@ public class LightControl : MonoBehaviour
         {
             case -2: rends[lane].material.SetColor("_BaseColor",tapColor); break;
             case 0: rends[lane].material.SetColor("_BaseColor", perfectColor); break;
-            case 1: rends[lane].material.SetColor("_BaseColor", tapColor); break;
+            case 1: rends[lane].material.SetColor("_BaseColor", greatColor); break;
             default: rends[lane].material.SetColor("_BaseColor", otherColor); break;
         }
         anis[lane].SetTrigger("play");
