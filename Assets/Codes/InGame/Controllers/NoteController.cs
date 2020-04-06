@@ -73,7 +73,7 @@ public class NoteController : MonoBehaviour
         }
 
         //粉键震动
-        if ((notebase.type == GameNoteType.Flick || notebase.type == GameNoteType.SlideEndFlick)&&result <= JudgeResult.Great)
+        if (LiveSetting.shakeFlick&&(notebase.type == GameNoteType.Flick || notebase.type == GameNoteType.SlideEndFlick)&&result <= JudgeResult.Great)
             cameraAnimation.Play("vibe");
 
         // Tap effect
