@@ -169,6 +169,7 @@ public class ScanChartsToJson : MonoBehaviour
     public static void ClearKey()
     {
         PlayerPrefs.DeleteKey("key");
+        PlayerPrefs.DeleteAll();
     }
 }
 
