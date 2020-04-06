@@ -25,7 +25,7 @@ public class LightControl : MonoBehaviour
 
     public void TriggerLight(int lane, int result = -2)
     {
-        if (result == 4)
+        if (result == 4||!LiveSetting.laneLight)
             return;
         if (lane < 0 || lane > 7)
             return;

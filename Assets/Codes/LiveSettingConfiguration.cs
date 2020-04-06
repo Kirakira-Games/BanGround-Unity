@@ -72,6 +72,8 @@ public static class LiveSetting
     public static bool mirrowEnabled = false;
     public static bool bangPerspective = true;
     public static bool autoPlayEnabled = false;
+    public static bool laneLight = true;
+    public static bool shakeFlick = true;
     public static float ELPValue = 0;
 
     public static float offsetTransform = 1f;
@@ -80,7 +82,6 @@ public static class LiveSetting
     public static float laneBrightness = 0.84f;
     public static float longBrightness = .8f;
 
-    //public static bool enableAudioTrack = false;
 
     public static NoteStyle noteStyle = NoteStyle.Circle;
     public static SEStyle seStyle = SEStyle.Drum;
@@ -202,6 +203,8 @@ public class LiveSettingTemplate
     public bool autoPlayEnabled = false;
     public float ELP = 40;
     public bool fullScreen = true;
+    public bool laneLight = true;
+    public bool shakeFlick = true;
 
     public float offsetTransform = 1f;
     public float farClip = 169f;
@@ -236,6 +239,8 @@ public class LiveSettingTemplate
         mirrowEnabled = LiveSetting.mirrowEnabled;
         bangPerspective = LiveSetting.bangPerspective;
         ELP = LiveSetting.ELPValue;
+        laneLight = LiveSetting.laneLight;
+        shakeFlick = LiveSetting.shakeFlick;
         //fullScreen = LiveSetting.fullScreen;
         //autoPlayEnabled = LiveSetting.autoPlayEnabled;
 
@@ -273,8 +278,10 @@ public class LiveSettingTemplate
         LiveSetting.mirrowEnabled = mirrowEnabled;
         LiveSetting.bangPerspective = bangPerspective;
         LiveSetting.ELPValue = ELP;
+        LiveSetting.shakeFlick = shakeFlick;
         //LiveSetting.fullScreen = fullScreen;
         //LiveSetting.autoPlayEnabled = autoPlayEnabled;
+        LiveSetting.laneLight = laneLight;
 
         LiveSetting.offsetTransform = offsetTransform;
         LiveSetting.farClip = farClip;
