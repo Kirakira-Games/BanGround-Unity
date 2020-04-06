@@ -212,7 +212,7 @@ public class SelectManager : MonoBehaviour
         GameObject.Find("Size<").GetComponent<Button>().onClick.AddListener(() => { size_Input.text = (float.Parse(size_Input.text) - 0.1f).ToString(); });
         size_Input.onValueChanged.AddListener((string a) =>
         {
-            if (float.Parse(size_Input.text) < 0.1f) { size_Input.text = "2"; }
+            if (float.Parse(size_Input.text) < 0.1f) { size_Input.text = "3"; }
             if (float.Parse(size_Input.text) > 2f) { size_Input.text = "0.1"; }
             size_Input.text = string.Format("{0:F1}", float.Parse(size_Input.text));
         });
