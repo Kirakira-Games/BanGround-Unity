@@ -69,13 +69,11 @@ class ScriptSoundEffect : IDisposable
     }
 }
 
+[CSharpCallLua]
 class ChartScript : IDisposable
 {
-    [CSharpCallLua]
-    private delegate int Update(int audioTime);
-
     LuaEnv luaEnv = null;
-    Update onUpdate = null;
+    LuaFunction onUpdate = null;
 
     private static int sid;
 
@@ -102,13 +100,13 @@ class ChartScript : IDisposable
             luaEnv = new LuaEnv();
             luaEnv.DoString(script);
 
-            onUpdate = luaEnv.Global.Get<Update>("OnUpdate");
+            onUpdate = luaEnv.Global.Get<LuaFunction>("OnUpdate");
         }
     }
 
     public void OnUpdate(int audioTime)
     {
-        onUpdate?.Invoke(audioTime);
+        onUpdate?.Call(audioTime);
     }
 
     public void Dispose()
