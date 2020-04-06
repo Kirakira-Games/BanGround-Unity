@@ -78,6 +78,7 @@ public class NoteController : MonoBehaviour
 
         // Tap effect
         int se = (int)EmitEffect(notebase.judgePos, result, notebase.type);
+        LightControl.instance.TriggerLight(notebase.lane, (int)result);
 
         // Sound effect
         if (notebase.syncLine.PlaySoundEffect(se))
@@ -241,6 +242,7 @@ public class NoteController : MonoBehaviour
             {
                 int se = (int)EmitEffect(NoteUtility.GetJudgePos(lanes[0]), JudgeResult.None, GameNoteType.Single);
                 soundEffects[se].PlayOneShot();
+                LightControl.instance.TriggerLight(lanes[0]);
             }
         }
         else
