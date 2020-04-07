@@ -379,7 +379,7 @@ public class ResultManager : MonoBehaviour
         //    pr.resultsList.Add(playResult);
         //}
         if (!LiveSetting.autoPlayEnabled)
-            print("Record Saved");// + PlayRecords.SaveRecord(pr));
+            print("Record Saved" + PlayRecords.SaveRecord(pr));
         else
             print("Autoplay score not saved");
     }
