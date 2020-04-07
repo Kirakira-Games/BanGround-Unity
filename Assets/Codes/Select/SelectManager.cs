@@ -29,6 +29,8 @@ public class SelectManager : MonoBehaviour
     private Slider ELP_Slider;
     private Toggle FS_Tog;
     private Toggle VSync_Tog;
+    private Toggle laneLight_Tog;
+    private Toggle shake_Tog;
     private NoteStyleToggleGroup noteToggles;
     private SESelector seSelector;
 
@@ -188,6 +190,9 @@ public class SelectManager : MonoBehaviour
         speedUp_Tog = GameObject.Find("Double_Toggle").GetComponent<StepToggle>();
         suddenDeath_Tog = GameObject.Find("SuddenDeath_Toggle").GetComponent<Toggle>();
         perfect_Tog = GameObject.Find("Perfect_Toggle").GetComponent<Toggle>();
+
+        laneLight_Tog = GameObject.Find("LaneLight_Toggle").GetComponent<Toggle>();
+        shake_Tog = GameObject.Find("Shake_Toggle").GetComponent<Toggle>();
 
         language_Dropdown = GameObject.Find("Language_Dropdown").GetComponent<Dropdown>();
         language_Dropdown.onValueChanged.AddListener(OnLanuageChanged);
@@ -586,6 +591,8 @@ public class SelectManager : MonoBehaviour
         ELP_Slider.value = LiveSetting.ELPValue;
         FS_Tog.isOn = Screen.fullScreen;
         VSync_Tog.isOn = QualitySettings.vSyncCount == 1;
+        laneLight_Tog.isOn = LiveSetting.laneLight;
+        shake_Tog.isOn = LiveSetting.shakeFlick;
 
         judgeOffsetTransform.value = LiveSetting.offsetTransform;
         far_Clip.value = LiveSetting.farClip;
@@ -635,6 +642,8 @@ public class SelectManager : MonoBehaviour
             LiveSetting.autoPlayEnabled = auto_Tog.isOn;
             LiveSetting.bangPerspective = persp_Tog.isOn;
             LiveSetting.ELPValue = ELP_Slider.value;
+            LiveSetting.laneLight = laneLight_Tog.isOn;
+            LiveSetting.shakeFlick = shake_Tog.isOn;
 #if (UNITY_STANDALONE || UNITY_WSA)
             if (FS_Tog.isOn)
             {
