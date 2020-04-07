@@ -9,6 +9,7 @@ public class TouchEffect : MonoBehaviour
     private RectTransform trans;
     private ParticleSystem touchEffect;
     bool isEffectEnabled = true;
+    float waiting = 0;
 
     private void Start()
     {
@@ -52,5 +53,24 @@ public class TouchEffect : MonoBehaviour
                 touchEffect.Play();
             }
         }
+
+#if !UNITY_EDITOR && (UNITY_ANDROID || UNITY_STANDALONE)
+        if (Input.GetKeyUp(KeyCode.Escape))
+        {
+            waiting += 1.5f;
+
+            if (waiting > 1.5f)
+            {
+                Application.Quit();
+            }
+            else
+            {
+                MessageBoxController.ShowMsg(LogLevel.INFO, "Tap Again to Exit");
+            }
+        }
+
+        waiting -= Time.deltaTime;
+        if (waiting < 0) waiting = 0;
+#endif
     }
 }
