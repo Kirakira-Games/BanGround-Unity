@@ -425,9 +425,12 @@ public class NoteController : MonoBehaviour
 
     private void OnDestroy()
     {
-        for (int i = 0; i < soundEffects.Length; i++)
+        if (soundEffects != null) 
         {
-            soundEffects[i].Dispose();
+            for (int i = 0; i < soundEffects.Length; i++)
+            {
+                soundEffects[i].Dispose();
+            }
         }
     }
 }
