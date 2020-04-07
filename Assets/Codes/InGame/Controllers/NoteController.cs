@@ -27,6 +27,7 @@ public class NoteController : MonoBehaviour
     private int numNotes;
 
     private ISoundEffect[] soundEffects;
+    private Animator cameraAnimation;
 
     private FixBackground background;
     private LaneEffects laneEffects;
@@ -71,8 +72,13 @@ public class NoteController : MonoBehaviour
             result = JudgeResult.Miss;
         }
 
+        //粉键震动
+        if (LiveSetting.shakeFlick&&(notebase.type == GameNoteType.Flick || notebase.type == GameNoteType.SlideEndFlick)&&result <= JudgeResult.Great)
+            cameraAnimation.Play("vibe");
+
         // Tap effect
         int se = (int)EmitEffect(notebase.judgePos, result, notebase.type);
+        LightControl.instance.TriggerLight(notebase.lane, (int)result);
 
         // Sound effect
         if (notebase.syncLine.PlaySoundEffect(se))
@@ -236,6 +242,7 @@ public class NoteController : MonoBehaviour
             {
                 int se = (int)EmitEffect(NoteUtility.GetJudgePos(lanes[0]), JudgeResult.None, GameNoteType.Single);
                 soundEffects[se].PlayOneShot();
+                LightControl.instance.TriggerLight(lanes[0]);
             }
         }
         else
@@ -268,6 +275,8 @@ public class NoteController : MonoBehaviour
 
         // Main camera
         mainCamera = GameObject.Find("GameMainCamera").GetComponent<Camera>();
+
+        cameraAnimation = GameObject.Find("Cameras").GetComponent<Animator>();
 
         // Init JudgeRange
         NoteUtility.Init(mainCamera.transform.forward);
