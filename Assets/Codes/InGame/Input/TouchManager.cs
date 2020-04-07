@@ -127,7 +127,7 @@ public class KirakiraTouch
     public static float flickDistPixels;
 
     /// <summary>
-    /// The distance between two screen points, converted to cm.
+    /// Test if distance between two screen points triggers flick.
     /// </summary>
     public static bool TraveledFlickDistance(Vector2 p, Vector2 q)
     {
