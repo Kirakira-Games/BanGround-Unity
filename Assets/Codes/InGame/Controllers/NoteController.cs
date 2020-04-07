@@ -12,6 +12,7 @@ public class NoteController : MonoBehaviour
 {
     public static NoteController instance;
     public static Camera mainCamera;
+    public static Vector3 mainForward = new Vector3(0, -0.518944f, 0.8548083f);
     public static int audioTime { get; private set; }
     public static int judgeTime { get; private set; }
     public static int numFuwafuwaNotes;
@@ -279,7 +280,7 @@ public class NoteController : MonoBehaviour
         cameraAnimation = GameObject.Find("Cameras").GetComponent<Animator>();
 
         // Init JudgeRange
-        NoteUtility.Init(mainCamera.transform.forward);
+        NoteUtility.Init(mainForward);
 
         // Init fuwafuwa lane
         numFuwafuwaNotes = 0;
