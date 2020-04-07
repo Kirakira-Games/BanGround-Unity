@@ -52,6 +52,7 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     void OnPressed()
     {
+        if (SceneLoader.Loading) return;
         if (!select)
         {
             StopAllCoroutines();
