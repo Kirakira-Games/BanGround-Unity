@@ -7,7 +7,7 @@ public class DelayQuit : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        StartCoroutine(DelayQ());
     }
 
     IEnumerator DelayQ()
