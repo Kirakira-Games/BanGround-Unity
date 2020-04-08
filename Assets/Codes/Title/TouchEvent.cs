@@ -46,8 +46,19 @@ public class TouchEvent : MonoBehaviour
     {
         GameObject.Find("MainCanvas").GetComponent<Animator>().SetBool("Touched", true);
         warnCanvas.SetActive(true);
+
         StartCoroutine(SwitchScene("Select"));
         StartCoroutine(delayAndSwitch());
+        StartCoroutine(TurndownMusic());
+    }
+
+    IEnumerator TurndownMusic()
+    {
+        for (float a = 0.7f; a > 0; a -= 0.1f)
+        {
+            TitleLoader.instance.music.SetVolume(a);
+            yield return new WaitForSeconds(0.1f);
+        }
     }
 
     IEnumerator delayAndSwitch()
