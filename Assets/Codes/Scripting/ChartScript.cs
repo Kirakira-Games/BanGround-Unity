@@ -98,6 +98,19 @@ class ChartScript : IDisposable
             var script = KiraFilesystem.Instance.ReadString(path);
 
             luaEnv = new LuaEnv();
+
+            luaEnv.AddLoader((ref string lib) =>
+            {
+                var path = GetChartResource(lib + ".lua");
+
+                if (KiraFilesystem.Instance.Exists(path))
+                {
+                    return KiraFilesystem.Instance.Read(path);
+                }
+
+                return null;
+            });
+
             luaEnv.DoString(script);
 
             onUpdate = luaEnv.Global.Get<LuaFunction>("OnUpdate");
