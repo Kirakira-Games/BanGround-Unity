@@ -17,13 +17,16 @@ public class TitleLoader : MonoBehaviour
     public Text Title;
     public Text touchStart;
 
-    private ISoundTrack music;
+    public static TitleLoader instance;
+
+    public ISoundTrack music;
     private ISoundEffect banGround;
 
     public static bool IsAprilFool => DateTime.Now.Month == 4 && DateTime.Now.Day == 1;
 
     private void Awake()
     {
+        instance = this;
         StartCoroutine(CheckUpdate());
         StartCoroutine(DataLoader.Init());
     }
