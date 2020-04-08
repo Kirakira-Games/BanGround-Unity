@@ -61,11 +61,11 @@ public class TouchEffect : MonoBehaviour
 
             if (waiting > 1.5f)
             {
-                Application.Quit();
+                SceneManager.LoadSceneAsync("GameOver", LoadSceneMode.Additive);
             }
             else
             {
-                MessageBoxController.ShowMsg(LogLevel.INFO, "Tap Again to Exit");
+                MessageBoxController.ShowMsg(LogLevel.INFO, "Tap Again to End The Game");
             }
         }
 
