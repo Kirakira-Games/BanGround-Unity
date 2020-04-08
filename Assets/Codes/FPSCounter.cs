@@ -28,6 +28,6 @@ public class FPSCounter : MonoBehaviour
 
         if (Time.timeScale == 0) return;
         frameInSec++;
-        text.text = $"{lastFPS} FPS";//\n{Mathf.Round(Time.deltaTime * 1000)}  ms";
+        text.text = $"FPS : {lastFPS}";//\n{Mathf.Round(Time.deltaTime * 1000)}  ms";
     }
 }
