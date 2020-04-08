@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class JudgeResultController : MonoBehaviour
 {
@@ -9,6 +10,8 @@ public class JudgeResultController : MonoBehaviour
     private Sprite[] judges;
     private Sprite early;
     private Sprite late;
+
+    private Text milisecTxt;
 
     private SpriteRenderer resultRenderer;
     private SpriteRenderer offsetRenderer;
@@ -29,6 +32,8 @@ public class JudgeResultController : MonoBehaviour
         animator = GetComponent<Animator>();
         resultRenderer = GetComponent<SpriteRenderer>();
         offsetRenderer = GameObject.Find("JudgeOffset").GetComponent<SpriteRenderer>();
+        milisecTxt = GameObject.Find("offset_miliseconds").GetComponent<Text>();
+        milisecTxt.text = "";
     }
 
     public void DisplayJudgeResult(JudgeResult result)
@@ -48,6 +53,20 @@ public class JudgeResultController : MonoBehaviour
         }
 
         int deltaTime = note.time - note.judgeTime;
+
+        if (LiveSetting.dispMilisec)
+        {
+            if (deltaTime >= 0)
+            {
+                milisecTxt.text = "E" + string.Format("{0:0000}", deltaTime);
+                milisecTxt.color = new Color(0, 0.7622f, 1f, 1f);
+            }
+            else
+            {
+                milisecTxt.text = "L" + string.Format("{0:0000}", -deltaTime);
+                milisecTxt.color = Color.red;
+            }
+        }
         if (result >= (LiveSetting.ELPValue == 0 ? 1 : 0) && result <= 3 && Mathf.Abs(deltaTime) >= LiveSetting.ELPValue)//
         {
             ComboManager.JudgeOffsetResult.Add(deltaTime);

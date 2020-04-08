@@ -74,8 +74,9 @@ public static class LiveSetting
     public static bool autoPlayEnabled = false;
     public static bool laneLight = true;
     public static bool shakeFlick = true;
-    public static float ELPValue = 0;
+    public static bool dispMilisec = false;
 
+    public static float ELPValue = 0;
     public static float offsetTransform = 1f;
     public static float farClip = 169f;
     public static float bgBrightness = .7f;
@@ -205,6 +206,7 @@ public class LiveSettingTemplate
     public bool fullScreen = true;
     public bool laneLight = true;
     public bool shakeFlick = true;
+    public bool dispMillsec = false;
 
     public float offsetTransform = 1f;
     public float farClip = 169f;
@@ -241,6 +243,7 @@ public class LiveSettingTemplate
         ELP = LiveSetting.ELPValue;
         laneLight = LiveSetting.laneLight;
         shakeFlick = LiveSetting.shakeFlick;
+        dispMillsec = LiveSetting.dispMilisec;
         //fullScreen = LiveSetting.fullScreen;
         //autoPlayEnabled = LiveSetting.autoPlayEnabled;
 
@@ -279,6 +282,7 @@ public class LiveSettingTemplate
         LiveSetting.bangPerspective = bangPerspective;
         LiveSetting.ELPValue = ELP;
         LiveSetting.shakeFlick = shakeFlick;
+        LiveSetting.dispMilisec = dispMillsec;
         //LiveSetting.fullScreen = fullScreen;
         //LiveSetting.autoPlayEnabled = autoPlayEnabled;
         LiveSetting.laneLight = laneLight;

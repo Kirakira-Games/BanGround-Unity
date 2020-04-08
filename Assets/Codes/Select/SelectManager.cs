@@ -31,6 +31,7 @@ public class SelectManager : MonoBehaviour
     private Toggle VSync_Tog;
     private Toggle laneLight_Tog;
     private Toggle shake_Tog;
+    private Toggle milisec_Tog;
     private NoteStyleToggleGroup noteToggles;
     private SESelector seSelector;
 
@@ -191,6 +192,7 @@ public class SelectManager : MonoBehaviour
         suddenDeath_Tog = GameObject.Find("SuddenDeath_Toggle").GetComponent<Toggle>();
         perfect_Tog = GameObject.Find("Perfect_Toggle").GetComponent<Toggle>();
 
+        milisec_Tog = GameObject.Find("Milisec_Toggle").GetComponent<Toggle>();
         laneLight_Tog = GameObject.Find("LaneLight_Toggle").GetComponent<Toggle>();
         shake_Tog = GameObject.Find("Shake_Toggle").GetComponent<Toggle>();
 
@@ -593,6 +595,7 @@ public class SelectManager : MonoBehaviour
         VSync_Tog.isOn = QualitySettings.vSyncCount == 1;
         laneLight_Tog.isOn = LiveSetting.laneLight;
         shake_Tog.isOn = LiveSetting.shakeFlick;
+        milisec_Tog.isOn = LiveSetting.dispMilisec;
 
         judgeOffsetTransform.value = LiveSetting.offsetTransform;
         far_Clip.value = LiveSetting.farClip;
@@ -644,6 +647,7 @@ public class SelectManager : MonoBehaviour
             LiveSetting.ELPValue = ELP_Slider.value;
             LiveSetting.laneLight = laneLight_Tog.isOn;
             LiveSetting.shakeFlick = shake_Tog.isOn;
+            LiveSetting.dispMilisec = milisec_Tog.isOn;
 #if (UNITY_STANDALONE || UNITY_WSA)
             if (FS_Tog.isOn)
             {
