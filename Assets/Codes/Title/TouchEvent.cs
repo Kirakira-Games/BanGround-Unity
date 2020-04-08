@@ -7,12 +7,14 @@ using UnityEngine.UI;
 public class TouchEvent : MonoBehaviour
 {
     public bool waitingUpdate = true;
+    public GameObject warnCanvas;
     public InputField inputField;
     private AsyncOperation operation;
     private bool touched = false;
 
     private void Start()
     {
+        warnCanvas.SetActive(false);
         if (PlayerPrefs.HasKey("key"))
         {
             inputField.SetTextWithoutNotify(PlayerPrefs.GetString("key"));
@@ -25,6 +27,7 @@ public class TouchEvent : MonoBehaviour
 
     private IEnumerator SwitchScene(string name)
     {
+        yield return new WaitForSeconds(4f);
         operation = SceneManager.LoadSceneAsync(name);
         operation.allowSceneActivation = false;
         yield return operation;
@@ -42,13 +45,14 @@ public class TouchEvent : MonoBehaviour
     void StartSwitch()
     {
         GameObject.Find("MainCanvas").GetComponent<Animator>().SetBool("Touched", true);
+        warnCanvas.SetActive(true);
         StartCoroutine(SwitchScene("Select"));
         StartCoroutine(delayAndSwitch());
     }
 
     IEnumerator delayAndSwitch()
     {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(4.5f);
         //SwitchScene("Select");
         //SceneLoader.LoadScene("Title", "Select", true);
         operation.allowSceneActivation = true;
@@ -71,7 +75,7 @@ public class TouchEvent : MonoBehaviour
                 PlayerPrefs.SetString("key", key);
                 PlayerPrefs.Save();
             }
-            MessageBoxController.ShowMsg(LogLevel.OK, "Authenticate successful");
+            //MessageBoxController.ShowMsg(LogLevel.OK, "Authenticate successful");
         }
         else
         {

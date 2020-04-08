@@ -63,7 +63,7 @@ public class TitleLoader : MonoBehaviour
 
     IEnumerator CheckUpdate()
     {
-        MessageBoxController.ShowMsg(LogLevel.INFO, VersionCheck.CheckUpdate);
+        //MessageBoxController.ShowMsg(LogLevel.INFO, VersionCheck.CheckUpdate);
         TouchEvent te = GameObject.Find("TouchStart").GetComponent<TouchEvent>();
         var check = VersionCheck.Instance;
         yield return StartCoroutine(check.GetVersionInfo());
@@ -94,7 +94,7 @@ public class TitleLoader : MonoBehaviour
         else
         {
             //无更新
-            MessageBoxController.ShowMsg(LogLevel.OK, VersionCheck.NoUpdate, true);
+            //MessageBoxController.ShowMsg(LogLevel.OK, VersionCheck.NoUpdate, true);
             te.waitingUpdate = false;
         }
     }
