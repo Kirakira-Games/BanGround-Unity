@@ -34,7 +34,7 @@ public class InGameBackground : MonoBehaviour
 
     public void SetBackground(string path)
     {
-        if (!KiraFilesystem.Instance.Exists(path))
+        if (path == null || !KiraFilesystem.Instance.Exists(path))
         {
             //RenderSettings.skybox = bgSkybox;
             mesh.sharedMaterial = bgSkybox;
