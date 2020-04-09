@@ -65,7 +65,8 @@ public class AudioManager : MonoBehaviour
         System.IO.KiraFilesystem.Instance.Dispose();
     }
 
-    public ISoundEffect PrecacheSE(byte[] data) => Provider.PrecacheSE(data);
+    public ISoundEffect PrecacheSE(byte[] data) => Provider.PrecacheSE(data, SEType.Common);
+    public ISoundEffect PrecacheInGameSE(byte[] data) => Provider.PrecacheSE(data, SEType.InGame);
     public void DelayPlayInGameBGM(byte[] audio, float seconds)
     {
         StartCoroutine(DelayPlayBGM(audio, seconds));

@@ -49,7 +49,8 @@ public static class LiveSetting
             }
         }
 
-        AudioManager.Provider.SetSoundEffectVolume(seVolume);
+        AudioManager.Provider.SetSoundEffectVolume(seVolume, AudioProvider.SEType.Common);
+        AudioManager.Provider.SetSoundEffectVolume(igseVolume, AudioProvider.SEType.InGame);
         AudioManager.Provider.SetSoundTrackVolume(bgmVolume);
     }
 
@@ -64,6 +65,7 @@ public static class LiveSetting
 
     public static float bgmVolume = .7f;
     public static float seVolume = .7f;
+    public static float igseVolume = .7f;
     //public static int bufferSize = -1;
 
     public static bool syncLineEnabled = true;
@@ -194,6 +196,7 @@ public class LiveSettingTemplate
 
     public float bgmVolume = .7f;
     public float seVolume = .7f;
+    public float igseVolume = .7f;
     public int bufferSize = -1;
 
     public bool syncLineEnabled = true;
@@ -234,6 +237,7 @@ public class LiveSettingTemplate
         meshOpacity = LiveSetting.meshOpacity;
         bgmVolume = LiveSetting.bgmVolume;
         seVolume = LiveSetting.seVolume;
+        igseVolume = LiveSetting.igseVolume;
         //bufferSize = LiveSetting.bufferSize;
         syncLineEnabled = LiveSetting.syncLineEnabled;
         laneEffectEnabled = LiveSetting.laneEffectEnabled;
@@ -274,6 +278,7 @@ public class LiveSettingTemplate
         LiveSetting.meshOpacity = meshOpacity;
         LiveSetting.bgmVolume = bgmVolume;
         LiveSetting.seVolume = seVolume;
+        LiveSetting.igseVolume = seVolume;
         //LiveSetting.bufferSize = bufferSize;
         LiveSetting.syncLineEnabled = syncLineEnabled;
         LiveSetting.laneEffectEnabled = laneEffectEnabled;

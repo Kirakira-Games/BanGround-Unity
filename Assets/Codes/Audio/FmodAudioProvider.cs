@@ -269,11 +269,13 @@ namespace AudioProvider
         FMOD.System _internalSystem;
         FmodAudioProvider parent;
         float volume;
+        SEType _type;
 
-        internal FmodSoundEffect(Sound sound, FMOD.System system, FmodAudioProvider provider)
+        internal FmodSoundEffect(Sound sound, FMOD.System system, FmodAudioProvider provider, SEType type)
         {
             _internalSound = sound;
             _internalSystem = system;
+            _type = type;
             parent = provider;
         }
 
@@ -291,7 +293,7 @@ namespace AudioProvider
 
         internal void VolumeChanged()
         {
-            volume = parent.masterVolume * parent.effectVolume;
+            volume = parent.masterVolume * parent.effectVolume[(int)_type];
         }
 
         internal void Unload()
@@ -305,7 +307,7 @@ namespace AudioProvider
         FMOD.System fmodSystem;
 
         internal float trackVolume = 1.0f;
-        internal float effectVolume = 1.0f;
+        internal float[] effectVolume = { 1.0f, 1.0f };
         internal float masterVolume = 1.0f;
 
         public delegate void FmodEventHandler();
@@ -332,7 +334,7 @@ namespace AudioProvider
             fmodSystem.createChannelGroup("Tracks", out FmodSoundTrack.stGroup);
             fmodSystem.createChannelGroup("SoundEffects", out FmodSoundEffect.seGroup);
         }
-        public ISoundEffect PrecacheSE(byte[] audio)
+        public ISoundEffect PrecacheSE(byte[] audio, SEType type)
         {
             CREATESOUNDEXINFO exinfo = new CREATESOUNDEXINFO();
             exinfo.cbsize = Marshal.SizeOf(exinfo);
@@ -342,7 +344,7 @@ namespace AudioProvider
                 fmodSystem.createSound(audio, MODE.OPENMEMORY | MODE.CREATESAMPLE | MODE.LOOP_OFF, ref exinfo, out Sound sound)
             );
 
-            var result = new FmodSoundEffect(sound, fmodSystem, this);
+            var result = new FmodSoundEffect(sound, fmodSystem, this, type);
             result.bytes = audio;
 
             OnVolumeChanged += result.VolumeChanged;
@@ -359,9 +361,9 @@ namespace AudioProvider
             OnVolumeChanged();
         }
 
-        public void SetSoundEffectVolume(float volume)
+        public void SetSoundEffectVolume(float volume, SEType type)
         {
-            effectVolume = volume;
+            effectVolume[(int)type] = volume;
             OnVolumeChanged?.Invoke();
         }
 

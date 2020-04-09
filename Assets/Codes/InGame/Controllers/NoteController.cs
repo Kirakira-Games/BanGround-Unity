@@ -328,11 +328,11 @@ public class NoteController : MonoBehaviour
         // Sound effects
         soundEffects = new ISoundEffect[5]
         {
-            AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), LiveSetting.seStyle) +"/perfect.wav").bytes),
-            AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), LiveSetting.seStyle) +"/great.wav").bytes),
-            AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), LiveSetting.seStyle) +"/empty.wav").bytes),
-            AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), LiveSetting.seStyle) +"/empty.wav").bytes),
-            AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), LiveSetting.seStyle) +"/flick.wav").bytes)
+            AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), LiveSetting.seStyle) +"/perfect.wav").bytes),
+            AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), LiveSetting.seStyle) +"/great.wav").bytes),
+            AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), LiveSetting.seStyle) +"/empty.wav").bytes),
+            AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), LiveSetting.seStyle) +"/empty.wav").bytes),
+            AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), LiveSetting.seStyle) +"/flick.wav").bytes)
         };
 
         AudioManager.Instance.DelayPlayInGameBGM(KiraFilesystem.Instance.Read(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), WARM_UP_SECOND);
