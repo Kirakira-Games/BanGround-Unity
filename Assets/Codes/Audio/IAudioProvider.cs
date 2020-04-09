@@ -13,6 +13,11 @@ namespace AudioProvider
         Playing,
         Unknown = -1
     }
+    public enum SEType
+    {
+        Common = 0,
+        InGame
+    }
 
     public interface ISoundTrack : IDisposable
     {
@@ -46,9 +51,9 @@ namespace AudioProvider
 
         void SetMasterVolume(float volume);
         void SetSoundTrackVolume(float volume);
-        void SetSoundEffectVolume(float volume);
+        void SetSoundEffectVolume(float volume, SEType type);
 
-        ISoundEffect PrecacheSE(byte[] audio);
+        ISoundEffect PrecacheSE(byte[] audio, SEType type);
         ISoundTrack StreamTrack(byte[] audio);
     }
 }

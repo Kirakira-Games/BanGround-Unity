@@ -186,12 +186,14 @@ namespace AudioProvider
         int _internalSound;
         byte[] _byteInstanse;
         BassAudioProvider _provider;
+        SEType _type;
 
-        internal BassSoundEffect(int sound, byte[] audio, BassAudioProvider provider)
+        internal BassSoundEffect(int sound, byte[] audio, BassAudioProvider provider, SEType type)
         {
             _internalSound = sound;
             _byteInstanse = audio;
             _provider = provider;
+            _type = type;
         }
 
         public void Dispose()
@@ -204,7 +206,7 @@ namespace AudioProvider
         public void PlayOneShot()
         {
             var channel = Bass.BASS_SampleGetChannel(_internalSound, false);
-            Bass.BASS_ChannelSetAttribute(channel, BASSAttribute.BASS_ATTRIB_VOL, _provider.effectVolume * _provider.masterVolume);
+            Bass.BASS_ChannelSetAttribute(channel, BASSAttribute.BASS_ATTRIB_VOL, _provider.effectVolume[(int)_type] * _provider.masterVolume);
             Bass.BASS_ChannelSetAttribute(channel, BASSAttribute.BASS_ATTRIB_NOBUFFER, 1);
             Bass.BASS_ChannelPlay(channel, false);
         }
@@ -213,7 +215,7 @@ namespace AudioProvider
     public class BassAudioProvider : IAudioProvider
     {
         internal float trackVolume = 1.0f;
-        internal float effectVolume = 1.0f;
+        internal float[] effectVolume = { 1.0f , 1.0f};
         internal float masterVolume = 1.0f;
 
         internal delegate void BassEventHandler();
@@ -255,10 +257,10 @@ namespace AudioProvider
             return st;
         }
 
-        public ISoundEffect PrecacheSE(byte[] audio)
+        public ISoundEffect PrecacheSE(byte[] audio, SEType type)
         {
             var id = Bass.BASS_SampleLoad(audio, 0, audio.Length, 65535, BASSFlag.BASS_DEFAULT);
-            var se = new BassSoundEffect(id, audio, this);
+            var se = new BassSoundEffect(id, audio, this, type);
 
             OnUnload += se.Dispose;
 
@@ -271,9 +273,9 @@ namespace AudioProvider
             OnVolumeChanged?.Invoke();
         }
 
-        public void SetSoundEffectVolume(float volume)
+        public void SetSoundEffectVolume(float volume, SEType type)
         {
-            effectVolume = volume;
+            effectVolume[(int)type] = volume;
             OnVolumeChanged?.Invoke();
         }
 

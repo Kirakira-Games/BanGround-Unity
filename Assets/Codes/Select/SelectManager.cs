@@ -61,6 +61,7 @@ public class SelectManager : MonoBehaviour
     private Slider lane_Bright;
     private Slider long_Bright;
     private Slider seVolume_Input;
+    private Slider igseVolume_Input;
     private Slider bgmVolume_Input;
 
     private Dropdown language_Dropdown;
@@ -183,6 +184,7 @@ public class SelectManager : MonoBehaviour
         lane_Bright = GameObject.Find("Lane_Bri_Slider").GetComponent<Slider>();
         long_Bright = GameObject.Find("Long_Bri_Slider").GetComponent<Slider>();
         seVolume_Input = GameObject.Find("SeVolume_Input").GetComponent<Slider>();
+        igseVolume_Input = GameObject.Find("IGSEVolume_Input").GetComponent<Slider>();
         bgmVolume_Input = GameObject.Find("BGMVolume_Input").GetComponent<Slider>();
         ELP_Slider = GameObject.Find("ELP_Slider").GetComponent<Slider>();
 
@@ -564,7 +566,8 @@ public class SelectManager : MonoBehaviour
         SetLiveSetting();
         File.WriteAllText(LiveSetting.settingsPath, JsonConvert.SerializeObject(new LiveSettingTemplate()));
 
-        AudioManager.Provider.SetSoundEffectVolume(LiveSetting.seVolume);
+        AudioManager.Provider.SetSoundEffectVolume(LiveSetting.seVolume, SEType.Common);
+        AudioManager.Provider.SetSoundEffectVolume(LiveSetting.igseVolume, SEType.InGame);
         AudioManager.Provider.SetSoundTrackVolume(LiveSetting.bgmVolume);
     }
     void OpenMod()
@@ -604,6 +607,7 @@ public class SelectManager : MonoBehaviour
         long_Bright.value = LiveSetting.longBrightness;
 
         seVolume_Input.value = LiveSetting.seVolume;
+        igseVolume_Input.value = LiveSetting.igseVolume;
         bgmVolume_Input.value = LiveSetting.bgmVolume;
 
         noteToggles.SetStyle(LiveSetting.noteStyle);
@@ -638,6 +642,7 @@ public class SelectManager : MonoBehaviour
             LiveSetting.audioOffset = int.Parse(string.IsNullOrWhiteSpace(audio_Input.text) ? 0.ToString() : audio_Input.text);
             LiveSetting.noteSize = float.Parse(size_Input.text);
             LiveSetting.seVolume = seVolume_Input.value;
+            LiveSetting.igseVolume = igseVolume_Input.value;
             LiveSetting.bgmVolume = bgmVolume_Input.value;
             LiveSetting.syncLineEnabled = syncLine_Tog.isOn;
             LiveSetting.grayNoteEnabled = offBeat_Tog.isOn;
