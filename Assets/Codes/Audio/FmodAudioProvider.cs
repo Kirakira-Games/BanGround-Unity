@@ -324,8 +324,12 @@ namespace AudioProvider
             if (bufferLength != 0)
             {
                 fmodSystem.setDSPBufferSize(bufferLength, 4);
-                fmodSystem.setSoftwareFormat(sampleRate, SPEAKERMODE.DEFAULT, 0);
             }
+            else
+            {
+                fmodSystem.setDSPBufferSize(512, 4);
+            }
+            fmodSystem.setSoftwareFormat(sampleRate, SPEAKERMODE.MONO, 0);
 
             FMODUtil.ErrCheck(
                 fmodSystem.init(512, INITFLAGS.NORMAL, IntPtr.Zero)
