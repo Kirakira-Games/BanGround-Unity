@@ -514,6 +514,7 @@ GameObject:
   - component: {fileID: 153337968}
   - component: {fileID: 153337967}
   - component: {fileID: 153337970}
+  - component: {fileID: 153337971}
   m_Layer: 0
   m_Name: InGameBackground
   m_TagString: Untagged
@@ -595,6 +596,40 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bgSkybox: {fileID: 2100000, guid: 9fa8dd06786f96543a99a20b8a92ef22, type: 2}
+--- !u!328 &153337971
+VideoPlayer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 153337966}
+  m_Enabled: 1
+  m_VideoClip: {fileID: 0}
+  m_TargetCameraAlpha: 1
+  m_TargetCamera3DLayout: 0
+  m_TargetCamera: {fileID: 506441008}
+  m_TargetTexture: {fileID: 0}
+  m_TimeReference: 0
+  m_TargetMaterialRenderer: {fileID: 0}
+  m_TargetMaterialProperty: _MainTex
+  m_RenderMode: 0
+  m_AspectRatio: 4
+  m_DataSource: 1
+  m_PlaybackSpeed: 1
+  m_AudioOutputMode: 0
+  m_TargetAudioSources:
+  - {fileID: 0}
+  m_DirectAudioVolumes:
+  - 1
+  m_Url: 
+  m_EnabledAudioTracks: 01
+  m_DirectAudioMutes: 00
+  m_ControlledAudioTrackCount: 1
+  m_PlayOnAwake: 0
+  m_SkipOnDrop: 1
+  m_Looping: 0
+  m_WaitForFirstFrame: 1
+  m_FrameReadyEventEnabled: 0
 --- !u!1 &154158305
 GameObject:
   m_ObjectHideFlags: 0
@@ -6523,8 +6558,8 @@ Camera:
   m_GameObject: {fileID: 506441006}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.30891773, g: 0.56457585, b: 0.735849, a: 0}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0

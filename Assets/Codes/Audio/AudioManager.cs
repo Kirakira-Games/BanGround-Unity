@@ -93,6 +93,7 @@ public class AudioManager : MonoBehaviour
                 (mod as AudioMod).ApplyMod(gameBGM);
         }
 
+        InGameBackground.instance.playVideo();
         gameBGM.Play();
         isInGame = true;
         isLoading = false;
