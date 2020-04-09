@@ -85,6 +85,7 @@ public class UIManager : MonoBehaviour
         {
             yield return new WaitForEndOfFrame();
         }
+        InGameBackground.instance.pauseVideo();
         Time.timeScale = 0;
         AudioTimelineSync.instance.Pause();
         AudioManager.Instance.isInGame = false;
@@ -119,7 +120,10 @@ public class UIManager : MonoBehaviour
         {
             currentTime -= Time.deltaTime;
             AudioTimelineSync.instance.Seek(currentTime);
+            InGameBackground.instance.seekVideo(currentTime);
+            InGameBackground.instance.playVideo();
             yield return new WaitForEndOfFrame();
+            InGameBackground.instance.pauseVideo();
         }
 
         // play
@@ -132,6 +136,8 @@ public class UIManager : MonoBehaviour
 
         AudioTimelineSync.instance.Seek(bgm.GetPlaybackTime() / 1000f);
         AudioTimelineSync.instance.Play();
+        InGameBackground.instance.seekVideo(bgm.GetPlaybackTime()/1000f);
+        InGameBackground.instance.playVideo();
         AudioManager.Instance.isInGame = true;
         BitingTheDust = false;
     }
@@ -164,6 +170,7 @@ public class UIManager : MonoBehaviour
     {
         if (SceneLoader.Loading || AudioManager.Instance.isLoading) return;
         isFinished = true;
+        InGameBackground.instance.stopVideo();
         AudioManager.Instance.gameBGM?.Dispose();
         StartCoroutine(ShowResult(restart));
     }
