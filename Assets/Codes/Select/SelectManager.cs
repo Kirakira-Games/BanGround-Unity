@@ -340,7 +340,7 @@ public class SelectManager : MonoBehaviour
     IEnumerator SelectDefault()
     {
         var background = GameObject.Find("KirakiraBackground").GetComponent<FixBackground>();
-        var path = DataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid);
+        var path = DataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid).Item1;
         background.UpdateBackground(path);
 
         yield return new WaitForEndOfFrame();
