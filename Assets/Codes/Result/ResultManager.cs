@@ -90,7 +90,7 @@ public class ResultManager : MonoBehaviour
     private void ShowBackground()
     {
         background = GameObject.Find("Background").GetComponent<FixBackground>();
-        string path = DataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid);
+        string path = DataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid).Item1;
         background.UpdateBackground(path);
     }
 
@@ -346,11 +346,13 @@ public class ResultManager : MonoBehaviour
         {
             var result = resultList.First();
             lastScore = result.Score;
-            if (lastScore < playResult.Score)
-            {
-                pr.resultsList.Remove(result);
-                pr.resultsList.Add(playResult);
-            }
+            playResult.Score = Math.Max(result.Score, playResult.Score);
+            playResult.ranks = (Ranks)Mathf.Min((int)result.ranks, (int)playResult.ranks);
+            playResult.clearMark = (ClearMarks)Mathf.Min((int)result.clearMark, (int)playResult.clearMark);
+            playResult.Acc = Math.Max(result.Acc, playResult.Acc);
+
+            pr.resultsList.Remove(result);
+            pr.resultsList.Add(playResult);
         }
         else
         {

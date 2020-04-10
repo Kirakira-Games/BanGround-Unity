@@ -9,12 +9,11 @@ using UnityEngine.Networking;
 public class InGameBackground : MonoBehaviour
 {
     //[SerializeField] private Texture defaultTex;
-    [SerializeField] private Material bgSkybox;
+    [SerializeField] 
+    private Material bgSkybox;
     private Material cacheMat = null;
     private MeshRenderer mesh;
     private VideoPlayer vp;
-
-    string VideoPath;
 
     public static InGameBackground instance;
 
@@ -22,7 +21,6 @@ public class InGameBackground : MonoBehaviour
     {
         instance = this;
         mesh = GetComponent<MeshRenderer>();
-        VideoPath = Application.persistentDataPath + "/data/video.mp4";
         Color color = new Color(LiveSetting.bgBrightness, LiveSetting.bgBrightness, LiveSetting.bgBrightness);
         Material mat = Instantiate(bgSkybox);
         mat.SetColor("_Tint", color);
@@ -43,9 +41,9 @@ public class InGameBackground : MonoBehaviour
     //        RenderSettings.skybox = cacheMat;
     //}
 
-    public void SetBackground(string path)
+    public void SetBackground(string path, int type)
     {
-        if (path == null || !KiraFilesystem.Instance.Exists(path))
+        if (path == null || (type == 0 && !KiraFilesystem.Instance.Exists(path)))
         {
             //RenderSettings.skybox = bgSkybox;
             mesh.sharedMaterial = bgSkybox;
@@ -55,8 +53,7 @@ public class InGameBackground : MonoBehaviour
         {
             Color color = new Color(LiveSetting.bgBrightness, LiveSetting.bgBrightness, LiveSetting.bgBrightness);
 
-            print("Load video from："+VideoPath);
-            if (!File.Exists(VideoPath))
+            if (type == 0)
             {
                 vp.enabled = false;
                 var tex = KiraFilesystem.Instance.ReadTexture2D(path);
@@ -75,12 +72,8 @@ public class InGameBackground : MonoBehaviour
                 cacheMat = mat;
             }
             else
-            {//纯弱智：https://forum.unity.com/threads/error-videoplayer-on-android.742451/
-#if UNITY_ANDROID && !UNITY_EDITOR
-                vp.url = VideoPath;
-#else
-                vp.url = "file://" + VideoPath;
-#endif
+            {
+                vp.url = path;
                 vp.Prepare();
                 playVideo();
                 pauseVideo();

@@ -28,6 +28,18 @@ public class FPSCounter : MonoBehaviour
 
         if (Time.timeScale == 0) return;
         frameInSec++;
-        text.text = $"FPS : {lastFPS}";//\n{Mathf.Round(Time.deltaTime * 1000)}  ms";
+
+        string str = $"FPS : {lastFPS}";
+
+        // Audio diff display
+        float? audioDiff = AudioTimelineSync.instance?.smoothAudioDiff;
+        if (audioDiff.HasValue && !float.IsNaN(audioDiff.Value))
+        {
+            int diff = Mathf.RoundToInt(audioDiff.Value * 1000);
+            string diffStr = diff >= 0 ? "+" + diff : diff.ToString();
+            str += $"\nSync: {diffStr}ms";
+        }
+
+        text.text = str;
     }
 }

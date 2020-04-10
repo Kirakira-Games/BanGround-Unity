@@ -182,6 +182,7 @@ public class AutoPlayTouchProvider : KirakiraTouchProvider
 
         while (head < events.Count && events[head].time <= NoteController.audioTime)
         {
+            if (UIManager.BitingTheDust) break;
             var cur = events[head];
             if (cur.phase == KirakiraTouchPhase.Began)
             {
