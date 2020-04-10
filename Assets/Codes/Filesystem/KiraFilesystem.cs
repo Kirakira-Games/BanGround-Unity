@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using UnityEngine;
@@ -278,6 +279,24 @@ namespace System.IO
             tex.LoadImage(Read(fileName));
 
             return tex;
+        }
+
+        public string Extract(string fileName, bool force = false)
+        {
+            var bytes = Read(fileName);
+            var path = $"{root}/temp/{Convert.ToBase64String(Encoding.UTF8.GetBytes(fileName))}"; ;
+            var write = true;
+
+            if (File.Exists(path))
+                if (force)
+                    File.Delete(path);
+                else
+                    write = false;
+
+            if (write)
+                File.WriteAllBytes(path, bytes);
+
+            return path;
         }
 
         //public void ReleaseUnusedKirapacks() => (from x in openedArchive where DateTime.Now - lastAccessTime[x.Key] > TimeSpan.FromMinutes(1) select x.Key).All((key) =>
