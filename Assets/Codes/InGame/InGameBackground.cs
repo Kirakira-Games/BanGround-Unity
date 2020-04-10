@@ -75,8 +75,12 @@ public class InGameBackground : MonoBehaviour
                 cacheMat = mat;
             }
             else
-            {
+            {//纯弱智：https://forum.unity.com/threads/error-videoplayer-on-android.742451/
+#if UNITY_ANDROID && !UNITY_EDITOR
+                vp.url = VideoPath;
+#else
                 vp.url = "file://" + VideoPath;
+#endif
                 vp.Prepare();
                 playVideo();
                 pauseVideo();
