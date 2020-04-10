@@ -11,26 +11,11 @@ public class FPSCounter : MonoBehaviour
     float lastClearTime = -1;
     int lastFPS = 0;
 
-    // Sync display
-    int audioSyncDiff;
-    Queue<int> syncQueue;
-    int totDiff;
-    private const int audioSyncCount = 30;
-
     float lostFocusTime = 0;
-
-    void ClearSync()
-    {
-        syncQueue.Clear();
-        totDiff = 0;
-        audioSyncDiff = int.MinValue;
-    }
 
     void Awake()
     {
-        syncQueue = new Queue<int>();
         text = GetComponent<Text>();
-        ClearSync();
     }
     void Update()
     {
@@ -44,30 +29,17 @@ public class FPSCounter : MonoBehaviour
         if (Time.timeScale == 0) return;
         frameInSec++;
 
-
         string str = $"FPS : {lastFPS}";
-        // Audio sync test
-        int? audioTime = (int?)AudioManager.Instance?.gameBGM?.GetPlaybackTime();
-        int? syncTime = AudioTimelineSync.instance?.GetTimeInMs();
-        if (audioTime.HasValue && syncTime.HasValue)
+
+        // Audio diff display
+        float? audioDiff = AudioTimelineSync.instance?.smoothAudioDiff;
+        if (audioDiff.HasValue && !float.IsNaN(audioDiff.Value))
         {
-            int diff = syncTime.Value - audioTime.Value;
-            syncQueue.Enqueue(diff);
-            totDiff += diff;
-            while (syncQueue.Count > audioSyncCount)
-            {
-                totDiff -= syncQueue.Dequeue();
-            }
-            audioSyncDiff = totDiff / syncQueue.Count;
+            int diff = Mathf.RoundToInt(audioDiff.Value * 1000);
+            string diffStr = diff >= 0 ? "+" + diff : diff.ToString();
+            str += $"\nSync: {diffStr}ms";
         }
-        else
-        {
-            ClearSync();
-        }
-        if (audioSyncDiff != int.MinValue)
-        {
-            str += $"\nSync: {(audioSyncDiff >= 0 ? "+" + audioSyncDiff : audioSyncDiff.ToString())}ms";
-        }
+
         text.text = str;
     }
 }
