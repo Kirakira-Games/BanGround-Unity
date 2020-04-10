@@ -26,6 +26,7 @@ namespace System.IO
 
         string indexFile;
         string root;
+        string tempPath;
 
         public KiraFilesystem(string indexFile, string filesystemRoot)
         {
@@ -34,6 +35,10 @@ namespace System.IO
 
             this.indexFile = indexFile;
             root = filesystemRoot;
+            tempPath = $"{root}temp/";
+
+            DirectoryInfo di = new DirectoryInfo(tempPath);
+            if (!di.Exists) di.Create();
 
             if (File.Exists(indexFile))
             {
@@ -284,7 +289,7 @@ namespace System.IO
         public string Extract(string fileName, bool force = false)
         {
             var bytes = Read(fileName);
-            var path = $"{root}/temp/{Convert.ToBase64String(Encoding.UTF8.GetBytes(fileName))}{fileName.Substring(fileName.LastIndexOf('.'), fileName.Length - fileName.LastIndexOf('.'))}";
+            var path = tempPath + Convert.ToBase64String(Encoding.UTF8.GetBytes(fileName)) + fileName.Substring(fileName.LastIndexOf('.'), fileName.Length - fileName.LastIndexOf('.'));
             var write = true;
 
             if (File.Exists(path))
