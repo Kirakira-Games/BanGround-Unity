@@ -339,7 +339,18 @@ public class NoteController : MonoBehaviour
 
         // Background
         var background = GameObject.Find("InGameBackground").GetComponent<InGameBackground>();
-        background.SetBackground(DataLoader.GetBackgroundPath(sid));
+        var (bg, bgtype) = DataLoader.GetBackgroundPath(sid);
+        if(bgtype == 1)
+        {
+            var videoPath = KiraFilesystem.Instance.Extract(bg);
+            background.SetBackground(videoPath, bgtype);
+        }
+        else
+        {
+            background.SetBackground(bg, bgtype);
+        }
+
+        
          //background = GameObject.Find("dokidokiBackground").GetComponent<FixBackground>();
          //background.UpdateBackground(DataLoader.GetBackgroundPath(sid));
 

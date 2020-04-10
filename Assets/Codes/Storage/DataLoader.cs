@@ -100,19 +100,25 @@ public class DataLoader
         return chartDic.ContainsKey(sid) ? chartDic[sid] : null;
     }
 
-    public static string GetBackgroundPath(int sid)
+    public static (string, int) GetBackgroundPath(int sid)
     {
         var header = GetChartHeader(sid);
         if (header != null)
         {
-            var name = header.backgroundFile.pic ?? header.backgroundFile.pic;
+            var type = 0;
+            if (LiveSetting.useVideo && !string.IsNullOrEmpty(header.backgroundFile.vid))
+                type = 1;
+
+            var name = type == 1 ? header.backgroundFile.vid : header.backgroundFile.pic;
+
             if (name == null || name.Length == 0)
             {
-                return null;
+                return (null, 0);
             }
-            return ChartDir + sid + "/" + name;
+
+            return (ChartDir + sid + "/" + name, type);
         }
-        return null;
+        return (null, 0);
     }
 
     public static int GetMidBySid(int sid)
