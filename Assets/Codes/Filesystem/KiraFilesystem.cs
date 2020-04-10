@@ -284,7 +284,7 @@ namespace System.IO
         public string Extract(string fileName, bool force = false)
         {
             var bytes = Read(fileName);
-            var path = $"{root}/temp/{Convert.ToBase64String(Encoding.UTF8.GetBytes(fileName))}"; ;
+            var path = $"{root}/temp/{Convert.ToBase64String(Encoding.UTF8.GetBytes(fileName))}{fileName.Substring(fileName.LastIndexOf('.'), fileName.Length)}";
             var write = true;
 
             if (File.Exists(path))

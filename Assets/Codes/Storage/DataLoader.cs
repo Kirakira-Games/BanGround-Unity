@@ -100,13 +100,14 @@ public class DataLoader
         return chartDic.ContainsKey(sid) ? chartDic[sid] : null;
     }
 
-    public static (string, int) GetBackgroundPath(int sid)
+    public static (string, int) GetBackgroundPath(int sid, bool forceImg = true)
     {
         var header = GetChartHeader(sid);
         if (header != null)
         {
             var type = 0;
-            if (LiveSetting.useVideo && !string.IsNullOrEmpty(header.backgroundFile.vid))
+
+            if (!forceImg && LiveSetting.useVideo && !string.IsNullOrEmpty(header.backgroundFile.vid))
                 type = 1;
 
             var name = type == 1 ? header.backgroundFile.vid : header.backgroundFile.pic;
