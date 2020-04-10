@@ -90,7 +90,7 @@ public class ResultManager : MonoBehaviour
     private void ShowBackground()
     {
         background = GameObject.Find("Background").GetComponent<FixBackground>();
-        string path = DataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid);
+        string path = DataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid).Item1;
         background.UpdateBackground(path);
     }
 

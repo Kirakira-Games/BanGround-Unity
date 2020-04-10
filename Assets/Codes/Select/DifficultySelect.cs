@@ -86,7 +86,7 @@ public class DifficultySelect : MonoBehaviour
         LiveSetting.actualDifficulty = selected;
         selectManager.DisplayRecord();
 
-        string path = DataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid);
+        string path = DataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid).Item1;
         background.UpdateBackground(path);
         //LiveSetting.selectedDifficulty = (Difficulty)enabledCards[0];
         //print(Enum.GetName(typeof(Difficulty), LiveSetting.selectedDifficulty));
