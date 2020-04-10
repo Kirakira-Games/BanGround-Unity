@@ -329,7 +329,7 @@ namespace AudioProvider
             {
                 fmodSystem.setDSPBufferSize(512, 4);
             }
-            fmodSystem.setSoftwareFormat(sampleRate, SPEAKERMODE.MONO, 0);
+            fmodSystem.setSoftwareFormat(sampleRate, SPEAKERMODE.STEREO, 0);
 
             FMODUtil.ErrCheck(
                 fmodSystem.init(512, INITFLAGS.NORMAL, IntPtr.Zero)

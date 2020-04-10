@@ -97,6 +97,8 @@ public static class LiveSetting
     public static Language language = Language.AutoDetect;
     public static Sorter sort = Sorter.SongName;
 
+    public static bool useVideo = true;
+
     public static int currentChart = 0; // Chart set index
     public static int currentDifficulty = (int)Difficulty.Easy;
     public static int actualDifficulty = currentDifficulty; // These may differ if a chart set does not have currentDifficulty
@@ -108,6 +110,7 @@ public static class LiveSetting
 
     public static List<ModBase> attachedMods = new List<ModBase>();
     public static float SpeedCompensationSum = 1.0f;
+
     //public static bool fullScreen;
 
     public static bool AddMod(ModBase mod)
