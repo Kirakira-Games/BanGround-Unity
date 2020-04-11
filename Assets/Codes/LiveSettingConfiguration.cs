@@ -221,6 +221,7 @@ public class LiveSettingTemplate
     public float longBrightness = .8f;
 
     public bool enableAudioTrack = true;
+    public bool enableVideo = true;
 
     public int currentChart = 0;
     public int currentDifficulty = 0;
@@ -251,6 +252,7 @@ public class LiveSettingTemplate
         laneLight = LiveSetting.laneLight;
         shakeFlick = LiveSetting.shakeFlick;
         dispMillsec = LiveSetting.dispMilisec;
+        enableVideo = LiveSetting.useVideo;
         //fullScreen = LiveSetting.fullScreen;
         //autoPlayEnabled = LiveSetting.autoPlayEnabled;
 
@@ -294,6 +296,7 @@ public class LiveSettingTemplate
         //LiveSetting.fullScreen = fullScreen;
         //LiveSetting.autoPlayEnabled = autoPlayEnabled;
         LiveSetting.laneLight = laneLight;
+        LiveSetting.useVideo = enableVideo;
 
         LiveSetting.offsetTransform = offsetTransform;
         LiveSetting.farClip = farClip;

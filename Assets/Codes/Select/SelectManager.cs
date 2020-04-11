@@ -32,6 +32,7 @@ public class SelectManager : MonoBehaviour
     private Toggle laneLight_Tog;
     private Toggle shake_Tog;
     private Toggle milisec_Tog;
+    private Toggle Video_Tog;
     private NoteStyleToggleGroup noteToggles;
     private SESelector seSelector;
 
@@ -172,6 +173,7 @@ public class SelectManager : MonoBehaviour
         VSync_Tog = GameObject.Find("VSync_Toggle").GetComponent<Toggle>();
         noteToggles = GameObject.Find("Note_Group").GetComponent<NoteStyleToggleGroup>();
         seSelector= GameObject.Find("SEGroup").GetComponent<SESelector>();
+        Video_Tog = GameObject.Find("Video_Toggle").GetComponent<Toggle>();
 
         speed_Input = GameObject.Find("Speed_Input").GetComponent<InputField>();
         judge_Input = GameObject.Find("Judge_Input").GetComponent<InputField>();
@@ -599,6 +601,7 @@ public class SelectManager : MonoBehaviour
         laneLight_Tog.isOn = LiveSetting.laneLight;
         shake_Tog.isOn = LiveSetting.shakeFlick;
         milisec_Tog.isOn = LiveSetting.dispMilisec;
+        Video_Tog.isOn = LiveSetting.useVideo;
 
         judgeOffsetTransform.value = LiveSetting.offsetTransform;
         far_Clip.value = LiveSetting.farClip;
@@ -653,6 +656,7 @@ public class SelectManager : MonoBehaviour
             LiveSetting.laneLight = laneLight_Tog.isOn;
             LiveSetting.shakeFlick = shake_Tog.isOn;
             LiveSetting.dispMilisec = milisec_Tog.isOn;
+            LiveSetting.useVideo = Video_Tog.isOn;
 #if (UNITY_STANDALONE || UNITY_WSA)
             if (FS_Tog.isOn)
             {
