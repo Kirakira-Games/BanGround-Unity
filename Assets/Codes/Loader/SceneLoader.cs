@@ -5,6 +5,9 @@ using UnityEngine.SceneManagement;
 
 public class SceneLoader : MonoBehaviour
 {
+    [SerializeField] private GameObject songInfo;
+    [SerializeField] private GameObject meme;
+
     private Animator animator;
     private Camera loaderCamera;
     private AsyncOperation loadOP;
@@ -17,6 +20,15 @@ public class SceneLoader : MonoBehaviour
 
     void Start()
     {
+        if (nextSceneName == "InGame")
+        {
+            songInfo.SetActive(true);
+        }
+        else
+        {
+            meme.SetActive(true);
+        }
+
         animator = GameObject.Find("GateCanvas2").GetComponent<Animator>();
         animator.Play("Closing");
         loaderCamera = GameObject.Find("LoaderCamera").GetComponent<Camera>();
