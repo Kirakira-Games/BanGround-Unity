@@ -88,7 +88,7 @@ public class SceneLoader : MonoBehaviour
         loadOP.allowSceneActivation = true;
 
         //开门时间（即loading播放时间） 应减去关门所需时间
-        animator.Play("Opening");
+        animator.SetTrigger("Open");
         //open gate need 1f
         yield return new WaitForSeconds(seconds);
         SceneManager.UnloadSceneAsync("Loader");

@@ -23,7 +23,7 @@ public class LoaderInfo : MonoBehaviour
     const string NameFormat = "{0}";// Offset Rhythm Test
     const string BPMFormat = "BPM {0}-{1}";// BPM 13-269
     const string LevelAndCharterFormat = "{0} {1} BY {2}"; // EASY 26 BY User
-    const string ArtistFormat = "Produced by {0}";// Produced by KIRAKIRA sound team "bbben"
+    const string ArtistFormat = "{0}";// Produced by KIRAKIRA sound team "bbben"<啥比
     const string NoteCountFormat = "Note {0}";//Note 999
 
     void Start()
@@ -37,8 +37,9 @@ public class LoaderInfo : MonoBehaviour
         //Show Info
         var tex = KiraFilesystem.Instance.ReadTexture2D(DataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid).Item1);
         songImg.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+
         songName.text = string.Format(NameFormat, musicHeader.title);
-        songBPM.text = string.Format(BPMFormat, chartData.bpm.Min().value, chartData.bpm.Max().value);
+        songBPM.text = string.Format(BPMFormat, chartData.bpm.Min(o=>o.value), chartData.bpm.Max(o => o.value));
         songLevelAndCharter.text = string.Format(LevelAndCharterFormat, Enum.GetName(typeof(Difficulty), chart.Difficulty).ToUpper(), chart.level, chartHeader.authorNick);
         songArtist.text = string.Format(ArtistFormat, musicHeader.artist);
         songNoteCount.text = string.Format(NoteCountFormat, chartData.notes.Count);
