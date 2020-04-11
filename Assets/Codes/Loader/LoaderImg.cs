@@ -47,7 +47,7 @@ public class LoaderImg : MonoBehaviour
                 else
                 {
                     image.texture = dht.texture;
-                    image.SetNativeSize();
+                    AdjLimitImageSize();
                 }
             }
         }
@@ -69,7 +69,7 @@ public class LoaderImg : MonoBehaviour
                 else
                 {
                     image.texture = dht.texture;
-                    image.SetNativeSize();
+                    AdjLimitImageSize();
                     File.WriteAllBytes(TempSav + img, dht.data);
                 }
             }
@@ -86,10 +86,18 @@ public class LoaderImg : MonoBehaviour
                 else
                 {
                     image.texture = dht.texture;
-                    image.SetNativeSize();
+                    AdjLimitImageSize();
                 }
             }
         }
     }
 
+    void AdjLimitImageSize()
+    {
+        float aspectR = image.texture.height / (float)image.texture.width;
+        if (aspectR >= 1f)
+            image.rectTransform.sizeDelta = new Vector2(300f / aspectR, 300f);
+        else
+            image.rectTransform.sizeDelta = new Vector2(300f, 300f * aspectR);
+    }
 }
