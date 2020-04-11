@@ -16,7 +16,7 @@ public class SESelector : MonoBehaviour
     private ISoundEffect perfectSE;
     private ISoundEffect flickSE;
 
-    private void Start()
+    private void Awake()
     {
         seInput = GameObject.Find("SE_Input").GetComponent<InputField>();
         perfectBtn = GameObject.Find("SE_P_Player").GetComponent<Button>();
