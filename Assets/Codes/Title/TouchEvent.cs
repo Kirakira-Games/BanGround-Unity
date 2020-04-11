@@ -25,13 +25,14 @@ public class TouchEvent : MonoBehaviour
         }
     }
 
-    private IEnumerator SwitchScene(string name)
-    {
-        yield return new WaitForSeconds(4f);
-        operation = SceneManager.LoadSceneAsync(name);
-        operation.allowSceneActivation = false;
-        yield return operation;
-    }
+    //private IEnumerator SwitchScene(string name)
+    //{
+    //    yield return new WaitForSeconds(4f);
+    //    operation = SceneManager.LoadSceneAsync(name);
+    //    operation.allowSceneActivation = false;
+    //    yield return operation;
+    //}
+
     public void ChangeAnimation()
     {
         if (waitingUpdate) return;
@@ -47,7 +48,7 @@ public class TouchEvent : MonoBehaviour
         GameObject.Find("MainCanvas").GetComponent<Animator>().SetBool("Touched", true);
         warnCanvas.SetActive(true);
 
-        StartCoroutine(SwitchScene("Select"));
+        //StartCoroutine(SwitchScene("Select"));
         StartCoroutine(delayAndSwitch());
         StartCoroutine(TurndownMusic());
     }
@@ -63,7 +64,15 @@ public class TouchEvent : MonoBehaviour
 
     IEnumerator delayAndSwitch()
     {
-        yield return new WaitForSeconds(4.5f);
+        operation = SceneManager.LoadSceneAsync("Select");
+        operation.allowSceneActivation = false;
+
+        yield return new WaitForSeconds(3.5f);
+        while (operation.progress < 0.9f)
+        {
+            yield return new WaitForEndOfFrame();
+        }
+
         //SwitchScene("Select");
         //SceneLoader.LoadScene("Title", "Select", true);
         operation.allowSceneActivation = true;

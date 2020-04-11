@@ -240,10 +240,10 @@ public class SelectManager : MonoBehaviour
 
         difficultySelect = GameObject.Find("DifficultySelect").GetComponent<DifficultySelect>();
 
-        GameObject.Find("ButtonName").GetComponent<Button>().onClick.AddListener(() => { LiveSetting.sort = Sorter.SongName; InitSongList(); });
-        GameObject.Find("ButtonArtist").GetComponent<Button>().onClick.AddListener(() => { LiveSetting.sort = Sorter.SongArtist; InitSongList(); });
-        GameObject.Find("ButtonCharter").GetComponent<Button>().onClick.AddListener(() => { LiveSetting.sort = Sorter.ChartAuthor; InitSongList(); });
-        GameObject.Find("ButtonLevel").GetComponent<Button>().onClick.AddListener(() => { LiveSetting.sort = Sorter.ChartDif; InitSongList(); });
+        GameObject.Find("ButtonName").GetComponent<Button>().onClick.AddListener(() => { LiveSetting.sort = Sorter.SongName; SwitchSort(); InitSongList(); });
+        GameObject.Find("ButtonArtist").GetComponent<Button>().onClick.AddListener(() => { LiveSetting.sort = Sorter.SongArtist; SwitchSort(); InitSongList(); });
+        GameObject.Find("ButtonCharter").GetComponent<Button>().onClick.AddListener(() => { LiveSetting.sort = Sorter.ChartAuthor; SwitchSort(); InitSongList(); });
+        GameObject.Find("ButtonLevel").GetComponent<Button>().onClick.AddListener(() => { LiveSetting.sort = Sorter.ChartDif; SwitchSort(); InitSongList(); });
 
 #if !(UNITY_STANDALONE || UNITY_WSA)
         GameObject.Find("Fullscreen").SetActive(false);
