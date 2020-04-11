@@ -9,7 +9,7 @@ public class NoteStyleToggleGroup : ToggleGroup
 {
     protected Toggle[] persistentTogs;
 
-    protected override void Start()
+    protected override void Awake()
     {
         base.Start();
         persistentTogs = GetComponentsInChildren<Toggle>();
@@ -17,13 +17,13 @@ public class NoteStyleToggleGroup : ToggleGroup
 
     public NoteStyle GetStyle()
     {
-        string name = persistentTogs.First(x => x.isOn).name;
+        string name = persistentTogs.First(x => x.isOn).gameObject.name;
         return (NoteStyle)Enum.Parse(typeof(NoteStyle), name, true);
     }
 
     public void SetStyle(NoteStyle style)
     {
-        var tog = persistentTogs.First(x => x.name == Enum.GetName(typeof(NoteStyle), style));
+        var tog = persistentTogs.First(x => x.gameObject.name == Enum.GetName(typeof(NoteStyle), style));
         tog.isOn = true;
     }
 }
