@@ -55,10 +55,9 @@ namespace System.IO
 
             if (Application.platform == RuntimePlatform.IPhonePlayer)
             {
-                var dummy = index.Select(item => item);
-                foreach(var kvp in dummy)
+                foreach(var key in index.Keys)
                 {
-                    index[kvp.Key] = root + kvp.Value.Substring(92);
+                    index[key] = root + index[key].Substring(92);
                 }
             }
 
