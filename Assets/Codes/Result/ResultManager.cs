@@ -346,13 +346,13 @@ public class ResultManager : MonoBehaviour
         {
             var result = resultList.First();
             lastScore = result.Score;
-            playResult.Score = Math.Max(result.Score, playResult.Score);
-            playResult.ranks = (Ranks)Mathf.Min((int)result.ranks, (int)playResult.ranks);
-            playResult.clearMark = (ClearMarks)Mathf.Min((int)result.clearMark, (int)playResult.clearMark);
-            playResult.Acc = Math.Max(result.Acc, playResult.Acc);
+            result.Score = Math.Max(result.Score, playResult.Score);
+            result.ranks = (Ranks)Mathf.Min((int)result.ranks, (int)playResult.ranks);
+            result.clearMark = (ClearMarks)Mathf.Min((int)result.clearMark, (int)playResult.clearMark);
+            result.Acc = Math.Max(result.Acc, playResult.Acc);
 
-            pr.resultsList.Remove(result);
-            pr.resultsList.Add(playResult);
+            //pr.resultsList.Remove(result);
+            //pr.resultsList.Add(playResult);
         }
         else
         {
