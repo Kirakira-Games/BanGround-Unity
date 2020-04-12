@@ -287,7 +287,7 @@ public class LiveSettingTemplate
         LiveSetting.meshOpacity = meshOpacity;
         LiveSetting.bgmVolume = bgmVolume;
         LiveSetting.seVolume = seVolume;
-        LiveSetting.igseVolume = seVolume;
+        LiveSetting.igseVolume = igseVolume;
         //LiveSetting.bufferSize = bufferSize;
         LiveSetting.syncLineEnabled = syncLineEnabled;
         LiveSetting.laneEffectEnabled = laneEffectEnabled;
