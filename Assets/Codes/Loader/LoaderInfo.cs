@@ -39,10 +39,10 @@ public class LoaderInfo : MonoBehaviour
         songImg.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
 
         songName.text = string.Format(NameFormat, musicHeader.title);
-        songBPM.text = string.Format(BPMFormat, chartData.bpm.Min(o=>o.value), chartData.bpm.Max(o => o.value));
+        songBPM.text = string.Format(BPMFormat, chartData.bpm.Min(o => o.value), chartData.bpm.Max(o => o.value));
         songLevelAndCharter.text = string.Format(LevelAndCharterFormat, Enum.GetName(typeof(Difficulty), chart.Difficulty).ToUpper(), chart.level, chartHeader.authorNick);
         songArtist.text = string.Format(ArtistFormat, musicHeader.artist);
-        songNoteCount.text = string.Format(NoteCountFormat, chartData.notes.Count);
+        songNoteCount.text = string.Format(NoteCountFormat, chartData.numNotes);
     }
 
 }

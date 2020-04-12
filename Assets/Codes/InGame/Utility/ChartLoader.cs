@@ -134,6 +134,7 @@ public static class ChartLoader
 
         // Compute actual time of each note
         float prevBeat = -1e9f;
+        int numNotes = 0;
         // Create game notes
         foreach (Note note in notes)
         {
@@ -148,6 +149,7 @@ public static class ChartLoader
                 // Note is a timing point
                 continue;
             }
+            numNotes++;
             // Create game note
             float time = timing.GetTimeByBeat(beat);
             GameNoteType type = TranslateNoteType(note);
@@ -215,6 +217,7 @@ public static class ChartLoader
         return new GameChartData
         {
             isFuwafuwa = isFuwafuwa,
+            numNotes = numNotes,
             notes = gameNotes,
             speed = timing.SpeedInfo,
             bpm = timing.BPMInfo
