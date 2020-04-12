@@ -22,7 +22,7 @@ public class DifficultySelect : MonoBehaviour
     int selected = 0;
     Text difficultyText;
     Text levelText;
-    SelectManager selectManager;
+    PlayRecordDisplay recordDisplayer;
     private FixBackground background;
 
 
@@ -43,7 +43,7 @@ public class DifficultySelect : MonoBehaviour
         levelText.text = "";
         difficultyText = GameObject.Find("Text_SelectedDifficulty").GetComponent<Text>();
         
-        selectManager = GameObject.Find("SelectManager").GetComponent<SelectManager>();
+        recordDisplayer = GameObject.Find("Left_Panel").GetComponent<PlayRecordDisplay>();
         //OnSongChange();
         background = GameObject.Find("KirakiraBackground").GetComponent<FixBackground>();
     }
@@ -84,7 +84,7 @@ public class DifficultySelect : MonoBehaviour
         levelText.text = levels[selected].ToString();
 
         LiveSetting.actualDifficulty = selected;
-        selectManager.DisplayRecord();
+        recordDisplayer.DisplayRecord();
 
         string path = DataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid).Item1;
         background.UpdateBackground(path);

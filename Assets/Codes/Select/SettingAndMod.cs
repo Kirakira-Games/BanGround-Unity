@@ -314,9 +314,4 @@ public class SettingAndMod : MonoBehaviour
         GetLiveSetting();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }
