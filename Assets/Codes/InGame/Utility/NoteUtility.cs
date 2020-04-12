@@ -95,6 +95,7 @@ public class GameNoteData
 public class GameChartData
 {
     public bool isFuwafuwa;
+    public int numNotes;
     public List<GameNoteData> notes;
     public List<GameBeatInfo> speed;
     public List<GameBeatInfo> bpm;

@@ -25,7 +25,6 @@ public class NoteController : MonoBehaviour
     private GameChartData chart;
     private List<GameNoteData> notes => chart.notes;
     private int noteHead;
-    private int numNotes;
 
     private ISoundEffect[] soundEffects;
     private Animator cameraAnimation;
@@ -305,19 +304,7 @@ public class NoteController : MonoBehaviour
         noteHead = 0;
 
         // Compute number of notes
-        numNotes = 0;
-        foreach (GameNoteData note in notes)
-        {
-            if (note.type == GameNoteType.SlideStart)
-            {
-                numNotes += note.seg.Count;
-            }
-            else
-            {
-                numNotes++;
-            }
-        }
-        ComboManager.manager.Init(numNotes);
+        ComboManager.manager.Init(chart.numNotes);
 
         // Check AutoPlay
         if (LiveSetting.autoPlayEnabled)
@@ -351,11 +338,11 @@ public class NoteController : MonoBehaviour
         }
 
         
-         //background = GameObject.Find("dokidokiBackground").GetComponent<FixBackground>();
-         //background.UpdateBackground(DataLoader.GetBackgroundPath(sid));
+        //background = GameObject.Find("dokidokiBackground").GetComponent<FixBackground>();
+        //background.UpdateBackground(DataLoader.GetBackgroundPath(sid));
 
-         // Lane Effects
-         laneEffects = GameObject.Find("Effects").GetComponent<LaneEffects>();
+        // Lane Effects
+        laneEffects = GameObject.Find("Effects").GetComponent<LaneEffects>();
         laneEffects.Init(chart.bpm, chart.speed);
 
         //Set Play Mod Event
