@@ -53,6 +53,15 @@ namespace System.IO
                 index = new Dictionary<string, string>();
             }
 
+            if (Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+                var dummy = index.Select(item => item);
+                foreach(var kvp in dummy)
+                {
+                    index[kvp.Key] = root + kvp.Value.Substring(92);
+                }
+            }
+
             thread = new Thread(() =>
             {
                 while(true)
