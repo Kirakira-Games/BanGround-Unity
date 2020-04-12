@@ -19,6 +19,10 @@ public static class LiveSetting
         {
             string sets = File.ReadAllText(settingsPath);
             LiveSettingTemplate loaded = JsonConvert.DeserializeObject<LiveSettingTemplate>(sets);
+            /*
+             * 下一条语句用于在0.6.0版本移除旧版的SE3
+             */
+            if (loaded.seStyle == SEStyle.Official) loaded.seStyle = SEStyle.Drum;
             loaded.ApplyToLiveSetting();
         }
         else
