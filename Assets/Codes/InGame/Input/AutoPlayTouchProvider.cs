@@ -78,13 +78,16 @@ public class AutoPlayTouchProvider : KirakiraTouchProvider
         events.Add(touchS);
     }
 
-    private void AddTapEnd(GameNoteData note)
+    private void AddTapEnd(GameNoteData note, bool needMove)
     {
         var pos = note.pos;
         if (NoteUtility.IsFlick(note.type))
         {
-            var last = events[events.Count - 1];
-            AddTapMove(note, -Mathf.Min(note.time - last.time - 1, 20));
+            if (needMove)
+            {
+                var last = events[events.Count - 1];
+                AddTapMove(note, -Mathf.Min(note.time - last.time - 1, 20));
+            }
             pos.y += 1;
         }
         var screenPos = NoteController.mainCamera.WorldToScreenPoint(pos);
@@ -118,12 +121,12 @@ public class AutoPlayTouchProvider : KirakiraTouchProvider
                 {
                     AddTapMove(note.seg[i]);
                 }
-                AddTapEnd(note.seg[note.seg.Count - 1]);
+                AddTapEnd(note.seg[note.seg.Count - 1], true);
             }
             else
             {
                 AddTapStart(note);
-                AddTapEnd(note);
+                AddTapEnd(note, false);
             }
         }
         events.Sort((lhs, rhs) => lhs.time.CompareTo(rhs.time));
