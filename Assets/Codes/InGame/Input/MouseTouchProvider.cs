@@ -18,6 +18,7 @@ public class MouseTouchProvider : KirakiraTouchProvider
             realtime = Time.realtimeSinceStartup,
             phase = phase
         };
+        Debug.Log(touch.ToString());
         return new KirakiraTouchState[] { touch };
     }
 

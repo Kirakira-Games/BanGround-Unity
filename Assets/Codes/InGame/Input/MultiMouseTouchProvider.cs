@@ -55,7 +55,7 @@ class MultiMouseTouchProvider : InputManagerTouchProvider
 
         public int iPress;
         public bool prevButton;
-        public bool button;
+        public bool button => iPress > 0;
     }
 
     Dictionary<int, MousePointer> pointersByDeviceId = new Dictionary<int, MousePointer>();
@@ -147,8 +147,9 @@ class MultiMouseTouchProvider : InputManagerTouchProvider
 
                 pointer.iPress += ev.press;
                 pointer.iPress -= ev.release;
+                //Debug.Log($"p:{ev.press},r:{ev.release},ip:{pointer.iPress},down:{pointer.button},last:{pointer.prevButton}");
 
-                pointer.button = pointer.iPress > 0;
+                //pointer.button = pointer.iPress > 0;
 
                 RectTransform rt = pointer.obj.GetComponent<RectTransform>();
                 rt.position = pointer.position;
@@ -175,12 +176,12 @@ class MultiMouseTouchProvider : InputManagerTouchProvider
                 var pos = NoteUtility.JudgePlane.Raycast(ray, out float dist) ? ray.GetPoint(dist) : KirakiraTouch.INVALID_POSITION;
                 var phase = KirakiraTouchPhase.Ongoing;
 
-                if (current.button ^ current.prevButton)
+                if (current.button != current.prevButton)
                 {
                     phase = KirakiraTouchPhase.Began;
                 }
 
-                states.Append(new KirakiraTouchState
+                var touch = new KirakiraTouchState
                 {
                     touchId = id,
                     screenPos = current.position,
@@ -188,16 +189,18 @@ class MultiMouseTouchProvider : InputManagerTouchProvider
                     time = NoteController.judgeTime,
                     realtime = Time.realtimeSinceStartup,
                     phase = phase
-                });
+                };
+                //Debug.Log(touch.ToString());
+                states = states.Append(touch).ToArray();
             }
             else
             {
-                if (current.button ^ current.prevButton)
+                if (current.button != current.prevButton)
                 {
                     var ray = NoteController.mainCamera.ScreenPointToRay(current.position);
                     var pos = NoteUtility.JudgePlane.Raycast(ray, out float dist) ? ray.GetPoint(dist) : KirakiraTouch.INVALID_POSITION;
 
-                    states.Append(new KirakiraTouchState
+                    states = states.Append(new KirakiraTouchState
                     {
                         touchId = id,
                         screenPos = current.position,
@@ -205,7 +208,7 @@ class MultiMouseTouchProvider : InputManagerTouchProvider
                         time = NoteController.judgeTime,
                         realtime = Time.realtimeSinceStartup,
                         phase = KirakiraTouchPhase.Ended
-                    });
+                    }).ToArray();
                 }
             }
         }
