@@ -308,8 +308,8 @@ public class TouchManager : MonoBehaviour
         }
         else
         {
-#if UNITY_EDITOR
-            provider = new MouseTouchProvider();
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+            provider = new MultiMouseTouchProvider();
 #else
             provider = new InputManagerTouchProvider();
 #endif
