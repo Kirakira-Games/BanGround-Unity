@@ -360,7 +360,7 @@ public class TouchManager : MonoBehaviour
         //}
         foreach (var touch1 in touches)
         {
-            //Debug.Log(touch1);
+            Debug.Log(touch1);
             GetTouchById(touch1.touchId).OnUpdate(touch1);
         }
 
