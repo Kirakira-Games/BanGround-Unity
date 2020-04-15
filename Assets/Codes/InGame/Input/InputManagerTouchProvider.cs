@@ -19,7 +19,7 @@ public class InputManagerTouchProvider : KirakiraTouchProvider
         }
     }
 
-    public KirakiraTouchState[] GetTouches()
+    public virtual KirakiraTouchState[] GetTouches()
     {
         var touches = Input.touches;
         KirakiraTouchState[] ret = new KirakiraTouchState[touches.Length];
