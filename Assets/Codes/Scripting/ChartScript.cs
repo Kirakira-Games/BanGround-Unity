@@ -101,11 +101,11 @@ class ChartScript : IDisposable
 
             luaEnv.AddLoader((ref string lib) =>
             {
-                var path = GetChartResource(lib + ".lua");
+                var modulepath = GetChartResource(lib + ".lua");
 
-                if (KiraFilesystem.Instance.Exists(path))
+                if (KiraFilesystem.Instance.Exists(modulepath))
                 {
-                    return KiraFilesystem.Instance.Read(path);
+                    return KiraFilesystem.Instance.Read(modulepath);
                 }
 
                 return null;
