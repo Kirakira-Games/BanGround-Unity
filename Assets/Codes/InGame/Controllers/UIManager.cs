@@ -57,6 +57,11 @@ public class UIManager : MonoBehaviour
         gateCanvas = GameObject.Find("GateCanvas");
         StartCoroutine(DelayDisableGate());
 
+#if UNITY_STANDALONE_WIN
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+#endif
+
         //Screen.orientation = ScreenOrientation.;
         //MessageBoxController.ShowMsg(LogLevel.INFO, Screen.orientation.ToString());
         switch (Screen.orientation)
@@ -85,6 +90,12 @@ public class UIManager : MonoBehaviour
         {
             yield return new WaitForEndOfFrame();
         }
+
+#if UNITY_STANDALONE_WIN
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.Locked;
+#endif
+
         InGameBackground.instance.pauseVideo();
         Time.timeScale = 0;
         AudioTimelineSync.instance.Pause();
@@ -97,6 +108,11 @@ public class UIManager : MonoBehaviour
     {
         Time.timeScale = 1;
         pause_Canvas.SetActive(false);
+
+#if UNITY_STANDALONE_WIN
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+#endif
 
         if (AudioManager.Instance.isLoading)
             AudioTimelineSync.instance.Play();
@@ -233,6 +249,14 @@ public class UIManager : MonoBehaviour
             AudioManager.Instance.isInGame = false;
             OnAudioFinish(false);
         }
+
+#if UNITY_STANDALONE_WIN
+        // TODO: Maybe move this
+        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Tilde))
+        {
+            OnPauseButtonClick();
+        }
+#endif
     }
 
     private void OnDestroy()
