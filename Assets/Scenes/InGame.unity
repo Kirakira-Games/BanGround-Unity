@@ -576,9 +576,9 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 153337966}
-  m_LocalRotation: {x: -0.26943618, y: -0, z: -0, w: 0.9630183}
-  m_LocalPosition: {x: 0, y: 66.179276, z: 211.35344}
-  m_LocalScale: {x: 1000, y: 1000, z: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -46.19, z: 217.4}
+  m_LocalScale: {x: 10000, y: 10000, z: 10000}
   m_Children: []
   m_Father: {fileID: 506441009}
   m_RootOrder: 0
@@ -8386,6 +8386,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 506441009}
+  - {fileID: 1961399955}
   - {fileID: 1796637315}
   m_Father: {fileID: 0}
   m_RootOrder: 2
@@ -11488,10 +11489,9 @@ Transform:
   m_LocalRotation: {x: 0.26943618, y: -0, z: -0, w: 0.9630183}
   m_LocalPosition: {x: 0, y: 6.92, z: 2.74}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 1961399955}
+  m_Children: []
   m_Father: {fileID: 941457292}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 31.261002, y: 0, z: 0}
 --- !u!114 &1796637316
 MonoBehaviour:
@@ -16865,12 +16865,12 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1961399954}
-  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 76.9, z: 43.54}
+  m_LocalRotation: {x: 0.8714769, y: -0, z: -0, w: 0.4904366}
+  m_LocalPosition: {x: 0, y: 50.059937, z: 79.86514}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 1796637315}
-  m_RootOrder: 0
+  m_Father: {fileID: 941457292}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!114 &1961399956
 MonoBehaviour:
@@ -16897,7 +16897,7 @@ MonoBehaviour:
   m_RenderPostProcessing: 0
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
-  m_StopNaN: 0
+  m_StopNaN: 1
   m_Dithering: 0
   m_ClearDepth: 1
   m_RequiresDepthTexture: 0
@@ -16912,8 +16912,8 @@ Camera:
   m_GameObject: {fileID: 1961399954}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 4
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
