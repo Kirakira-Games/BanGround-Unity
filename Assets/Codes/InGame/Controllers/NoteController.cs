@@ -34,6 +34,8 @@ public class NoteController : MonoBehaviour
 
     private UnityAction<JudgeResult> onJudge;
 
+    private ChartScript chartScript;
+
     private const int WARM_UP_SECOND = 4;
 
     public TapEffectType EmitEffect(Vector3 position, JudgeResult result, GameNoteType type)
@@ -374,6 +376,8 @@ public class NoteController : MonoBehaviour
                     }
                 });
         }
+
+        chartScript = new ChartScript(sid, (Difficulty)LiveSetting.actualDifficulty);
     }
 
     bool shutdown = false;
@@ -420,6 +424,8 @@ public class NoteController : MonoBehaviour
 
         // Update lane effects
         laneEffects.UpdateLaneEffects(audioTime);
+
+        chartScript.OnUpdate(audioTime);
     }
 
     private void OnDestroy()
