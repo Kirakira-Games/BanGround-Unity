@@ -73,6 +73,9 @@ class MultiMouseTouchProvider : InputManagerTouchProvider
     ~MultiMouseTouchProvider()
     {
         kill();
+
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.Locked;
     }
     MousePointer AddCursor(int deviceId)
     {
