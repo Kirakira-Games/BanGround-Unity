@@ -159,7 +159,7 @@ class MultiMouseTouchProvider : InputManagerTouchProvider
 
     public override KirakiraTouchState[] GetTouches()
     {
-        var states = base.GetTouches();
+        var states = base.GetTouches().ToList();
 
         UpdateMouseStatus();
 
@@ -191,7 +191,7 @@ class MultiMouseTouchProvider : InputManagerTouchProvider
                     phase = phase
                 };
                 //Debug.Log(touch.ToString());
-                states = states.Append(touch).ToArray();
+                states.Add(touch);
             }
             else
             {
@@ -200,7 +200,7 @@ class MultiMouseTouchProvider : InputManagerTouchProvider
                     var ray = NoteController.mainCamera.ScreenPointToRay(current.position);
                     var pos = NoteUtility.JudgePlane.Raycast(ray, out float dist) ? ray.GetPoint(dist) : KirakiraTouch.INVALID_POSITION;
 
-                    states = states.Append(new KirakiraTouchState
+                    states.Add(new KirakiraTouchState
                     {
                         touchId = id,
                         screenPos = current.position,
@@ -208,11 +208,11 @@ class MultiMouseTouchProvider : InputManagerTouchProvider
                         time = NoteController.judgeTime,
                         realtime = Time.realtimeSinceStartup,
                         phase = KirakiraTouchPhase.Ended
-                    }).ToArray();
+                    });
                 }
             }
         }
 
-        return states;
+        return states.ToArray();
     }
 }
