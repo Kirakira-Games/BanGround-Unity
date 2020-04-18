@@ -308,8 +308,10 @@ public class TouchManager : MonoBehaviour
         }
         else
         {
-#if UNITY_STANDALONE_WIN
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
             provider = new MultiMouseTouchProvider();
+#elif UNITY_EDITOR_OSX
+            provider = new MouseTouchProvider();
 #else
             provider = new InputManagerTouchProvider();
 #endif
@@ -360,7 +362,7 @@ public class TouchManager : MonoBehaviour
         //}
         foreach (var touch1 in touches)
         {
-            Debug.Log(touch1);
+            //Debug.Log(touch1);
             GetTouchById(touch1.touchId).OnUpdate(touch1);
         }
 
