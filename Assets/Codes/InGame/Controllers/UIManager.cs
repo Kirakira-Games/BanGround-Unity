@@ -57,7 +57,7 @@ public class UIManager : MonoBehaviour
         gateCanvas = GameObject.Find("GateCanvas");
         StartCoroutine(DelayDisableGate());
 
-#if UNITY_STANDALONE_WIN
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
 #endif
@@ -91,9 +91,9 @@ public class UIManager : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
 
-#if UNITY_STANDALONE_WIN
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
         Cursor.visible = true;
-        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.lockState = CursorLockMode.Confined;
 #endif
 
         InGameBackground.instance.pauseVideo();
@@ -109,7 +109,7 @@ public class UIManager : MonoBehaviour
         Time.timeScale = 1;
         pause_Canvas.SetActive(false);
 
-#if UNITY_STANDALONE_WIN
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
 #endif
@@ -250,7 +250,7 @@ public class UIManager : MonoBehaviour
             OnAudioFinish(false);
         }
 
-#if UNITY_STANDALONE_WIN
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
         // TODO: Maybe move this
         if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Tilde))
         {
