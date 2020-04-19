@@ -117,15 +117,6 @@ public static class ChartLoader
         {
             NormalizeBeat(note.beat);
             // April fool
-            if (TitleLoader.IsAprilFool)
-            {
-                if (!isFuwafuwa)
-                {
-                    note.x = note.lane;
-                    note.y = Random.Range(0f, 1f);
-                    note.lane = -1;
-                }
-            }
         }
         isFuwafuwa = IsChartFuwafuwa(notes);
 

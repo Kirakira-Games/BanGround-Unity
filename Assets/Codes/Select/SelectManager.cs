@@ -11,7 +11,6 @@ using AudioProvider;
 
 public class SelectManager : MonoBehaviour
 {
-    public static bool letTheBassKick = false; //AprFOOl
     public const float scroll_Min_Speed = 50f;
 
     private int lastIndex = -1;
@@ -58,12 +57,6 @@ public class SelectManager : MonoBehaviour
         InitComponent();
         InitSongList(false);
         PlayVoicesAtSceneIn();
-
-        if (letTheBassKick)
-        {
-            StartCoroutine(KickBass());
-            letTheBassKick = false;
-        }
     }
 
     IEnumerator KickBass()
