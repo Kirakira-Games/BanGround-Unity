@@ -22,8 +22,6 @@ public class TitleLoader : MonoBehaviour
     public ISoundTrack music;
     private ISoundEffect banGround;
 
-    public static bool IsAprilFool => DateTime.Now.Month == 4 && DateTime.Now.Day == 1;
-
     private void Awake()
     {
         instance = this;
@@ -33,10 +31,6 @@ public class TitleLoader : MonoBehaviour
 
     private void Start()
     {
-        if (IsAprilFool)
-        {
-            voice[0] = Resources.Load<TextAsset>("Sound/voice/LetTheBassKick");
-        }
 
         StartCoroutine(PlayTitle());
 
@@ -53,15 +47,7 @@ public class TitleLoader : MonoBehaviour
         banGround = AudioManager.Instance.PrecacheSE(voice[UnityEngine.Random.Range(0,voice.Length)].bytes);
         banGround.PlayOneShot();
 
-        if(IsAprilFool)
-        {
-            Title.text = "Let the bass kick!";
-            touchStart.text = "Bass Bass Kick Kick Bass Kick Kick";
-            if (!Directory.Exists($"{Application.persistentDataPath}/data/chart/233333"))
-            {
-                File.WriteAllBytes($"{Application.persistentDataPath}/BBKKBKK_Min_Commit_c8ecd6fa71.kirapack", Resources.Load<TextAsset>("BBKKBKK_23dead5111_V0.3.kirapack").bytes);
-            }
-        }
+
     }
 
     IEnumerator CheckUpdate()

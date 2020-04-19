@@ -179,10 +179,6 @@ public class SettingAndMod : MonoBehaviour
     }
     void GetLiveSetting()
     {
-        if (SelectManager.letTheBassKick)
-        {
-            LiveSetting.farClip = 169f;
-        }
         speed_Input.text = LiveSetting.noteSpeed.ToString();
         judge_Input.text = LiveSetting.judgeOffset.ToString();
         audio_Input.text = LiveSetting.audioOffset.ToString();

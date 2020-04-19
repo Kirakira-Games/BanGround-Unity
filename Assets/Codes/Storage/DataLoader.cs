@@ -347,9 +347,6 @@ public class DataLoader
     public static bool LoadAllKiraPackFromInbox()
     {
         bool LoadSuccess = false;
-        if (TitleLoader.IsAprilFool && !KiraFilesystem.Instance.Exists($"data/chart/233333/special.bin"))
-            SelectManager.letTheBassKick = true;
-
         try
         {
             //if (!Directory.Exists(InboxDir))
