@@ -82,7 +82,7 @@ public class SlideMesh : MonoBehaviour
         meshFilter.mesh = mesh;
         if (cacheMat == null)
         {
-            Material material = Resources.Load<Material>("TestAssets/Materials/note_body");
+            Material material = Resources.Load<Material>("InGame/Materials/note_body");
             cacheMat = Instantiate(material);
             cacheMat.mainTexture = NoteUtility.LoadResource<Texture2D>("long_note_mask");
             cacheMat.SetColor("_BaseColor", new Color(0.5843137f, 0.9019607f, 0.3019607f, LiveSetting.longBrightness));

@@ -14,7 +14,7 @@ public class FuwafuwaPillar : MonoBehaviour
         pillar.useWorldSpace = true;
         pillar.receiveShadows = false;
         pillar.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        pillar.material = Resources.Load<Material>("TestAssets/Materials/note_body");
+        pillar.material = Resources.Load<Material>("InGame/Materials/note_body");
         pillar.startWidth = LINE_WIDTH * LiveSetting.noteSize;
         pillar.endWidth = LINE_WIDTH * LiveSetting.noteSize;
         pillar.startColor = Color.white;

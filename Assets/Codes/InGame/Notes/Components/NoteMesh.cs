@@ -18,7 +18,7 @@ public class NoteSprite
     public static void Init()
     {
         sortingLayerID = SortingLayer.NameToID("Note");
-        mat = Resources.Load<Material>("TestAssets/Materials/note");
+        mat = Resources.Load<Material>("InGame/Materials/note");
     }
 }
 */
@@ -89,7 +89,7 @@ public class NoteMesh : MonoBehaviour
     public static void Init()
     {
         sortingLayerID = SortingLayer.NameToID("Note");
-        mat = Resources.Load<Material>("TestAssets/Materials/note");
+        mat = Resources.Load<Material>("InGame/Materials/note");
 
         screenYStart = NoteController.mainCamera.WorldToScreenPoint(
             new Vector3(0, 0, NoteUtility.NOTE_START_Z_POS)).y;
