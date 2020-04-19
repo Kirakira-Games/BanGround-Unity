@@ -29,7 +29,7 @@ public class NoteSyncLine : MonoBehaviour
         lineRenderer.useWorldSpace = false;
         lineRenderer.receiveShadows = false;
         lineRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        lineRenderer.material = Resources.Load<Material>("TestAssets/Materials/sync_line");
+        lineRenderer.material = Resources.Load<Material>("InGame/Materials/sync_line");
         lineRenderer.startWidth = lineWidth * LiveSetting.noteSize;
         lineRenderer.endWidth = lineWidth * LiveSetting.noteSize;
         lineRenderer.startColor = Color.white;

@@ -311,8 +311,10 @@ public class TouchManager : MonoBehaviour
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
             provider = new MultiMouseTouchProvider();
 #elif UNITY_EDITOR_OSX
+            GameObject.Find("MouseCanvas").SetActive(false);
             provider = new MouseTouchProvider();
 #else
+            GameObject.Find("MouseCanvas").SetActive(false);
             provider = new InputManagerTouchProvider();
 #endif
         }
