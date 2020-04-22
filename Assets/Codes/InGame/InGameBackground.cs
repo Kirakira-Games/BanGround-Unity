@@ -88,11 +88,29 @@ public class InGameBackground : MonoBehaviour
         }
     }
 
-    public void playVideo() => vp.Play();
-    public void pauseVideo() => vp.Pause();
-    public void stopVideo() => vp.Stop();
+    public void playVideo()
+    {
+        if (vp.isActiveAndEnabled)
+            vp.Play();
+    }
 
-    public void seekVideo(double sec) => vp.time = sec;
+    public void pauseVideo()
+    {
+        if (vp.isActiveAndEnabled)
+            vp.Pause();
+    }
+
+    public void stopVideo()
+    {
+        if (vp.isActiveAndEnabled)
+            vp.Stop();
+    }
+
+    public void seekVideo(double sec)
+    {
+        if (vp.isActiveAndEnabled)
+            vp.time = sec;
+    }
 
     private void Update()
     {
