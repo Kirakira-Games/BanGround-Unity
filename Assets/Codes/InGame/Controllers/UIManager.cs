@@ -188,6 +188,7 @@ public class UIManager : MonoBehaviour
         isFinished = true;
         InGameBackground.instance.stopVideo();
         AudioManager.Instance.gameBGM?.Dispose();
+        AudioManager.Instance.gameBGM = null;
         StartCoroutine(ShowResult(restart));
     }
 
