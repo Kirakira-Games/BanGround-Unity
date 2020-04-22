@@ -17,7 +17,7 @@ public class AudioManager : MonoBehaviour
     public bool isLoading = false;
     //public bool restart = false;
 
-    public ISoundTrack gameBGM { get; private set; }
+    public ISoundTrack gameBGM { get; set; }
 
     private void Awake()
     {
