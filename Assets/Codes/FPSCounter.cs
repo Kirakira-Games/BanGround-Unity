@@ -32,12 +32,20 @@ public class FPSCounter : MonoBehaviour
         string str = $"FPS : {lastFPS}";
 
         // Audio diff display
-        float? audioDiff = AudioTimelineSync.instance?.smoothAudioDiff;
-        if (audioDiff.HasValue && !float.IsNaN(audioDiff.Value))
+        if (AudioTimelineSync.instance != null && AudioManager.Instance.gameBGM != null)
         {
-            int diff = Mathf.RoundToInt(audioDiff.Value * 1000);
-            string diffStr = diff >= 0 ? "+" + diff : diff.ToString();
-            str += $"\nSync: {diffStr}ms";
+            uint audioTime = AudioManager.Instance.gameBGM.GetPlaybackTime();
+            int syncTime = AudioTimelineSync.instance.GetTimeInMs();
+            str += $"\nS: {audioTime}/{syncTime}";
+            /*
+            float? audioDiff = AudioTimelineSync.instance?.smoothAudioDiff;
+            if (audioDiff.HasValue && !float.IsNaN(audioDiff.Value))
+            {
+                int diff = Mathf.RoundToInt(audioDiff.Value * 1000);
+                string diffStr = diff >= 0 ? "+" + diff : diff.ToString();
+                str += $"\nSync: {diffStr}ms";
+            }
+            */
         }
 
         text.text = str;
