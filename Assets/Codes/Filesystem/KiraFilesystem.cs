@@ -297,7 +297,21 @@ namespace System.IO
         public string Extract(string fileName, bool force = false)
         {
             var bytes = Read(fileName);
-            var path = tempPath + Convert.ToBase64String(Encoding.UTF8.GetBytes(index[fileName] + fileName)) + fileName.Substring(fileName.LastIndexOf('.'), fileName.Length - fileName.LastIndexOf('.'));
+
+            var md5Filename = "";
+
+            using (var md5 = MD5.Create())
+            {
+                var tmp = Encoding.UTF8.GetBytes(index[fileName] + fileName);
+                var arr = md5.ComputeHash(tmp);
+                var arr1 = new char[arr.Length];
+
+                arr.CopyTo(arr1, 0);
+                md5Filename = new string(arr1);
+            }
+                
+
+            var path = Path.Combine(tempPath, md5Filename + Path.GetExtension(fileName));
             var write = true;
 
             if (File.Exists(path))
