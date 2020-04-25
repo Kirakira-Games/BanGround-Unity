@@ -356,6 +356,8 @@ public class TouchManager : MonoBehaviour
 
     public void OnUpdate()
     {
+        if (UIManager.instance.isFinished) return;
+
         var touches = provider.GetTouches();
 
         // Update touches that just starts
