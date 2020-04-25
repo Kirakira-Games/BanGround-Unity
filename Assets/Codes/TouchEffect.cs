@@ -10,6 +10,7 @@ public class TouchEffect : MonoBehaviour
     private ParticleSystem touchEffect;
     bool isEffectEnabled = true;
     float waiting = 0;
+    bool exiting = false;
 
     private void Start()
     {
@@ -55,12 +56,13 @@ public class TouchEffect : MonoBehaviour
         }
 
 #if !UNITY_EDITOR && (UNITY_ANDROID || UNITY_STANDALONE)
-        if (Input.GetKeyUp(KeyCode.Escape))
+        if (Input.GetKeyUp(KeyCode.Escape) && !exiting)
         {
             waiting += 1.5f;
 
             if (waiting > 1.5f)
             {
+                exiting = true;
                 SceneManager.LoadSceneAsync("GameOver", LoadSceneMode.Additive);
             }
             else
