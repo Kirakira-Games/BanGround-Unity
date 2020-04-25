@@ -304,6 +304,7 @@ public class TouchManager : MonoBehaviour
         // Touch provider
         if (LiveSetting.autoPlayEnabled)
         {
+            GameObject.Find("MouseCanvas").SetActive(false);
             provider = new AutoPlayTouchProvider();
         }
         else
