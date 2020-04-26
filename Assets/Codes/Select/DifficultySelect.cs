@@ -84,6 +84,8 @@ public class DifficultySelect : MonoBehaviour
         levelText.text = levels[selected].ToString();
 
         LiveSetting.actualDifficulty = selected;
+        if (LiveSetting.sort == Sorter.ChartDifficulty)
+            SelectManager.instance.InitSongList();
         recordDisplayer.DisplayRecord();
 
         string path = DataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid).Item1;

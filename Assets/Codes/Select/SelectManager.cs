@@ -13,7 +13,7 @@ public class SelectManager : MonoBehaviour
 {
     public const float scroll_Min_Speed = 50f;
 
-    private int lastIndex = -1;
+    private cHeader lastcHeader = new cHeader();
 
     RectTransform rt;
     RectTransform rt_v;
@@ -21,9 +21,8 @@ public class SelectManager : MonoBehaviour
     VerticalLayoutGroup lg;
     DragHandler dh;
 
-
-
-    private Animator scene_Animator;//sort animation
+    //sort
+    private Text sort_Text;
     private Button sort_Button;
 
     public GameObject songItemPrefab;
@@ -47,7 +46,6 @@ public class SelectManager : MonoBehaviour
         DataLoader.ReloadSongList();
     }
 
-    // Start is called before the first frame update
     void Start()
     {
         Screen.orientation = ScreenOrientation.AutoRotation;
@@ -55,24 +53,9 @@ public class SelectManager : MonoBehaviour
         Screen.autorotateToLandscapeRight = true;
 
         InitComponent();
+        InitSort();
         InitSongList(false);
         PlayVoicesAtSceneIn();
-    }
-
-    IEnumerator KickBass()
-    {
-        yield return new WaitForEndOfFrame();
-
-        for (var i = 0; i < DataLoader.chartList.Count; i++)
-        {
-            var chart = DataLoader.chartList[i];
-
-            if (chart.mid == 233333)
-            {
-                SelectSong(i);
-                OnEnterPressed();
-            }
-        }
     }
 
     private void PlayVoicesAtSceneIn()
@@ -83,14 +66,13 @@ public class SelectManager : MonoBehaviour
     private void PlayVoicesAtSceneOut()
     {
         AudioManager.Instance.PrecacheSE(voices[UnityEngine.Random.Range(3, 7)].bytes).PlayOneShot();
-
     }
 
     private void InitComponent()
     {
         //sort
-        scene_Animator = GameObject.Find("SceneAnimator").GetComponent<Animator>();
         sort_Button = GameObject.Find("Sort_Button").GetComponent<Button>();
+        sort_Text = GameObject.Find("Sort_Text").GetComponent<Text>();
         sort_Button.onClick.AddListener(SwitchSort);
 
         //Main Scroll View
@@ -101,27 +83,24 @@ public class SelectManager : MonoBehaviour
         lg = GameObject.Find("SongContent").GetComponent<VerticalLayoutGroup>();
 
         difficultySelect = GameObject.Find("DifficultySelect").GetComponent<DifficultySelect>();
-
-        //Sort
-        GameObject.Find("ButtonName").GetComponent<Button>().onClick.AddListener(() => { LiveSetting.sort = Sorter.SongName; SwitchSort(); InitSongList(); });
-        GameObject.Find("ButtonArtist").GetComponent<Button>().onClick.AddListener(() => { LiveSetting.sort = Sorter.SongArtist; SwitchSort(); InitSongList(); });
-        GameObject.Find("ButtonCharter").GetComponent<Button>().onClick.AddListener(() => { LiveSetting.sort = Sorter.ChartAuthor; SwitchSort(); InitSongList(); });
-        GameObject.Find("ButtonLevel").GetComponent<Button>().onClick.AddListener(() => { LiveSetting.sort = Sorter.ChartDif; SwitchSort(); InitSongList(); });
     }
 
     //---------------------------------------------
-    bool isSortOpen = false;
     void SwitchSort()
     {
-        if (isSortOpen)
-            scene_Animator.Play("SortOut");
-        else
-            scene_Animator.Play("SortIn");
-        isSortOpen = !isSortOpen;
+        LiveSetting.sort++;
+        if ((int)LiveSetting.sort > 3) LiveSetting.sort = 0;
+        sort_Text.text = Enum.GetName(typeof(Sorter), LiveSetting.sort);
+        InitSongList();
+    }
+
+    void InitSort()
+    {
+        sort_Text.text = Enum.GetName(typeof(Sorter), LiveSetting.sort);
     }
 
     //Song Selection-------------------------------
-    private void InitSongList(bool saveSid = true)
+    public void InitSongList(bool saveSid = true)
     {
         //Save Sid
         int sid = DataLoader.chartList[LiveSetting.currentChart].sid;
@@ -130,7 +109,7 @@ public class SelectManager : MonoBehaviour
         IComparer<cHeader> compare;
         switch (LiveSetting.sort)
         {
-            case Sorter.ChartDif:
+            case Sorter.ChartDifficulty:
                 compare = new ChartDifSort();
                 break;
             case Sorter.SongName:
@@ -260,8 +239,8 @@ public class SelectManager : MonoBehaviour
         }
 
         LiveSetting.currentChart = index;
-        if (lastIndex == LiveSetting.currentChart) return;
-        else lastIndex = LiveSetting.currentChart;
+        if (lastcHeader == LiveSetting.CurrentHeader) return;
+        else lastcHeader = LiveSetting.CurrentHeader;
 
         difficultySelect.levels = LiveSetting.CurrentHeader.difficultyLevel.ToArray();
         difficultySelect.OnSongChange();
