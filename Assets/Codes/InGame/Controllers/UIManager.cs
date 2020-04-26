@@ -243,8 +243,8 @@ public class UIManager : MonoBehaviour
         retry_Btn.onClick.RemoveAllListeners();
 
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
-        Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
 #endif
     }
 
@@ -270,8 +270,8 @@ public class UIManager : MonoBehaviour
         resultVoice?.Dispose();
 
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
-        Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
 #endif
     }
 }
