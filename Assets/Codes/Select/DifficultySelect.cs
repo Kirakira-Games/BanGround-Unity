@@ -42,6 +42,7 @@ public class DifficultySelect : MonoBehaviour
         difficultyText = GameObject.Find("Text_SelectedDifficulty").GetComponent<Text>();
         recordDisplayer = GameObject.Find("Left_Panel").GetComponent<PlayRecordDisplay>();
         background = GameObject.Find("KirakiraBackground").GetComponent<FixBackground>();
+        lastDifficulty = LiveSetting.actualDifficulty;
     }
     
     public void OnSongChange()
@@ -66,6 +67,8 @@ public class DifficultySelect : MonoBehaviour
         UpdateView();
     }
 
+    int lastDifficulty;
+    //This Called both change button clicked and song changed
     public void UpdateView()
     {
         for (int i = 0; i < enabledCards.Count; i++)
@@ -80,16 +83,20 @@ public class DifficultySelect : MonoBehaviour
         levelText.text = levels[selected].ToString();
 
         LiveSetting.actualDifficulty = selected;
-        if (LiveSetting.sort == Sorter.ChartDifficulty)
+        LiveSetting.currentDifficulty = selected;
+        if (LiveSetting.sort == Sorter.ChartDifficulty&&lastDifficulty!=LiveSetting.actualDifficulty)
             SelectManager.instance.InitSongList();
+        
+        lastDifficulty = LiveSetting.actualDifficulty;
+        
         recordDisplayer.DisplayRecord();
-
         string path = DataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid).Item1;
         background.UpdateBackground(path);
         //LiveSetting.selectedDifficulty = (Difficulty)enabledCards[0];
         //print(Enum.GetName(typeof(Difficulty), LiveSetting.selectedDifficulty));
     }
 
+    //This called on the change button clicked
     public void OnSwipeNext()
     {
         if (enabledCards.Count <= 1)
@@ -125,7 +132,7 @@ public class DifficultySelect : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
         cardImg[selected].color = Color.white;*/
-        LiveSetting.currentDifficulty = selected;
+        
         processedVoices[selected].PlayOneShot();
     }
 
