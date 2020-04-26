@@ -9,7 +9,7 @@ using Newtonsoft.Json.Converters;
 [JsonConverter(typeof(StringEnumConverter))]
 public enum Sorter
 {
-    ChartDif,
+    ChartDifficulty,
     SongName,
     SongArtist,
     ChartAuthor
@@ -20,7 +20,7 @@ public class ChartDifSort : IComparer<cHeader>
 {
     public int Compare(cHeader x, cHeader y)
     {
-        return x.difficultyLevel.Max() - y.difficultyLevel.Max();
+        return x.difficultyLevel[LiveSetting.actualDifficulty] - y.difficultyLevel[LiveSetting.actualDifficulty];
     }
 }
 
