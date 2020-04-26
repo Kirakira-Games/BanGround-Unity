@@ -9,6 +9,31 @@ using System.Text;
 using System.Threading;
 using UnityEngine;
 
+namespace System.Collections.Generic
+{
+    public static class ExtMethods
+    {
+        public static int Update<T1, T2>(this Dictionary<T1,T2> d, Func<T2,bool> where, Func<T2, T2> set)
+        {
+            var keys = d.Keys.ToArray();
+            var counter = 0;
+
+            for(int i = 0; i < keys.Length; i++)
+            {
+                var v = d[keys[i]];
+
+                if (where(v))
+                {
+                    d[keys[i]] = set(v);
+                    counter++;
+                }
+            }
+
+            return counter;
+        }
+    }
+}
+
 namespace System.IO
 {
     class KiraFilesystem : IDisposable
@@ -55,10 +80,10 @@ namespace System.IO
 
             if (Application.platform == RuntimePlatform.IPhonePlayer)
             {
-                foreach(var key in index.Keys)
-                {
-                    index[key] = root + index[key].Substring(92);
-                }
+                var count = index.Update(value => true, value => root + value.Substring(92));
+
+                if (count > 0)
+                    SaveIndex();
             }
 
             thread = new Thread(() =>
