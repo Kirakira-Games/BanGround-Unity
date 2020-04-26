@@ -9,7 +9,7 @@ public class PlayRecordDisplay : MonoBehaviour
     RawImage clearMark;
     Text score;
     Text acc;
-    PlayRecords playRecords;
+    public static PlayRecords playRecords;
     private void Awake()
     {
         //Marks
@@ -17,9 +17,6 @@ public class PlayRecordDisplay : MonoBehaviour
         clearMark = GameObject.Find("ClearMark").GetComponent<RawImage>();
         score = GameObject.Find("ScoreHistory").GetComponent<Text>();
         acc = GameObject.Find("AccText").GetComponent<Text>();
-    }
-    private void Start()
-    {
         playRecords = PlayRecords.OpenRecord();
     }
     public void DisplayRecord()
