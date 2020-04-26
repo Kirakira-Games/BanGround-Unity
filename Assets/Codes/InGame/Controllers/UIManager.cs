@@ -241,6 +241,11 @@ public class UIManager : MonoBehaviour
         resume_Btn.onClick.RemoveAllListeners();
         retire_Btn.onClick.RemoveAllListeners();
         retry_Btn.onClick.RemoveAllListeners();
+
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+#endif
     }
 
     private void Update()
@@ -263,5 +268,10 @@ public class UIManager : MonoBehaviour
     private void OnDestroy()
     {
         resultVoice?.Dispose();
+
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+#endif
     }
 }
