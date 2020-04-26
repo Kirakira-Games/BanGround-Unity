@@ -37,14 +37,10 @@ public class DifficultySelect : MonoBehaviour
             labelText[i].text = "";
             processedVoices[i] = AudioManager.Instance.PrecacheSE(voices[i].bytes);
         }
-
-
         levelText = GameObject.Find("Text_SelectedLevel").GetComponent<Text>();
         levelText.text = "";
         difficultyText = GameObject.Find("Text_SelectedDifficulty").GetComponent<Text>();
-        
         recordDisplayer = GameObject.Find("Left_Panel").GetComponent<PlayRecordDisplay>();
-        //OnSongChange();
         background = GameObject.Find("KirakiraBackground").GetComponent<FixBackground>();
     }
     
@@ -105,7 +101,6 @@ public class DifficultySelect : MonoBehaviour
             enabledCards.Add(oldList[i]);
         }
         enabledCards.Add(oldList[0]);
-
         StartCoroutine(SwipeOutAnimation());
     }
     IEnumerator SwipeOutAnimation()

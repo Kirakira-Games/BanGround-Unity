@@ -89,7 +89,7 @@ public class SelectManager : MonoBehaviour
     void SwitchSort()
     {
         LiveSetting.sort++;
-        if ((int)LiveSetting.sort > 3) LiveSetting.sort = 0;
+        if ((int)LiveSetting.sort > 4) LiveSetting.sort = 0;
         sort_Text.text = Enum.GetName(typeof(Sorter), LiveSetting.sort);
         InitSongList();
     }
@@ -120,6 +120,9 @@ public class SelectManager : MonoBehaviour
                 break;
             case Sorter.ChartAuthor:
                 compare = new ChartAuthorSort();
+                break;
+            case Sorter.ChartScore:
+                compare = new ChartScoreSort();
                 break;
             default:
                 compare = new SongNameSort();
