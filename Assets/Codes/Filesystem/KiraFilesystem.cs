@@ -9,31 +9,6 @@ using System.Text;
 using System.Threading;
 using UnityEngine;
 
-namespace System.Collections.Generic
-{
-    public static class ExtMethods
-    {
-        public static int Update<T1, T2>(this Dictionary<T1,T2> d, Func<T2,bool> where, Func<T2, T2> set)
-        {
-            var keys = d.Keys.ToArray();
-            var counter = 0;
-
-            for(int i = 0; i < keys.Length; i++)
-            {
-                var v = d[keys[i]];
-
-                if (where(v))
-                {
-                    d[keys[i]] = set(v);
-                    counter++;
-                }
-            }
-
-            return counter;
-        }
-    }
-}
-
 namespace System.IO
 {
     class KiraFilesystem : IDisposable
@@ -110,10 +85,13 @@ namespace System.IO
                 {
                     foreach (var entry in zip.Entries)
                     {
-                        if (Exists(entry.FullName))
-                            RemoveFileFromIndex(entry.FullName);
-
-                        index.Add(entry.FullName, kiraPack);
+                        if (!entry.FullName.EndsWith("/") && entry.Length != 0)
+                        {
+                            if (Exists(entry.FullName))
+                                RemoveFileFromIndex(entry.FullName);
+                        
+                            index.Add(entry.FullName, kiraPack);
+                        }
                     }
                 }
             }
@@ -156,7 +134,7 @@ namespace System.IO
         public void CleanUnusedKirapack()
         {
             var query = from x in index
-                        where x.Key.EndsWith(".kirapack") && (from y in index where y.Value == x.Key select y).Count() == 1
+                        where x.Key.Contains("data/filesystem/") && (from y in index where y.Value == x.Key select y).Count() == 1
                         select x.Key;
 
             query.Any(kirapack =>
@@ -177,6 +155,13 @@ namespace System.IO
 
         public void SaveIndex()
         {
+            if (index.ContainsKey("chart/"))
+                index.Remove("chart/");
+            if (index.ContainsKey("music/"))
+                index.Remove("music/");
+
+            CleanUnusedKirapack();
+
             if (File.Exists(indexFile))
                 File.Delete(indexFile);
 
@@ -203,7 +188,7 @@ namespace System.IO
         private void GetFiles(List<string> files, DirectoryInfo di, Func<string, bool> func)
         {
             var subfiles = from x in di.GetFiles()
-                           where func(x.FullName)
+                           where func(x.FullName.Replace('\\', '/'))
                            select x.FullName.Replace('\\','/').Replace(root, "");
 
             var subdirs = di.GetDirectories();
