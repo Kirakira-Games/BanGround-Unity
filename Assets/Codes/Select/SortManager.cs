@@ -24,16 +24,8 @@ public class ChartDifSort : IComparer<cHeader>
     {
         int difX = x.difficultyLevel[LiveSetting.actualDifficulty];
         int difY = y.difficultyLevel[LiveSetting.actualDifficulty];
-        if (difX - difY == 0)
-        {
-            mHeader xm = DataLoader.GetMusicHeader(x.mid);
-            mHeader ym = DataLoader.GetMusicHeader(y.mid);
-            return string.Compare(xm.title, ym.title);// add a fallback
-        }
-        else
-        {
-            return difX - difY;
-        }
+        int dif = difX - difY;
+        return dif == 0 ? x.mid - y.mid : dif;
     }
 }
 
@@ -43,7 +35,8 @@ public class SongNameSort : IComparer<cHeader>
     {
         mHeader xm = DataLoader.GetMusicHeader(x.mid);
         mHeader ym = DataLoader.GetMusicHeader(y.mid);
-        return string.Compare(xm.title, ym.title);
+        int dif = string.Compare(xm.title, ym.title);
+        return dif == 0 ? x.mid - y.mid : dif;
     }
 }
 
@@ -53,7 +46,8 @@ public class SongArtistSort : IComparer<cHeader>
     {
         mHeader xm = DataLoader.GetMusicHeader(x.mid);
         mHeader ym = DataLoader.GetMusicHeader(y.mid);
-        return string.Compare(xm.artist, ym.artist);
+        int dif = string.Compare(xm.artist, ym.artist);
+        return dif == 0 ? x.mid - y.mid : dif;
     }
 }
 
@@ -63,7 +57,8 @@ public class ChartAuthorSort : IComparer<cHeader>
     {
         string xauthor = string.IsNullOrWhiteSpace(x.authorNick) ? x.author : x.authorNick;
         string yauthor = string.IsNullOrWhiteSpace(y.authorNick) ? y.author : y.authorNick;
-        return string.Compare(xauthor, yauthor);
+        int dif = string.Compare(xauthor, yauthor);
+        return dif == 0 ? x.mid - y.mid : dif;
     }
 }
 
@@ -76,16 +71,8 @@ public class ChartScoreSort : IComparer<cHeader>
         double resultX = 0, resultY = 0;
         if (ListX.Count() > 0) resultX = ListX.Max(o => o.Score);
         if (ListY.Count() > 0) resultY = ListY.Max(o => o.Score);
-        if (resultX - resultY == 0)
-        {
-            mHeader xm = DataLoader.GetMusicHeader(x.mid);
-            mHeader ym = DataLoader.GetMusicHeader(y.mid);
-            return string.Compare(xm.title, ym.title);// add a fallback here too
-        }
-        else
-        {
-            return (int)(resultX - resultY);
-        }
+        int dif = (int)(resultX - resultY);
+        return dif == 0 ? x.mid - y.mid : dif;
         //DAMN:The selector could select a different song if score was changed
     }
 }
