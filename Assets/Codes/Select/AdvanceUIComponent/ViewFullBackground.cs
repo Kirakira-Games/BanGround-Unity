@@ -12,7 +12,7 @@ public class ViewFullBackground : MonoBehaviour,IPointerDownHandler,IPointerUpHa
     private void Start()
     {
         DisableGmobjs.Add(GameObject.Find("Setting_Canvas"));
-        DisableGmobjs.Add(GameObject.Find("Selet_Canvas"));
+        DisableGmobjs.Add(GameObject.Find("Select_Canvas"));
         EnableGmobjs.Add(GameObject.Find("FullBaCkGrouNd"));
 
         foreach (GameObject o in EnableGmobjs) o.SetActive(false);
