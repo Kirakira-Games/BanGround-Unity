@@ -85,7 +85,7 @@ public class DifficultySelect : MonoBehaviour
         LiveSetting.actualDifficulty = selected;
         LiveSetting.currentDifficulty = selected;
         if (LiveSetting.sort == Sorter.ChartDifficulty&&lastDifficulty!=LiveSetting.actualDifficulty)
-            SelectManager.instance.InitSongList();
+            SelectManager.instance.InitSongList(LiveSetting.CurrentHeader.sid);
         
         lastDifficulty = LiveSetting.actualDifficulty;
         
