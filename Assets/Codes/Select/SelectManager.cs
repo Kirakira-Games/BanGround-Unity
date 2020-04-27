@@ -224,6 +224,7 @@ public class SelectManager : MonoBehaviour
 
     public void SelectSong(int index)
     {
+        StartCoroutine(PreviewFadeOut(0.02f));
         if (index == -1)
         {
             StartCoroutine(SelectNear());
@@ -247,7 +248,7 @@ public class SelectManager : MonoBehaviour
 
         difficultySelect.levels = LiveSetting.CurrentHeader.difficultyLevel.ToArray();
         difficultySelect.OnSongChange();
-        //DisplayRecord();
+        StopCoroutine(PlayPreview());
         StartCoroutine(PlayPreview());
     }
 
@@ -265,7 +266,6 @@ public class SelectManager : MonoBehaviour
     IEnumerator PlayPreview()
     {
         mHeader mheader = DataLoader.GetMusicHeader(LiveSetting.CurrentHeader.mid);
-
         if (previewSound != null) {
             previewSound.Dispose();
             previewSound = null;
@@ -285,16 +285,35 @@ public class SelectManager : MonoBehaviour
                 yield return new WaitForSeconds(2.2f); //给语音留个地方
                 previewSound.Play();
             }
+            StopCoroutine("PreviewFadeIn");
+            StartCoroutine(PreviewFadeIn());
             isFirstPlay = false;
         }
     }
 
-    IEnumerator PreviewFadeOut()
+    IEnumerator PreviewFadeOut(float speed =0.008F)
     {
-        for (float i = 1f; i > 0; i -= 0.2f)
-        {
+        if (previewSound == null) yield break;
+        for (float i = 0.7f; i > 0; i -= speed)
+        {   
+            StopCoroutine("PreviewFadeIn");
+            StopCoroutine("PreviewFadeOut");
+            //print("FadingOut");
             previewSound.SetVolume(i);
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForFixedUpdate();
+        }
+    }
+
+    IEnumerator PreviewFadeIn()
+    {
+        if (previewSound == null) yield break;
+        for (float i = 0f; i < 0.7f; i += 0.02f)
+        {
+            StopCoroutine("PreviewFadeIn");
+            StopCoroutine("PreviewFadeOut");
+            //print("FadingIn");
+            previewSound.SetVolume(i);
+            yield return new WaitForFixedUpdate();
         }
     }
 
