@@ -14,6 +14,7 @@ public class AudioTimelineSync : MonoBehaviour
     public float smoothAudioDiff => syncQueue.Count == 0 ? float.NaN : totDiff / syncQueue.Count;
     private Queue<float> syncQueue;
     private const int QUEUE_SIZE = 10;
+    private const float DIFF_TOLERANCE = 0.1f;
     private float totDiff;
     private uint prevAudioTime;
     private static float adjustLimit;
@@ -55,7 +56,7 @@ public class AudioTimelineSync : MonoBehaviour
         syncQueue = new Queue<float>();
         ClearSync();
         deltaTime = -1e3f;
-        adjustLimit = Time.deltaTime * 0.2f * LiveSetting.SpeedCompensationSum;
+        adjustLimit = Time.smoothDeltaTime * 0.2f * LiveSetting.SpeedCompensationSum;
     }
 
     public void Play()
@@ -89,7 +90,7 @@ public class AudioTimelineSync : MonoBehaviour
         if (UIManager.instance.isFinished)
             return;
         var bgm = AudioManager.Instance?.gameBGM;
-        if (bgm == null)
+        if (bgm == null || bgm.GetStatus() != AudioProvider.PlaybackStatus.Playing)
             return;
         // Audio sync test
         uint audioTime = bgm.GetPlaybackTime();
@@ -105,8 +106,15 @@ public class AudioTimelineSync : MonoBehaviour
         }
         // Try to sync
         float adjust = diff * 0.2f;
-        if (Mathf.Abs(adjust) > adjustLimit)
-            adjust = adjustLimit * Mathf.Sign(diff);
+        if (Mathf.Abs(diff) > DIFF_TOLERANCE)
+        {
+            adjust = diff;
+        }
+        else
+        {
+            if (Mathf.Abs(adjust) > adjustLimit)
+                adjust = adjustLimit * Mathf.Sign(diff);
+        }
         deltaTime += adjust;
     }
 }
