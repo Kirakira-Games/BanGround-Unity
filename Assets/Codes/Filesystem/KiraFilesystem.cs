@@ -329,17 +329,8 @@ namespace System.IO
             {
                 var tmp = Encoding.UTF8.GetBytes(index[fileName] + fileName);
                 var arr = md5.ComputeHash(tmp);
-                var arr1 = new char[arr.Length];
 
-                arr.CopyTo(arr1, 0);
-                md5Filename = new string(arr1);
-
-                Path.GetInvalidPathChars().All(c =>
-                {
-                    md5Filename.Replace(c, '_');
-
-                    return true;
-                });
+                md5Filename = Convert.ToBase64String(arr);
             }
                 
 
