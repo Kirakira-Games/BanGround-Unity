@@ -224,7 +224,7 @@ public class SelectManager : MonoBehaviour
 
     public void SelectSong(int index)
     {
-        StartCoroutine(PreviewFadeOut(0.02f));
+        
         if (index == -1)
         {
             StartCoroutine(SelectNear());
@@ -244,7 +244,11 @@ public class SelectManager : MonoBehaviour
 
         LiveSetting.currentChart = index;
         if (lastcHeader == LiveSetting.CurrentHeader) return;
-        else lastcHeader = LiveSetting.CurrentHeader;
+        else
+        {
+            lastcHeader = LiveSetting.CurrentHeader; 
+            StartCoroutine(PreviewFadeOut(0.02f));
+        }
 
         difficultySelect.levels = LiveSetting.CurrentHeader.difficultyLevel.ToArray();
         difficultySelect.OnSongChange();
