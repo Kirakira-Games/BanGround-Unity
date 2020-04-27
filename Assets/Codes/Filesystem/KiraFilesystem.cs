@@ -333,6 +333,13 @@ namespace System.IO
 
                 arr.CopyTo(arr1, 0);
                 md5Filename = new string(arr1);
+
+                Path.GetInvalidPathChars().All(c =>
+                {
+                    md5Filename.Replace(c, '_');
+
+                    return true;
+                });
             }
                 
 
