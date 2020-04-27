@@ -8,7 +8,7 @@ using UnityEngine.Networking;
 using System;
 using System.Linq;
 
-public class DataLoader
+public static class DataLoader
 {
     public static readonly string DataDir = Application.persistentDataPath + "/data/";
     public static readonly string ChartDir = "chart/";
@@ -23,6 +23,7 @@ public class DataLoader
     public static SongList songList;
     public static List<mHeader> musicList => songList.mHeaders;
     public static List<cHeader> chartList => songList.cHeaders;
+    public static bool loaded => songList != null;
 
     public const int ChartVersion = 1;
     private const int InitialChartVersion = 4;

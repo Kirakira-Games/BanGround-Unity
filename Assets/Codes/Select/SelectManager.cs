@@ -41,9 +41,6 @@ public class SelectManager : MonoBehaviour
     private void Awake()
     {
         instance = this;
-        DataLoader.LoadAllKiraPackFromInbox();
-        DataLoader.RefreshSongList();
-        DataLoader.ReloadSongList();
     }
 
     void Start()
@@ -52,9 +49,16 @@ public class SelectManager : MonoBehaviour
         Screen.autorotateToLandscapeLeft = true;
         Screen.autorotateToLandscapeRight = true;
 
+        int selectedSid = -1;
+        if (DataLoader.loaded)
+            selectedSid = LiveSetting.CurrentHeader.sid;
+        DataLoader.LoadAllKiraPackFromInbox();
+        DataLoader.RefreshSongList();
+        DataLoader.ReloadSongList();
+
         InitComponent();
         InitSort();
-        InitSongList(false);
+        InitSongList(selectedSid);
         PlayVoicesAtSceneIn();
     }
 
@@ -91,7 +95,7 @@ public class SelectManager : MonoBehaviour
         LiveSetting.sort++;
         if ((int)LiveSetting.sort > 4) LiveSetting.sort = 0;
         sort_Text.text = Enum.GetName(typeof(Sorter), LiveSetting.sort);
-        InitSongList();
+        InitSongList(LiveSetting.CurrentHeader.sid);
     }
 
     void InitSort()
@@ -100,11 +104,8 @@ public class SelectManager : MonoBehaviour
     }
 
     //Song Selection-------------------------------
-    public void InitSongList(bool saveSid = true)
+    public void InitSongList(int selectedSid = -1)
     {
-        //Save Sid
-        int sid = DataLoader.chartList[LiveSetting.currentChart].sid;
-
         // Sort SongList
         IComparer<cHeader> compare;
         switch (LiveSetting.sort)
@@ -160,13 +161,12 @@ public class SelectManager : MonoBehaviour
         // After import, select imported chart
         if (DataLoader.LastImportedSid != -1)
         {
-            sid = DataLoader.LastImportedSid;
-            saveSid = true;
+            selectedSid = DataLoader.LastImportedSid;
             DataLoader.LastImportedSid = -1;
         }
-        if (saveSid)
+        if (selectedSid != -1)
         {
-            LiveSetting.currentChart = DataLoader.chartList.IndexOf(DataLoader.chartList.First(x => x.sid == sid));
+            LiveSetting.currentChart = DataLoader.chartList.IndexOf(DataLoader.chartList.First(x => x.sid == selectedSid));
         }
 
         StartCoroutine(SelectDefault());
