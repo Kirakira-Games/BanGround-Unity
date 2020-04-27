@@ -169,9 +169,19 @@ public static class DataLoader
         musicDic = new Dictionary<int, mHeader>();
 
         var newSongList = new SongList();
-        var referencedSongs = new Dictionary<string, List<string>>();
+        var referencedSongs = new Dictionary<mHeader, int>();
 
         var files = KiraFilesystem.Instance.ListFiles();
+
+        var musics = from x in files
+                     where x.EndsWith("mheader.bin")
+                     select x;
+
+        foreach (var music in musics)
+        {
+            mHeader musicHeader = ProtobufHelper.LoadFromKiraFs<mHeader>(music);
+            referencedSongs.Add(musicHeader, 0);
+        }
 
         var charts = from x in files
                      where x.EndsWith("cheader.bin")
@@ -181,14 +191,18 @@ public static class DataLoader
         {
             cHeader chartHeader = ProtobufHelper.LoadFromKiraFs<cHeader>(chart);
             // Update reference
-            string mid = chartHeader.mid.ToString();
+            var mid = chartHeader.mid;
 
-            if (!referencedSongs.ContainsKey(mid))
+            try
             {
-                referencedSongs[mid] = new List<string>();
+                var music = referencedSongs.First(mc => mc.Key.mid == mid);
+                referencedSongs[music.Key]++;
             }
-
-            referencedSongs[mid].Add(chart);
+            catch
+            {
+                Debug.LogWarning($"Chart {chartHeader.sid} does not have corresponding song {chartHeader.mid}. GC!");
+                continue;
+            }
 
             chartHeader.difficultyLevel = new List<int>();
 
@@ -208,24 +222,28 @@ public static class DataLoader
             newSongList.cHeaders.Add(chartHeader);
         }
 
-        var musics = from x in files
-                     where x.EndsWith("mheader.bin")
-                     select x;
+        
 
-        foreach (var music in musics)
+        foreach (var (song, refcount) in referencedSongs)
         {
-            mHeader musicHeader = ProtobufHelper.LoadFromKiraFs<mHeader>(music);
-            referencedSongs.Remove(musicHeader.mid.ToString());
-            
-            newSongList.mHeaders.Add(musicHeader);
-        }
-
-        foreach (var song in referencedSongs)
-        {
-            foreach (var sid in song.Value)
+            if(refcount == 0)
             {
-                Debug.LogWarning(string.Format("Chart {0} does not have corresponding song {1}. GC!", sid, song.Key));
-                newSongList.cHeaders.Remove(newSongList.cHeaders.Find(header => header.sid.ToString() == sid));
+                var musicDir = $"music/{song.mid}";
+
+                var musicFiles = KiraFilesystem.Instance.ListFiles(name => name.Contains(musicDir));
+                musicFiles.All(item =>
+                {
+                    KiraFilesystem.Instance.RemoveFileFromIndex(item);
+                    return true;
+                });
+
+                KiraFilesystem.Instance.SaveIndex();
+
+                Debug.Log($"Removing music {song} due to the refcount is zero");
+            }
+            else
+            {
+                newSongList.mHeaders.Add(song);
             }
         }
 
