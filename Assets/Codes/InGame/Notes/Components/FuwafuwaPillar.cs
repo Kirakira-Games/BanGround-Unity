@@ -7,6 +7,8 @@ public class FuwafuwaPillar : MonoBehaviour
     private LineRenderer pillar;
     private const float LINE_WIDTH = 0.2f;
 
+    static KVarRef r_notesize = new KVarRef("r_notesize");
+
     private void Awake()
     {
         pillar = gameObject.AddComponent<LineRenderer>();
@@ -15,8 +17,8 @@ public class FuwafuwaPillar : MonoBehaviour
         pillar.receiveShadows = false;
         pillar.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         pillar.material = Resources.Load<Material>("InGame/Materials/note_body");
-        pillar.startWidth = LINE_WIDTH * LiveSetting.noteSize;
-        pillar.endWidth = LINE_WIDTH * LiveSetting.noteSize;
+        pillar.startWidth = LINE_WIDTH * r_notesize;
+        pillar.endWidth = LINE_WIDTH * r_notesize;
         pillar.startColor = Color.white;
         pillar.endColor = Color.white;
         pillar.rendererPriority = 1;

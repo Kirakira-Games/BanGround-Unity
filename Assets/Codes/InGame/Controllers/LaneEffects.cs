@@ -63,9 +63,11 @@ public class LaneEffects : MonoBehaviour
         };
     }
 
+    static KVarRef r_notespeed = new KVarRef("r_notespeed");
+
     public void UpdateLaneEffects(int audioTime)
     {
-        float speed = GetSpeed(audioTime) * LiveSetting.SpeedCompensationSum * (LiveSetting.noteSpeed + 1) / 12;
+        float speed = GetSpeed(audioTime) * LiveSetting.SpeedCompensationSum * (r_notespeed + 1) / 12;
         float abs = Mathf.Abs(speed);
         if (prevSpeed != speed)
         {

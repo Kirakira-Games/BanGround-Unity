@@ -292,6 +292,8 @@ public class TouchManager : MonoBehaviour
 #endif
     }
 
+    static KVarRef mod_autoplay = new KVarRef("mod_autoplay");
+
     private void Awake()
     {
         instance = this;
@@ -302,7 +304,7 @@ public class TouchManager : MonoBehaviour
         KirakiraTouch.flickDistPixels = Mathf.Min(Screen.height / 20, NoteUtility.FLICK_JUDGE_DIST / 2.54f * KirakiraTouch.dpi);
 
         // Touch provider
-        if (LiveSetting.autoPlayEnabled)
+        if (mod_autoplay)
         {
             GameObject.Find("MouseCanvas").SetActive(false);
             provider = new AutoPlayTouchProvider();

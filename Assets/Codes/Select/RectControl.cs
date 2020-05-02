@@ -7,6 +7,8 @@ using System;
 using System.IO;
 using System.Linq;
 
+#pragma warning disable 0649
+#pragma warning disable 0414
 public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerClickHandler, IPointerExitHandler
 {
     RectTransform rt_m;
@@ -16,7 +18,8 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     VerticalLayoutGroup vg;
     DragHandler dh;
 
-    [SerializeField] private Animator deleteAni;
+    [SerializeField] 
+    private Animator deleteAni;
 
     SelectManager sm;
     public int index;

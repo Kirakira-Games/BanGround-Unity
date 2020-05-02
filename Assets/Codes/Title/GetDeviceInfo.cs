@@ -4,6 +4,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
+#pragma warning disable 0649
 public class GetDeviceInfo : MonoBehaviour
 {
     [SerializeField] private Button openBtn;

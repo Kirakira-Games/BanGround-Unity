@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
 
+#pragma warning disable 0649
+#pragma warning disable 0414
 public class TouchEffect : MonoBehaviour
 {
     private RectTransform trans;

@@ -61,6 +61,8 @@ public class NoteController : MonoBehaviour
         return se;
     }
 
+    static KVarRef r_shake_flick = new KVarRef("r_shake_flick");
+
     // Judge a note as result
     public void Judge(NoteBase notebase, JudgeResult result, KirakiraTouch touch)
     {
@@ -75,7 +77,7 @@ public class NoteController : MonoBehaviour
         }
 
         //粉键震动
-        if (LiveSetting.shakeFlick&&(notebase.type == GameNoteType.Flick || notebase.type == GameNoteType.SlideEndFlick)&&result <= JudgeResult.Great)
+        if (r_shake_flick && (notebase.type == GameNoteType.Flick || notebase.type == GameNoteType.SlideEndFlick)&&result <= JudgeResult.Great)
             cameraAnimation.Play("vibe");
 
         // Tap effect
@@ -271,6 +273,9 @@ public class NoteController : MonoBehaviour
         }
     }
 
+    static KVarRef mod_autoplay = new KVarRef("mod_autoplay");
+    static KVarRef cl_sestyle = new KVarRef("cl_sestyle");
+
     void Start()
     {
         instance = this;
@@ -309,7 +314,7 @@ public class NoteController : MonoBehaviour
         ComboManager.manager.Init(chart.numNotes);
 
         // Check AutoPlay
-        if (LiveSetting.autoPlayEnabled)
+        if (mod_autoplay)
         {
             (TouchManager.provider as AutoPlayTouchProvider).Init(notes);
         }
@@ -317,11 +322,11 @@ public class NoteController : MonoBehaviour
         // Sound effects
         soundEffects = new ISoundEffect[5]
         {
-            AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), LiveSetting.seStyle) +"/perfect.wav").bytes),
-            AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), LiveSetting.seStyle) +"/great.wav").bytes),
-            AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), LiveSetting.seStyle) +"/empty.wav").bytes),
-            AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), LiveSetting.seStyle) +"/empty.wav").bytes),
-            AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), LiveSetting.seStyle) +"/flick.wav").bytes)
+            AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) +"/perfect.wav").bytes),
+            AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) +"/great.wav").bytes),
+            AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) +"/empty.wav").bytes),
+            AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) +"/empty.wav").bytes),
+            AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) +"/flick.wav").bytes)
         };
 
         AudioManager.Instance.DelayPlayInGameBGM(KiraFilesystem.Instance.Read(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), WARM_UP_SECOND);
@@ -382,12 +387,15 @@ public class NoteController : MonoBehaviour
 
     bool shutdown = false;
 
+    static KVarRef o_judge = new KVarRef("o_judge");
+    static KVarRef o_audio = new KVarRef("o_audio");
+
     void Update()
     {
         if (SceneLoader.Loading || shutdown || Time.timeScale == 0) return;
 
-        audioTime = AudioTimelineSync.instance.GetTimeInMs() + AudioTimelineSync.RealTimeToBGMTime(LiveSetting.audioOffset);
-        judgeTime = audioTime - LiveSetting.judgeOffset;
+        audioTime = AudioTimelineSync.instance.GetTimeInMs() + AudioTimelineSync.RealTimeToBGMTime(o_audio);
+        judgeTime = audioTime - o_judge;
 
         // Create notes
         UpdateNotes(audioTime);

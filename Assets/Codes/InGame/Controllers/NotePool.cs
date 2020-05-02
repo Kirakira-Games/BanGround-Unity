@@ -46,6 +46,9 @@ public class NotePool : MonoBehaviour
     private Queue<GameObject>[] teQueue;
     private Object[] tapEffects;
 
+    static KVarRef r_notesize = new KVarRef("r_notesize");
+    static KVarRef o_judge = new KVarRef("o_judge");
+
     private void AddNote(Queue<GameObject> Q, GameNoteType type, int count = 1)
     {
         var name = Enum.GetName(typeof(GameNoteType), type);
@@ -77,7 +80,7 @@ public class NotePool : MonoBehaviour
                     break;
             }
             note.isDestroyed = true;
-            note.transform.localScale = Vector3.one * NoteUtility.NOTE_SCALE * LiveSetting.noteSize;
+            note.transform.localScale = Vector3.one * NoteUtility.NOTE_SCALE * r_notesize;
 
             if (NoteUtility.IsSlide(type))
             {
@@ -118,7 +121,7 @@ public class NotePool : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             var fx = Instantiate(tapEffects[effect], Vector3.zero, Quaternion.identity) as GameObject;
-            fx.transform.localScale = Vector3.one * LiveSetting.noteSize * NoteUtility.NOTE_SCALE;
+            fx.transform.localScale = Vector3.one * r_notesize * NoteUtility.NOTE_SCALE;
             //fx.SetActive(false);
             fx.transform.SetParent(transform);
             teQueue[effect].Enqueue(fx);
@@ -141,7 +144,7 @@ public class NotePool : MonoBehaviour
                 {
                     type = i.type,
                     time = range == -1 ?
-                        note.time + NoteUtility.SLIDE_TICK_JUDGE_RANGE + Mathf.Max(0, LiveSetting.judgeOffset) :
+                        note.time + NoteUtility.SLIDE_TICK_JUDGE_RANGE + Mathf.Max(0, o_judge) :
                         note.time + range,
                     delta = -1
                 });
@@ -159,7 +162,7 @@ public class NotePool : MonoBehaviour
             {
                 type = note.type,
                 time = range == -1 ?
-                    note.time + NoteUtility.SLIDE_TICK_JUDGE_RANGE + Mathf.Max(0, LiveSetting.judgeOffset) :
+                    note.time + NoteUtility.SLIDE_TICK_JUDGE_RANGE + Mathf.Max(0, o_judge) :
                     note.time + range,
                 delta = -1
             });

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+#pragma warning disable 0649
 public class SceneLoader : MonoBehaviour
 {
     [SerializeField] private GameObject songInfo;
