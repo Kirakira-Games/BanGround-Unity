@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
 
+#pragma warning disable 0649
 public class LoaderInfo : MonoBehaviour
 {
     private mHeader musicHeader;

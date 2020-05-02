@@ -46,6 +46,7 @@ class MultiMouseTouchProvider : InputManagerTouchProvider
         public byte type;
     }
 
+#pragma warning disable 0649
     public class MousePointer
     {
         public GameObject obj;

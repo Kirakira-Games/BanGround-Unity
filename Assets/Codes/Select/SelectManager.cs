@@ -9,6 +9,7 @@ using System.Linq;
 using System;
 using AudioProvider;
 
+#pragma warning disable 0649
 public class SelectManager : MonoBehaviour
 {
     public const float scroll_Min_Speed = 50f;
@@ -27,7 +28,8 @@ public class SelectManager : MonoBehaviour
 
     public GameObject songItemPrefab;
 
-    [SerializeField] private TextAsset[] voices;
+    [SerializeField] 
+    private TextAsset[] voices;
 
     public List<cHeader> chartList => DataLoader.chartList;
     List<GameObject> SelectButtons = new List<GameObject>();
@@ -36,7 +38,10 @@ public class SelectManager : MonoBehaviour
 
     public static SelectManager instance;
 
-    [HideInInspector] public ISoundTrack previewSound;
+    [HideInInspector] 
+    public ISoundTrack previewSound;
+
+    static KVar cl_cursorter = new KVar("cl_cursorter", "0", KVarFlags.Archive);
 
     private void Awake()
     {
@@ -92,15 +97,17 @@ public class SelectManager : MonoBehaviour
     //---------------------------------------------
     void SwitchSort()
     {
-        LiveSetting.sort++;
-        if ((int)LiveSetting.sort > 4) LiveSetting.sort = 0;
-        sort_Text.text = Enum.GetName(typeof(Sorter), LiveSetting.sort);
+        cl_cursorter.Set(cl_cursorter + 1);
+        if (cl_cursorter > 4) 
+            cl_cursorter.Set(0);
+
+        sort_Text.text = Enum.GetName(typeof(Sorter), (Sorter)cl_cursorter);
         InitSongList(LiveSetting.CurrentHeader.sid);
     }
 
     void InitSort()
     {
-        sort_Text.text = Enum.GetName(typeof(Sorter), LiveSetting.sort);
+        sort_Text.text = Enum.GetName(typeof(Sorter), (Sorter)cl_cursorter);
     }
 
     //Song Selection-------------------------------
@@ -108,7 +115,7 @@ public class SelectManager : MonoBehaviour
     {
         // Sort SongList
         IComparer<cHeader> compare;
-        switch (LiveSetting.sort)
+        switch ((Sorter)cl_cursorter)
         {
             case Sorter.ChartDifficulty:
                 compare = new ChartDifSort();
@@ -325,7 +332,9 @@ public class SelectManager : MonoBehaviour
     {
         StartCoroutine(PreviewFadeOut());
         SettingAndMod.instance.SetLiveSetting();
-        File.WriteAllText(LiveSetting.settingsPath, JsonConvert.SerializeObject(new LiveSettingTemplate()));
+
+        KVSystem.Instance.SaveConfig();
+
         PlayVoicesAtSceneOut();
         SceneLoader.LoadScene("Select", "InGame", true);
     }

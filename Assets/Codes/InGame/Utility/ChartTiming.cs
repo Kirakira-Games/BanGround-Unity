@@ -216,6 +216,7 @@ public class ChartTiming
         }
     }
 
+    static KVarRef r_mirror = new KVarRef("r_mirror");
     public void AddAnimation(Note data, GameNoteData gameNote)
     {
         // Debug.Log("Add animation");
@@ -329,7 +330,7 @@ public class ChartTiming
         gameNote.appearTime = gameNote.anims[0].S.t;
 
         // Check mirror
-        if (LiveSetting.mirrowEnabled)
+        if (r_mirror)
         {
             if (gameNote.lane != -1)
                 gameNote.lane = 6 - gameNote.lane;
