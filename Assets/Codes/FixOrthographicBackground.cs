@@ -8,13 +8,7 @@ using UnityEngine.UI;
 
 public class FixOrthographicBackground : FixBackground
 {
-    Image fullback;
     public bool isResult;
-    private void Awake()
-    {
-        if(!isResult)
-        fullback = GameObject.Find("FullBaCkGrouNd").GetComponent<Image>();
-    }
     protected override void Start()
     {
         mainCam = Camera.main;
@@ -35,12 +29,4 @@ public class FixOrthographicBackground : FixBackground
         transform.localScale = Vector3.one * scale;
     }
 
-    protected override void GetAndSetBG(string path)
-    {
-        var tex = KiraFilesystem.Instance.ReadTexture2D(path);
-        render.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
-        if (!isResult)
-            fullback.sprite = render.sprite;
-        UpdateScale();
-    }
 }
