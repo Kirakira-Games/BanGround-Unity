@@ -21,17 +21,17 @@ public class AudioManager : MonoBehaviour
 
     private void Awake()
     {
-        KVar cl_audioengine = new KVar("cl_audioengine", "Fmod", KVarFlags.Archive | KVarFlags.StringOnly);
-        KVar cl_bassbuffer = new KVar("cl_bassbuffer", "-1", KVarFlags.Archive);
-        KVar cl_fmodbuffer = new KVar("cl_fmodbuffer", "-1", KVarFlags.Archive);
+        KVar snd_engine = new KVar("snd_engine", "Fmod", KVarFlags.Archive | KVarFlags.StringOnly);
+        KVar snd_buffer_bass = new KVar("snd_buffer_bass", "-1", KVarFlags.Archive);
+        KVar snd_buffer_fmod = new KVar("snd_buffer_fmod", "-1", KVarFlags.Archive);
         int bufferIndex;
         //string engine = PlayerPrefs.GetString("AudioEngine", "Fmod");
-        if (cl_audioengine == "Bass") 
+        if (snd_engine == "Bass") 
         {
-            bufferIndex = cl_bassbuffer;
+            bufferIndex = snd_buffer_bass;
             if (bufferIndex == -1)
             {
-                cl_bassbuffer.Set(5);
+                snd_buffer_bass.Set(5);
                 bufferIndex = 5;
             }
             Provider = new BassAudioProvider();
@@ -39,10 +39,10 @@ public class AudioManager : MonoBehaviour
         }
         else
         {
-            bufferIndex = cl_fmodbuffer;
+            bufferIndex = snd_buffer_fmod;
             if (bufferIndex == -1)
             {
-                cl_fmodbuffer.Set(2);
+                snd_buffer_fmod.Set(2);
                 bufferIndex = 2;
             }
             Provider = new FmodAudioProvider();

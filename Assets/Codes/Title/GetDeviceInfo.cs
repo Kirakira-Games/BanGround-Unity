@@ -33,14 +33,14 @@ public class GetDeviceInfo : MonoBehaviour
             animator.Play("FlyOut");
         });
 
-        KVarRef cl_audioengine = new KVarRef("cl_audioengine");
+        KVarRef snd_engine = new KVarRef("snd_engine");
 
         StringBuilder sb = new StringBuilder();
         sb.Append("Device Model: ").AppendLine(SystemInfo.deviceModel).AppendLine();
         sb.Append("System: ").AppendLine(SystemInfo.operatingSystem).AppendLine();
         sb.Append("CPU: ").AppendLine(SystemInfo.processorType).AppendLine();
         sb.Append("GPU: ").AppendLine(SystemInfo.graphicsDeviceName).AppendLine();
-        sb.Append("AudioProvider: ").AppendLine(cl_audioengine).AppendLine();
+        sb.Append("AudioProvider: ").AppendLine(snd_engine).AppendLine();
 #if UNITY_ANDROID && !UNITY_EDITOR
         sb.Append("SampleRate: ").AppendLine(AppPreLoader.sampleRate.ToString()).AppendLine();
         sb.Append("BufferSize: ").AppendLine(AppPreLoader.bufferSize.ToString()).AppendLine();
@@ -52,19 +52,19 @@ public class GetDeviceInfo : MonoBehaviour
 
     private string GetCurrentBuffer()
     {
-        KVarRef cl_audioengine = new KVarRef("cl_audioengine");
-        KVarRef cl_bassbuffer = new KVarRef("cl_bassbuffer");
-        KVarRef cl_fmodbuffer = new KVarRef("cl_fmodbuffer");
+        KVarRef snd_engine = new KVarRef("snd_engine");
+        KVarRef snd_buffer_bass = new KVarRef("snd_buffer_bass");
+        KVarRef snd_buffer_fmod = new KVarRef("snd_buffer_fmod");
 
         int bufferIndex;
-        if (cl_audioengine == "Bass")
+        if (snd_engine == "Bass")
         {
-            bufferIndex = cl_bassbuffer;
+            bufferIndex = snd_buffer_bass;
             return (AppPreLoader.bufferSize * HandelValue_Buffer.BassBufferScale[bufferIndex]).ToString();
         }
         else
         {
-            bufferIndex = cl_fmodbuffer;
+            bufferIndex = snd_buffer_fmod;
             return (AppPreLoader.bufferSize / HandelValue_Buffer.FmodBufferScale[bufferIndex]).ToString();
         }
 

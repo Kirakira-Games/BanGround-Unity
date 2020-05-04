@@ -23,7 +23,6 @@ public enum KVarFlags
     StringOnly = 32
 }
 
-
 // KVar == Kirakira Variable
 public class KVar
 {
@@ -35,6 +34,8 @@ public class KVar
     private int m_intValue = 0;
     private float m_floatValue = 0.0f;
     private bool m_boolValue = false;
+
+    private Action<object> m_cbValueChanged = null;
 
     private void UpdateValue(object o)
     {
@@ -112,18 +113,24 @@ public class KVar
 
         var type = typeof(T);
 
+        object lastValue;
+
         switch (type.Name)
         {
             case "String":
+                lastValue = m_stringValue;
                 m_stringValue = (string)(object)value;
                 break;
             case "Int32":
+                lastValue = m_intValue;
                 m_intValue = (int)(object)value;
                 break;
             case "Single":
+                lastValue = m_floatValue;
                 m_floatValue = (float)(object)value;
                 break;
             case "Boolean":
+                lastValue = m_boolValue;
                 m_boolValue = (bool)(object)value;
                 break;
             default:
@@ -131,6 +138,8 @@ public class KVar
         }
 
         UpdateValue(value);
+
+        m_cbValueChanged?.Invoke(lastValue);
     }
 
     public bool IsFlagSet(KVarFlags flag)
@@ -138,14 +147,23 @@ public class KVar
         return m_flags.HasFlag(flag);
     }
 
-    public KVar(string name, string defaultValue, KVarFlags flag = 0, string help = "")
+    /// <summary>
+    /// Create a KVar
+    /// </summary>
+    /// <param name="name">Name of the KVar</param>
+    /// <param name="defaultValue">Default Value</param>
+    /// <param name="flag">Flags</param>
+    /// <param name="help">Help string</param>
+    /// <param name="callback">Callback that will be called after value changed</param>
+    public KVar(string name, string defaultValue, KVarFlags flag = 0, string help = "", Action<object> callback = null)
     {
         Name = name;
         Description = help;
         m_stringValue = defaultValue;
         m_flags = flag;
+        m_cbValueChanged = callback;
 
-        if(!IsFlagSet(KVarFlags.StringOnly))
+        if (!IsFlagSet(KVarFlags.StringOnly))
             UpdateValue(m_stringValue);
 
         KVSystem.Instance.Add(this);
