@@ -23,18 +23,22 @@ public class HandelValue_Buffer : MonoBehaviour
             return;
         }
 
-        if (PlayerPrefs.GetString("AudioEngine", "Fmod") == "Bass")
+        KVarRef cl_audioengine = new KVarRef("cl_audioengine");
+        KVarRef cl_bassbuffer = new KVarRef("cl_bassbuffer");
+        KVarRef cl_fmodbuffer = new KVarRef("cl_fmodbuffer");
+
+        if (cl_audioengine == "Bass")
         {
             slider.minValue = 0;
             slider.maxValue = 15;
             slider.wholeNumbers = true;
 
-            slider.value = PlayerPrefs.GetInt("BassBufferIndex");
+            slider.value = cl_bassbuffer;
             valueText.text = ((int)(AppPreLoader.bufferSize * BassBufferScale[(int)slider.value])).ToString();
             slider.onValueChanged.AddListener((value) =>
             {
                 valueText.text = ((int)(AppPreLoader.bufferSize * BassBufferScale[(int)slider.value])).ToString();
-                PlayerPrefs.SetInt("BassBufferIndex", (int)value);
+                cl_bassbuffer.Set((int)value);
             });
         }
         else
@@ -43,12 +47,12 @@ public class HandelValue_Buffer : MonoBehaviour
             slider.maxValue = 4;
             slider.wholeNumbers = true;
 
-            slider.value = PlayerPrefs.GetInt("FmodBufferIndex");
+            slider.value = cl_fmodbuffer;
             valueText.text = (AppPreLoader.bufferSize / FmodBufferScale[(int)slider.value]).ToString();
             slider.onValueChanged.AddListener((value) =>
             {
                 valueText.text = (AppPreLoader.bufferSize / FmodBufferScale[(int)value]).ToString();
-                PlayerPrefs.SetInt("FmodBufferIndex", (int)value);
+                cl_fmodbuffer.Set((int)value);
             });
         }
     }

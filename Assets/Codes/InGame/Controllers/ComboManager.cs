@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+#pragma warning disable 0649
+
 public class ComboManager : MonoBehaviour
 {
     public static readonly int[] accRate = { 10, 8, 5, 2, 0 };

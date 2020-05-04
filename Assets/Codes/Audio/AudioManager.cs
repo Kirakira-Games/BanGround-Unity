@@ -21,31 +21,32 @@ public class AudioManager : MonoBehaviour
 
     private void Awake()
     {
+        KVar cl_audioengine = new KVar("cl_audioengine", "Fmod", KVarFlags.Archive | KVarFlags.StringOnly);
+        KVar cl_bassbuffer = new KVar("cl_bassbuffer", "-1", KVarFlags.Archive);
+        KVar cl_fmodbuffer = new KVar("cl_fmodbuffer", "-1", KVarFlags.Archive);
         int bufferIndex;
-        string engine = PlayerPrefs.GetString("AudioEngine", "Fmod");
-        if (engine == "Bass") 
+        //string engine = PlayerPrefs.GetString("AudioEngine", "Fmod");
+        if (cl_audioengine == "Bass") 
         {
-            bufferIndex = PlayerPrefs.GetInt("BassBufferIndex", -1);
+            bufferIndex = cl_bassbuffer;
             if (bufferIndex == -1)
             {
-                PlayerPrefs.SetInt("BassBufferIndex", 5);
+                cl_bassbuffer.Set(5);
                 bufferIndex = 5;
             }
             Provider = new BassAudioProvider();
             Provider.Init(AppPreLoader.sampleRate, (uint)(AppPreLoader.bufferSize * HandelValue_Buffer.BassBufferScale[bufferIndex]));
-            //MessageBoxController.ShowMsg(LogLevel.INFO, $"Init {engine} with SampleRate: {AppPreLoader.sampleRate}, Buffer: {(int)(AppPreLoader.bufferSize * HandelValue_Buffer.BassBufferScale[bufferIndex])}");
         }
         else
         {
-            bufferIndex = PlayerPrefs.GetInt("FmodBufferIndex", -1);
+            bufferIndex = cl_fmodbuffer;
             if (bufferIndex == -1)
             {
-                PlayerPrefs.SetInt("FmodBufferIndex", 2);
+                cl_fmodbuffer.Set(2);
                 bufferIndex = 2;
             }
             Provider = new FmodAudioProvider();
             Provider.Init(AppPreLoader.sampleRate, (uint)(AppPreLoader.bufferSize / HandelValue_Buffer.FmodBufferScale[bufferIndex]));
-            //MessageBoxController.ShowMsg(LogLevel.INFO, $"Init {engine} with SampleRate: {AppPreLoader.sampleRate}, Buffer: {AppPreLoader.bufferSize / HandelValue_Buffer.FmodBufferScale[bufferIndex]}");
         }
 
         Instance = this;
