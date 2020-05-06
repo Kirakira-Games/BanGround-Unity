@@ -6,6 +6,7 @@ using System.IO;
 using UnityEngine.SceneManagement;
 using UnityEngine.Networking;
 
+#pragma warning disable 0649
 public class InGameBackground : MonoBehaviour
 {
     //[SerializeField] private Texture defaultTex;
@@ -17,11 +18,13 @@ public class InGameBackground : MonoBehaviour
 
     public static InGameBackground instance;
 
+    static KVarRef r_brightness_bg = new KVarRef("r_brightness_bg");
+
     private void Awake()
     {
         instance = this;
         mesh = GetComponent<MeshRenderer>();
-        Color color = new Color(LiveSetting.bgBrightness, LiveSetting.bgBrightness, LiveSetting.bgBrightness);
+        Color color = new Color(r_brightness_bg, r_brightness_bg, r_brightness_bg);
         Material mat = Instantiate(bgSkybox);
         mat.SetColor("_Tint", color);
         //RenderSettings.skybox = mat;
@@ -51,7 +54,7 @@ public class InGameBackground : MonoBehaviour
         }
         else
         {
-            Color color = new Color(LiveSetting.bgBrightness, LiveSetting.bgBrightness, LiveSetting.bgBrightness);
+            Color color = new Color(r_brightness_bg, r_brightness_bg, r_brightness_bg);
 
             if (type == 0)
             {
@@ -78,7 +81,7 @@ public class InGameBackground : MonoBehaviour
                 playVideo();
                 pauseVideo();
                 mesh.enabled = false;
-                vp.targetCameraAlpha = LiveSetting.bgBrightness;
+                vp.targetCameraAlpha = r_brightness_bg;
                 foreach(ModBase m in LiveSetting.attachedMods)
                 {
                     if (m is AudioMod)

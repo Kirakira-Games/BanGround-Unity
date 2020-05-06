@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
+#pragma warning disable 0649
 public class FarClipSliderHandler : MonoBehaviour, IBeginDragHandler, IEndDragHandler, IDragHandler
 {
     private Slider farClipSlider;

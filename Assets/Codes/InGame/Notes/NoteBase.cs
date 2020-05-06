@@ -29,6 +29,8 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
         noteMesh = gameObject.AddComponent<NoteMesh>();
     }
 
+    static KVarRef r_graynote = new KVarRef("r_graynote");
+
     public virtual void ResetNote(GameNoteData data)
     {
         touchId = -1;
@@ -42,7 +44,7 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
         time = data.time;
         lane = data.lane;
         type = data.type;
-        isGray = LiveSetting.grayNoteEnabled ? data.isGray : false;
+        isGray = r_graynote ? data.isGray : false;
         displayFuwafuwa = data.isFuwafuwa;
         anims = data.anims.ToArray();
 
@@ -55,6 +57,8 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
             NoteController.numFuwafuwaNotes++;
         }
     }
+
+    static KVarRef r_bang_perspect = new KVarRef("r_bang_perspect");
 
     public virtual void UpdatePosition(int audioTime)
     {
@@ -72,7 +76,7 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
 
         // Update position
         Vector3 newPos = Vector3.Lerp(anim.S.p, anim.T.p, ratio);
-        if (LiveSetting.bangPerspective)
+        if (r_bang_perspect)
         {
             pos = NoteUtility.GetBangPerspective(pos);
         }

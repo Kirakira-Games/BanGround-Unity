@@ -6,9 +6,11 @@ public class LaneTransform : MonoBehaviour
 {
     float desScaleZ;
     float desPosZ;
+
+    static KVarRef r_farclip = new KVarRef("r_farclip");
     void Start()
     {
-        desScaleZ = LiveSetting.farClip * 0.11838f - 1.00623f;
+        desScaleZ = r_farclip * 0.11838f - 1.00623f;
         desPosZ = desScaleZ * 5 + 8;
         StartCoroutine(toSmaller1());
         StartCoroutine(toSmaller2());

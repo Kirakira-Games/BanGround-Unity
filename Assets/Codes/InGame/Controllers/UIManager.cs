@@ -29,6 +29,8 @@ public class UIManager : MonoBehaviour
     private ISoundEffect resultVoice;
     public bool isFinished;
 
+    static KVarRef r_brightness_lane = new KVarRef("r_brightness_lane");
+
     void Start()
     {
         instance = this;
@@ -39,7 +41,7 @@ public class UIManager : MonoBehaviour
         
         //var bgColor = LiveSetting.bgBrightness;
         //bg_SR.color = new Color(bgColor, bgColor, bgColor);
-        lan_MR.material.SetColor("_BaseColor", new Color(1f, 1f, 1f, LiveSetting.laneBrightness));
+        lan_MR.material.SetColor("_BaseColor", new Color(1f, 1f, 1f, r_brightness_lane));
 
         pause_Btn = GameObject.Find("Pause_Btn").GetComponent<Button>();
         resume_Btn = GameObject.Find("Resume_Btn").GetComponent<Button>();

@@ -12,7 +12,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
     InstallFileType();
     TryCopyKirapack();
     
-    auto handle = FindWindow(L"UnityWndClass", L"BanGround-Unity");
+    auto handle = FindWindow(L"UnityWndClass", L"BanGround");
     if (handle != nullptr)
     {
         SetForegroundWindow(handle);

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
 
+#pragma warning disable 0649
 public class SwitchToggle : MonoBehaviour
 {
     private Toggle toggle;

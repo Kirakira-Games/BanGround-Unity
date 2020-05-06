@@ -42,12 +42,29 @@ public static class DataLoader
             var files = new DirectoryInfo(Application.persistentDataPath).GetFiles("*.*", SearchOption.AllDirectories);
             foreach (var file in files)
             {
-                if(file.Name == "LiveSettings.json")
+                if (file.Name == "LiveSettings.json")
                     File.Delete(file.FullName);
             }
             PlayerPrefs.SetInt("GameVersion", GameVersion);
         }
-        
+
+        // Check first launch after updating initial charts
+        if (!File.Exists(SongListPath) || PlayerPrefs.GetInt("InitialChartVersion") != InitialChartVersion)
+        {
+            Debug.Log("Load initial charts...");
+            yield return CopyFileFromStreamingAssetsToPersistentDataPath("/Initial.kirapack");
+            LoadKiraPack(new FileInfo(Application.persistentDataPath + "/Initial.kirapack"));
+            PlayerPrefs.SetInt("InitialChartVersion", InitialChartVersion);
+        }
+
+#if UNITY_ANDROID && false
+        AndroidCallback.Init();
+#endif
+
+    }
+
+    public static void InitFileSystem()
+    {
         // Create directories
         if (!Directory.Exists(Path.Combine(DataDir, ChartDir)))
         {
@@ -63,22 +80,6 @@ public static class DataLoader
         }
 
         new KiraFilesystem(FSIndex, DataDir);
-
-        LiveSetting.Load();
-
-        // Check first launch after updating initial charts
-        if (!File.Exists(SongListPath) || PlayerPrefs.GetInt("InitialChartVersion") != InitialChartVersion)
-        {
-            Debug.Log("Load initial charts...");
-            yield return CopyFileFromStreamingAssetsToPersistentDataPath("/Initial.kirapack");
-            LoadKiraPack(new FileInfo(Application.persistentDataPath + "/Initial.kirapack"));
-            PlayerPrefs.SetInt("InitialChartVersion", InitialChartVersion);
-        }
-
-#if UNITY_ANDROID && false
-        AndroidCallback.Init();
-#endif
-
     }
 
     public static string GetMusicPath(int mid)
@@ -101,6 +102,8 @@ public static class DataLoader
         return chartDic.ContainsKey(sid) ? chartDic[sid] : null;
     }
 
+    static KVarRef r_usevideo = new KVarRef("r_usevideo");
+
     public static (string, int) GetBackgroundPath(int sid, bool forceImg = true)
     {
         var header = GetChartHeader(sid);
@@ -108,7 +111,7 @@ public static class DataLoader
         {
             var type = 0;
 
-            if (!forceImg && LiveSetting.useVideo && !string.IsNullOrEmpty(header.backgroundFile.vid))
+            if (!forceImg && r_usevideo && !string.IsNullOrEmpty(header.backgroundFile.vid))
                 type = 1;
 
             var name = type == 1 ? header.backgroundFile.vid : header.backgroundFile.pic;

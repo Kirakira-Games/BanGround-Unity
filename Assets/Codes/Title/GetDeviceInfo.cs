@@ -4,6 +4,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
+#pragma warning disable 0649
 public class GetDeviceInfo : MonoBehaviour
 {
     [SerializeField] private Button openBtn;
@@ -32,12 +33,14 @@ public class GetDeviceInfo : MonoBehaviour
             animator.Play("FlyOut");
         });
 
+        KVarRef snd_engine = new KVarRef("snd_engine");
+
         StringBuilder sb = new StringBuilder();
         sb.Append("Device Model: ").AppendLine(SystemInfo.deviceModel).AppendLine();
         sb.Append("System: ").AppendLine(SystemInfo.operatingSystem).AppendLine();
         sb.Append("CPU: ").AppendLine(SystemInfo.processorType).AppendLine();
         sb.Append("GPU: ").AppendLine(SystemInfo.graphicsDeviceName).AppendLine();
-        sb.Append("AudioProvider: ").AppendLine(PlayerPrefs.GetString("AudioEngine", "Fmod")).AppendLine();
+        sb.Append("AudioProvider: ").AppendLine(snd_engine).AppendLine();
 #if UNITY_ANDROID && !UNITY_EDITOR
         sb.Append("SampleRate: ").AppendLine(AppPreLoader.sampleRate.ToString()).AppendLine();
         sb.Append("BufferSize: ").AppendLine(AppPreLoader.bufferSize.ToString()).AppendLine();
@@ -49,16 +52,19 @@ public class GetDeviceInfo : MonoBehaviour
 
     private string GetCurrentBuffer()
     {
-        string engine = PlayerPrefs.GetString("AudioEngine", "Fmod");
+        KVarRef snd_engine = new KVarRef("snd_engine");
+        KVarRef snd_buffer_bass = new KVarRef("snd_buffer_bass");
+        KVarRef snd_buffer_fmod = new KVarRef("snd_buffer_fmod");
+
         int bufferIndex;
-        if (engine == "Bass")
+        if (snd_engine == "Bass")
         {
-            bufferIndex = PlayerPrefs.GetInt("BassBufferIndex", 5);
+            bufferIndex = snd_buffer_bass;
             return (AppPreLoader.bufferSize * HandelValue_Buffer.BassBufferScale[bufferIndex]).ToString();
         }
         else
         {
-            bufferIndex = PlayerPrefs.GetInt("FmodBufferIndex", 2);
+            bufferIndex = snd_buffer_fmod;
             return (AppPreLoader.bufferSize / HandelValue_Buffer.FmodBufferScale[bufferIndex]).ToString();
         }
 

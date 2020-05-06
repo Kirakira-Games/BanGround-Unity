@@ -42,6 +42,9 @@ public class JudgeResultController : MonoBehaviour
         animator.Play("Play", -1, 0);
     }
 
+    static KVarRef cl_showms = new KVarRef("cl_showms");
+    static KVarRef cl_elp = new KVarRef("cl_elp");
+
     public void DisplayJudgeOffset(NoteBase note, int result)
     {
         //if (offsetRenderer == null) return;
@@ -54,7 +57,7 @@ public class JudgeResultController : MonoBehaviour
 
         int deltaTime = note.time - note.judgeTime;
 
-        if (LiveSetting.dispMilisec)
+        if (cl_showms)
         {
             if (deltaTime >= 0)
             {
@@ -67,7 +70,7 @@ public class JudgeResultController : MonoBehaviour
                 milisecTxt.color = Color.red;
             }
         }
-        if (result >= (LiveSetting.ELPValue == 0 ? 1 : 0) && result <= 3 && Mathf.Abs(deltaTime) >= LiveSetting.ELPValue)//
+        if (result >= (cl_elp == 0 ? 1 : 0) && result <= 3 && Mathf.Abs(deltaTime) >= cl_elp)
         {
             ComboManager.JudgeOffsetResult.Add(deltaTime);
             OffsetResult offset = deltaTime > 0 ? OffsetResult.Early : OffsetResult.Late;

@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+#pragma warning disable 0649
+
 public class ComboManager : MonoBehaviour
 {
     public static readonly int[] accRate = { 10, 8, 5, 2, 0 };
@@ -19,11 +21,13 @@ public class ComboManager : MonoBehaviour
 
     private int[] combo;
 
+    [SerializeField] private Material[] comboMat;
     private Text comboText;
     private Animator comboAnimator;
     private GradeColorChange scoreDisplay;
     private Image[] comboImg;
     private Sprite[] comboSprite;
+    private ClearFlag flag = ClearFlag.AP;
 
     private void Awake()
     {
@@ -49,6 +53,9 @@ public class ComboManager : MonoBehaviour
 
     public void UpdateCombo(JudgeResult result)
     {
+        if (flag == ClearFlag.AP && result > JudgeResult.Perfect) { flag = ClearFlag.FC; UpdateComboMat(); }
+        if (flag == ClearFlag.FC && result > JudgeResult.Great) { flag = ClearFlag.None; UpdateComboMat(); }
+
         int intResult = (int)result;
         judgeCount[intResult]++;
         acc += accRate[intResult];
@@ -99,6 +106,14 @@ public class ComboManager : MonoBehaviour
         }
     }
 
+    private void UpdateComboMat()
+    {
+        for (int i = 0; i < comboImg.Length; i++)
+        {
+            comboImg[i].material = comboMat[(int)flag];
+        }
+    }
+
     private static double Accumulate(int segSize, double segDelta, int num)
     {
         int segNum = num / segSize;
@@ -127,4 +142,7 @@ public class ComboManager : MonoBehaviour
             maxScore = numNotes + Accumulate(50, 0.005, numNotes) + Accumulate(100, 0.005, numNotes);
         }
     }
+
+    [Flags]
+    enum ClearFlag { None,FC,AP}
 }
