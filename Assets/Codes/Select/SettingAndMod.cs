@@ -192,12 +192,14 @@ public class SettingAndMod : MonoBehaviour
         GameObject.Find("AudOff<").GetComponent<Button>().onClick.AddListener(() => { audio_Input.text = (float.Parse(audio_Input.text) - 1f).ToString(); });
         //live setting init
 
+        setting_Close_Btn.gameObject.SetActive(false);
     }
 
     void OpenSetting()
     {
         //GetModStatus();
-        GameObject.Find("Setting_Canvas").GetComponent<Animator>().Play("DropDown");
+        GameObject.Find("Setting_Canvas").GetComponent<Animator>().SetTrigger("SwitchSetting");
+        setting_Close_Btn.gameObject.SetActive(true);
         if (GameObject.Find("Sound_Panel") != null)
         {
             SelectManager.instance.previewSound?.Pause();
@@ -205,23 +207,23 @@ public class SettingAndMod : MonoBehaviour
     }
     void CloseSetting()
     {
-        SelectManager.instance.previewSound.Play();
-        GameObject.Find("Setting_Canvas").GetComponent<Animator>().Play("FlyUp");
+        
+        GameObject.Find("Setting_Canvas").GetComponent<Animator>().SetTrigger("SwitchSetting");
         SetLiveSetting();
-
+        setting_Close_Btn.gameObject.SetActive(false);
         KVSystem.Instance.SaveConfig();
-
+        SelectManager.instance.previewSound.Play();
         AudioManager.Provider.SetSoundEffectVolume(snd_se_volume, SEType.Common);
         AudioManager.Provider.SetSoundEffectVolume(snd_igse_volume, SEType.InGame);
         AudioManager.Provider.SetSoundTrackVolume(snd_bgm_volume);
     }
     void OpenMod()
     {
-        GameObject.Find("Setting_Canvas").GetComponent<Animator>().Play("ModDropDown");
+        GameObject.Find("Setting_Canvas").GetComponent<Animator>().SetTrigger("SwitchMod");
     }
     void CloseMod()
     {
-        GameObject.Find("Setting_Canvas").GetComponent<Animator>().Play("ModFlyUp");
+        GameObject.Find("Setting_Canvas").GetComponent<Animator>().SetTrigger("SwitchMod");
         SetLiveSetting();
     }
     void GetLiveSetting()
