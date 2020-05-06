@@ -13,10 +13,28 @@ public class AppPreLoader : MonoBehaviour
 
     void Start()
     {
+        DataLoader.InitFileSystem();
+        KVSystem.Instance.ReloadConfig();
+
         Screen.orientation = ScreenOrientation.AutoRotation;
-        print(Screen.orientation);
         Application.targetFrameRate = 120;
-        if (Application.platform != RuntimePlatform.Android) 
+        InitAudioInfo();
+
+        Application.deepLinkActivated += (url) =>
+        {
+            if (DataLoader.LoadAllKiraPackFromInbox())
+            {
+                if (SceneManager.GetActiveScene().name == "Select")
+                {
+                    SceneManager.LoadScene("Select");
+                }
+            }
+        };
+    }
+
+    private void InitAudioInfo()
+    {
+        if (Application.platform != RuntimePlatform.Android)
         {
             sampleRate = 48000;
             bufferSize = 0;
@@ -40,28 +58,7 @@ public class AppPreLoader : MonoBehaviour
             success &= int.TryParse(bs, out bufferSize);
             init = success;
 
-            //Debug.LogWarning($"Get Device Audio Info: {success}");
-            //MessageBoxController.ShowMsg(LogLevel.INFO, "Load Device Audio Info Success");
-            //MessageBoxController.ShowMsg(LogLevel.INFO, "SampleRate: " + sampleRate.ToString() + "  BufferSize: " + bufferSize.ToString());
             SceneManager.LoadScene("Title");
         }
-
-        // Input system
-        UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
-
-//#if UNITY_IOS
-        // File import
-        Application.deepLinkActivated += (url) =>
-        {
-            //Debug.Log(url);
-            if (DataLoader.LoadAllKiraPackFromInbox())
-            {
-                if (SceneManager.GetActiveScene().name == "Select")
-                {
-                    SceneManager.LoadScene("Select");
-                }
-            }
-        };
-//#endif
     }
 }

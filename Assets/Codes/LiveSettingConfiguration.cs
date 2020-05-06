@@ -7,6 +7,7 @@ using System.IO;
 
 public static class LiveSetting
 {
+    /*
     public static bool Loaded { get; private set; } = false;
     public static void Load()
     {
@@ -19,11 +20,6 @@ public static class LiveSetting
         {
             string sets = File.ReadAllText(settingsPath);
             LiveSettingTemplate loaded = JsonConvert.DeserializeObject<LiveSettingTemplate>(sets);
-            /*
-             * 下一条语句用于在0.6.0版本移除旧版的SE3
-             */
-            if (loaded.seStyle == SEStyle.Official) loaded.seStyle = SEStyle.Drum;
-            loaded.ApplyToLiveSetting();
         }
         else
         {
@@ -57,7 +53,8 @@ public static class LiveSetting
         AudioManager.Provider.SetSoundEffectVolume(igseVolume, AudioProvider.SEType.InGame);
         AudioManager.Provider.SetSoundTrackVolume(bgmVolume);
     }
-
+    */
+    /*
     public static int judgeOffset = 0;
     public static int audioOffset = 0;
 
@@ -88,20 +85,24 @@ public static class LiveSetting
     public static float bgBrightness = .7f;
     public static float laneBrightness = 0.84f;
     public static float longBrightness = .8f;
+    */
+
+    /*
+   public static NoteStyle noteStyle = NoteStyle.Circle;
+   public static SEStyle seStyle = SEStyle.Drum;
 
 
-    public static NoteStyle noteStyle = NoteStyle.Circle;
-    public static SEStyle seStyle = SEStyle.Drum;
-    public const string assetDirectory = "V2Assets";
-    public const string IconPath = "UI/ClearMark/";
+   public static Language language = Language.AutoDetect;
+   public static Sorter sort = Sorter.SongName;
+   */
 
+    static KVar fs_assetpath = new KVar("fs_assetpath", "V2Assets", KVarFlags.Hidden | KVarFlags.StringOnly);
+    static KVar fs_iconpath = new KVar("fs_iconpath", "UI/ClearMark/", KVarFlags.Hidden | KVarFlags.StringOnly);
+
+    public static string assetDirectory => fs_assetpath;
+    public static string IconPath => fs_iconpath;
     private static float cachedSpeed = 0;
     private static int cachedScreenTime = 0;
-
-    public static Language language = Language.AutoDetect;
-    public static Sorter sort = Sorter.SongName;
-
-    public static bool useVideo = true;
 
     public static int currentChart = 0; // Chart set index
     public static int currentDifficulty = (int)Difficulty.Easy;
@@ -126,7 +127,7 @@ public static class LiveSetting
                 return false;
 
             attachedMods.Add(mod);
-            if(mod is AudioMod)
+            if (mod is AudioMod)
             {
                 SpeedCompensationSum *= (mod as AudioMod).SpeedCompensation;
             }
@@ -159,14 +160,16 @@ public static class LiveSetting
         }
     }
 
+    static KVarRef r_notespeed = new KVarRef("r_notespeed");
+
     public static int NoteScreenTime
     {
         get
         {
-            if(cachedSpeed != trueNoteSpeed)
+            if (cachedSpeed != r_notespeed)
             {
-                cachedSpeed = trueNoteSpeed;
-                cachedScreenTime = (int)(-540 * trueNoteSpeed + 6500);
+                cachedSpeed = r_notespeed;
+                cachedScreenTime = (int)(-540 * r_notespeed + 6500);
             }
 
             return (int)(cachedScreenTime * SpeedCompensationSum);
@@ -187,135 +190,5 @@ public enum SEStyle
     None,
     Drum,
     Bbben,
-    Official,
     Custom
-}
-
-public class LiveSettingTemplate
-{
-    public int judgeOffset = 0;
-    public int audioOffset = 0;
-
-    public float noteSpeed = 10f;
-    public float noteSize = 1f;
-    public float meshSize = .75f;
-    public float meshOpacity = .6f;
-
-    public float bgmVolume = .7f;
-    public float seVolume = .7f;
-    public float igseVolume = .7f;
-    public int bufferSize = -1;
-
-    public bool syncLineEnabled = true;
-    public bool laneEffectEnabled = true;
-    public bool grayNoteEnabled = true;
-    public bool mirrowEnabled = false;
-    public bool bangPerspective = true;
-    public bool autoPlayEnabled = false;
-    public float ELP = 40;
-    public bool fullScreen = true;
-    public bool laneLight = true;
-    public bool shakeFlick = true;
-    public bool dispMillsec = false;
-
-    public float offsetTransform = 1f;
-    public float farClip = 169f;
-    public float bgBrightness = .7f;
-    public float laneBrightness = 0.84f;
-    public float longBrightness = .8f;
-
-    public bool enableAudioTrack = true;
-    public bool enableVideo = true;
-
-    public int currentChart = 0;
-    public int currentDifficulty = 0;
-
-    public NoteStyle noteStyle = NoteStyle.Circle;
-    public SEStyle seStyle = SEStyle.Drum;
-    public Language language = Language.AutoDetect;
-    public Sorter sort = Sorter.SongName;
-
-    public LiveSettingTemplate()
-    {
-        judgeOffset = LiveSetting.judgeOffset;
-        audioOffset = LiveSetting.audioOffset;
-        noteSpeed = LiveSetting.noteSpeed;
-        noteSize = LiveSetting.noteSize;
-        meshSize = LiveSetting.meshSize;
-        meshOpacity = LiveSetting.meshOpacity;
-        bgmVolume = LiveSetting.bgmVolume;
-        seVolume = LiveSetting.seVolume;
-        igseVolume = LiveSetting.igseVolume;
-        //bufferSize = LiveSetting.bufferSize;
-        syncLineEnabled = LiveSetting.syncLineEnabled;
-        laneEffectEnabled = LiveSetting.laneEffectEnabled;
-        grayNoteEnabled = LiveSetting.grayNoteEnabled;
-        mirrowEnabled = LiveSetting.mirrowEnabled;
-        bangPerspective = LiveSetting.bangPerspective;
-        ELP = LiveSetting.ELPValue;
-        laneLight = LiveSetting.laneLight;
-        shakeFlick = LiveSetting.shakeFlick;
-        dispMillsec = LiveSetting.dispMilisec;
-        enableVideo = LiveSetting.useVideo;
-        //fullScreen = LiveSetting.fullScreen;
-        //autoPlayEnabled = LiveSetting.autoPlayEnabled;
-
-        offsetTransform = LiveSetting.offsetTransform;
-        farClip = LiveSetting.farClip;
-        bgBrightness = LiveSetting.bgBrightness;
-        laneBrightness = LiveSetting.laneBrightness;
-        longBrightness = LiveSetting.longBrightness;
-
-        //enableAudioTrack = LiveSetting.enableAudioTrack;
-
-        currentChart = LiveSetting.currentChart;
-        currentDifficulty = LiveSetting.currentDifficulty;
-
-        noteStyle = LiveSetting.noteStyle;
-        seStyle = LiveSetting.seStyle;
-        language = LiveSetting.language;
-        sort = LiveSetting.sort;
-    }
-    public void ApplyToLiveSetting()
-    {
-
-        LiveSetting.judgeOffset = judgeOffset;
-        LiveSetting.audioOffset = audioOffset;
-        LiveSetting.noteSpeed = noteSpeed;
-        LiveSetting.noteSize = noteSize;
-        LiveSetting.meshSize = meshSize;
-        LiveSetting.meshOpacity = meshOpacity;
-        LiveSetting.bgmVolume = bgmVolume;
-        LiveSetting.seVolume = seVolume;
-        LiveSetting.igseVolume = igseVolume;
-        //LiveSetting.bufferSize = bufferSize;
-        LiveSetting.syncLineEnabled = syncLineEnabled;
-        LiveSetting.laneEffectEnabled = laneEffectEnabled;
-        LiveSetting.grayNoteEnabled = grayNoteEnabled;
-        LiveSetting.mirrowEnabled = mirrowEnabled;
-        LiveSetting.bangPerspective = bangPerspective;
-        LiveSetting.ELPValue = ELP;
-        LiveSetting.shakeFlick = shakeFlick;
-        LiveSetting.dispMilisec = dispMillsec;
-        //LiveSetting.fullScreen = fullScreen;
-        //LiveSetting.autoPlayEnabled = autoPlayEnabled;
-        LiveSetting.laneLight = laneLight;
-        LiveSetting.useVideo = enableVideo;
-
-        LiveSetting.offsetTransform = offsetTransform;
-        LiveSetting.farClip = farClip;
-        LiveSetting.bgBrightness = bgBrightness;
-        LiveSetting.laneBrightness = laneBrightness;
-        LiveSetting.longBrightness = longBrightness;
-
-        //LiveSetting.enableAudioTrack = enableAudioTrack;
-
-        LiveSetting.currentChart = currentChart;
-        LiveSetting.currentDifficulty = currentDifficulty;
-
-        LiveSetting.seStyle = seStyle;
-        LiveSetting.noteStyle = noteStyle;
-        LiveSetting.language = language;
-        LiveSetting.sort = sort;
-    }
 }

@@ -60,7 +60,53 @@ public class SettingAndMod : MonoBehaviour
     private Slider bgmVolume_Input;
 
     private Dropdown language_Dropdown;
-    
+
+    /*
+     * Config KVars
+    */
+
+    // o for Offset
+    static KVar o_judge = new KVar("o_judge", "0", KVarFlags.Archive);
+    static KVar o_audio = new KVar("o_audio", "0", KVarFlags.Archive);
+
+    // snd for Sound
+    static KVar snd_bgm_volume = new KVar("snd_bgm_volume", "0.7", KVarFlags.Archive);
+    static KVar snd_se_volume = new KVar("snd_se_volume", "0.7", KVarFlags.Archive);
+    static KVar snd_igse_volume = new KVar("snd_igse_volume", "0.7", KVarFlags.Archive);
+
+    // r for Render
+    static KVar r_notespeed = new KVar("r_notespeed", "10.0", KVarFlags.Archive);
+    static KVar r_notesize = new KVar("r_notesize", "1.0", KVarFlags.Archive);
+
+    static KVar r_syncline = new KVar("r_syncline", "1", KVarFlags.Archive);
+    static KVar r_lanefx = new KVar("r_lanefx", "1", KVarFlags.Archive);
+    static KVar r_graynote = new KVar("r_graynote", "1", KVarFlags.Archive);
+    static KVar r_mirror = new KVar("r_mirror", "0", KVarFlags.Archive);
+    static KVar r_bang_perspect = new KVar("r_bang_perspect", "1", KVarFlags.Archive);
+    static KVar r_shake_flick = new KVar("r_shake_flick", "1", KVarFlags.Archive);
+
+    static KVar r_usevideo = new KVar("r_usevideo", "1", KVarFlags.Archive);
+
+    static KVar r_farclip = new KVar("r_farclip", "196.0", KVarFlags.Archive);
+    static KVar r_brightness_bg = new KVar("r_brightness_bg", "0.7", KVarFlags.Archive);
+    static KVar r_brightness_lane = new KVar("r_brightness_lane", "0.84", KVarFlags.Archive);
+    static KVar r_brightness_long = new KVar("r_brightness_long", "0.8", KVarFlags.Archive);
+
+    // cl for Client
+    static KVar cl_showms = new KVar("cl_showms", "0", KVarFlags.Archive);
+    static KVar cl_elp = new KVar("cl_elp", "0", KVarFlags.Archive);
+    static KVar cl_offset_transform = new KVar("cl_offset_transform", "1", KVarFlags.Archive);
+
+    static KVar cl_notestyle = new KVar("cl_notestyle", "0", KVarFlags.Archive);
+    static KVar cl_sestyle = new KVar("cl_sestyle", "1", KVarFlags.Archive);
+
+    static KVarRef cl_language = new KVarRef("cl_language");
+
+    // mod for Mod
+    static KVar mod_autoplay = new KVar("mod_autoplay", "0");
+    /*
+     * End
+     */
     void initCompoinents()
     {
 #if !(UNITY_STANDALONE || UNITY_WSA)
@@ -162,11 +208,12 @@ public class SettingAndMod : MonoBehaviour
         SelectManager.instance.previewSound.Play();
         GameObject.Find("Setting_Canvas").GetComponent<Animator>().Play("FlyUp");
         SetLiveSetting();
-        File.WriteAllText(LiveSetting.settingsPath, JsonConvert.SerializeObject(new LiveSettingTemplate()));
 
-        AudioManager.Provider.SetSoundEffectVolume(LiveSetting.seVolume, SEType.Common);
-        AudioManager.Provider.SetSoundEffectVolume(LiveSetting.igseVolume, SEType.InGame);
-        AudioManager.Provider.SetSoundTrackVolume(LiveSetting.bgmVolume);
+        KVSystem.Instance.SaveConfig();
+
+        AudioManager.Provider.SetSoundEffectVolume(snd_se_volume, SEType.Common);
+        AudioManager.Provider.SetSoundEffectVolume(snd_igse_volume, SEType.InGame);
+        AudioManager.Provider.SetSoundTrackVolume(snd_bgm_volume);
     }
     void OpenMod()
     {
@@ -179,34 +226,34 @@ public class SettingAndMod : MonoBehaviour
     }
     void GetLiveSetting()
     {
-        speed_Input.text = LiveSetting.noteSpeed.ToString();
-        judge_Input.text = LiveSetting.judgeOffset.ToString();
-        audio_Input.text = LiveSetting.audioOffset.ToString();
-        size_Input.text = LiveSetting.noteSize.ToString();
-        syncLine_Tog.isOn = LiveSetting.syncLineEnabled;
-        offBeat_Tog.isOn = LiveSetting.grayNoteEnabled;
-        mirrow_Tog.isOn = LiveSetting.mirrowEnabled;
-        persp_Tog.isOn = LiveSetting.bangPerspective;
-        ELP_Slider.value = LiveSetting.ELPValue;
+        speed_Input.text = r_notespeed;
+        judge_Input.text = o_judge;
+        audio_Input.text = o_audio;
+        size_Input.text = r_notesize;
+        syncLine_Tog.isOn = r_syncline;
+        offBeat_Tog.isOn = r_graynote;
+        mirrow_Tog.isOn = r_mirror;
+        persp_Tog.isOn = r_bang_perspect;
+        ELP_Slider.value = cl_elp;
 
-        laneLight_Tog.isOn = LiveSetting.laneLight;
-        shake_Tog.isOn = LiveSetting.shakeFlick;
-        milisec_Tog.isOn = LiveSetting.dispMilisec;
-        Video_Tog.isOn = LiveSetting.useVideo;
+        laneLight_Tog.isOn = r_lanefx;
+        shake_Tog.isOn = r_shake_flick;
+        milisec_Tog.isOn = cl_showms;
+        Video_Tog.isOn = r_usevideo;
 
-        judgeOffsetTransform.value = LiveSetting.offsetTransform;
-        far_Clip.value = LiveSetting.farClip;
-        bg_Bright.value = LiveSetting.bgBrightness;
-        lane_Bright.value = LiveSetting.laneBrightness;
-        long_Bright.value = LiveSetting.longBrightness;
+        judgeOffsetTransform.value = cl_offset_transform;
+        far_Clip.value = r_farclip;
+        bg_Bright.value = r_brightness_bg;
+        lane_Bright.value = r_brightness_lane;
+        long_Bright.value = r_brightness_long;
 
-        seVolume_Input.value = LiveSetting.seVolume;
-        igseVolume_Input.value = LiveSetting.igseVolume;
-        bgmVolume_Input.value = LiveSetting.bgmVolume;
+        seVolume_Input.value = snd_se_volume;
+        igseVolume_Input.value = snd_igse_volume;
+        bgmVolume_Input.value = snd_bgm_volume;
 
-        noteToggles.SetStyle(LiveSetting.noteStyle);
-        seSelector.SetSE(LiveSetting.seStyle);
-        language_Dropdown.value = (int)LiveSetting.language;
+        noteToggles.SetStyle((NoteStyle)cl_notestyle);
+        seSelector.SetSE((SEStyle)cl_sestyle);
+        language_Dropdown.value = cl_language;
 #if (UNITY_STANDALONE || UNITY_WSA)
         FS_Tog.isOn = Screen.fullScreen;
         VSync_Tog.isOn = QualitySettings.vSyncCount == 1;
@@ -215,7 +262,7 @@ public class SettingAndMod : MonoBehaviour
     }
     void GetModStatus()
     {
-        auto_Tog.isOn = LiveSetting.autoPlayEnabled;
+        auto_Tog.isOn = mod_autoplay;
 
         speedDown_Tog.SetStep(LiveSetting.attachedMods);
         speedUp_Tog.SetStep(LiveSetting.attachedMods);
@@ -225,8 +272,8 @@ public class SettingAndMod : MonoBehaviour
 
     public void OnLanuageChanged(int value)
     {
-        LiveSetting.language = (Language)value;
-        LocalizedStrings.Instanse.ReloadLanguageFile(LiveSetting.language);
+        cl_language.Set(value);
+        LocalizedStrings.Instanse.ReloadLanguageFile(cl_language);
         LocalizedText.ReloadAll();
     }
 
@@ -234,23 +281,23 @@ public class SettingAndMod : MonoBehaviour
     {
         try
         {
-            LiveSetting.noteSpeed = float.Parse(speed_Input.text);
-            LiveSetting.judgeOffset = int.Parse(string.IsNullOrWhiteSpace(judge_Input.text) ? 0.ToString() : judge_Input.text);
-            LiveSetting.audioOffset = int.Parse(string.IsNullOrWhiteSpace(audio_Input.text) ? 0.ToString() : audio_Input.text);
-            LiveSetting.noteSize = float.Parse(size_Input.text);
-            LiveSetting.seVolume = seVolume_Input.value;
-            LiveSetting.igseVolume = igseVolume_Input.value;
-            LiveSetting.bgmVolume = bgmVolume_Input.value;
-            LiveSetting.syncLineEnabled = syncLine_Tog.isOn;
-            LiveSetting.grayNoteEnabled = offBeat_Tog.isOn;
-            LiveSetting.mirrowEnabled = mirrow_Tog.isOn;
-            LiveSetting.autoPlayEnabled = auto_Tog.isOn;
-            LiveSetting.bangPerspective = persp_Tog.isOn;
-            LiveSetting.ELPValue = ELP_Slider.value;
-            LiveSetting.laneLight = laneLight_Tog.isOn;
-            LiveSetting.shakeFlick = shake_Tog.isOn;
-            LiveSetting.dispMilisec = milisec_Tog.isOn;
-            LiveSetting.useVideo = Video_Tog.isOn;
+            r_notespeed.Set(speed_Input.text);
+            o_judge.Set(string.IsNullOrWhiteSpace(judge_Input.text) ? 0.ToString() : judge_Input.text);
+            o_audio.Set(string.IsNullOrWhiteSpace(audio_Input.text) ? 0.ToString() : audio_Input.text);
+            r_notesize.Set(size_Input.text);
+            snd_se_volume.Set(seVolume_Input.value);
+            snd_igse_volume.Set(igseVolume_Input.value);
+            snd_bgm_volume.Set(bgmVolume_Input.value);
+            r_syncline.Set(syncLine_Tog.isOn);
+            r_graynote.Set(offBeat_Tog.isOn);
+            r_mirror.Set(mirrow_Tog.isOn);
+            mod_autoplay.Set(auto_Tog.isOn);
+            r_bang_perspect.Set(persp_Tog.isOn);
+            cl_elp.Set(ELP_Slider.value);
+            r_lanefx.Set(laneLight_Tog.isOn);
+            r_shake_flick.Set(shake_Tog.isOn);
+            cl_showms.Set(milisec_Tog.isOn);
+            r_usevideo.Set(Video_Tog.isOn);
 #if (UNITY_STANDALONE || UNITY_WSA)
             if (FS_Tog.isOn)
             {
@@ -274,14 +321,14 @@ public class SettingAndMod : MonoBehaviour
                 QualitySettings.vSyncCount = 0;
             }
 #endif
-            LiveSetting.offsetTransform = judgeOffsetTransform.value;
-            LiveSetting.farClip = far_Clip.value;
-            LiveSetting.bgBrightness = bg_Bright.value;
-            LiveSetting.laneBrightness = lane_Bright.value;
-            LiveSetting.longBrightness = long_Bright.value;
+            cl_offset_transform.Set(judgeOffsetTransform.value);
+            r_farclip.Set(far_Clip.value);
+            r_brightness_bg.Set(bg_Bright.value);
+            r_brightness_lane.Set(lane_Bright.value);
+            r_brightness_long.Set(long_Bright.value);
 
-            LiveSetting.noteStyle = noteToggles.GetStyle();
-            LiveSetting.seStyle = seSelector.GetSE();
+            cl_notestyle.Set((int)noteToggles.GetStyle());
+            cl_sestyle.Set((int)seSelector.GetSE());
 
             LiveSetting.RemoveAllMods();
             LiveSetting.attachedMods.Clear();

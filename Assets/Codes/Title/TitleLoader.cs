@@ -88,11 +88,13 @@ public class TitleLoader : MonoBehaviour
         }
     }
 
+    static KVarRef cl_language = new KVarRef("cl_language");
+
     private void OnDestroy()
     {
         music?.Dispose();
         banGround?.Dispose();
-        LocalizedStrings.Instanse.ReloadLanguageFile(LiveSetting.language);
+        LocalizedStrings.Instanse.ReloadLanguageFile(cl_language);
         LocalizedText.ReloadAll();
     }
 

@@ -25,6 +25,8 @@ public class GradeColorChange : MonoBehaviour
         scoreTxt = GameObject.Find("ScoreText").GetComponent<Text>();
     }
 
+    static KVarRef mod_autoplay = new KVarRef("mod_autoplay");
+
     public void SetScore(double _score, double _acc)
     {
         float modScoreMultiplier = 1.0f;
@@ -34,7 +36,7 @@ public class GradeColorChange : MonoBehaviour
 
         score = _score * modScoreMultiplier;
         sld.value = (float)_score;
-        txt.text = LiveSetting.autoPlayEnabled ? "AUTO": string.Format("{0:P2}", Mathf.FloorToInt((float)_acc * 10000) / 10000f);
+        txt.text = mod_autoplay ? "AUTO": string.Format("{0:P2}", Mathf.FloorToInt((float)_acc * 10000) / 10000f);
         
     }
 

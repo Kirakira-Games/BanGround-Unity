@@ -223,13 +223,15 @@ public static class NoteUtility
         }
     }
 
+    static KVarRef cl_notestyle = new KVarRef("cl_notestyle");
+
     public static T LoadResource<T>(string name) where T: Object
     {
-        return Resources.Load<T>(LiveSetting.assetDirectory + "/" + System.Enum.GetName(typeof(NoteStyle), LiveSetting.noteStyle) +"/"+ name);
+        return Resources.Load<T>(LiveSetting.assetDirectory + "/" + System.Enum.GetName(typeof(NoteStyle), (NoteStyle)cl_notestyle) +"/"+ name);
     }
     public static Object LoadResource(string name) 
     {
-        return Resources.Load(LiveSetting.assetDirectory + "/" + System.Enum.GetName(typeof(NoteStyle), LiveSetting.noteStyle) + "/" + name);
+        return Resources.Load(LiveSetting.assetDirectory + "/" + System.Enum.GetName(typeof(NoteStyle), (NoteStyle)cl_notestyle) + "/" + name);
     }
 
     public static bool IsTouchContinuing(Touch touch)

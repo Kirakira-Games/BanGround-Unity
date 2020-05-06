@@ -246,7 +246,7 @@ void TryCopyKirapack()
 	SHGetSpecialFolderPath(NULL, buffer, CSIDL_LOCAL_APPDATA, false);
 
 	std::wstring inbox(buffer);
-	inbox += L"Low\\Kirakira Games\\BanGround-Unity\\InBox\\";
+	inbox += L"Low\\Kirakira Games\\BanGround\\InBox\\";
 
 	if (GetFileAttributes(inbox.c_str()) == -1)
 		CreateDirectory(inbox.c_str(), NULL);

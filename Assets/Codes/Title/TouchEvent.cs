@@ -21,8 +21,9 @@ public class TouchEvent : MonoBehaviour
             inputField.inputType = InputField.InputType.Password;
             inputField.asteriskChar = '☆';
             inputField.readOnly = true;
-            inputField.gameObject.SetActive(false);
+            inputField.transform.parent.gameObject.SetActive(false);
         }
+        else inputField.transform.parent.gameObject.SetActive(true);
     }
 
     //private IEnumerator SwitchScene(string name)
@@ -105,7 +106,7 @@ public class TouchEvent : MonoBehaviour
                 touched = false;
                 inputField.readOnly = false;
                 inputField.inputType = InputField.InputType.Standard;
-                inputField.gameObject.SetActive(true);
+                inputField.transform.parent.gameObject.SetActive(true);
                 yield break;
             }
         }

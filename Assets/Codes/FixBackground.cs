@@ -51,7 +51,7 @@ public class FixBackground : MonoBehaviour
         GetAndSetBG(path);
     }
 
-    protected virtual void GetAndSetBG(string path)
+    protected void GetAndSetBG(string path)
     {
         var tex = KiraFilesystem.Instance.ReadTexture2D(path);
         render.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));

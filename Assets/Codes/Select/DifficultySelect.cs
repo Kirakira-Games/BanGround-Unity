@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
 
+#pragma warning disable 0649
 public class DifficultySelect : MonoBehaviour
 {
     public static readonly string[] DIFFICULTY_ABBR = { "EZ", "NM", "HD", "EX", "SP" };
@@ -14,7 +15,9 @@ public class DifficultySelect : MonoBehaviour
     Image[] cardImg = new Image[5];
     RectTransform[] Rects = new RectTransform[5];
     public int[] levels = new int[5];
-    [SerializeField] private TextAsset[] voices;
+
+    [SerializeField] 
+    private TextAsset[] voices;
     AudioProvider.ISoundEffect[] processedVoices = new AudioProvider.ISoundEffect[5];
 
 
@@ -25,6 +28,7 @@ public class DifficultySelect : MonoBehaviour
     PlayRecordDisplay recordDisplayer;
     private FixBackground background;
 
+    static KVarRef cl_cursorter = new KVarRef("cl_cursorter");
 
     void Start()
     {
@@ -44,7 +48,7 @@ public class DifficultySelect : MonoBehaviour
         background = GameObject.Find("KirakiraBackground").GetComponent<FixBackground>();
         lastDifficulty = LiveSetting.actualDifficulty;
     }
-    
+
     public void OnSongChange()
     {
         enabledCards = new List<int>();
@@ -75,7 +79,7 @@ public class DifficultySelect : MonoBehaviour
         {
             //Rects[enabledCards[i]].anchoredPosition = new Vector2(0, 0); //图层 位置
             Rects[enabledCards[i]].SetAsFirstSibling();
-            cardImg[enabledCards[i]].color = new Color(1,1,1,0);
+            cardImg[enabledCards[i]].color = new Color(1, 1, 1, 0);
         }
         selected = enabledCards[0]; //最顶上一层
         cardImg[selected].color = Color.white;
@@ -84,11 +88,11 @@ public class DifficultySelect : MonoBehaviour
 
         LiveSetting.actualDifficulty = selected;
         LiveSetting.currentDifficulty = selected;
-        if (LiveSetting.sort == Sorter.ChartDifficulty&&lastDifficulty!=LiveSetting.actualDifficulty)
+        if ((Sorter)cl_cursorter == Sorter.ChartDifficulty && lastDifficulty != LiveSetting.actualDifficulty)
             SelectManager.instance.InitSongList(LiveSetting.CurrentHeader.sid);
-        
+
         lastDifficulty = LiveSetting.actualDifficulty;
-        
+
         recordDisplayer.DisplayRecord();
         string path = DataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid).Item1;
         background.UpdateBackground(path);
@@ -114,13 +118,13 @@ public class DifficultySelect : MonoBehaviour
     {
         int last = enabledCards.Count - 1;
         int no = enabledCards[last];
-       /* while (cardImg[no].color.a > 0)
-        {
-            cardImg[no].color -= new Color(0, 0, 0, 0.1f);
-            yield return new WaitForEndOfFrame();
-        }
-        //cards[no].SetActive(false);
-        */
+        /* while (cardImg[no].color.a > 0)
+         {
+             cardImg[no].color -= new Color(0, 0, 0, 0.1f);
+             yield return new WaitForEndOfFrame();
+         }
+         //cards[no].SetActive(false);
+         */
         //cardImg[no].color = Color.clear;
 
         UpdateView();
@@ -132,7 +136,7 @@ public class DifficultySelect : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
         cardImg[selected].color = Color.white;*/
-        
+
         processedVoices[selected].PlayOneShot();
     }
 

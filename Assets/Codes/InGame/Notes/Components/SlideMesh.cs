@@ -17,6 +17,9 @@ public class SlideMesh : MonoBehaviour
     public static Material cacheMat = null;
     public static readonly Vector3 initPos = new Vector3(0, -0.01f);
 
+    static KVarRef r_brightness_long = new KVarRef("r_brightness_long");
+    static KVarRef r_notesize = new KVarRef("r_notesize");
+
     public void ResetMesh(Transform S, Transform T, bool isFuwafuwa)
     {
         transform.SetParent(S);
@@ -42,7 +45,7 @@ public class SlideMesh : MonoBehaviour
     public void OnUpdate()
     {
         Vector3 delta = transT.position - transform.parent.position;
-        float width = BODY_WIDTH * LiveSetting.noteSize;
+        float width = BODY_WIDTH * r_notesize;
         Vector3[] vertices =
         {
             new Vector3(-width, 0, 0),
@@ -85,7 +88,7 @@ public class SlideMesh : MonoBehaviour
             Material material = Resources.Load<Material>("InGame/Materials/note_body");
             cacheMat = Instantiate(material);
             cacheMat.mainTexture = NoteUtility.LoadResource<Texture2D>("long_note_mask");
-            cacheMat.SetColor("_BaseColor", new Color(0.5843137f, 0.9019607f, 0.3019607f, LiveSetting.longBrightness));
+            cacheMat.SetColor("_BaseColor", new Color(0.5843137f, 0.9019607f, 0.3019607f, r_brightness_long));
         }
         meshRenderer.material = cacheMat;
     }

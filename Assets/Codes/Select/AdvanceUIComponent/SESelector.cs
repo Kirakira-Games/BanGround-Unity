@@ -16,6 +16,8 @@ public class SESelector : MonoBehaviour
     private ISoundEffect perfectSE;
     private ISoundEffect flickSE;
 
+    static KVarRef cl_sestyle = new KVarRef("cl_sestyle");
+
     private void Awake()
     {
         seInput = GameObject.Find("SE_Input").GetComponent<InputField>();
@@ -39,8 +41,8 @@ public class SESelector : MonoBehaviour
             flickSE = AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)int.Parse(seInput.text)) + "/flick.wav").bytes);
         });
 
-        perfectSE = AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), LiveSetting.seStyle) + "/perfect.wav").bytes);
-        flickSE = AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), LiveSetting.seStyle) + "/flick.wav").bytes);
+        perfectSE = AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) + "/perfect.wav").bytes);
+        flickSE = AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) + "/flick.wav").bytes);
 
         perfectBtn.onClick.AddListener(() =>
         {

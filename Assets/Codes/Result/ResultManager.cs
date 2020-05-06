@@ -317,12 +317,13 @@ public class ResultManager : MonoBehaviour
         }
     }
 
+    static KVarRef mod_autoplay = new KVarRef("mod_autoplay");
     private void ShowSongInfo()
     {
         level_Text.text = Enum.GetName(typeof(Difficulty), LiveSetting.actualDifficulty).ToUpper() + " " +
             cheader.difficultyLevel[LiveSetting.actualDifficulty];
         songName_Text.text = mheader.title;
-        acc_Text.text = LiveSetting.autoPlayEnabled ? "AUTOPLAY" : string.Format("{0:P2}", Mathf.FloorToInt((float)playResult.Acc * 10000) / 10000f);
+        acc_Text.text = mod_autoplay ? "AUTOPLAY" : string.Format("{0:P2}", Mathf.FloorToInt((float)playResult.Acc * 10000) / 10000f);
         difficultCard.sprite = Resources.Load<Sprite>("UI/DifficultyCards/" + Enum.GetName(typeof(Difficulty), LiveSetting.actualDifficulty));
     }
 
@@ -380,7 +381,7 @@ public class ResultManager : MonoBehaviour
         //    lastScore = 0;
         //    pr.resultsList.Add(playResult);
         //}
-        if (!LiveSetting.autoPlayEnabled)
+        if (!mod_autoplay)
             print("Record Saved" + PlayRecords.SaveRecord(pr));
         else
             print("Autoplay score not saved");
