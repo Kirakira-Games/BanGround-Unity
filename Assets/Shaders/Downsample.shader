@@ -41,13 +41,31 @@
 
             sampler2D _MainTex;
             float4 _MainTex_TexelSize;
-            float4 _CameraOpaqueTexture_TexelSize;
 
             static const int iBlurSamples = 4;
 
+            // Makes the blur smoother
+            #define SMOOTH
+
+#ifdef SMOOTH
+            #define SAMPLEFUNC tex2Davg
+            half4 tex2Davg(sampler2D sp, float2 uv)
+            {
+                half4 col = tex2D(sp, uv);
+                col += tex2D(sp, uv + (_MainTex_TexelSize.xy * float2(1, 1)));
+                col += tex2D(sp, uv + (_MainTex_TexelSize.xy * float2(-1, -1)));
+                col += tex2D(sp, uv + (_MainTex_TexelSize.xy * float2(-1, 1)));
+                col += tex2D(sp, uv + (_MainTex_TexelSize.xy * float2(1, -1)));
+
+                return col / 5;
+            }
+#else
+            #define SAMPLEFUNC tex2D
+#endif
+
             half4 blur(sampler2D sp, float2 uv, float scale) 
             {
-                float2 ps = _CameraOpaqueTexture_TexelSize * scale;
+                float2 ps = _MainTex_TexelSize * scale;
 
                 static const float kernel[9] = {
                     0.0269955, 0.0647588, 0.120985, 0.176033, 0.199471, 0.176033, 0.120985, 0.0647588, 0.0269955
@@ -62,7 +80,7 @@
                     [unroll]
                     for (int y = -iBlurSamples; y <= iBlurSamples; ++y) {
                         gaussian_weight = kernel[x + iBlurSamples] * kernel[y + iBlurSamples];
-                        col += tex2D(sp, uv + ps * float2(x, y)).rgb * gaussian_weight;
+                        col += SAMPLEFUNC(sp, uv + ps * float2(x, y)).rgb * gaussian_weight;
                     }
                 }
 
@@ -71,7 +89,7 @@
 
             fixed4 frag(v2f i) : SV_Target
             {
-                fixed4 col = blur(_MainTex, i.uv, 2); //tex2D(_CameraOpaqueTexture, i.uv);
+                fixed4 col = blur(_MainTex, i.uv, 4); //tex2D(_CameraOpaqueTexture, i.uv);
                 return col;
             }
             ENDCG
