@@ -78,6 +78,9 @@ public class UIManager : MonoBehaviour
                 break;
         }
 
+        // Don't do blur pass while in-game for keeping hi-framerate
+        BlurRenderFeature.Disabled = true;
+
     }
 
     public void OnPauseButtonClick()
@@ -104,6 +107,8 @@ public class UIManager : MonoBehaviour
         AudioManager.Instance.isInGame = false;
         AudioManager.Instance.gameBGM.Pause();
         pause_Canvas.SetActive(true);
+
+        BlurRenderFeature.Disabled = false;
     }
 
     public void GameResume()
@@ -120,6 +125,8 @@ public class UIManager : MonoBehaviour
             AudioTimelineSync.instance.Play();
         else
             StartCoroutine(BiteTheDust());
+
+        BlurRenderFeature.Disabled = true;
     }
 
     public static bool BitingTheDust = false;
@@ -236,6 +243,8 @@ public class UIManager : MonoBehaviour
 
     private void OnStopPlaying()
     {
+        BlurRenderFeature.Disabled = true;
+
         AudioManager.Instance.gameBGM?.Pause();
         AudioManager.Instance.StopAllCoroutines();
 
