@@ -52,7 +52,8 @@ public class ResultManager : MonoBehaviour
     {
         cheader = LiveSetting.CurrentHeader;
         mheader = DataLoader.GetMusicHeader(cheader.mid);
-        
+
+        BlurRenderFeature.Disabled = false;
         SetBtnObject();
         GetResultObjectAndComponent();
         ReadScores();
