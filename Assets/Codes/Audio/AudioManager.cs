@@ -62,8 +62,15 @@ public class AudioManager : MonoBehaviour
     {
         Provider.Unload();
 
-        // ? 随便这里好像可以
-        System.IO.KiraFilesystem.Instance.Dispose();
+        try
+        {
+            // ? 随便这里好像可以
+            System.IO.KiraFilesystem.Instance.Dispose();
+        }
+        catch
+        {
+
+        }
     }
 
     public ISoundEffect PrecacheSE(byte[] data) => Provider.PrecacheSE(data, SEType.Common);
