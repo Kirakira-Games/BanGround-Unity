@@ -54,6 +54,8 @@ public class SelectManager : MonoBehaviour
         Screen.autorotateToLandscapeLeft = true;
         Screen.autorotateToLandscapeRight = true;
 
+        BlurRenderFeature.Disabled = false;
+
         int selectedSid = -1;
         if (DataLoader.loaded)
             selectedSid = LiveSetting.CurrentHeader.sid;
