@@ -89,7 +89,7 @@
 
             fixed4 frag(v2f i) : SV_Target
             {
-                fixed4 col = blur(_MainTex, i.uv, 4); //tex2D(_CameraOpaqueTexture, i.uv);
+                fixed4 col = blur(_MainTex, i.uv, 8); //tex2D(_CameraOpaqueTexture, i.uv);
                 return col;
             }
             ENDCG
