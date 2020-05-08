@@ -5,8 +5,11 @@ using UnityEngine.Rendering.Universal;
 class BlurPass : ScriptableRenderPass
 {
     private RenderTexture rt;
+
     private RenderTexture rt1;
+
     private RenderTexture rt2;
+    private RenderTexture rt3;
     private Material mat;
     private int blurSize;
 
@@ -16,8 +19,10 @@ class BlurPass : ScriptableRenderPass
         this.mat = mat;
         this.blurSize = (int)blurSize;
 
-        rt2 = new RenderTexture(Screen.width, Screen.height, 8);
-        rt1 = new RenderTexture(Screen.width / this.blurSize, Screen.height / this.blurSize, 8);
+        rt1 = new RenderTexture(Screen.width, Screen.height, 8);
+
+        rt2 = new RenderTexture(Screen.width / this.blurSize, Screen.height / this.blurSize, 8);
+        rt3 = new RenderTexture(Screen.width / this.blurSize, Screen.height / this.blurSize, 8);
     }
 
     public override void Configure(CommandBuffer cmd, RenderTextureDescriptor cameraTextureDescriptor)
@@ -41,16 +46,29 @@ class BlurPass : ScriptableRenderPass
             {
                 rt1.Release();
                 rt2.Release();
-                
-                rt1 = new RenderTexture(Screen.width / blurSize, Screen.height / blurSize, 8);
-                rt2 = new RenderTexture(Screen.width, Screen.height, 8);
+                rt3.Release();
+
+                rt1 = new RenderTexture(Screen.width, Screen.height, 8);
+                rt2 = new RenderTexture(Screen.width / this.blurSize, Screen.height / this.blurSize, 8);
+                rt3 = new RenderTexture(Screen.width / this.blurSize, Screen.height / this.blurSize, 8);
             }
 #endif
 
             // It does not works without copying
-            cmd.Blit(src, rt2);
-            cmd.Blit(rt2, rt1);
-            cmd.Blit(rt1, rt, mat);
+            cmd.Blit(src, rt1);
+
+            // Downsample
+            cmd.Blit(rt1, rt2);
+
+            for(int i = 0; i < 4; i++)
+            {
+                // X direction blur
+                cmd.Blit(rt2, rt3, mat, 0);
+                // y direction blur
+                cmd.Blit(rt3, rt2, mat, 1);
+            }
+
+            cmd.Blit(rt2, rt);
         }
 
         // execution
