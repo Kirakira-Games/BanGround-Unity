@@ -6,13 +6,18 @@ class BlurPass : ScriptableRenderPass
 {
     private RenderTexture rt;
     private RenderTexture rt1;
+    private RenderTexture rt2;
     private Material mat;
+    private int blurSize;
 
-    public BlurPass(RenderTexture rt, RenderTexture rt1, Material mat)
+    public BlurPass(RenderTexture rt, Material mat, uint blurSize)
     {
         this.rt = rt;
-        this.rt1 = rt1;
         this.mat = mat;
+        this.blurSize = (int)blurSize;
+
+        rt2 = new RenderTexture(Screen.width, Screen.height, 8);
+        rt1 = new RenderTexture(Screen.width / this.blurSize, Screen.height / this.blurSize, 8);
     }
 
     public override void Configure(CommandBuffer cmd, RenderTextureDescriptor cameraTextureDescriptor)
@@ -30,8 +35,21 @@ class BlurPass : ScriptableRenderPass
 
         if(!BlurRenderFeature.Disabled)
         {
+// Standalone has resizeable window so we need to check it.
+#if UNITY_STANDALONE || UNITY_EDITOR
+            if(rt2.width != Screen.width || rt2.height != Screen.height)
+            {
+                rt1.Release();
+                rt2.Release();
+                
+                rt1 = new RenderTexture(Screen.width / blurSize, Screen.height / blurSize, 8);
+                rt2 = new RenderTexture(Screen.width, Screen.height, 8);
+            }
+#endif
+
             // It does not works without copying
-            cmd.Blit(src, rt1);
+            cmd.Blit(src, rt2);
+            cmd.Blit(rt2, rt1);
             cmd.Blit(rt1, rt, mat);
         }
 
@@ -51,12 +69,13 @@ public class BlurRenderFeature : ScriptableRendererFeature
     BlurPass m_ScriptablePass;
     public RenderTexture rt = null;
     public Material mat = null;
+    public uint blurSize = 2;
 
     public static bool Disabled = false;
 
     public override void Create()
     {
-        m_ScriptablePass = new BlurPass(rt, new RenderTexture(Screen.width, Screen.height, 8) , mat);
+        m_ScriptablePass = new BlurPass(rt, mat, blurSize);
 
         m_ScriptablePass.renderPassEvent = RenderPassEvent.AfterRenderingPostProcessing;
     }
@@ -65,4 +84,6 @@ public class BlurRenderFeature : ScriptableRendererFeature
     {
         renderer.EnqueuePass(m_ScriptablePass);
     }
+
+    
 }
