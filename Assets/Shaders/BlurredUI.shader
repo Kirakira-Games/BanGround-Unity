@@ -4,7 +4,7 @@ Shader "UI/Blurred"
 {
     Properties
     {
-        [PerRendererData] _MainTex("Sprite Texture", 2D) = "white" {}
+        _MainTex("Sprite Texture", 2D) = "white" {}
         _BlurFB("Blured RenderTarget", 2D) = "white" {}
         _Color("Tint", Color) = (1,1,1,1)
 
@@ -105,9 +105,13 @@ Shader "UI/Blurred"
                 fixed4 frag(v2f IN) : SV_Target
                 {
                     half4 bgColor = tex2D(_BlurFB, IN.screenPosition);
+                    half4 spriteColor = tex2D(_MainTex, IN.texcoord);
+
                     bgColor.a = 1.0;
 
                     bgColor.rgb = (bgColor.rgb * (1 - IN.color.a)) + (bgColor.rgb * IN.color.rgb * IN.color.a);
+
+                    bgColor.rgb = (1 - spriteColor.a) * bgColor.rgb + spriteColor.a * spriteColor.rgb;
 
                     // Don't show blur while the color is a fully transparent color
                     float factor = min(IN.color.a * 10000, 1.0);
