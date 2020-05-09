@@ -200,7 +200,7 @@ public class SettingAndMod : MonoBehaviour
         //GetModStatus();
         GameObject.Find("Setting_Canvas").GetComponent<Animator>().SetTrigger("SwitchSetting");
         setting_Close_Btn.gameObject.SetActive(true);
-        if (GameObject.Find("Sound_Panel") != null)
+        if (GameObject.Find("SoundToggle").GetComponent<Toggle>().isOn)
         {
             SelectManager.instance.previewSound?.Pause();
         }
