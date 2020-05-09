@@ -38,24 +38,21 @@ class BlurPass : ScriptableRenderPass
         cmd.Blit(src, dst);
         cmd.SetRenderTarget(dst);
 
-        if(!BlurRenderFeature.Disabled)
+        if(!BlurRenderFeature.Disabled && rt2 != null)
         {
-
-
-            if(rt1 == null
-#if UNITY_STANDALONE || UNITY_EDITOR // Standalone has resizeable window so we need to check it.
-                || rt2.width != Screen.width || rt2.height != Screen.height
-#endif
-                )
+            // Standalone has resizeable window so we need to check it.
+#if UNITY_STANDALONE || UNITY_EDITOR
+            if(rt2.width != Screen.width || rt2.height != Screen.height)
             {
-                rt1?.Release();
-                rt2?.Release();
-                rt3?.Release();
+                rt1.Release();
+                rt2.Release();
+                rt3.Release();
 
                 rt1 = new RenderTexture(Screen.width, Screen.height, 8);
-                rt2 = new RenderTexture(Screen.width / blurSize, Screen.height / blurSize, 8);
-                rt3 = new RenderTexture(Screen.width / blurSize, Screen.height / blurSize, 8);
+                rt2 = new RenderTexture(Screen.width / this.blurSize, Screen.height / this.blurSize, 8);
+                rt3 = new RenderTexture(Screen.width / this.blurSize, Screen.height / this.blurSize, 8);
             }
+#endif
 
             // It does not works without copying
             cmd.Blit(src, rt1);
@@ -98,7 +95,7 @@ public class BlurRenderFeature : ScriptableRendererFeature
     {
         m_ScriptablePass = new BlurPass(rt, mat, blurSize);
 
-        m_ScriptablePass.renderPassEvent = RenderPassEvent.AfterRendering;
+        m_ScriptablePass.renderPassEvent = RenderPassEvent.AfterRenderingPostProcessing;
     }
 
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
