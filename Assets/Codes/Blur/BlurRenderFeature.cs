@@ -42,7 +42,7 @@ class BlurPass : ScriptableRenderPass
         {
 // Standalone has resizeable window so we need to check it.
 #if UNITY_STANDALONE || UNITY_EDITOR
-            if(rt2.width != Screen.width || rt2.height != Screen.height)
+            if(rt2 != null && (rt2.width != Screen.width || rt2.height != Screen.height))
             {
                 rt1.Release();
                 rt2.Release();
