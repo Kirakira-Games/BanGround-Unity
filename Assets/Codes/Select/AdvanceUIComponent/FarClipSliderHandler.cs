@@ -27,12 +27,12 @@ public class FarClipSliderHandler : MonoBehaviour, IBeginDragHandler, IEndDragHa
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        var rect = GetComponent<RectTransform>();
-        pos = rect.anchoredPosition;
+        //var rect = GetComponent<RectTransform>();
+        //pos = rect.anchoredPosition;
 
         previewObj.SetActive(true);
         transform.SetParent(newParent);
-        rect.anchoredPosition = pos;
+        //rect.anchoredPosition = pos;
         settingCanvas.enabled = false;
         mainCanvas.enabled = false;
     }
@@ -46,11 +46,11 @@ public class FarClipSliderHandler : MonoBehaviour, IBeginDragHandler, IEndDragHa
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        var rect = GetComponent<RectTransform>();
-        pos = rect.anchoredPosition;
+        //var rect = GetComponent<RectTransform>();
+        //pos = rect.anchoredPosition;
 
         transform.SetParent(oldParent);
-        rect.anchoredPosition = pos;
+        //rect.anchoredPosition = pos;
         previewObj.SetActive(false);
         settingCanvas.enabled = true;
         mainCanvas.enabled = true;
