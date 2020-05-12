@@ -306,7 +306,8 @@ public class NoteController : MonoBehaviour
 
         // Load chart
         int sid = LiveSetting.CurrentHeader.sid;
-        chart = ChartLoader.LoadChart(DataLoader.LoadChart(sid, (Difficulty)LiveSetting.actualDifficulty));
+        Difficulty difficulty = (Difficulty)LiveSetting.actualDifficulty;
+        chart = ChartLoader.LoadChart(DataLoader.LoadChart(sid, difficulty));
         NotePool.instance.Init(notes);
         noteHead = 0;
 
@@ -329,6 +330,7 @@ public class NoteController : MonoBehaviour
             AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) +"/flick.wav").bytes)
         };
 
+        // Game BGM
         AudioManager.Instance.DelayPlayInGameBGM(KiraFilesystem.Instance.Read(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), WARM_UP_SECOND);
 
         // Background
@@ -380,6 +382,16 @@ public class NoteController : MonoBehaviour
                         GameObject.Find("UIManager").GetComponent<UIManager>().OnAudioFinish(true);
                     }
                 });
+        }
+
+        // Check if adjusting offset
+        if (LiveSetting.offsetAdjustMode)
+        {
+            GameObject.Find("infoCanvas").GetComponent<Canvas>().enabled = false;
+        }
+        else
+        {
+            GameObject.Find("settingsCanvas").GetComponent<Canvas>().enabled = false;
         }
 
         chartScript = new ChartScript(sid, (Difficulty)LiveSetting.actualDifficulty);

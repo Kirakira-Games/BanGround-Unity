@@ -26,7 +26,7 @@ public static class DataLoader
     public static bool loaded => songList != null;
 
     public const int ChartVersion = 1;
-    private const int InitialChartVersion = 4;
+    private const int InitialChartVersion = 5;
     private const int GameVersion = 4;
 
     private static Dictionary<int, cHeader> chartDic;

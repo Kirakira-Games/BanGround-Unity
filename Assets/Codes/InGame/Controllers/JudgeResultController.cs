@@ -16,6 +16,7 @@ public class JudgeResultController : MonoBehaviour
     private SpriteRenderer resultRenderer;
     private SpriteRenderer offsetRenderer;
     private Animator animator;
+    private OffsetSettingController offsetSetting;
 
     private void Awake()
     {
@@ -34,6 +35,11 @@ public class JudgeResultController : MonoBehaviour
         offsetRenderer = GameObject.Find("JudgeOffset").GetComponent<SpriteRenderer>();
         milisecTxt = GameObject.Find("offset_miliseconds").GetComponent<Text>();
         milisecTxt.text = "";
+        var recent10 = GameObject.Find("Recent10Avg");
+        if (recent10 != null)
+        {
+            offsetSetting = recent10.GetComponent<OffsetSettingController>();
+        }
     }
 
     public void DisplayJudgeResult(JudgeResult result)
@@ -56,6 +62,8 @@ public class JudgeResultController : MonoBehaviour
         }
 
         int deltaTime = note.time - note.judgeTime;
+        if (result <= 3)
+            offsetSetting?.Add(deltaTime);
 
         if (cl_showms)
         {

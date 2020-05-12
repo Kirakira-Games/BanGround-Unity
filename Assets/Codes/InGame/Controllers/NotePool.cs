@@ -80,7 +80,6 @@ public class NotePool : MonoBehaviour
                     break;
             }
             note.isDestroyed = true;
-            note.transform.localScale = Vector3.one * NoteUtility.NOTE_SCALE * r_notesize;
 
             if (NoteUtility.IsSlide(type))
             {
