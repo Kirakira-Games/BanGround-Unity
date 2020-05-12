@@ -36,7 +36,9 @@ public class TouchEvent : MonoBehaviour
 
     public void ChangeAnimation()
     {
+#if !UNITY_EDITOR
         if (waitingUpdate) return;
+#endif
         if (!touched)
         {
             touched = true;
@@ -81,6 +83,7 @@ public class TouchEvent : MonoBehaviour
 
     IEnumerator GetAuthenticationResult()
     {
+#if !UNITY_EDITOR
         string uuid = SystemInfo.deviceUniqueIdentifier;
         string key = inputField.text;
         bool usePrefKey = false;
@@ -110,6 +113,10 @@ public class TouchEvent : MonoBehaviour
                 yield break;
             }
         }
+#else
+        yield return 0;
+#endif
+
         StartSwitch();
     }
 }
