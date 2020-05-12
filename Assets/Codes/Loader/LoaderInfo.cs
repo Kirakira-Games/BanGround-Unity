@@ -19,13 +19,10 @@ public class LoaderInfo : MonoBehaviour
     [SerializeField] private Text songBPM;
     [SerializeField] private Text songLevelAndCharter;
     [SerializeField] private Text songArtist;
-    [SerializeField] private Text songNoteCount;
 
-    const string NameFormat = "{0}";// Offset Rhythm Test
-    //const string BPMFormat = "BPM {0}-{1}";// BPM 13-269
-    const string LevelAndCharterFormat = "{0} {1} BY {2}"; // EASY 26 BY User
-    const string ArtistFormat = "{0}";// Produced by KIRAKIRA sound team "bbben"<啥比
-    const string NoteCountFormat = "Note {0}";//Note 999
+    const string NameFormat = "{0}";
+    const string LevelAndCharterFormat = "{0}\n{1}"; 
+    const string ArtistFormat = "{0}";
 
     private void Start()
     {
@@ -52,16 +49,15 @@ public class LoaderInfo : MonoBehaviour
         }
 
         songName.text = string.Format(NameFormat, musicHeader.title);
-        songBPM.text = GetBPM();
+        songBPM.text = GetBPM() + " NOTE " + chartData.numNotes;
         songLevelAndCharter.text = string.Format(LevelAndCharterFormat, Enum.GetName(typeof(Difficulty), chart.Difficulty).ToUpper(), chart.level, chartHeader.authorNick);
         songArtist.text = string.Format(ArtistFormat, musicHeader.artist);
-        songNoteCount.text = string.Format(NoteCountFormat, chartData.numNotes);
     }
 
     private string GetBPM()
     {
         var min = chartData.bpm.Min(o => o.value);
         var max = chartData.bpm.Max(o => o.value);
-        return min == max ? $"BPM {min}" : $"BPM {min}-{max}";
+        return min == max ? $"BPM{min}" : $"BPM{min}-{max}";
     }
 }
