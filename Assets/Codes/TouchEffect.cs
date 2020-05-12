@@ -17,7 +17,7 @@ public class TouchEffect : MonoBehaviour
     private void Start()
     {
         trans = GetComponent<RectTransform>();
-        touchEffect = GameObject.Find("ParRoot").GetComponent<ParticleSystem>();
+        //touchEffect = GameObject.Find("ParRoot").GetComponent<ParticleSystem>();
         //SceneManager.activeSceneChanged += OnSceneChanged;
     }
 
@@ -40,22 +40,22 @@ public class TouchEffect : MonoBehaviour
 
     private void Update()
     {
-        if (isEffectEnabled)
-        {
-            Touch[] touches = Input.touches;
-            if (touches.Length == 0)
-            {
-                if (Input.GetMouseButtonDown(0))
-                {
-                    touches = SimulateMouseTouch(TouchPhase.Began);
-                }
-            }
-            foreach (var touch in touches)
-            {
-                trans.anchoredPosition = touch.position;
-                touchEffect.Play();
-            }
-        }
+        //if (isEffectEnabled)
+        //{
+        //    Touch[] touches = Input.touches;
+        //    if (touches.Length == 0)
+        //    {
+        //        if (Input.GetMouseButtonDown(0))
+        //        {
+        //            touches = SimulateMouseTouch(TouchPhase.Began);
+        //        }
+        //    }
+        //    foreach (var touch in touches)
+        //    {
+        //        trans.anchoredPosition = touch.position;
+        //        touchEffect.Play();
+        //    }
+        //}
 
 #if !UNITY_EDITOR && (UNITY_ANDROID || UNITY_STANDALONE)
         if (Input.GetKeyUp(KeyCode.Escape) && !exiting)
