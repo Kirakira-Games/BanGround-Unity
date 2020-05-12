@@ -67,7 +67,7 @@ public class LaneEffects : MonoBehaviour
 
     public void UpdateLaneEffects(int audioTime)
     {
-        float speed = GetSpeed(audioTime) * LiveSetting.SpeedCompensationSum * (r_notespeed + 1) / 12;
+        float speed = GetSpeed(audioTime) * LiveSetting.SpeedCompensationSum * (r_notespeed + 1f) / 12;
         float abs = Mathf.Abs(speed);
         if (prevSpeed != speed)
         {
