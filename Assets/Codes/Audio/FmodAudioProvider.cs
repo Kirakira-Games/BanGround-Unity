@@ -317,6 +317,7 @@ namespace AudioProvider
 
         public void Init(int sampleRate, uint bufferLength)
         {
+            KVar ao_output = new KVar("snd_output", ((int)OUTPUTTYPE.AUTODETECT).ToString(), KVarFlags.Archive);
             FMODUtil.ErrCheck(
                 Factory.System_Create(out fmodSystem)
             );
@@ -330,6 +331,8 @@ namespace AudioProvider
                 fmodSystem.setDSPBufferSize(512, 4);
             }
             fmodSystem.setSoftwareFormat(sampleRate, SPEAKERMODE.STEREO, 0);
+            fmodSystem.setOutput((OUTPUTTYPE)ao_output.Get<int>());
+            UnityEngine.Debug.Log($"Init FMOD with OUTPUTTYPE:{Enum.GetName(typeof(OUTPUTTYPE), ao_output.Get<int>())}");
 
             FMODUtil.ErrCheck(
                 fmodSystem.init(512, INITFLAGS.NORMAL, IntPtr.Zero)
