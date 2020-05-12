@@ -33,9 +33,13 @@
             const response = await fetch(url);
             
             if(response.status == 200) {
-                output.innerHTML += await response.text();
+                const txt = await response.text();
 
-                output.scrollTop = output.scrollHeight;
+                if(txt != "") {
+                    output.innerHTML += txt;
+                    output.scrollTop = output.scrollHeight;
+                }
+                
             }
         }
 
