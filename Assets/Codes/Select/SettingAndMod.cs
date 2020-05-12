@@ -110,10 +110,7 @@ public class SettingAndMod : MonoBehaviour
     void initCompoinents()
     {
 #if !(UNITY_STANDALONE || UNITY_WSA)
-        GameObject.Find("Fullscreen").SetActive(false);
-        GameObject.Find("Fullscreen_Toggle").SetActive(false);
-        GameObject.Find("VSync").SetActive(false);
-        GameObject.Find("VSync_Toggle").SetActive(false);
+        GameObject.Find("Windows_Panel").SetActive(false);
 #else
         FS_Tog = GameObject.Find("Fullscreen_Toggle").GetComponent<Toggle>();
         VSync_Tog = GameObject.Find("VSync_Toggle").GetComponent<Toggle>();
