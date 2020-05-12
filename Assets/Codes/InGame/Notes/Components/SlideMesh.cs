@@ -19,13 +19,16 @@ public class SlideMesh : MonoBehaviour
 
     static KVarRef r_brightness_long = new KVarRef("r_brightness_long");
     static KVarRef r_notesize = new KVarRef("r_notesize");
+    private float width;
 
     public void ResetMesh(Transform S, Transform T, bool isFuwafuwa)
     {
         transform.SetParent(S);
         transform.localPosition = initPos;
+        transform.localScale = Vector3.one / transform.parent.localScale.x;
         transS = S;
         transT = T;
+        width = BODY_WIDTH * r_notesize;
         SetFuwafuwa(isFuwafuwa);
     }
 
@@ -45,7 +48,6 @@ public class SlideMesh : MonoBehaviour
     public void OnUpdate()
     {
         Vector3 delta = transT.position - transform.parent.position;
-        float width = BODY_WIDTH * r_notesize;
         Vector3[] vertices =
         {
             new Vector3(-width, 0, 0),

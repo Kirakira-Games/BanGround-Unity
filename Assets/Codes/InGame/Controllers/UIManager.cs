@@ -194,6 +194,8 @@ public class UIManager : MonoBehaviour
     public void OnAudioFinish(bool restart)
     {
         if (SceneLoader.Loading || AudioManager.Instance.isLoading) return;
+        if (LiveSetting.offsetAdjustMode)
+            restart = true;
         isFinished = true;
         InGameBackground.instance.stopVideo();
         AudioManager.Instance.gameBGM?.Dispose();
@@ -209,6 +211,8 @@ public class UIManager : MonoBehaviour
 
     IEnumerator ShowResult(bool restart)
     {
+        if (LiveSetting.offsetAdjustMode)
+            restart = true;
         gateCanvas.SetActive(true);
         Image gateImg = GameObject.Find("GateImg").GetComponent<Image>();
         switch (ResultsGetter.GetClearMark())

@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 using System;
 using System.IO;
 using System.Linq;
+using UnityEngine.Networking.NetworkSystem;
 
 #pragma warning disable 0649
 #pragma warning disable 0414
@@ -33,6 +34,20 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public Color DisabledColor = Color.clear;
 
     bool select = false;
+
+    private static readonly string[] delFailMsg = new string[]
+    {
+        "Please don't be so cruel!",
+        "It is a good chart, I promise!",
+        "How come? This is your oldest friend in this game.",
+        "Nooooooooooooooo",
+        "Stop or there will be tons of bugs.",
+        "I'll stand by this chart FOREVER!",
+        "I won't surrender. Even if you uninstall me.",
+        "What's wrong with it? Tell me and I'll try to improve it.",
+        "FailedToComeUpWithGoodReasonException: Operation Failed.",
+        "Sorry I wasn't paying attention. What was that again?"
+    };
 
     // Start is called before the first frame update
     void Start()
@@ -207,6 +222,12 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         var path = new System.IO.FileInfo(file).Directory.FullName;
         //Debug.Log(path);
         System.IO.Directory.Delete(path, true);*/
+        if (LiveSetting.CurrentHeader.sid == LiveSetting.offsetAdjustChart)
+        {
+            int index = UnityEngine.Random.Range(0, delFailMsg.Length);
+            MessageBoxController.ShowMsg(LogLevel.INFO, delFailMsg[index]);
+            return;
+        }
 
         var chartDir = $"chart/{LiveSetting.CurrentHeader.sid}";
 

@@ -30,6 +30,7 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
     }
 
     static KVarRef r_graynote = new KVarRef("r_graynote");
+    static KVarRef r_notesize = new KVarRef("r_notesize");
 
     public virtual void ResetNote(GameNoteData data)
     {
@@ -56,6 +57,8 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
         {
             NoteController.numFuwafuwaNotes++;
         }
+
+        transform.localScale = Vector3.one * NoteUtility.NOTE_SCALE * r_notesize;
     }
 
     static KVarRef r_bang_perspect = new KVarRef("r_bang_perspect");

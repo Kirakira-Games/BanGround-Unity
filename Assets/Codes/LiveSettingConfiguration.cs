@@ -106,15 +106,41 @@ public static class LiveSetting
 
     public static int currentChart = 0; // Chart set index
     public static int currentDifficulty = (int)Difficulty.Easy;
-    public static int actualDifficulty = currentDifficulty; // These may differ if a chart set does not have currentDifficulty
+    private static int cachedActualDifficulty = currentDifficulty;
+    public static int actualDifficulty
+    {
+        get
+        {
+            return offsetAdjustMode ? (int)Difficulty.Normal : cachedActualDifficulty;
+        }
+        set
+        {
+            cachedActualDifficulty = value;
+        }
+    } // actualDifficulty may differ if a chart set does not have currentDifficulty
 
-    public static cHeader CurrentHeader => DataLoader.chartList[currentChart];
+    public const int offsetAdjustChart = 9746;
+    public static cHeader CurrentHeader
+    {
+        get
+        {
+            if (offsetAdjustMode)
+            {
+                return DataLoader.chartList.Where((x) => x.sid == offsetAdjustChart).First();
+            }
+            else
+            {
+                return DataLoader.chartList[currentChart];
+            }
+        }
+    }
 
     public static readonly string settingsPath = Application.persistentDataPath + "/LiveSettings.json";
     public static readonly string scoresPath = Application.persistentDataPath + "/Scores.bin";
 
     public static List<ModBase> attachedMods = new List<ModBase>();
     public static float SpeedCompensationSum = 1.0f;
+    public static bool offsetAdjustMode = false;
 
     //public static bool fullScreen;
 
