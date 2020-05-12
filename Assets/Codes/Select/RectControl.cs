@@ -88,6 +88,7 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         select = true;
         img.color = SelectedColor;
         title.color = Color.white;
+        title.fontStyle = FontStyle.Bold;
         StartCoroutine(OnSelectAnimation1());
         StartCoroutine(OnSelectAnimation2());
         StartCoroutine(OnSelectAnimation3());
@@ -98,7 +99,7 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         yield return new WaitForEndOfFrame();
 
         //滑动展开
-        float destPos = 0 - rt.anchoredPosition.y - vg.padding.top - (rt.sizeDelta.y / 2);
+        float destPos = 0 - rt.anchoredPosition.y - vg.padding.top - (rt.sizeDelta.y / 2)+100;
         while (Math.Abs(rt_m.anchoredPosition.y - destPos) > 1f || Math.Abs(rt_s.velocity.y) > 1f)
         {
             rt_m.anchoredPosition -= new Vector2(0, (rt_m.anchoredPosition.y - destPos) * 0.3f);
@@ -130,7 +131,8 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         StopAllCoroutines();
         rt.sizeDelta = new Vector2(980, 116);
         img.color = DisabledColor;
-        title.color = Color.grey;
+        title.color = Color.white;
+        title.fontStyle = FontStyle.Normal;
         startImg.SetActive(false);
         select = false;
     }

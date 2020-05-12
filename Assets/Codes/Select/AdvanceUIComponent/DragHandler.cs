@@ -16,12 +16,12 @@ public class DragHandler : MonoBehaviour, IBeginDragHandler, IEndDragHandler
     {
         if (!canDrag) return;
         isDragging = true;
-        sm.UnselectSong();
+        //sm.UnselectSong();
     }
 
     public void OnEndDrag(PointerEventData data)
     {
         isDragging = false;
-        sm.SelectSong(-1);
+        //sm.SelectSong(-1);
     }
 }
