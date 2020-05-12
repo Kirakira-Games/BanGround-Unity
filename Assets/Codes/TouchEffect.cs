@@ -10,7 +10,7 @@ public class TouchEffect : MonoBehaviour
 {
     private RectTransform trans;
     private ParticleSystem touchEffect;
-    bool isEffectEnabled = true;
+    bool isEffectEnabled = false;
     float waiting = 0;
     bool exiting = false;
 
@@ -18,7 +18,7 @@ public class TouchEffect : MonoBehaviour
     {
         trans = GetComponent<RectTransform>();
         touchEffect = GameObject.Find("ParRoot").GetComponent<ParticleSystem>();
-        SceneManager.activeSceneChanged += OnSceneChanged;
+        //SceneManager.activeSceneChanged += OnSceneChanged;
     }
 
     void OnSceneChanged(Scene s1, Scene s2)
