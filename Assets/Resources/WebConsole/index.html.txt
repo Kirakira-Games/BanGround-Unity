@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BanGround Konsole</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <div class="console" id="banground-title"></div>
+    <div class="console" id="console-output"></div>
+    <div>
+        <input type="text" id="console-input">
+        <button id="console-btnsend">Send</button>
+    </div>
+
+    <script>
+        const title = document.getElementById("banground-title");
+
+        title.innerHTML =  " ______               ______                            _    _ \n" +
+                            "(____  \\             / _____)                          | |  | |\n" +
+                            " ____)  ) ____ ____ | /  ___  ____ ___  _   _ ____   _ | |  | |\n" +
+                            "|  __  ( / _  |  _ \\| | (___)/ ___) _ \\| | | |  _ \\ / || |  |_|\n" +
+                            "| |__)  | ( | | | | | \\____/| |  | |_| | |_| | | | ( (_| |   _ \n" +
+                            "|______/ \\_||_|_| |_|\\_____/|_|   \\___/ \\____|_| |_|\\____|  |_|\n\n";
+
+        title.innerHTML += "Web Konsole";
+
+        const output = document.getElementById("console-output");
+
+        async function FetchLog(url = "/log_additive")
+        {
+            const response = await fetch(url);
+            
+            if(response.status == 200) {
+                const txt = await response.text();
+
+                if(txt != "") {
+                    output.innerHTML += txt;
+                    output.scrollTop = output.scrollHeight;
+                }
+                
+            }
+        }
+
+        FetchLog("/log");
+        setInterval(FetchLog, 500);
+
+        const sendButton = document.getElementById("console-btnsend");
+        const input = document.getElementById("console-input");
+        sendButton.onclick = () => {
+            fetch("/input?" + input.value);
+            output.innerHTML += "] " + input.value + "\n";
+            input.value = "";
+        };
+
+        onkeydown = (e) => {
+            if(e.keyCode == 13)
+                sendButton.onclick();
+        };
+    </script>
+</body>
+</html>
