@@ -82,9 +82,9 @@ public class ResultManager : MonoBehaviour
 
         //Debug.Log($"total = {ComboManager.JudgeOffsetResult.Count}, early = {earlyCount}, late = {lateCount}");
         //offset_Obj.text = $"E:{earlyCount}(avg:{earlyAverage})\nL:{lateCount}(avg:{lateAverage})";
-        earlyCount_Text.text = earlyCount.ToString();
+        earlyCount_Text.text ="E"+earlyCount.ToString();
         earlyAvg_Text.text = earlyAverage.ToString() + "ms";
-        lateCount_Text.text = lateCount.ToString();
+        lateCount_Text.text = "L"+lateCount.ToString();
         lateAvg_Text.text = Mathf.Abs(lateAverage).ToString() + "ms";
     }
 
