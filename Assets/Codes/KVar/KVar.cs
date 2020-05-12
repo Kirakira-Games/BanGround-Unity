@@ -23,11 +23,41 @@ public enum KVarFlags
     StringOnly = 32
 }
 
-// KVar == Kirakira Variable
-public class KVar
+public class KonCommandBase
 {
-    public string Name { get; private set; }
-    public string Description { get; private set; }
+    public string Name { get; protected set; }
+    public string Description { get; protected set; }
+}
+
+// Kommand = Kirakira Command
+public class Kommand : KonCommandBase
+{
+    private Action<string[]> command;
+
+    public void Invoke(string[] args = null) => command(args);
+
+    public Kommand(string name, string help, Action<string[]> command)
+    {
+        Name = name;
+        Description = help;
+        this.command = command;
+
+        KVSystem.Instance.Add(this);
+    }
+
+    public Kommand(string name, string help, Action command)
+    {
+        Name = name;
+        Description = help;
+        this.command = _ => command();
+
+        KVSystem.Instance.Add(this);
+    }
+}
+
+// KVar == Kirakira Variable
+public class KVar : KonCommandBase
+{
     public string Default { get; private set; }
 
     private KVarFlags m_flags;
@@ -220,8 +250,8 @@ public class KVSystem
 {
     public static KVSystem Instance = new KVSystem();
 
-    // All kvars
-    private Dictionary<string, KVar> m_allKvars = new Dictionary<string, KVar>();
+    // All commands
+    private Dictionary<string, KonCommandBase> m_allCmds = new Dictionary<string, KonCommandBase>();
 
     // Wait for assign values, for kvars that does not exists but already had readed value from config
     private Dictionary<string, string> m_wfaValues = new Dictionary<string, string>();
@@ -243,10 +273,101 @@ public class KVSystem
         Instance = this;
 
         // g for Global
-        cheat = KVar("g_cheats", "0", KVarFlags.None, "Enable Cheats");
+        cheat = new KVar("g_cheats", "0", KVarFlags.None, "Enable Cheats");
+
+        new Kommand("savecfg", "Save configs", SaveConfig);
+        new Kommand("exec", "Execute a config file", (string[] args) =>
+        {
+            if (args == null || args.Length == 0)
+                Debug.Log("Useage: exec <cfg file name>");
+
+            var filename = args[0];
+            if (!filename.EndsWith(".cfg"))
+                filename += ".cfg";
+
+            if (FS.Instance.Exists(filename))
+            {
+                string[] cfg = FS.Instance.ReadString(filename).Replace("\r", "").Split('\n');
+
+                cfg.All(line => {
+                    ExecuteLine(line);
+                    return true;
+                });
+            }
+        });
+
+        new Kommand("echo", "Repeater", (string[] args) =>
+        {
+            var str = "";
+            args.All(arg =>
+            {
+                str += arg + " ";
+                return true;
+            });
+
+            Debug.Log(str);
+        });
+
+        new Kommand("help", "List available kommands and kvars", () =>
+        {
+            var table = "<table cellspacing=\"5\"><tr><td>Name</td><td>Type</td><td>Description</td></tr>\n" +
+                        "<tr><td height=\"1\" colspan=\"3\" style=\"background-color:#0c0;\"></td></tr>";
+
+            foreach (var (name, cmd) in m_allCmds)
+            {
+                bool show = true;
+                string type = "Kommand";
+
+                if(cmd is KVar kVar)
+                {
+                    if (kVar.IsFlagSet(KVarFlags.Hidden)
+#if !DEBUG
+                        || kVar.IsFlagSet(KVarFlags.DevelopmentOnly)
+#endif
+                    ) show = false;
+
+                    type = "KVar";
+                }
+
+                if (show)
+                    table += $"<tr><td>{name}</td><td>{type}</td><td>{cmd.Description}</td></tr>";
+            }
+
+            table += "</table>";
+            Debug.Log(table);
+        });
     }
 
-    KVar KVar(string name, string defaultValue, KVarFlags flag = 0, string help = "") => new KVar(name, defaultValue, flag, help);
+    public unsafe static string[] CommandLineToArgs(string str)
+    {
+        var stack = new Stack<char>();
+
+        fixed (char* pszCmd = str)
+        {
+            var pszCmda_cpy = pszCmd - 1;
+
+            while (++pszCmda_cpy < pszCmd + str.Length)
+            {
+                if (*pszCmda_cpy == '"' || *pszCmda_cpy == '\'')
+                {
+                    if (stack.Count > 0 && stack.Peek() == *pszCmda_cpy)
+                        stack.Pop();
+                    else
+                        stack.Push(*pszCmda_cpy);
+                }
+
+                if (*pszCmda_cpy == ' ' && stack.Count == 0)
+                    *pszCmda_cpy = '\n';
+            }
+        }
+
+        var output = str.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+        for (int i = 0; i < output.Length; i++)
+            output[i] = output[i].Trim('\'', '"');
+
+        return output;
+    }
 
     public void ExecuteLine(string line, bool userInput = false)
     {
@@ -271,81 +392,77 @@ public class KVSystem
         // Split by whitespace
         var parts = command.Split(' ');
 
-        // kvar is the first part
-        var kvar = parts[0];
+        // cmd name is the first part
+        var cmdName = parts[0];
 
-        // left parts are just value...
-        var value = command.Replace(kvar, "").TrimStart(' ');
+        // left parts are just value/params...
+        var value = command.Replace(cmdName, "").TrimStart(' ');
 
         // Check if we are good to go
-        if (m_allKvars.ContainsKey(kvar))
+        if (m_allCmds.ContainsKey(cmdName))
         {
-            var kVar = m_allKvars[kvar];
+            var cmd = m_allCmds[cmdName];
 
-            if (string.IsNullOrWhiteSpace(value) || string.IsNullOrEmpty(value))
+            if (cmd is KVar kVar)
             {
-                if(userInput)
+                if (string.IsNullOrWhiteSpace(value) || string.IsNullOrEmpty(value))
                 {
-                    Debug.Log($"KVar: {kvar} - {kVar.Get<string>()} (Default: {kVar.Default})");
+                    if (userInput)
+                    {
+                        Debug.Log($"KVar: {cmdName} - {kVar.Get<string>()} (Default: {kVar.Default})");
 
-                    if (!string.IsNullOrEmpty(kVar.Description))
-                        Debug.Log(kVar.Description);
+                        if (!string.IsNullOrEmpty(kVar.Description))
+                            Debug.Log(kVar.Description);
+                    }
+
+                    return;
                 }
 
-                return;
-            }
-
-            if (kVar.IsFlagSet(KVarFlags.Hidden)
+                if (kVar.IsFlagSet(KVarFlags.Hidden)
 #if !DEBUG
              || kVar.IsFlagSet(KVarFlags.DevelopmentOnly)
 #endif
-            )
-            {
-                // Shhhh! looks like it's hidden, just skip it.
-                return;
+                )
+                {
+                    // Shhhh! looks like it's hidden, just skip it.
+                    return;
+                }
+
+                // Set it
+                kVar.Set(value);
             }
-            
-            // Set it
-            kVar.Set(value);
+            else if(cmd is Kommand kmd)
+            {
+                string[] args = CommandLineToArgs(value);
+                kmd.Invoke(args);
+            }
         }
         else
         {
             if (userInput)
             {
-                if (string.IsNullOrWhiteSpace(value) || string.IsNullOrEmpty(value))
-                    Debug.Log($"KVar {kvar} not found, but we would keep this value");
-                else
-                    Debug.Log($"KVar {kvar} not found.");
+                Debug.Log($"KonCommand {cmdName} not found.");
             }
 
-            m_wfaValues[kvar] = value;
+            m_wfaValues[cmdName] = value;
         }
     }
 
-    public void ReloadConfig()
-    {
-        if (FS.Instance.Exists("config.cfg"))
-        {
-            string[] cfg = FS.Instance.ReadString("config.cfg").Replace("\r","").Split('\n');
-
-            cfg.All(line => {
-                ExecuteLine(line);
-                return true;
-            });
-        }
-    }
+    public void ReloadConfig() => ExecuteLine("exec config.cfg");
 
     public void SaveConfig()
     {
         var cfg = "// generated by Kirakira Games, do not modify\n";
 
-        foreach(var (name, var) in m_allKvars)
+        foreach(var (name, cmd) in m_allCmds)
         {
-            if(var.IsFlagSet(KVarFlags.Archive))
+            if (cmd is KVar var)
             {
-                cfg = $"{cfg}{name} {var.Get<string>()}\n";
+                if (var.IsFlagSet(KVarFlags.Archive))
+                {
+                    cfg = $"{cfg}{name} {var.Get<string>()}\n";
+                }
             }
-            
         }
             
         var path = Path.Combine(DataLoader.DataDir, "config.cfg");
@@ -356,26 +473,28 @@ public class KVSystem
         File.WriteAllText(path, cfg);
     }
 
-    public bool Add(KVar var)
+    public void Add(KonCommandBase cmd)
     {
-        string name = var.Name;
-        
-        if(m_wfaValues.ContainsKey(name))
+        string name = cmd.Name;
+
+        if (cmd is KVar var)
         {
-            var.Set(m_wfaValues[name]);
-            m_wfaValues.Remove(name);
+            if (m_wfaValues.ContainsKey(name))
+            {
+                var.Set(m_wfaValues[name]);
+                m_wfaValues.Remove(name);
+            }
         }
 
         // This will throws if kvar already exists, do check before you create a kvar!
-        m_allKvars.Add(name, var);
-
-        return true;
+        m_allCmds.Add(name, cmd);
     }
 
     public KVar Find(string name)
     {
-        if (m_allKvars.ContainsKey(name))
-            return m_allKvars[name];
+        if (m_allCmds.ContainsKey(name))
+            if (m_allCmds[name] is KVar var)
+                return var;
 
         return null;
     }

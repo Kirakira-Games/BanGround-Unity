@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
@@ -15,6 +17,8 @@ public class WebConsole : MonoBehaviour
     static StringBuilder additiveLog = new StringBuilder();
 
     static Dictionary<string, byte[]> resourceList = new Dictionary<string, byte[]>();
+
+    static List<Action> actionPool = new List<Action>();
 
     Thread httpThread = new Thread(() =>
     {
@@ -59,7 +63,12 @@ public class WebConsole : MonoBehaviour
                 var parm = ctx.Request.Url.Query.TrimStart('?');
                 parm = System.Runtime.UrlUtility.UrlDecode(parm, Encoding.UTF8);
 
-                KVSystem.Instance.ExecuteLine(parm, true);
+                actionPool.Add(() =>
+                {
+                    KVSystem.Instance.ExecuteLine(parm, true);
+                });
+
+                ctx.Response.OutputStream.Close();
             }
             else
             {
@@ -85,6 +94,17 @@ public class WebConsole : MonoBehaviour
             }
         }
     });
+
+    void Update()
+    {
+        actionPool.All(act =>
+        {
+            act();
+            return true;
+        });
+
+        actionPool.Clear();
+    }
 
     void Awake()
     {
