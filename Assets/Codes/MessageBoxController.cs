@@ -67,6 +67,8 @@ public class MessageBoxController : MonoBehaviour
             content = content,
             autoClose = autoClose
         });
+
+        Debug.Log(content);
     }
 
     private void ShowMsg(MessageQueueItem item)

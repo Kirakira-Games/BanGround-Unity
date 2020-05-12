@@ -195,7 +195,7 @@ public static class LiveSetting
             if (cachedSpeed != r_notespeed)
             {
                 cachedSpeed = r_notespeed;
-                cachedScreenTime = (int)(-540 * r_notespeed + 6500);
+                cachedScreenTime = (int)(-540f * r_notespeed + 6500);
             }
 
             return (int)(cachedScreenTime * SpeedCompensationSum);

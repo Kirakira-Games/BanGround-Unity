@@ -28,6 +28,7 @@ public class KVar
 {
     public string Name { get; private set; }
     public string Description { get; private set; }
+    public string Default { get; private set; }
 
     private KVarFlags m_flags;
     private string m_stringValue = "0";
@@ -159,6 +160,8 @@ public class KVar
     {
         Name = name;
         Description = help;
+        Default = defaultValue;
+
         m_stringValue = defaultValue;
         m_flags = flag;
         m_cbValueChanged = callback;
@@ -245,7 +248,7 @@ public class KVSystem
 
     KVar KVar(string name, string defaultValue, KVarFlags flag = 0, string help = "") => new KVar(name, defaultValue, flag, help);
 
-    public void ExecuteLine(string line)
+    public void ExecuteLine(string line, bool userInput = false)
     {
         string command = line;
 
@@ -279,6 +282,19 @@ public class KVSystem
         {
             var kVar = m_allKvars[kvar];
 
+            if (string.IsNullOrWhiteSpace(value) || string.IsNullOrEmpty(value))
+            {
+                if(userInput)
+                {
+                    Debug.Log($"KVar: {kvar} - {kVar.Get<string>()} (Default: {kVar.Default})");
+
+                    if (!string.IsNullOrEmpty(kVar.Description))
+                        Debug.Log(kVar.Description);
+                }
+
+                return;
+            }
+
             if (kVar.IsFlagSet(KVarFlags.Hidden)
 #if !DEBUG
              || kVar.IsFlagSet(KVarFlags.DevelopmentOnly)
@@ -294,6 +310,14 @@ public class KVSystem
         }
         else
         {
+            if (userInput)
+            {
+                if (string.IsNullOrWhiteSpace(value) || string.IsNullOrEmpty(value))
+                    Debug.Log($"KVar {kvar} not found, but we would keep this value");
+                else
+                    Debug.Log($"KVar {kvar} not found.");
+            }
+
             m_wfaValues[kvar] = value;
         }
     }
