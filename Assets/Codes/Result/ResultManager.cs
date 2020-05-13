@@ -313,7 +313,7 @@ public class ResultManager : MonoBehaviour
                 break;
             case ClearMarks.F:
                 markIcon.texture = null;
-                markIcon.color = Color.clear;
+                markIcon.color = new Color(0,0,0,0);
                 break;
         }
     }
