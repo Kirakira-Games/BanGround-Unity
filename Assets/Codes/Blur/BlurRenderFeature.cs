@@ -29,6 +29,8 @@ class BlurPass : ScriptableRenderPass
     {
     }
 
+    int counter = 0;
+
     public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
     {
         CommandBuffer cmd = CommandBufferPool.Get();
@@ -38,7 +40,7 @@ class BlurPass : ScriptableRenderPass
         cmd.Blit(src, dst);
         cmd.SetRenderTarget(dst);
 
-        if(!BlurRenderFeature.Disabled && rt2 != null)
+        if(counter == 0 && !BlurRenderFeature.Disabled && rt2 != null)
         {
             // Standalone has resizeable window so we need to check it.
 #if UNITY_STANDALONE || UNITY_EDITOR
@@ -74,6 +76,9 @@ class BlurPass : ScriptableRenderPass
         // execution
         context.ExecuteCommandBuffer(cmd);
         CommandBufferPool.Release(cmd);
+
+        if (++counter > 1)
+            counter = 0;
     }
 
     public override void FrameCleanup(CommandBuffer cmd)
