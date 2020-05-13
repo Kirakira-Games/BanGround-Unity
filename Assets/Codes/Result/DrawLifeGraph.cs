@@ -8,7 +8,7 @@ public class DrawLifeGraph : MonoBehaviour
     public Material mat;
     private Texture2D tex;
     private Sprite spr;
-    private const int TEX_SIZE = 256;
+    private const int TEX_SIZE = 512;
 
     void Start()
     {
