@@ -317,6 +317,7 @@ namespace System.IO
                 var arr = md5.ComputeHash(tmp);
 
                 md5Filename = Convert.ToBase64String(arr);
+                md5Filename = md5Filename.Replace("/","_");
             }
                 
 
