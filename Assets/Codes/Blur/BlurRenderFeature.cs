@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.PlayerLoop;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
@@ -29,8 +30,6 @@ class BlurPass : ScriptableRenderPass
     {
     }
 
-    int counter = 0;
-
     public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
     {
         CommandBuffer cmd = CommandBufferPool.Get();
@@ -40,7 +39,7 @@ class BlurPass : ScriptableRenderPass
         cmd.Blit(src, dst);
         cmd.SetRenderTarget(dst);
 
-        if(counter == 0 && !BlurRenderFeature.Disabled && rt2 != null)
+        if(rt2 != null)
         {
             // Standalone has resizeable window so we need to check it.
 #if UNITY_STANDALONE || UNITY_EDITOR
@@ -76,9 +75,6 @@ class BlurPass : ScriptableRenderPass
         // execution
         context.ExecuteCommandBuffer(cmd);
         CommandBufferPool.Release(cmd);
-
-        if (++counter > 1)
-            counter = 0;
     }
 
     public override void FrameCleanup(CommandBuffer cmd)
@@ -95,6 +91,7 @@ public class BlurRenderFeature : ScriptableRendererFeature
     public uint blurSize = 2;
 
     public static bool Disabled = false;
+    public static bool NeedToRender = false;
 
     public override void Create()
     {
@@ -103,10 +100,24 @@ public class BlurRenderFeature : ScriptableRendererFeature
         m_ScriptablePass.renderPassEvent = RenderPassEvent.AfterRenderingPostProcessing;
     }
 
+    int framePassed = 0;
+    const int TargetFPS = 10;
+
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
-        renderer.EnqueuePass(m_ScriptablePass);
-    }
+        // Simple fps limiter
+        if(++framePassed > Application.targetFrameRate / TargetFPS)
+        {
+            framePassed = 0;
+            NeedToRender = true;
+        }
 
-    
+        if(!Disabled && // Don't render if disabled
+            NeedToRender && // Only update blur when we need
+            renderingData.cameraData.targetTexture == null // Make sure it's main camera
+        ) {
+            renderer.EnqueuePass(m_ScriptablePass);
+            NeedToRender = false;
+        }
+    }
 }
