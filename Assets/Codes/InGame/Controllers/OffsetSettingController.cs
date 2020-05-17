@@ -28,8 +28,8 @@ public class OffsetSettingController : MonoBehaviour
         offsetText.text = "+0";
         offsetText.color = Color.blue;
 
-        var noteSpeed = GameObject.Find("Speed_Input").GetComponent<InputField>();
-        noteSpeed.text = string.Format("{0:f1}", r_notespeed.Get<float>());
+        //var noteSpeed = GameObject.Find("Speed_Input").GetComponent<InputField>();
+        //noteSpeed.text = string.Format("{0:f1}", r_notespeed.Get<float>());
         noteSize = GameObject.Find("Size_Input").GetComponent<InputField>();
         noteSize.text = string.Format("{0:f1}", r_notesize.Get<float>());
         judgeOffset = GameObject.Find("Judge_Input").GetComponent<InputField>();
