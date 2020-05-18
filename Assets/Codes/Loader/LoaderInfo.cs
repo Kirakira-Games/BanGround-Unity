@@ -58,6 +58,6 @@ public class LoaderInfo : MonoBehaviour
     {
         var min = chartData.bpm.Min(o => o.value);
         var max = chartData.bpm.Max(o => o.value);
-        return min == max ? $"BPM{min}" : $"BPM{min}-{max}";
+        return min == max ? $"BPM {min}" : $"BPM {min}-{max}";
     }
 }
