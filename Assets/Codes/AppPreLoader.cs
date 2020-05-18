@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Runtime.InteropServices;
 
 public class AppPreLoader : MonoBehaviour
 {
     public static int sampleRate = -1;
     public static int bufferSize = -1;
     public static bool init = false;
+    public static string UUID = string.Empty;
 
     private AndroidJavaObject s_ActivityContext = null;
 
@@ -19,6 +21,7 @@ public class AppPreLoader : MonoBehaviour
         Screen.orientation = ScreenOrientation.AutoRotation;
         Application.targetFrameRate = 120;
         InitAudioInfo();
+        GetUUID();
 
         Application.deepLinkActivated += (url) =>
         {
@@ -61,4 +64,25 @@ public class AppPreLoader : MonoBehaviour
             SceneManager.LoadScene("Title");
         }
     }
+
+    private void GetUUID()
+    {
+#if UNITY_IOS && !UNITY_EDITOR
+        UUID = UUIDToolExtern.getUUIDInKeychain();
+#else
+        UUID = SystemInfo.deviceUniqueIdentifier;
+#endif
+        Debug.Log($"Device UUID:{UUID}");
+    }
+}
+public class UUIDToolExtern
+{
+#if UNITY_IOS && !UNITY_EDITOR
+    [DllImport("__Internal")]
+    private static extern string _getUUIDInKeychain();
+    public static string getUUIDInKeychain()
+    {
+        return _getUUIDInKeychain();
+    }
+#endif
 }

@@ -84,7 +84,7 @@ public class TouchEvent : MonoBehaviour
     IEnumerator GetAuthenticationResult()
     {
 #if !UNITY_EDITOR
-        string uuid = SystemInfo.deviceUniqueIdentifier;
+        string uuid = AppPreLoader.UUID;
         string key = inputField.text;
         bool usePrefKey = false;
         if (PlayerPrefs.HasKey("key") && inputField.text == PlayerPrefs.GetString("key"))
@@ -119,4 +119,6 @@ public class TouchEvent : MonoBehaviour
 
         StartSwitch();
     }
+
 }
+
