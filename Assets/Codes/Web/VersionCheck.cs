@@ -14,42 +14,43 @@ public class VersionCheck
     public const string UpdateNotForce = "建议更新到最新版{0}";
     public const string NoUpdate = "当前客户端已经是最新版了";
 
-    public VersionInfo version;
+    public VersionRespone respone;
     public static VersionCheck Instance = new VersionCheck
     {
-        version = new VersionInfo
+        respone = new VersionRespone
         {
-            status = true,
+            result = true,
             data = new VersionData
             {
-                has = false
+                version = Application.version
             }
         }
     };
 
-    private const string Prefix = "https://tempapi.banground.fun";
-    private readonly string API = "/update/" + Application.version;
+    private const string Prefix = "https://api.reikohaku.fun/api";
+    private readonly string API = "/version/check?version=" + Application.version;
 
     public IEnumerator GetVersionInfo()
     {
         string FullAPI = Prefix + API;
-        var req = new KirakiraWebRequest<VersionInfo>();
+        var req = new KirakiraWebRequest<VersionRespone>();
         yield return req.Get(FullAPI);
         if (req.isNetworkError)
-            version = null;
+            respone = null;
         else
-            version = req.resp;
+            respone = req.resp;
     }
 }
 
-public class VersionInfo
+public class VersionRespone
 {
-    public bool status;
+    public bool result;
     public VersionData data;
 }
 public class VersionData
 {
+    public int id;
     public string version;
     public bool force;
-    public bool has;
+    //public bool has;
 }

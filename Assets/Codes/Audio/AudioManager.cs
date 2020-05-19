@@ -19,6 +19,10 @@ public class AudioManager : MonoBehaviour
 
     public ISoundTrack gameBGM { get; set; }
 
+    static KVar snd_bgm_volume = new KVar("snd_bgm_volume", "0.7", KVarFlags.Archive);
+    static KVar snd_se_volume = new KVar("snd_se_volume", "0.7", KVarFlags.Archive);
+    static KVar snd_igse_volume = new KVar("snd_igse_volume", "0.7", KVarFlags.Archive);
+
     private void Awake()
     {
         KVar snd_engine = new KVar("snd_engine", "Fmod", KVarFlags.Archive | KVarFlags.StringOnly);
@@ -48,6 +52,10 @@ public class AudioManager : MonoBehaviour
             Provider = new FmodAudioProvider();
             Provider.Init(AppPreLoader.sampleRate, (uint)(AppPreLoader.bufferSize / HandelValue_Buffer.FmodBufferScale[bufferIndex]));
         }
+
+        Provider.SetSoundEffectVolume(snd_se_volume, SEType.Common);
+        Provider.SetSoundEffectVolume(snd_igse_volume, SEType.InGame);
+        Provider.SetSoundTrackVolume(snd_bgm_volume);
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
