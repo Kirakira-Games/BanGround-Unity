@@ -70,9 +70,9 @@ public class SettingAndMod : MonoBehaviour
     static KVar o_audio = new KVar("o_audio", "0", KVarFlags.Archive);
 
     // snd for Sound
-    static KVar snd_bgm_volume = new KVar("snd_bgm_volume", "0.7", KVarFlags.Archive);
-    static KVar snd_se_volume = new KVar("snd_se_volume", "0.7", KVarFlags.Archive);
-    static KVar snd_igse_volume = new KVar("snd_igse_volume", "0.7", KVarFlags.Archive);
+    static KVarRef snd_bgm_volume = new KVarRef("snd_bgm_volume");
+    static KVarRef snd_se_volume = new KVarRef("snd_se_volume");
+    static KVarRef snd_igse_volume = new KVarRef("snd_igse_volume");
 
     // r for Render
     static KVar r_notespeed = new KVar("r_notespeed", "10.0", KVarFlags.Archive);

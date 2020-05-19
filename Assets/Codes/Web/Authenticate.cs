@@ -6,8 +6,8 @@ using System.Text;
 
 public class Authenticate
 {
-    private const string Prefix = "https://tempapi.banground.fun";
-    private const string API = "/auth";
+    private const string Prefix = "https://api.reikohaku.fun/api";
+    private const string API = "/auth/check";
     private const string FullAPI = Prefix + API;
 
     public static AuthResponse result;

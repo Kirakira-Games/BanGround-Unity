@@ -57,24 +57,24 @@ public class TitleLoader : MonoBehaviour
         var check = VersionCheck.Instance;
         yield return StartCoroutine(check.GetVersionInfo());
 
-        if (check == null || check.version == null || check.version.status == false) 
+        if (check == null || check.respone == null || check.respone.result == false) 
         {
             //网络错误
             MessageBoxController.ShowMsg(LogLevel.ERROR, VersionCheck.CheckError, false);
             te.waitingUpdate = false; // 椰叶先别强制更新罢
         }
-        else if (check.version.data.has)
+        else if (Application.version != check.respone.data.version)
         {
             //有更新
-            if (check.version.data.force)
+            if (check.respone.data.force)
             {
-                string result = string.Format(VersionCheck.UpdateForce, check.version.data.version);
+                string result = string.Format(VersionCheck.UpdateForce, check.respone.data.version);
                 //强制更新
                 MessageBoxController.ShowMsg(LogLevel.ERROR, result, false);
             }
             else
             {
-                string result = string.Format(VersionCheck.UpdateNotForce, check.version.data.version);
+                string result = string.Format(VersionCheck.UpdateNotForce, check.respone.data.version);
                 //不强制更新
                 MessageBoxController.ShowMsg(LogLevel.OK, result, true);
                 te.waitingUpdate = false;
@@ -83,7 +83,7 @@ public class TitleLoader : MonoBehaviour
         else
         {
             //无更新
-            //MessageBoxController.ShowMsg(LogLevel.OK, VersionCheck.NoUpdate, true);
+            MessageBoxController.ShowMsg(LogLevel.OK, VersionCheck.NoUpdate, true);
             te.waitingUpdate = false;
         }
     }
