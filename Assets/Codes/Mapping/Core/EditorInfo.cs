@@ -15,7 +15,7 @@
         public EditorInfo()
         {
             gridDivision = 6;
-            barHeight = 100;
+            barHeight = 200;
             numBars = 100;
             scrollPos = 1000;
         }

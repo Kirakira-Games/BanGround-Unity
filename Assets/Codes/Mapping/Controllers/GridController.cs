@@ -55,32 +55,32 @@ namespace BGEditor
             {
                 for (int j = 0; j < Editor.gridDivision; j++)
                 {
-                    float y = ((float)j / Editor.gridDivision + i) * Editor.barHeight - Editor.scrollPos;
+                    float y = Mathf.Round(((float)j / Editor.gridDivision + i) * Editor.barHeight - Editor.scrollPos);
                     float width;
                     Color color;
                     if (j == 0)
                     {
-                        width = 2;
+                        width = 3;
                         color = Color.white;
                     }
                     else if (j * 2 % Editor.gridDivision == 0)
                     {
-                        width = 2;
+                        width = 3;
                         color = Color.red;
                     }
                     else if (j * 3 % Editor.gridDivision == 0)
                     {
-                        width = 2;
+                        width = 3;
                         color = Color.green;
                     }
                     else if (j * 4 % Editor.gridDivision == 0)
                     {
-                        width = 1.5f;
+                        width = 2;
                         color = Color.blue;
                     }
                     else
                     {
-                        width = 1.5f;
+                        width = 2;
                         color = Color.gray;
                     }
                     var obj = CreateLine(width, new Vector2(0, y), color);
