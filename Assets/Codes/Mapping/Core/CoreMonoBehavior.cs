@@ -4,9 +4,11 @@ namespace BGEditor
 {
     public class CoreMonoBehavior : MonoBehaviour
     {
-        protected ChartCore Core;
-        protected Chart Chart => Core.chart;
-        protected EditorInfo Editor => Core.editor;
+        [HideInInspector]
+        public ChartCore Core;
+        public Chart Chart => Core.chart;
+        public EditorInfo Editor => Core.editor;
+        public ObjectPool Pool => Core.pool;
 
         protected virtual void Awake()
         {
