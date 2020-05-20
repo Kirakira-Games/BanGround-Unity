@@ -4,7 +4,13 @@ namespace BGEditor
 {
     public class CoreMonoBehavior : MonoBehaviour
     {
-        private ChartCore mCore;
-        public ChartCore Core => mCore == null ? mCore = ChartCore.Instance : mCore;
+        protected ChartCore Core;
+        protected Chart Chart => Core.chart;
+        protected EditorInfo Editor => Core.editor;
+
+        protected virtual void Awake()
+        {
+            Core = ChartCore.Instance;
+        }
     }
 }

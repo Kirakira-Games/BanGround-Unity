@@ -65,7 +65,7 @@ public static class ChartLoader
         return GameNoteType.None;
     }
 
-    public static float GetFloatingPointBeat(int[] beat)
+    public static float BeatToFloat(int[] beat)
     {
         return beat[0] + (float)beat[1] / beat[2];
     }
@@ -129,7 +129,7 @@ public static class ChartLoader
         // Create game notes
         foreach (Note note in notes)
         {
-            float beat = GetFloatingPointBeat(note.beat);
+            float beat = BeatToFloat(note.beat);
             if (prevBeat - beat > NoteUtility.EPS)
             {
                 Debug.LogError(BeatToString(note.beat) + "Incorrect order of notes!");
