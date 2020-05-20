@@ -8,11 +8,13 @@ namespace BGEditor
     {
         private Dictionary<Type, LinkedList<GameObject>> pool;
         private Dictionary<GameObject, Type> typeLookup;
+        private HashSet<GameObject> recycledThisFrame;
 
         public ObjectPool()
         {
             pool = new Dictionary<Type, LinkedList<GameObject>>();
             typeLookup = new Dictionary<GameObject, Type>();
+            recycledThisFrame = new HashSet<GameObject>();
         }
 
         public GameObject Create<T>() where T: MonoBehaviour
@@ -25,13 +27,15 @@ namespace BGEditor
             {
                 var obj = new GameObject(type.Name);
                 obj.AddComponent<T>();
-                typeLookup[obj] = obj.GetType();
+                typeLookup[obj] = typeof(T);
                 list.AddLast(obj);
             }
             var ret = list.Last.Value;
             list.RemoveLast();
-
-            ret.SetActive(true);
+            if (recycledThisFrame.Contains(ret))
+                recycledThisFrame.Remove(ret);
+            if (!ret.activeSelf)
+                ret.SetActive(true);
             return ret;
         }
 
@@ -47,12 +51,19 @@ namespace BGEditor
             var list = pool[type];
             list.AddLast(obj.gameObject);
 
-            obj.gameObject.SetActive(false);
+            recycledThisFrame.Add(obj);
         }
 
         public void Destroy<T>(T obj) where T: MonoBehaviour
         {
             Destroy(typeof(T), obj.gameObject);
+        }
+
+        public void PostUpdate()
+        {
+            foreach (var obj in recycledThisFrame)
+                obj.SetActive(false);
+            recycledThisFrame.Clear();
         }
     }
 }

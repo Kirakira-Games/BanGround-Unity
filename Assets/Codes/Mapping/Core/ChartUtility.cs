@@ -70,5 +70,10 @@
         {
             return note.lane == -1;
         }
+
+        public static string ToString(int[] beat)
+        {
+            return $"{beat[0]}:{beat[1]}/{beat[2]}";
+        }
     }
 }
