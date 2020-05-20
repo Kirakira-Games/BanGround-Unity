@@ -10,6 +10,10 @@ namespace BGEditor
     {
         public static ChartCore Instance;
 
+        public GridController grid;
+        public NoteController notes;
+        public Camera cam;
+
         [HideInInspector]
         public Chart chart { get; private set; }
 
@@ -18,6 +22,7 @@ namespace BGEditor
 
         [HideInInspector]
         public ObjectPool pool { get; private set; }
+
 
         [HideInInspector]
         public Dictionary<NotePosition, Note> groundNotes;
@@ -37,6 +42,7 @@ namespace BGEditor
         void Awake()
         {
             Instance = this;
+            chart = new Chart();
 
             // Initialize events
             onTimingModified = new UnityEvent();
@@ -59,6 +65,11 @@ namespace BGEditor
 
             // Initialize object pool
             pool = new ObjectPool();
+        }
+
+        private void LateUpdate()
+        {
+            pool.PostUpdate();
         }
 
         /// <summary>
@@ -171,6 +182,19 @@ namespace BGEditor
         public void MoveGrid(float delta)
         {
             SeekGrid(editor.scrollPos + delta);
+        }
+
+        public void SwitchTool(EditorTool tool)
+        {
+            if (editor.tool == tool)
+                return;
+            editor.tool = tool;
+            onToolSwitched.Invoke();
+        }
+
+        public void SwitchTool(int tool)
+        {
+            SwitchTool((EditorTool)tool);
         }
     }
 }
