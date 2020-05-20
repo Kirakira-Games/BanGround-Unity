@@ -13,9 +13,19 @@ namespace BGEditor
         [HideInInspector]
         public Chart chart { get; private set; }
 
+        [HideInInspector]
+        public EditorInfo editor { get; private set; }
+
+        [HideInInspector]
+        public ObjectPool pool { get; private set; }
+
+        [HideInInspector]
+        public Dictionary<NotePosition, Note> groundNotes;
+
         public UnityEvent onTimingModified;
         public UnityEvent onGridMoved;
         public UnityEvent onGridModifed;
+        public UnityEvent onToolSwitched;
         public NoteEvent onNoteCreated;
         public NoteEvent onNoteModified;
         public NoteEvent onNoteRemoved;
@@ -23,9 +33,6 @@ namespace BGEditor
         private LinkedList<IEditorCmd> cmdList;
         private LinkedListNode<IEditorCmd> lastCmd;
         private const int MAX_UNDO_COUNT = 100;
-
-        public Dictionary<NotePosition, Note> groundNotes;
-        public EditorInfo editor { get; private set; }
 
         void Awake()
         {
@@ -35,6 +42,7 @@ namespace BGEditor
             onTimingModified = new UnityEvent();
             onGridMoved = new UnityEvent();
             onGridModifed = new UnityEvent();
+            onToolSwitched = new UnityEvent();
             onNoteCreated = new NoteEvent();
             onNoteModified = new NoteEvent();
             onNoteRemoved = new NoteEvent();
@@ -48,6 +56,9 @@ namespace BGEditor
 
             // Initialize editor info
             editor = new EditorInfo();
+
+            // Initialize object pool
+            pool = new ObjectPool();
         }
 
         /// <summary>
@@ -94,6 +105,9 @@ namespace BGEditor
 
         public bool AddNote(Note note)
         {
+            var beat = ChartUtility.BeatToFloat(note.beat);
+            if (beat > editor.numBars + NoteUtility.EPS || beat < -NoteUtility.EPS)
+                return false;
             if (!ChartUtility.IsFuwafuwa(note))
             {
                 var pos = ChartUtility.GetPosition(note);
@@ -139,11 +153,24 @@ namespace BGEditor
 
         public void IncreaseBarHeight(int delta)
         {
-            int result = Mathf.Clamp(EditorInfo.MIN_BAR_HEIGHT, EditorInfo.MAX_BAR_HEIGHT, delta);
+            int result = Mathf.Clamp(delta, EditorInfo.MIN_BAR_HEIGHT, EditorInfo.MAX_BAR_HEIGHT);
             if (result == editor.barHeight)
                 return;
+            float beat = editor.scrollPos / editor.barHeight;
             editor.barHeight = result;
+            editor.scrollPos = beat * result;
             onGridModifed.Invoke();
+        }
+
+        public void SeekGrid(float target)
+        {
+            editor.scrollPos = Mathf.Clamp(target, 0, editor.maxHeight);
+            onGridMoved.Invoke();
+        }
+
+        public void MoveGrid(float delta)
+        {
+            SeekGrid(editor.scrollPos + delta);
         }
     }
 }
