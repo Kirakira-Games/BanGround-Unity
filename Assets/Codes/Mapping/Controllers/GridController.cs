@@ -177,10 +177,30 @@ namespace BGEditor
                 else if (Editor.tool == EditorTool.Slide)
                 {
                     note.type = NoteType.SlideTick;
+                    var prev = Notes.singleSlideSelected;
+                    if (prev != null)
+                    {
+                        var slidenote = new Note
+                        {
+                            lane = lane,
+                            beat = beat,
+                            type = NoteType.SlideTick
+                        };
+                        var cmds = new CmdGroup();
+                        cmds.Add(new CreateNoteCmd(slidenote));
+                        cmds.Add(new ConnectNoteCmd(prev.note, slidenote));
+                        if (cmds.Commit(Core))
+                            return;
+                    }
                 }
                 var cmd = new CreateNoteCmd(note);
+                Notes.UnselectAll();
                 Core.Commit(cmd);
                 return;
+            }
+            else if (eventData.button == PointerEventData.InputButton.Right)
+            {
+                Notes.UnselectAll();
             }
         }
     }

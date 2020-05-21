@@ -23,6 +23,11 @@ namespace BGEditor
             image.color = Color.white;
         }
 
+        public virtual bool Remove()
+        {
+            return Core.Commit(new RemoveNoteCmd(note));
+        }
+
         protected override void Awake()
         {
             base.Awake();
@@ -40,7 +45,7 @@ namespace BGEditor
         {
             if (eventData.button == PointerEventData.InputButton.Right || Editor.tool == EditorTool.Delete)
             {
-                Core.Commit(new RemoveNoteCmd(note));
+                Remove();
                 Notes.UnselectAll();
                 return;
             }
