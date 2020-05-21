@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine.Rendering.UI;
+using System.Linq;
 
 namespace BGEditor
 {
@@ -30,6 +31,7 @@ namespace BGEditor
             Core.onNoteCreated.AddListener(CreateNote);
             Core.onNoteRemoved.AddListener(RemoveNote);
             Core.onNoteModified.AddListener(ModifyNote);
+            Core.onToolSwitched.AddListener(ToolSwitch);
         }
 
         public void CreateNote(Note note)
@@ -108,7 +110,10 @@ namespace BGEditor
         public void UnselectAll()
         {
             foreach (var note in selectedNotes)
-                UnselectNote(note);
+            {
+                note.Unselect();
+            }
+            selectedNotes.Clear();
         }
 
         public bool ConnectNote(Note prev, Note next)
@@ -138,13 +143,13 @@ namespace BGEditor
             if (Editor.tool == EditorTool.Delete)
             {
                 foreach (var note in selectedNotes)
-                    RemoveNote(note.note);
+                    note.Remove();
+                selectedNotes.Clear();
             }
             else
             {
                 UnselectAll();
             }
-            selectedNotes.Clear();
         }
     }
 }
