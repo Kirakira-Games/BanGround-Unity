@@ -1,0 +1,150 @@
+﻿using UnityEngine;
+using System.Collections.Generic;
+using System;
+using UnityEngine.Rendering.UI;
+
+namespace BGEditor
+{
+    public class EditNoteController : CoreMonoBehaviour
+    {
+        private Dictionary<Note, EditorNoteBase> displayNotes;
+        private HashSet<EditorNoteBase> selectedNotes;
+        public IDPool slideIdPool;
+
+        public EditorSlideNote singleSlideSelected {
+            get
+            {
+                if (selectedNotes.Count != 1)
+                    return null;
+                var note = selectedNotes.GetEnumerator();
+                note.MoveNext();
+                return note.Current as EditorSlideNote;
+            }
+        }
+
+        private void Start()
+        {
+            displayNotes = new Dictionary<Note, EditorNoteBase>();
+            selectedNotes = new HashSet<EditorNoteBase>();
+            slideIdPool = new IDPool();
+            Core.onNoteCreated.AddListener(CreateNote);
+            Core.onNoteRemoved.AddListener(RemoveNote);
+            Core.onNoteModified.AddListener(ModifyNote);
+        }
+
+        public void CreateNote(Note note)
+        {
+            if (note.type == NoteType.BPM)
+                return;
+            Debug.Assert(!displayNotes.ContainsKey(note));
+            EditorNoteBase notebase;
+            switch (note.type)
+            {
+                case NoteType.Single:
+                    notebase = Pool.Create<EditorSingleNote>().GetComponent<EditorSingleNote>();
+                    break;
+                case NoteType.Flick:
+                    notebase = Pool.Create<EditorFlickNote>().GetComponent<EditorFlickNote>();
+                    break;
+                case NoteType.SlideTick:
+                    if (note.tickStack == -1)
+                        note.tickStack = slideIdPool.RegisterNext();
+                    else
+                        slideIdPool.Register(note.tickStack);
+                    notebase = Pool.Create<EditorSlideNote>().GetComponent<EditorSlideNote>();
+                    break;
+                default:
+                    throw new NotImplementedException($"NoteType {Enum.GetName(typeof(NoteType), note.type)} is unsupported.");
+            }
+            displayNotes.Add(note, notebase);
+            notebase.Init(note);
+        }
+
+        public void RemoveNote(Note note)
+        {
+            if (note.type == NoteType.BPM)
+                return;
+            Debug.Assert(displayNotes.ContainsKey(note));
+            Pool.Destroy(displayNotes[note]);
+            displayNotes.Remove(note);
+        }
+
+        public void ModifyNote(Note note)
+        {
+            if (note.type == NoteType.BPM)
+                return;
+            Debug.Assert(displayNotes.ContainsKey(note));
+            var notebase = displayNotes[note];
+            notebase.UpdatePosition();
+            notebase.Refresh();
+        }
+
+        public void SelectNote(Note note)
+        {
+            SelectNote(displayNotes[note]);
+        }
+
+        public void SelectNote(EditorNoteBase note)
+        {
+            if (selectedNotes.Contains(note))
+                return;
+            selectedNotes.Add(note);
+            note.Select();
+        }
+
+        public void UnselectNote(Note note)
+        {
+            UnselectNote(displayNotes[note]);
+        }
+
+        public void UnselectNote(EditorNoteBase note)
+        {
+            if (!selectedNotes.Contains(note))
+                return;
+            selectedNotes.Remove(note);
+            note.Unselect();
+        }
+
+        public void UnselectAll()
+        {
+            foreach (var note in selectedNotes)
+                UnselectNote(note);
+        }
+
+        public bool ConnectNote(Note prev, Note next)
+        {
+            Debug.Assert(displayNotes.ContainsKey(prev));
+            var note = displayNotes[prev] as EditorSlideNote;
+            if (next == null)
+                return note.SetNext(null);
+            else
+                return note.SetNext(displayNotes[next] as EditorSlideNote);
+        }
+
+        public void Refresh()
+        {
+            foreach (var note in displayNotes)
+            {
+                note.Value.UpdatePosition();
+            }
+            foreach (var note in displayNotes)
+            {
+                (note.Value as EditorSlideNote)?.Refresh();
+            }
+        }
+
+        public void ToolSwitch()
+        {
+            if (Editor.tool == EditorTool.Delete)
+            {
+                foreach (var note in selectedNotes)
+                    RemoveNote(note.note);
+            }
+            else
+            {
+                UnselectAll();
+            }
+            selectedNotes.Clear();
+        }
+    }
+}

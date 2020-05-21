@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-using UnityEngine.Profiling;
+using UnityEngine.Networking.NetworkSystem;
 
 namespace BGEditor
 {
-    public class GridController : CoreMonoBehavior, IPointerClickHandler
+    public class GridController : CoreMonoBehaviour, IPointerClickHandler
     {
         public float VPadding;
         public float LineBoundingHeight;
@@ -66,9 +66,9 @@ namespace BGEditor
             return ret;
         }
 
-        private bool GetTrackBeat(Vector2 pos, out int track, out int[] beat)
+        private bool GetLaneBeat(Vector2 pos, out int lane, out int[] beat)
         {
-            track = -1;
+            lane = -1;
             beat = new int[3];
             RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, pos, Cam, out var point);
 
@@ -86,8 +86,21 @@ namespace BGEditor
             ChartUtility.NormalizeBeat(beat);
 
             // Compute track
-            track = Mathf.Clamp(Mathf.FloorToInt(point.x / laneWidth), 0, NoteUtility.LANE_COUNT - 1);
+            lane = Mathf.Clamp(Mathf.FloorToInt(point.x / laneWidth), 0, NoteUtility.LANE_COUNT - 1);
             return true;
+        }
+
+        public Vector2 GetLocalPosition(int lane, float beat)
+        {
+            float x = (lane + 0.5f) * laneWidth;
+            float y = beat * Editor.barHeight - (Editor.scrollPos - VPadding);
+            return new Vector2(x, y);
+        }
+
+        public Vector2 GetLocalPosition(int lane, int[] beat)
+        {
+            float floatbeat = ChartUtility.BeatToFloat(beat);
+            return GetLocalPosition(lane, floatbeat);
         }
 
         public void Refresh()
@@ -138,13 +151,36 @@ namespace BGEditor
                     var obj = CreateLine(width, new Vector2(0, y), color);
                 }
             }
+
+            Notes.Refresh();
         }
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (GetTrackBeat(eventData.pressPosition, out var track, out var beat))
+            if (GetLaneBeat(eventData.pressPosition, out var lane, out var beat))
             {
-                Debug.Log($"{track}: {ChartUtility.ToString(beat)}");
+                if (eventData.button == PointerEventData.InputButton.Right || Editor.tool == EditorTool.Delete || Editor.tool == EditorTool.Select)
+                    return;
+                var note = new Note
+                {
+                    lane = lane,
+                    beat = beat,
+                };
+                if (Editor.tool == EditorTool.Single)
+                {
+                    note.type = NoteType.Single;
+                }
+                else if (Editor.tool == EditorTool.Flick)
+                {
+                    note.type = NoteType.Flick;
+                }
+                else if (Editor.tool == EditorTool.Slide)
+                {
+                    note.type = NoteType.SlideTick;
+                }
+                var cmd = new CreateNoteCmd(note);
+                Core.Commit(cmd);
+                return;
             }
         }
     }

@@ -11,8 +11,12 @@ namespace BGEditor
         public static ChartCore Instance;
 
         public GridController grid;
-        public NoteController notes;
+        public EditNoteController notes;
         public Camera cam;
+
+        public GameObject SingleNote;
+        public GameObject FlickNote;
+        public GameObject SlideNote;
 
         [HideInInspector]
         public Chart chart { get; private set; }
@@ -22,7 +26,6 @@ namespace BGEditor
 
         [HideInInspector]
         public ObjectPool pool { get; private set; }
-
 
         [HideInInspector]
         public Dictionary<NotePosition, Note> groundNotes;
@@ -190,11 +193,6 @@ namespace BGEditor
                 return;
             editor.tool = tool;
             onToolSwitched.Invoke();
-        }
-
-        public void SwitchTool(int tool)
-        {
-            SwitchTool((EditorTool)tool);
         }
     }
 }

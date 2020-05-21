@@ -2,7 +2,7 @@
 
 namespace BGEditor
 {
-    public class CoreMonoBehavior : MonoBehaviour
+    public class CoreMonoBehaviour : MonoBehaviour
     {
         [HideInInspector]
         public ChartCore Core;
@@ -11,7 +11,7 @@ namespace BGEditor
         public ObjectPool Pool => Core.pool;
         public GridController Grid => Core.grid;
         public Camera Cam => Core.cam;
-        public NoteController Notes => Core.notes;
+        public EditNoteController Notes => Core.notes;
 
         protected virtual void Awake()
         {

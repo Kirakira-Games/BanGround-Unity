@@ -10,9 +10,12 @@ namespace BGEditor
         private Dictionary<GameObject, Type> typeLookup;
         private HashSet<GameObject> recycledThisFrame;
 
+        private ChartCore Core;
+
         public ObjectPool()
         {
             pool = new Dictionary<Type, LinkedList<GameObject>>();
+            Core = ChartCore.Instance;
             typeLookup = new Dictionary<GameObject, Type>();
             recycledThisFrame = new HashSet<GameObject>();
         }
@@ -25,8 +28,24 @@ namespace BGEditor
             var list = pool[type];
             if (list.Count == 0)
             {
-                var obj = new GameObject(type.Name);
-                obj.AddComponent<T>();
+                GameObject obj;
+                if (type.Equals(typeof(EditorSingleNote)))
+                {
+                    obj = GameObject.Instantiate(Core.SingleNote, Core.grid.transform);
+                }
+                else if (type.Equals(typeof(EditorFlickNote)))
+                {
+                    obj = GameObject.Instantiate(Core.FlickNote, Core.grid.transform);
+                }
+                else if (type.Equals(typeof(EditorSlideNote)))
+                {
+                    obj = GameObject.Instantiate(Core.SlideNote, Core.grid.transform);
+                }
+                else
+                {
+                    obj = new GameObject(type.Name);
+                    obj.AddComponent<T>();
+                }
                 typeLookup[obj] = typeof(T);
                 list.AddLast(obj);
             }

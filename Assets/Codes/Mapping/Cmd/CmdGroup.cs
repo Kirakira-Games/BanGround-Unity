@@ -41,5 +41,10 @@ namespace BGEditor
             }
             return true;
         }
+
+        public void Add(IEditorCmd cmd)
+        {
+            cmds.AddLast(cmd);
+        }
     }
 }
