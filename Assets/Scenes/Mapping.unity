@@ -3188,18 +3188,7 @@ MonoBehaviour:
   m_Group: {fileID: 1437371220}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 810050434}
-        m_MethodName: SwitchTool
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 3
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_IsOn: 0
 --- !u!114 &674697972
 MonoBehaviour:
@@ -3519,7 +3508,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 391.47, y: 8.6576}
+  m_AnchoredPosition: {x: 391.46997, y: 8.6576}
   m_SizeDelta: {x: 237.0531, y: 2000}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &757368694
@@ -3860,7 +3849,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   grid: {fileID: 1672627265}
-  cam: {fileID: 0}
+  notes: {fileID: 1672627268}
+  cam: {fileID: 458680988}
+  SingleNote: {fileID: 985738360263098538, guid: e45a170f490e79349aa6e7ad13ac6b6f,
+    type: 3}
+  FlickNote: {fileID: 5839510501118655355, guid: 523916279e41b9545973aed8a13b6336,
+    type: 3}
+  SlideNote: {fileID: 510600496633266808, guid: 606863d939e380b4f9907dc3eda8a43e,
+    type: 3}
+  SlideTickNote: {fileID: 7018967703240146859, guid: e3af9826a352f4446abc95aa9e4b7812,
+    type: 3}
   onTimingModified:
     m_PersistentCalls:
       m_Calls: []
@@ -4291,7 +4289,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0.13}
+  m_AnchoredPosition: {x: 0, y: 0.13000011}
   m_SizeDelta: {x: 20, y: 76.25882}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &924076610
@@ -4895,18 +4893,7 @@ MonoBehaviour:
   m_Group: {fileID: 1437371220}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 810050434}
-        m_MethodName: SwitchTool
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 2
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_IsOn: 0
 --- !u!114 &1059604426
 MonoBehaviour:
@@ -5410,8 +5397,8 @@ Canvas:
   m_GameObject: {fileID: 1194960948}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
-  m_Camera: {fileID: 0}
+  m_RenderMode: 1
+  m_Camera: {fileID: 458680988}
   m_PlaneDistance: 100
   m_PixelPerfect: 1
   m_ReceivesEvents: 1
@@ -5441,7 +5428,7 @@ RectTransform:
   - {fileID: 1437371216}
   - {fileID: 1606546118}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -5874,18 +5861,7 @@ MonoBehaviour:
   m_Group: {fileID: 1437371220}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 810050434}
-        m_MethodName: SwitchTool
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 4
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_IsOn: 0
 --- !u!114 &1285240848
 MonoBehaviour:
@@ -6541,6 +6517,7 @@ GameObject:
   - component: {fileID: 1437371217}
   - component: {fileID: 1437371219}
   - component: {fileID: 1437371220}
+  - component: {fileID: 1437371221}
   m_Layer: 5
   m_Name: Tools
   m_TagString: Untagged
@@ -6649,6 +6626,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_AllowSwitchOff: 0
+--- !u!114 &1437371221
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1437371215}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4824273f265d3c6498dff4f2f9b5262a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Core: {fileID: 0}
+  Toggles:
+  - {fileID: 1990415990}
+  - {fileID: 1673443439}
+  - {fileID: 1059604425}
+  - {fileID: 674697971}
+  - {fileID: 1285240847}
 --- !u!1 &1465100548
 GameObject:
   m_ObjectHideFlags: 0
@@ -7342,7 +7338,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -239.71, y: -141.54}
+  m_AnchoredPosition: {x: -239.71002, y: -141.53998}
   m_SizeDelta: {x: 479.42932, y: 154.04688}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1606546119
@@ -7612,6 +7608,7 @@ GameObject:
   - component: {fileID: 1672627266}
   - component: {fileID: 1672627265}
   - component: {fileID: 1672627267}
+  - component: {fileID: 1672627268}
   m_Layer: 5
   m_Name: GridLines
   m_TagString: Untagged
@@ -7690,6 +7687,19 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &1672627268
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1672627263}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e50e059e7a216184aafed165f59d83e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Core: {fileID: 0}
 --- !u!1 &1673443437
 GameObject:
   m_ObjectHideFlags: 0
@@ -7775,18 +7785,7 @@ MonoBehaviour:
   m_Group: {fileID: 1437371220}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 810050434}
-        m_MethodName: SwitchTool
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 1
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_IsOn: 0
 --- !u!114 &1673443440
 MonoBehaviour:
@@ -7859,7 +7858,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: -0.33}
+  m_AnchoredPosition: {x: 0, y: -0.32999992}
   m_SizeDelta: {x: 20, y: 57.914764}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1703190373
@@ -8676,7 +8675,7 @@ GameObject:
   - component: {fileID: 1897870740}
   - component: {fileID: 1897870739}
   m_Layer: 5
-  m_Name: changerCanvaschanger
+  m_Name: ToolBarCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8730,8 +8729,8 @@ Canvas:
   m_GameObject: {fileID: 1897870738}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
-  m_Camera: {fileID: 0}
+  m_RenderMode: 1
+  m_Camera: {fileID: 458680988}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
@@ -8740,7 +8739,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_TargetDisplay: 0
 --- !u!224 &1897870742
 RectTransform:
@@ -8755,7 +8754,7 @@ RectTransform:
   m_Children:
   - {fileID: 398890037}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -9143,18 +9142,7 @@ MonoBehaviour:
   m_Group: {fileID: 1437371220}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 810050434}
-        m_MethodName: SwitchTool
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_IsOn: 1
 --- !u!114 &1990415991
 MonoBehaviour:
@@ -9690,7 +9678,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -100.29999, y: 1.018}
+  m_AnchoredPosition: {x: -100.30005, y: 1.018}
   m_SizeDelta: {x: -757.4923, y: 18.923233}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2052041219
