@@ -21,7 +21,7 @@
         public EditorInfo()
         {
             gridDivision = 4;
-            barHeight = 60;
+            barHeight = 400;
             numBars = 100;
             scrollPos = 0;
             tool = EditorTool.Select;
