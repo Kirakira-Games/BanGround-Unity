@@ -75,7 +75,7 @@ namespace BGEditor
 
             // Compute beat
             float actualY = point.y + Editor.scrollPos - VPadding;
-            float unitgrid = Editor.barHeight / Editor.gridDivision;
+            float unitgrid = (float)Editor.barHeight / Editor.gridDivision;
             int nearestline = Mathf.RoundToInt(actualY / unitgrid);
             if (nearestline < 0)
                 return false;
