@@ -1,59 +1,183 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BanGround Konsole</title>
     <link rel="stylesheet" href="styles/main.css">
 </head>
+
 <body>
     <div class="console" id="banground-title"></div>
+    <div class="file-panel">
+        <div class="drag-border">
+            <button onclick="dropIt()">Select Kirapack</button>
+            or drop here for "Airdropping".
+        </div>
+
+        <form style="display: none;">
+            <input multiple type="file" id="airdrop-file">
+        </form>
+    </div>
+
     <div class="console" id="console-output"></div>
     <div>
         <input type="text" id="console-input">
         <button id="console-btnsend">Send</button>
     </div>
+    <div class="drag-overlay">
+
+    </div>
 
     <script>
+        // TITLE
         const title = document.getElementById("banground-title");
 
-        title.innerHTML =  " ______               ______                            _    _ \n" +
-                            "(____  \\             / _____)                          | |  | |\n" +
-                            " ____)  ) ____ ____ | /  ___  ____ ___  _   _ ____   _ | |  | |\n" +
-                            "|  __  ( / _  |  _ \\| | (___)/ ___) _ \\| | | |  _ \\ / || |  |_|\n" +
-                            "| |__)  | ( | | | | | \\____/| |  | |_| | |_| | | | ( (_| |   _ \n" +
-                            "|______/ \\_||_|_| |_|\\_____/|_|   \\___/ \\____|_| |_|\\____|  |_|\n\n";
+        title.innerHTML = " ______               ______                            _    _ \n" +
+            "(____  \\             / _____)                          | |  | |\n" +
+            " ____)  ) ____ ____ | /  ___  ____ ___  _   _ ____   _ | |  | |\n" +
+            "|  __  ( / _  |  _ \\| | (___)/ ___) _ \\| | | |  _ \\ / || |  |_|\n" +
+            "| |__)  | ( | | | | | \\____/| |  | |_| | |_| | | | ( (_| |   _ \n" +
+            "|______/ \\_||_|_| |_|\\_____/|_|   \\___/ \\____|_| |_|\\____|  |_|\n\n";
 
         title.innerHTML += "Web Konsole";
 
-        const output = document.getElementById("console-output");
+        // KIRAPACK IMPORT
+        const filePanel = document.querySelector(".file-panel");
 
-        if(!window.WebSocket)
-            output.innerHTML = "This browser does not supports WebSocket";
+        filePanel.ondragover =
+            document.ondragover =
+            document.ondrop = (e) => {
+                e.preventDefault();
+            };
 
-        const ws = new WebSocket("ws://" + location.host + "/websocket");
-        ws.onmessage = (e) => {
-            output.innerHTML += e.data;
-            output.scrollTop = output.scrollHeight;
+        const fileReadHandler = (e) => {
+            if (e.target.readyState !== FileReader.DONE)
+                return;
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("PUT", "/airdrop");
+            xhr.send(e.target.result);
         };
 
-        ws.onclose = (e) => {
-            output.innerHTML += "\n---------------------------\nCONNECTION CLOSED\n---------------------------";
-            output.scrollTop = output.scrollHeight;
+        filePanel.ondrop = (e) => {
+            for (let i = 0; i < e.dataTransfer.files.length; i++) {
+                const file = e.dataTransfer.files[i];
+                if (file.name.endsWith(".kirapack")) {
+                    const fileReader = new FileReader();
+                    fileReader.onloadend = fileReadHandler;
+
+                    fileReader.readAsArrayBuffer(file);
+                }
+            }
+        }
+
+        const fileInput = document.getElementById("airdrop-file");
+        function dropIt() {
+            if(fileReader.readyState == fileReader.LOADING)
+                return;
+
+            fileInput.click();
+
+            const file = fileInput.files[0];
+
+            for (let i = 0; i < fileInput.files.length; i++) {
+                const file = fileInput.files[i];
+                if (file.name.endsWith(".kirapack")) {
+                    const fileReader = new FileReader();
+                    fileReader.onloadend = fileReadHandler;
+
+                    fileReader.readAsArrayBuffer(file);
+                }
+            }
+        }
+
+        // OUTPUT
+        class ConsoleOutputHandler {
+            ws = undefined;
+            output = document.getElementById("console-output");
+
+            openHandler() {
+                const _this = this;
+
+                return (e) => {
+                    _this.output.innerHTML = "";
+                };
+            };
+
+            messageHandler() {
+                const _this = this;
+                
+                return (e) => {
+                    _this.output.innerHTML += e.data;
+                    _this.output.scrollTop = _this.output.scrollHeight;
+                };
+            };
+
+            errorHandler() {
+                const _this = this;
+
+                return (e) => {
+                    _this.CreateWS();
+                };
+            };
+
+            closeHandler() {
+                const _this = this;
+
+                return (e) => {
+                    _this.output.innerHTML += "\n---------------------------\nCONNECTION CLOSED\n---------------------------\r\nReconnecting...\n";
+                    _this.output.scrollTop = _this.output.scrollHeight;
+
+                    _this.CreateWS();
+                };
+            };
+
+            CreateWS() {
+                if (!window.WebSocket) {
+                    output.innerHTML = "This browser does not supports WebSocket";
+                    return;
+                }
+
+                if(this.ws != undefined)
+                {
+                    this.ws.onopen = undefined;
+                    this.ws.onmessage = undefined;
+                    this.ws.onclose = undefined;
+                    this.ws.onerror = undefined;
+                }
+
+                this.ws = new WebSocket("ws://" + location.host + "/websocket");
+                this.ws.onopen = this.openHandler();
+                this.ws.onmessage = this.messageHandler();
+                this.ws.onclose = this.closeHandler();
+                this.ws.onerror = this.errorHandler();
+            };
+
+            SendCommand(cmd) {
+                this.ws.send(cmd);
+                this.output.innerHTML += "] " + input.value + "\n";
+                this.output.scrollTop = this.output.scrollHeight;
+            };
         };
 
+        const outputHandler = new ConsoleOutputHandler();
+        outputHandler.CreateWS();
+
+        // INPUT
         const sendButton = document.getElementById("console-btnsend");
         const input = document.getElementById("console-input");
         sendButton.onclick = () => {
-            ws.send(input.value);
-            output.innerHTML += "] " + input.value + "\n";
+            outputHandler.SendCommand(input.value);
             input.value = "";
         };
 
         onkeydown = (e) => {
-            if(e.keyCode == 13)
+            if (e.keyCode == 13)
                 sendButton.onclick();
         };
     </script>
 </body>
+
 </html>

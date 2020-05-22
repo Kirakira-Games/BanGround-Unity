@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using WebSocketSharp;
 using WebSocketSharp.Server;
 
@@ -33,6 +34,17 @@ public class WebConsole : MonoBehaviour
     }
 
     Dictionary<string, byte[]> resourceList = new Dictionary<string, byte[]>();
+
+    Action flushKirapacksAction = () =>
+    {
+        if (DataLoader.LoadAllKiraPackFromInbox())
+        {
+            if (SceneManager.GetActiveScene().name == "Select")
+            {
+                SceneManager.LoadScene("Select");
+            }
+        }
+    };
 
     Queue<Action> actionQueue = new Queue<Action>();
     List<WebSocketInterface> webSockets = new List<WebSocketInterface>();
@@ -63,6 +75,13 @@ public class WebConsole : MonoBehaviour
         public void SendLog(string log)
         {
             Send(log);
+        }
+
+        protected override void OnClose(CloseEventArgs e)
+        {
+            base.OnClose(e);
+
+            console.webSockets.Remove(this);
         }
     }
 
@@ -126,7 +145,13 @@ public class WebConsole : MonoBehaviour
                     bytes = br.ReadBytes((int)ctx.Request.ContentLength64);
                 }
 
+                if (!Directory.Exists(DataLoader.InboxDir))
+                    Directory.CreateDirectory(DataLoader.InboxDir);
+
                 File.WriteAllBytes(Path.Combine(DataLoader.InboxDir, Guid.NewGuid().ToString("N") + ".kirapack"), bytes);
+
+                if (!actionQueue.Contains(flushKirapacksAction))
+                    actionQueue.Enqueue(flushKirapacksAction);
             }
         };
 
@@ -185,7 +210,8 @@ public class WebConsole : MonoBehaviour
         await Task.Run(() =>
             webSockets.All(ws =>
             {
-                ws.SendLog(str);
+                if(ws.ConnectionState == WebSocketState.Open)
+                    ws.SendLog(str);
 
                 return true;
             })
