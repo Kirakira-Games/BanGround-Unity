@@ -22,6 +22,6 @@ public class DragHandler : MonoBehaviour, IBeginDragHandler, IEndDragHandler
     public void OnEndDrag(PointerEventData data)
     {
         isDragging = false;
-        //sm.SelectSong(-1);
+        StartCoroutine(sm.SelectNear());
     }
 }

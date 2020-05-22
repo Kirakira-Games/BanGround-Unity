@@ -13,8 +13,6 @@ using WebSocketSharp.Server;
 
 public class WebConsole : MonoBehaviour
 {
-    bool Stop = false;
-
     StringBuilder fullLog = new StringBuilder(0x10000);
 
     public string FullLog
