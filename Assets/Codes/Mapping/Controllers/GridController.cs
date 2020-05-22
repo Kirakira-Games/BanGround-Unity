@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.Networking.NetworkSystem;
+using System;
 
 namespace BGEditor
 {
@@ -157,10 +158,32 @@ namespace BGEditor
 
         public void OnPointerClick(PointerEventData eventData)
         {
+            // Handle click on slide body
+            var ray = Cam.ScreenPointToRay(eventData.pressPosition);
+            var hits = Physics2D.GetRayIntersectionAll(ray);
+            foreach (var hit in hits)
+            {
+                var collider = hit.collider;
+                if (collider.CompareTag("MappingSlideBody"))
+                {
+                    var body = collider.GetComponent<EditorSlideBody>();
+                    if (body.enabled)
+                    {
+                        body.parent.OnPointerClick(eventData);
+                        return;
+                    }
+                }
+            }
+            // Other clicks
             if (GetLaneBeat(eventData.pressPosition, out var lane, out var beat))
             {
-                if (eventData.button == PointerEventData.InputButton.Right || Editor.tool == EditorTool.Delete || Editor.tool == EditorTool.Select)
+                if (Editor.tool == EditorTool.Select)
                     return;
+                if (eventData.button == PointerEventData.InputButton.Right || Editor.tool == EditorTool.Delete)
+                {
+                    Notes.UnselectAll();
+                    return;
+                }
                 var note = new Note
                 {
                     lane = lane,
@@ -176,29 +199,27 @@ namespace BGEditor
                 }
                 else if (Editor.tool == EditorTool.Slide)
                 {
-                    note.type = NoteType.SlideTick;
+                    note.type = NoteType.Single;
+                    note.tickStack = Notes.slideIdPool.RegisterNext();
                     var prev = Notes.singleSlideSelected;
                     if (prev != null)
                     {
-                        var slidenote = new Note
-                        {
-                            lane = lane,
-                            beat = beat,
-                            type = NoteType.SlideTick
-                        };
                         var cmds = new CmdGroup();
-                        cmds.Add(new CreateNoteCmd(slidenote));
-                        cmds.Add(new ConnectNoteCmd(prev.note, slidenote));
-                        if (cmds.Commit(Core))
+                        cmds.Add(new CreateNoteCmd(note));
+                        cmds.Add(new ConnectNoteCmd(prev.note, note));
+                        if (Core.Commit(cmds))
                             return;
+                        Notes.UnselectAll();
+                        return;
                     }
                 }
-                var cmd = new CreateNoteCmd(note);
-                Notes.UnselectAll();
-                Core.Commit(cmd);
+                if (Notes.selectedNotes.Count > 0)
+                    Notes.UnselectAll();
+                else
+                    Core.Commit(new CreateNoteCmd(note));
                 return;
             }
-            else if (eventData.button == PointerEventData.InputButton.Right)
+            else if (Editor.tool != EditorTool.Select)
             {
                 Notes.UnselectAll();
             }

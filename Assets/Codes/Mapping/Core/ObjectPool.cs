@@ -73,11 +73,6 @@ namespace BGEditor
             recycledThisFrame.Add(obj);
         }
 
-        public void Destroy<T>(T obj) where T: MonoBehaviour
-        {
-            Destroy(typeof(T), obj.gameObject);
-        }
-
         public void PostUpdate()
         {
             foreach (var obj in recycledThisFrame)

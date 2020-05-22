@@ -117,7 +117,7 @@ namespace BGEditor
             return true;
         }
 
-        public bool AddNote(Note note)
+        public bool CreateNote(Note note)
         {
             var beat = ChartUtility.BeatToFloat(note.beat);
             if (beat > editor.numBars + NoteUtility.EPS || beat < -NoteUtility.EPS)

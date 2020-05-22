@@ -2,11 +2,11 @@
 
 namespace BGEditor
 {
-    class CmdGroup : IEditorCmd
+    public class CmdGroup : IEditorCmd
     {
         public LinkedList<IEditorCmd> cmds = new LinkedList<IEditorCmd>();
 
-        public bool Commit(ChartCore core)
+        public virtual bool Commit(ChartCore core)
         {
             for (var i = cmds.First; i != null; i = i.Next)
             {
@@ -24,7 +24,7 @@ namespace BGEditor
             return true;
         }
 
-        public bool Rollback(ChartCore core)
+        public virtual bool Rollback(ChartCore core)
         {
             for (var i = cmds.Last; i != null; i = i.Previous)
             {
