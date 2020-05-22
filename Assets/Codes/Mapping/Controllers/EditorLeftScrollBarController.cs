@@ -53,9 +53,8 @@ namespace BGEditor
                 dbClick.Remove(eventData.pointerId);
         }
 
-        protected override void Awake()
+        protected void Awake()
         {
-            base.Awake();
             rectTransform = GetComponent<RectTransform>();
             rect = RectTransformUtility.PixelAdjustRect(rectTransform, canvas);
             dbClick = new HashSet<int>();

@@ -28,9 +28,8 @@ namespace BGEditor
             return Core.Commit(new RemoveNoteCmd(note));
         }
 
-        protected override void Awake()
+        protected void Awake()
         {
-            base.Awake();
             image = GetComponent<Image>();
         }
 

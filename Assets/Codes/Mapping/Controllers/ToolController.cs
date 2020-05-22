@@ -9,9 +9,8 @@ namespace BGEditor
     {
         public Toggle[] Toggles;
 
-        protected override void Awake()
+        protected void Awake()
         {
-            base.Awake();
             for (int i = 0; i < Toggles.Length; i++)
             {
                 EditorTool tool = (EditorTool)i;
