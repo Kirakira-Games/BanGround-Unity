@@ -75,6 +75,9 @@ public class DifficultySelect : MonoBehaviour
     //This Called both change button clicked and song changed
     public void UpdateView()
     {
+        if(enabledCards.Count == 0)
+            return;
+
         for (int i = 0; i < enabledCards.Count; i++)
         {
             //Rects[enabledCards[i]].anchoredPosition = new Vector2(0, 0); //图层 位置

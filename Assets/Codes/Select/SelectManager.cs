@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using System.Linq;
 using System;
 using AudioProvider;
+using Random = UnityEngine.Random;
 
 #pragma warning disable 0649
 public class SelectManager : MonoBehaviour
@@ -41,7 +42,15 @@ public class SelectManager : MonoBehaviour
     [HideInInspector] 
     public ISoundTrack previewSound;
 
-    static KVar cl_cursorter = new KVar("cl_cursorter", "0", KVarFlags.Archive);
+    static KVar cl_cursorter = new KVar("cl_cursorter", "1", KVarFlags.Archive, "Current sorter type", obj =>
+    {
+        KVSystem.Instance.SaveConfig();
+    });
+
+    static KVar cl_lastsid = new KVar("cl_lastsid", "-1", KVarFlags.Archive, "Current chart set id", obj =>
+    {
+        KVSystem.Instance.SaveConfig();
+    });
 
     private void Awake()
     {
@@ -55,9 +64,8 @@ public class SelectManager : MonoBehaviour
         Screen.autorotateToLandscapeRight = true;
 
 
-        int selectedSid = -1;
-        if (DataLoader.loaded)
-            selectedSid = LiveSetting.CurrentHeader.sid;
+        int selectedSid = cl_lastsid;
+
         DataLoader.LoadAllKiraPackFromInbox();
         DataLoader.RefreshSongList();
         DataLoader.ReloadSongList();
@@ -174,6 +182,9 @@ public class SelectManager : MonoBehaviour
         }
         if (selectedSid != -1)
         {
+            if (DataLoader.chartList.Find(item => item.sid == selectedSid) == null)
+                selectedSid = DataLoader.chartList[Random.Range(0, DataLoader.chartList.Count)].sid;
+
             LiveSetting.currentChart = DataLoader.chartList.IndexOf(DataLoader.chartList.First(x => x.sid == selectedSid));
         }
 
@@ -198,7 +209,7 @@ public class SelectManager : MonoBehaviour
         }
     }
 
-    IEnumerator SelectNear()
+    public IEnumerator SelectNear()
     {
         //yield return new WaitForSeconds(1);
         RectTransform[] rts = new RectTransform[SelectButtons.Count];
@@ -235,7 +246,7 @@ public class SelectManager : MonoBehaviour
         
         if (index == -1)
         {
-            //StartCoroutine(SelectNear());
+            StartCoroutine(SelectNear());
             return;
         }
 
@@ -251,6 +262,7 @@ public class SelectManager : MonoBehaviour
         }
 
         LiveSetting.currentChart = index;
+
         if (lastcHeader == LiveSetting.CurrentHeader) return;
         else
         {
@@ -258,6 +270,7 @@ public class SelectManager : MonoBehaviour
             StartCoroutine(PreviewFadeOut(0.02f));
         }
 
+        cl_lastsid.Set(LiveSetting.CurrentHeader.sid);
         difficultySelect.levels = LiveSetting.CurrentHeader.difficultyLevel.ToArray();
         difficultySelect.OnSongChange();
         StopCoroutine(PlayPreview());
