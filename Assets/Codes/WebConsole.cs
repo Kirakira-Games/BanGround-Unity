@@ -181,6 +181,7 @@ public class WebConsole : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         resourceList.Add("/index.html", Resources.Load<TextAsset>("WebConsole/index").bytes);
+        resourceList.Add("/favicon.ico", Resources.Load<TextAsset>("WebConsole/favicon.ico").bytes);
         resourceList.Add("/styles/main.css", Resources.Load<TextAsset>("WebConsole/styles/main.css").bytes);
 
         StartHttp();
