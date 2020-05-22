@@ -28,28 +28,24 @@
 
         const output = document.getElementById("console-output");
 
-        async function FetchLog(url = "/log_additive")
-        {
-            const response = await fetch(url);
-            
-            if(response.status == 200) {
-                const txt = await response.text();
+        if(!window.WebSocket)
+            output.innerHTML = "This browser does not supports WebSocket";
 
-                if(txt != "") {
-                    output.innerHTML += txt;
-                    output.scrollTop = output.scrollHeight;
-                }
-                
-            }
-        }
+        const ws = new WebSocket("ws://" + location.host + "/websocket");
+        ws.onmessage = (e) => {
+            output.innerHTML += e.data;
+            output.scrollTop = output.scrollHeight;
+        };
 
-        FetchLog("/log");
-        setInterval(FetchLog, 500);
+        ws.onclose = (e) => {
+            output.innerHTML += "\n---------------------------\nCONNECTION CLOSED\n---------------------------";
+            output.scrollTop = output.scrollHeight;
+        };
 
         const sendButton = document.getElementById("console-btnsend");
         const input = document.getElementById("console-input");
         sendButton.onclick = () => {
-            fetch("/input?" + input.value);
+            ws.send(input.value);
             output.innerHTML += "] " + input.value + "\n";
             input.value = "";
         };
