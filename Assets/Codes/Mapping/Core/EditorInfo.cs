@@ -7,8 +7,8 @@
 
     public class EditorInfo
     {
-        public const int MAX_BAR_HEIGHT = 500;
-        public const int MIN_BAR_HEIGHT = 50;
+        public const int MAX_BAR_HEIGHT = 600;
+        public const int MIN_BAR_HEIGHT = 60;
 
         public int gridDivision;
         public int barHeight;
@@ -21,7 +21,7 @@
         public EditorInfo()
         {
             gridDivision = 4;
-            barHeight = 500;
+            barHeight = 60;
             numBars = 100;
             scrollPos = 0;
             tool = EditorTool.Select;
