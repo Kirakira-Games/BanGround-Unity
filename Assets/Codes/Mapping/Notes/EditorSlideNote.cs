@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using Un4seen.Bass.Misc;
@@ -12,8 +13,12 @@ namespace BGEditor
     public class EditorSlideNote : EditorNoteBase
     {
         public Image noteImg;
-        public Image tickImg;
         public EditorSlideBody bodyImg;
+
+        public Sprite Long;
+        public Sprite Flick;
+        public Sprite SlideTick;
+
         public EditorSlideNote prev { get; private set; }
         public EditorSlideNote next { get; private set; }
 
@@ -32,6 +37,8 @@ namespace BGEditor
         public override void Init(Note note)
         {
             base.Init(note);
+            Debug.Assert(prev == null);
+            Debug.Assert(next == null);
             SelectSlide();
             Refresh();
         }
@@ -41,7 +48,6 @@ namespace BGEditor
             isSelected = true;
             noteImg.color = Color.gray;
             bodyImg.SetColor(new Color(0.5843137f, 0.9019607f, 0.3019607f, 0.4f));
-            tickImg.color = Color.gray;
         }
 
         public override void Unselect()
@@ -50,7 +56,6 @@ namespace BGEditor
             isSelected = false;
             noteImg.color = Color.white;
             bodyImg.SetColor(new Color(0.5843137f, 0.9019607f, 0.3019607f, 0.8f));
-            tickImg.color = Color.white;
             prev?.Unselect();
         }
 
@@ -90,9 +95,7 @@ namespace BGEditor
                 if (next == null)
                     return false;
                 next.prev = null;
-                next.SetTickstack(Notes.slideIdPool.RegisterNext());
                 UnselectSlide();
-                Core.onNoteModified.Invoke(next.note);
                 next = null;
             }
             else if (next != null || nxt.prev != null)
@@ -109,9 +112,7 @@ namespace BGEditor
                 UnselectSlide();
                 nxt.prev = this;
                 next = nxt;
-                next.SetTickstack(note.tickStack);
                 SelectSlide();
-                Core.onNoteModified.Invoke(nxt.note);
             }
             Core.onNoteModified.Invoke(note);
             return true;
@@ -119,22 +120,21 @@ namespace BGEditor
 
         public override void Refresh()
         {
-            if (prev == null || next == null)
+            switch (note.type)
             {
-                noteImg.enabled = true;
-                tickImg.enabled = false;
+                case NoteType.Single:
+                case NoteType.SlideTickEnd:
+                    noteImg.sprite = Long;
+                    break;
+                case NoteType.Flick:
+                    noteImg.sprite = Flick;
+                    break;
+                case NoteType.SlideTick:
+                    noteImg.sprite = SlideTick;
+                    break;
+                default:
+                    throw new NotImplementedException("Unsupported slide note type: " + note.type);
             }
-            else
-            {
-                noteImg.enabled = false;
-                tickImg.enabled = true;
-            }
-            if (prev == null)
-                note.type = NoteType.Single;
-            else if (next == null)
-                note.type = NoteType.SlideTickEnd;
-            else
-                note.type = NoteType.SlideTick;
             SetBodyMesh();
         }
 
@@ -143,40 +143,49 @@ namespace BGEditor
             if (isSelected)
             {
                 var cmds = new CmdGroup();
-                for (var i = this; i != null; i = i.prev)
+                var i = this;
+                while (i.next != null)
+                    i = i.next;
+                while (i != null)
                 {
                     Debug.Assert(i.isSelected);
                     if (i.prev != null)
                     {
-                        cmds.Add(new ConnectNoteCmd(i.prev.note, null));
+                        cmds.Add(new DisconnectNoteCmd(i.prev.note, i.note, Notes));
                     }
-                    cmds.Add(new RemoveNoteCmd(note));
+                    cmds.Add(new RemoveNoteCmd(i.note));
+                    i = i.prev;
                 }
-                bool result = cmds.Commit(Core);
+                bool result = Core.Commit(cmds);
+                Debug.Assert(result);
                 return result;
             }
             if (prev == null && next == null)
             {
                 return Core.Commit(new RemoveNoteCmd(note));
             }
-            else if (prev == null)
+            var cmd = new CmdGroup();
+            if (prev == null)
             {
-                var cmd = new CmdGroup();
-                cmd.Add(new ConnectNoteCmd(note, null));
+                cmd.Add(new DisconnectNoteCmd(note, next.note, Notes));
                 cmd.Add(new RemoveNoteCmd(note));
-                return Core.Commit(cmd);
+                if (next.next == null)
+                    cmd.Add(new RemoveNoteCmd(next.note));
             }
             else if (next == null)
             {
-                var cmd = new CmdGroup();
-                cmd.Add(new ConnectNoteCmd(prev.note, null));
+                cmd.Add(new DisconnectNoteCmd(prev.note, note, Notes));
                 cmd.Add(new RemoveNoteCmd(note));
-                return Core.Commit(cmd);
+                if (prev.prev == null)
+                    cmd.Add(new RemoveNoteCmd(prev.note));
             }
             else
             {
-                return Core.Commit(new ConnectNoteCmd(note, null));
+                cmd.Add(new DisconnectNoteCmd(note, next.note, Notes));
+                if (next.next == null)
+                    cmd.Add(new RemoveNoteCmd(next.note));
             }
+            return Core.Commit(cmd);
         }
 
         public override void OnPointerClick(PointerEventData eventData)
@@ -202,6 +211,25 @@ namespace BGEditor
                 {
                     Core.Commit(new ConnectNoteCmd(prev.note, note));
                     return;
+                }
+            }
+            else if (next == null)
+            {
+                if (Editor.tool == EditorTool.Single)
+                {
+                    if (note.type != NoteType.SlideTickEnd)
+                    {
+                        Core.Commit(new ChangeNoteTypeCmd(note, NoteType.SlideTickEnd));
+                        return;
+                    }
+                }
+                else if (Editor.tool == EditorTool.Flick)
+                {
+                    if (note.type != NoteType.Flick)
+                    {
+                        Core.Commit(new ChangeNoteTypeCmd(note, NoteType.Flick));
+                        return;
+                    }
                 }
             }
             if (isSelected)

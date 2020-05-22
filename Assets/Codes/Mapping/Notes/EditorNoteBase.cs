@@ -37,6 +37,7 @@ namespace BGEditor
         public virtual void Init(Note note)
         {
             this.note = note;
+            Unselect();
             transform.SetParent(Grid.transform, false);
             UpdatePosition();
         }

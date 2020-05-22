@@ -9,8 +9,8 @@ namespace BGEditor
     public class EditNoteController : CoreMonoBehaviour
     {
         private Dictionary<Note, EditorNoteBase> displayNotes;
-        private HashSet<EditorNoteBase> selectedNotes;
-        public IDPool slideIdPool;
+        public HashSet<EditorNoteBase> selectedNotes { get; private set; }
+        public IDPool slideIdPool { get; private set; }
 
         public EditorSlideNote singleSlideSelected {
             get
@@ -34,29 +34,32 @@ namespace BGEditor
             Core.onToolSwitched.AddListener(ToolSwitch);
         }
 
+        public EditorNoteBase Find(Note note)
+        {
+            return displayNotes[note];
+        }
+
         public void CreateNote(Note note)
         {
             if (note.type == NoteType.BPM)
                 return;
             Debug.Assert(!displayNotes.ContainsKey(note));
             EditorNoteBase notebase;
-            switch (note.type)
+            if (note.tickStack != -1)
             {
-                case NoteType.Single:
-                    notebase = Pool.Create<EditorSingleNote>().GetComponent<EditorSingleNote>();
-                    break;
-                case NoteType.Flick:
-                    notebase = Pool.Create<EditorFlickNote>().GetComponent<EditorFlickNote>();
-                    break;
-                case NoteType.SlideTick:
-                    if (note.tickStack == -1)
-                        note.tickStack = slideIdPool.RegisterNext();
-                    else
-                        slideIdPool.Register(note.tickStack);
-                    notebase = Pool.Create<EditorSlideNote>().GetComponent<EditorSlideNote>();
-                    break;
-                default:
-                    throw new NotImplementedException($"NoteType {Enum.GetName(typeof(NoteType), note.type)} is unsupported.");
+                notebase = Pool.Create<EditorSlideNote>().GetComponent<EditorSlideNote>();
+            }
+            else if (note.type == NoteType.Single)
+            {
+                notebase = Pool.Create<EditorSingleNote>().GetComponent<EditorSingleNote>();
+            }
+            else if (note.type == NoteType.Flick)
+            {
+                notebase = Pool.Create<EditorFlickNote>().GetComponent<EditorFlickNote>();
+            }
+            else
+            {
+                throw new NotImplementedException($"NoteType {Enum.GetName(typeof(NoteType), note.type)} is unsupported.");
             }
             displayNotes.Add(note, notebase);
             notebase.Init(note);
@@ -67,7 +70,7 @@ namespace BGEditor
             if (note.type == NoteType.BPM)
                 return;
             Debug.Assert(displayNotes.ContainsKey(note));
-            Pool.Destroy(displayNotes[note]);
+            Pool.Destroy(Find(note).gameObject);
             displayNotes.Remove(note);
         }
 
@@ -76,14 +79,14 @@ namespace BGEditor
             if (note.type == NoteType.BPM)
                 return;
             Debug.Assert(displayNotes.ContainsKey(note));
-            var notebase = displayNotes[note];
+            var notebase = Find(note);
             notebase.UpdatePosition();
             notebase.Refresh();
         }
 
         public void SelectNote(Note note)
         {
-            SelectNote(displayNotes[note]);
+            SelectNote(Find(note));
         }
 
         public void SelectNote(EditorNoteBase note)
@@ -96,7 +99,7 @@ namespace BGEditor
 
         public void UnselectNote(Note note)
         {
-            UnselectNote(displayNotes[note]);
+            UnselectNote(Find(note));
         }
 
         public void UnselectNote(EditorNoteBase note)
@@ -119,15 +122,20 @@ namespace BGEditor
         public bool ConnectNote(Note prev, Note next)
         {
             Debug.Assert(displayNotes.ContainsKey(prev));
-            var note = displayNotes[prev] as EditorSlideNote;
+            var note = Find(prev) as EditorSlideNote;
             if (next == null)
                 return note.SetNext(null);
             else
-                return note.SetNext(displayNotes[next] as EditorSlideNote);
+                return note.SetNext(Find(next) as EditorSlideNote);
         }
 
         public void Refresh()
         {
+            if (displayNotes == null)
+            {
+                // Have not initialized
+                return;
+            }
             foreach (var note in displayNotes)
             {
                 note.Value.UpdatePosition();
@@ -142,7 +150,8 @@ namespace BGEditor
         {
             if (Editor.tool == EditorTool.Delete)
             {
-                foreach (var note in selectedNotes)
+                var tmpNotes = selectedNotes.ToArray();
+                foreach (var note in tmpNotes)
                     note.Remove();
                 selectedNotes.Clear();
             }
