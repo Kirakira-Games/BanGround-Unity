@@ -12,6 +12,7 @@ namespace BGEditor
 
         public GridController grid;
         public EditNoteController notes;
+        public TimingController timing;
         public Camera cam;
 
         public GameObject SingleNote;
