@@ -36,6 +36,7 @@ namespace BGEditor
         public UnityEvent onGridMoved;
         public UnityEvent onGridModifed;
         public UnityEvent onToolSwitched;
+        public UnityEvent onAudioLoaded;
         public NoteEvent onNoteCreated;
         public NoteEvent onNoteModified;
         public NoteEvent onNoteRemoved;
@@ -48,15 +49,21 @@ namespace BGEditor
         {
             Instance = this;
             chart = new Chart();
+            timing.Init();
 
             // Initialize events
             onTimingModified = new UnityEvent();
             onGridMoved = new UnityEvent();
             onGridModifed = new UnityEvent();
             onToolSwitched = new UnityEvent();
+            onAudioLoaded = new UnityEvent();
             onNoteCreated = new NoteEvent();
             onNoteModified = new NoteEvent();
             onNoteRemoved = new NoteEvent();
+
+            // Add listeners
+            onAudioLoaded.AddListener(RefreshBarCount);
+            onTimingModified.AddListener(RefreshBarCount);
 
             // Initialize commands
             cmdList = new LinkedList<IEditorCmd>();
@@ -197,6 +204,13 @@ namespace BGEditor
                 return;
             editor.tool = tool;
             onToolSwitched.Invoke();
+        }
+
+        public void RefreshBarCount()
+        {
+            float duration = AudioManager.Instance.gameBGM.GetLength() / 1000f;
+            editor.numBars = Mathf.CeilToInt(timing.TimeToBeat(duration));
+            onGridModifed.Invoke();
         }
     }
 }

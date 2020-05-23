@@ -3,7 +3,6 @@ using System.Collections;
 using UnityEngine.UI;
 using AudioProvider;
 using System;
-using System.Threading;
 
 namespace BGEditor
 {
@@ -19,6 +18,10 @@ namespace BGEditor
         private uint audioLength;
 
         private ISoundTrack bgm => AudioManager.Instance.gameBGM;
+        private ISoundEffect singleSE;
+        private ISoundEffect flickSE;
+        private float lastBeat;
+        private static KVarRef cl_sestyle = new KVarRef("cl_sestyle");
 
         public static float TimeToScrollPos(float time)
         {
@@ -39,16 +42,17 @@ namespace BGEditor
         public void UpdateDisplay()
         {
             int time = Mathf.RoundToInt(ScrollPosToTime(Editor.scrollPos) * 1000);
+            time = Mathf.Clamp(time, 0, (int)audioLength - 1);
             int ms = time % 1000;
-            time /= 1000;
-            int s = time % 60;
-            time /= 60;
-            int m = time % 60;
-            time /= 60;
-            TimeText.text = $"{time:D1}:{m:D2}:{s:D2}.{ms:D3}";
+            int hour = time / 1000;
+            int s = hour % 60;
+            hour /= 60;
+            int m = hour % 60;
+            hour /= 60;
+            TimeText.text = $"{hour:D1}:{m:D2}:{s:D2}.{ms:D3}";
             if (canSeek && Math.Abs(time - bgm.GetPlaybackTime()) > 3)
                 bgm.SetPlaybackTime((uint)time);
-            AudioProgressSlider.SetValueWithoutNotify(time / 1000f / audioLength);
+            AudioProgressSlider.SetValueWithoutNotify((float)time / audioLength);
         }
 
         public void Play()
@@ -80,18 +84,28 @@ namespace BGEditor
             bgm.SetTimeScale(value, true);
         }
 
-        private void Awake()
+        private void Start()
         {
+            var hack = SettingAndMod.instance;
+            // Load BGM
             byte[] audio = Resources.Load<TextAsset>("等mapping测完就把它杀了.ogg").bytes;
             AudioManager.Instance.gameBGM = AudioManager.Provider.StreamTrack(audio);
             bgm.Play();
             bgm.Pause();
-            AudioProgressSlider.onValueChanged.AddListener((value) => Core.SeekGrid(TimeToScrollPos(value * audioLength)));
+
+            // Load SE
+            singleSE = AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) + "/perfect.wav").bytes);
+            flickSE = AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) + "/flick.wav").bytes);
+
+            // Add listeners
+            AudioProgressSlider.onValueChanged.AddListener((value) => Core.SeekGrid(TimeToScrollPos(value * audioLength / 1000f)));
             PlaybackRateSlider.onValueChanged.AddListener(ChangePlaybackRate);
 
             Core.onGridMoved.AddListener(UpdateDisplay);
             Core.onTimingModified.AddListener(UpdateDisplay);
+            Core.onAudioLoaded.Invoke();
 
+            lastBeat = float.NaN;
             Refresh();
         }
 
@@ -99,7 +113,30 @@ namespace BGEditor
         {
             if (bgm.GetStatus() == PlaybackStatus.Playing)
             {
-                Core.SeekGrid(TimeToScrollPos(bgm.GetPlaybackTime() / 1000f), true);
+                float time = bgm.GetPlaybackTime() / 1000f;
+                float beat = Timing.TimeToBeat(time);
+                Core.SeekGrid(beat * Editor.barHeight, true);
+                if (!float.IsNaN(lastBeat))
+                {
+                    foreach (var note in Chart.notes)
+                    {
+                        if (note.type == NoteType.BPM)
+                            continue;
+                        float cur = ChartUtility.BeatToFloat(note.beat);
+                        if (cur < lastBeat || cur >= beat)
+                            continue;
+                        if (note.type == NoteType.Flick)
+                            flickSE.PlayOneShot();
+                        else
+                            singleSE.PlayOneShot();
+                    }
+                }
+                lastBeat = beat;
+            }
+            else if (PlayButtonText.text == "Pause")
+            {
+                lastBeat = float.NaN;
+                Pause();
             }
         }
     }
