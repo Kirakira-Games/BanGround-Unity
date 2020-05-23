@@ -8,6 +8,7 @@ namespace BGEditor
     public class EditorLeftScrollBarController : CoreMonoBehaviour, IDragHandler, IPointerDownHandler, IPointerUpHandler
     {
         public Canvas canvas;
+        public Image PosIndicator;
         public float PaddingBottom;
         public float PaddingTop;
 
@@ -18,6 +19,12 @@ namespace BGEditor
         private RectTransform rectTransform;
         private Rect rect;
 
+        public void UpdatePos()
+        {
+            float y = Mathf.Lerp(PaddingBottom, rectTransform.rect.height - PaddingTop, Editor.scrollPos / Editor.maxHeight);
+            PosIndicator.transform.localPosition = new Vector2(PosIndicator.transform.localPosition.x, y);
+        }
+
         private void Seek(Vector2 pos)
         {
             RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, pos, Cam, out var point);
@@ -27,6 +34,7 @@ namespace BGEditor
 
         public void OnDrag(PointerEventData eventData)
         {
+            lastDown = -1e5f;
             if (dbClick.Contains(eventData.pointerId))
             {
                 Seek(eventData.position);
@@ -59,6 +67,8 @@ namespace BGEditor
             rect = RectTransformUtility.PixelAdjustRect(rectTransform, canvas);
             dbClick = new HashSet<int>();
             lastDown = -1e5f;
+            Core.onGridMoved.AddListener(UpdatePos);
+            Core.onGridModifed.AddListener(UpdatePos);
         }
     }
 }
