@@ -26,9 +26,13 @@ namespace BGEditor
         private ScrollRect scrollRect;
         private int waitScrollToBottom;
 
-        protected void Awake()
+        private void Awake()
         {
             scrollRect = GetComponentInParent<ScrollRect>();
+        }
+
+        public void Init()
+        {
             BpmList = new List<Note>();
             BpmList.Add(new Note
             {
