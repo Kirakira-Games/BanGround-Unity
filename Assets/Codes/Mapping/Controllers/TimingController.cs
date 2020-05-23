@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine.UI;
 using System.Linq;
-using UnityEngine.Rendering;
-using System.Collections;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System;
 
 namespace BGEditor

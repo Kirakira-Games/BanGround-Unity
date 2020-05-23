@@ -13,6 +13,7 @@ namespace BGEditor
         public GridController grid;
         public EditNoteController notes;
         public TimingController timing;
+        public AudioProgressController progress;
         public Camera cam;
 
         public GameObject SingleNote;
@@ -177,15 +178,17 @@ namespace BGEditor
             onGridModifed.Invoke();
         }
 
-        public void SeekGrid(float target)
+        public void SeekGrid(float target, bool force = false)
         {
+            if (!force && !progress.canSeek)
+                return;
             editor.scrollPos = Mathf.Clamp(target, 0, editor.maxHeight);
             onGridMoved.Invoke();
         }
 
-        public void MoveGrid(float delta)
+        public void MoveGrid(float delta, bool force = false)
         {
-            SeekGrid(editor.scrollPos + delta);
+            SeekGrid(editor.scrollPos + delta, force);
         }
 
         public void SwitchTool(EditorTool tool)
