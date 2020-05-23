@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine.UI;
 using AudioProvider;
 using System;
+using FMOD;
 
 namespace BGEditor
 {
@@ -84,18 +85,13 @@ namespace BGEditor
             bgm.SetTimeScale(value, true);
         }
 
-        private void Start()
+        public void Init(byte[] audio)
         {
             var hack = SettingAndMod.instance;
             // Load BGM
-            byte[] audio = Resources.Load<TextAsset>("等mapping测完就把它杀了.ogg").bytes;
             AudioManager.Instance.gameBGM = AudioManager.Provider.StreamTrack(audio);
             bgm.Play();
             bgm.Pause();
-
-            // Load SE
-            singleSE = AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) + "/perfect.wav").bytes);
-            flickSE = AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) + "/flick.wav").bytes);
 
             // Add listeners
             AudioProgressSlider.onValueChanged.AddListener((value) => Core.SeekGrid(TimeToScrollPos(value * audioLength / 1000f)));
@@ -105,12 +101,22 @@ namespace BGEditor
             Core.onTimingModified.AddListener(UpdateDisplay);
             Core.onAudioLoaded.Invoke();
 
-            lastBeat = float.NaN;
             Refresh();
+        }
+
+        private void Start()
+        {
+            // Load SE
+            singleSE = AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) + "/perfect.wav").bytes);
+            flickSE = AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) + "/flick.wav").bytes);
+
+            lastBeat = float.NaN;
         }
 
         private void Update()
         {
+            if (bgm == null)
+                return;
             if (bgm.GetStatus() == PlaybackStatus.Playing)
             {
                 float time = bgm.GetPlaybackTime() / 1000f;

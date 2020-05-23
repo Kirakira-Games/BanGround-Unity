@@ -23,11 +23,15 @@ namespace BGEditor
             }
         }
 
-        private void Start()
+        public EditNoteController()
         {
             displayNotes = new Dictionary<Note, EditorNoteBase>();
             selectedNotes = new HashSet<EditorNoteBase>();
             slideIdPool = new IDPool();
+        }
+
+        private void Awake()
+        {
             Core.onNoteCreated.AddListener(CreateNote);
             Core.onNoteRemoved.AddListener(RemoveNote);
             Core.onNoteModified.AddListener(ModifyNote);
@@ -142,7 +146,7 @@ namespace BGEditor
             }
             foreach (var note in displayNotes)
             {
-                (note.Value as EditorSlideNote)?.Refresh();
+                note.Value.Refresh();
             }
         }
 

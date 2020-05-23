@@ -11,6 +11,8 @@ namespace BGEditor
         protected Image image;
         public bool isSelected { get; protected set; }
 
+        protected float maxHeight;
+
         public virtual void Select()
         {
             isSelected = true;
@@ -38,6 +40,7 @@ namespace BGEditor
             this.note = note;
             Unselect();
             transform.SetParent(Grid.transform, false);
+            maxHeight = Grid.GetComponent<RectTransform>().rect.height;
             UpdatePosition();
         }
 
@@ -72,6 +75,28 @@ namespace BGEditor
             transform.localPosition = pos;
         }
 
-        public virtual void Refresh() { }
+        protected virtual bool IsOutOfBound()
+        {
+            var pos = transform.localPosition;
+            if (pos.y < 0)
+                return true;
+            if (pos.y > maxHeight)
+                return true;
+            return false;
+        }
+
+        public virtual void Refresh()
+        {
+            if (IsOutOfBound())
+            {
+                if (gameObject.activeSelf)
+                    gameObject.SetActive(false);
+            }
+            else
+            {
+                if (!gameObject.activeSelf)
+                    gameObject.SetActive(true);
+            }
+        }
     }
 }

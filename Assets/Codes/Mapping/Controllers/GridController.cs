@@ -115,7 +115,7 @@ namespace BGEditor
             float start = Editor.scrollPos - VPadding;
             float end = start + gridHeight;
             int startBar = Mathf.Max(0, Mathf.FloorToInt(start / Editor.barHeight));
-            int endBar = Mathf.CeilToInt(end / Editor.barHeight);
+            int endBar = Mathf.Max(0, Mathf.FloorToInt(end / Editor.barHeight));
             for (int i = startBar; i <= endBar; i++)
             {
                 for (int j = 0; j < Editor.gridDivision; j++)

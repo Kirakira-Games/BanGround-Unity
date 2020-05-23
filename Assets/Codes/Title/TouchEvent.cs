@@ -67,7 +67,7 @@ public class TouchEvent : MonoBehaviour
 
     IEnumerator delayAndSwitch()
     {
-        operation = SceneManager.LoadSceneAsync(Application.platform == RuntimePlatform.WindowsEditor ? "Mapping" : "Select");
+        operation = SceneManager.LoadSceneAsync("Select");
         operation.allowSceneActivation = false;
 
         yield return new WaitForSeconds(1.2f);
