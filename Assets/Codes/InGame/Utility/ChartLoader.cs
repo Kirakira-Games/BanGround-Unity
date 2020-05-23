@@ -16,7 +16,7 @@ public static class ChartLoader
 {
     public static string BeatToString(int[] beat)
     {
-        return "[" + beat[1] + "/" + beat[2] + "]";
+        return "[" + (beat[1] + beat[2] * beat[0]) + "/" + beat[2] + "]";
     }
     public static int Gcd(int a, int b)
     {

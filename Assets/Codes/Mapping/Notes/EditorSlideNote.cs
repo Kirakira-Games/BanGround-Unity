@@ -30,6 +30,18 @@ namespace BGEditor
             bodyImg.SetDirection(dir);
         }
 
+        protected override bool IsOutOfBound()
+        {
+            var pos = transform.localPosition;
+            if (pos.y > maxHeight)
+                return true;
+            if (pos.y >= 0)
+                return false;
+            if (next == null)
+                return true;
+            return next.transform.localPosition.y < 0;
+        }
+
         public override void Init(Note note)
         {
             base.Init(note);
@@ -90,8 +102,8 @@ namespace BGEditor
             {
                 if (next == null)
                     return false;
-                next.prev = null;
                 UnselectSlide();
+                next.prev = null;
                 next = null;
             }
             else if (next != null || nxt.prev != null)
@@ -105,7 +117,7 @@ namespace BGEditor
                 float nextbeat = ChartUtility.BeatToFloat(nxt.note.beat);
                 if (beat >= nextbeat - NoteUtility.EPS)
                     return false;
-                UnselectSlide();
+                Notes.UnselectAll();
                 nxt.prev = this;
                 next = nxt;
                 SelectSlide();
@@ -116,6 +128,17 @@ namespace BGEditor
 
         public override void Refresh()
         {
+            if (IsOutOfBound())
+            {
+                if (gameObject.activeSelf)
+                    gameObject.SetActive(false);
+                return;
+            }
+            else
+            {
+                if (!gameObject.activeSelf)
+                    gameObject.SetActive(true);
+            }
             switch (note.type)
             {
                 case NoteType.Single:

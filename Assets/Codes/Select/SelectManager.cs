@@ -340,6 +340,11 @@ public class SelectManager : MonoBehaviour
         SceneLoader.LoadScene("Select", "InGame", true);
     }
 
+    public void OpenMappingScene()
+    {
+        SceneLoader.LoadScene("Select", "Mapping", true);
+    }
+
     private void OnApplicationPause(bool pause)
     {
         if (pause)

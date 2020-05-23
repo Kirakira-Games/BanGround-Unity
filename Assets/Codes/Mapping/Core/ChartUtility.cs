@@ -40,6 +40,11 @@
         {
             return !lhs.Equals(rhs);
         }
+
+        public override string ToString()
+        {
+            return $"{lane}:{beat}/{div}";
+        }
     };
 
     public static class ChartUtility
