@@ -4,13 +4,14 @@ namespace BGEditor
 {
     public class CoreMonoBehaviour : MonoBehaviour
     {
-        public ChartCore Core => ChartCore.Instance;
-        public Chart Chart => Core.chart;
-        public EditorInfo Editor => Core.editor;
-        public ObjectPool Pool => Core.pool;
-        public GridController Grid => Core.grid;
-        public Camera Cam => Core.cam;
-        public EditNoteController Notes => Core.notes;
-        public TimingController Timing => Core.timing;
+        public static ChartCore Core => ChartCore.Instance;
+        public static Chart Chart => Core.chart;
+        public static EditorInfo Editor => Core.editor;
+        public static ObjectPool Pool => Core.pool;
+        public static GridController Grid => Core.grid;
+        public static Camera Cam => Core.cam;
+        public static EditNoteController Notes => Core.notes;
+        public static TimingController Timing => Core.timing;
+        public static AudioProgressController Progress => Core.progress;
     }
 }

@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 1
+  m_UseShadowmask: 0
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -3148,7 +3148,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 570277896}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1111323045}
+        m_MethodName: Switch
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &570277896
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4827,6 +4838,7 @@ MonoBehaviour:
   grid: {fileID: 1672627265}
   notes: {fileID: 1672627268}
   timing: {fileID: 254423521}
+  progress: {fileID: 1111323045}
   cam: {fileID: 458680988}
   SingleNote: {fileID: 985738360263098538, guid: e45a170f490e79349aa6e7ad13ac6b6f,
     type: 3}
@@ -6263,6 +6275,7 @@ GameObject:
   - component: {fileID: 1111323043}
   - component: {fileID: 1111323042}
   - component: {fileID: 1111323044}
+  - component: {fileID: 1111323045}
   m_Layer: 5
   m_Name: Time
   m_TagString: Untagged
@@ -6354,6 +6367,22 @@ MonoBehaviour:
   m_ChildControlHeight: 0
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
+--- !u!114 &1111323045
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1111323040}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b8b85029d10acb41b7a5154b1e9b722, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TimeText: {fileID: 1746565846}
+  AudioProgressSlider: {fileID: 2052041219}
+  PlaybackRateSlider: {fileID: 2108860136}
+  PlayButtonText: {fileID: 430288970}
 --- !u!1 &1121611250
 GameObject:
   m_ObjectHideFlags: 0
