@@ -51,6 +51,7 @@ public class NoteMesh : MonoBehaviour
 
     private MeshFilter meshFilter;
     private MeshRenderer meshRenderer;
+    public float width = 1;
 
     private static float GetLength(float z)
     {
@@ -74,15 +75,15 @@ public class NoteMesh : MonoBehaviour
         return Mathf.Lerp(cachedLength[index], cachedLength[index+1], ratio);
     }
 
-    private static Vector3[] GetVertices(Vector3 p)
+    private Vector3[] GetVertices(Vector3 p)
     {
         float dz = GetCachedLength(p.z);
         return new Vector3[]
         {
-            new Vector3(-1, 0, -dz),
-            new Vector3(1, 0, -dz),
-            new Vector3(-1, 0.001f, dz),
-            new Vector3(1, 0.001f, dz)
+            new Vector3(-width, 0, -dz),
+            new Vector3(width, 0, -dz),
+            new Vector3(-width, 0.001f, dz),
+            new Vector3(width, 0.001f, dz)
         };
     }
 

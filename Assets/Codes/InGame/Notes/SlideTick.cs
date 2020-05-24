@@ -24,6 +24,7 @@ public class SlideTick : SlideNoteBase
     public override void InitNote()
     {
         base.InitNote();
+        noteMesh.width = 1.2f;
         GetComponent<MeshRenderer>().material.SetTexture("_BaseMap", NoteUtility.LoadResource<Texture2D>("note_tick_default"));
         //GetComponent<SpriteRenderer>().sprite = NoteUtility.LoadResource<Sprite>("note_tick_default");
     }
