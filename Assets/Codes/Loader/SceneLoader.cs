@@ -71,7 +71,7 @@ public class SceneLoader : MonoBehaviour
         //需要开门的话需要等开门动画播放完毕后再卸载Loader场景并重置Loading标志
         if (needOpen)
         {
-            StartCoroutine(CountDown(1f));
+            StartCoroutine(CountDown(.5f));
         }
         else
         {
