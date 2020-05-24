@@ -391,6 +391,8 @@ MonoBehaviour:
   Default: 0
   MinVal: -9999
   MaxVal: 9999
+  NormalColor: {r: 0, g: 0, b: 0, a: 1}
+  ErrorColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!114 &61957773
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5236,7 +5238,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 809005522}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 810050434}
+        m_MethodName: Save
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &809005522
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10329,6 +10342,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   VPadding: 200
   LineBoundingHeight: 40
+  Div1Color: {r: 1, g: 1, b: 1, a: 1}
+  Div2Color: {r: 0.09803922, g: 0.6, b: 0.6, a: 1}
+  Div3Color: {r: 0.60784316, g: 0.60784316, b: 0.09803922, a: 1}
+  Div4Color: {r: 0.6, g: 0.29803923, b: 0.09803922, a: 1}
+  OtherColor: {r: 0.5019608, g: 0.5019608, b: 0.5019608, a: 1}
 --- !u!222 &1672627266
 CanvasRenderer:
   m_ObjectHideFlags: 0

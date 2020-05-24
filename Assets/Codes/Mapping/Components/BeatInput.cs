@@ -10,6 +10,10 @@ public class BeatInput : MonoBehaviour
     public InputField Numerator;
     public InputField Denominator;
     public int[] beat { get; private set; }
+
+    public Color NormalColor;
+    public Color ErrorColor;
+
     private int[] mBeat;
 
     private void Validate(string _)
@@ -22,11 +26,11 @@ public class BeatInput : MonoBehaviour
             if (!int.TryParse(field.text, out mBeat[i]) || mBeat[i] < 0 || mBeat[i] >= 10000)
             {
                 success = false;
-                field.textComponent.color = Color.red;
+                field.textComponent.color = ErrorColor;
             }
             else
             {
-                field.textComponent.color = Color.black;
+                field.textComponent.color = NormalColor;
             }
         }
         if (!success)
@@ -34,20 +38,20 @@ public class BeatInput : MonoBehaviour
         if (mBeat[2] == 0 || mBeat[2] > 128)
         {
             success = false;
-            Denominator.textComponent.color = Color.red;
+            Denominator.textComponent.color = ErrorColor;
         }
         else
         {
-            Denominator.textComponent.color = Color.black;
+            Denominator.textComponent.color = NormalColor;
         }
         if (mBeat[1] >= mBeat[2])
         {
             success = false;
-            Numerator.textComponent.color = Color.red;
+            Numerator.textComponent.color = ErrorColor;
         }
         else
         {
-            Numerator.textComponent.color = Color.black;
+            Numerator.textComponent.color = NormalColor;
         }
         if (!success)
             return;

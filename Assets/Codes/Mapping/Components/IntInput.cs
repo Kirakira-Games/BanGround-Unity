@@ -9,18 +9,21 @@ public class IntInput : MonoBehaviour
     public int MaxVal;
     public int value { get; private set; }
 
+    public Color NormalColor;
+    public Color ErrorColor;
+
     private InputField Component;
 
     private void Validate(string _)
     {
         if (!int.TryParse(Component.text, out int val) || val <= MinVal || val >= MaxVal)
         {
-            Component.textComponent.color = Color.red;
+            Component.textComponent.color = ErrorColor;
         }
         else
         {
             value = val;
-            Component.textComponent.color = Color.black;
+            Component.textComponent.color = NormalColor;
         }
     }
 

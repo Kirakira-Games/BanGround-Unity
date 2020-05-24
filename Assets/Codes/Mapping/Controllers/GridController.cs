@@ -12,6 +12,12 @@ namespace BGEditor
         public float VPadding;
         public float LineBoundingHeight;
 
+        public Color Div1Color;
+        public Color Div2Color;
+        public Color Div3Color;
+        public Color Div4Color;
+        public Color OtherColor;
+
         private LinkedList<GameObject> objectsInUse;
         private float gridHeight;
         private float gridWidth;
@@ -126,28 +132,28 @@ namespace BGEditor
                     if (j == 0)
                     {
                         width = 3;
-                        color = Color.white;
+                        color = Div1Color;
                         CreateText(new Vector2(-50, y), i.ToString());
                     }
                     else if (j * 2 % Editor.gridDivision == 0)
                     {
                         width = 3;
-                        color = new Color(0.1f,0.6f,0.6f);
+                        color = Div2Color;
                     }
                     else if (j * 3 % Editor.gridDivision == 0)
                     {
                         width = 3;
-                        color = new Color(0.6f,0.6f,0.1f);
+                        color = Div3Color;
                     }
                     else if (j * 4 % Editor.gridDivision == 0)
                     {
                         width = 2;
-                        color = new Color(0.6f, 0.3f, 0.1f);
+                        color = Div4Color;
                     }
                     else
                     {
                         width = 2;
-                        color = Color.gray;
+                        color = OtherColor;
                     }
                     var obj = CreateLine(width, new Vector2(0, y), color);
                 }
