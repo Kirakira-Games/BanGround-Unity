@@ -12,6 +12,8 @@ namespace BGEditor
         public float VPadding;
         public float LineBoundingHeight;
 
+        public GameObject GridParent;
+
         public Color Div1Color;
         public Color Div2Color;
         public Color Div3Color;
@@ -21,7 +23,7 @@ namespace BGEditor
         private LinkedList<GameObject> objectsInUse;
         private float gridHeight;
         private float gridWidth;
-        float laneWidth;
+        private float laneWidth;
         private RectTransform parentRect;
 
         private void Start()
@@ -36,13 +38,16 @@ namespace BGEditor
             gridWidth = rect.width;
             laneWidth = gridWidth / 7;
 
+            var obj = new GameObject("GridParent");
+            obj.transform.SetParent(transform, false);
+
             Refresh();
         }
 
         private GameObject CreateLine(float width, Vector2 anchoredPosition, Color color)
         {
             var ret = Pool.Create<Image>();
-            ret.transform.SetParent(transform, false);
+            ret.transform.SetParent(GridParent.transform, false);
             var rect = ret.GetComponent<RectTransform>();
             rect.anchorMin = new Vector2(0.5f, 0);
             rect.anchorMax = new Vector2(0.5f, 0);
