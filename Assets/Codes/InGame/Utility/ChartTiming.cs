@@ -48,7 +48,7 @@ public class ChartTiming
 
     public float GetTimeByBeat(int[] beat)
     {
-        return GetTimeByBeat(ChartLoader.GetFloatingPointBeat(beat));
+        return GetTimeByBeat(ChartLoader.BeatToFloat(beat));
     }
 
     public void GenerateAnimation(List<GameNoteAnim> raw, List<GameNoteAnim> output, GameNoteData note)
@@ -181,7 +181,7 @@ public class ChartTiming
                 continue;
             BPMInfo.Add(new GameBeatInfo
             {
-                beat = ChartLoader.GetFloatingPointBeat(note.beat),
+                beat = ChartLoader.BeatToFloat(note.beat),
                 value = note.value
             });
             foreach (NoteAnim anim in note.anims)
@@ -189,7 +189,7 @@ public class ChartTiming
                 Debug.Assert(!float.IsNaN(anim.speed));
                 SpeedInfo.Add(new GameBeatInfo
                 {
-                    beat = ChartLoader.GetFloatingPointBeat(anim.beat),
+                    beat = ChartLoader.BeatToFloat(anim.beat),
                     value = anim.speed
                 });
             }
@@ -297,8 +297,8 @@ public class ChartTiming
         for (int i = 0; i < data.anims.Count; i++)
         {
             var anim = data.anims[i];
-            beatStart = ChartLoader.GetFloatingPointBeat(anim.beat);
-            beatEnd = ChartLoader.GetFloatingPointBeat(i == data.anims.Count - 1 ?
+            beatStart = ChartLoader.BeatToFloat(anim.beat);
+            beatEnd = ChartLoader.BeatToFloat(i == data.anims.Count - 1 ?
                 data.beat : data.anims[i+1].beat);
             if (beatStart > beatEnd - NoteUtility.EPS)
             {
@@ -314,7 +314,7 @@ public class ChartTiming
                 GenerateAnimationRawData(anim, beatStart, beatEnd, data.anims[i + 1].lane, data.anims[i + 1].y, tmpList);
             }
         }
-        beatStart = ChartLoader.GetFloatingPointBeat(data.beat);
+        beatStart = ChartLoader.BeatToFloat(data.beat);
         beatEnd = beatStart;
         while (GetTimeByBeat(beatEnd) - GetTimeByBeat(data.beat) <= NoteUtility.SLIDE_TICK_JUDGE_RANGE / 1000f)
         {
