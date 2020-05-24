@@ -132,17 +132,17 @@ namespace BGEditor
                     else if (j * 2 % Editor.gridDivision == 0)
                     {
                         width = 3;
-                        color = Color.cyan;
+                        color = new Color(0.1f,0.6f,0.6f);
                     }
                     else if (j * 3 % Editor.gridDivision == 0)
                     {
                         width = 3;
-                        color = Color.yellow;
+                        color = new Color(0.6f,0.6f,0.1f);
                     }
                     else if (j * 4 % Editor.gridDivision == 0)
                     {
                         width = 2;
-                        color = new Color(1, 0.5f, 0);
+                        color = new Color(0.6f, 0.3f, 0.1f);
                     }
                     else
                     {
