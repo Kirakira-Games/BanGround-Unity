@@ -8,18 +8,21 @@ public class FloatInput : MonoBehaviour
     public float MaxVal;
     public float value { get; private set; }
 
+    public Color NormalColor;
+    public Color ErrorColor;
+
     private InputField Component;
 
     private void Validate(string _)
     {
         if (!float.TryParse(Component.text, out float val) || val < MinVal || val > MaxVal)
         {
-            Component.textComponent.color = Color.red;
+            Component.textComponent.color = ErrorColor;
         }
         else
         {
             value = val;
-            Component.textComponent.color = Color.black;
+            Component.textComponent.color = NormalColor;
         }
     }
 

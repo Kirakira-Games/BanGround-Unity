@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -224,7 +225,16 @@ namespace BGEditor
             ret.Difficulty = chart.Difficulty;
             ret.level = chart.level;
             ret.offset = chart.offset;
-            ret.notes = new List<Note>(chart.notes);
+            // Slides of length 1 must be excluded
+            var cmds = new CmdGroup();
+            chart.notes.Where(note =>
+            {
+                var notebase = notes.Find(note) as EditorSlideNote;
+                return notebase != null && notebase.prev == null && notebase.next == null;
+            }).ToList().ForEach(note => cmds.Add(new RemoveNoteCmd(note)));
+            Commit(cmds);
+
+            ret.notes = chart.notes.ToList();
             ret.notes.AddRange(timing.BpmList);
             ret.notes.Sort((lhs, rhs) =>
             {
@@ -237,9 +247,15 @@ namespace BGEditor
             return ret;
         }
 
-        public void Exit()
+        public void Save()
         {
             MappingInit.Save(GetFinalizedChart());
+        }
+
+        public void Exit()
+        {
+            Save();
+            progress.Pause();
             SceneLoader.LoadScene("Mapping", "Select");
         }
 
