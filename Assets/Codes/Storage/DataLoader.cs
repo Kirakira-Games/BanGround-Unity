@@ -14,6 +14,7 @@ public static class DataLoader
     public static readonly string ChartDir = "chart/";
     public static readonly string MusicDir = "music/";
     public static readonly string SkinDir = "skin/";
+    public static readonly string KirapackDir = Application.persistentDataPath + "/kirapack/";
     public static readonly string FSDir = DataDir + "filesystem/";
     public static readonly string FSIndex = DataDir + "filesystem/fsindex.bin";
     public static readonly string InboxDir = Application.persistentDataPath + "/Inbox/";
@@ -153,6 +154,62 @@ public static class DataLoader
         if (!Directory.Exists(dir))
             Directory.CreateDirectory(dir);
         ProtobufHelper.Save(chart, path);
+    }
+
+    private static void ExtractRelatedFiles(cHeader header, DirectoryInfo dir)
+    {
+        if (dir.Exists)
+            dir.Delete(true);
+        dir.Create();
+        // Find possible related files
+        var files = KiraFilesystem.Instance.ListFiles((path) =>
+        {
+            path = path.Replace("\\", "/");
+            return path.StartsWith(ChartDir + header.sid + "/") ||
+                path.StartsWith(MusicDir + header.mid + "/");
+        });
+        foreach (var file in files)
+        {
+            var dirpath = Path.Combine(dir.FullName, Path.GetDirectoryName(file));
+            if (!Directory.Exists(dirpath))
+                Directory.CreateDirectory(dirpath);
+            File.WriteAllBytes(Path.Combine(dir.FullName, file), KiraFilesystem.Instance.Read(file));
+        }
+    }
+
+    public static string BuildKiraPack(cHeader header)
+    {
+        var dir = new DirectoryInfo(Path.Combine(KirapackDir, "temp/"));
+        ExtractRelatedFiles(header, dir);
+        var zippath = Path.Combine(KirapackDir, header.sid + ".kirapack");
+        if (File.Exists(zippath))
+            File.Delete(zippath);
+        ZipFile.CreateFromDirectory(dir.FullName, zippath);
+        dir.Delete(true);
+        return zippath;
+    }
+
+    public static void DuplicateKiraPack(cHeader header)
+    {
+        var dir = new DirectoryInfo(Path.Combine(KirapackDir, "temp/"));
+        ExtractRelatedFiles(header, dir);
+
+        // Move directory
+        DateTime epochStart = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        int newsid = (int)(DateTime.UtcNow - epochStart).TotalSeconds;
+        var newdir = Path.Combine(dir.FullName, "chart/", newsid + "/");
+        Directory.Move(Path.Combine(dir.FullName, "chart/", header.sid + "/"), newdir);
+
+        // Save new header
+        header.sid = newsid;
+        ProtobufHelper.Save(header, Path.Combine(newdir, "cheader.bin"));
+
+        // Add to zip file
+        var zippath = Path.Combine(Application.persistentDataPath, newsid + ".kirapack");
+        if (File.Exists(zippath))
+            File.Delete(zippath);
+        ZipFile.CreateFromDirectory(dir.FullName, zippath);
+        dir.Delete(true);
     }
 
     public static void ReloadSongList()
