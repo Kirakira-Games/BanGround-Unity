@@ -40,11 +40,11 @@ public class TouchEvent : MonoBehaviour
 
     public void ChangeAnimation()
     {
-        //#if !UNITY_EDITOR
+#if !UNITY_EDITOR
         inputField.transform.parent.gameObject.SetActive(false);
         if (!authing) StartCoroutine(GetAuthenticationResult());
         if (waitingUpdate || waitingAuth) return;
-//#endif
+#endif
         if (!touched)
         {
             touched = true;
@@ -90,7 +90,7 @@ public class TouchEvent : MonoBehaviour
 
     IEnumerator GetAuthenticationResult()
     {
-        //#if !UNITY_EDITOR
+//#if !UNITY_EDITOR
         authing = true;
         string uuid = AppPreLoader.UUID;
         string key = inputField.text;
@@ -132,7 +132,7 @@ public class TouchEvent : MonoBehaviour
         }
         authing = false;
 //#else
-        //yield return 0;
+//        yield return 0;
 //#endif
     }
 
