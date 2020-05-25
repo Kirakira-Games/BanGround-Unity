@@ -4,11 +4,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.IO;
-using Newtonsoft.Json;
 using System.Linq;
 using System;
 using AudioProvider;
 using Random = UnityEngine.Random;
+using UniRx.Async;
 
 #pragma warning disable 0649
 public class SelectManager : MonoBehaviour
@@ -358,11 +358,21 @@ public class SelectManager : MonoBehaviour
         SceneLoader.LoadScene("Select", "Mapping", true);
     }
 
-    public void ExportKiraPack()
+    public async void ExportKiraPack()
     {
+        var prevOrientation = Screen.orientation;
+        Screen.orientation = ScreenOrientation.Portrait;
+        await UniTask.DelayFrame(1);
         var zip = DataLoader.BuildKiraPack(LiveSetting.CurrentHeader);
         var song = DataLoader.GetMusicHeader(LiveSetting.CurrentHeader.mid);
-        new NativeShare().AddFile(zip).SetSubject("Share " + song.title).SetText("Kirakira Dokidoki").Share();
+        new NativeShare()
+            .AddFile(zip)
+            .SetSubject("Share " + song.title)
+            .SetTitle("Share Kirapack")
+            .SetText(song.title)
+            .Share();
+        await UniTask.DelayFrame(1);
+        Screen.orientation = prevOrientation;
     }
 
     public void DuplicateKiraPack()
