@@ -737,6 +737,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 199095164}
     m_Modifications:
+    - target: {fileID: 871950675244231906, guid: 23bcc4b57da8bf14aa4568dd54cb6dcd,
+        type: 3}
+      propertyPath: m_Name
+      value: UserInfo
+      objectReference: {fileID: 0}
     - target: {fileID: 871950675244231916, guid: 23bcc4b57da8bf14aa4568dd54cb6dcd,
         type: 3}
       propertyPath: m_Material
@@ -897,6 +902,11 @@ PrefabInstance:
       propertyPath: m_SizeDelta.x
       value: 578.09717
       objectReference: {fileID: 0}
+    - target: {fileID: 871950675444292837, guid: 23bcc4b57da8bf14aa4568dd54cb6dcd,
+        type: 3}
+      propertyPath: m_Name
+      value: Username
+      objectReference: {fileID: 0}
     - target: {fileID: 1345226800477837675, guid: 23bcc4b57da8bf14aa4568dd54cb6dcd,
         type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -907,6 +917,11 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.x
       value: 155
       objectReference: {fileID: 0}
+    - target: {fileID: 2307146969875938236, guid: 23bcc4b57da8bf14aa4568dd54cb6dcd,
+        type: 3}
+      propertyPath: m_Name
+      value: UserAvatar
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 23bcc4b57da8bf14aa4568dd54cb6dcd, type: 3}
 --- !u!224 &233455154 stripped
@@ -915,6 +930,25 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 233455153}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &233455155 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 871950675244231906, guid: 23bcc4b57da8bf14aa4568dd54cb6dcd,
+    type: 3}
+  m_PrefabInstance: {fileID: 233455153}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &233455156
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 233455155}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 787ca121a5516f741b0d01682d4f9b76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  username: 
 --- !u!1 &242536846
 GameObject:
   m_ObjectHideFlags: 0
@@ -10935,6 +10969,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   waitingUpdate: 1
+  waitingAuth: 1
+  authing: 0
   warnCanvas: {fileID: 67490845}
   inputField: {fileID: 1272533078}
 --- !u!114 &1275346212
