@@ -17,6 +17,7 @@ public class NoteController : MonoBehaviour
     public static int judgeTime { get; private set; }
     public static int numFuwafuwaNotes;
     public static bool hasFuwafuwaNote => numFuwafuwaNotes > 0;
+    public bool isFinished { get; private set; }
 
     private JudgeQueue noteQueue;
     private JudgeQueue[] laneQueue;
@@ -279,6 +280,7 @@ public class NoteController : MonoBehaviour
     void Start()
     {
         instance = this;
+        isFinished = false;
 
         // Main camera
         mainCamera = GameObject.Find("GameMainCamera").GetComponent<Camera>();
@@ -441,6 +443,13 @@ public class NoteController : MonoBehaviour
         {
             noteSyncLine[i].OnSyncLineUpdate();
         }
+
+        // Update isfinished
+        isFinished = noteHead >= notes.Count;
+        if (noteQueue.Count > 0)
+            isFinished = false;
+        if (laneQueue.Any(Q => Q.Count > 0))
+            isFinished = false;
 
         // Update lane effects
         laneEffects.UpdateLaneEffects(audioTime);

@@ -15,6 +15,7 @@ public class AudioTimelineSync : MonoBehaviour
     private Queue<float> syncQueue;
     private const int QUEUE_SIZE = 10;
     private const float DIFF_TOLERANCE = 0.1f;
+    private const float UNSYNC_LIMIT = 10f;
     private float totDiff;
     private uint prevAudioTime;
     private static float adjustLimit;
@@ -98,6 +99,10 @@ public class AudioTimelineSync : MonoBehaviour
             return;
         prevAudioTime = audioTime;
         float diff = audioTime / 1000f - GetTimeInS();
+        // too unsync
+        if (diff < -UNSYNC_LIMIT)
+            return;
+
         syncQueue.Enqueue(diff);
         totDiff += diff;
         while (syncQueue.Count > QUEUE_SIZE)

@@ -256,7 +256,9 @@ public class UIManager : MonoBehaviour
 
     private void Update()
     {
-        if (AudioManager.Instance.isInGame && AudioTimelineSync.instance.GetTimeInMs() > AudioManager.Instance.gameBGM.GetLength() + 1000)
+        if (AudioManager.Instance.isInGame &&
+            AudioTimelineSync.instance.GetTimeInMs() > AudioManager.Instance.gameBGM.GetLength() + 1000 &&
+            NoteController.instance.isFinished)
         {
             AudioManager.Instance.isInGame = false;
             OnAudioFinish(false);
