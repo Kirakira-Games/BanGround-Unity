@@ -88,6 +88,7 @@ public class TitleLoader : MonoBehaviour
         }
     }
 
+
     static KVarRef cl_language = new KVarRef("cl_language");
 
     private void OnDestroy()

@@ -7,6 +7,8 @@ using UnityEngine.UI;
 public class TouchEvent : MonoBehaviour
 {
     public bool waitingUpdate = true;
+    public bool waitingAuth = true;
+    public bool authing = false;
     public GameObject warnCanvas;
     public InputField inputField;
     private AsyncOperation operation;
@@ -24,6 +26,8 @@ public class TouchEvent : MonoBehaviour
             inputField.transform.parent.gameObject.SetActive(false);
         }
         else inputField.transform.parent.gameObject.SetActive(true);
+
+        StartCoroutine(GetAuthenticationResult());
     }
 
     //private IEnumerator SwitchScene(string name)
@@ -36,13 +40,16 @@ public class TouchEvent : MonoBehaviour
 
     public void ChangeAnimation()
     {
-#if !UNITY_EDITOR
-        if (waitingUpdate) return;
-#endif
+        //#if !UNITY_EDITOR
+        inputField.transform.parent.gameObject.SetActive(false);
+        if (!authing) StartCoroutine(GetAuthenticationResult());
+        if (waitingUpdate || waitingAuth) return;
+//#endif
         if (!touched)
         {
             touched = true;
-            StartCoroutine(GetAuthenticationResult());
+            StartSwitch();
+            //StartCoroutine(GetAuthenticationResult());
         }
     }
 
@@ -83,7 +90,8 @@ public class TouchEvent : MonoBehaviour
 
     IEnumerator GetAuthenticationResult()
     {
-#if !UNITY_EDITOR
+        //#if !UNITY_EDITOR
+        authing = true;
         string uuid = AppPreLoader.UUID;
         string key = inputField.text;
         bool usePrefKey = false;
@@ -99,6 +107,10 @@ public class TouchEvent : MonoBehaviour
                 PlayerPrefs.SetString("key", key);
                 PlayerPrefs.Save();
             }
+            waitingAuth = false;
+            UserInfo.Instance.username = Authenticate.result.username;
+            UserInfo.Instance.ShowUserInfo();
+            //Debug.Log(Authenticate.result.username);
             //MessageBoxController.ShowMsg(LogLevel.OK, "Authenticate successful");
         }
         else
@@ -106,18 +118,22 @@ public class TouchEvent : MonoBehaviour
             MessageBoxController.ShowMsg(LogLevel.ERROR, Authenticate.result.error);
             if (!Authenticate.isNetworkError || !usePrefKey)
             {
-                touched = false;
+                //touched = false;
                 inputField.readOnly = false;
                 inputField.inputType = InputField.InputType.Standard;
                 inputField.transform.parent.gameObject.SetActive(true);
+                authing = false;
                 yield break;
             }
+            else
+            {
+                waitingAuth = false;
+            }
         }
-#else
-        yield return 0;
-#endif
-
-        StartSwitch();
+        authing = false;
+//#else
+        //yield return 0;
+//#endif
     }
 
 }

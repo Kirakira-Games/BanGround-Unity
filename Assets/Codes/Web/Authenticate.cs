@@ -43,6 +43,7 @@ class AuthRequest
 public class AuthResponse
 {
     public bool status;
+    public string username;
     public string error = "Authentication error";
 }
 
