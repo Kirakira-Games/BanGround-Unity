@@ -358,6 +358,19 @@ public class SelectManager : MonoBehaviour
         SceneLoader.LoadScene("Select", "Mapping", true);
     }
 
+    public void ExportKiraPack()
+    {
+        var zip = DataLoader.BuildKiraPack(LiveSetting.CurrentHeader);
+        var song = DataLoader.GetMusicHeader(LiveSetting.CurrentHeader.mid);
+        new NativeShare().AddFile(zip).SetSubject("Share " + song.title).SetText("Kirakira Dokidoki").Share();
+    }
+
+    public void DuplicateKiraPack()
+    {
+        DataLoader.DuplicateKiraPack(LiveSetting.CurrentHeader);
+        SceneManager.LoadScene("Select");
+    }
+
     private void OnApplicationPause(bool pause)
     {
         if (pause)

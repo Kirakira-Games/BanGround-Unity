@@ -251,6 +251,12 @@ namespace BGEditor
         public void Save()
         {
             DataLoader.SaveChart(GetFinalizedChart(), LiveSetting.CurrentHeader.sid, (Difficulty) LiveSetting.actualDifficulty);
+            MessageBoxController.ShowMsg(LogLevel.OK, "Chart saved.");
+        }
+
+        public void 还没做好()
+        {
+            MessageBoxController.ShowMsg(LogLevel.INFO, "Cooming soon!");
         }
 
         public async void Exit()
@@ -311,12 +317,17 @@ namespace BGEditor
                     // slide start
                     if (note.type != NoteType.Single)
                     {
-                        Debug.LogWarning(ChartLoader.BeatToString(note.beat) + "Slide without a start. Translated to single note.");
-                        note.tickStack = -1;
-                        if (note.type != NoteType.Flick)
-                            note.type = NoteType.Single;
-                        CreateNote(note, true);
-                        continue;
+                        if (note.type == NoteType.Flick || note.type == NoteType.SlideTickEnd)
+                        {
+                            Debug.LogWarning(ChartLoader.BeatToString(note.beat) + "Slide without a start. Translated to single note.");
+                            note.tickStack = -1;
+                            if (note.type != NoteType.Flick)
+                                note.type = NoteType.Single;
+                            CreateNote(note, true);
+                            continue;
+                        }
+                        Debug.LogWarning(ChartLoader.BeatToString(note.beat) + "Start of a slide must be 'Single' instead of '" + note.type + "'.");
+                        note.type = NoteType.Single;
                     }
                     int id = notes.slideIdPool.RegisterNext();
                     idmap[note.tickStack] = id;

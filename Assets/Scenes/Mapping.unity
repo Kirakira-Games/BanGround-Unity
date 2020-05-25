@@ -658,7 +658,7 @@ GameObject:
   - component: {fileID: 91354725}
   - component: {fileID: 91354724}
   m_Layer: 5
-  m_Name: Button (2)
+  m_Name: Gameplay
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -726,7 +726,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 91354725}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 810050434}
+        m_MethodName: "\u8FD8\u6CA1\u505A\u597D"
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &91354725
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6302,7 +6313,7 @@ GameObject:
   - component: {fileID: 965252153}
   - component: {fileID: 965252152}
   m_Layer: 5
-  m_Name: Button
+  m_Name: Meta
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6370,7 +6381,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 965252153}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 810050434}
+        m_MethodName: "\u8FD8\u6CA1\u505A\u597D"
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &965252153
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11297,7 +11319,7 @@ GameObject:
   - component: {fileID: 1707582150}
   - component: {fileID: 1707582149}
   m_Layer: 5
-  m_Name: Button (1)
+  m_Name: Timing
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12481,7 +12503,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Setup
+  m_Text: Metadata
 --- !u!222 &1916802237
 CanvasRenderer:
   m_ObjectHideFlags: 0
