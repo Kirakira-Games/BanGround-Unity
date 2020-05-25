@@ -58,6 +58,7 @@ namespace BGEditor
 
         public void Play()
         {
+            lastBeat = float.NaN;
             bgm.Play();
             PlayButtonText.text = "Pause";
         }
