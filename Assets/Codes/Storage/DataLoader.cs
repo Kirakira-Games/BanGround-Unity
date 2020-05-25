@@ -146,6 +146,15 @@ public static class DataLoader
         return ProtobufHelper.LoadFromKiraFs<Chart>(GetChartPath(sid, difficulty));
     }
 
+    public static void SaveChart(Chart chart, int sid, Difficulty difficulty)
+    {
+        string path = Path.Combine(DataDir, GetChartPath(sid, difficulty));
+        string dir = Path.GetDirectoryName(path);
+        if (!Directory.Exists(dir))
+            Directory.CreateDirectory(dir);
+        ProtobufHelper.Save(chart, path);
+    }
+
     public static void ReloadSongList()
     {
         songList = ProtobufHelper.Load<SongList>(SongListPath);
