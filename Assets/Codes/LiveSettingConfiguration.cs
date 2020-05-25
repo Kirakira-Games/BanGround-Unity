@@ -216,5 +216,6 @@ public enum SEStyle
     None,
     Drum,
     Bbben,
+    AECBanana,
     Custom
 }
