@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UniRx.Async;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -249,13 +250,16 @@ namespace BGEditor
 
         public void Save()
         {
-            MappingInit.Save(GetFinalizedChart());
+            DataLoader.SaveChart(GetFinalizedChart(), LiveSetting.CurrentHeader.sid, (Difficulty) LiveSetting.actualDifficulty);
         }
 
-        public void Exit()
+        public async void Exit()
         {
-            Save();
             progress.Pause();
+            if (await MessageBox.ShowMessage("Exit", "Save before exit?"))
+            {
+                Save();
+            }
             SceneLoader.LoadScene("Mapping", "Select");
         }
 

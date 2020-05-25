@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Runtime.InteropServices;
+using UniRx.Async;
 
 public class AppPreLoader : MonoBehaviour
 {
@@ -33,6 +34,10 @@ public class AppPreLoader : MonoBehaviour
                 }
             }
         };
+
+        // Init Unitask
+        var playerLoop = UnityEngine.LowLevel.PlayerLoop.GetCurrentPlayerLoop();
+        PlayerLoopHelper.Initialize(ref playerLoop);
     }
 
     private void InitAudioInfo()

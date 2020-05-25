@@ -28,10 +28,5 @@ namespace BGEditor
 
             core.StartCoroutine(InitCoroutine(core));
         }
-
-        public static void Save(Chart chart)
-        {
-            // ???
-        }
     }
 }
