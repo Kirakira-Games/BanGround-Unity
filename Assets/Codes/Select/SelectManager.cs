@@ -63,6 +63,8 @@ public class SelectManager : MonoBehaviour
         Screen.autorotateToLandscapeLeft = true;
         Screen.autorotateToLandscapeRight = true;
 
+        GameObject.Find("UserInfo").GetComponent<UserInfo>().ShowUserInfo();
+
 
         int selectedSid = cl_lastsid;
 
