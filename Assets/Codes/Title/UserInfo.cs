@@ -7,22 +7,16 @@ using System.Text;
 
 public class UserInfo : MonoBehaviour
 {
-    public static UserInfo Instance { get; private set; }
 
     private const string Prefix = "https://api.reikohaku.fun/api";
     private const string API = "/auth/info?username=";
     private const string FullAPI = Prefix + API;
 
-    public UserInfoRespone result;
-    public string username;
+    public static UserInfoRespone result = null;
+    public static string username;
 
     private Text username_Text;
     private Image userAvatar;
-
-    private void Awake()
-    {
-        Instance = this;
-    }
 
     private void Start()
     {
@@ -37,9 +31,12 @@ public class UserInfo : MonoBehaviour
 
     private IEnumerator GetUserInfo()
     {
-        var req = new KirakiraWebRequest<UserInfoRespone>();
-        yield return req.Get(FullAPI + username);
-        result = req.resp;
+        if (result == null) 
+        {
+            var req = new KirakiraWebRequest<UserInfoRespone>();
+            yield return req.Get(FullAPI + username);
+            result = req.resp;
+        }
         username_Text.text = result.nickname;
         using (UnityWebRequest ub = UnityWebRequestTexture.GetTexture(result.avatar))
         {

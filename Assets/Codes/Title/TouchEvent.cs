@@ -9,6 +9,8 @@ public class TouchEvent : MonoBehaviour
     public bool waitingUpdate = true;
     public bool waitingAuth = true;
     public bool authing = false;
+
+    public UserInfo usercanvas;
     public GameObject warnCanvas;
     public InputField inputField;
     private AsyncOperation operation;
@@ -17,6 +19,7 @@ public class TouchEvent : MonoBehaviour
     private void Start()
     {
         warnCanvas.SetActive(false);
+        usercanvas = GameObject.Find("UserInfo").GetComponent<UserInfo>();
         if (PlayerPrefs.HasKey("key"))
         {
             inputField.SetTextWithoutNotify(PlayerPrefs.GetString("key"));
@@ -108,8 +111,8 @@ public class TouchEvent : MonoBehaviour
                 PlayerPrefs.Save();
             }
             waitingAuth = false;
-            UserInfo.Instance.username = Authenticate.result.username;
-            UserInfo.Instance.ShowUserInfo();
+            UserInfo.username = Authenticate.result.username;
+            usercanvas.ShowUserInfo();
             //Debug.Log(Authenticate.result.username);
             //MessageBoxController.ShowMsg(LogLevel.OK, "Authenticate successful");
         }

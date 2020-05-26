@@ -182,7 +182,7 @@ public class WebConsole : MonoBehaviour
         resourceList.Add("/favicon.ico", Resources.Load<TextAsset>("WebConsole/favicon.ico").bytes);
         resourceList.Add("/styles/main.css", Resources.Load<TextAsset>("WebConsole/styles/main.css").bytes);
 
-        StartHttp();
+        new Thread(StartHttp).Start();
     }
 
     private async void Application_logMessageReceived(string condition, string stackTrace, LogType type)
