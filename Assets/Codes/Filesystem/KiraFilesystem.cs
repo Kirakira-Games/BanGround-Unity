@@ -89,7 +89,11 @@ namespace System.IO
                         {
                             if (Exists(entry.FullName))
                                 RemoveFileFromIndex(entry.FullName);
-                        
+
+                            var path = Path.Combine(root, entry.FullName);
+                            if (File.Exists(path))
+                                File.Delete(path);
+
                             index.Add(entry.FullName, kiraPack);
                         }
                     }
