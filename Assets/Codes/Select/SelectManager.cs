@@ -369,7 +369,8 @@ public class SelectManager : MonoBehaviour
             .AddFile(zip)
             .SetSubject("Share " + song.title)
             .SetTitle("Share Kirapack")
-            .SetText(song.title).Share();
+            .SetText(song.title)
+            .Share();
         await UniTask.DelayFrame(1);
         Screen.orientation = prevOrientation;
     }
