@@ -38,6 +38,8 @@ public class AppPreLoader : MonoBehaviour
         // Init Unitask
         var playerLoop = UnityEngine.LowLevel.PlayerLoop.GetCurrentPlayerLoop();
         PlayerLoopHelper.Initialize(ref playerLoop);
+
+        SceneManager.LoadScene("Title");
     }
 
     private void InitAudioInfo()
@@ -46,7 +48,7 @@ public class AppPreLoader : MonoBehaviour
         {
             sampleRate = 48000;
             bufferSize = 0;
-            SceneManager.LoadScene("Title");
+            //SceneManager.LoadScene("Title");
         }
         else
         {
@@ -66,7 +68,7 @@ public class AppPreLoader : MonoBehaviour
             success &= int.TryParse(bs, out bufferSize);
             init = success;
 
-            SceneManager.LoadScene("Title");
+            //SceneManager.LoadScene("Title");
         }
     }
 
