@@ -156,6 +156,24 @@ public static class DataLoader
         ProtobufHelper.Save(chart, path);
     }
 
+    public static void SaveHeader(cHeader header)
+    {
+        string path = Path.Combine(DataDir, ChartDir, header.sid.ToString(), "cheader.bin");
+        string dir = Path.GetDirectoryName(path);
+        if (!Directory.Exists(dir))
+            Directory.CreateDirectory(dir);
+        ProtobufHelper.Save(header, path);
+    }
+
+    public static void SaveHeader(mHeader header)
+    {
+        string path = Path.Combine(DataDir, MusicDir, header.mid.ToString(), "mheader.bin");
+        string dir = Path.GetDirectoryName(path);
+        if (!Directory.Exists(dir))
+            Directory.CreateDirectory(dir);
+        ProtobufHelper.Save(header, path);
+    }
+
     private static void ExtractRelatedFiles(cHeader header, DirectoryInfo dir)
     {
         if (dir.Exists)
@@ -239,6 +257,7 @@ public static class DataLoader
 
         var newSongList = new SongList();
         var referencedSongs = new Dictionary<mHeader, int>();
+        var loadedIds = new HashSet<int>();
 
         var files = KiraFilesystem.Instance.ListFiles();
 
@@ -249,9 +268,14 @@ public static class DataLoader
         foreach (var music in musics)
         {
             mHeader musicHeader = ProtobufHelper.LoadFromKiraFs<mHeader>(music);
-            referencedSongs.Add(musicHeader, 0);
+            if (!loadedIds.Contains(musicHeader.mid))
+            {
+                referencedSongs.Add(musicHeader, 0);
+                loadedIds.Add(musicHeader.mid);
+            }
         }
 
+        loadedIds.Clear();
         var charts = from x in files
                      where x.EndsWith("cheader.bin")
                      select x;
@@ -259,6 +283,9 @@ public static class DataLoader
         foreach(var chart in charts)
         {
             cHeader chartHeader = ProtobufHelper.LoadFromKiraFs<cHeader>(chart);
+            if (loadedIds.Contains(chartHeader.sid))
+                continue;
+            loadedIds.Add(chartHeader.sid);
             // Update reference
             var mid = chartHeader.mid;
 

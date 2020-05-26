@@ -16,7 +16,7 @@ namespace BGEditor
 
         public bool canSeek => bgm != null && bgm.GetStatus() != PlaybackStatus.Unknown && bgm.GetStatus() != PlaybackStatus.Playing;
 
-        private uint audioLength;
+        public uint audioLength { get; private set; }
 
         private ISoundTrack bgm => AudioManager.Instance.gameBGM;
         private ISoundEffect singleSE;

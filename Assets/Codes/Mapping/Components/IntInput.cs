@@ -16,7 +16,7 @@ public class IntInput : MonoBehaviour
 
     private void Validate(string _)
     {
-        if (!int.TryParse(Component.text, out int val) || val <= MinVal || val >= MaxVal)
+        if (!int.TryParse(Component.text, out int val) || val < MinVal || val > MaxVal)
         {
             Component.textComponent.color = ErrorColor;
         }
