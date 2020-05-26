@@ -363,8 +363,11 @@ public class SelectManager : MonoBehaviour
     public async void ExportKiraPack()
     {
         var prevOrientation = Screen.orientation;
-        Screen.orientation = ScreenOrientation.Portrait;
-        await UniTask.DelayFrame(1);
+        if (Application.platform == RuntimePlatform.Android)
+        {
+            Screen.orientation = ScreenOrientation.Portrait;
+            await UniTask.DelayFrame(1);
+        }
         var zip = DataLoader.BuildKiraPack(LiveSetting.CurrentHeader);
         var song = DataLoader.GetMusicHeader(LiveSetting.CurrentHeader.mid);
         new NativeShare()
@@ -373,8 +376,11 @@ public class SelectManager : MonoBehaviour
             .SetTitle("Share Kirapack")
             .SetText(song.title)
             .Share();
-        await UniTask.DelayFrame(1);
-        Screen.orientation = prevOrientation;
+        if (Application.platform == RuntimePlatform.Android)
+        {
+            await UniTask.DelayFrame(1);
+            Screen.orientation = prevOrientation;
+        }
     }
 
     public void DuplicateKiraPack()
