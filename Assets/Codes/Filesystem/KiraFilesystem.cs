@@ -305,6 +305,58 @@ namespace System.IO
             return tex;
         }
 
+        /// <summary>
+        /// Write file to fs root path, not any kirapack
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="data"></param>
+        /// <returns>True if sucess</returns>
+        public bool Write(string fileName, byte[] data)
+        {
+            try
+            {
+                File.WriteAllBytes(Path.Combine(root, fileName), data);
+            }
+            catch
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Save a kirapack with files from filesystem
+        /// </summary>
+        /// <param name="kiraPack"></param>
+        /// <param name="fileList"></param>
+        /// <returns>True if sucess</returns>
+        public bool SaveKirapack(string kiraPack, string[] fileList)
+        {
+            try
+            {
+                using (var zip = ZipFile.Open(kiraPack, ZipArchiveMode.Create))
+                {
+                    foreach (var file in fileList)
+                    {
+                        var entry = zip.CreateEntry(file, Compression.CompressionLevel.Fastest);
+                        using (var bw = new BinaryWriter(entry.Open()))
+                        {
+                            var bytes = Read(file);
+
+                            bw.Write(bytes);
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         public string Extract(string fileName, bool force = false)
         {
             var bytes = Read(fileName);
