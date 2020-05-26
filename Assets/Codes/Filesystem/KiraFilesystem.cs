@@ -188,7 +188,7 @@ namespace System.IO
         private void GetFiles(List<string> files, DirectoryInfo di, Func<string, bool> func)
         {
             var subfiles = from x in di.GetFiles()
-                           where func(x.FullName.Replace('\\', '/'))
+                           where func(x.FullName.Replace('\\', '/').Replace(root, ""))
                            select x.FullName.Replace('\\','/').Replace(root, "");
 
             var subdirs = di.GetDirectories();
