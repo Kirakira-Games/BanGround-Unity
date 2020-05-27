@@ -256,7 +256,7 @@ namespace BGEditor
 
         public void 还没做好()
         {
-            MessageBoxController.ShowMsg(LogLevel.INFO, "Cooming soon!");
+            MessageBoxController.ShowMsg(LogLevel.INFO, "Coming soon!");
         }
 
         public async void Exit()

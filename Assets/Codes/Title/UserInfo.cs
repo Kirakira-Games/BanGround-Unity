@@ -37,6 +37,8 @@ public class UserInfo : MonoBehaviour
             yield return req.Get(FullAPI + username);
             result = req.resp;
         }
+        if (result == null)
+            yield break;
         username_Text.text = result.nickname;
         using (UnityWebRequest ub = UnityWebRequestTexture.GetTexture(result.avatar))
         {
