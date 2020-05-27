@@ -12,7 +12,7 @@ public class UserInfo : MonoBehaviour
     private const string API = "/auth/info?username=";
     private const string FullAPI = Prefix + API;
 
-    public static UserInfoRespone result = null;
+    public static UserInfoResponse result = null;
     public static string username;
 
     private Text username_Text;
@@ -33,7 +33,7 @@ public class UserInfo : MonoBehaviour
     {
         if (result == null) 
         {
-            var req = new KirakiraWebRequest<UserInfoRespone>();
+            var req = new KirakiraWebRequest<UserInfoResponse>();
             yield return req.Get(FullAPI + username);
             result = req.resp;
         }
@@ -49,7 +49,7 @@ public class UserInfo : MonoBehaviour
     }
 }
 
-public class UserInfoRespone
+public class UserInfoResponse
 {
     public bool status;
     public string nickname;
