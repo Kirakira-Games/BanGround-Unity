@@ -30,7 +30,7 @@ public class TouchEvent : MonoBehaviour
         }
         else inputField.transform.parent.gameObject.SetActive(true);
 
-        StartCoroutine(GetAuthenticationResult());
+        GetAuthenticationResult();
     }
 
     //private IEnumerator SwitchScene(string name)
@@ -45,7 +45,7 @@ public class TouchEvent : MonoBehaviour
     {
 #if !UNITY_EDITOR
         inputField.transform.parent.gameObject.SetActive(false);
-        if (!authing) StartCoroutine(GetAuthenticationResult());
+        if (!authing) GetAuthenticationResult();
         if (waitingUpdate || waitingAuth) return;
 #endif
         if (!touched)
@@ -91,7 +91,7 @@ public class TouchEvent : MonoBehaviour
         operation.allowSceneActivation = true;
     }
 
-    IEnumerator GetAuthenticationResult()
+    async void GetAuthenticationResult()
     {
 //#if !UNITY_EDITOR
         authing = true;
@@ -102,8 +102,8 @@ public class TouchEvent : MonoBehaviour
         {
             usePrefKey = true;
         }
-        yield return StartCoroutine(Authenticate.TryAuthenticate(key, uuid));
-        if (Authenticate.result.status)
+        var result = await Authenticate.TryAuthenticate(key, uuid);
+        if (result.status)
         {
             if (!usePrefKey)
             {
@@ -111,14 +111,14 @@ public class TouchEvent : MonoBehaviour
                 PlayerPrefs.Save();
             }
             waitingAuth = false;
-            UserInfo.username = Authenticate.result.username;
-            usercanvas.ShowUserInfo();
+            UserInfo.username = result.username;
+            usercanvas.GetUserInfo();
             //Debug.Log(Authenticate.result.username);
             //MessageBoxController.ShowMsg(LogLevel.OK, "Authenticate successful");
         }
         else
         {
-            MessageBoxController.ShowMsg(LogLevel.ERROR, Authenticate.result.error);
+            MessageBoxController.ShowMsg(LogLevel.ERROR, result.error);
             if (!Authenticate.isNetworkError || !usePrefKey)
             {
                 //touched = false;
@@ -126,7 +126,7 @@ public class TouchEvent : MonoBehaviour
                 inputField.inputType = InputField.InputType.Standard;
                 inputField.transform.parent.gameObject.SetActive(true);
                 authing = false;
-                yield break;
+                return;
             }
             else
             {

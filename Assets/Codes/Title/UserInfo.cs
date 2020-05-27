@@ -1,9 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
 using UnityEngine.Networking;
-using Newtonsoft.Json;
-using System.Text;
+using UniRx.Async;
 
 public class UserInfo : MonoBehaviour
 {
@@ -24,25 +22,18 @@ public class UserInfo : MonoBehaviour
         userAvatar = GameObject.Find("Avatar").GetComponent<Image>();
     }
 
-    public void ShowUserInfo()
+    public async void GetUserInfo()
     {
-        StartCoroutine(GetUserInfo());
-    }
-
-    private IEnumerator GetUserInfo()
-    {
-        if (result == null) 
-        {
-            var req = new KirakiraWebRequest<UserInfoResponse>();
-            yield return req.Get(FullAPI + username);
-            result = req.resp;
-        }
         if (result == null)
-            yield break;
+        {
+            result = await new KirakiraWebRequest<UserInfoResponse>().Get(FullAPI + username);
+            if (result == null)
+                return;
+        }
         username_Text.text = result.nickname;
         using (UnityWebRequest ub = UnityWebRequestTexture.GetTexture(result.avatar))
         {
-            yield return ub.SendWebRequest();
+            await ub.SendWebRequest();
             var tex = DownloadHandlerTexture.GetContent(ub);
             userAvatar.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
         }

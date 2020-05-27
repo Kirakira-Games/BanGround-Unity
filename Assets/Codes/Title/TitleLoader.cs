@@ -25,7 +25,7 @@ public class TitleLoader : MonoBehaviour
     private void Awake()
     {
         instance = this;
-        StartCoroutine(CheckUpdate());
+        CheckUpdate();
         StartCoroutine(DataLoader.Init());
     }
 
@@ -50,31 +50,31 @@ public class TitleLoader : MonoBehaviour
 
     }
 
-    IEnumerator CheckUpdate()
+    async void CheckUpdate()
     {
         //MessageBoxController.ShowMsg(LogLevel.INFO, VersionCheck.CheckUpdate);
         TouchEvent te = GameObject.Find("TouchStart").GetComponent<TouchEvent>();
         var check = VersionCheck.Instance;
-        yield return StartCoroutine(check.GetVersionInfo());
+        await check.GetVersionInfo();
 
-        if (check == null || check.respone == null || check.respone.result == false) 
+        if (check == null || check.response == null || check.response.result == false) 
         {
             //网络错误
             MessageBoxController.ShowMsg(LogLevel.ERROR, VersionCheck.CheckError, false);
             te.waitingUpdate = false; // 椰叶先别强制更新罢
         }
-        else if (Application.version != check.respone.data.version)
+        else if (Application.version != check.response.data.version)
         {
             //有更新
-            if (check.respone.data.force)
+            if (check.response.data.force)
             {
-                string result = string.Format(VersionCheck.UpdateForce, check.respone.data.version);
+                string result = string.Format(VersionCheck.UpdateForce, check.response.data.version);
                 //强制更新
                 MessageBoxController.ShowMsg(LogLevel.ERROR, result, false);
             }
             else
             {
-                string result = string.Format(VersionCheck.UpdateNotForce, check.respone.data.version);
+                string result = string.Format(VersionCheck.UpdateNotForce, check.response.data.version);
                 //不强制更新
                 MessageBoxController.ShowMsg(LogLevel.OK, result, true);
                 te.waitingUpdate = false;
