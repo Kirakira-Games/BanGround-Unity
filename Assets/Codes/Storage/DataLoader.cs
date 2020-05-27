@@ -207,14 +207,19 @@ public static class DataLoader
         return zippath;
     }
 
+    public static int GenerateSid()
+    {
+        DateTime epochStart = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        return (int) (DateTime.UtcNow - epochStart).TotalSeconds;
+    }
+
     public static void DuplicateKiraPack(cHeader header)
     {
         var dir = new DirectoryInfo(Path.Combine(KirapackDir, "temp/"));
         ExtractRelatedFiles(header, dir);
 
         // Move directory
-        DateTime epochStart = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-        int newsid = (int)(DateTime.UtcNow - epochStart).TotalSeconds;
+        int newsid = GenerateSid();
         var newdir = Path.Combine(dir.FullName, "chart/", newsid + "/");
         Directory.Move(Path.Combine(dir.FullName, "chart/", header.sid + "/"), newdir);
 
