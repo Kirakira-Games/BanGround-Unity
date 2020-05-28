@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine.Networking;
 using Newtonsoft.Json;
 using System.Text;
+using UniRx.Async;
 
 public class Authenticate
 {
@@ -10,18 +11,17 @@ public class Authenticate
     private const string API = "/auth/check";
     private const string FullAPI = Prefix + API;
 
-    public static AuthResponse result;
     public static bool isNetworkError;
 
-    public static IEnumerator TryAuthenticate(string key, string uuid)
+    public static async UniTask<AuthResponse> TryAuthenticate(string key, string uuid)
     {
         var req = new KirakiraWebRequest<AuthResponse>();
         var body = new AuthRequest { key = key, uuid = uuid };
-        yield return req.Post(FullAPI, body);
+        await req.Post(FullAPI, body);
         isNetworkError = req.isNetworkError;
         if (req.isNetworkError)
         {
-            result = new AuthResponse
+            return new AuthResponse
             {
                 status = false,
                 error = "Network error"
@@ -29,7 +29,7 @@ public class Authenticate
         }
         else
         {
-            result = req.resp;
+            return req.resp;
         }
     }
 }

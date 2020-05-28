@@ -4,7 +4,7 @@ using UnityEngine;
 using System.Threading.Tasks;
 using UnityEngine.Networking;
 using Newtonsoft.Json;
-
+using UniRx.Async;
 
 public class VersionCheck
 {
@@ -14,10 +14,10 @@ public class VersionCheck
     public const string UpdateNotForce = "建议更新到最新版{0}";
     public const string NoUpdate = "当前客户端已经是最新版了";
 
-    public VersionRespone respone;
+    public VersionResponse response;
     public static VersionCheck Instance = new VersionCheck
     {
-        respone = new VersionRespone
+        response = new VersionResponse
         {
             result = true,
             data = new VersionData
@@ -30,19 +30,15 @@ public class VersionCheck
     private const string Prefix = "https://api.reikohaku.fun/api";
     private readonly string API = "/version/check?version=" + Application.version;
 
-    public IEnumerator GetVersionInfo()
+    public async UniTask<VersionResponse> GetVersionInfo()
     {
         string FullAPI = Prefix + API;
-        var req = new KirakiraWebRequest<VersionRespone>();
-        yield return req.Get(FullAPI);
-        if (req.isNetworkError)
-            respone = null;
-        else
-            respone = req.resp;
+        var req = new KirakiraWebRequest<VersionResponse>();
+        return await req.Get(FullAPI);
     }
 }
 
-public class VersionRespone
+public class VersionResponse
 {
     public bool result;
     public VersionData data;

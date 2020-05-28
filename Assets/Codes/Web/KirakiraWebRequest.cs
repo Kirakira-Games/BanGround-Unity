@@ -3,22 +3,23 @@ using System.Collections;
 using UnityEngine.Networking;
 using Newtonsoft.Json;
 using System.Text;
+using UniRx.Async;
 
 public class KirakiraWebRequest<Resp>
 {
     public Resp resp;
     public bool isNetworkError;
 
-    public Coroutine Get(string url)
+    public async UniTask<Resp> Get(string url)
     {
-        return KirakiraWebRequestObject.instance.StartCoroutine(RunGet(url));
+        return await RunGet(url);
     }
 
-    private IEnumerator RunGet(string url)
+    private async UniTask<Resp> RunGet(string url)
     {
         using (UnityWebRequest webRequest = UnityWebRequest.Get(url))
         {
-            yield return webRequest.SendWebRequest();
+            await webRequest.SendWebRequest();
             if (webRequest.isNetworkError | webRequest.isHttpError)
             {
                 isNetworkError = true;
@@ -28,14 +29,15 @@ public class KirakiraWebRequest<Resp>
                 resp = JsonConvert.DeserializeObject<Resp>(webRequest.downloadHandler.text);
             }
         }
+        return resp;
     }
 
-    public Coroutine Post<Req>(string url, Req req)
+    public async UniTask<Resp> Post<Req>(string url, Req req)
     {
-        return KirakiraWebRequestObject.instance.StartCoroutine(RunPost(url, req));
+        return await RunPost(url, req);
     }
 
-    private IEnumerator RunPost<Req>(string url, Req req)
+    private async UniTask<Resp> RunPost<Req>(string url, Req req)
     {
         var reqJson = JsonConvert.SerializeObject(req);
         byte[] jsonToSend = new UTF8Encoding().GetBytes(reqJson);
@@ -44,7 +46,7 @@ public class KirakiraWebRequest<Resp>
             webRequest.uploadHandler = new UploadHandlerRaw(jsonToSend);
             webRequest.downloadHandler = new DownloadHandlerBuffer();
             webRequest.SetRequestHeader("Content-Type", "application/json");
-            yield return webRequest.SendWebRequest();
+            await webRequest.SendWebRequest();
             if (webRequest.isNetworkError | webRequest.isHttpError)
             {
                 isNetworkError = true;
@@ -54,6 +56,7 @@ public class KirakiraWebRequest<Resp>
                 resp = JsonConvert.DeserializeObject<Resp>(webRequest.downloadHandler.text);
             }
         }
+        return resp;
     }
 }
 
