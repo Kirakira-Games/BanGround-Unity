@@ -5,6 +5,9 @@ using UnityEngine.UI;
 
 public class SongItem : MonoBehaviour
 {
+    public cHeader cHeader;
+    public mHeader mHeader;
+
     public Text songName;
     public Text songArtist;
 
@@ -20,8 +23,10 @@ public class SongItem : MonoBehaviour
 
     void ScrollCellIndex(int idx)
     {
-        songName.text = idx.ToString();
-        gameObject.name = idx.ToString();
-        Debug.Log(idx);
+        cHeader = DataLoader.chartList[idx];
+        mHeader = DataLoader.GetMusicHeader(cHeader.mid);
+
+        songName.text = mHeader.title;
+        songArtist.text = mHeader.artist;
     }
 }
