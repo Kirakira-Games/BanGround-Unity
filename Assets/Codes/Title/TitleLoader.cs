@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using System.Text;
@@ -9,6 +8,7 @@ using Newtonsoft.Json;
 using UnityEngine;
 using AudioProvider;
 using UnityEngine.UI;
+using System.Security.Cryptography;
 
 public class TitleLoader : MonoBehaviour
 {
@@ -16,17 +16,35 @@ public class TitleLoader : MonoBehaviour
     public TextAsset[] voice;
     public Text Title;
     public Text touchStart;
+    public Material backgroundMat;
+    public MeshRenderer background;
 
     public static TitleLoader instance;
 
     public ISoundTrack music;
     private ISoundEffect banGround;
 
+    const string BACKGROUND_PATH = "backgrounds";
+
     private void Awake()
     {
         instance = this;
         CheckUpdate();
         StartCoroutine(DataLoader.Init());
+
+        var backgrounds = KiraFilesystem.Instance.ListFiles(filename => filename.StartsWith(BACKGROUND_PATH));
+
+        if (backgrounds.Length != 0)
+        {
+            var tex = KiraFilesystem.Instance.ReadTexture2D(backgrounds[Random.Range(0, backgrounds.Length)]);
+
+            var matCopy = Instantiate(backgroundMat);
+
+            matCopy.SetTexture("_MainTex", tex);
+            matCopy.SetFloat("_TexRatio", tex.width / tex.height);
+
+            background.sharedMaterial = matCopy;
+        }
     }
 
     private void Start()
