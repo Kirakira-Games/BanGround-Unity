@@ -266,7 +266,7 @@ namespace UnityEngine.UI
         private Vector2 m_Velocity;
         public Vector2 velocity { get { return m_Velocity; } set { m_Velocity = value; } }
 
-        private bool m_Dragging;
+        public bool m_Dragging;
 
         private Vector2 m_PrevPosition = Vector2.zero;
         private Bounds m_PrevContentBounds;
@@ -416,6 +416,9 @@ namespace UnityEngine.UI
                 // recycle items if we can
                 for (int i = 0; i < content.childCount; i++)
                 {
+                    if (content.GetChild(i).name.Contains("Dummy"))
+                        continue;
+
                     if (itemTypeEnd < totalCount)
                     {
                         dataSource.ProvideData(content.GetChild(i), itemTypeEnd);
