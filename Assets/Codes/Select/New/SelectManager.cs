@@ -18,6 +18,8 @@ public class SelectManager : MonoBehaviour
     public RectTransform m_tfDummyStart;
     public RectTransform m_tfDummyEnd;
 
+    private int m_iSelectedItem;
+
     private float m_flYMid;
 
     private void Awake()
@@ -54,6 +56,15 @@ public class SelectManager : MonoBehaviour
 
     private void LateUpdate()
     {
+        if(!m_srSongList.m_Dragging)
+        {
+            m_srSongList.StopMovement();
+
+            m_tfContent.anchoredPosition = new Vector2(0, 160 * m_iSelectedItem);
+
+            return;
+        }
+
         float minDist = 10240;
 
         SongItem targetSong = null;
@@ -88,6 +99,15 @@ public class SelectManager : MonoBehaviour
             return;
 
         firstUpdate = false;
+
+        for(int i = 1; i < m_tfContent.childCount - 1; i++)
+        {
+            if(m_tfContent.GetChild(i).GetComponent<SongItem>() == targetSong)
+            {
+                m_iSelectedItem = i - 1;
+                break;
+            }
+        }
 
         LiveSetting.currentChart = currentIndex;
 
