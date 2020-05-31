@@ -19,6 +19,8 @@ public class SelectManager : MonoBehaviour
     public RectTransform m_tfDummyEnd;
 
     private int m_iSelectedItem;
+    private SongItem lastSong = null;
+    private SongItem currentSong = null;
 
     private float m_flYMid;
 
@@ -41,10 +43,11 @@ public class SelectManager : MonoBehaviour
         m_flYMid = (vector3s[0].y + vector3s[1].y + vector3s[2].y + vector3s[3].y) * 0.5f;
 
         // Dirty hack to allow songitems moving around while there's only few somg
-        
+
         // Move dummy end to end
-        m_tfDummyEnd.SetParent(null);
-        m_tfDummyEnd.SetParent(m_tfContent);
+        m_tfDummyEnd.SetAsLastSibling();
+        //m_tfDummyEnd.SetParent(null);
+        //m_tfDummyEnd.SetParent(m_tfContent);
 
         // Set dummy height
         var dummyHeight = new Vector2(0, Mathf.Min(m_srSongList.gameObject.GetComponent<RectTransform>().rect.height / 2 - 120));
@@ -56,11 +59,11 @@ public class SelectManager : MonoBehaviour
 
     private void LateUpdate()
     {
-        if(!m_srSongList.m_Dragging)
+        if (!m_srSongList.m_Dragging)
         {
             m_srSongList.StopMovement();
 
-            m_tfContent.anchoredPosition = new Vector2(0, 160 * m_iSelectedItem);
+            m_tfContent.anchoredPosition = new Vector2(0, 120 * m_iSelectedItem);
 
             return;
         }
@@ -93,6 +96,14 @@ public class SelectManager : MonoBehaviour
         if (targetSong == null)
             return;
 
+        currentSong = targetSong;
+        if (lastSong != currentSong)
+        {
+            lastSong?.OnDeselect();
+            currentSong.OnSelect();
+            lastSong = currentSong;
+        }
+
         int currentIndex = DataLoader.chartList.IndexOf(targetSong.cHeader);
 
         if (currentIndex == LiveSetting.currentChart && !firstUpdate)
@@ -100,9 +111,9 @@ public class SelectManager : MonoBehaviour
 
         firstUpdate = false;
 
-        for(int i = 1; i < m_tfContent.childCount - 1; i++)
+        for (int i = 1; i < m_tfContent.childCount - 1; i++)
         {
-            if(m_tfContent.GetChild(i).GetComponent<SongItem>() == targetSong)
+            if (m_tfContent.GetChild(i).GetComponent<SongItem>() == targetSong)
             {
                 m_iSelectedItem = i - 1;
                 break;
