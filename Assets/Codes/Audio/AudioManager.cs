@@ -6,6 +6,7 @@ using System.Text;
 using UnityEngine;
 using AudioProvider;
 using System.Threading.Tasks;
+using UniRx.Async;
 
 public class AudioManager : MonoBehaviour
 {
@@ -83,24 +84,20 @@ public class AudioManager : MonoBehaviour
 
     public ISoundEffect PrecacheSE(byte[] data) => Provider.PrecacheSE(data, SEType.Common);
     public ISoundEffect PrecacheInGameSE(byte[] data) => Provider.PrecacheSE(data, SEType.InGame);
-    public void DelayPlayInGameBGM(byte[] audio, float seconds)
-    {
-        StartCoroutine(DelayPlayBGM(audio, seconds));
-    }
-    private IEnumerator DelayPlayBGM(byte[] audio, float seconds)
+    public async void DelayPlayInGameBGM(byte[] audio, float seconds)
     {
         isLoading = true;
         gameBGM = Provider.StreamTrack(audio);
         gameBGM.Play();
         gameBGM.Pause();
 
-        yield return new WaitUntil(() => SceneLoader.Loading == false);
+        await UniTask.WaitUntil(() => SceneLoader.Loading == false);
 
         AudioTimelineSync.instance.Seek(-seconds);
         AudioTimelineSync.instance.Play();
         while (AudioTimelineSync.instance.GetTimeInS() < -0.02)
         {
-            yield return new WaitForEndOfFrame();
+            await UniTask.DelayFrame(1);
         }
 
         foreach (var mod in LiveSetting.attachedMods)
@@ -117,7 +114,7 @@ public class AudioManager : MonoBehaviour
         while (gameBGM.GetPlaybackTime() == 0)
         {
             AudioTimelineSync.instance.Seek(0);
-            yield return new WaitForEndOfFrame();
+            await UniTask.DelayFrame(1);
         }
         AudioTimelineSync.instance.Seek(gameBGM.GetPlaybackTime() / 1000f);
     }
