@@ -57,7 +57,7 @@ public class AudioTimelineSync : MonoBehaviour
         syncQueue = new Queue<float>();
         ClearSync();
         deltaTime = -1e3f;
-        adjustLimit = Time.smoothDeltaTime * 0.2f * LiveSetting.SpeedCompensationSum;
+        adjustLimit = Time.smoothDeltaTime * 0.2f;
     }
 
     public void Play()
@@ -98,7 +98,7 @@ public class AudioTimelineSync : MonoBehaviour
         if (audioTime == prevAudioTime)
             return;
         prevAudioTime = audioTime;
-        float diff = audioTime / 1000f - GetTimeInS();
+        float diff = BGMTimeToRealtime(audioTime / 1000f - GetTimeInS());
         // too unsync
         if (diff < -UNSYNC_LIMIT)
             return;
