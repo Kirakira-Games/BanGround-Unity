@@ -98,7 +98,7 @@ public class AudioManager : MonoBehaviour
 
         AudioTimelineSync.instance.Seek(-seconds);
         AudioTimelineSync.instance.Play();
-        while (AudioTimelineSync.instance.GetTimeInS() < -0.05)
+        while (AudioTimelineSync.instance.GetTimeInS() < -0.02)
         {
             yield return new WaitForEndOfFrame();
         }
