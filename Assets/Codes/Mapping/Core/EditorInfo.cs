@@ -12,17 +12,17 @@
 
         public int gridDivision;
         public int barHeight;
-        public int numBars;
+        public int numBeats;
         public float scrollPos;
         public EditorTool tool;
 
-        public int maxHeight => barHeight * numBars;
+        public int maxHeight => barHeight * numBeats;
 
         public EditorInfo()
         {
             gridDivision = 4;
             barHeight = 400;
-            numBars = 100;
+            numBeats = 100;
             scrollPos = 0;
             tool = EditorTool.Select;
         }
