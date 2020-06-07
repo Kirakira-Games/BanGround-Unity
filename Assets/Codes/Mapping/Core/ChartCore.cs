@@ -216,7 +216,7 @@ namespace BGEditor
         public void RefreshBarCount()
         {
             float duration = AudioManager.Instance.gameBGM.GetLength() / 1000f;
-            editor.numBars = Mathf.CeilToInt(timing.TimeToBeat(duration));
+            editor.numBeats = Mathf.CeilToInt(timing.TimeToBeat(duration));
             onGridModifed.Invoke();
         }
 
