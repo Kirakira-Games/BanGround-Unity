@@ -9,28 +9,32 @@ namespace BGEditor
     public class EditorPreviewPanelController : CoreMonoBehaviour
     {
         public Color FillColor;
-        public int NumRows;
-        public int PixelPerRow;
-        public int PixelPerNote;
+        public int NoteHalfHeight;
+        public int NoteHalfWidth;
 
         private Texture2D texture;
         private Rect rect;
         private Color[] colorArray;
         private bool isAudioLoaded = false;
         private bool shouldApply = false;
-        private float beatPerRow;
-        private int[] numNotes;
+        private float stackingAlpha;
+        private int horizontalPadding;
 
         private void Start()
         {
-            numNotes = new int[NumRows];
             rect = GetComponent<RectTransform>().rect;
             texture = new Texture2D((int)rect.width, (int)rect.height, TextureFormat.ARGB32, false);
             var image = gameObject.AddComponent<Image>();
             image.material = new Material(image.material);
             image.material.mainTexture = texture;
+            horizontalPadding = (int)(rect.width - NoteHalfWidth * 2 * NoteUtility.LANE_COUNT) / (NoteUtility.LANE_COUNT + 1);
 
-            colorArray = texture.GetPixels32().Select(x => Color.clear).ToArray();
+            // Colors
+            stackingAlpha = FillColor.a;
+            FillColor.a = 0;
+            colorArray = texture.GetPixels32().Select(x => FillColor).ToArray();
+
+            // Listeners
             Core.onNoteCreated.AddListener(CreateNote);
             Core.onNoteRemoved.AddListener(RemoveNote);
             if (Progress.audioLength > 0)
@@ -48,21 +52,26 @@ namespace BGEditor
         private void Refresh()
         {
             texture.SetPixels(colorArray);
-            beatPerRow = (float)Editor.numBeats / NumRows;
-            for (int i = 0; i < numNotes.Length; i++)
-                numNotes[i] = 0;
             foreach (var note in Chart.notes)
                 CreateNote(note);
+            shouldApply = true;
         }
 
-        private void FillNote(int row, int num, Color color)
+        private void FillNote(float x, float y, float delta)
         {
-            for (int i = PixelPerRow * row, ed = PixelPerRow * (row + 1); i < ed; i++)
+            x = Mathf.Lerp(horizontalPadding + NoteHalfWidth, rect.width - NoteHalfWidth - horizontalPadding, x);
+            y = Mathf.Lerp(NoteHalfHeight, rect.height - NoteHalfHeight, y);
+            int xmin = Mathf.RoundToInt(x - NoteHalfWidth);
+            int xmax = Mathf.RoundToInt(x + NoteHalfWidth);
+            int ymin = Mathf.RoundToInt(y - NoteHalfHeight);
+            int ymax = Mathf.RoundToInt(y + NoteHalfHeight);
+            for (int i = xmin; i <= xmax; i++)
             {
-                for (int j = num * PixelPerNote, edj = (num + 1) * PixelPerNote; j < edj; j++)
+                for (int j = ymin; j <= ymax; j++)
                 {
-                    if (i < texture.height && j < texture.width)
-                        texture.SetPixel(j, i, color);
+                    var color = texture.GetPixel(i, j);
+                    color.a += delta;
+                    texture.SetPixel(i, j, color);
                 }
             }
         }
@@ -72,9 +81,9 @@ namespace BGEditor
             if (!isAudioLoaded)
                 return;
 
-            int pos = Mathf.Clamp(Mathf.FloorToInt(ChartUtility.BeatToFloat(note.beat) / beatPerRow), 0, numNotes.Length - 1);
-            FillNote(pos, numNotes[pos], FillColor);
-            numNotes[pos]++;
+            float row = Mathf.Clamp01(ChartUtility.BeatToFloat(note.beat) / Editor.numBeats);
+            float col = Mathf.InverseLerp(0, NoteUtility.LANE_COUNT - 1, note.lane);
+            FillNote(col, row, stackingAlpha);
 
             shouldApply = true;
         }
@@ -84,9 +93,9 @@ namespace BGEditor
             if (!isAudioLoaded)
                 return;
 
-            int pos = Mathf.Clamp(Mathf.FloorToInt(ChartUtility.BeatToFloat(note.beat) / beatPerRow), 0, numNotes.Length - 1);
-            numNotes[pos]--;
-            FillNote(pos, numNotes[pos], Color.clear);
+            float row = Mathf.Clamp01(ChartUtility.BeatToFloat(note.beat) / Editor.numBeats);
+            float col = Mathf.InverseLerp(0, NoteUtility.LANE_COUNT - 1, note.lane);
+            FillNote(col, row, -stackingAlpha);
 
             shouldApply = true;
         }
