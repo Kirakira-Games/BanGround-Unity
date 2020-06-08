@@ -8,31 +8,36 @@ namespace BGEditor
 {
     public class EditorPreviewPanelController : CoreMonoBehaviour
     {
-        public Color FillColor;
+        public Color[] FillColors;
         public int NoteHalfHeight;
         public int NoteHalfWidth;
 
-        private Texture2D texture;
         private Rect rect;
-        private Color[] colorArray;
+        private Texture2D[] textures;
+        private Color[][] colorArray;
+        private Image[] images;
         private bool isAudioLoaded = false;
         private bool shouldApply = false;
-        private float stackingAlpha;
         private int horizontalPadding;
 
         private void Start()
         {
             rect = GetComponent<RectTransform>().rect;
-            texture = new Texture2D((int)rect.width, (int)rect.height, TextureFormat.ARGB32, false);
-            var image = gameObject.AddComponent<Image>();
-            image.material = new Material(image.material);
-            image.material.mainTexture = texture;
-            horizontalPadding = (int)(rect.width - NoteHalfWidth * 2 * NoteUtility.LANE_COUNT) / (NoteUtility.LANE_COUNT + 1);
 
-            // Colors
-            stackingAlpha = FillColor.a;
-            FillColor.a = 0;
-            colorArray = texture.GetPixels32().Select(x => FillColor).ToArray();
+            // Create Texture
+            textures = new Texture2D[FillColors.Length];
+            colorArray = new Color[FillColors.Length][];
+            images = GetComponentsInChildren<Image>();
+            for (int i = 0; i < FillColors.Length; i++)
+            {
+                textures[i] = new Texture2D((int) rect.width, (int) rect.height, TextureFormat.ARGB32, false);
+                images[i].material = new Material(images[i].material);
+                images[i].material.mainTexture = textures[i];
+                var color = FillColors[i];
+                color.a = 0;
+                colorArray[i] = textures[i].GetPixels32().Select(x => color).ToArray();
+            }
+            horizontalPadding = (int)(rect.width - NoteHalfWidth * 2 * NoteUtility.LANE_COUNT) / (NoteUtility.LANE_COUNT + 1);
 
             // Listeners
             Core.onNoteCreated.AddListener(CreateNote);
@@ -51,13 +56,14 @@ namespace BGEditor
 
         private void Refresh()
         {
-            texture.SetPixels(colorArray);
+            for (int i = 0; i < textures.Length; i++)
+                textures[i].SetPixels(colorArray[i]);
             foreach (var note in Chart.notes)
                 CreateNote(note);
             shouldApply = true;
         }
 
-        private void FillNote(float x, float y, float delta)
+        private void FillNote(int id, float x, float y, float delta)
         {
             x = Mathf.Lerp(horizontalPadding + NoteHalfWidth, rect.width - NoteHalfWidth - horizontalPadding, x);
             y = Mathf.Lerp(NoteHalfHeight, rect.height - NoteHalfHeight, y);
@@ -65,15 +71,22 @@ namespace BGEditor
             int xmax = Mathf.RoundToInt(x + NoteHalfWidth);
             int ymin = Mathf.RoundToInt(y - NoteHalfHeight);
             int ymax = Mathf.RoundToInt(y + NoteHalfHeight);
-            for (int i = xmin; i <= xmax; i++)
+            for (int i = xmin; i < xmax; i++)
             {
-                for (int j = ymin; j <= ymax; j++)
+                for (int j = ymin; j < ymax; j++)
                 {
-                    var color = texture.GetPixel(i, j);
+                    var color = textures[id].GetPixel(i, j);
                     color.a += delta;
-                    texture.SetPixel(i, j, color);
+                    textures[id].SetPixel(i, j, color);
                 }
             }
+        }
+
+        private static int GetIdByNote(Note note)
+        {
+            if (note.tickStack != -1)
+                return 2;
+            return note.type == NoteType.Single ? 0 : 1;
         }
 
         private void CreateNote(Note note)
@@ -83,7 +96,8 @@ namespace BGEditor
 
             float row = Mathf.Clamp01(ChartUtility.BeatToFloat(note.beat) / Editor.numBeats);
             float col = Mathf.InverseLerp(0, NoteUtility.LANE_COUNT - 1, note.lane);
-            FillNote(col, row, stackingAlpha);
+            int id = GetIdByNote(note);
+            FillNote(id, col, row, FillColors[id].a);
 
             shouldApply = true;
         }
@@ -95,7 +109,8 @@ namespace BGEditor
 
             float row = Mathf.Clamp01(ChartUtility.BeatToFloat(note.beat) / Editor.numBeats);
             float col = Mathf.InverseLerp(0, NoteUtility.LANE_COUNT - 1, note.lane);
-            FillNote(col, row, -stackingAlpha);
+            int id = GetIdByNote(note);
+            FillNote(id, col, row, -FillColors[id].a);
 
             shouldApply = true;
         }
@@ -105,7 +120,8 @@ namespace BGEditor
             if (shouldApply)
             {
                 shouldApply = false;
-                texture.Apply();
+                foreach (var texture in textures)
+                    texture.Apply();
             }
         }
     }
