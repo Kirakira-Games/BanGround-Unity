@@ -15,14 +15,8 @@ public class SelectManager : MonoBehaviour
     public Text m_txtArtist;
     public Text m_txtCharter;
 
-    public RectTransform m_tfDummyStart;
-    public RectTransform m_tfDummyEnd;
-
-    private int m_iSelectedItem;
     private SongItem lastSong = null;
     private SongItem currentSong = null;
-
-    private float m_flYMid;
 
     private void Awake()
     {
@@ -35,95 +29,36 @@ public class SelectManager : MonoBehaviour
         DataLoader.RefreshSongList();
         DataLoader.ReloadSongList();
 
-        m_srSongList.totalCount = DataLoader.chartList.Count;
+        m_srSongList.totalCount = -1;// DataLoader.chartList.Count;
         m_srSongList.RefillCells();
 
-        Vector3[] vector3s = new Vector3[4];
-        m_srSongList.gameObject.GetComponent<RectTransform>().GetWorldCorners(vector3s);
-        m_flYMid = (vector3s[0].y + vector3s[1].y + vector3s[2].y + vector3s[3].y) * 0.5f;
-
-        // Dirty hack to allow songitems moving around while there's only few somg
-
-        // Move dummy end to end
-        m_tfDummyEnd.SetAsLastSibling();
-        //m_tfDummyEnd.SetParent(null);
-        //m_tfDummyEnd.SetParent(m_tfContent);
-
-        // Set dummy height
-        var dummyHeight = new Vector2(0, Mathf.Min(m_srSongList.gameObject.GetComponent<RectTransform>().rect.height / 2 - 120));
-        m_tfDummyStart.sizeDelta = dummyHeight;
-        m_tfDummyEnd.sizeDelta = dummyHeight;
     }
-
-    private bool firstUpdate = true;
 
     private void LateUpdate()
     {
-        if (!m_srSongList.m_Dragging)
+        if (!m_srSongList.m_Dragging && m_srSongList.needMove)
         {
-            m_srSongList.StopMovement();
+            m_srSongList.needMove = false;
 
-            m_tfContent.anchoredPosition = new Vector2(0, 120 * m_iSelectedItem);
+            //Scroll到合适位置
+            var si = m_tfContent.GetComponentsInChildren<SongItem>();
+            int mid = si.Count() / 2;
+            m_srSongList.ScrollToCell(si[mid].idx - mid, 1000);
 
-            return;
-        }
-
-        float minDist = 10240;
-
-        SongItem targetSong = null;
-
-        Vector3[] childVector3s = new Vector3[4];
-
-        foreach (RectTransform child in m_tfContent)
-        {
-            var si = child.gameObject.GetComponent<SongItem>();
-
-            if (si == null)
-                continue;
-
-            child.GetWorldCorners(childVector3s);
-
-            var yPos = (childVector3s[0].y + childVector3s[1].y + childVector3s[2].y + childVector3s[3].y) * 0.5f;
-
-            float dist = Mathf.Abs(m_flYMid - yPos);
-            if (dist < minDist)
+            //设置SongItem变大变小
+            currentSong = si[mid];
+            if (lastSong != currentSong)
             {
-                minDist = dist;
-                targetSong = si;
+                lastSong?.OnDeselect();
+                currentSong.OnSelect();
+                lastSong = currentSong;
             }
-        }
 
-        if (targetSong == null)
+            //更新当前选定的歌曲
+            LiveSetting.currentChart = DataLoader.chartList.IndexOf(currentSong.cHeader);
+
             return;
-
-        currentSong = targetSong;
-        if (lastSong != currentSong)
-        {
-            lastSong?.OnDeselect();
-            currentSong.OnSelect();
-            lastSong = currentSong;
         }
 
-        int currentIndex = DataLoader.chartList.IndexOf(targetSong.cHeader);
-
-        if (currentIndex == LiveSetting.currentChart && !firstUpdate)
-            return;
-
-        firstUpdate = false;
-
-        for (int i = 1; i < m_tfContent.childCount - 1; i++)
-        {
-            if (m_tfContent.GetChild(i).GetComponent<SongItem>() == targetSong)
-            {
-                m_iSelectedItem = i - 1;
-                break;
-            }
-        }
-
-        LiveSetting.currentChart = currentIndex;
-
-        m_txtTitle.text = targetSong.mHeader.title;
-        m_txtArtist.text = targetSong.mHeader.artist;
-        m_txtCharter.text = targetSong.cHeader.author;
     }
 }
