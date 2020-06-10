@@ -15,6 +15,9 @@ public class SongItem : MonoBehaviour
     private static readonly Vector2 selectedSize = new Vector2(888, 180);
     private static readonly Vector2 deselectedSize = new Vector2(888, 120);
 
+    public int idx;
+    public int id;
+
     void Start()
     {
     }
@@ -26,9 +29,11 @@ public class SongItem : MonoBehaviour
 
     void ScrollCellIndex(int idx)
     {
-        cHeader = DataLoader.chartList[idx];
+        this.idx = idx;
+        id = FlatID(idx);
+        cHeader = DataLoader.chartList[id];
         mHeader = DataLoader.GetMusicHeader(cHeader.mid);
-
+        name = id.ToString();
         songName.text = mHeader.title;
         songArtist.text = mHeader.artist;
     }
@@ -43,5 +48,12 @@ public class SongItem : MonoBehaviour
     {
         RectTransform rt = transform as RectTransform;
         rt.sizeDelta = deselectedSize;
+    }
+
+    int FlatID(int idx)
+    {
+        int count = DataLoader.chartList.Count;
+        int mod = idx % count;
+        return mod < 0 ? count + mod : mod;
     }
 }
