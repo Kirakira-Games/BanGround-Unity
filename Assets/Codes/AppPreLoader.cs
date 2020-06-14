@@ -28,9 +28,9 @@ public class AppPreLoader : MonoBehaviour
         {
             if (DataLoader.LoadAllKiraPackFromInbox())
             {
-                if (SceneManager.GetActiveScene().name == "Select")
+                if (SceneManager.GetActiveScene().name == "NewSelect")
                 {
-                    SceneManager.LoadScene("Select");
+                    SceneManager.LoadScene("NewSelect");
                 }
             }
         };
