@@ -199,7 +199,7 @@ public class SettingAndMod : MonoBehaviour
         setting_Close_Btn.gameObject.SetActive(true);
         if (GameObject.Find("SoundToggle").GetComponent<Toggle>().isOn)
         {
-            SelectManager_old.instance.previewSound?.Pause();
+            SelectManager.instance.previewSound?.Pause();
         }
     }
     void CloseSetting()
@@ -209,7 +209,7 @@ public class SettingAndMod : MonoBehaviour
         SetLiveSetting();
         setting_Close_Btn.gameObject.SetActive(false);
         KVSystem.Instance.SaveConfig();
-        SelectManager_old.instance.previewSound.Play();
+        SelectManager.instance.previewSound.Play();
         AudioManager.Provider.SetSoundEffectVolume(snd_se_volume, SEType.Common);
         AudioManager.Provider.SetSoundEffectVolume(snd_igse_volume, SEType.InGame);
         AudioManager.Provider.SetSoundTrackVolume(snd_bgm_volume);

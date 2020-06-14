@@ -18,15 +18,6 @@ public class SongItem : MonoBehaviour
     public int idx;
     public int id;
 
-    void Start()
-    {
-    }
-
-    void Update()
-    {
-        
-    }
-
     void ScrollCellIndex(int idx)
     {
         this.idx = idx;
