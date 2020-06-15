@@ -18,6 +18,8 @@ public class SongItem : MonoBehaviour
     public int idx;
     public int id;
 
+    private Button Enter_Btn;
+
     void ScrollCellIndex(int idx)
     {
         this.idx = idx;
@@ -27,6 +29,7 @@ public class SongItem : MonoBehaviour
         name = id.ToString();
         songName.text = mHeader.title;
         songArtist.text = mHeader.artist;
+        Enter_Btn = GetComponent<Button>();
     }
 
     public void OnSelect()
@@ -40,12 +43,15 @@ public class SongItem : MonoBehaviour
         SelectManager.instance.difficultySelect.levels = LiveSetting.CurrentHeader.difficultyLevel.ToArray();
         SelectManager.instance.difficultySelect.OnSongChange();
 
+        Enter_Btn.onClick.AddListener(() => SelectManager.instance.OnEnterPressed());
     }
 
     public void OnDeselect()
     {
         RectTransform rt = transform as RectTransform;
         rt.sizeDelta = deselectedSize;
+
+        Enter_Btn.onClick.RemoveAllListeners();
     }
 
     int FlatID(int idx)
