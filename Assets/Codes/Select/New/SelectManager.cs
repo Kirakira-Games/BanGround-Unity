@@ -164,20 +164,21 @@ public class SelectManager : MonoBehaviour
             return;
 
         int currentIndex = DataLoader.chartList.IndexOf(targetSong.cHeader);
+        Debug.Log($"target idx: {targetSong.idx}");
 
-        if (currentIndex == LiveSetting.currentChart)
-            return;
+        //if (currentIndex == LiveSetting.currentChart)
+        //    return;
 
-        var sis = m_tfContent.GetComponentsInChildren<SongItem>();
+        //var sis = m_tfContent.GetComponentsInChildren<SongItem>();
 
-        for (int i = 0; i < sis.Length; i++)
-        {
-            if (sis[i] == targetSong)
-            {
-                m_iSelectedItem = i;
-                break;
-            }
-        }
+        //for (int i = 0; i < sis.Length; i++)
+        //{
+        //    if (sis[i] == targetSong)
+        //    {
+        //        m_iSelectedItem = i;
+        //        break;
+        //    }
+        //}
 
         currentSong = targetSong;// sis[m_iSelectedItem];
         if (lastSong != currentSong)
@@ -318,12 +319,27 @@ public class SelectManager : MonoBehaviour
 
         //Find targetSong
         var sis = m_tfContent.GetComponentsInChildren<SongItem>();
+        float minDist = 10240;
+        float dist;
+        float yPos;
+        RectTransform rt;
+        Vector3[] childVector3s = new Vector3[4];
         for (int i = 0; i < sis.Length; i++)
         {
             if (sis[i].cHeader.sid == cl_lastsid)
             {
-                currentSong = sis[i];
-                break;
+                rt = sis[i].transform as RectTransform;
+                rt.GetWorldCorners(childVector3s);
+                yPos = (childVector3s[0].y + childVector3s[1].y + childVector3s[2].y + childVector3s[3].y) * 0.5f;
+                dist = Mathf.Abs(m_flYMid - yPos);
+                if (dist < minDist)
+                {
+                    minDist = dist;
+                    currentSong = sis[i];
+                }
+
+                //currentSong = sis[i];
+                //break;
             }
         }
 
@@ -332,8 +348,8 @@ public class SelectManager : MonoBehaviour
         Vector3[] v3s = new Vector3[4];
         var target = currentSong.gameObject.GetComponent<RectTransform>();
         target.GetWorldCorners(v3s);
-        var yPos = (v3s[0].y + v3s[1].y + v3s[2].y + v3s[3].y) * 0.5f;
-        float dist = m_flYMid - yPos;
+        yPos = (v3s[0].y + v3s[1].y + v3s[2].y + v3s[3].y) * 0.5f;
+        dist = m_flYMid - yPos;
         m_tfContent.anchoredPosition = m_tfContent.anchoredPosition + new Vector2(0, dist);
 
         //Select
