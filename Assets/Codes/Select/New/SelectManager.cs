@@ -352,12 +352,12 @@ public class SelectManager : MonoBehaviour
         difficultySelect = GameObject.Find("DifficultySelect").GetComponent<DifficultySelect>();
     }
 
-    void InitSort()
+    private void InitSort()
     {
         sort_Text.text = Enum.GetName(typeof(Sorter), (Sorter)cl_cursorter);
     }
 
-    void SwitchSort()
+    private void SwitchSort()
     {
         cl_cursorter.Set(cl_cursorter + 1);
         if (cl_cursorter > 4)
@@ -393,6 +393,17 @@ public class SelectManager : MonoBehaviour
                 break;
         }
         DataLoader.chartList.Sort(compare);
+    }
+
+    public void OnEnterPressed()
+    {
+        StartCoroutine(PreviewFadeOut());
+        SettingAndMod.instance.SetLiveSetting();
+
+        KVSystem.Instance.SaveConfig();
+
+        PlayVoicesAtSceneOut();
+        SceneLoader.LoadScene("NewSelect", "InGame", true);
     }
 
     public void RefeshSonglist()
