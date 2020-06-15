@@ -11,7 +11,8 @@ using Random = UnityEngine.Random;
 using UniRx.Async;
 
 #pragma warning disable 0649
-public class SelectManager : MonoBehaviour
+[Obsolete]
+public class SelectManager_old : MonoBehaviour
 {
     public const float scroll_Min_Speed = 50f;
 
@@ -37,7 +38,7 @@ public class SelectManager : MonoBehaviour
 
     DifficultySelect difficultySelect;
 
-    public static SelectManager instance;
+    public static SelectManager_old instance;
 
     [HideInInspector] 
     public ISoundTrack previewSound;

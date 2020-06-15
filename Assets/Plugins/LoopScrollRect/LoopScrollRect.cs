@@ -266,7 +266,8 @@ namespace UnityEngine.UI
         private Vector2 m_Velocity;
         public Vector2 velocity { get { return m_Velocity; } set { m_Velocity = value; } }
 
-        private bool m_Dragging;
+        public bool m_Dragging;
+        public bool needMove;
 
         private Vector2 m_PrevPosition = Vector2.zero;
         private Bounds m_PrevContentBounds;
@@ -318,7 +319,7 @@ namespace UnityEngine.UI
             }
         }
 
-        public void SrollToCell(int index, float speed)
+        public void ScrollToCell(int index, float speed)
         {
             if(totalCount >= 0 && (index < 0 || index >= totalCount))
             {
@@ -416,6 +417,9 @@ namespace UnityEngine.UI
                 // recycle items if we can
                 for (int i = 0; i < content.childCount; i++)
                 {
+                    if (content.GetChild(i).name.Contains("Dummy"))
+                        continue;
+
                     if (itemTypeEnd < totalCount)
                     {
                         dataSource.ProvideData(content.GetChild(i), itemTypeEnd);
@@ -798,6 +802,7 @@ namespace UnityEngine.UI
             RectTransformUtility.ScreenPointToLocalPointInRectangle(viewRect, eventData.position, eventData.pressEventCamera, out m_PointerStartLocalCursor);
             m_ContentStartPosition = m_Content.anchoredPosition;
             m_Dragging = true;
+            needMove = true;
         }
 
         public virtual void OnEndDrag(PointerEventData eventData)
