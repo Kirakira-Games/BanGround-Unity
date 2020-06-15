@@ -75,7 +75,7 @@ public class ChartCreator : MonoBehaviour
     public void Duplicate()
     {
         DataLoader.DuplicateKiraPack(cHeader);
-        SceneManager.LoadScene("Select");
+        SceneManager.LoadScene("NewSelect");
     }
 
     public void NewChartSet()
@@ -100,7 +100,7 @@ public class ChartCreator : MonoBehaviour
         LiveSetting.currentDifficulty = difficulty;
         LiveSetting.actualDifficulty = difficulty;
         cl_lastsid.Set(header.sid);
-        SceneManager.LoadScene("Select");
+        SceneManager.LoadScene("NewSelect");
     }
 
     public void NewDifficulty()
@@ -125,7 +125,7 @@ public class ChartCreator : MonoBehaviour
         // Reload scene
         LiveSetting.currentDifficulty = difficulty;
         LiveSetting.actualDifficulty = difficulty;
-        SceneManager.LoadScene("Select");
+        SceneManager.LoadScene("NewSelect");
     }
 
     public void 还没做好()
