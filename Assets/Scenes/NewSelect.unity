@@ -605,7 +605,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1523617949}
         m_MethodName: DuplicateKiraPack
         m_Mode: 1
         m_Arguments:
@@ -18980,7 +18980,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1523617949}
         m_MethodName: ExportKiraPack
         m_Mode: 1
         m_Arguments:
@@ -21395,7 +21395,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1523617949}
         m_MethodName: OpenMappingScene
         m_Mode: 1
         m_Arguments:
@@ -23217,8 +23217,14 @@ MonoBehaviour:
   m_txtTitle: {fileID: 197587322065654076}
   m_txtArtist: {fileID: 197587321627447155}
   m_txtCharter: {fileID: 873299082}
-  m_tfDummyStart: {fileID: 1077264602}
-  m_tfDummyEnd: {fileID: 764835673}
+  voices:
+  - {fileID: 4900000, guid: 6e04faaa1a019eb4ab3abe6e54a1acc8, type: 3}
+  - {fileID: 4900000, guid: 4a5ab275227c25f4aac725d89d97b482, type: 3}
+  - {fileID: 4900000, guid: c377c5813e755f448814b44775d79bb2, type: 3}
+  - {fileID: 4900000, guid: c3e0aff406448684d94591f3f2c04a8e, type: 3}
+  - {fileID: 4900000, guid: 15b5bab7937446b4aa71fc270acb338b, type: 3}
+  - {fileID: 4900000, guid: d5cee6ed526554446be29a190c02c764, type: 3}
+  - {fileID: 4900000, guid: 82aa2a93f66138b46b95779aead459e9, type: 3}
 --- !u!4 &1523617950
 Transform:
   m_ObjectHideFlags: 0
@@ -23651,7 +23657,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 544539901}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.7533705
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -27427,6 +27433,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_Dragging: 0
+  needMove: 0
 --- !u!43 &1835317677
 Mesh:
   m_ObjectHideFlags: 0

@@ -30,7 +30,14 @@ public class SelectManager : MonoBehaviour
     private int m_iSelectedItem;
     private bool m_bDirty = false;
 
+    [SerializeField] private TextAsset[] voices;
+    private DifficultySelect difficultySelect;
+    //sort
+    private Text sort_Text;
+    private Button sort_Button;
+
     public ISoundTrack previewSound { get; private set; }
+    public FixBackground background { get; private set; }
 
     static KVar cl_cursorter = new KVar("cl_cursorter", "1", KVarFlags.Archive, "Current sorter type", obj =>
     {
@@ -80,9 +87,17 @@ public class SelectManager : MonoBehaviour
 
     private void Start()
     {
+        GameObject.Find("UserInfo").GetComponent<UserInfo>().ShowUserInfo();
+        background = GameObject.Find("KirakiraBackground").GetComponent<FixBackground>();
+        PlayVoicesAtSceneIn();
+
+        InitComponent();
+        InitSort();
+
         DataLoader.LoadAllKiraPackFromInbox();
         DataLoader.RefreshSongList();
         DataLoader.ReloadSongList();
+        SortSongList();
 
         m_srSongList.totalCount = -1;// DataLoader.chartList.Count;
         m_srSongList.RefillCells();
@@ -167,17 +182,17 @@ public class SelectManager : MonoBehaviour
         currentSong = targetSong;// sis[m_iSelectedItem];
         if (lastSong != currentSong)
         {
+            LiveSetting.currentChart = currentIndex;
+
             lastSong?.OnDeselect();
             currentSong.OnSelect();
             lastSong = currentSong;
+            StartCoroutine(PreviewFadeOut(0.02f));
 
-            LiveSetting.currentChart = currentIndex;
             cl_lastsid.Set(currentSong.cHeader.sid);
             StopCoroutine(PlayPreview());
             StartCoroutine(PlayPreview());
         }
-
-        
     }
 
     private void OnApplicationPause(bool pause)
@@ -262,6 +277,17 @@ public class SelectManager : MonoBehaviour
             yield return new WaitForFixedUpdate();
         }
     }
+
+    private void PlayVoicesAtSceneIn()
+    {
+        AudioManager.Instance.PrecacheSE(voices[Random.Range(0, 3)].bytes).PlayOneShot();
+    }
+
+    private void PlayVoicesAtSceneOut()
+    {
+        AudioManager.Instance.PrecacheSE(voices[Random.Range(3, 7)].bytes).PlayOneShot();
+    }
+
     #endregion
 
     private void SelectDefault()
@@ -288,7 +314,7 @@ public class SelectManager : MonoBehaviour
     private IEnumerator DelaySetPos()
     {
         //Wait for scroll
-        yield return new WaitForSeconds(.5f);
+        yield return new WaitForSeconds(1f);
 
         //Find targetSong
         var sis = m_tfContent.GetComponentsInChildren<SongItem>();
@@ -313,5 +339,61 @@ public class SelectManager : MonoBehaviour
         //Select
         currentSong.OnSelect();
         StartCoroutine(PlayPreview());
+    }
+
+    private void InitComponent()
+    {
+        //sort
+        sort_Button = GameObject.Find("Sort_Button").GetComponent<Button>();
+        sort_Text = GameObject.Find("Sort_Text").GetComponent<Text>();
+        sort_Button.onClick.AddListener(SwitchSort);
+
+        difficultySelect = GameObject.Find("DifficultySelect").GetComponent<DifficultySelect>();
+    }
+
+    void InitSort()
+    {
+        sort_Text.text = Enum.GetName(typeof(Sorter), (Sorter)cl_cursorter);
+    }
+
+    void SwitchSort()
+    {
+        cl_cursorter.Set(cl_cursorter + 1);
+        if (cl_cursorter > 4)
+            cl_cursorter.Set(0);
+
+        sort_Text.text = Enum.GetName(typeof(Sorter), (Sorter)cl_cursorter);
+        currentSong?.OnDeselect();
+        SortSongList();
+        m_srSongList.RefillCells();
+        SelectDefault();
+    }
+
+    private void SortSongList()
+    {
+        // Sort SongList
+        IComparer<cHeader> compare;
+        switch ((Sorter)cl_cursorter)
+        {
+            case Sorter.ChartDifficulty:
+                compare = new ChartDifSort();
+                break;
+            case Sorter.SongName:
+                compare = new SongNameSort();
+                break;
+            case Sorter.SongArtist:
+                compare = new SongArtistSort();
+                break;
+            case Sorter.ChartAuthor:
+                compare = new ChartAuthorSort();
+                break;
+            case Sorter.ChartScore:
+                compare = new ChartScoreSort();
+                break;
+            default:
+                compare = new SongNameSort();
+                break;
+        }
+        DataLoader.chartList.Sort(compare);
     }
 }
