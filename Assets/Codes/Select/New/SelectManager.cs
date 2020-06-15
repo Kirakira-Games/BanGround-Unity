@@ -337,6 +337,7 @@ public class SelectManager : MonoBehaviour
         m_tfContent.anchoredPosition = m_tfContent.anchoredPosition + new Vector2(0, dist);
 
         //Select
+        lastSong = currentSong;
         currentSong.OnSelect();
         StartCoroutine(PlayPreview());
     }
@@ -363,10 +364,7 @@ public class SelectManager : MonoBehaviour
             cl_cursorter.Set(0);
 
         sort_Text.text = Enum.GetName(typeof(Sorter), (Sorter)cl_cursorter);
-        currentSong?.OnDeselect();
-        SortSongList();
-        m_srSongList.RefillCells();
-        SelectDefault();
+        RefeshSonglist();
     }
 
     private void SortSongList()
@@ -395,5 +393,13 @@ public class SelectManager : MonoBehaviour
                 break;
         }
         DataLoader.chartList.Sort(compare);
+    }
+
+    public void RefeshSonglist()
+    {
+        currentSong?.OnDeselect();
+        SortSongList();
+        m_srSongList.RefillCells();
+        SelectDefault();
     }
 }

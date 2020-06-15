@@ -29,6 +29,7 @@ public class DifficultySelect : MonoBehaviour
     //private FixBackground background;
 
     static KVarRef cl_cursorter = new KVarRef("cl_cursorter");
+    static KVarRef cl_lastsid = new KVarRef("cl_lastsid");
 
     void Start()
     {
@@ -91,8 +92,11 @@ public class DifficultySelect : MonoBehaviour
 
         LiveSetting.actualDifficulty = selected;
         LiveSetting.currentDifficulty = selected;
-        //if ((Sorter)cl_cursorter == Sorter.ChartDifficulty && lastDifficulty != LiveSetting.actualDifficulty)
-        //    SelectManager_old.instance.InitSongList(LiveSetting.CurrentHeader.sid);
+        if ((Sorter)cl_cursorter == Sorter.ChartDifficulty && lastDifficulty != LiveSetting.actualDifficulty)
+        {
+            cl_lastsid.Set(LiveSetting.CurrentHeader.sid);
+            SelectManager.instance.RefeshSonglist();
+        }
 
         lastDifficulty = LiveSetting.actualDifficulty;
 
