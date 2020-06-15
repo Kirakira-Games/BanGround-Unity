@@ -33,6 +33,9 @@ public class SongItem : MonoBehaviour
     {
         RectTransform rt = transform as RectTransform;
         rt.sizeDelta = selectedSize;
+
+        var path = DataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid).Item1;
+        SelectManager.instance.background.UpdateBackground(path);
     }
 
     public void OnDeselect()

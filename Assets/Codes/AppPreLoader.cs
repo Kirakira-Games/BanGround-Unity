@@ -79,7 +79,6 @@ public class AppPreLoader : MonoBehaviour
 #else
         UUID = SystemInfo.deviceUniqueIdentifier;
 #endif
-        Debug.Log($"Device UUID:{UUID}");
     }
 }
 public class UUIDToolExtern
