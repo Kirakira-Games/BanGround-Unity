@@ -353,12 +353,12 @@ public class SelectManager_old : MonoBehaviour
         KVSystem.Instance.SaveConfig();
 
         PlayVoicesAtSceneOut();
-        SceneLoader.LoadScene("Select", "InGame", true);
+        SceneLoader.LoadScene("NewSelect", "InGame", true);
     }
 
     public void OpenMappingScene()
     {
-        SceneLoader.LoadScene("Select", "Mapping", true);
+        SceneLoader.LoadScene("NewSelect", "Mapping", true);
     }
 
     public async void ExportKiraPack()
