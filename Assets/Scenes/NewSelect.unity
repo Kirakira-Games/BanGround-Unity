@@ -772,6 +772,7 @@ GameObject:
   - component: {fileID: 46389049}
   - component: {fileID: 46389052}
   - component: {fileID: 46389051}
+  - component: {fileID: 46389053}
   - component: {fileID: 46389050}
   m_Layer: 5
   m_Name: Loop Vertical Scroll Rect
@@ -807,12 +808,28 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 46389048}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c41ca759a5d70b448b991ca2699766ba, type: 3}
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  totalCount: 50
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_RaycastTarget: 1
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
 --- !u!114 &46389051
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -863,6 +880,14 @@ MonoBehaviour:
       m_Calls: []
   m_Dragging: 0
   needMove: 0
+--- !u!222 &46389053
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 46389048}
+  m_CullTransparentMesh: 0
 --- !u!43 &47553978
 Mesh:
   m_ObjectHideFlags: 0
@@ -1284,14 +1309,14 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 59938307}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1736162808}
   - {fileID: 1084982300}
-  m_Father: {fileID: 218056357}
-  m_RootOrder: 0
+  m_Father: {fileID: 1902449253}
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
@@ -2012,7 +2037,7 @@ RectTransform:
   m_Children:
   - {fileID: 1407148949}
   m_Father: {fileID: 218056357}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
@@ -4403,7 +4428,6 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_Children:
-  - {fileID: 59938308}
   - {fileID: 1041879623}
   - {fileID: 219961676}
   - {fileID: 2142675344}
@@ -4462,7 +4486,7 @@ RectTransform:
   - {fileID: 1224851466}
   - {fileID: 1192317785}
   m_Father: {fileID: 218056357}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
@@ -6910,7 +6934,7 @@ RectTransform:
   m_Children:
   - {fileID: 506662616}
   m_Father: {fileID: 1902449253}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
@@ -17511,7 +17535,7 @@ RectTransform:
   - {fileID: 712940869}
   - {fileID: 822402387}
   m_Father: {fileID: 218056357}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
@@ -20229,7 +20253,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1902449253}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -21629,7 +21653,7 @@ RectTransform:
   m_Children:
   - {fileID: 1766399770}
   m_Father: {fileID: 1902449253}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
@@ -21679,7 +21703,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 2098537918}
         m_MethodName: ExportKiraPack
         m_Mode: 1
         m_Arguments:
@@ -24339,7 +24363,7 @@ RectTransform:
   m_Children:
   - {fileID: 625598811}
   m_Father: {fileID: 1902449253}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
@@ -24389,7 +24413,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 2098537918}
         m_MethodName: OpenMappingScene
         m_Mode: 1
         m_Arguments:
@@ -32938,7 +32962,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_TargetDisplay: 0
 --- !u!224 &1902449253
 RectTransform:
@@ -32953,6 +32977,7 @@ RectTransform:
   m_Children:
   - {fileID: 885520372}
   - {fileID: 1682146586}
+  - {fileID: 59938308}
   - {fileID: 1376908538}
   - {fileID: 1227774826}
   - {fileID: 367114992}
@@ -35019,7 +35044,7 @@ RectTransform:
   - {fileID: 730821871}
   - {fileID: 315688138}
   m_Father: {fileID: 1902449253}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -38056,7 +38081,7 @@ RectTransform:
   - {fileID: 467075951}
   - {fileID: 550873563}
   m_Father: {fileID: 218056357}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}

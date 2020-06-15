@@ -164,7 +164,7 @@ public class SelectManager : MonoBehaviour
             return;
 
         int currentIndex = DataLoader.chartList.IndexOf(targetSong.cHeader);
-        Debug.Log($"target idx: {targetSong.idx}");
+        //Debug.Log($"target idx: {targetSong.idx}");
 
         //if (currentIndex == LiveSetting.currentChart)
         //    return;
@@ -210,7 +210,7 @@ public class SelectManager : MonoBehaviour
         if (focus)
         {
             bool success = DataLoader.LoadAllKiraPackFromInbox();
-            if (success) SceneManager.LoadScene("Select");
+            if (success) SceneManager.LoadScene("NewSelect");
         }
     }
 #endif
