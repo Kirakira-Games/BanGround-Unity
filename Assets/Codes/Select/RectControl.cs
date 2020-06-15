@@ -22,7 +22,7 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     [SerializeField] 
     private Animator deleteAni;
 
-    SelectManager sm;
+    SelectManager_old sm;
     public int index;
     //Button bt;
 
@@ -56,7 +56,7 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         vg = GameObject.Find("SongContent").GetComponent<VerticalLayoutGroup>();
         rt_v = GameObject.Find("Song Scroll View").GetComponent<RectTransform>();
         rt_s = GameObject.Find("Song Scroll View").GetComponent<ScrollRect>();
-        sm = GameObject.Find("SelectManager").GetComponent<SelectManager>();
+        sm = GameObject.Find("SelectManager").GetComponent<SelectManager_old>();
         startImg = transform.Find("StartImg").gameObject;
         img = GetComponent<Image>();
         title = transform.Find("TextTitle").GetComponent<Text>();

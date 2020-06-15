@@ -11,9 +11,9 @@ public class MouseWheelHandler : MonoBehaviour,IScrollHandler
         if (p.scrollDelta.y > 0)
         {
             if (LiveSetting.currentChart < DataLoader.chartList.Count-1)
-                SelectManager.instance.SelectSong(LiveSetting.currentChart + 1);
+                SelectManager_old.instance.SelectSong(LiveSetting.currentChart + 1);
         }
         else
-            SelectManager.instance.SelectSong(LiveSetting.currentChart - 1);
+            SelectManager_old.instance.SelectSong(LiveSetting.currentChart - 1);
     }
 }

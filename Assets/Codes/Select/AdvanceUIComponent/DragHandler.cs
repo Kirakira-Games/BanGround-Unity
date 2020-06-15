@@ -3,13 +3,13 @@ using UnityEngine.EventSystems;
 
 public class DragHandler : MonoBehaviour, IBeginDragHandler, IEndDragHandler
 {
-    SelectManager sm;
+    SelectManager_old sm;
     public bool isDragging = false;
     public bool canDrag = true;
 
     public void Start()
     {
-        sm = GameObject.Find("SelectManager").GetComponent<SelectManager>();
+        sm = GameObject.Find("SelectManager").GetComponent<SelectManager_old>();
     }
 
     public void OnBeginDrag(PointerEventData data)
