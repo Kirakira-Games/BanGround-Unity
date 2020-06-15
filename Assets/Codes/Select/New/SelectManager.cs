@@ -87,7 +87,7 @@ public class SelectManager : MonoBehaviour
 
     private void Start()
     {
-        GameObject.Find("UserInfo").GetComponent<UserInfo>().ShowUserInfo();
+        GameObject.Find("UserInfo").GetComponent<UserInfo>().GetUserInfo();
         background = GameObject.Find("KirakiraBackground").GetComponent<FixBackground>();
         PlayVoicesAtSceneIn();
 
