@@ -277,12 +277,41 @@ public class SelectManager : MonoBehaviour
         {
             selectedSid = DataLoader.chartList[Random.Range(0, DataLoader.chartList.Count)].sid;
         }
+        cl_lastsid.Set(selectedSid);
         LiveSetting.currentChart = DataLoader.chartList.IndexOf(DataLoader.chartList.First(x => x.sid == selectedSid));
 
-        //TODO:
         //滚动到cl_lastsid的位置并选择
-        m_srSongList.ScrollToCell(LiveSetting.currentChart, float.MaxValue);
-        //m_bDirty = true;
+        m_srSongList.ScrollToCell(LiveSetting.currentChart - 4, 9999);
+        StartCoroutine(DelaySetPos());
     }
 
+    private IEnumerator DelaySetPos()
+    {
+        //Wait for scroll
+        yield return new WaitForSeconds(.5f);
+
+        //Find targetSong
+        var sis = m_tfContent.GetComponentsInChildren<SongItem>();
+        for (int i = 0; i < sis.Length; i++)
+        {
+            if (sis[i].cHeader.sid == cl_lastsid)
+            {
+                currentSong = sis[i];
+                break;
+            }
+        }
+
+        //Set Pos
+        m_srSongList.StopMovement();
+        Vector3[] v3s = new Vector3[4];
+        var target = currentSong.gameObject.GetComponent<RectTransform>();
+        target.GetWorldCorners(v3s);
+        var yPos = (v3s[0].y + v3s[1].y + v3s[2].y + v3s[3].y) * 0.5f;
+        float dist = m_flYMid - yPos;
+        m_tfContent.anchoredPosition = m_tfContent.anchoredPosition + new Vector2(0, dist);
+
+        //Select
+        currentSong.OnSelect();
+        StartCoroutine(PlayPreview());
+    }
 }
