@@ -36,6 +36,10 @@ public class SongItem : MonoBehaviour
 
         var path = DataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid).Item1;
         SelectManager.instance.background.UpdateBackground(path);
+
+        SelectManager.instance.difficultySelect.levels = LiveSetting.CurrentHeader.difficultyLevel.ToArray();
+        SelectManager.instance.difficultySelect.OnSongChange();
+
     }
 
     public void OnDeselect()
