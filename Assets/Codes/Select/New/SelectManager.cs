@@ -31,13 +31,13 @@ public class SelectManager : MonoBehaviour
     private bool m_bDirty = false;
 
     [SerializeField] private TextAsset[] voices;
-    private DifficultySelect difficultySelect;
     //sort
     private Text sort_Text;
     private Button sort_Button;
 
     public ISoundTrack previewSound { get; private set; }
     public FixBackground background { get; private set; }
+    public DifficultySelect difficultySelect { get; private set; }
 
     static KVar cl_cursorter = new KVar("cl_cursorter", "1", KVarFlags.Archive, "Current sorter type", obj =>
     {

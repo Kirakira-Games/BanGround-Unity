@@ -13694,6 +13694,7 @@ GameObject:
   - component: {fileID: 885520372}
   - component: {fileID: 885520374}
   - component: {fileID: 885520376}
+  - component: {fileID: 885520373}
   m_Layer: 5
   m_Name: DifficultySelect
   m_TagString: Untagged
@@ -13729,6 +13730,37 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 180.1}
   m_SizeDelta: {x: 0, y: 360.172}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &885520373
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 885520371}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20210387a79523340a28ccba24d42c8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cards:
+  - {fileID: 1159203805}
+  - {fileID: 734546144}
+  - {fileID: 1784670156}
+  - {fileID: 815679545}
+  - {fileID: 744104899}
+  labels:
+  - {fileID: 520041514}
+  - {fileID: 322799432}
+  - {fileID: 1398957789}
+  - {fileID: 1720087035}
+  - {fileID: 1228517789}
+  levels: 0000000000000000000000000000000000000000
+  voices:
+  - {fileID: 4900000, guid: 9719cf3d3757ab543b749467ff716645, type: 3}
+  - {fileID: 4900000, guid: 3b4bdfb952c67624da104afb1cf4d0bb, type: 3}
+  - {fileID: 4900000, guid: 65ca9f5c92d21d1459527f811f51b583, type: 3}
+  - {fileID: 4900000, guid: 2d571d1911ae7de498659a09c48ef2c5, type: 3}
+  - {fileID: 4900000, guid: e7fb34605b9a00343ae6e2c068c0182a, type: 3}
 --- !u!114 &885520374
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13771,7 +13803,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 0}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 885520373}
+        m_MethodName: OnSwipeNext
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!222 &885520376
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -23657,7 +23700,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 544539901}
   m_Direction: 2
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.7533705
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
