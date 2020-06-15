@@ -266,7 +266,7 @@ namespace BGEditor
             {
                 Save();
             }
-            SceneLoader.LoadScene("Mapping", "Select");
+            SceneLoader.LoadScene("Mapping", "NewSelect");
         }
 
         public void LoadChart(Chart raw)

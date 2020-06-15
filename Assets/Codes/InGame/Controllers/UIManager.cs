@@ -175,7 +175,7 @@ public class UIManager : MonoBehaviour
 
         OnStopPlaying();
         //SceneManager.LoadScene("Select");
-        SceneLoader.LoadScene("InGame", "Select", true);
+        SceneLoader.LoadScene("InGame", "NewSelect", true);
     }
 
     private void OnApplicationPause(bool pause)
