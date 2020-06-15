@@ -26,7 +26,7 @@ public class SongItem : MonoBehaviour
         id = FlatID(idx);
         cHeader = DataLoader.chartList[id];
         mHeader = DataLoader.GetMusicHeader(cHeader.mid);
-        name = id.ToString();
+        name = idx.ToString();
         songName.text = mHeader.title;
         songArtist.text = mHeader.artist;
         Enter_Btn = GetComponent<Button>();
