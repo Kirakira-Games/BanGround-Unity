@@ -380,6 +380,7 @@ public class NoteController : MonoBehaviour
                     if (result != JudgeResult.Perfect && result != JudgeResult.Great)
                     {
                         shutdown = true;
+                        UIManager.instance.isFinished = true;
                         AudioManager.Instance.isInGame = false;
                         AudioManager.Instance.StopBGM();
                         GameObject.Find("UIManager").GetComponent<UIManager>().OnAudioFinish(true);
@@ -392,6 +393,7 @@ public class NoteController : MonoBehaviour
                     if (result != JudgeResult.Perfect)
                     {
                         shutdown = true;
+                        UIManager.instance.isFinished = true;
                         AudioManager.Instance.isInGame = false;
                         AudioManager.Instance.StopBGM();
                         GameObject.Find("UIManager").GetComponent<UIManager>().OnAudioFinish(true);
