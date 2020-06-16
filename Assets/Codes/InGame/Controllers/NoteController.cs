@@ -356,6 +356,19 @@ public class NoteController : MonoBehaviour
         laneEffects = GameObject.Find("Effects").GetComponent<LaneEffects>();
         laneEffects.Init(chart.bpm, chart.speed);
 
+        // Check if adjusting offset
+        if (LiveSetting.offsetAdjustMode)
+        {
+            GameObject.Find("infoCanvas").GetComponent<Canvas>().enabled = false;
+            LiveSetting.attachedMods.Clear();
+        }
+        else
+        {
+            GameObject.Find("settingsCanvas").GetComponent<Canvas>().enabled = false;
+        }
+
+        chartScript = new ChartScript(sid, (Difficulty)LiveSetting.actualDifficulty);
+
         //Set Play Mod Event
         //AudioManager.Instance.restart = false;
         onJudge = null;
@@ -373,7 +386,7 @@ public class NoteController : MonoBehaviour
                     }
                 });
 
-            else if (mod is PerfectMod) 
+            else if (mod is PerfectMod)
                 onJudge += ((JudgeResult result) =>
                 {
                     if (result != JudgeResult.Perfect)
@@ -385,18 +398,6 @@ public class NoteController : MonoBehaviour
                     }
                 });
         }
-
-        // Check if adjusting offset
-        if (LiveSetting.offsetAdjustMode)
-        {
-            GameObject.Find("infoCanvas").GetComponent<Canvas>().enabled = false;
-        }
-        else
-        {
-            GameObject.Find("settingsCanvas").GetComponent<Canvas>().enabled = false;
-        }
-
-        chartScript = new ChartScript(sid, (Difficulty)LiveSetting.actualDifficulty);
     }
 
     bool shutdown = false;
