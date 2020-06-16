@@ -14,6 +14,8 @@ public class SongItem : MonoBehaviour
 
     private static readonly Vector2 selectedSize = new Vector2(888, 180);
     private static readonly Vector2 deselectedSize = new Vector2(888, 120);
+    private static readonly Color selectedColor = new Color(1, 1, 1);
+    private static readonly Color deselectedColor = new Color(137f / 255, 137f / 255, 137f / 255);
 
     public int idx;
     public int id;
@@ -29,6 +31,7 @@ public class SongItem : MonoBehaviour
         name = idx.ToString();
         songName.text = mHeader.title;
         songArtist.text = mHeader.artist;
+        songArtist.color = selectedColor;
         Enter_Btn = GetComponent<Button>();
     }
 
@@ -36,6 +39,7 @@ public class SongItem : MonoBehaviour
     {
         RectTransform rt = transform as RectTransform;
         rt.sizeDelta = selectedSize;
+        songName.color = selectedColor;
 
         var path = DataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid).Item1;
         SelectManager.instance.background.UpdateBackground(path);
@@ -50,6 +54,7 @@ public class SongItem : MonoBehaviour
     {
         RectTransform rt = transform as RectTransform;
         rt.sizeDelta = deselectedSize;
+        songName.color = deselectedColor;
 
         Enter_Btn.onClick.RemoveAllListeners();
     }
