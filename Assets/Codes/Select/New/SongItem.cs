@@ -14,13 +14,17 @@ public class SongItem : MonoBehaviour
 
     private static readonly Vector2 selectedSize = new Vector2(888, 180);
     private static readonly Vector2 deselectedSize = new Vector2(888, 120);
-    private static readonly Color selectedColor = new Color(1, 1, 1);
-    private static readonly Color deselectedColor = new Color(137f / 255, 137f / 255, 137f / 255);
+    private static readonly Color selectedTextColor = new Color(1, 1, 1);
+    private static readonly Color deselectedTextColor = new Color(137f / 255, 137f / 255, 137f / 255);
+    private static readonly Color selectedImgColor = new Color(1, 1, 1, 1);
+    private static readonly Color deselectedImgColor = new Color(1, 1, 1, 2f / 255);
+
 
     public int idx;
     public int id;
 
     private Button Enter_Btn;
+    private Image background;
 
     void ScrollCellIndex(int idx)
     {
@@ -31,15 +35,17 @@ public class SongItem : MonoBehaviour
         name = idx.ToString();
         songName.text = mHeader.title;
         songArtist.text = mHeader.artist;
-        songArtist.color = selectedColor;
+        songArtist.color = selectedTextColor;
         Enter_Btn = GetComponent<Button>();
+        background = GetComponent<Image>();
     }
 
     public void OnSelect()
     {
         RectTransform rt = transform as RectTransform;
         rt.sizeDelta = selectedSize;
-        songName.color = selectedColor;
+        songName.color = selectedTextColor;
+        background.color = selectedImgColor;
 
         var path = DataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid).Item1;
         SelectManager.instance.background.UpdateBackground(path);
@@ -54,7 +60,8 @@ public class SongItem : MonoBehaviour
     {
         RectTransform rt = transform as RectTransform;
         rt.sizeDelta = deselectedSize;
-        songName.color = deselectedColor;
+        songName.color = deselectedTextColor;
+        background.color = deselectedImgColor;
 
         Enter_Btn.onClick.RemoveAllListeners();
     }
