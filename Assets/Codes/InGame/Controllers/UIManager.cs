@@ -206,36 +206,42 @@ public class UIManager : MonoBehaviour
     {
         if (LiveSetting.offsetAdjustMode)
             restart = true;
-        gateCanvas.SetActive(true);
-        Image gateImg = GameObject.Find("GateImg").GetComponent<Image>();
-        switch (ResultsGetter.GetClearMark())
+
+        if (restart)
         {
-            case ClearMarks.AP:
-                gateImg.sprite = Resources.Load<Sprite>("UI/ClearMark_Long/AllPerfect");
-                resultVoice = AudioManager.Instance.PrecacheSE(APvoice.bytes);
-                resultVoice.PlayOneShot();
-                break;
-            case ClearMarks.FC:
-                gateImg.sprite = Resources.Load<Sprite>("UI/ClearMark_Long/FullCombo");
-                resultVoice = AudioManager.Instance.PrecacheSE(FCvoice.bytes);
-                resultVoice.PlayOneShot();
-                break;
-            case ClearMarks.CL:
-                gateImg.sprite = Resources.Load<Sprite>("UI/ClearMark_Long/Clear");
-                resultVoice = AudioManager.Instance.PrecacheSE(CLvoice.bytes);
-                resultVoice.PlayOneShot();
-                break;
-            case ClearMarks.F:
-                gateImg.sprite = Resources.Load<Sprite>("UI/ClearMark_Long/Fail");
-                resultVoice = AudioManager.Instance.PrecacheSE(Fvoice.bytes);
-                resultVoice.PlayOneShot();
-                break;
+            SceneManager.LoadSceneAsync("InGame");
         }
-        GameObject.Find("GateCanvas").GetComponent<Animator>().Play("GateClose");
-        yield return new WaitForSeconds(3);
-        if (restart) SceneManager.LoadSceneAsync("InGame");
-        else SceneManager.LoadSceneAsync("Result");
-        //SceneLoader.LoadScene("InGame", "Result", true);
+        else
+        {
+            gateCanvas.SetActive(true);
+            Image gateImg = GameObject.Find("GateImg").GetComponent<Image>();
+            switch (ResultsGetter.GetClearMark())
+            {
+                case ClearMarks.AP:
+                    gateImg.sprite = Resources.Load<Sprite>("UI/ClearMark_Long/AllPerfect");
+                    resultVoice = AudioManager.Instance.PrecacheSE(APvoice.bytes);
+                    resultVoice.PlayOneShot();
+                    break;
+                case ClearMarks.FC:
+                    gateImg.sprite = Resources.Load<Sprite>("UI/ClearMark_Long/FullCombo");
+                    resultVoice = AudioManager.Instance.PrecacheSE(FCvoice.bytes);
+                    resultVoice.PlayOneShot();
+                    break;
+                case ClearMarks.CL:
+                    gateImg.sprite = Resources.Load<Sprite>("UI/ClearMark_Long/Clear");
+                    resultVoice = AudioManager.Instance.PrecacheSE(CLvoice.bytes);
+                    resultVoice.PlayOneShot();
+                    break;
+                case ClearMarks.F:
+                    gateImg.sprite = Resources.Load<Sprite>("UI/ClearMark_Long/Fail");
+                    resultVoice = AudioManager.Instance.PrecacheSE(Fvoice.bytes);
+                    resultVoice.PlayOneShot();
+                    break;
+            }
+            GameObject.Find("GateCanvas").GetComponent<Animator>().Play("GateClose");
+            yield return new WaitForSeconds(3);
+            SceneManager.LoadSceneAsync("Result");
+        }
     }
 
     private void OnStopPlaying()
