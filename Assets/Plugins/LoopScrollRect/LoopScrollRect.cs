@@ -335,7 +335,7 @@ namespace UnityEngine.UI
             StartCoroutine(ScrollToCellCoroutine(index, speed));
         }
 
-        IEnumerator ScrollToCellCoroutine(int index, float speed)
+        public IEnumerator ScrollToCellCoroutine(int index, float speed)
         {
             bool needMoving = true;
             while(needMoving)
