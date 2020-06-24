@@ -161,9 +161,9 @@ class MultiMouseTouchProvider : InputManagerTouchProvider
         }
     }
 
-    public override KirakiraTouchState[] GetTouches()
+    public override KirakiraTouchState[][] GetTouches()
     {
-        var states = base.GetTouches().ToList();
+        var states = base.GetTouches()[0].ToList();
 
         UpdateMouseStatus();
 
@@ -217,6 +217,6 @@ class MultiMouseTouchProvider : InputManagerTouchProvider
             }
         }
 
-        return states.ToArray();
+        return new KirakiraTouchState[][] { states.ToArray() };
     }
 }
