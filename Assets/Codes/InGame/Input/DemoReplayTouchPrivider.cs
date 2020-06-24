@@ -16,9 +16,9 @@ namespace Assets.Codes.InGame.Input
 
         int currentIndex;
 
-        public DemoReplayTouchPrivider(string demoFile)
+        public DemoReplayTouchPrivider(DemoFile demoFile)
         {
-            this.demoFile = DemoFile.LoadFrom(demoFile);
+            this.demoFile = demoFile;
 
             currentIndex = 0;
         }

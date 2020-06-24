@@ -49,6 +49,62 @@ public class SelectManager : MonoBehaviour
         KVSystem.Instance.SaveConfig();
     });
 
+    static Kommand cmd_playdemo = new Kommand("demo_play", "Play a demo file", (args) =>
+    {
+        if(args.Length > 0)
+        {
+            if (SceneManager.GetActiveScene().name == "NewSelect")
+            {
+                var path = args[0];
+
+                if(!File.Exists(path))
+                {
+                    if(KiraFilesystem.Instance.Exists(path))
+                    {
+                        path = Path.Combine(DataLoader.DataDir, path);
+                    }
+                    else
+                    {
+                        Debug.Log("[Demo Player] File not exists");
+                        return;
+                    }
+                }
+
+                var file = DemoFile.LoadFrom(path);
+
+                var targetHeader = DataLoader.chartList.First(x => x.sid == file.sid);
+
+                if(targetHeader == null)
+                {
+                    Debug.Log("[Demo Player] Target chartset not installed.");
+                    return;
+                }
+
+                if(targetHeader.difficultyLevel[(int)file.difficulty] == -1)
+                {
+                    Debug.Log("[Demo Player] Target chart not installed.");
+                    return;
+                }
+
+                LiveSetting.currentChart = DataLoader.chartList.IndexOf(DataLoader.chartList.First(x => x.sid == file.sid));
+                LiveSetting.actualDifficulty = (int)file.difficulty;
+                LiveSetting.currentDifficulty = (int)file.difficulty;
+
+                LiveSetting.DemoFile = file;
+
+                SceneLoader.LoadScene("NewSelect", "InGame", true);
+            }
+            else
+            {
+                Debug.Log("[Demo Player] Must use in select page!");
+            }
+        }
+        else
+        {
+            Debug.Log("demo_play: Play a demo file<br />Usage: demo_play <demo file>");
+        }
+    });
+
     #region ChartEditor
     public void OpenMappingScene()
     {

@@ -314,7 +314,13 @@ public class TouchManager : MonoBehaviour
         KirakiraTouch.flickDistPixels = Mathf.Min(Screen.height / 20, NoteUtility.FLICK_JUDGE_DIST / 2.54f * KirakiraTouch.dpi);
 
         // Touch provider
-        if (mod_autoplay)
+        var demoFile = LiveSetting.DemoFile;
+
+        if (demoFile != null)
+        {
+            provider = new DemoReplayTouchPrivider(demoFile);
+        }
+        else if (mod_autoplay)
         {
             GameObject.Find("MouseCanvas").SetActive(false);
             provider = new AutoPlayTouchProvider();
@@ -333,11 +339,9 @@ public class TouchManager : MonoBehaviour
 #endif
         }
 
-        provider = new DemoReplayTouchPrivider("C:\\Users\\mnb_2\\AppData\\LocalLow\\Kirakira Games\\BanGround\\data\\195_Special_2020年6月24日_17-02-29.kirareplay");
-
         if (!(provider is DemoReplayTouchPrivider) && g_demoRecord)
         {
-            recorder = new DemoRecorder(LiveSetting.currentChart, (Difficulty)LiveSetting.currentDifficulty);
+            recorder = new DemoRecorder(LiveSetting.CurrentHeader.sid, (Difficulty)LiveSetting.currentDifficulty);
         }
     }
 
