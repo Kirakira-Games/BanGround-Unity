@@ -96,6 +96,22 @@ public static class LiveSetting
    public static Sorter sort = Sorter.SongName;
    */
 
+    private static DemoFile _demoFile = null;
+
+    public static DemoFile DemoFile 
+    {
+        get
+        {
+            var demo = _demoFile;
+            _demoFile = null;
+            return demo;
+        }
+        set
+        {
+            _demoFile = value;
+        }
+    }
+
     static KVar fs_assetpath = new KVar("fs_assetpath", "V2Assets", KVarFlags.Hidden | KVarFlags.StringOnly);
     static KVar fs_iconpath = new KVar("fs_iconpath", "UI/ClearMark/", KVarFlags.Hidden | KVarFlags.StringOnly);
 
