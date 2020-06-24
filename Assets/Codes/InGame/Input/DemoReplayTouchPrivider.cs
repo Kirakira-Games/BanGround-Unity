@@ -12,7 +12,7 @@ namespace Assets.Codes.InGame.Input
 {
     class DemoReplayTouchPrivider : KirakiraTouchProvider
     {
-        List<KeyValuePair<float, KirakiraTouchState[]>> demoContent = new List<KeyValuePair<float, KirakiraTouchState[]>>();
+        private List<KirakiraTouchState> events = new List<KirakiraTouchState>();
 
         int currentIndex;
 
@@ -22,9 +22,26 @@ namespace Assets.Codes.InGame.Input
             {
                 var savedData = JsonConvert.DeserializeObject<DemoFile>(sr.ReadToEnd());
 
-                foreach(var (time, touches) in savedData.demoContent)
-                    demoContent.Add(new KeyValuePair<float, KirakiraTouchState[]>(time, KirakiraSerializableTouchState.To(touches)));
+                foreach (var touch in savedData.events)
+                    events.Add(touch);
             }
+
+            events.Sort((a, b) =>
+            {
+                if (a.time > b.time)
+                    return 1;
+
+                if (a.time < b.time)
+                    return -1;
+
+                if ((int)a.phase > (int)a.phase)
+                    return -1;
+
+                if ((int)a.phase < (int)a.phase)
+                    return 1;
+
+                return 0;
+            });
 
             currentIndex = 0;
         }
@@ -32,18 +49,25 @@ namespace Assets.Codes.InGame.Input
         public KirakiraTouchState[] GetTouches()
         {
             var states = new List<KirakiraTouchState>();
-            while(currentIndex < demoContent.Count && demoContent[currentIndex].Key <= NoteController.audioTime)
+            while (currentIndex < events.Count && events[currentIndex].time < NoteController.audioTime)
             {
-                var cur = demoContent[currentIndex].Value;
+                var state = events[currentIndex];
+                state.realtime = Time.realtimeSinceStartup;
+                state.screenPos = NoteController.mainCamera.WorldToScreenPoint(state.pos);
 
-                foreach (var state in cur)
+                bool f = true;
+
+                foreach(var s in states)
                 {
-                    state.time = NoteController.audioTime;
-                    state.realtime = Time.realtimeSinceStartup;
-                    state.screenPos = NoteController.mainCamera.WorldToScreenPoint(state.pos);
+                    if(s.touchId == state.touchId && (s.pos - state.pos).sqrMagnitude < 0.01)
+                    {
+                        f = false;
+                        break;
+                    }
                 }
 
-                states.AddRange(cur);
+                if(f)
+                    states.Add(state);
 
                 currentIndex++;
             }

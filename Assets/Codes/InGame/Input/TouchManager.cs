@@ -6,6 +6,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO.Compression;
 using Newtonsoft.Json;
+using System.Linq;
 
 public interface KirakiraTouchProvider
 {
@@ -45,6 +46,11 @@ public enum KirakiraTouchPhase
 public class KirakiraSerializableTouchState
 {
     /// <summary>
+    /// Time of receiving this touch. (Judge time)
+    /// </summary>
+    public int time;
+
+    /// <summary>
     /// Unique ID of this touch.
     /// </summary>
     public int touchId;
@@ -63,6 +69,7 @@ public class KirakiraSerializableTouchState
     {
         return new KirakiraSerializableTouchState
         {
+            time = state.time,
             phase = state.phase,
             pos = new float[2] { state.pos.x, state.pos.y },
             touchId = state.touchId
@@ -73,30 +80,11 @@ public class KirakiraSerializableTouchState
     {
         return new KirakiraTouchState
         {
+            time = state.time,
             phase = state.phase,
             pos = new Vector2(state.pos[0], state.pos[1]),
             touchId = state.touchId
         };
-    }
-
-    public static KirakiraSerializableTouchState[] From(KirakiraTouchState[] kirakiraTouchStates)
-    {
-        var states = new KirakiraSerializableTouchState[kirakiraTouchStates.Length];
-
-        for (int i = 0; i < kirakiraTouchStates.Length; i++)
-            states[i] = kirakiraTouchStates[i];
-
-        return states;
-    }
-
-    public static KirakiraTouchState[] To(KirakiraSerializableTouchState[] kirakiraTouchStates)
-    {
-        var states = new KirakiraTouchState[kirakiraTouchStates.Length];
-
-        for (int i = 0; i < kirakiraTouchStates.Length; i++)
-            states[i] = kirakiraTouchStates[i];
-
-        return states;
     }
 }
 
@@ -267,34 +255,35 @@ public class DemoFile
 {
     public int sid;
     public Difficulty difficulty;
-    public List<KeyValuePair<float, KirakiraSerializableTouchState[]>> demoContent = new List<KeyValuePair<float, KirakiraSerializableTouchState[]>>();
+    public List<KirakiraTouchState> events = new List<KirakiraTouchState>();
 
-    public void Add(float time, KirakiraTouchState[] kirakiraTouchStates) => demoContent.Add(new KeyValuePair<float, KirakiraSerializableTouchState[]>(time, KirakiraSerializableTouchState.From(kirakiraTouchStates)));
+    public void Add(KirakiraSerializableTouchState kirakiraTouchState) => events.Add(kirakiraTouchState);
 }
 
 public class DemoRecorder
 {
     string demoName;
-    List<KeyValuePair<float, KirakiraTouchState[]>> demoContent = new List<KeyValuePair<float, KirakiraTouchState[]>>();
+    DemoFile demoFile;
 
     public DemoRecorder(int chartId, Difficulty diff)
     {
-        demoName = $"{chartId}_{diff:g}_{DateTime.Now.ToLongDateString()}_{DateTime.Now.ToLongTimeString()}.kirareplay".Replace(":", "-").Replace("/","-").Replace("\\", "-");
-    }
-
-    public void Add(float time, KirakiraTouchState[] kirakiraTouchStates) => demoContent.Add(new KeyValuePair<float, KirakiraTouchState[]>(time, kirakiraTouchStates));
-
-    public void Save()
-    {
-        var demoFile = new DemoFile
+        demoFile = new DemoFile
         {
             sid = LiveSetting.CurrentHeader.sid,
             difficulty = (Difficulty)LiveSetting.currentDifficulty
         };
 
-        foreach (var (time, touch) in demoContent)
-            demoFile.Add(time, touch);
-        
+        demoName = $"{chartId}_{diff:g}_{DateTime.Now.ToLongDateString()}_{DateTime.Now.ToLongTimeString()}.kirareplay".Replace(":", "-").Replace("/","-").Replace("\\", "-");
+    }
+
+    public void Add(KirakiraTouchState[] kirakiraTouchStates)
+    {
+        foreach (var touch in kirakiraTouchStates)
+            demoFile.Add(touch);
+    }
+
+    public void Save()
+    {
         var path = Path.Combine(DataLoader.DataDir, demoName);
         using (var sw = new StreamWriter(new DeflateStream(File.OpenWrite(path), System.IO.Compression.CompressionLevel.Optimal)))
         {
@@ -435,7 +424,7 @@ public class TouchManager : MonoBehaviour
 #endif
         }
 
-//        provider = new DemoReplayTouchPrivider("C:\\Users\\mnb_2\\AppData\\LocalLow\\Kirakira Games\\BanGround\\data\\195_Special_2020年6月24日_14-04-30.kirareplay");
+        provider = new DemoReplayTouchPrivider("C:\\Users\\mnb_2\\AppData\\LocalLow\\Kirakira Games\\BanGround\\data\\195_Special_2020年6月24日_15-05-32.kirareplay");
 
         if (!(provider is DemoReplayTouchPrivider) && g_demoRecord)
         {
@@ -478,7 +467,10 @@ public class TouchManager : MonoBehaviour
 
     void OnDestroy()
     {
-        recorder.Save();
+        if (recorder != null)
+        {
+            recorder.Save();
+        }
     }
 
     public void OnUpdate()
@@ -491,7 +483,7 @@ public class TouchManager : MonoBehaviour
         {
             if(touches.Length > 0)
             {
-                recorder.Add(NoteController.audioTime, touches);
+                recorder.Add(touches);
             }
         }
 
