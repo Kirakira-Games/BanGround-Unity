@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if InputSystem
+using UnityEngine;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 using TouchPhase = UnityEngine.InputSystem.TouchPhase;
 
@@ -23,7 +24,7 @@ public class InputSystemTouchProvider : KirakiraTouchProvider
 
     static KVarRef o_judge = new KVarRef("o_judge");
 
-    public KirakiraTouchState[] GetTouches()
+    public KirakiraTouchState[][] GetTouches()
     {
         var touches = Touch.activeTouches;
         KirakiraTouchState[] ret = new KirakiraTouchState[touches.Count];
@@ -43,6 +44,7 @@ public class InputSystemTouchProvider : KirakiraTouchProvider
                 phase = Kirakira(touch.phase)
             };
         }
-        return ret;
+        return new KirakiraTouchState[][] { ret };
     }
 }
+#endif

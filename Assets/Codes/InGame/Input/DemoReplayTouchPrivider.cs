@@ -12,67 +12,34 @@ namespace Assets.Codes.InGame.Input
 {
     class DemoReplayTouchPrivider : KirakiraTouchProvider
     {
-        private List<KirakiraTouchState> events = new List<KirakiraTouchState>();
+        private DemoFile demoFile;
 
         int currentIndex;
 
         public DemoReplayTouchPrivider(string demoFile)
         {
-            using(var sr = new StreamReader(new DeflateStream(File.OpenRead(demoFile), CompressionMode.Decompress)))
-            {
-                var savedData = JsonConvert.DeserializeObject<DemoFile>(sr.ReadToEnd());
-
-                foreach (var touch in savedData.events)
-                    events.Add(touch);
-            }
-
-            events.Sort((a, b) =>
-            {
-                if (a.time > b.time)
-                    return 1;
-
-                if (a.time < b.time)
-                    return -1;
-
-                if ((int)a.phase > (int)a.phase)
-                    return -1;
-
-                if ((int)a.phase < (int)a.phase)
-                    return 1;
-
-                return 0;
-            });
+            this.demoFile = DemoFile.LoadFrom(demoFile);
 
             currentIndex = 0;
         }
 
-        public KirakiraTouchState[] GetTouches()
+        public KirakiraTouchState[][] GetTouches()
         {
-            var states = new List<KirakiraTouchState>();
-            while (currentIndex < events.Count && events[currentIndex].time < NoteController.audioTime)
+            var frames = new List<KirakiraTouchState[]>();
+            while (currentIndex < demoFile.frames.Count && demoFile.frames[currentIndex].audioTime <= NoteController.audioTime)
             {
-                var state = events[currentIndex];
-                state.realtime = Time.realtimeSinceStartup;
-                state.screenPos = NoteController.mainCamera.WorldToScreenPoint(state.pos);
-
-                bool f = true;
-
-                foreach(var s in states)
+                for(int i = 0; i < demoFile.frames[currentIndex].events.Length; i ++)
                 {
-                    if(s.touchId == state.touchId && (s.pos - state.pos).sqrMagnitude < 0.01)
-                    {
-                        f = false;
-                        break;
-                    }
+                    demoFile.frames[currentIndex].events[i].screenPos = NoteController.mainCamera.WorldToScreenPoint(demoFile.frames[currentIndex].events[i].pos);
+                    demoFile.frames[currentIndex].events[i].realtime = Time.realtimeSinceStartup;
                 }
 
-                if(f)
-                    states.Add(state);
+                frames.Add(demoFile.frames[currentIndex].events);
 
                 currentIndex++;
             }
 
-            return states.ToArray();
+            return frames.ToArray();
         }
     }
 }

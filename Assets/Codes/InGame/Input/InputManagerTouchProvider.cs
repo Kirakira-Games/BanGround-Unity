@@ -19,7 +19,7 @@ public class InputManagerTouchProvider : KirakiraTouchProvider
         }
     }
 
-    public virtual KirakiraTouchState[] GetTouches()
+    public virtual KirakiraTouchState[][] GetTouches()
     {
         var touches = Input.touches;
         KirakiraTouchState[] ret = new KirakiraTouchState[touches.Length];
@@ -39,6 +39,6 @@ public class InputManagerTouchProvider : KirakiraTouchProvider
                 phase = Kirakira(touch.phase)
             };
         }
-        return ret;
+        return new KirakiraTouchState[][] { ret };
     }
 }

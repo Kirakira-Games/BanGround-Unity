@@ -10,7 +10,7 @@ using System.Linq;
 
 public interface KirakiraTouchProvider
 {
-    KirakiraTouchState[] GetTouches();
+    KirakiraTouchState[][] GetTouches();
 }
 
 public interface KirakiraTracer
@@ -36,58 +36,10 @@ public interface KirakiraTracer
     void Assign(KirakiraTouch touch);
 }
 
-[Serializable]
 public enum KirakiraTouchPhase
 {
     None, Began, Ongoing, Ended
 }
-
-[Serializable]
-public class KirakiraSerializableTouchState
-{
-    /// <summary>
-    /// Time of receiving this touch. (Judge time)
-    /// </summary>
-    public int time;
-
-    /// <summary>
-    /// Unique ID of this touch.
-    /// </summary>
-    public int touchId;
-
-    /// <summary>
-    /// Touch position on judge plane.
-    /// </summary>
-    public float[] pos;
-
-    /// <summary>
-    /// Phase of the touch.
-    /// </summary>
-    public KirakiraTouchPhase phase;
-
-    public static implicit operator KirakiraSerializableTouchState(KirakiraTouchState state)
-    {
-        return new KirakiraSerializableTouchState
-        {
-            time = state.time,
-            phase = state.phase,
-            pos = new float[2] { state.pos.x, state.pos.y },
-            touchId = state.touchId
-        };
-    }
-
-    public static implicit operator KirakiraTouchState(KirakiraSerializableTouchState state)
-    {
-        return new KirakiraTouchState
-        {
-            time = state.time,
-            phase = state.phase,
-            pos = new Vector2(state.pos[0], state.pos[1]),
-            touchId = state.touchId
-        };
-    }
-}
-
 
 public class KirakiraTouchState
 {
@@ -251,49 +203,6 @@ public class KirakiraTouch
     }
 }
 
-public class DemoFile
-{
-    public int sid;
-    public Difficulty difficulty;
-    public List<KirakiraTouchState> events = new List<KirakiraTouchState>();
-
-    public void Add(KirakiraSerializableTouchState kirakiraTouchState) => events.Add(kirakiraTouchState);
-}
-
-public class DemoRecorder
-{
-    string demoName;
-    DemoFile demoFile;
-
-    public DemoRecorder(int chartId, Difficulty diff)
-    {
-        demoFile = new DemoFile
-        {
-            sid = LiveSetting.CurrentHeader.sid,
-            difficulty = (Difficulty)LiveSetting.currentDifficulty
-        };
-
-        demoName = $"{chartId}_{diff:g}_{DateTime.Now.ToLongDateString()}_{DateTime.Now.ToLongTimeString()}.kirareplay".Replace(":", "-").Replace("/","-").Replace("\\", "-");
-    }
-
-    public void Add(KirakiraTouchState[] kirakiraTouchStates)
-    {
-        foreach (var touch in kirakiraTouchStates)
-            demoFile.Add(touch);
-    }
-
-    public void Save()
-    {
-        var path = Path.Combine(DataLoader.DataDir, demoName);
-        using (var sw = new StreamWriter(new DeflateStream(File.OpenWrite(path), System.IO.Compression.CompressionLevel.Optimal)))
-        {
-            sw.Write(JsonConvert.SerializeObject(demoFile));
-        }
-
-        Debug.Log($"[DemoRecorder] Recorded demo to {path}");
-    }
-}
-
 public class TouchManager : MonoBehaviour
 {
     public static TouchManager instance;
@@ -424,7 +333,7 @@ public class TouchManager : MonoBehaviour
 #endif
         }
 
-        provider = new DemoReplayTouchPrivider("C:\\Users\\mnb_2\\AppData\\LocalLow\\Kirakira Games\\BanGround\\data\\195_Special_2020年6月24日_15-05-32.kirareplay");
+        provider = new DemoReplayTouchPrivider("C:\\Users\\mnb_2\\AppData\\LocalLow\\Kirakira Games\\BanGround\\data\\195_Special_2020年6月24日_17-02-29.kirareplay");
 
         if (!(provider is DemoReplayTouchPrivider) && g_demoRecord)
         {
@@ -477,126 +386,129 @@ public class TouchManager : MonoBehaviour
     {
         if (UIManager.instance.isFinished) return;
 
-        var touches = provider.GetTouches();
+        var touchFrames = provider.GetTouches();
 
-        if(recorder != null)
+        foreach (var touches in touchFrames)
         {
-            if(touches.Length > 0)
+            if (recorder != null)
             {
-                recorder.Add(touches);
+                if (touches.Length > 0)
+                {
+                    recorder.Add(touches);
+                }
             }
-        }
 
-        // Update touches that just starts
-        //if (touches.Length > 0)
-        //{
-        //    Debug.Log("===== Time: " + NoteController.audioTime);
-        //}
-        foreach (var touch1 in touches)
-        {
-            //Debug.Log(touch1);
-            GetTouchById(touch1.touchId).OnUpdate(touch1);
-        }
-
-        // Compute exchangable touches
-        foreach (var touch1 in touches)
-        {
-            var tracer1 = GetTouchById(touch1.touchId);
-            Debug.Assert(tracer1.isValid);
-            var owner1 = tracer1.owner;
-            // If exchangable, the touch must lie in both judge areas.
-            if (owner1 == null || !TouchesNote(touch1, owner1.GetPosition()))
+            // Update touches that just starts
+            //if (touches.Length > 0)
+            //{
+            //    Debug.Log("===== Time: " + NoteController.audioTime);
+            //}
+            foreach (var touch1 in touches)
             {
-                continue;
+                //Debug.Log(touch1);
+                GetTouchById(touch1.touchId).OnUpdate(touch1);
             }
-            foreach (var entry in touchTable)
+
+            // Compute exchangable touches
+            foreach (var touch1 in touches)
             {
-                if (!entry.Value.isValid)
+                var tracer1 = GetTouchById(touch1.touchId);
+                Debug.Assert(tracer1.isValid);
+                var owner1 = tracer1.owner;
+                // If exchangable, the touch must lie in both judge areas.
+                if (owner1 == null || !TouchesNote(touch1, owner1.GetPosition()))
                 {
                     continue;
                 }
-                var tracer2 = entry.Value;
-                var owner2 = tracer2.owner;
-                if (owner2 == null || !TouchesNote(touch1, owner2.GetPosition()))
-                {
-                    continue;
-                }
-                tracer2.exchangable.Add(touch1.touchId);
-            }
-        }
-
-        // Try exchanging touches
-        traceCache.Clear();
-        exchanged.Clear();
-        bool hasExchanged;
-        do
-        {
-            hasExchanged = false;
-            if (!hasExchanged) break; // Don't exchange
-            foreach (var entry in touchTable)
-            {
-                var tracer = entry.Value;
-                var owner = tracer.owner;
-                if (!tracer.isValid || owner == null)
-                {
-                    continue;
-                }
-                foreach (var i in tracer.exchangable)
-                {
-                    var tracer2 = GetTouchById(i);
-                    Debug.Assert(tracer2.isValid);
-                    var owner2 = tracer2.owner;
-                    int prevVal = EvalResult(TryTrace(owner, tracer)) +
-                        (owner2 == null ? 0 : EvalResult(TryTrace(owner2, tracer2)));
-                    int exchangeVal = EvalResult(TryTrace(owner, tracer2)) +
-                        (owner2 == null ? 0 : EvalResult(TryTrace(owner2, tracer)));
-                    if (exchangeVal > prevVal)
-                    {
-                        hasExchanged = true;
-                        Debug.Log("Exchange: " + tracer.touchId + " / " + tracer2.touchId);
-                        ExchangeTouch(tracer, tracer2);
-                        break;
-                    }
-                }
-            }
-        } while (hasExchanged);
-        foreach (var e in exchanged)
-        {
-            e.exchangable.Clear();
-        }
-
-        // Actually trace touches
-        foreach (var entry in touchTable)
-        {
-            if (!IsTracing(entry.Key))
-            {
-                continue;
-            }
-            var tracer = entry.Value;
-            tracer.owner.Trace(tracer, TryTrace(tracer.owner, tracer));
-        }
-
-        // Process other touches
-        foreach (var touch in touches)
-        {
-            if (IsTracing(touch.touchId))
-            {
-                continue;
-            }
-            NoteController.instance.UpdateTouch(GetTouchById(touch.touchId));
-        }
-
-        // Remove ended touches
-        foreach (var touch1 in touches)
-        {
-            var tracer = GetTouchById(touch1.touchId);
-            if (touch1.phase == KirakiraTouchPhase.Ended)
-            {
                 foreach (var entry in touchTable)
                 {
-                    entry.Value.exchangable.Remove(touch1.touchId);
+                    if (!entry.Value.isValid)
+                    {
+                        continue;
+                    }
+                    var tracer2 = entry.Value;
+                    var owner2 = tracer2.owner;
+                    if (owner2 == null || !TouchesNote(touch1, owner2.GetPosition()))
+                    {
+                        continue;
+                    }
+                    tracer2.exchangable.Add(touch1.touchId);
                 }
-                tracer.Reset();
+            }
+
+            // Try exchanging touches
+            traceCache.Clear();
+            exchanged.Clear();
+            bool hasExchanged;
+            do
+            {
+                hasExchanged = false;
+                if (!hasExchanged) break; // Don't exchange
+                foreach (var entry in touchTable)
+                {
+                    var tracer = entry.Value;
+                    var owner = tracer.owner;
+                    if (!tracer.isValid || owner == null)
+                    {
+                        continue;
+                    }
+                    foreach (var i in tracer.exchangable)
+                    {
+                        var tracer2 = GetTouchById(i);
+                        Debug.Assert(tracer2.isValid);
+                        var owner2 = tracer2.owner;
+                        int prevVal = EvalResult(TryTrace(owner, tracer)) +
+                            (owner2 == null ? 0 : EvalResult(TryTrace(owner2, tracer2)));
+                        int exchangeVal = EvalResult(TryTrace(owner, tracer2)) +
+                            (owner2 == null ? 0 : EvalResult(TryTrace(owner2, tracer)));
+                        if (exchangeVal > prevVal)
+                        {
+                            hasExchanged = true;
+                            Debug.Log("Exchange: " + tracer.touchId + " / " + tracer2.touchId);
+                            ExchangeTouch(tracer, tracer2);
+                            break;
+                        }
+                    }
+                }
+            } while (hasExchanged);
+            foreach (var e in exchanged)
+            {
+                e.exchangable.Clear();
+            }
+
+            // Actually trace touches
+            foreach (var entry in touchTable)
+            {
+                if (!IsTracing(entry.Key))
+                {
+                    continue;
+                }
+                var tracer = entry.Value;
+                tracer.owner.Trace(tracer, TryTrace(tracer.owner, tracer));
+            }
+
+            // Process other touches
+            foreach (var touch in touches)
+            {
+                if (IsTracing(touch.touchId))
+                {
+                    continue;
+                }
+                NoteController.instance.UpdateTouch(GetTouchById(touch.touchId));
+            }
+
+            // Remove ended touches
+            foreach (var touch1 in touches)
+            {
+                var tracer = GetTouchById(touch1.touchId);
+                if (touch1.phase == KirakiraTouchPhase.Ended)
+                {
+                    foreach (var entry in touchTable)
+                    {
+                        entry.Value.exchangable.Remove(touch1.touchId);
+                    }
+                    tracer.Reset();
+                }
             }
         }
     }

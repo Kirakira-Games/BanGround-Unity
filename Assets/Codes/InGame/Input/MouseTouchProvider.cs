@@ -21,20 +21,27 @@ public class MouseTouchProvider : KirakiraTouchProvider
         return new KirakiraTouchState[] { touch };
     }
 
-    public KirakiraTouchState[] GetTouches()
+    public KirakiraTouchState[][] GetTouches()
     {
+        KirakiraTouchState[] ret = null;
+
         if (Input.GetMouseButtonDown(0))
         {
-            return SimulateMouseTouch(KirakiraTouchPhase.Began);
+            ret = SimulateMouseTouch(KirakiraTouchPhase.Began);
         }
         if (Input.GetMouseButton(0))
         {
-            return SimulateMouseTouch(KirakiraTouchPhase.Ongoing);
+            ret = SimulateMouseTouch(KirakiraTouchPhase.Ongoing);
         }
         if (Input.GetMouseButtonUp(0))
         {
-            return SimulateMouseTouch(KirakiraTouchPhase.Ended);
+            ret = SimulateMouseTouch(KirakiraTouchPhase.Ended);
         }
-        return new KirakiraTouchState[0];
+        else
+        {
+            ret = new KirakiraTouchState[0];
+        }
+
+        return new KirakiraTouchState[][] { ret };
     }
 }

@@ -164,7 +164,7 @@ public class AutoPlayTouchProvider : KirakiraTouchProvider
 #endif
     }
 
-    public KirakiraTouchState[] GetTouches()
+    public KirakiraTouchState[][] GetTouches()
     {
         existsId.Clear();
         var ret = new List<KirakiraTouchState>();
@@ -253,6 +253,6 @@ public class AutoPlayTouchProvider : KirakiraTouchProvider
             e.realtime = Time.realtimeSinceStartup;
         }
 
-        return ret.ToArray();
+        return new KirakiraTouchState[][] { ret.ToArray() };
     }
 }
