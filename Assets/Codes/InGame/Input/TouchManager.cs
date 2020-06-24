@@ -1,6 +1,11 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections.Generic;
+using Assets.Codes.InGame.Input;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO.Compression;
+using Newtonsoft.Json;
 
 public interface KirakiraTouchProvider
 {
@@ -30,10 +35,71 @@ public interface KirakiraTracer
     void Assign(KirakiraTouch touch);
 }
 
+[Serializable]
 public enum KirakiraTouchPhase
 {
     None, Began, Ongoing, Ended
 }
+
+[Serializable]
+public class KirakiraSerializableTouchState
+{
+    /// <summary>
+    /// Unique ID of this touch.
+    /// </summary>
+    public int touchId;
+
+    /// <summary>
+    /// Touch position on judge plane.
+    /// </summary>
+    public float[] pos;
+
+    /// <summary>
+    /// Phase of the touch.
+    /// </summary>
+    public KirakiraTouchPhase phase;
+
+    public static implicit operator KirakiraSerializableTouchState(KirakiraTouchState state)
+    {
+        return new KirakiraSerializableTouchState
+        {
+            phase = state.phase,
+            pos = new float[2] { state.pos.x, state.pos.y },
+            touchId = state.touchId
+        };
+    }
+
+    public static implicit operator KirakiraTouchState(KirakiraSerializableTouchState state)
+    {
+        return new KirakiraTouchState
+        {
+            phase = state.phase,
+            pos = new Vector2(state.pos[0], state.pos[1]),
+            touchId = state.touchId
+        };
+    }
+
+    public static KirakiraSerializableTouchState[] From(KirakiraTouchState[] kirakiraTouchStates)
+    {
+        var states = new KirakiraSerializableTouchState[kirakiraTouchStates.Length];
+
+        for (int i = 0; i < kirakiraTouchStates.Length; i++)
+            states[i] = kirakiraTouchStates[i];
+
+        return states;
+    }
+
+    public static KirakiraTouchState[] To(KirakiraSerializableTouchState[] kirakiraTouchStates)
+    {
+        var states = new KirakiraTouchState[kirakiraTouchStates.Length];
+
+        for (int i = 0; i < kirakiraTouchStates.Length; i++)
+            states[i] = kirakiraTouchStates[i];
+
+        return states;
+    }
+}
+
 
 public class KirakiraTouchState
 {
@@ -197,6 +263,48 @@ public class KirakiraTouch
     }
 }
 
+public class DemoFile
+{
+    public int sid;
+    public Difficulty difficulty;
+    public List<KeyValuePair<float, KirakiraSerializableTouchState[]>> demoContent = new List<KeyValuePair<float, KirakiraSerializableTouchState[]>>();
+
+    public void Add(float time, KirakiraTouchState[] kirakiraTouchStates) => demoContent.Add(new KeyValuePair<float, KirakiraSerializableTouchState[]>(time, KirakiraSerializableTouchState.From(kirakiraTouchStates)));
+}
+
+public class DemoRecorder
+{
+    string demoName;
+    List<KeyValuePair<float, KirakiraTouchState[]>> demoContent = new List<KeyValuePair<float, KirakiraTouchState[]>>();
+
+    public DemoRecorder(int chartId, Difficulty diff)
+    {
+        demoName = $"{chartId}_{diff:g}_{DateTime.Now.ToLongDateString()}_{DateTime.Now.ToLongTimeString()}.kirareplay".Replace(":", "-").Replace("/","-").Replace("\\", "-");
+    }
+
+    public void Add(float time, KirakiraTouchState[] kirakiraTouchStates) => demoContent.Add(new KeyValuePair<float, KirakiraTouchState[]>(time, kirakiraTouchStates));
+
+    public void Save()
+    {
+        var demoFile = new DemoFile
+        {
+            sid = LiveSetting.CurrentHeader.sid,
+            difficulty = (Difficulty)LiveSetting.currentDifficulty
+        };
+
+        foreach (var (time, touch) in demoContent)
+            demoFile.Add(time, touch);
+        
+        var path = Path.Combine(DataLoader.DataDir, demoName);
+        using (var sw = new StreamWriter(new DeflateStream(File.OpenWrite(path), System.IO.Compression.CompressionLevel.Optimal)))
+        {
+            sw.Write(JsonConvert.SerializeObject(demoFile));
+        }
+
+        Debug.Log($"[DemoRecorder] Recorded demo to {path}");
+    }
+}
+
 public class TouchManager : MonoBehaviour
 {
     public static TouchManager instance;
@@ -205,6 +313,10 @@ public class TouchManager : MonoBehaviour
     private Dictionary<int, KirakiraTouch> touchTable;
     private Dictionary<(KirakiraTracer, int), JudgeResult> traceCache;
     private HashSet<KirakiraTouch> exchanged;
+    private DemoRecorder recorder = null;
+
+
+    public static KVar g_demoRecord = new KVar("g_demoRecord", "1", KVarFlags.Archive, "Enables demo recording.");
 
     public static int EvalResult(JudgeResult result)
     {
@@ -313,7 +425,7 @@ public class TouchManager : MonoBehaviour
         {
             /*#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
                         provider = new MultiMouseTouchProvider();
-            #el*/
+            #else*/
 #if UNITY_EDITOR
             GameObject.Find("MouseCanvas").SetActive(false);
             provider = new MouseTouchProvider();
@@ -321,6 +433,13 @@ public class TouchManager : MonoBehaviour
             GameObject.Find("MouseCanvas").SetActive(false);
             provider = new InputManagerTouchProvider();
 #endif
+        }
+
+//        provider = new DemoReplayTouchPrivider("C:\\Users\\mnb_2\\AppData\\LocalLow\\Kirakira Games\\BanGround\\data\\195_Special_2020年6月24日_14-04-30.kirareplay");
+
+        if (!(provider is DemoReplayTouchPrivider) && g_demoRecord)
+        {
+            recorder = new DemoRecorder(LiveSetting.currentChart, (Difficulty)LiveSetting.currentDifficulty);
         }
     }
 
@@ -357,11 +476,24 @@ public class TouchManager : MonoBehaviour
         touch2.owner?.Assign(touch2);
     }
 
+    void OnDestroy()
+    {
+        recorder.Save();
+    }
+
     public void OnUpdate()
     {
         if (UIManager.instance.isFinished) return;
 
         var touches = provider.GetTouches();
+
+        if(recorder != null)
+        {
+            if(touches.Length > 0)
+            {
+                recorder.Add(NoteController.audioTime, touches);
+            }
+        }
 
         // Update touches that just starts
         //if (touches.Length > 0)
