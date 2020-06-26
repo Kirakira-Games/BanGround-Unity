@@ -93,41 +93,62 @@ public class WebConsole : MonoBehaviour
             if (path == "/")
                 path = "/index.html";
 
+            byte[] content;
+
             if (path == "/log")
             {
-                using (var sw = new StreamWriter(ctx.Response.OutputStream))
-                {
-                    sw.Write(fullLog.ToString());
-                }
+                content = Encoding.UTF8.GetBytes(fullLog.ToString());
             }
             if (path == "/airdrop")
             {
-                using (var sw = new StreamWriter(ctx.Response.OutputStream))
+                content = Encoding.UTF8.GetBytes("Hey I mean this is a PUT interface");
+            }
+            if (path == "/commands")
+            {
+                ctx.Response.ContentType = "application/json";
+
+                var json = new StringBuilder();
+                bool first = true;
+
+                json.Append("[");
+
+                foreach (var item in KVSystem.Instance)
                 {
-                    sw.WriteLine("Hey I mean this is a PUT interface");
+                    if (!first)
+                    {
+                        json.Append(",");
+                    }
+                    else
+                    {
+                        first = false;
+                    }
+
+                    json.Append($"{{\"value\":\"{item.Name}\",\"type\":\"{(item is KVar ? "KVar" : "Kommand")}\",\"help\":\"{item.Description}\"}}");
                 }
+
+                json.Append("]");
+
+                content = Encoding.UTF8.GetBytes(json.ToString());
             }
             else
             {
                 if (resourceList.ContainsKey(path))
                 {
-                    var content = resourceList[path];
-                    ctx.Response.ContentLength64 = content.Length;
-
-                    using (var bw = new BinaryWriter(ctx.Response.OutputStream))
-                    {
-                        bw.Write(content);
-                    }
+                    content = resourceList[path];
                 }
                 else
                 {
                     ctx.Response.StatusCode = 404;
 
-                    using (var sw = new StreamWriter(ctx.Response.OutputStream))
-                    {
-                        sw.WriteLine("404");
-                    }
+                    content = Encoding.UTF8.GetBytes("404");
                 }
+            }
+
+            ctx.Response.ContentLength64 = content.Length;
+
+            using (var bw = new BinaryWriter(ctx.Response.OutputStream))
+            {
+                bw.Write(content);
             }
         };
 
@@ -178,9 +199,12 @@ public class WebConsole : MonoBehaviour
     {
         DontDestroyOnLoad(gameObject);
 
-        resourceList.Add("/index.html", Resources.Load<TextAsset>("WebConsole/index").bytes);
-        resourceList.Add("/favicon.ico", Resources.Load<TextAsset>("WebConsole/favicon.ico").bytes);
-        resourceList.Add("/styles/main.css", Resources.Load<TextAsset>("WebConsole/styles/main.css").bytes);
+        var resources = WebConsoleResource.GetEnumerator();
+
+        while(resources.MoveNext())
+        {
+            resourceList.Add(resources.Current.Key, Resources.Load<TextAsset>(resources.Current.Value).bytes);
+        }
 
         new Thread(StartHttp).Start();
     }
