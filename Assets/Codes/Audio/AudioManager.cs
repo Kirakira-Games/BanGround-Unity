@@ -20,15 +20,15 @@ public class AudioManager : MonoBehaviour
 
     public ISoundTrack gameBGM { get; set; }
 
-    static KVar snd_bgm_volume = new KVar("snd_bgm_volume", "0.7", KVarFlags.Archive);
-    static KVar snd_se_volume = new KVar("snd_se_volume", "0.7", KVarFlags.Archive);
-    static KVar snd_igse_volume = new KVar("snd_igse_volume", "0.7", KVarFlags.Archive);
+    static KVar snd_bgm_volume = new KVar("snd_bgm_volume", "0.7", KVarFlags.Archive, "BGM volume");
+    static KVar snd_se_volume = new KVar("snd_se_volume", "0.7", KVarFlags.Archive, "Sound effect volume");
+    static KVar snd_igse_volume = new KVar("snd_igse_volume", "0.7", KVarFlags.Archive, "In-game sound effect volume");
 
     private void Awake()
     {
-        KVar snd_engine = new KVar("snd_engine", "Fmod", KVarFlags.Archive | KVarFlags.StringOnly);
-        KVar snd_buffer_bass = new KVar("snd_buffer_bass", "-1", KVarFlags.Archive);
-        KVar snd_buffer_fmod = new KVar("snd_buffer_fmod", "-1", KVarFlags.Archive);
+        KVar snd_engine = new KVar("snd_engine", "Fmod", KVarFlags.Archive | KVarFlags.StringOnly, "Sound engine type");
+        KVar snd_buffer_bass = new KVar("snd_buffer_bass", "-1", KVarFlags.Archive, "Buffer size of Bass Sound Engine");
+        KVar snd_buffer_fmod = new KVar("snd_buffer_fmod", "-1", KVarFlags.Archive, "Buffer size of Fmod Sound Engine");
         int bufferIndex;
         //string engine = PlayerPrefs.GetString("AudioEngine", "Fmod");
         if (snd_engine == "Bass") 

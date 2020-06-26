@@ -66,8 +66,8 @@ public class SettingAndMod : MonoBehaviour
     */
 
     // o for Offset
-    static KVar o_judge = new KVar("o_judge", "0", KVarFlags.Archive);
-    static KVar o_audio = new KVar("o_audio", "0", KVarFlags.Archive);
+    static KVar o_judge = new KVar("o_judge", "0", KVarFlags.Archive, "Judge offset");
+    static KVar o_audio = new KVar("o_audio", "0", KVarFlags.Archive, "Audio offset");
 
     // snd for Sound
     static KVarRef snd_bgm_volume = new KVarRef("snd_bgm_volume");
@@ -75,22 +75,22 @@ public class SettingAndMod : MonoBehaviour
     static KVarRef snd_igse_volume = new KVarRef("snd_igse_volume");
 
     // r for Render
-    static KVar r_notespeed = new KVar("r_notespeed", "10.0", KVarFlags.Archive);
-    static KVar r_notesize = new KVar("r_notesize", "1.0", KVarFlags.Archive);
+    static KVar r_notespeed = new KVar("r_notespeed", "10.0", KVarFlags.Archive, "Note speed for rendering");
+    static KVar r_notesize = new KVar("r_notesize", "1.0", KVarFlags.Archive, "Note size for rendering");
 
-    static KVar r_syncline = new KVar("r_syncline", "1", KVarFlags.Archive);
-    static KVar r_lanefx = new KVar("r_lanefx", "1", KVarFlags.Archive);
-    static KVar r_graynote = new KVar("r_graynote", "1", KVarFlags.Archive);
-    static KVar r_mirror = new KVar("r_mirror", "0", KVarFlags.Archive);
-    static KVar r_bang_perspect = new KVar("r_bang_perspect", "1", KVarFlags.Archive);
-    static KVar r_shake_flick = new KVar("r_shake_flick", "1", KVarFlags.Archive);
+    static KVar r_syncline = new KVar("r_syncline", "1", KVarFlags.Archive, "Show syncline");
+    static KVar r_lanefx = new KVar("r_lanefx", "1", KVarFlags.Archive, "Show lane effects while clicking on lanes");
+    static KVar r_graynote = new KVar("r_graynote", "1", KVarFlags.Archive, "Enables the \"Off-beat coloring\" aka grey notes");
+    static KVar r_mirror = new KVar("r_mirror", "0", KVarFlags.Archive, "Mirror the chart");
+    static KVar r_bang_perspect = new KVar("r_bang_perspect", "1", KVarFlags.Archive, "Use BanG Dream style perspect instead of read 3d perspect");
+    static KVar r_shake_flick = new KVar("r_shake_flick", "1", KVarFlags.Archive, "Shake the screen while flicker note judged");
 
-    static KVar r_usevideo = new KVar("r_usevideo", "1", KVarFlags.Archive);
+    static KVar r_usevideo = new KVar("r_usevideo", "1", KVarFlags.Archive, "Use video for background (If present)");
 
-    static KVar r_farclip = new KVar("r_farclip", "196.0", KVarFlags.Archive);
-    static KVar r_brightness_bg = new KVar("r_brightness_bg", "0.7", KVarFlags.Archive);
-    static KVar r_brightness_lane = new KVar("r_brightness_lane", "0.84", KVarFlags.Archive);
-    static KVar r_brightness_long = new KVar("r_brightness_long", "0.8", KVarFlags.Archive);
+    static KVar r_farclip = new KVar("r_farclip", "196.0", KVarFlags.Archive, "Far clip of note camera (means length of lane)");
+    static KVar r_brightness_bg = new KVar("r_brightness_bg", "0.7", KVarFlags.Archive, "Background brightness");
+    static KVar r_brightness_lane = new KVar("r_brightness_lane", "0.84", KVarFlags.Archive, "Lane brightness");
+    static KVar r_brightness_long = new KVar("r_brightness_long", "0.8", KVarFlags.Archive, "Brightness of Longs or Slides");
 
     // cl for Client
     static KVar cl_showms = new KVar("cl_showms", "0", KVarFlags.Archive);

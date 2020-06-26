@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -246,7 +247,7 @@ public class KVarRef
     public static explicit operator Sorter(KVarRef kVar) => (Sorter)kVar.Get<int>();
 }
 
-public class KVSystem
+public class KVSystem : IEnumerable<KonCommandBase>
 {
     public static KVSystem Instance = new KVSystem();
 
@@ -497,5 +498,18 @@ public class KVSystem
                 return var;
 
         return null;
+    }
+
+    public IEnumerator<KonCommandBase> GetEnumerator()
+    {
+        foreach(var (name, cmd) in m_allCmds)
+        {
+            yield return cmd;
+        }
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
     }
 }
