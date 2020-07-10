@@ -1,22 +1,17 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 using AudioProvider;
-using System.Threading.Tasks;
 using UniRx.Async;
+
+using State = GameStateMachine.State;
 
 public class AudioManager : MonoBehaviour
 {
     public static AudioManager Instance { get; private set; }
 
     public static IAudioProvider Provider { get; private set; }
-
-    public bool isInGame = false;
-    public bool isLoading = false;
-    //public bool restart = false;
 
     public ISoundTrack gameBGM { get; set; }
 
@@ -84,9 +79,8 @@ public class AudioManager : MonoBehaviour
 
     public ISoundEffect PrecacheSE(byte[] data) => Provider.PrecacheSE(data, SEType.Common);
     public ISoundEffect PrecacheInGameSE(byte[] data) => Provider.PrecacheSE(data, SEType.InGame);
-    public async void DelayPlayInGameBGM(byte[] audio, float seconds)
+    public async UniTaskVoid DelayPlayInGameBGM(byte[] audio, float seconds)
     {
-        isLoading = true;
         gameBGM = Provider.StreamTrack(audio);
         gameBGM.Play();
         gameBGM.Pause();
@@ -106,10 +100,11 @@ public class AudioManager : MonoBehaviour
                 (mod as AudioMod).ApplyMod(gameBGM);
         }
 
+        if (UIManager.Instance.SM.Current != State.Loading)
+            await UniTask.WaitUntil(() => UIManager.Instance.SM.Current == State.Loading);
         InGameBackground.instance.playVideo();
         gameBGM.Play();
-        isInGame = true;
-        isLoading = false;
+        UIManager.Instance.SM.Transit(State.Loading, State.Playing);
 
         while (gameBGM.GetPlaybackTime() == 0)
         {

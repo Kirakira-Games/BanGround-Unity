@@ -221,7 +221,7 @@ public class NoteController : MonoBehaviour
         int[] lanes = GetLanesByTouchState(touch.current);
 
         NoteBase noteToJudge = null;
-        if (!UIManager.BitingTheDust)
+        if (UIManager.Instance.SM.Count == 1)
         {
             NoteBase ret;
             // Find note to judge - non-fuwafuwa
@@ -333,12 +333,12 @@ public class NoteController : MonoBehaviour
         };
 
         // Game BGM
-        AudioManager.Instance.DelayPlayInGameBGM(KiraFilesystem.Instance.Read(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), WARM_UP_SECOND);
+        _ = AudioManager.Instance.DelayPlayInGameBGM(KiraFilesystem.Instance.Read(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), WARM_UP_SECOND);
 
         // Background
         var background = GameObject.Find("InGameBackground").GetComponent<InGameBackground>();
         var (bg, bgtype) = DataLoader.GetBackgroundPath(sid, false);
-        if(bgtype == 1)
+        if (bgtype == 1)
         {
             var videoPath = KiraFilesystem.Instance.Extract(bg);
             background.SetBackground(videoPath, bgtype);
@@ -348,7 +348,7 @@ public class NoteController : MonoBehaviour
             background.SetBackground(bg, bgtype);
         }
 
-        
+
         //background = GameObject.Find("dokidokiBackground").GetComponent<FixBackground>();
         //background.UpdateBackground(DataLoader.GetBackgroundPath(sid));
 
@@ -379,11 +379,9 @@ public class NoteController : MonoBehaviour
                 {
                     if (result != JudgeResult.Perfect && result != JudgeResult.Great)
                     {
-                        shutdown = true;
-                        UIManager.instance.isFinished = true;
-                        AudioManager.Instance.isInGame = false;
+                        UIManager.Instance.SM.Transit(UIManager.Instance.SM.Current, GameStateMachine.State.Finished);
                         AudioManager.Instance.StopBGM();
-                        GameObject.Find("UIManager").GetComponent<UIManager>().OnAudioFinish(true);
+                        UIManager.Instance.OnAudioFinish(true);
                     }
                 });
 
@@ -392,9 +390,7 @@ public class NoteController : MonoBehaviour
                 {
                     if (result != JudgeResult.Perfect)
                     {
-                        shutdown = true;
-                        UIManager.instance.isFinished = true;
-                        AudioManager.Instance.isInGame = false;
+                        UIManager.Instance.SM.Transit(UIManager.Instance.SM.Current, GameStateMachine.State.Finished);
                         AudioManager.Instance.StopBGM();
                         GameObject.Find("UIManager").GetComponent<UIManager>().OnAudioFinish(true);
                     }
@@ -402,14 +398,12 @@ public class NoteController : MonoBehaviour
         }
     }
 
-    bool shutdown = false;
-
     static KVarRef o_judge = new KVarRef("o_judge");
     static KVarRef o_audio = new KVarRef("o_audio");
 
     void Update()
     {
-        if (SceneLoader.Loading || shutdown || Time.timeScale == 0) return;
+        if (SceneLoader.Loading || UIManager.Instance.SM.Base == GameStateMachine.State.Finished || Time.timeScale == 0) return;
 
         audioTime = AudioTimelineSync.instance.GetTimeInMs() + AudioTimelineSync.RealTimeToBGMTime(o_audio);
         judgeTime = audioTime - o_judge;

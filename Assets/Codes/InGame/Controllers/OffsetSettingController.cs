@@ -61,6 +61,6 @@ public class OffsetSettingController : MonoBehaviour
     public void SaveAndExit()
     {
         LiveSetting.offsetAdjustMode = false;
-        UIManager.instance.GameRetire();
+        UIManager.Instance.GameRetire();
     }
 }

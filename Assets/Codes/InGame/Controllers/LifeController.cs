@@ -61,7 +61,7 @@ public class LifeController : MonoBehaviour
     {
         while (true)//不知道会不会在场景结束被destroy
         {
-            if (AudioManager.Instance.isInGame && !UIManager.instance.isFinished)
+            if (UIManager.Instance.SM.Base == GameStateMachine.State.Playing)
                 lifePerSecond.Add(lifePoint / 100.0f);
             yield return new WaitForSeconds(0.2f);
         }
