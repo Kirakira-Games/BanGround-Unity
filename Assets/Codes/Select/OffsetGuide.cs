@@ -12,6 +12,12 @@ public class OffsetGuide : MonoBehaviour
 
     void StartOffsetGuide()
     {
+        if (!LiveSetting.LoadChart())
+        {
+            MessageBoxController.ShowMsg(LogLevel.ERROR, "This chart is outdated and unsupported.");
+            return;
+        }
+
         LiveSetting.offsetAdjustMode = true;
         SettingAndMod.instance.SetLiveSetting();
         KVSystem.Instance.SaveConfig();

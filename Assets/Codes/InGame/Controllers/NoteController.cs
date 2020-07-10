@@ -7,6 +7,7 @@ using UnityEngine.Profiling;
 using UnityEngine.Events;
 using AudioProvider;
 using JudgeQueue = PriorityQueue<int, NoteBase>;
+using UnityEngine.SceneManagement;
 
 public class NoteController : MonoBehaviour
 {
@@ -307,9 +308,7 @@ public class NoteController : MonoBehaviour
         noteQueue = new JudgeQueue();
 
         // Load chart
-        int sid = LiveSetting.CurrentHeader.sid;
-        Difficulty difficulty = (Difficulty)LiveSetting.actualDifficulty;
-        chart = ChartLoader.LoadChart(DataLoader.LoadChart(sid, difficulty));
+        chart = ChartLoader.LoadChart(LiveSetting.chart);
         NotePool.instance.Init(notes);
         noteHead = 0;
 
@@ -337,7 +336,7 @@ public class NoteController : MonoBehaviour
 
         // Background
         var background = GameObject.Find("InGameBackground").GetComponent<InGameBackground>();
-        var (bg, bgtype) = DataLoader.GetBackgroundPath(sid, false);
+        var (bg, bgtype) = DataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid, false);
         if (bgtype == 1)
         {
             var videoPath = KiraFilesystem.Instance.Extract(bg);
@@ -367,7 +366,7 @@ public class NoteController : MonoBehaviour
             GameObject.Find("settingsCanvas").GetComponent<Canvas>().enabled = false;
         }
 
-        chartScript = new ChartScript(sid, (Difficulty)LiveSetting.actualDifficulty);
+        chartScript = new ChartScript(LiveSetting.CurrentHeader.sid, (Difficulty)LiveSetting.actualDifficulty);
 
         //Set Play Mod Event
         //AudioManager.Instance.restart = false;
