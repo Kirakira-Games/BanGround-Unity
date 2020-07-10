@@ -1,4 +1,5 @@
 ﻿using AudioProvider;
+using BGEditor;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -91,6 +92,12 @@ public class SelectManager : MonoBehaviour
                 LiveSetting.currentDifficulty = (int)file.difficulty;
 
                 LiveSetting.DemoFile = file;
+
+                if (!LiveSetting.LoadChart())
+                {
+                    MessageBoxController.ShowMsg(LogLevel.ERROR, "This chart is outdated and unsupported.");
+                    return;
+                }
 
                 SceneLoader.LoadScene("NewSelect", "InGame", true);
             }
@@ -527,6 +534,11 @@ public class SelectManager : MonoBehaviour
 
     public void OnEnterPressed()
     {
+        if (!LiveSetting.LoadChart())
+        {
+            MessageBoxController.ShowMsg(LogLevel.ERROR, "This chart is outdated and unsupported.");
+            return;
+        }
         StartCoroutine(PreviewFadeOut());
         SettingAndMod.instance.SetLiveSetting();
 

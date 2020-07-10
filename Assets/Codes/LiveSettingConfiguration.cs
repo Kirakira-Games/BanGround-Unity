@@ -150,6 +150,7 @@ public static class LiveSetting
             }
         }
     }
+    public static Chart chart;
 
     public static readonly string settingsPath = Application.persistentDataPath + "/LiveSettings.json";
     public static readonly string scoresPath = Application.persistentDataPath + "/Scores.bin";
@@ -200,6 +201,17 @@ public static class LiveSetting
                 SpeedCompensationSum /= (mod as AudioMod).SpeedCompensation;
             }
         }
+    }
+
+    public static bool LoadChart()
+    {
+        chart = DataLoader.LoadChart(CurrentHeader.sid, (Difficulty)actualDifficulty);
+        if (!ChartVersion.Process(CurrentHeader, chart))
+        {
+            chart = null;
+            return false;
+        }
+        return true;
     }
 
     static KVarRef r_notespeed = new KVarRef("r_notespeed");

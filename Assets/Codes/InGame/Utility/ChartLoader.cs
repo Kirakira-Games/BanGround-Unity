@@ -110,15 +110,13 @@ public static class ChartLoader
         }
         List<GameNoteData> gameNotes = new List<GameNoteData>();
         var tickStackTable = new Dictionary<int, GameNoteData>();
-        bool isFuwafuwa = IsChartFuwafuwa(notes);
 
         // AnalyzeNotes
         foreach(Note note in notes)
         {
             NormalizeBeat(note.beat);
-            // April fool
         }
-        isFuwafuwa = IsChartFuwafuwa(notes);
+        bool isFuwafuwa = IsChartFuwafuwa(notes);
 
         ChartTiming timing = new ChartTiming();
         timing.AnalyzeNotes(notes, chart.offset);
