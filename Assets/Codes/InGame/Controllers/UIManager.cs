@@ -5,10 +5,15 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using AudioProvider;
 using System;
+using UniRx.Async;
+
+using State = GameStateMachine.State;
 
 public class UIManager : MonoBehaviour
 {
-    public static UIManager instance;
+    public static UIManager Instance;
+
+    private const float BiteTime = 2;
 
     SpriteRenderer bg_SR;
     MeshRenderer lan_MR;
@@ -27,15 +32,18 @@ public class UIManager : MonoBehaviour
     GameObject gateCanvas;
 
     private ISoundEffect resultVoice;
-    public bool isFinished;
+    public GameStateMachine SM { get; private set; }
 
     static KVarRef r_brightness_lane = new KVarRef("r_brightness_lane");
 
+    private void Awake()
+    {
+        Instance = this;
+        SM = new GameStateMachine();
+    }
+
     void Start()
     {
-        instance = this;
-
-        isFinished = false;
         //bg_SR = GameObject.Find("dokidokiBackground").GetComponent<SpriteRenderer>();
         lan_MR = GameObject.Find("LaneBackground").GetComponent<MeshRenderer>();
         
@@ -83,31 +91,31 @@ public class UIManager : MonoBehaviour
     public void OnPauseButtonClick()
     {
         if (Input.touches.Length >= 2) return;
-        StartCoroutine(GamePause());
+        GamePause();
     }
-    public IEnumerator GamePause()
+
+    private void GamePause()
     {
-        if (isFinished) yield break;
-        while (BitingTheDust)
+        if (SM.Current == State.Paused || SM.Current == State.Finished || LiveSetting.offsetAdjustMode)
         {
-            yield return new WaitForEndOfFrame();
+            return;
         }
+        InGameBackground.instance.pauseVideo();
+        Time.timeScale = 0;
+        AudioTimelineSync.instance.Pause();
+        AudioManager.Instance.gameBGM.Pause();
+        pause_Canvas.SetActive(true);
+        SM.AddState(State.Paused);
 
 /*#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.Confined;
 #endif*/
-
-        InGameBackground.instance.pauseVideo();
-        Time.timeScale = 0;
-        AudioTimelineSync.instance.Pause();
-        AudioManager.Instance.isInGame = false;
-        AudioManager.Instance.gameBGM.Pause();
-        pause_Canvas.SetActive(true);
     }
 
-    public void GameResume()
+    private void GameResume()
     {
+        SM.PopState(State.Paused);
         Time.timeScale = 1;
         pause_Canvas.SetActive(false);
 
@@ -116,19 +124,16 @@ public class UIManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
 #endif*/
 
-        if (AudioManager.Instance.isLoading)
-            AudioTimelineSync.instance.Play();
-        else
-            StartCoroutine(BiteTheDust());
+        if (SM.Current == State.Playing)
+        {
+            _ = BiteTheDust();
+        }
     }
 
-    public static bool BitingTheDust = false;
-    private const float BiteTime = 2;
-
-    IEnumerator BiteTheDust()
+    private async UniTaskVoid BiteTheDust()
     {
         ISoundTrack bgm = AudioManager.Instance.gameBGM;
-        BitingTheDust = true;
+        SM.AddState(State.Rewinding);
         float currentTime = AudioTimelineSync.instance.GetTimeInS();
         float targetTime = Mathf.Max(0, currentTime - BiteTime);
 
@@ -140,24 +145,24 @@ public class UIManager : MonoBehaviour
             AudioTimelineSync.instance.Seek(currentTime);
             InGameBackground.instance.seekVideo(currentTime);
             InGameBackground.instance.playVideo();
-            yield return new WaitForEndOfFrame();
+            await UniTask.DelayFrame(1);
             InGameBackground.instance.pauseVideo();
+            if (SM.Current != State.Rewinding)
+                await UniTask.WaitUntil(() => SM.Current == State.Rewinding);
         }
 
         // play
         uint pauseTime = bgm.GetPlaybackTime();
         bgm.Play();
-        while (bgm.GetPlaybackTime() == pauseTime)
-        {
-            yield return new WaitForEndOfFrame();
-        }
-
+        await UniTask.WaitUntil(() => bgm.GetPlaybackTime() != pauseTime);
         AudioTimelineSync.instance.Seek(bgm.GetPlaybackTime() / 1000f);
         AudioTimelineSync.instance.Play();
         InGameBackground.instance.seekVideo(bgm.GetPlaybackTime()/1000f);
         InGameBackground.instance.playVideo();
-        AudioManager.Instance.isInGame = true;
-        BitingTheDust = false;
+
+        if (SM.Current != State.Rewinding)
+            await UniTask.WaitUntil(() => SM.Current == State.Rewinding);
+        SM.PopState(State.Rewinding);
     }
 
     public void GameRetry()
@@ -181,15 +186,15 @@ public class UIManager : MonoBehaviour
     private void OnApplicationPause(bool pause)
     {
         if (SceneLoader.Loading) return;
-        StartCoroutine(GamePause());
+        GamePause();
     }
 
     public void OnAudioFinish(bool restart)
     {
-        if (SceneLoader.Loading || AudioManager.Instance.isLoading) return;
+        if (SceneLoader.Loading || SM.Base == State.Loading) return;
         if (LiveSetting.offsetAdjustMode)
             restart = true;
-        isFinished = true;
+
         InGameBackground.instance.stopVideo();
         AudioManager.Instance.gameBGM?.Dispose();
         AudioManager.Instance.gameBGM = null;
@@ -262,11 +267,11 @@ public class UIManager : MonoBehaviour
 
     private void Update()
     {
-        if (AudioManager.Instance.isInGame &&
+        if (SM.Count == 1 && SM.Current != State.Finished &&
             AudioTimelineSync.instance.GetTimeInMs() > AudioManager.Instance.gameBGM.GetLength() + 1000 &&
             NoteController.instance.isFinished)
         {
-            AudioManager.Instance.isInGame = false;
+            SM.Transit(SM.Current, State.Finished);
             OnAudioFinish(false);
         }
 

@@ -88,7 +88,7 @@ public class AudioTimelineSync : MonoBehaviour
 
     private void Update()
     {
-        if (UIManager.instance.isFinished)
+        if (UIManager.Instance.SM.Base == GameStateMachine.State.Finished)
             return;
         var bgm = AudioManager.Instance?.gameBGM;
         if (bgm == null || bgm.GetStatus() != AudioProvider.PlaybackStatus.Playing)

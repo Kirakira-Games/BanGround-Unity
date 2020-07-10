@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using AudioProvider;
+using State = GameStateMachine.State;
+using UnityEditor.UI;
 
 public class TimeProgressManager : MonoBehaviour
 {
@@ -18,9 +20,17 @@ public class TimeProgressManager : MonoBehaviour
 
     void Update()
     {
-        if (AudioManager.Instance.isInGame)
+        switch (UIManager.Instance.SM.Current)
         {
-            TimeProgress.value = gameBGM.GetPlaybackTime() / (float)gameBGM.GetLength();
+            case State.Loading:
+                TimeProgress.value = 0;
+                break;
+            case State.Finished:
+                TimeProgress.value = 1;
+                break;
+            default:
+                TimeProgress.value = gameBGM.GetPlaybackTime() / (float)gameBGM.GetLength();
+                break;
         }
     }
 }
