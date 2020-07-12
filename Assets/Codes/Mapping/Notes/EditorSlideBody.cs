@@ -20,6 +20,7 @@ namespace BGEditor
         {
             1, 0, 3, 3, 0, 2
         };
+        private static Material[] materials;
         public Vector3 widthDelta;
         public EditorSlideNote parent;
 
@@ -29,6 +30,16 @@ namespace BGEditor
         protected override void Awake()
         {
             base.Awake();
+            if (materials == null)
+            {
+                // init global materials
+                materials = new Material[] {
+                    new Material(Resources.Load<Material>("InGame/Materials/note_body")),
+                    new Material(Resources.Load<Material>("InGame/Materials/note_body"))
+                };
+                materials[0].SetColor("_BaseColor", new Color(0.5843137f, 0.9019607f, 0.3019607f, 0.8f));
+                materials[1].SetColor("_BaseColor", new Color(0.5843137f, 0.9019607f, 0.3019607f, 0.4f));
+            }
             widthDelta = GetComponent<RectTransform>().rect.width * Vector3.right / 2;
             material = new Material(Resources.Load<Material>("InGame/Materials/note_body"));
             vertices = new Vector3[uvs.Length];
@@ -63,9 +74,9 @@ namespace BGEditor
             polyCollider.points = points.ToArray();
         }
 
-        public void SetColor(Color color)
+        public void SetColor(int index)
         {
-            material.SetColor("_BaseColor", color);
+            material = materials[index];
         }
     }
 }
