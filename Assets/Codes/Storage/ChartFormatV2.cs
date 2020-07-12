@@ -1,7 +1,10 @@
 ﻿#pragma warning disable CS1591, CS0612, CS3021, IDE1006
 using System.Collections.Generic;
+using System.Linq;
 using ProtoBuf;
 using UnityEngine.Scripting;
+using V1Chart = Chart;
+using V1Note = Note;
 
 namespace V2
 {
@@ -64,6 +67,19 @@ namespace V2
         [ProtoMember(6, IsPacked = true)]
         public TransitionColor slide { get; set; }
 
+        public static TimingPoint Default()
+        {
+            return new TimingPoint
+            {
+                beat = new int[] { 0, 0, 1 },
+                speed = new TransitionProperty<float>(1f),
+                tap = new TransitionColor(0, 0, 255),
+                flick = new TransitionColor(255, 0, 0),
+                slideTick = new TransitionColor(0, 255, 0),
+                slide = new TransitionColor(0, 255, 0)
+            };
+        }
+
         public static TimingPoint Lerp(TimingPoint a, TimingPoint b, float t)
         {
             TimingPoint ret = new TimingPoint
@@ -94,6 +110,16 @@ namespace V2
 
         [ProtoMember(3)]
         public uint flags { get; set; }
+
+        public static TimingGroup From(List<V1Note> notes)
+        {
+            var ret = new TimingGroup
+            {
+                notes = notes.Select(note => Note.From(note)).ToList()
+            };
+            ret.points.Add(TimingPoint.Default());
+            return ret;
+        }
     }
 
     [Preserve]
@@ -127,12 +153,27 @@ namespace V2
 
         [ProtoMember(8)]
         public uint flags { get; set; }
+
+        public static Note From(V1Note note)
+        {
+            return new Note
+            {
+                type = note.type,
+                beat = note.beat.ToArray(),
+                lane = note.lane,
+                tickStack = note.tickStack < 0 ? 0 : note.tickStack + 1,
+                x = note.x,
+                y = note.y
+            };
+        }
     }
 
     [Preserve]
     [ProtoContract()]
     public partial class Chart : IExtensible
     {
+        public const int VERSION = 2;
+
         private IExtension __pbn__extensionData;
         IExtension IExtensible.GetExtensionObject(bool createIfMissing)
             => Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
@@ -141,7 +182,7 @@ namespace V2
         public int version { get; set; }
 
         [ProtoMember(2)]
-        public Difficulty Difficulty { get; set; }
+        public Difficulty difficulty { get; set; }
 
         [ProtoMember(3)]
         public int level { get; set; }
@@ -154,6 +195,17 @@ namespace V2
 
         [ProtoMember(6)]
         public List<BPMPoint> bpm { get; set; } = new List<BPMPoint>();
+
+        public static Chart From(V1Chart old)
+        {
+            return new Chart
+            {
+                version = VERSION,
+                difficulty = old.Difficulty,
+                level = old.level,
+                offset = old.offset,
+            };
+        }
     }
 }
 
