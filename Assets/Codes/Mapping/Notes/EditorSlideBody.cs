@@ -41,7 +41,7 @@ namespace BGEditor
                 materials[1].SetColor("_BaseColor", new Color(0.5843137f, 0.9019607f, 0.3019607f, 0.4f));
             }
             widthDelta = GetComponent<RectTransform>().rect.width * Vector3.right / 2;
-            material = new Material(Resources.Load<Material>("InGame/Materials/note_body"));
+            material = materials[0];
             vertices = new Vector3[uvs.Length];
             polyCollider = GetComponent<PolygonCollider2D>();
             parent = GetComponentInParent<EditorSlideNote>();
