@@ -55,7 +55,7 @@ namespace BGEditor
         {
             isSelected = true;
             noteImg.color = Color.gray;
-            bodyImg.SetColor(new Color(0.5843137f, 0.9019607f, 0.3019607f, 0.4f));
+            bodyImg.SetColor(1);
         }
 
         public override void Unselect()
@@ -63,7 +63,7 @@ namespace BGEditor
             Debug.Assert(next == null || !next.isSelected);
             isSelected = false;
             noteImg.color = Color.white;
-            bodyImg.SetColor(new Color(0.5843137f, 0.9019607f, 0.3019607f, 0.8f));
+            bodyImg.SetColor(0);
             prev?.Unselect();
         }
 
