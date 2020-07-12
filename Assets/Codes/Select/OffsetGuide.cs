@@ -10,9 +10,9 @@ public class OffsetGuide : MonoBehaviour
         GetComponent<Button>().onClick.AddListener(StartOffsetGuide);
     }
 
-    void StartOffsetGuide()
+    async void StartOffsetGuide()
     {
-        if (!LiveSetting.LoadChart())
+        if (!await LiveSetting.LoadChart())
         {
             MessageBoxController.ShowMsg(LogLevel.ERROR, "This chart is outdated and unsupported.");
             return;
