@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using Newtonsoft.Json;
 using System.IO;
+using UniRx.Async;
 
 public static class LiveSetting
 {
@@ -203,10 +204,10 @@ public static class LiveSetting
         }
     }
 
-    public static bool LoadChart()
+    public static async UniTask<bool> LoadChart()
     {
         chart = DataLoader.LoadChart(CurrentHeader.sid, (Difficulty)actualDifficulty);
-        if (!ChartVersion.Process(CurrentHeader, chart))
+        if (!await ChartVersion.Process(CurrentHeader, chart))
         {
             chart = null;
             return false;

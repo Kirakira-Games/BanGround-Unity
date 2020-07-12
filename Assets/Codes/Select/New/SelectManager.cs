@@ -50,7 +50,7 @@ public class SelectManager : MonoBehaviour
         KVSystem.Instance.SaveConfig();
     });
 
-    static Kommand cmd_playdemo = new Kommand("demo_play", "Play a demo file", (args) =>
+    static Kommand cmd_playdemo = new Kommand("demo_play", "Play a demo file", async (args) =>
     {
         if(args.Length > 0)
         {
@@ -93,7 +93,7 @@ public class SelectManager : MonoBehaviour
 
                 LiveSetting.DemoFile = file;
 
-                if (!LiveSetting.LoadChart())
+                if (!await LiveSetting.LoadChart())
                 {
                     MessageBoxController.ShowMsg(LogLevel.ERROR, "This chart is outdated and unsupported.");
                     return;
@@ -532,9 +532,9 @@ public class SelectManager : MonoBehaviour
         DataLoader.chartList.Sort(compare);
     }
 
-    public void OnEnterPressed()
+    public async void OnEnterPressed()
     {
-        if (!LiveSetting.LoadChart())
+        if (!await LiveSetting.LoadChart())
         {
             MessageBoxController.ShowMsg(LogLevel.ERROR, "This chart is outdated and unsupported.");
             return;

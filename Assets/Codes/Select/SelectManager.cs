@@ -345,9 +345,9 @@ public class SelectManager_old : MonoBehaviour
         }
     }
 
-    public void OnEnterPressed()
+    public async void OnEnterPressed()
     {
-        if (!LiveSetting.LoadChart())
+        if (!await LiveSetting.LoadChart())
         {
             MessageBoxController.ShowMsg(LogLevel.ERROR, "This chart is outdated and unsupported.");
             return;
