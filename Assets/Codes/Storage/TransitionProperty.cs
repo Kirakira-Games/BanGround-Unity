@@ -55,7 +55,7 @@ public class TransitionProperty<T>
 
     public TransitionProperty() { }
 
-    public TransitionProperty(T value, Transition transition)
+    public TransitionProperty(T value, Transition transition = Transition.Constant)
     {
         this.value = value;
         this.transition = transition;
@@ -70,6 +70,11 @@ public class TransitionProperty<T>
     {
         value = rhs;
         transition = trans;
+    }
+
+    public void Set(T rhs)
+    {
+        value = rhs;
     }
 }
 
@@ -88,6 +93,15 @@ public class TransitionColor
 
     [ProtoMember(4)]
     public TransitionProperty<byte> a = new TransitionProperty<byte>();
+
+    public TransitionColor() { }
+    public TransitionColor(byte r, byte g, byte b, byte a = 255, Transition transition = Transition.Constant)
+    {
+        this.r.Set(r, transition);
+        this.g.Set(g, transition);
+        this.b.Set(b, transition);
+        this.a.Set(a, transition);
+    }
 
     public static implicit operator Color(TransitionColor color)
     {
