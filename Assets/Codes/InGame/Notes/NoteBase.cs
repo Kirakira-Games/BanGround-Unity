@@ -13,13 +13,14 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
     public bool isTracingOrJudged => judgeTime != int.MinValue;
     public bool isDestroyed;
     public bool inJudgeQueue;
-    public GameNoteAnim[] anims;
+    public List<V2.NoteAnim> anims;
     private int animsHead;
 
     public GameNoteType type;
     public NoteSyncLine syncLine;
     public NoteMesh noteMesh;
     public JudgeResult judgeResult;
+    public TimingGroupController timingGroup;
 
     public Vector3 initPos;
     public Vector3 judgePos;
@@ -47,9 +48,9 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
         type = data.type;
         isGray = r_graynote ? data.isGray : false;
         displayFuwafuwa = data.isFuwafuwa;
-        anims = data.anims.ToArray();
+        anims = data.anims;
 
-        initPos = anims[0].S.p;
+        initPos = anims[0].pos;
         judgePos = data.pos;
         gameObject.layer = displayFuwafuwa ? 9 : 8;
 
@@ -65,7 +66,7 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
 
     public virtual void UpdatePosition(int audioTime)
     {
-        while (animsHead < anims.Length - 1 && audioTime > anims[animsHead].T.t)
+        while (animsHead < anims.Count - 1 && audioTime > anims[animsHead + 1].time)
             animsHead++;
         while (animsHead > 0 && audioTime < anims[animsHead].S.t)
             animsHead--;

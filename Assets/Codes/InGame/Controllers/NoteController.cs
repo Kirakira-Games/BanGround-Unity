@@ -7,15 +7,18 @@ using UnityEngine.Profiling;
 using UnityEngine.Events;
 using AudioProvider;
 using JudgeQueue = PriorityQueue<int, NoteBase>;
-using UnityEngine.SceneManagement;
 
 public class NoteController : MonoBehaviour
 {
     public static NoteController instance;
     public static Camera mainCamera;
     public static Vector3 mainForward = new Vector3(0, -0.518944f, 0.8548083f);
+    
     public static int audioTime { get; private set; }
     public static int judgeTime { get; private set; }
+    public static float audioTimef { get; private set; }
+    public static float judgeTimef { get; private set; }
+
     public static int numFuwafuwaNotes;
     public static bool hasFuwafuwaNote => numFuwafuwaNotes > 0;
     public bool isFinished { get; private set; }
@@ -25,6 +28,7 @@ public class NoteController : MonoBehaviour
     private Dictionary<int, NoteSyncLine> syncTable;
 
     private GameChartData chart;
+    private TimingGroupController[] timingGroups;
     private List<GameNoteData> notes => chart.notes;
     private int noteHead;
 
@@ -78,7 +82,7 @@ public class NoteController : MonoBehaviour
             result = JudgeResult.Miss;
         }
 
-        //粉键震动
+        // 粉键震动
         if (r_shake_flick && (notebase.type == GameNoteType.Flick || notebase.type == GameNoteType.SlideEndFlick)&&result <= JudgeResult.Great)
             cameraAnimation.Play("vibe");
 
@@ -128,6 +132,7 @@ public class NoteController : MonoBehaviour
         var noteObj = NotePool.instance.GetNote(gameNote.type);
         noteObj.transform.SetParent(transform);
         NoteBase note = noteObj.GetComponent<NoteBase>();
+        note.timingGroup = timingGroups[gameNote.timingGroup];
         note.ResetNote(gameNote);
         if (note.judgeFuwafuwa)
         {
@@ -257,7 +262,7 @@ public class NoteController : MonoBehaviour
         }
     }
 
-    private void UpdateNotes(int audioTime)
+    private void UpdateNotes()
     {
         while (noteHead < notes.Count)
         {
@@ -315,6 +320,9 @@ public class NoteController : MonoBehaviour
         // Compute number of notes
         ComboManager.manager.Init(chart.numNotes);
 
+        // Timing groups
+        timingGroups = chart.groups.Select(g => new TimingGroupController(g)).ToArray();
+
         // Check AutoPlay
         if (mod_autoplay)
         {
@@ -353,7 +361,7 @@ public class NoteController : MonoBehaviour
 
         // Lane Effects
         laneEffects = GameObject.Find("Effects").GetComponent<LaneEffects>();
-        laneEffects.Init(chart.bpm, chart.speed);
+        laneEffects.Init(chart.groups[0]);
 
         // Check if adjusting offset
         if (LiveSetting.offsetAdjustMode)
@@ -406,9 +414,17 @@ public class NoteController : MonoBehaviour
 
         audioTime = AudioTimelineSync.instance.GetTimeInMs() + AudioTimelineSync.RealTimeToBGMTime(o_audio);
         judgeTime = audioTime - o_judge;
+        audioTimef = audioTime / 1000f;
+        judgeTimef = judgeTime / 1000f;
+
+        // Update timing groups
+        foreach (var i in timingGroups)
+        {
+            i.OnUpdate();
+        }
 
         // Create notes
-        UpdateNotes(audioTime);
+        UpdateNotes();
         for (int i = 0; i < NoteUtility.LANE_COUNT; i++)
         {
             UpdateLane(laneQueue[i]);
@@ -424,20 +440,21 @@ public class NoteController : MonoBehaviour
         var noteSyncLine = transform.GetComponentsInChildren<NoteSyncLine>();
 
         Profiler.BeginSample("OnNoteUpdate");
-        for (int i = 0; i < noteBase.Length; i++)
+
+        foreach (var i in noteBase)
         {
-            noteBase[i].OnNoteUpdate();
+            i.OnNoteUpdate();
         }
         Profiler.EndSample();
 
-        for (int i = 0; i < slide.Length; i++)
+        foreach (var i in slide)
         {
-            slide[i].OnSlideUpdate();
+            i.OnSlideUpdate();
         }
 
-        for (int i = 0; i < noteSyncLine.Length; i++)
+        foreach (var i in noteSyncLine)
         {
-            noteSyncLine[i].OnSyncLineUpdate();
+            i.OnSyncLineUpdate();
         }
 
         // Update isfinished

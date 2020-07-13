@@ -40,7 +40,6 @@ public class GameNoteData
 public class GameTimingGroup
 {
     public List<V2.TimingPoint> points = new List<V2.TimingPoint>();
-    public Material[] materials { get; private set; } = new Material[5];
 }
 
 public class GameChartData
