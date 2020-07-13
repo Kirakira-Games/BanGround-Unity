@@ -1,38 +1,81 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using V2;
+using System.Runtime.CompilerServices;
+using System.Linq;
+using UnityEngine.Rendering;
 
-class BeatInfoComparer : IComparer<GameBeatInfo>
+class IWithTimingComparer : IComparer<IWithTiming>
 {
-    public int Compare(GameBeatInfo lhs, GameBeatInfo rhs)
+    public int Compare(IWithTiming lhs, IWithTiming rhs)
     {
-        if (lhs.beat == rhs.beat) return 0;
-        return lhs.beat > rhs.beat ? 1 : -1;
+        if (lhs.beatf == rhs.beatf) return 0;
+        return lhs.beatf > rhs.beatf ? 1 : -1;
     }
 }
 
 public class ChartTiming
 {
-    public List<GameBeatInfo> BPMInfo { get; }
-    public List<GameBeatInfo> SpeedInfo { get; }
+    public List<ValuePoint> bpms { get; private set; }
+    public TimingGroup timings { get; private set; }
     private float totTime;
+    private float unitSpeed;
 
     private delegate bool UnknownPredicate(NoteAnim anim);
     private delegate void Lerp(NoteAnim S, NoteAnim T, NoteAnim i);
 
-    public ChartTiming()
+    public static float BeatToFloat(int[] beat)
     {
-        BPMInfo = new List<GameBeatInfo>();
-        SpeedInfo = new List<GameBeatInfo>();
-        totTime = LiveSetting.NoteScreenTime / 1000f;
+        return beat[0] + (float)beat[1] / beat[2];
     }
 
-    private int GetPrevIndex(List<GameBeatInfo> list, float beat)
+    public ChartTiming(List<ValuePoint> bpms, int offset)
+    {
+        totTime = LiveSetting.NoteScreenTime / 1000f;
+        this.bpms = bpms;
+        bpms.ForEach(bpm => bpm.beatf = BeatToFloat(bpm.beat));
+        bpms.Sort(new IWithTimingComparer());
+        // Compute time for BPM
+        float currentBpm = 120;
+        float startDash = 0;
+        float startTime = offset / 1000f;
+        foreach (var bpm in bpms)
+        {
+            startTime += (bpm.beatf - startDash) * 60 / currentBpm;
+            startDash = bpm.beatf;
+            currentBpm = bpm.value;
+            bpm.time = startTime;
+        }
+    }
+
+    public void PopulateTimingInfo(IWithTiming timing)
+    {
+        if (timing == null)
+            return;
+        if (timing.beat != null)
+            timing.beatf = BeatToFloat(timing.beat);
+        timing.time = GetTimeByBeat(timing.beatf);
+    }
+
+    public void LoadTimingGroup(TimingGroup group)
+    {
+        // Populate necessary information
+        timings = group;
+        timings.points.ForEach(point => PopulateTimingInfo(point));
+        timings.notes.ForEach(note => note.anims.ForEach(anim => PopulateTimingInfo(anim)));
+        timings.notes.ForEach(note => PopulateTimingInfo(note));
+
+        // Process animation data
+        timings.notes.ForEach(note => AddAnimation(note));
+    }
+
+    private int GetPrevIndex<T>(List<T> list, float beatf) where T : IWithTiming
     {
         int l = 0, r = list.Count - 1;
         while (r > l)
         {
             int mid = (l + r + 1) >> 1;
-            if (list[mid].beat > beat)
+            if (list[mid].beatf > beatf)
                 r = mid - 1;
             else
                 l = mid;
@@ -40,306 +83,187 @@ public class ChartTiming
         return l;
     }
 
+    public float GetAppearTime(V2.Note note)
+    {
+        return note.anims[0].time;
+    }
+
     public float GetTimeByBeat(float beat)
     {
-        var info = BPMInfo[GetPrevIndex(BPMInfo, beat)];
-        return info.time + (beat - info.beat) * 60 / info.value;
+        var bpm = bpms[GetPrevIndex(bpms, beat)];
+        return bpm.time + (beat - bpm.beatf) * 60 / bpm.value;
     }
 
     public float GetTimeByBeat(int[] beat)
     {
-        return GetTimeByBeat(ChartLoader.BeatToFloat(beat));
+        return GetTimeByBeat(BeatToFloat(beat));
     }
 
-    public void GenerateAnimation(List<GameNoteAnim> raw, List<GameNoteAnim> output, GameNoteData note)
+    public List<V2.NoteAnim> GenerateAnimation(List<V2.NoteAnim> raw, V2.Note note)
     {
-        if (raw.Count == 0)
+        var ret = new List<V2.NoteAnim>();
+        if (raw == null)
         {
-            return;
+            return ret;
         }
         float totDist = 0;
         float curDist = 0;
+        bool isEnd = false;
         foreach (var anim in raw)
         {
+            anim.pos.z += curDist;
+            curDist = anim.pos.z;
+            if (!isEnd)
+                totDist = anim.pos.z;
             //Debug.Log("Raw anim: " + AnimToString(anim));
-            if (anim.S.t - note.time >= -1) break;
-            totDist += anim.T.p.z;
+            if (Mathf.Approximately(anim.time, note.time))
+                isEnd = true;
         }
         //Debug.Log("Tot dist=" + totDist);
-        bool isStart = true;
-        foreach (var anim in raw)
+        bool isStart = raw[0].pos.z <= totDist - 1;
+        for (int i = 0; i < raw.Count - 1; i++)
         {
-            anim.S.p.z = 1 - totDist + curDist;
-            curDist += anim.T.p.z;
-            anim.T.p.z += anim.S.p.z;
+            var cur = raw[i];
+            var nxt = raw[i + 1];
             if (isStart)
             {
-                if (anim.S.p.z <= 0 && anim.T.p.z <= 0)
+                if (nxt.pos.z <= totDist - 1)
                 {
                     continue;
                 }
                 else
                 {
                     isStart = false;
-                    if (anim.S.p.z <= 0)
-                    {
-                        float incRatio = (0 - anim.S.p.z) / (anim.T.p.z - anim.S.p.z);
-                        anim.S.p.z = 0;
-                        anim.S.t += Mathf.RoundToInt((anim.T.t - anim.S.t) * incRatio);
-                    }
+                    float ratio = Mathf.InverseLerp(cur.pos.z, nxt.pos.z, totDist - 1);
+                    ret.Add(V2.NoteAnim.LerpUnclamped(cur, nxt, ratio));
                 }
             }
-            if (anim.S.t < anim.T.t)
-                output.Add(anim);
+            if (!isStart)
+                ret.Add(nxt);
         }
-        /*
-        foreach (var anim in output)
-        {
-            Debug.Log("Add anim: " + anim);
-        }
-        */
+        return ret;
     }
 
-    public void GenerateAnimationRawData(NoteAnim anim, float beatStart, float beatEnd, float nextlane, float nextY, List<GameNoteAnim> output)
+    public void GenerateAnimationRawData(V2.NoteAnim S, V2.NoteAnim T, List<V2.NoteAnim> output)
     {
         //Debug.Log("Anim: " + beatStart + " / " + beatEnd);
-        float timeStart = GetTimeByBeat(beatStart);
-        float timeEnd = GetTimeByBeat(beatEnd);
-        for (int i = GetPrevIndex(SpeedInfo, beatStart); i < SpeedInfo.Count; i++)
+        float totDist = 0;
+        for (int i = GetPrevIndex(timings.points, S.beatf); i < timings.points.Count; i++)
         {
-            var info = SpeedInfo[i];
-            if (info.beat >= beatEnd)
+            var info = timings.points[i];
+            if (info.beatf >= T.beatf - NoteUtility.EPS)
                 break;
             //Debug.Log("Speed: " + info.value + " / " + info.beat + " / " + anim.speed);
-            float timeS = beatStart > info.beat ? timeStart : info.time;
-            float timeT = (i == SpeedInfo.Count - 1 || beatEnd < SpeedInfo[i + 1].beat) ?
-                timeEnd : SpeedInfo[i + 1].time;
-            if (timeT < timeS) continue;
+            float timeS = Mathf.Max(S.time, info.time);
+            float timeT = (i == timings.points.Count - 1 || T.beatf < timings.points[i + 1].beatf) ?
+                T.time : timings.points[i + 1].time;
 
-            float ratioS = (timeS - timeStart) / (timeEnd - timeStart);
-            float ratioT = (timeT - timeStart) / (timeEnd - timeStart);
-
-            var newAnim = new GameNoteAnim
-            {
-                S = new GameNoteAnimState
-                {
-                    t = Mathf.RoundToInt(timeS * 1000),
-                    p = new Vector3(
-                        NoteUtility.GetXPos(Mathf.Lerp(anim.lane, nextlane, ratioS)),
-                        NoteUtility.GetYPos(Mathf.Lerp(anim.y, nextY, ratioS)),
-                        0)
-                },
-                T = new GameNoteAnimState
-                {
-                    t = Mathf.RoundToInt(timeT * 1000),
-                    p = new Vector3(
-                        NoteUtility.GetXPos(Mathf.Lerp(anim.lane, nextlane, ratioT)),
-                        NoteUtility.GetYPos(Mathf.Lerp(anim.y, nextY, ratioT)),
-                        (timeT - timeS) / totTime * info.value * anim.speed)
-                }
-            };
-            output.Add(newAnim); // T.p.z temporarily stores the distance traveled
+            totDist += (timeT - timeS) * info.speed / totTime; // Assume constant speed transition here
         }
-    }
 
-    // Fill in unknown properties by interpolation
-    private void FillInUnknown(Note data, UnknownPredicate predicate, Lerp lerp, NoteAnim fallback)
-    {
-        for (int i = 1; i < data.anims.Count; i++)
+        float curDist = 0;
+        for (int i = GetPrevIndex(timings.points, S.beatf); i < timings.points.Count; i++)
         {
-            if (predicate(data.anims[i]))
+            var info = timings.points[i];
+            if (info.beatf >= T.beatf - NoteUtility.EPS)
+                break;
+            //Debug.Log("Speed: " + info.value + " / " + info.beat + " / " + anim.speed);
+            float timeS = Mathf.Max(S.time, info.time);
+            float timeT = T.time;
+            var beatT = T.beat;
+            V2.NoteAnim anim = T;
+            float dist;
+            bool isLast = i != timings.points.Count - 1 && T.beatf >= timings.points[i + 1].beatf;
+
+            if (isLast)
             {
-                bool suc = false;
-                for (int j = i + 1; j < data.anims.Count; j++)
-                {
-                    if (!predicate(data.anims[j]))
-                    {
-                        lerp(data.anims[i - 1], data.anims[j], data.anims[i]);
-                        suc = true;
-                        break;
-                    }
-                }
-                if (!suc)
-                {
-                    lerp(data.anims[i - 1], fallback, data.anims[i]);
-                }
+                timeT = timings.points[i + 1].time;
+                beatT = timings.points[i + 1].beat;
             }
-        }
-    }
 
-    public void AnalyzeNotes(List<Note> notes, int offset)
-    {
-        SpeedInfo.Add(new GameBeatInfo
-        {
-            beat = -100,
-            time = -50f,
-            value = 1
-        });
-        foreach (Note note in notes)
-        {
-            if (note.type != NoteType.BPM)
-                continue;
-            BPMInfo.Add(new GameBeatInfo
+            dist = (timeT - timeS) * info.speed / totTime;
+            curDist += dist; // Assume constant speed transition here
+
+            if (!isLast)
             {
-                beat = ChartLoader.BeatToFloat(note.beat),
-                value = note.value
-            });
-            foreach (NoteAnim anim in note.anims)
-            {
-                Debug.Assert(!float.IsNaN(anim.speed));
-                SpeedInfo.Add(new GameBeatInfo
+                anim = new V2.NoteAnim
                 {
-                    beat = ChartLoader.BeatToFloat(anim.beat),
-                    value = anim.speed
-                });
+                    beat = beatT,
+                    pos = TransitionVector.LerpUnclamped(S.pos, T.pos, curDist / totDist)
+                };
             }
-        }
-        // Sort by beat time
-        var comparer = new BeatInfoComparer();
-        BPMInfo.Sort(comparer);
-        SpeedInfo.Sort(comparer);
+            else
+            {
+                Debug.Assert(Mathf.Approximately(dist, curDist));
+            }
+            anim.pos.z = dist; // z temporarily stores the distance traveled
 
-        // Compute time for BPM
-        float currentBpm = 120;
-        float startDash = 0;
-        float startTime = offset / 1000f;
-        foreach (GameBeatInfo info in BPMInfo)
-        {
-            startTime += (info.beat - startDash) * 60 / currentBpm;
-            startDash = info.beat;
-            currentBpm = info.value;
-            info.time = startTime;
-        }
-        foreach (GameBeatInfo info in SpeedInfo)
-        {
-            info.time = GetTimeByBeat(info.beat);
+            PopulateTimingInfo(anim);
+            output.Add(anim);
         }
     }
 
     static KVarRef r_mirror = new KVarRef("r_mirror");
-    public void AddAnimation(Note data, GameNoteData gameNote)
+    public void AddAnimation(V2.Note data)
     {
-        // Debug.Log("Add animation");
-        gameNote.anims = new List<GameNoteAnim>();
         // Generate default animation
-        var initAnim = new NoteAnim
+        var initAnim = new V2.NoteAnim
         {
             beat = new int[] { 0, -99, 1 },
-            speed = 1,
-            lane = data.lane == -1 ? data.x : data.lane,
-            y = data.y
+            pos = new TransitionVector(
+                data.lane == -1 ? data.x : data.lane,
+                data.y
+            )
         };
-        // Update default properties 
-        foreach (var i in data.anims)
-        {
-            if (!float.IsNaN(i.speed))
-            {
-                initAnim.speed = i.speed;
-                break;
-            }
-        }
-        foreach (var i in data.anims)
-        {
-            if (!float.IsNaN(i.lane))
-            {
-                initAnim.lane = i.lane;
-                break;
-            }
-        }
-        foreach (var i in data.anims)
-        {
-            if (!float.IsNaN(i.y))
-            {
-                initAnim.y = i.y;
-                break;
-            }
-        }
-        data.anims.Insert(0, initAnim);
+        PopulateTimingInfo(initAnim);
 
-        // Override missing animation properties
-        for (int i = 1; i < data.anims.Count; i++)
-        {
-            // Speed - direct propagate
-            if (float.IsNaN(data.anims[i].speed))
-            {
-                data.anims[i].speed = data.anims[i - 1].speed;
-            }
-        }
-
-        // Interpolation for unknown properties
-        var judgeAnim = new NoteAnim
+        // Generate judge animation
+        var judgeAnim = new V2.NoteAnim
         {
             beat = data.beat,
-            speed = data.anims[data.anims.Count - 1].speed,
-            lane = data.lane == -1 ? data.x : data.lane,
-            y = data.y
+            pos = new TransitionVector(
+                data.lane == -1 ? data.x : data.lane,
+                data.y
+            )
         };
-        FillInUnknown(data, anim => float.IsNaN(anim.lane), (S, T, i) =>
-        {
-            float ts = GetTimeByBeat(S.beat);
-            float tt = GetTimeByBeat(T.beat);
-            float ti = GetTimeByBeat(i.beat);
-            float ratio = Mathf.InverseLerp(ts, tt, ti);
-            i.lane = Mathf.Lerp(S.lane, T.lane, ratio);
-        }, judgeAnim);
-        FillInUnknown(data, anim => float.IsNaN(anim.y), (S, T, i) =>
-        {
-            float ts = GetTimeByBeat(S.beat);
-            float tt = GetTimeByBeat(T.beat);
-            float ti = GetTimeByBeat(i.beat);
-            float ratio = Mathf.InverseLerp(ts, tt, ti);
-            i.y = Mathf.Lerp(S.y, T.y, ratio);
-        }, judgeAnim);
+        PopulateTimingInfo(judgeAnim);
 
-        // Compute appear time and animation
-        float beatStart, beatEnd;
-        List<GameNoteAnim> tmpList = new List<GameNoteAnim>();
-        for (int i = 0; i < data.anims.Count; i++)
-        {
-            var anim = data.anims[i];
-            beatStart = ChartLoader.BeatToFloat(anim.beat);
-            beatEnd = ChartLoader.BeatToFloat(i == data.anims.Count - 1 ?
-                data.beat : data.anims[i+1].beat);
-            if (beatStart > beatEnd - NoteUtility.EPS)
-            {
-                Debug.LogError(ChartLoader.BeatToString(data.beat) + "Cannot add animation after judgeTime of a note.");
-                break;
-            }
-            if (i == data.anims.Count - 1)
-            {
-                GenerateAnimationRawData(anim, beatStart, beatEnd, judgeAnim.lane, data.y, tmpList);
-            }
-            else
-            {
-                GenerateAnimationRawData(anim, beatStart, beatEnd, data.anims[i + 1].lane, data.anims[i + 1].y, tmpList);
-            }
-        }
-        beatStart = ChartLoader.BeatToFloat(data.beat);
-        beatEnd = beatStart;
-        while (GetTimeByBeat(beatEnd) - GetTimeByBeat(data.beat) <= NoteUtility.SLIDE_TICK_JUDGE_RANGE / 1000f)
+        // Add existing anims - do not allow animation after judge
+        data.anims = data.anims.Where(anim => anim.time < judgeAnim.time).ToList();
+        data.anims.Insert(0, initAnim);
+        data.anims.Add(judgeAnim);
+
+        // The last animation after judge
+        float beatEnd = data.beatf;
+        while (GetTimeByBeat(beatEnd) - GetTimeByBeat(data.beatf) <= NoteUtility.SLIDE_TICK_JUDGE_RANGE / 1000f)
         {
             beatEnd += 1f;
         }
+        var lastAnim = new V2.NoteAnim
+        {
+            beatf = beatEnd,
+            pos = judgeAnim.pos.Copy()
+        };
+        PopulateTimingInfo(lastAnim);
+        data.anims.Add(lastAnim);
 
-        // Judge time should split animation
-        GenerateAnimationRawData(judgeAnim, beatStart, beatEnd, judgeAnim.lane, data.y, tmpList);
+        // Compute appear time and animation
+        var tmpList = new List<V2.NoteAnim> { data.anims[0] };
+        for (int i = 1; i < data.anims.Count; i++)
+        {
+            GenerateAnimationRawData(data.anims[i - 1], data.anims[i], tmpList);
+        }
 
-        GenerateAnimation(tmpList, gameNote.anims, gameNote);
-
-        // Compute appear time for the note
-        gameNote.appearTime = gameNote.anims[0].S.t;
+        GenerateAnimation(tmpList, data);
 
         // Check mirror
         if (r_mirror)
         {
-            if (gameNote.lane != -1)
-                gameNote.lane = 6 - gameNote.lane;
-            gameNote.pos.x *= -1;
-            foreach (var i in gameNote.anims)
-            {
-                i.S.p.x *= -1;
-                i.T.p.x *= -1;
-            }
+            if (data.lane != -1)
+                data.lane = 6 - data.lane;
+            else
+                data.x *= -1;
+            data.anims.ForEach(i => i.pos.x *= -1);
         }
     }
 }

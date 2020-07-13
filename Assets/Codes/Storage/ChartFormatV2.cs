@@ -13,7 +13,7 @@ namespace V2
     public interface IWithTiming
     {
         public int[] beat { get; set; }
-        public int time { get; set; }
+        public float time { get; set; }
         public float beatf { get; set; }
     }
 
@@ -28,17 +28,33 @@ namespace V2
         [ProtoMember(1, IsPacked = true)]
         public int[] beat { get; set; }
         [JsonIgnore]
-        public int time { get; set; }
+        public float time { get; set; }
         [JsonIgnore]
         public float beatf { get; set; }
 
         [ProtoMember(2)]
         public TransitionVector pos { get; set; }
+
+        public static NoteAnim Lerp(NoteAnim a, NoteAnim b, float t)
+        {
+            t = Mathf.Clamp01(t);
+            return LerpUnclamped(a, b, t);
+        }
+
+        public static NoteAnim LerpUnclamped(NoteAnim a, NoteAnim b, float t)
+        {
+            return new NoteAnim
+            {
+                beatf = Mathf.LerpUnclamped(a.beatf, b.beatf, t),
+                time = Mathf.LerpUnclamped(a.time, b.time, t),
+                pos = TransitionVector.LerpUnclamped(a.pos, b.pos, t)
+            };
+        }
     }
 
     [Preserve]
     [ProtoContract()]
-    public class BPMPoint : IExtensible, IWithTiming
+    public class ValuePoint : IExtensible, IWithTiming
     {
         private IExtension __pbn__extensionData;
         IExtension IExtensible.GetExtensionObject(bool createIfMissing)
@@ -47,7 +63,7 @@ namespace V2
         [ProtoMember(1, IsPacked = true)]
         public int[] beat { get; set; }
         [JsonIgnore]
-        public int time { get; set; }
+        public float time { get; set; }
         [JsonIgnore]
         public float beatf { get; set; }
 
@@ -66,7 +82,7 @@ namespace V2
         [ProtoMember(1, IsPacked = true)]
         public int[] beat { get; set; }
         [JsonIgnore]
-        public int time { get; set; }
+        public float time { get; set; }
         [JsonIgnore]
         public float beatf { get; set; }
 
@@ -153,7 +169,7 @@ namespace V2
 
     [Preserve]
     [ProtoContract()]
-    public partial class Note : IExtensible
+    public partial class Note : IExtensible, IWithTiming
     {
         private IExtension __pbn__extensionData;
         IExtension IExtensible.GetExtensionObject(bool createIfMissing)
@@ -164,6 +180,10 @@ namespace V2
 
         [ProtoMember(2, IsPacked = true)]
         public int[] beat { get; set; }
+        [JsonIgnore]
+        public float time { get; set; }
+        [JsonIgnore]
+        public float beatf { get; set; }
 
         [ProtoMember(3)]
         public int lane { get; set; }
@@ -223,7 +243,7 @@ namespace V2
         public List<TimingGroup> groups { get; set; } = new List<TimingGroup>();
 
         [ProtoMember(6)]
-        public List<BPMPoint> bpm { get; set; } = new List<BPMPoint>();
+        public List<ValuePoint> bpm { get; set; } = new List<ValuePoint>();
 
         public static Chart From(V1Chart old)
         {

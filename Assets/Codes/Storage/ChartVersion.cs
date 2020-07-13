@@ -21,7 +21,7 @@ public static class ChartVersion
     {
         Chart chart = DataLoader.LoadChart<Chart>(header.sid, difficulty);
         V2.Chart newChart = V2.Chart.From(chart);
-        DataLoader.SaveChart(newChart, header.sid, difficulty);
+        // DataLoader.SaveChart(newChart, header.sid, difficulty);
         return newChart;
     }
 

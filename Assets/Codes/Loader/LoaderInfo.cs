@@ -32,7 +32,6 @@ public class LoaderInfo : MonoBehaviour
     {
         chartHeader = LiveSetting.CurrentHeader;
         musicHeader = DataLoader.GetMusicHeader(LiveSetting.CurrentHeader.mid);
-        LiveSetting.gameChart = ChartLoader.LoadChart(LiveSetting.chart);
     }
 
     private void ShowInfo()

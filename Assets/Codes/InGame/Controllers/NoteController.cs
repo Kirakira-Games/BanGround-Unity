@@ -308,7 +308,7 @@ public class NoteController : MonoBehaviour
         noteQueue = new JudgeQueue();
 
         // Load chart
-        chart = ChartLoader.LoadChart(LiveSetting.chart);
+        chart = LiveSetting.gameChart;
         NotePool.instance.Init(notes);
         noteHead = 0;
 
