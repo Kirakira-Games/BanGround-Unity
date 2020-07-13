@@ -1,15 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using V2;
 
 public class LaneEffects : MonoBehaviour
 {
     private ParticleSystem[] ps;
-    private List<GameBeatInfo> bpm;
-    private List<GameBeatInfo> speed;
+    private List<TimingPoint> speed;
     private float prevSpeed;
     private Quaternion[] rotation;
 
-    public static GameBeatInfo GetIndexByTime(List<GameBeatInfo> list, float time)
+    public static TimingPoint GetIndexByTime(List<TimingPoint> list, float time)
     {
         int l = -1, r = list.Count - 1;
         while (r > l)
@@ -24,21 +24,9 @@ public class LaneEffects : MonoBehaviour
     }
 
 
-    public void Init(List<GameBeatInfo> bpm, List<GameBeatInfo> speed)
+    public void Init(GameTimingGroup timingGroup)
     {
-        this.bpm = bpm;
-        this.speed = speed;
-    }
-
-    public float GetBPM(int audioTime)
-    {
-        return GetBPM(audioTime / 1000f);
-    }
-
-    public float GetBPM(float audioTimeS)
-    {
-        var data = GetIndexByTime(bpm, audioTimeS);
-        return data == null ? bpm[0].value : data.value;
+        speed = timingGroup.points;
     }
 
     public float GetSpeed(int audioTime)
@@ -49,7 +37,7 @@ public class LaneEffects : MonoBehaviour
     public float GetSpeed(float audioTimeS)
     {
         var data = GetIndexByTime(speed, audioTimeS);
-        return data == null ? speed[0].value : data.value;
+        return data == null ? speed[0].speed : data.speed;
     }
 
     void Start()
