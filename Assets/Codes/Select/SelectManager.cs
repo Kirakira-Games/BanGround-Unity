@@ -349,7 +349,7 @@ public class SelectManager_old : MonoBehaviour
     {
         if (!await LiveSetting.LoadChart())
         {
-            MessageBoxController.ShowMsg(LogLevel.ERROR, "This chart is outdated and unsupported.");
+            MessageBoxController.ShowMsg(LogLevel.ERROR, "This chart is unsupported.");
             return;
         }
         StartCoroutine(PreviewFadeOut());

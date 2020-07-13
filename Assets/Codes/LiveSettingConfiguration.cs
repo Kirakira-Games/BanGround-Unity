@@ -151,7 +151,8 @@ public static class LiveSetting
             }
         }
     }
-    public static Chart chart;
+    public static V2.Chart chart;
+    public static GameChartData gameChart;
 
     public static readonly string settingsPath = Application.persistentDataPath + "/LiveSettings.json";
     public static readonly string scoresPath = Application.persistentDataPath + "/Scores.bin";
@@ -206,13 +207,8 @@ public static class LiveSetting
 
     public static async UniTask<bool> LoadChart()
     {
-        chart = DataLoader.LoadChart(CurrentHeader.sid, (Difficulty)actualDifficulty);
-        if (!await ChartVersion.Process(CurrentHeader, chart))
-        {
-            chart = null;
-            return false;
-        }
-        return true;
+        chart = await ChartVersion.Process(CurrentHeader, (Difficulty)actualDifficulty);
+        return chart != null;
     }
 
     static KVarRef r_notespeed = new KVarRef("r_notespeed");
