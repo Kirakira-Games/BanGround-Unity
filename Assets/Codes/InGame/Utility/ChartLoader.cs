@@ -100,7 +100,7 @@ public static class ChartLoader
         return false;
     }
 
-    public static GameChartData LoadChart(Chart chart)
+    public static GameChartData LoadChart(V2.Chart chart)
     {
         List<Note> notes = chart.notes;
         if (notes == null)
