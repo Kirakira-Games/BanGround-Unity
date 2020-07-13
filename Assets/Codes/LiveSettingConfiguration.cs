@@ -5,6 +5,7 @@ using UnityEngine;
 using Newtonsoft.Json;
 using System.IO;
 using UniRx.Async;
+using System;
 
 public static class LiveSetting
 {
@@ -208,7 +209,22 @@ public static class LiveSetting
     public static async UniTask<bool> LoadChart()
     {
         chart = await ChartVersion.Process(CurrentHeader, (Difficulty)actualDifficulty);
-        return chart != null;
+        if (chart == null)
+        {
+            MessageBoxController.ShowMsg(LogLevel.ERROR, "This chart is unsupported.");
+            return false;
+        }
+        try
+        {
+            gameChart = ChartLoader.LoadChart(chart);
+            return true;
+        }
+        catch (Exception e)
+        {
+            MessageBoxController.ShowMsg(LogLevel.ERROR, e.Message);
+        }
+        MessageBoxController.ShowMsg(LogLevel.ERROR, "Unexpected failure.");
+        return false;
     }
 
     static KVarRef r_notespeed = new KVarRef("r_notespeed");

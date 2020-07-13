@@ -1,7 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Newtonsoft.Json;
+using System.Linq;
+using System;
 using System.IO;
 
 class GameNoteComparer : Comparer<GameNoteData>
@@ -14,6 +15,7 @@ class GameNoteComparer : Comparer<GameNoteData>
 
 public static class ChartLoader
 {
+    public static int numNotes;
     public static string BeatToString(int[] beat)
     {
         return "[" + (beat[1] + beat[2] * beat[0]) + "/" + beat[2] + "]";
@@ -30,9 +32,9 @@ public static class ChartLoader
         beat[1] += beat[0] * beat[2];
         beat[0] = 0;
     }
-    public static GameNoteType TranslateNoteType(Note note)
+    public static GameNoteType TranslateNoteType(V2.Note note)
     {
-        if (note.tickStack == -1)
+        if (note.tickStack <= 0)
         {
             if (note.type == NoteType.Single)
             {
@@ -65,12 +67,7 @@ public static class ChartLoader
         return GameNoteType.None;
     }
 
-    public static float BeatToFloat(int[] beat)
-    {
-        return beat[0] + (float)beat[1] / beat[2];
-    }
-
-    public static Vector3 GetJudgePosFromRawNote(Note note)
+    public static Vector3 GetJudgePosFromRawNote(V2.Note note)
     {
         Vector3 vec = new Vector3(
             NoteUtility.GetXPos(note.lane == -1 ? note.x : note.lane),
@@ -80,84 +77,68 @@ public static class ChartLoader
         return NoteUtility.ProjectVectorToParallelPlane(vec);
     }
 
-    public static bool IsNoteFuwafuwa(Note note)
+    public static bool IsNoteFuwafuwa(GameNoteData note)
     {
-        if (note.lane == -1) return true;
-        foreach (var anim in note.anims)
-        {
-            if (anim.y > NoteUtility.EPS) return true;
-        }
-        return false;
+        return note.lane == -1 || note.anims.Any(anim => Mathf.Abs(anim.pos.y) > NoteUtility.EPS);
     }
 
-    public static bool IsChartFuwafuwa(List<Note> notes)
+    public static bool IsNoteFuwafuwa(V2.Note note)
     {
+        return note.lane == -1 || note.anims.Any(anim => Mathf.Abs(anim.pos.y) > NoteUtility.EPS);
+    }
+
+    public static bool IsChartFuwafuwa(List<GameNoteData> notes)
+    {
+        return notes.Any(note => IsNoteFuwafuwa(note));
+    }
+
+    public static bool IsChartFuwafuwa(List<V2.Note> notes)
+    {
+        return notes.Any(note => IsNoteFuwafuwa(note));
+    }
+
+    private static List<GameNoteData> LoadTimingGroup(ChartTiming timing, int groupId, V2.TimingGroup group)
+    {
+        // AnalyzeNotes
+        var notes = group.notes;
+        notes.ForEach(note => NormalizeBeat(note.beat));
+        timing.LoadTimingGroup(group);
+        // Create game notes
+        float prevBeat = -1e9f;
+        var tickStackTable = new Dictionary<int, GameNoteData>();
+        var ret = new List<GameNoteData>();
         foreach (var note in notes)
         {
-            if (note.type == NoteType.BPM) continue;
-            if (IsNoteFuwafuwa(note)) return true;
-        }
-        return false;
-    }
-
-    public static GameChartData LoadChart(V2.Chart chart)
-    {
-        List<Note> notes = chart.notes;
-        if (notes == null)
-        {
-            Debug.LogError("No notes found for current chart.");
-            return null;
-        }
-        List<GameNoteData> gameNotes = new List<GameNoteData>();
-        var tickStackTable = new Dictionary<int, GameNoteData>();
-
-        // AnalyzeNotes
-        foreach(Note note in notes)
-        {
-            NormalizeBeat(note.beat);
-        }
-        bool isFuwafuwa = IsChartFuwafuwa(notes);
-
-        ChartTiming timing = new ChartTiming();
-        timing.AnalyzeNotes(notes, chart.offset);
-
-        // Compute actual time of each note
-        float prevBeat = -1e9f;
-        int numNotes = 0;
-        // Create game notes
-        foreach (Note note in notes)
-        {
-            float beat = BeatToFloat(note.beat);
-            if (prevBeat - beat > NoteUtility.EPS)
+            if (prevBeat - note.beatf > NoteUtility.EPS)
             {
                 Debug.LogError(BeatToString(note.beat) + "Incorrect order of notes!");
             }
-            prevBeat = beat;
+            prevBeat = note.beatf;
             if (note.type == NoteType.BPM)
             {
-                // Note is a timing point
-                continue;
+                throw new InvalidDataException("Unexpected note of type BPM");
             }
             numNotes++;
             // Create game note
-            float time = timing.GetTimeByBeat(beat);
             GameNoteType type = TranslateNoteType(note);
             GameNoteData gameNote = new GameNoteData
             {
-                time = Mathf.RoundToInt(time * 1000),
+                time = Mathf.RoundToInt(note.time * 1000),
                 lane = note.lane,
                 pos = GetJudgePosFromRawNote(note),
                 type = type,
                 isFuwafuwa = IsNoteFuwafuwa(note),
-                isGray = type == GameNoteType.Single && note.beat[2] > 2
+                isGray = type == GameNoteType.Single && note.beat[2] > 2,
+                anims = note.anims,
+                appearTime = Mathf.RoundToInt(timing.GetAppearTime(note) * 1000),
+                timingGroup = groupId
             };
-            timing.AddAnimation(note, gameNote);
 
             // Check slide
             if (note.tickStack == -1)
             {
                 // Note is a single note or flick
-                gameNotes.Add(gameNote);
+                ret.Add(gameNote);
                 continue;
             }
             // Note is part of a slide
@@ -169,7 +150,7 @@ public static class ChartLoader
                     {
                         Debug.LogWarning(BeatToString(note.beat) + "Slide without a start. Translated to single note.");
                         gameNote.type = type == GameNoteType.SlideEnd ? GameNoteType.Single : GameNoteType.Flick;
-                        gameNotes.Add(gameNote);
+                        ret.Add(gameNote);
                         continue;
                     }
                     Debug.LogWarning(BeatToString(note.beat) + "Start of a slide must be 'Single' instead of '" + note.type + "'.");
@@ -182,9 +163,9 @@ public static class ChartLoader
                 tickStackTable[note.tickStack] = tmp;
                 type = GameNoteType.SlideStart;
                 gameNote.type = type;
-                gameNotes.Add(tmp);
+                ret.Add(tmp);
             }
-            GameNoteData tickStack = tickStackTable[note.tickStack] as GameNoteData;
+            GameNoteData tickStack = tickStackTable[note.tickStack];
             tickStack.seg.Add(gameNote);
             if (NoteUtility.IsSlideEnd(type))
             {
@@ -200,16 +181,37 @@ public static class ChartLoader
             }
             Debug.LogError("Some slides do not contain a tail. Ignored.");
         }
+        return ret;
+    }
+    
+    public static GameTimingGroup ToGameTimingGroup(V2.TimingGroup group)
+    {
+        return new GameTimingGroup
+        {
+            points = group.points
+        };
+    }
+
+    public static GameChartData LoadChart(V2.Chart chart)
+    {
+        numNotes = 0;
+        var timing = new ChartTiming(chart.bpm, chart.offset);
+        List<GameNoteData> gameNotes = new List<GameNoteData>();
+        for (int i = 0; i < chart.groups.Count; i++)
+        {
+            LoadTimingGroup(timing, i, chart.groups[i]).ForEach(note => gameNotes.Add(note));
+        }
+
         // Sort notes by animation order
         gameNotes.Sort(new GameNoteComparer());
 
         return new GameChartData
         {
-            isFuwafuwa = isFuwafuwa,
+            isFuwafuwa = IsChartFuwafuwa(gameNotes),
             numNotes = numNotes,
             notes = gameNotes,
-            speed = timing.SpeedInfo,
-            bpm = timing.BPMInfo
+            groups = chart.groups.Select(x => ToGameTimingGroup(x)).ToList(),
+            bpm = chart.bpm
         };
     }
 }

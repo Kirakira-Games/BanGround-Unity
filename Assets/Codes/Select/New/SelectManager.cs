@@ -95,7 +95,6 @@ public class SelectManager : MonoBehaviour
 
                 if (!await LiveSetting.LoadChart())
                 {
-                    MessageBoxController.ShowMsg(LogLevel.ERROR, "This chart is unsupported.");
                     return;
                 }
 
@@ -536,7 +535,6 @@ public class SelectManager : MonoBehaviour
     {
         if (!await LiveSetting.LoadChart())
         {
-            MessageBoxController.ShowMsg(LogLevel.ERROR, "This chart is unsupported.");
             return;
         }
         StartCoroutine(PreviewFadeOut());

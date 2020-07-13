@@ -49,7 +49,7 @@ public class GameChartData
     public int numNotes;
     public List<GameNoteData> notes;
     public List<GameTimingGroup> groups;
-    public List<V2.BPMPoint> bpm;
+    public List<V2.ValuePoint> bpm;
 }
 
 public enum JudgeResult

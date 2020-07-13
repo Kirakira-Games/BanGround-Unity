@@ -169,6 +169,17 @@ public class TransitionVector : IExtensible
         this.transition = transition;
     }
 
+    public TransitionVector Copy()
+    {
+        return new TransitionVector
+        {
+            x = x,
+            y = y,
+            z = z,
+            transition = transition
+        };
+    }
+
     public static implicit operator Vector3(TransitionVector vector)
     {
         return new Vector3(vector.x, vector.y, vector.z);
@@ -176,11 +187,17 @@ public class TransitionVector : IExtensible
 
     public static TransitionVector Lerp(TransitionVector a, TransitionVector b, float t)
     {
+        t = Mathf.Clamp01(t);
+        return LerpUnclamped(a, b, t);
+    }
+
+    public static TransitionVector LerpUnclamped(TransitionVector a, TransitionVector b, float t)
+    {
         return new TransitionVector
         {
-            x = TransitionLib.Lerp(a.x, b.x, t, a.transition),
-            y = TransitionLib.Lerp(a.y, b.y, t, a.transition),
-            z = TransitionLib.Lerp(a.z, b.z, t, a.transition)
+            x = TransitionLib.LerpUnclamped(a.x, b.x, t, a.transition),
+            y = TransitionLib.LerpUnclamped(a.y, b.y, t, a.transition),
+            z = TransitionLib.LerpUnclamped(a.z, b.z, t, Transition.Linear)
         };
     }
 }
