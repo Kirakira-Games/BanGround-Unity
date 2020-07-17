@@ -2,6 +2,7 @@
 using System.Collections;
 using UniRx.Async;
 using System;
+using Newtonsoft.Json;
 
 public static class ChartVersion
 {

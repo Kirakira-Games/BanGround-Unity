@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Linq;
 using System;
 using System.IO;
+using Newtonsoft.Json;
 
 class GameNoteComparer : Comparer<GameNoteData>
 {
@@ -79,6 +80,10 @@ public static class ChartLoader
 
     public static bool IsNoteFuwafuwa(GameNoteData note)
     {
+        if (note.seg != null)
+        {
+            return note.seg.Any(IsNoteFuwafuwa);
+        }
         return note.lane == -1 || note.anims.Any(anim => Mathf.Abs(anim.pos.y) > NoteUtility.EPS);
     }
 
@@ -109,6 +114,7 @@ public static class ChartLoader
         var ret = new List<GameNoteData>();
         foreach (var note in notes)
         {
+            Debug.Log(note);
             if (prevBeat - note.beatf > NoteUtility.EPS)
             {
                 Debug.LogError(BeatToString(note.beat) + "Incorrect order of notes!");
@@ -135,7 +141,7 @@ public static class ChartLoader
             };
 
             // Check slide
-            if (note.tickStack == -1)
+            if (note.tickStack <= 0)
             {
                 // Note is a single note or flick
                 ret.Add(gameNote);
@@ -209,9 +215,9 @@ public static class ChartLoader
         {
             isFuwafuwa = IsChartFuwafuwa(gameNotes),
             numNotes = numNotes,
-            notes = gameNotes,
-            groups = chart.groups.Select(x => ToGameTimingGroup(x)).ToList(),
-            bpm = chart.bpm
+            notes = gameNotes.ToArray(),
+            groups = chart.groups.Select(x => ToGameTimingGroup(x)).ToArray(),
+            bpm = chart.bpm.ToArray()
         };
     }
 }

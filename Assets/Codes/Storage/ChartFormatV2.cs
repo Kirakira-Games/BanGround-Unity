@@ -50,6 +50,19 @@ namespace V2
                 pos = TransitionVector.LerpUnclamped(a.pos, b.pos, t)
             };
         }
+
+        public static string ToString(IWithTiming t)
+        {
+            if (t.beat != null)
+                return $"[{t.beat[0]}:{t.beat[1]}/{t.beat[2]}] ";
+            else
+                return $"[{t.beatf}] ";
+        }
+
+        public override string ToString()
+        {
+            return $"{ToString(this)} pos={pos.x},{pos.y},{pos.z}({pos.transition})";
+        }
     }
 
     [Preserve]
@@ -160,7 +173,7 @@ namespace V2
         {
             var ret = new TimingGroup
             {
-                notes = notes.Select(note => Note.From(note)).ToList()
+                notes = notes.Where(note => note.type != NoteType.BPM).Select(note => Note.From(note)).ToList()
             };
             ret.points.Add(TimingPoint.Default());
             return ret;
@@ -215,6 +228,11 @@ namespace V2
                 y = note.y
             };
         }
+
+        public override string ToString()
+        {
+            return $"{NoteAnim.ToString(this)} lane={lane}, x={x}, y={y}, ts={tickStack}, anims=[\n  {string.Join("\n  ", anims.Select(anim => anim.ToString()))}\n]";;
+        }
     }
 
     [Preserve]
@@ -253,6 +271,12 @@ namespace V2
                 difficulty = old.Difficulty,
                 level = old.level,
                 offset = old.offset,
+                groups = new List<TimingGroup> { TimingGroup.From(old.notes) },
+                bpm = old.notes.Where(note => note.type == NoteType.BPM).Select(note => new ValuePoint
+                {
+                    beat = note.beat.ToArray(),
+                    value = note.value
+                }).ToList()
             };
         }
     }
