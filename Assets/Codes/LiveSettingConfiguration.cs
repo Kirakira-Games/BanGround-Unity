@@ -222,9 +222,9 @@ public static class LiveSetting
         catch (Exception e)
         {
             MessageBoxController.ShowMsg(LogLevel.ERROR, e.Message);
+            Debug.LogError(e.StackTrace);
+            return false;
         }
-        MessageBoxController.ShowMsg(LogLevel.ERROR, "Unexpected failure.");
-        return false;
     }
 
     static KVarRef r_notespeed = new KVarRef("r_notespeed");

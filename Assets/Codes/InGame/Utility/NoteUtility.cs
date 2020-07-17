@@ -46,9 +46,9 @@ public class GameChartData
 {
     public bool isFuwafuwa;
     public int numNotes;
-    public List<GameNoteData> notes;
-    public List<GameTimingGroup> groups;
-    public List<V2.ValuePoint> bpm;
+    public GameNoteData[] notes;
+    public GameTimingGroup[] groups;
+    public V2.ValuePoint[] bpm;
 }
 
 public enum JudgeResult

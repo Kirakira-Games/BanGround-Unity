@@ -19,7 +19,6 @@ public class ChartTiming
     public List<ValuePoint> bpms { get; private set; }
     public TimingGroup timings { get; private set; }
     private float totTime;
-    private float unitSpeed;
 
     private delegate bool UnknownPredicate(NoteAnim anim);
     private delegate void Lerp(NoteAnim S, NoteAnim T, NoteAnim i);
@@ -61,12 +60,12 @@ public class ChartTiming
     {
         // Populate necessary information
         timings = group;
-        timings.points.ForEach(point => PopulateTimingInfo(point));
+        timings.points.ForEach(PopulateTimingInfo);
+        timings.notes.ForEach(PopulateTimingInfo);
         timings.notes.ForEach(note => note.anims.ForEach(anim => PopulateTimingInfo(anim)));
-        timings.notes.ForEach(note => PopulateTimingInfo(note));
 
         // Process animation data
-        timings.notes.ForEach(note => AddAnimation(note));
+        timings.notes.ForEach(AddAnimation);
     }
 
     private int GetPrevIndex<T>(List<T> list, float beatf) where T : IWithTiming
@@ -170,7 +169,7 @@ public class ChartTiming
             //Debug.Log("Speed: " + info.value + " / " + info.beat + " / " + anim.speed);
             float timeS = Mathf.Max(S.time, info.time);
             float timeT = T.time;
-            var beatT = T.beat;
+            float beatT = T.beatf;
             V2.NoteAnim anim = T;
             float dist;
             bool isLast = i != timings.points.Count - 1 && T.beatf >= timings.points[i + 1].beatf;
@@ -178,7 +177,7 @@ public class ChartTiming
             if (isLast)
             {
                 timeT = timings.points[i + 1].time;
-                beatT = timings.points[i + 1].beat;
+                beatT = timings.points[i + 1].beatf;
             }
 
             dist = (timeT - timeS) * info.speed / totTime;
@@ -188,7 +187,7 @@ public class ChartTiming
             {
                 anim = new V2.NoteAnim
                 {
-                    beat = beatT,
+                    beatf = beatT,
                     pos = TransitionVector.LerpUnclamped(S.pos, T.pos, curDist / totDist)
                 };
             }
@@ -206,10 +205,11 @@ public class ChartTiming
     static KVarRef r_mirror = new KVarRef("r_mirror");
     public void AddAnimation(V2.Note data)
     {
+        Debug.Assert(data.beat != null);
         // Generate default animation
         var initAnim = new V2.NoteAnim
         {
-            beat = new int[] { 0, -99, 1 },
+            beat = new int[] { 0, -100, 1 },
             pos = new TransitionVector(
                 data.lane == -1 ? data.x : data.lane,
                 data.y
@@ -254,7 +254,7 @@ public class ChartTiming
             GenerateAnimationRawData(data.anims[i - 1], data.anims[i], tmpList);
         }
 
-        GenerateAnimation(tmpList, data);
+        data.anims = GenerateAnimation(tmpList, data);
 
         // Check mirror
         if (r_mirror)

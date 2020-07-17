@@ -29,7 +29,7 @@ public class NoteController : MonoBehaviour
 
     private GameChartData chart;
     private TimingGroupController[] timingGroups;
-    private List<GameNoteData> notes => chart.notes;
+    private GameNoteData[] notes => chart.notes;
     private int noteHead;
 
     private ISoundEffect[] soundEffects;
@@ -264,7 +264,7 @@ public class NoteController : MonoBehaviour
 
     private void UpdateNotes()
     {
-        while (noteHead < notes.Count)
+        while (noteHead < notes.Length)
         {
             GameNoteData note = notes[noteHead];
             if (audioTime <= note.appearTime) break;
@@ -458,7 +458,7 @@ public class NoteController : MonoBehaviour
         }
 
         // Update isfinished
-        isFinished = noteHead >= notes.Count;
+        isFinished = noteHead >= notes.Length;
         if (noteQueue.Count > 0)
             isFinished = false;
         if (laneQueue.Any(Q => Q.Count > 0))

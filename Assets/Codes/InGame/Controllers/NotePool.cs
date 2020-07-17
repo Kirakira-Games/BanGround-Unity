@@ -168,7 +168,7 @@ public class NotePool : MonoBehaviour
         }
     }
 
-    public void Init(List<GameNoteData> notes)
+    public void Init(GameNoteData[] notes)
     {
         // Init notemesh
         NoteMesh.Init();

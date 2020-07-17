@@ -14,6 +14,11 @@ public class TimingGroupController
     public TimingGroupController(GameTimingGroup group)
     {
         this.group = group;
+        properties = new MaterialPropertyBlock[5];
+        for (int i = 0; i < properties.Length; i++)
+        {
+            properties[i] = new MaterialPropertyBlock();
+        }
     }
 
     public void SetColor(TimingPoint p)
