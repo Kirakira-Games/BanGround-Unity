@@ -12,9 +12,9 @@ namespace V2
 {
     public interface IWithTiming
     {
-        public int[] beat { get; set; }
-        public float time { get; set; }
-        public float beatf { get; set; }
+        int[] beat { get; set; }
+        float time { get; set; }
+        float beatf { get; set; }
     }
 
     [Preserve]
