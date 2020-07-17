@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class SlideEnd : SlideNoteBase
 {
-    public override void UpdatePosition(int audioTime)
+    public override void UpdatePosition()
     {
-        base.UpdatePosition(audioTime);
+        base.UpdatePosition();
         isStickEnd = false;
         if (!parentSlide) Debug.LogWarning(name);
-        if (isJudging && audioTime >= time)
+        if (isJudging && NoteController.audioTime >= time)
         {
             isStickEnd = true;
             transform.position = judgePos;

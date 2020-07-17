@@ -46,7 +46,7 @@ public class LoaderInfo : MonoBehaviour
 
         songName.text = string.Format(NameFormat, musicHeader.title);
         songBPM.text = GetBPM() + " NOTE " + LiveSetting.gameChart.numNotes;
-        songLevelAndCharter.text = string.Format(LevelAndCharterFormat, Enum.GetName(typeof(Difficulty), LiveSetting.chart.Difficulty).ToUpper(), LiveSetting.chart.level, chartHeader.authorNick);
+        songLevelAndCharter.text = string.Format(LevelAndCharterFormat, LiveSetting.chart.difficulty.ToString().ToUpper(), LiveSetting.chart.level, chartHeader.authorNick);
         songArtist.text = string.Format(ArtistFormat, musicHeader.artist);
     }
 
