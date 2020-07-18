@@ -25,9 +25,14 @@ public class SwitchEngine : MonoBehaviour
             if (on) snd_engine.Set("Fmod");
         });
 
-        bool fmod = snd_engine == "Fmod";
-        engineTgs[0].isOn = !fmod;
-        engineTgs[1].isOn = fmod;
+        engineTgs[2].onValueChanged.AddListener(on =>
+        {
+            if (on) snd_engine.Set("Unity");
+        });
+
+        engineTgs[0].isOn = snd_engine == "Bass";
+        engineTgs[1].isOn = snd_engine == "Fmod";
+        engineTgs[2].isOn = snd_engine == "Unity";
 
     }
 }
