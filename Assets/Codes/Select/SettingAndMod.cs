@@ -27,6 +27,7 @@ public class SettingAndMod : MonoBehaviour
     private Toggle shake_Tog;
     private Toggle milisec_Tog;
     private Toggle Video_Tog;
+    private Toggle Effect_Tog;
     private NoteStyleToggleGroup noteToggles;
     private SESelector seSelector;
 
@@ -91,6 +92,7 @@ public class SettingAndMod : MonoBehaviour
     static KVar r_brightness_bg = new KVar("r_brightness_bg", "0.7", KVarFlags.Archive, "Background brightness");
     static KVar r_brightness_lane = new KVar("r_brightness_lane", "0.84", KVarFlags.Archive, "Lane brightness");
     static KVar r_brightness_long = new KVar("r_brightness_long", "0.8", KVarFlags.Archive, "Brightness of Longs or Slides");
+    static KVar r_showeffect = new KVar("r_showeffect", "1", KVarFlags.Archive, "Show LaneParticleEffect");
 
     // cl for Client
     static KVar cl_showms = new KVar("cl_showms", "0", KVarFlags.Archive);
@@ -128,6 +130,7 @@ public class SettingAndMod : MonoBehaviour
         noteToggles = GameObject.Find("Note_Group").GetComponent<NoteStyleToggleGroup>();
         seSelector = GameObject.Find("SEGroup").GetComponent<SESelector>();
         Video_Tog = GameObject.Find("Video_Toggle").GetComponent<Toggle>();
+        Effect_Tog = GameObject.Find("Effect_Tog").GetComponent<Toggle>();
 
         speed_Input = GameObject.Find("Speed_Input").GetComponent<InputField>();
         judge_Input = GameObject.Find("Judge_Input").GetComponent<InputField>();
@@ -239,6 +242,7 @@ public class SettingAndMod : MonoBehaviour
         shake_Tog.isOn = r_shake_flick;
         milisec_Tog.isOn = cl_showms;
         Video_Tog.isOn = r_usevideo;
+        Effect_Tog.isOn = r_showeffect;
 
         judgeOffsetTransform.value = cl_offset_transform;
         far_Clip.value = r_farclip;
@@ -297,6 +301,7 @@ public class SettingAndMod : MonoBehaviour
             r_shake_flick.Set(shake_Tog.isOn);
             cl_showms.Set(milisec_Tog.isOn);
             r_usevideo.Set(Video_Tog.isOn);
+            r_showeffect.Set(Effect_Tog.isOn);
 #if (UNITY_STANDALONE || UNITY_WSA)
             if (FS_Tog.isOn)
             {

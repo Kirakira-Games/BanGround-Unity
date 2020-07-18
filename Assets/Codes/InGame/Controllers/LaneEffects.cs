@@ -54,7 +54,12 @@ public class LaneEffects : MonoBehaviour
 
     void Start()
     {
+        KVarRef effect = new KVarRef("r_showeffect");
         ps = GetComponentsInChildren<ParticleSystem>();
+        if (!effect)
+        {
+            foreach (var particle in ps) particle.gameObject.SetActive(false);
+        }
         prevSpeed = ps[0].main.simulationSpeed;
         rotation = new Quaternion[]
         {
