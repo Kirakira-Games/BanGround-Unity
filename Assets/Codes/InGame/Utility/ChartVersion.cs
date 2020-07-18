@@ -14,7 +14,7 @@ public static class ChartVersion
 
     public static bool CanConvert(int version)
     {
-        return true;
+        return false;
         //return version == 1;
     }
 
