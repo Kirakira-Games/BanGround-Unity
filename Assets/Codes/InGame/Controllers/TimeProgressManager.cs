@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using AudioProvider;
 using State = GameStateMachine.State;
-using UnityEditor.UI;
 
 public class TimeProgressManager : MonoBehaviour
 {
