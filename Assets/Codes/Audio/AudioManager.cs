@@ -26,6 +26,7 @@ public class AudioManager : MonoBehaviour
         KVar snd_buffer_fmod = new KVar("snd_buffer_fmod", "-1", KVarFlags.Archive, "Buffer size of Fmod Sound Engine");
         int bufferIndex;
         //string engine = PlayerPrefs.GetString("AudioEngine", "Fmod");
+        if (!AppPreLoader.init) return;
         if (snd_engine == "Bass") 
         {
             bufferIndex = snd_buffer_bass;
