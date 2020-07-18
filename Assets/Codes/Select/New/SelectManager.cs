@@ -170,7 +170,7 @@ public class SelectManager : MonoBehaviour
         m_flYMid = (vector3s[0].y + vector3s[1].y + vector3s[2].y + vector3s[3].y) * 0.5f;
 
         //SelectDefault();
-        StartCoroutine(SelectDefaultCoroutine());
+        //StartCoroutine(SelectDefaultCoroutine());
     }
 
     private void LateUpdate()
@@ -355,72 +355,72 @@ public class SelectManager : MonoBehaviour
 
     #endregion
 
-    private void SelectDefault()
-    {
-        int selectedSid = cl_lastsid;
-        // After import, select imported chart
-        if (DataLoader.LastImportedSid != -1)
-        {
-            selectedSid = DataLoader.LastImportedSid;
-            DataLoader.LastImportedSid = -1;
-        }
-        if (selectedSid == -1 || DataLoader.chartList.Find(item => item.sid == selectedSid) == null)
-        {
-            selectedSid = DataLoader.chartList[Random.Range(0, DataLoader.chartList.Count)].sid;
-        }
-        cl_lastsid.Set(selectedSid);
-        LiveSetting.currentChart = DataLoader.chartList.IndexOf(DataLoader.chartList.First(x => x.sid == selectedSid));
+    //private void SelectDefault()
+    //{
+    //    int selectedSid = cl_lastsid;
+    //    // After import, select imported chart
+    //    if (DataLoader.LastImportedSid != -1)
+    //    {
+    //        selectedSid = DataLoader.LastImportedSid;
+    //        DataLoader.LastImportedSid = -1;
+    //    }
+    //    if (selectedSid == -1 || DataLoader.chartList.Find(item => item.sid == selectedSid) == null)
+    //    {
+    //        selectedSid = DataLoader.chartList[Random.Range(0, DataLoader.chartList.Count)].sid;
+    //    }
+    //    cl_lastsid.Set(selectedSid);
+    //    LiveSetting.currentChart = DataLoader.chartList.IndexOf(DataLoader.chartList.First(x => x.sid == selectedSid));
 
-        //滚动到cl_lastsid的位置并选择
-        m_srSongList.ScrollToCell(LiveSetting.currentChart - 4, 9999);
-        StartCoroutine(DelaySetPos());
-    }
+    //    //滚动到cl_lastsid的位置并选择
+    //    m_srSongList.ScrollToCell(LiveSetting.currentChart - 4, 9999);
+    //    StartCoroutine(DelaySetPos());
+    //}
 
-    private IEnumerator DelaySetPos()
-    {
-        //Wait for scroll
-        yield return new WaitForSeconds(1f);
+    //private IEnumerator DelaySetPos()
+    //{
+    //    //Wait for scroll
+    //    yield return new WaitForSeconds(1f);
 
-        //Find targetSong
-        var sis = m_tfContent.GetComponentsInChildren<SongItem>();
-        float minDist = 10240;
-        float dist;
-        float yPos;
-        RectTransform rt;
-        Vector3[] childVector3s = new Vector3[4];
-        for (int i = 0; i < sis.Length; i++)
-        {
-            if (sis[i].cHeader.sid == cl_lastsid)
-            {
-                rt = sis[i].transform as RectTransform;
-                rt.GetWorldCorners(childVector3s);
-                yPos = (childVector3s[0].y + childVector3s[1].y + childVector3s[2].y + childVector3s[3].y) * 0.5f;
-                dist = Mathf.Abs(m_flYMid - yPos);
-                if (dist < minDist)
-                {
-                    minDist = dist;
-                    currentSong = sis[i];
-                }
+    //    //Find targetSong
+    //    var sis = m_tfContent.GetComponentsInChildren<SongItem>();
+    //    float minDist = 10240;
+    //    float dist;
+    //    float yPos;
+    //    RectTransform rt;
+    //    Vector3[] childVector3s = new Vector3[4];
+    //    for (int i = 0; i < sis.Length; i++)
+    //    {
+    //        if (sis[i].cHeader.sid == cl_lastsid)
+    //        {
+    //            rt = sis[i].transform as RectTransform;
+    //            rt.GetWorldCorners(childVector3s);
+    //            yPos = (childVector3s[0].y + childVector3s[1].y + childVector3s[2].y + childVector3s[3].y) * 0.5f;
+    //            dist = Mathf.Abs(m_flYMid - yPos);
+    //            if (dist < minDist)
+    //            {
+    //                minDist = dist;
+    //                currentSong = sis[i];
+    //            }
 
-                //currentSong = sis[i];
-                //break;
-            }
-        }
+    //            //currentSong = sis[i];
+    //            //break;
+    //        }
+    //    }
 
-        //Set Pos
-        m_srSongList.StopMovement();
-        Vector3[] v3s = new Vector3[4];
-        var target = currentSong.gameObject.GetComponent<RectTransform>();
-        target.GetWorldCorners(v3s);
-        yPos = (v3s[0].y + v3s[1].y + v3s[2].y + v3s[3].y) * 0.5f;
-        dist = m_flYMid - yPos;
-        m_tfContent.anchoredPosition = m_tfContent.anchoredPosition + new Vector2(0, dist);
+    //    //Set Pos
+    //    m_srSongList.StopMovement();
+    //    Vector3[] v3s = new Vector3[4];
+    //    var target = currentSong.gameObject.GetComponent<RectTransform>();
+    //    target.GetWorldCorners(v3s);
+    //    yPos = (v3s[0].y + v3s[1].y + v3s[2].y + v3s[3].y) * 0.5f;
+    //    dist = m_flYMid - yPos;
+    //    m_tfContent.anchoredPosition = m_tfContent.anchoredPosition + new Vector2(0, dist);
 
-        //Select
-        lastSong = currentSong;
-        currentSong.OnSelect();
-        StartCoroutine(PlayPreview());
-    }
+    //    //Select
+    //    lastSong = currentSong;
+    //    currentSong.OnSelect();
+    //    StartCoroutine(PlayPreview());
+    //}
 
     private IEnumerator SelectDefaultCoroutine()
     {
@@ -554,6 +554,6 @@ public class SelectManager : MonoBehaviour
         SortSongList();
         m_srSongList.RefillCells();
         //SelectDefault();
-        StartCoroutine(SelectDefaultCoroutine());
+        //StartCoroutine(SelectDefaultCoroutine());
     }
 }
