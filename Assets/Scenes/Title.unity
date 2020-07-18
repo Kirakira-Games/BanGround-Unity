@@ -7512,6 +7512,8 @@ GameObject:
   - component: {fileID: 1130646968}
   - component: {fileID: 1130646971}
   - component: {fileID: 1130646976}
+  - component: {fileID: 1130646973}
+  - component: {fileID: 1130646974}
   m_Layer: 5
   m_Name: MessageBox
   m_TagString: Untagged
@@ -7537,7 +7539,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: -3.3000553, y: -68.999825}
-  m_SizeDelta: {x: 1200, y: 80}
+  m_SizeDelta: {x: 0, y: 80}
   m_Pivot: {x: 0.5, y: 0.5000009}
 --- !u!95 &1130646968
 Animator:
@@ -7650,6 +7652,40 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1130646973
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1130646966}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalFit: 2
+  m_VerticalFit: 0
+--- !u!114 &1130646974
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1130646966}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreLayout: 0
+  m_MinWidth: -1
+  m_MinHeight: -1
+  m_PreferredWidth: 90
+  m_PreferredHeight: -1
+  m_FlexibleWidth: -1
+  m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!223 &1130646976
 Canvas:
   m_ObjectHideFlags: 0
@@ -10994,7 +11030,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 2.6976318, y: -12.924988}
+  m_AnchoredPosition: {x: 2.697754, y: -12.924988}
   m_SizeDelta: {x: -275.0232, y: -539.15}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1294284125
@@ -16510,7 +16546,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -579, y: 0.0010375977}
+  m_AnchoredPosition: {x: -579, y: 0.0009765625}
   m_SizeDelta: {x: -1158.0408, y: 0.0020751953}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1576171380
@@ -19270,14 +19306,14 @@ MonoBehaviour:
     m_FontStyle: 0
     m_BestFit: 1
     m_MinSize: 30
-    m_MaxSize: 45
+    m_MaxSize: 84
     m_Alignment: 4
     m_AlignByGeometry: 1
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Msg
+  m_Text: msg
 --- !u!222 &1716209274
 CanvasRenderer:
   m_ObjectHideFlags: 0
