@@ -19,6 +19,8 @@ namespace AudioProvider
         SEType type;
         PureUnityAudioProvider provider;
 
+        bool isDisposed = false;
+
         public UnityAudioClip(float[] data, int sampleRate, int channels, GameObject obj, SEType type, PureUnityAudioProvider provider)
         {
             totalClips++;
@@ -36,28 +38,96 @@ namespace AudioProvider
 
         public void Dispose()
         {
+            if (isDisposed)
+                return;
+
+            isDisposed = true;
+
             GameObject.Destroy(source.gameObject);
         }
 
-        public uint GetLength() => (uint)(clip.length * 1000f);
-        public uint GetPlaybackTime() => (uint)(source.time * 1000f);
-        public void Pause() => source.Pause();
-        public void Play() => source.Play();
+        public uint GetLength()
+        {
+            if (isDisposed)
+                return 0;
+
+            return (uint)(clip.length * 1000f);
+        }
+
+        public uint GetPlaybackTime()
+        {
+            if (isDisposed)
+                return 0;
+
+            return (uint)(source.time * 1000f);
+        }
+        public void Pause()
+        {
+            if (isDisposed)
+                return;
+
+            source.Pause();
+        }
+        public void Play()
+        {
+            if (isDisposed)
+                return;
+
+            source.Play();
+        }
         public void PlayOneShot()
         {
+            if (isDisposed)
+                return;
+
             if (provider.effectVolume[(int)type] == 0)
                 return;
 
             source.PlayOneShot(clip);
         }
-        public void Restart() => source.Play();
-        public void Resume() => source.UnPause();
-        public void SetPlaybackTime(uint time) => source.time = time / 1000.0f;
-        public void SetVolume(float volume) => source.volume = volume;
-        public void Stop() => source.Stop();
+        public void Restart()
+        {
+            if (isDisposed)
+                return;
+
+            source.Play();
+        }
+        public void Resume()
+        {
+            if (isDisposed)
+                return;
+
+            source.UnPause();
+        }
+        public void SetPlaybackTime(uint time)
+        {
+            if (isDisposed)
+                return;
+
+            source.time = time / 1000.0f;
+        }
+
+        public void SetVolume(float volume)
+        {
+            if (isDisposed)
+                return;
+
+            source.volume = volume;
+        }
+
+        public void Stop()
+        {
+            if (isDisposed)
+                return;
+
+            source.Stop();
+        }
 
         public PlaybackStatus GetStatus()
         {
+            if (isDisposed)
+                return PlaybackStatus.Unknown;
+
             if (source.isPlaying)
                 return PlaybackStatus.Playing;
 
@@ -69,18 +139,27 @@ namespace AudioProvider
 
         public void SetLoopingPoint(uint start, uint end, bool noFade)
         {
+            if (isDisposed)
+                return;
+
             // TODO: uint start, uint end, bool noFade, need to do this like bass
             source.loop = true;
         }
 
         public void SetTimeScale(float scale, bool noPitchShift)
         {
+            if (isDisposed)
+                return;
+
             // TODO: bool noPitchShift, maybe able to do this via modifiying data in audioclip, requires a math master like @KCFindstr
             source.pitch = scale;
         }
 
         internal void VolumeChanged()
         {
+            if (isDisposed)
+                return;
+
             if (type == SEType.Unknown)
                 source.volume = provider.masterVolume * provider.trackVolume;
             else
@@ -111,6 +190,7 @@ namespace AudioProvider
             cfg.sampleRate = sampleRate;
             cfg.numRealVoices = 32;
             cfg.numVirtualVoices = 1024;
+            cfg.speakerMode = AudioSpeakerMode.Stereo;
 
             AudioSettings.Reset(cfg);
 
