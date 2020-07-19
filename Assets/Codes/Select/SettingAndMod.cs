@@ -212,7 +212,7 @@ public class SettingAndMod : MonoBehaviour
         SetLiveSetting();
         setting_Close_Btn.gameObject.SetActive(false);
         KVSystem.Instance.SaveConfig();
-        SelectManager.instance.previewSound.Play();
+        SelectManager.instance.previewSound?.Play();
         AudioManager.Provider.SetSoundEffectVolume(snd_se_volume, SEType.Common);
         AudioManager.Provider.SetSoundEffectVolume(snd_igse_volume, SEType.InGame);
         AudioManager.Provider.SetSoundTrackVolume(snd_bgm_volume);
