@@ -35,7 +35,7 @@ public class AudioManager : MonoBehaviour
             // Disable Unity Audio
             var cfg = AudioSettings.GetConfiguration();
             cfg.dspBufferSize = 0;
-            cfg.sampleRate = 0e;
+            cfg.sampleRate = 0;
             cfg.numRealVoices = 0;
             cfg.numVirtualVoices = 0;
             cfg.speakerMode = AudioSpeakerMode.Stereo;
