@@ -11,7 +11,7 @@ public class SwitchEngine : MonoBehaviour
     void Start()
     {
         tg = GetComponent<ToggleGroup>();
-        engineTgs = GetComponentsInChildren<Toggle>();
+        engineTgs = GetComponentsInChildren<Toggle>(true);
 
         KVarRef snd_engine = new KVarRef("snd_engine");
 
