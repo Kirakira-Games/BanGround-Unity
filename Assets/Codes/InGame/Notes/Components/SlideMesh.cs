@@ -21,7 +21,7 @@ public class SlideMesh : MonoBehaviour
     static KVarRef r_notesize = new KVarRef("r_notesize");
     private float width;
 
-    public void ResetMesh(Transform S, Transform T, bool isFuwafuwa)
+    public void ResetMesh(Transform S, Transform T, bool isFuwafuwa, MaterialPropertyBlock properties)
     {
         transform.SetParent(S);
         transform.localPosition = initPos;
@@ -30,6 +30,7 @@ public class SlideMesh : MonoBehaviour
         transT = T;
         width = BODY_WIDTH * r_notesize;
         SetFuwafuwa(isFuwafuwa);
+        meshRenderer.SetPropertyBlock(properties);
     }
 
     readonly Vector2[] uv =
@@ -90,7 +91,7 @@ public class SlideMesh : MonoBehaviour
             Material material = Resources.Load<Material>("InGame/Materials/note_body");
             cacheMat = Instantiate(material);
             cacheMat.mainTexture = NoteUtility.LoadResource<Texture2D>("long_note_mask");
-            cacheMat.SetColor("_BaseColor", new Color(0.5843137f, 0.9019607f, 0.3019607f, r_brightness_long));
+            //cacheMat.SetColor("_BaseColor", new Color(0.5843137f, 0.9019607f, 0.3019607f, r_brightness_long));
         }
         meshRenderer.material = cacheMat;
     }

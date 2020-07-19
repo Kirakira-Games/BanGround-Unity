@@ -63,7 +63,9 @@ public class TimingGroupController
             case GameNoteType.Flick:
             case GameNoteType.SlideEndFlick:
                 return properties[2];
+            case GameNoteType.SlideStart:
             case GameNoteType.SlideTick:
+            case GameNoteType.SlideEnd:
                 return properties[3];
             default:
                 return properties[4];
