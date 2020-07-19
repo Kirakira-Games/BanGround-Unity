@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 1
+  m_UseShadowmask: 0
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -2558,8 +2558,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 402058849}
   m_HandleRect: {fileID: 402058848}
   m_Direction: 2
-  m_Value: -0.000002516953
-  m_Size: 0.12656873
+  m_Value: -0.00000006895761
+  m_Size: 0.12656707
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -4718,7 +4718,6 @@ GameObject:
   m_Component:
   - component: {fileID: 227569269}
   - component: {fileID: 227569268}
-  - component: {fileID: 227569267}
   - component: {fileID: 227569270}
   m_Layer: 0
   m_Name: Main Camera
@@ -4727,14 +4726,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!81 &227569267
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 227569266}
-  m_Enabled: 1
 --- !u!20 &227569268
 Camera:
   m_ObjectHideFlags: 0
@@ -13998,7 +13989,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 7080.908}
+  m_AnchoredPosition: {x: 0, y: 7080.891}
   m_SizeDelta: {x: 0, y: 8107.0146}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &761209290
@@ -16056,7 +16047,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.00075531006}
+  m_AnchoredPosition: {x: 0, y: -0.0007095337}
   m_SizeDelta: {x: 0, y: 107.9}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!1 &902244106
@@ -22300,7 +22291,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 33.63, y: 0}
+  m_AnchoredPosition: {x: 33.629883, y: 0}
   m_SizeDelta: {x: -67.265274, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1224851467
@@ -28308,7 +28299,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 544539902}
   m_HandleRect: {fileID: 544539901}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
