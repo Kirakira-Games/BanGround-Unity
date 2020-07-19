@@ -8,12 +8,14 @@ public static class ChartVersion
 
     public static bool CanRead(int version)
     {
-        return version == VERSION;
+        return true;
+        //return version == VERSION;
     }
 
     public static bool CanConvert(int version)
     {
-        return version == 1;
+        return false;
+        //return version == 1;
     }
 
     public static async UniTask<bool> Process(cHeader header, Chart _)

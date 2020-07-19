@@ -40,6 +40,8 @@ public class UIManager : MonoBehaviour
     {
         Instance = this;
         SM = new GameStateMachine();
+        KVarRef lowResolution = new KVarRef("r_lowresolution");
+        QualitySettings.SetQualityLevel(lowResolution ? 0 : 1);
     }
 
     void Start()
