@@ -115,6 +115,11 @@ public class TransitionProperty<T> : IExtensible
     {
         return new TransitionProperty<int>(TransitionLib.LerpUnclamped(a, b, t, a.transition), a.transition);
     }
+
+    public override string ToString()
+    {
+        return $"{value} [{transition}]";
+    }
 }
 
 [Preserve]
@@ -173,6 +178,11 @@ public class TransitionColor : IExtensible
         };
         return ret;
     }
+
+    public override string ToString()
+    {
+        return $"({r},{g},{b} [{transition}])";
+    }
 }
 
 [Preserve]
@@ -203,8 +213,8 @@ public class TransitionVector : IExtensible
     {
         return new TransitionVector
         {
-            x = x,
-            y = y,
+            x = x.Copy(),
+            y = y.Copy(),
             z = z
         };
     }
@@ -226,12 +236,12 @@ public class TransitionVector : IExtensible
         {
             x = TransitionProperty<float>.LerpUnclamped(a.x, b.x, t),
             y = TransitionProperty<float>.LerpUnclamped(a.y, b.y, t),
-            z = TransitionLib.LerpUnclamped(a.z, b.z, t, Transition.Linear)
+            z = Mathf.LerpUnclamped(a.z, b.z, t)
         };
     }
 
     public override string ToString()
     {
-        return $"({x} [{x.transition}], {y}[{y.transition}], {z})";
+        return $"({x.value} [{x.transition}], {y.value}[{y.transition}], {z})";
     }
 }

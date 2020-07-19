@@ -55,7 +55,7 @@ public class Slide : MonoBehaviour, KirakiraTracer
                 notes[i + 1].transform,
                 notes[i].displayFuwafuwa || notes[i + 1].displayFuwafuwa,
                 // GameNoteType.None for slide body which does not have a note type
-                noteHead.timingGroup.GetMaterialPropertyBlock(GameNoteType.None, false)
+                noteHead.timingGroup.GetMaterial(GameNoteType.None, notes[i].slideMesh.meshRenderer.material)
             );
         }
         foreach (var note in notes)

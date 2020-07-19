@@ -417,12 +417,6 @@ public class NoteController : MonoBehaviour
         audioTimef = audioTime / 1000f;
         judgeTimef = judgeTime / 1000f;
 
-        // Update timing groups
-        foreach (var i in timingGroups)
-        {
-            i.OnUpdate();
-        }
-
         // Create notes
         UpdateNotes();
         for (int i = 0; i < NoteUtility.LANE_COUNT; i++)
@@ -430,6 +424,12 @@ public class NoteController : MonoBehaviour
             UpdateLane(laneQueue[i]);
         }
         UpdateLane(noteQueue);
+
+        // Update timing groups
+        foreach (var i in timingGroups)
+        {
+            i.OnUpdate();
+        }
 
         // Trigger touch event
         TouchManager.instance.OnUpdate();
@@ -465,7 +465,7 @@ public class NoteController : MonoBehaviour
             isFinished = false;
 
         // Update lane effects
-        laneEffects.UpdateLaneEffects(audioTime);
+        laneEffects.UpdateLaneEffects();
 
         chartScript.OnUpdate(audioTime);
     }
