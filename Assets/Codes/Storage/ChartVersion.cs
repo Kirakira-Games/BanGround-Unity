@@ -10,13 +10,12 @@ public static class ChartVersion
 
     public static bool CanRead(int version)
     {
-        return true;
-        //return version == VERSION;
+        return version == VERSION;
     }
 
     public static bool CanConvert(int version)
     {
-        return version == 1;
+        return version <= 1;
     }
 
     public static V2.Chart ConvertFromV1(cHeader header, Difficulty difficulty)
