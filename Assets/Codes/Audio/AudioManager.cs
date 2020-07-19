@@ -30,15 +30,15 @@ public class AudioManager : MonoBehaviour
 
         if (!AppPreLoader.init) return;
 
-        if (snd_engine != "Unity")
-        {
-            // Disable Unity Audio
-            var audioManager = UnityEditor.AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/AudioManager.asset")[0];
-            var serializedManager = new UnityEditor.SerializedObject(audioManager);
-            var prop = serializedManager.FindProperty("m_DisableAudio");
-            prop.boolValue = true;
-            serializedManager.ApplyModifiedProperties();
-        }
+        //if (snd_engine != "Unity")
+        //{
+        //    // Disable Unity Audio
+        //    var audioManager = AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/AudioManager.asset")[0];
+        //    var serializedManager = new SerializedObject(audioManager);
+        //    var prop = serializedManager.FindProperty("m_DisableAudio");
+        //    prop.boolValue = true;
+        //    serializedManager.ApplyModifiedProperties();
+        //}
 
         if (snd_engine == "Bass") 
         {
