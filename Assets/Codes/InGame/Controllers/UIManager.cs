@@ -60,7 +60,7 @@ public class UIManager : MonoBehaviour
 
         pause_Btn.onClick.AddListener(OnPauseButtonClick);
         resume_Btn.onClick.AddListener(GameResume);
-        retry_Btn.onClick.AddListener(GameRetry);
+        retry_Btn.onClick.AddListener(GameRetryAsync);
         retire_Btn.onClick.AddListener(GameRetire);
 
         pause_Canvas = GameObject.Find("PauseCanvas");
@@ -167,12 +167,13 @@ public class UIManager : MonoBehaviour
         SM.PopState(State.Rewinding);
     }
 
-    public void GameRetry()
+    public async void GameRetryAsync()
     {
         Time.timeScale = 1;
 
         OnStopPlaying();
         //SceneManager.LoadScene("InGame");
+        await LiveSetting.LoadChart();
         SceneLoader.LoadScene("InGame", "InGame", true);
     }
 
