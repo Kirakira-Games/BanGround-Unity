@@ -79,14 +79,14 @@ public class SelectManager_old : MonoBehaviour
         PlayVoicesAtSceneIn();
     }
 
-    private void PlayVoicesAtSceneIn()
+    private async void PlayVoicesAtSceneIn()
     {
-        AudioManager.Instance.PrecacheSE(voices[UnityEngine.Random.Range(0,3)].bytes).PlayOneShot();
+        (await AudioManager.Instance.PrecacheSE(voices[UnityEngine.Random.Range(0,3)].bytes)).PlayOneShot();
     }
 
-    private void PlayVoicesAtSceneOut()
+    private async void PlayVoicesAtSceneOut()
     {
-        AudioManager.Instance.PrecacheSE(voices[UnityEngine.Random.Range(3, 7)].bytes).PlayOneShot();
+        (await AudioManager.Instance.PrecacheSE(voices[UnityEngine.Random.Range(3, 7)].bytes)).PlayOneShot();
     }
 
     private void InitComponent()
@@ -276,8 +276,7 @@ public class SelectManager_old : MonoBehaviour
         cl_lastsid.Set(LiveSetting.CurrentHeader.sid);
         difficultySelect.levels = LiveSetting.CurrentHeader.difficultyLevel.ToArray();
         difficultySelect.OnSongChange();
-        StopCoroutine(PlayPreview());
-        StartCoroutine(PlayPreview());
+        PlayPreviewAsync();
     }
 
     public void UnselectSong()
@@ -291,7 +290,7 @@ public class SelectManager_old : MonoBehaviour
     
 
     bool isFirstPlay = true;
-    IEnumerator PlayPreview()
+    async void PlayPreviewAsync()
     {
         mHeader mheader = DataLoader.GetMusicHeader(LiveSetting.CurrentHeader.mid);
         if (previewSound != null) {
@@ -300,19 +299,22 @@ public class SelectManager_old : MonoBehaviour
         }
         if (DataLoader.MusicExists(LiveSetting.CurrentHeader.mid))
         {
-            previewSound = AudioManager.Instance.PlayLoopMusic(KiraFilesystem.Instance.Read(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), true,
+            previewSound = await AudioManager.Instance.PlayLoopMusic(KiraFilesystem.Instance.Read(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), true,
                 new uint[]
                 {
-                (uint)(mheader.preview[0] * 1000),
-                (uint)(mheader.preview[1] * 1000)
-                    },
-                    false);
+                    (uint)(mheader.preview[0] * 1000),
+                    (uint)(mheader.preview[1] * 1000)
+                }, 
+                false
+            );
+
             if (isFirstPlay)
             {
                 previewSound.Pause();
-                yield return new WaitForSeconds(2.2f); //给语音留个地方
+                await UniTask.Delay(2200); //给语音留个地方
                 previewSound.Play();
             }
+
             StopCoroutine("PreviewFadeIn");
             StartCoroutine(PreviewFadeIn());
             isFirstPlay = false;

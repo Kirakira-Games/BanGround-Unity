@@ -8,9 +8,9 @@ public class OneShootAudioCustom : MonoBehaviour
 
     [SerializeField] private TextAsset sound;
     // Start is called before the first frame update
-    void Start()
+    async void Start()
     {
-        AudioManager.Instance.PrecacheSE(sound.bytes).PlayOneShot();
+        (await AudioManager.Instance.PrecacheSE(sound.bytes)).PlayOneShot();
 
     }
 

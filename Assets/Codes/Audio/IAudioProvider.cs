@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UniRx.Async;
 using XLua;
 
 namespace AudioProvider
@@ -56,7 +57,7 @@ namespace AudioProvider
         void SetSoundTrackVolume(float volume);
         void SetSoundEffectVolume(float volume, SEType type);
 
-        ISoundEffect PrecacheSE(byte[] audio, SEType type);
-        ISoundTrack StreamTrack(byte[] audio);
+        UniTask<ISoundEffect> PrecacheSE(byte[] audio, SEType type);
+        UniTask<ISoundTrack> StreamTrack(byte[] audio);
     }
 }

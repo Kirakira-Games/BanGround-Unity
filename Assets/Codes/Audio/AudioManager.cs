@@ -102,11 +102,11 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    public ISoundEffect PrecacheSE(byte[] data) => Provider.PrecacheSE(data, SEType.Common);
-    public ISoundEffect PrecacheInGameSE(byte[] data) => Provider.PrecacheSE(data, SEType.InGame);
+    public async UniTask<ISoundEffect> PrecacheSE(byte[] data) => await Provider.PrecacheSE(data, SEType.Common);
+    public async UniTask<ISoundEffect> PrecacheInGameSE(byte[] data) => await Provider.PrecacheSE(data, SEType.InGame);
     public async UniTaskVoid DelayPlayInGameBGM(byte[] audio, float seconds)
     {
-        gameBGM = Provider.StreamTrack(audio);
+        gameBGM = await Provider.StreamTrack(audio);
         gameBGM.Play();
         gameBGM.Pause();
 
@@ -139,9 +139,9 @@ public class AudioManager : MonoBehaviour
         AudioTimelineSync.instance.Seek(gameBGM.GetPlaybackTime() / 1000f);
     }
     public void StopBGM() => gameBGM.Stop();
-    public ISoundTrack PlayLoopMusic(byte[] audio,bool needLoop = true, uint[] times = null, bool noFade = true)
+    public async UniTask<ISoundTrack> PlayLoopMusic(byte[] audio,bool needLoop = true, uint[] times = null, bool noFade = true)
     {
-        ISoundTrack soundTrack = Provider.StreamTrack(audio);
+        ISoundTrack soundTrack = await Provider.StreamTrack(audio);
 
         uint start = 0;
         uint end = soundTrack.GetLength();

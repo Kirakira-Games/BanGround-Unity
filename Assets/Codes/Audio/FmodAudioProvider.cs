@@ -5,6 +5,9 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using FMOD;
+using UniRx.Async;
+
+#pragma warning disable CS1998 // 异步方法缺少 "await" 运算符，将以同步方式运行
 
 namespace AudioProvider
 {
@@ -341,7 +344,7 @@ namespace AudioProvider
             fmodSystem.createChannelGroup("Tracks", out FmodSoundTrack.stGroup);
             fmodSystem.createChannelGroup("SoundEffects", out FmodSoundEffect.seGroup);
         }
-        public ISoundEffect PrecacheSE(byte[] audio, SEType type)
+        public async UniTask<ISoundEffect> PrecacheSE(byte[] audio, SEType type)
         {
             CREATESOUNDEXINFO exinfo = new CREATESOUNDEXINFO();
             exinfo.cbsize = Marshal.SizeOf(exinfo);
@@ -380,7 +383,7 @@ namespace AudioProvider
             OnVolumeChanged?.Invoke();
         }
 
-        public ISoundTrack StreamTrack(byte[] audio)
+        public async UniTask<ISoundTrack> StreamTrack(byte[] audio)
         {
             CREATESOUNDEXINFO exinfo = new CREATESOUNDEXINFO();
             exinfo.cbsize = Marshal.SizeOf(exinfo);
