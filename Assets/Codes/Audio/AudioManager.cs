@@ -7,6 +7,7 @@ using UniRx.Async;
 
 using State = GameStateMachine.State;
 using UnityEditor;
+using System.Threading.Tasks;
 
 public class AudioManager : MonoBehaviour
 {
@@ -109,7 +110,15 @@ public class AudioManager : MonoBehaviour
     public async UniTask<ISoundEffect> PrecacheInGameSE(byte[] data) => await Provider.PrecacheSE(data, SEType.InGame);
     public async UniTaskVoid DelayPlayInGameBGM(byte[] audio, float seconds)
     {
-        gameBGM = await Provider.StreamTrack(audio);
+        if(Provider is PureUnityAudioProvider)
+        {
+            gameBGM = await ((PureUnityAudioProvider)Provider).PrecacheTrack(audio);
+        }
+        else
+        {
+            gameBGM = await Provider.StreamTrack(audio);
+        }
+        
         gameBGM.Play();
         gameBGM.Pause();
 
@@ -156,6 +165,7 @@ public class AudioManager : MonoBehaviour
 
         if (needLoop)
             soundTrack.SetLoopingPoint(start, end, noFade);
+
         soundTrack.Play();
         return soundTrack;
     }
