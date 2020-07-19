@@ -21,7 +21,7 @@ public class SlideMesh : MonoBehaviour
     static KVarRef r_notesize = new KVarRef("r_notesize");
     private float width;
 
-    public void ResetMesh(Transform S, Transform T, bool isFuwafuwa, MaterialPropertyBlock properties)
+    public void ResetMesh(Transform S, Transform T, bool isFuwafuwa, Material material)
     {
         transform.SetParent(S);
         transform.localPosition = initPos;
@@ -30,7 +30,7 @@ public class SlideMesh : MonoBehaviour
         transT = T;
         width = BODY_WIDTH * r_notesize;
         SetFuwafuwa(isFuwafuwa);
-        meshRenderer.SetPropertyBlock(properties);
+        meshRenderer.material = material;
     }
 
     readonly Vector2[] uv =

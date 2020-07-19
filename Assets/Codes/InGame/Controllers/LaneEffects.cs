@@ -9,6 +9,8 @@ public class LaneEffects : MonoBehaviour
     private float prevSpeed;
     private Quaternion[] rotation;
 
+    static KVarRef effect = new KVarRef("r_showeffect");
+
     public static TimingPoint GetIndexByTime(List<TimingPoint> list, float time)
     {
         int l = -1, r = list.Count - 1;
@@ -60,12 +62,12 @@ public class LaneEffects : MonoBehaviour
 
     static KVarRef r_notespeed = new KVarRef("r_notespeed");
 
-    public void UpdateLaneEffects(int audioTime)
+    public void UpdateLaneEffects()
     {
         if (!effect)
             return;
 
-        float speed = GetSpeed(audioTime) * LiveSetting.SpeedCompensationSum * (r_notespeed + 1f) / 12;
+        float speed = GetSpeed(NoteController.audioTimef) * LiveSetting.SpeedCompensationSum * (r_notespeed + 1f) / 12;
         float abs = Mathf.Abs(speed);
         if (prevSpeed != speed)
         {

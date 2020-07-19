@@ -109,12 +109,35 @@ public static class ChartLoader
         note.y = Random.Range(0f, 1f);
     }
 
+    public static TransitionColor RandomColor()
+    {
+        return new TransitionColor((byte)Random.Range(0, 255), (byte)Random.Range(0, 255), (byte)Random.Range(0, 255), (byte)Random.Range(128, 255), Transition.Linear);
+    }
+
+    public static void RandomizeTimingGroup(V2.TimingGroup group)
+    {
+        for (int i = 1; i <= 10; i++)
+        {
+            group.points.Add(new V2.TimingPoint
+            {
+                beat = new int[3] { i * 10, 0, 1 },
+                speed = new TransitionProperty<float>(i % 2 == 0 ? 1 : 2),
+                tap = RandomColor(),
+                flick = RandomColor(),
+                tapGrey = RandomColor(),
+                slideTick = RandomColor(),
+                slide = RandomColor()
+            });
+        }
+    }
+
     private static List<GameNoteData> LoadTimingGroup(ChartTiming timing, int groupId, V2.TimingGroup group)
     {
         // AnalyzeNotes
         var notes = group.notes;
         notes.ForEach(note => NormalizeBeat(note.beat));
         notes.ForEach(RandomizeNote);
+        RandomizeTimingGroup(group);
         timing.LoadTimingGroup(group);
         // Create game notes
         float prevBeat = -1e9f;
@@ -122,7 +145,6 @@ public static class ChartLoader
         var ret = new List<GameNoteData>();
         foreach (var note in notes)
         {
-            //Debug.Log(note);
             if (prevBeat - note.beatf > NoteUtility.EPS)
             {
                 Debug.LogError(BeatToString(note.beat) + "Incorrect order of notes!");

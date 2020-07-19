@@ -150,6 +150,11 @@ namespace V2
             };
             return ret;
         }
+
+        public override string ToString()
+        {
+            return $"{NoteAnim.ToString(this)} speed={speed} tap={tap} tapGrey={tapGrey} flick={flick} slideTick={slideTick} slide={slide}";
+        }
     }
 
     [Preserve]

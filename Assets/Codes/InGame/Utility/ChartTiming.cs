@@ -111,7 +111,6 @@ public class ChartTiming
         foreach (var anim in raw)
         {
             anim.pos.z += curDist;
-            //Debug.Log("Finalize " + anim);
             curDist = anim.pos.z;
             if (!isEnd)
                 totDist = anim.pos.z;
@@ -136,11 +135,14 @@ public class ChartTiming
                 {
                     isStart = false;
                     float ratio = Mathf.InverseLerp(cur.pos.z, nxt.pos.z, 0);
-                    ret.Add(V2.NoteAnim.LerpUnclamped(cur, nxt, ratio));
+                    var anim = V2.NoteAnim.LerpUnclamped(cur, nxt, ratio);
+                    ret.Add(anim);
                 }
             }
             if (!isStart)
+            {
                 ret.Add(nxt);
+            }
         }
         return ret;
     }
@@ -152,7 +154,7 @@ public class ChartTiming
         for (int i = GetPrevIndex(timings.points, S.beatf); i < timings.points.Count; i++)
         {
             var info = timings.points[i];
-            if (info.beatf >= T.beatf - NoteUtility.EPS)
+            if (info.beatf > T.beatf)
                 break;
             //Debug.Log("Speed: " + info.value + " / " + info.beat + " / " + anim.speed);
             float timeS = Mathf.Max(S.time, info.time);
@@ -167,23 +169,22 @@ public class ChartTiming
         for (int i = GetPrevIndex(timings.points, S.beatf); i < timings.points.Count; i++)
         {
             var info = timings.points[i];
-            if (info.beatf >= T.beatf - NoteUtility.EPS)
+            if (info.beatf > T.beatf)
                 break;
             //Debug.Log("Speed: " + info.value + " / " + info.beat + " / " + anim.speed);
             float timeS = Mathf.Max(S.time, info.time);
             float timeT = T.time;
             float beatT = T.beatf;
             V2.NoteAnim anim = T;
-            float dist;
-            bool isLast = i != timings.points.Count - 1 && T.beatf >= timings.points[i + 1].beatf;
+            bool isLast = i == timings.points.Count - 1 || T.beatf < timings.points[i + 1].beatf;
 
-            if (isLast)
+            if (!isLast)
             {
                 timeT = timings.points[i + 1].time;
                 beatT = timings.points[i + 1].beatf;
             }
 
-            dist = (timeT - timeS) * info.speed / totTime;
+            float dist = (timeT - timeS) * info.speed / totTime;
             curDist += dist; // Assume constant speed transition here
 
             if (!isLast)
@@ -196,7 +197,7 @@ public class ChartTiming
             }
             else
             {
-                Debug.Assert(Mathf.Approximately(dist, curDist));
+                Debug.Assert(Mathf.Approximately(totDist, curDist));
             }
             anim.pos.z = dist; // z temporarily stores the distance traveled
             //Debug.Log("Add anim " + anim + " from " + S + " and " + T);

@@ -59,8 +59,8 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
 
         transform.localScale = Vector3.one * NoteUtility.NOTE_SCALE * r_notesize;
 
-        // Setup material property block
-        noteMesh.meshRenderer.SetPropertyBlock(timingGroup.GetMaterialPropertyBlock(type, r_graynote && data.isGray));
+        // Setup material
+        noteMesh.meshRenderer.material = timingGroup.GetMaterial(type, noteMesh.meshRenderer.material, r_graynote && data.isGray);
     }
 
     static KVarRef r_bang_perspect = new KVarRef("r_bang_perspect");
