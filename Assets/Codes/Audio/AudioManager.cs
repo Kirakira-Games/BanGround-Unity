@@ -30,15 +30,18 @@ public class AudioManager : MonoBehaviour
 
         if (!AppPreLoader.init) return;
 
-        //if (snd_engine != "Unity")
-        //{
-        //    // Disable Unity Audio
-        //    var audioManager = AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/AudioManager.asset")[0];
-        //    var serializedManager = new SerializedObject(audioManager);
-        //    var prop = serializedManager.FindProperty("m_DisableAudio");
-        //    prop.boolValue = true;
-        //    serializedManager.ApplyModifiedProperties();
-        //}
+        if (snd_engine != "Unity")
+        {
+            // Disable Unity Audio
+            var cfg = AudioSettings.GetConfiguration();
+            cfg.dspBufferSize = 0;
+            cfg.sampleRate = 0e;
+            cfg.numRealVoices = 0;
+            cfg.numVirtualVoices = 0;
+            cfg.speakerMode = AudioSpeakerMode.Stereo;
+
+            AudioSettings.Reset(cfg);
+        }
 
         if (snd_engine == "Bass") 
         {
