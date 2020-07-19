@@ -27,7 +27,6 @@ public static class DataLoader
     public static List<cHeader> chartList => songList.cHeaders;
     public static bool loaded => songList != null;
 
-    public const int ChartVersion = 1;
     private const int InitialChartVersion = 5;
     private const int GameVersion = 4;
 

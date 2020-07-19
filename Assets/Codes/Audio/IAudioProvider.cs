@@ -17,7 +17,9 @@ namespace AudioProvider
     public enum SEType
     {
         Common = 0,
-        InGame
+        InGame,
+
+        Unknown = -1
     }
 
     public interface ISoundTrack : IDisposable

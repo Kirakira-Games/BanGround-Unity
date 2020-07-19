@@ -7,6 +7,7 @@ using XLua;
 using System.IO;
 using UnityEngine;
 using AudioProvider;
+using SELib;
 
 [LuaCallCSharp]
 class ChartCamera
@@ -66,6 +67,123 @@ class ScriptSoundEffect : IDisposable
     public void PlayOneShot()
     {
         se?.PlayOneShot();
+    }
+}
+
+[LuaCallCSharp]
+class ScriptModel : IDisposable
+{
+    SEModel model;
+
+    GameObject rootObj;
+
+    public ScriptModel(string path)
+    {
+        model = SEModel.Read(KiraFilesystem.Instance.ReadStream(ChartScript.GetChartResource(path)));
+
+        rootObj = new GameObject(path);
+
+        rootObj.transform.parent = GameObject.Find("ScriptObjects").transform;
+
+        var bones = new List<Transform>();
+
+        foreach (var bone in model.Bones)
+        {
+            var boneObj = new GameObject(bone.BoneName);
+
+            if (bone.RootBone)
+                boneObj.transform.parent = rootObj.transform;
+            else
+                boneObj.transform.parent = bones[bone.BoneParent];
+
+            boneObj.transform.position = new Vector3((float)bone.LocalPosition.X, (float)bone.LocalPosition.Y, (float)bone.LocalPosition.Z);
+            boneObj.transform.rotation = new Quaternion((float)bone.LocalRotation.X, (float)bone.LocalRotation.Y, (float)bone.LocalRotation.Z, (float)bone.LocalRotation.W);
+
+            bones.Add(boneObj.transform);
+        }
+
+        foreach (var mesh in model.Meshes)
+        {
+            var modelObj = new GameObject(path);
+
+            modelObj.transform.parent = rootObj.transform;
+
+            var meshRenderer = modelObj.AddComponent<SkinnedMeshRenderer>();
+
+            var umesh = new Mesh();
+
+            var verts = new List<Vector3>();
+            var normals = new List<Vector3>();
+            var UVs = new List<Vector2>();
+            var boneWeights = new List<BoneWeight>();
+            var triangles = new List<int>();
+            var bindPoses = new List<Matrix4x4>();
+
+            int baseIndex = verts.Count;
+
+            foreach (var vert in mesh.Verticies)
+            {
+                verts.Add(new Vector3((float)vert.Position.X, (float)vert.Position.Y, (float)vert.Position.Z));
+                normals.Add(new Vector3((float)vert.VertexNormal.X, (float)vert.VertexNormal.Y, (float)vert.VertexNormal.Z));
+                UVs.Add(new Vector2((float)vert.UVSets[0].X, (float)vert.UVSets[0].Y));
+
+                bindPoses.Add(Matrix4x4.identity);
+
+                var weight = new BoneWeight();
+
+                for (int i = 0; i < vert.WeightCount; i++)
+                {
+                    if (i == 0)
+                    {
+                        weight.boneIndex0 = (int)vert.Weights[i].BoneIndex;
+                        weight.weight0 = vert.Weights[i].BoneWeight;
+                    }
+                    else if (i == 1)
+                    {
+                        weight.boneIndex1 = (int)vert.Weights[i].BoneIndex;
+                        weight.weight1 = vert.Weights[i].BoneWeight;
+                    }
+                    else if (i == 2)
+                    {
+                        weight.boneIndex2 = (int)vert.Weights[i].BoneIndex;
+                        weight.weight2 = vert.Weights[i].BoneWeight;
+                    }
+                    else if (i == 3)
+                    {
+                        weight.boneIndex3 = (int)vert.Weights[i].BoneIndex;
+                        weight.weight3 = vert.Weights[i].BoneWeight;
+                    }
+                }
+
+                boneWeights.Add(weight);
+            }
+
+            foreach (var face in mesh.Faces)
+            {
+                triangles.Add(baseIndex + (int)face.FaceIndex1);
+                triangles.Add(baseIndex + (int)face.FaceIndex2);
+                triangles.Add(baseIndex + (int)face.FaceIndex3);
+            }
+
+            umesh.vertices = verts.ToArray();
+            umesh.normals = normals.ToArray();
+            umesh.uv = UVs.ToArray();
+            umesh.triangles = triangles.ToArray();
+            umesh.boneWeights = boneWeights.ToArray();
+            umesh.bindposes = bindPoses.ToArray();
+
+            umesh.RecalculateBounds();
+            umesh.Optimize();
+
+            meshRenderer.sharedMesh = umesh;
+            meshRenderer.quality = SkinQuality.Bone2;
+            meshRenderer.bones = bones.ToArray();
+            meshRenderer.rootBone = bones[0];
+        }
+    }
+
+    public void Dispose()
+    {
     }
 }
 

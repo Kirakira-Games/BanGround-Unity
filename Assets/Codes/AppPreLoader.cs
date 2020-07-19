@@ -48,6 +48,7 @@ public class AppPreLoader : MonoBehaviour
         {
             sampleRate = 48000;
             bufferSize = 0;
+            init = true;
             //SceneManager.LoadScene("Title");
         }
         else
