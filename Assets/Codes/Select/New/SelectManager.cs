@@ -275,6 +275,8 @@ public class SelectManager : MonoBehaviour
 
     async void PlayPreview()
     {
+        await UniTask.WaitUntil(() => !faderWorking);
+
         if (LiveSetting.CurrentHeader.mid == lastPreviewMid)
             return;
 
@@ -311,16 +313,22 @@ public class SelectManager : MonoBehaviour
         }
     }
 
+    bool faderWorking = false;
+
     async UniTask PreviewFadeOut(float speed = 0.008F)
     {
         if (previewSound == null)
             return;
+
+        faderWorking = true;
 
         for (float i = 0.7f; i > 0; i -= speed)
         {
             previewSound.SetVolume(i);
             await UniTask.DelayFrame(1);
         }
+
+        faderWorking = false;
     }
 
     async UniTask PreviewFadeIn()
@@ -328,11 +336,15 @@ public class SelectManager : MonoBehaviour
         if (previewSound == null)
             return;
 
+        faderWorking = true;
+
         for (float i = 0f; i < 0.7f; i += 0.02f)
         {
             previewSound.SetVolume(i);
             await UniTask.DelayFrame(1);
         }
+
+        faderWorking = false;
     }
 
     private async void PlayVoicesAtSceneIn()
