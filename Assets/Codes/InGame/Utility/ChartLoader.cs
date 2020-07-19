@@ -68,14 +68,13 @@ public static class ChartLoader
         return GameNoteType.None;
     }
 
-    public static Vector3 GetJudgePosFromRawNote(V2.Note note)
+    public static Vector3 GetJudgePos(V2.Note note)
     {
-        Vector3 vec = new Vector3(
+        return new Vector3(
             NoteUtility.GetXPos(note.lane == -1 ? note.x : note.lane),
             NoteUtility.GetYPos(note.y),
             NoteUtility.NOTE_JUDGE_Z_POS
         );
-        return NoteUtility.ProjectVectorToParallelPlane(vec);
     }
 
     public static bool IsNoteFuwafuwa(GameNoteData note)
@@ -114,7 +113,7 @@ public static class ChartLoader
         var ret = new List<GameNoteData>();
         foreach (var note in notes)
         {
-            Debug.Log(note);
+            //Debug.Log(note);
             if (prevBeat - note.beatf > NoteUtility.EPS)
             {
                 Debug.LogError(BeatToString(note.beat) + "Incorrect order of notes!");
@@ -131,7 +130,7 @@ public static class ChartLoader
             {
                 time = Mathf.RoundToInt(note.time * 1000),
                 lane = note.lane,
-                pos = GetJudgePosFromRawNote(note),
+                pos = GetJudgePos(note),
                 type = type,
                 isFuwafuwa = IsNoteFuwafuwa(note),
                 isGray = type == GameNoteType.Single && note.beat[2] > 2,

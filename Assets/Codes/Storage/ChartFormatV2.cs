@@ -61,7 +61,7 @@ namespace V2
 
         public override string ToString()
         {
-            return $"{ToString(this)} pos={pos.x},{pos.y},{pos.z}({pos.transition})";
+            return $"{ToString(this)} pos={pos}";
         }
     }
 
@@ -121,7 +121,7 @@ namespace V2
         {
             return new TimingPoint
             {
-                beat = new int[] { 0, 0, 1 },
+                beat = new int[] { -100, 0, 1 },
                 speed = new TransitionProperty<float>(1f),
                 tap = new TransitionColor(0, 0, 255),
                 tapGrey = new TransitionColor(128, 128, 128),

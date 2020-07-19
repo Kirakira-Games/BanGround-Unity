@@ -31,7 +31,7 @@ public static class TransitionLib
             case Transition.Linear:
                 return Mathf.LerpUnclamped(a, b, t);
             default:
-                Debug.Log("Unsupported transition property:" + trans);
+                Debug.LogWarning("Unsupported transition property:" + trans);
                 return a;
         };
     }
@@ -88,6 +88,33 @@ public class TransitionProperty<T> : IExtensible
     {
         value = rhs;
     }
+
+    public TransitionProperty<T> Copy()
+    {
+        return new TransitionProperty<T>(value, transition);
+    }
+
+    public static TransitionProperty<float> Lerp(TransitionProperty<float> a, TransitionProperty<float> b, float t)
+    {
+        t = Mathf.Clamp01(t);
+        return LerpUnclamped(a, b, t);
+    }
+
+    public static TransitionProperty<float> LerpUnclamped(TransitionProperty<float> a, TransitionProperty<float> b, float t)
+    {
+        return new TransitionProperty<float>(TransitionLib.LerpUnclamped(a, b, t, a.transition), a.transition);
+    }
+
+    public static TransitionProperty<int> Lerp(TransitionProperty<int> a, TransitionProperty<int> b, float t)
+    {
+        t = Mathf.Clamp01(t);
+        return LerpUnclamped(a, b, t);
+    }
+
+    public static TransitionProperty<int> LerpUnclamped(TransitionProperty<int> a, TransitionProperty<int> b, float t)
+    {
+        return new TransitionProperty<int>(TransitionLib.LerpUnclamped(a, b, t, a.transition), a.transition);
+    }
 }
 
 [Preserve]
@@ -99,24 +126,28 @@ public class TransitionColor : IExtensible
         => Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
     [ProtoMember(1)]
-    public TransitionProperty<byte> r { get; set; } = new TransitionProperty<byte>();
+    public byte r;
 
     [ProtoMember(2)]
-    public TransitionProperty<byte> g { get; set; } = new TransitionProperty<byte>();
+    public byte g;
 
     [ProtoMember(3)]
-    public TransitionProperty<byte> b { get; set; } = new TransitionProperty<byte>();
+    public byte b;
 
     [ProtoMember(4)]
-    public TransitionProperty<byte> a { get; set; } = new TransitionProperty<byte>();
+    public byte a;
+
+    [ProtoMember(5)]
+    public Transition transition;
 
     public TransitionColor() { }
     public TransitionColor(byte r, byte g, byte b, byte a = 255, Transition transition = Transition.Constant)
     {
-        this.r.Set(r, transition);
-        this.g.Set(g, transition);
-        this.b.Set(b, transition);
-        this.a.Set(a, transition);
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        this.a = a;
+        this.transition = transition;
     }
 
     public static implicit operator Color(TransitionColor color)
@@ -132,11 +163,14 @@ public class TransitionColor : IExtensible
 
     public static TransitionColor LerpUnclamped(TransitionColor a, TransitionColor b, float t)
     {
-        TransitionColor ret = new TransitionColor();
-        ret.r.Set((byte)TransitionLib.LerpUnclamped(a.r, b.r, t, a.r.transition), a.r.transition);
-        ret.g.Set((byte)TransitionLib.LerpUnclamped(a.g, b.g, t, a.g.transition), a.g.transition);
-        ret.b.Set((byte)TransitionLib.LerpUnclamped(a.b, b.b, t, a.b.transition), a.b.transition);
-        ret.a.Set((byte)TransitionLib.LerpUnclamped(a.a, b.a, t, a.a.transition), a.a.transition);
+        TransitionColor ret = new TransitionColor
+        {
+            r = (byte)TransitionLib.LerpUnclamped(a.r, b.r, t, a.transition),
+            g = (byte)TransitionLib.LerpUnclamped(a.g, b.g, t, a.transition),
+            b = (byte)TransitionLib.LerpUnclamped(a.b, b.b, t, a.transition),
+            a = (byte)TransitionLib.LerpUnclamped(a.a, b.a, t, a.transition),
+            transition = a.transition
+        };
         return ret;
     }
 }
@@ -150,23 +184,19 @@ public class TransitionVector : IExtensible
         => Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
     [ProtoMember(1)]
-    public float x { get; set; }
+    public TransitionProperty<float> x { get; set; }
 
     [ProtoMember(2)]
-    public float y { get; set; }
-
-    [ProtoMember(3)]
-    public Transition transition;
+    public TransitionProperty<float> y { get; set; }
 
     [JsonIgnore]
     public float z { get; set; }
 
     public TransitionVector() { }
-    public TransitionVector(float x, float y, Transition transition = Transition.Linear)
+    public TransitionVector(float x, float y, Transition transX = Transition.Linear, Transition transY = Transition.Linear)
     {
-        this.x = x;
-        this.y = y;
-        this.transition = transition;
+        this.x = new TransitionProperty<float>(x, transX);
+        this.y = new TransitionProperty<float>(y, transY);
     }
 
     public TransitionVector Copy()
@@ -175,8 +205,7 @@ public class TransitionVector : IExtensible
         {
             x = x,
             y = y,
-            z = z,
-            transition = transition
+            z = z
         };
     }
 
@@ -195,9 +224,14 @@ public class TransitionVector : IExtensible
     {
         return new TransitionVector
         {
-            x = TransitionLib.LerpUnclamped(a.x, b.x, t, a.transition),
-            y = TransitionLib.LerpUnclamped(a.y, b.y, t, a.transition),
+            x = TransitionProperty<float>.LerpUnclamped(a.x, b.x, t),
+            y = TransitionProperty<float>.LerpUnclamped(a.y, b.y, t),
             z = TransitionLib.LerpUnclamped(a.z, b.z, t, Transition.Linear)
         };
+    }
+
+    public override string ToString()
+    {
+        return $"({x} [{x.transition}], {y}[{y.transition}], {z})";
     }
 }

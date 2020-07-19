@@ -49,7 +49,7 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
         anims = data.anims;
 
         initPos = anims[0].pos;
-        judgePos = data.pos;
+        judgePos = NoteUtility.ProjectVectorToParallelPlane(data.pos);
         gameObject.layer = displayFuwafuwa ? 9 : 8;
 
         if (displayFuwafuwa)
