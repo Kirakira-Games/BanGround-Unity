@@ -9,6 +9,8 @@ public class LaneEffects : MonoBehaviour
     private float prevSpeed;
     private Quaternion[] rotation;
 
+    static KVarRef effect = new KVarRef("r_showeffect");
+
     public static GameBeatInfo GetIndexByTime(List<GameBeatInfo> list, float time)
     {
         int l = -1, r = list.Count - 1;
@@ -55,6 +57,13 @@ public class LaneEffects : MonoBehaviour
     void Start()
     {
         ps = GetComponentsInChildren<ParticleSystem>();
+        if (!effect)
+        {
+            foreach (var particle in ps) 
+                particle.gameObject.SetActive(false);
+
+            return;
+        }
         prevSpeed = ps[0].main.simulationSpeed;
         rotation = new Quaternion[]
         {
@@ -67,6 +76,9 @@ public class LaneEffects : MonoBehaviour
 
     public void UpdateLaneEffects(int audioTime)
     {
+        if (!effect)
+            return;
+
         float speed = GetSpeed(audioTime) * LiveSetting.SpeedCompensationSum * (r_notespeed + 1f) / 12;
         float abs = Mathf.Abs(speed);
         if (prevSpeed != speed)
