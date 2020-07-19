@@ -20,6 +20,9 @@ public class MessageBoxController : MonoBehaviour
     private LocalizedText msgText;
     private Animator animator;
 
+    //Resize
+    private LayoutElement layout;
+
     private static Queue<MessageQueueItem> msgQueue = new Queue<MessageQueueItem>();
 
     private void Awake()
@@ -35,6 +38,7 @@ public class MessageBoxController : MonoBehaviour
         msgBtn = GetComponent<Button>();
         msgImg = GetComponent<Image>();
         msgText = GetComponentInChildren<LocalizedText>();
+        layout = GetComponent<LayoutElement>();
 
         msgBtn.onClick.AddListener(() =>
         {
@@ -81,6 +85,8 @@ public class MessageBoxController : MonoBehaviour
 
         //Show Box
         animator.Play("MsgIn");
+        layout.preferredWidth = msgText.preferredWidth + 200;
+
 
         //AutoClose
         if (item.autoClose) StartCoroutine(AutoClose());

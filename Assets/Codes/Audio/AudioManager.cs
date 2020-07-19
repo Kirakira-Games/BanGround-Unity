@@ -6,6 +6,7 @@ using AudioProvider;
 using UniRx.Async;
 
 using State = GameStateMachine.State;
+using UnityEditor;
 
 public class AudioManager : MonoBehaviour
 {
@@ -22,10 +23,23 @@ public class AudioManager : MonoBehaviour
     private void Awake()
     {
         KVar snd_engine = new KVar("snd_engine", "Fmod", KVarFlags.Archive | KVarFlags.StringOnly, "Sound engine type");
-        KVar snd_buffer_bass = new KVar("snd_buffer_bass", "-1", KVarFlags.Archive, "Buffer size of Bass Sound Engine");
-        KVar snd_buffer_fmod = new KVar("snd_buffer_fmod", "-1", KVarFlags.Archive, "Buffer size of Fmod Sound Engine");
+        KVar snd_buffer_bass = new KVar("snd_buffer_bass", "-1", KVarFlags.Archive, "Buffer type of Bass Sound Engine");
+        KVar snd_buffer_fmod = new KVar("snd_buffer_fmod", "-1", KVarFlags.Archive, "Buffer size of Fmod/Unity Sound Engine");
+
         int bufferIndex;
-        //string engine = PlayerPrefs.GetString("AudioEngine", "Fmod");
+
+        if (!AppPreLoader.init) return;
+
+        if (snd_engine != "Unity")
+        {
+            // Disable Unity Audio
+            var audioManager = UnityEditor.AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/AudioManager.asset")[0];
+            var serializedManager = new UnityEditor.SerializedObject(audioManager);
+            var prop = serializedManager.FindProperty("m_DisableAudio");
+            prop.boolValue = true;
+            serializedManager.ApplyModifiedProperties();
+        }
+
         if (snd_engine == "Bass") 
         {
             bufferIndex = snd_buffer_bass;
@@ -37,7 +51,7 @@ public class AudioManager : MonoBehaviour
             Provider = new BassAudioProvider();
             Provider.Init(AppPreLoader.sampleRate, (uint)(AppPreLoader.bufferSize * HandelValue_Buffer.BassBufferScale[bufferIndex]));
         }
-        else
+        else if(snd_engine == "Fmod")
         {
             bufferIndex = snd_buffer_fmod;
             if (bufferIndex == -1)
@@ -46,6 +60,17 @@ public class AudioManager : MonoBehaviour
                 bufferIndex = 2;
             }
             Provider = new FmodAudioProvider();
+            Provider.Init(AppPreLoader.sampleRate, (uint)(AppPreLoader.bufferSize / HandelValue_Buffer.FmodBufferScale[bufferIndex]));
+        }
+        else if(snd_engine == "Unity")
+        {
+            bufferIndex = snd_buffer_fmod;
+            if (bufferIndex == -1)
+            {
+                snd_buffer_fmod.Set(2);
+                bufferIndex = 2;
+            }
+            Provider = new PureUnityAudioProvider();
             Provider.Init(AppPreLoader.sampleRate, (uint)(AppPreLoader.bufferSize / HandelValue_Buffer.FmodBufferScale[bufferIndex]));
         }
 

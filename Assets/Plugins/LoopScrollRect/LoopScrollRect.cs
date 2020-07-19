@@ -319,28 +319,28 @@ namespace UnityEngine.UI
             }
         }
 
-        public void ScrollToCell(int index, float speed)
+        public Coroutine ScrollToCell(int index, float speed)
         {
             if(totalCount >= 0 && (index < 0 || index >= totalCount))
             {
                 Debug.LogWarningFormat("invalid index {0}", index);
-                return;
+                return null;
             }
             if(speed <= 0)
             {
                 Debug.LogWarningFormat("invalid speed {0}", speed);
-                return;
+                return null;
             }
             StopAllCoroutines();
-            StartCoroutine(ScrollToCellCoroutine(index, speed));
+            return StartCoroutine(ScrollToCellCoroutine(index, speed));
         }
 
-        public IEnumerator ScrollToCellCoroutine(int index, float speed)
+        private IEnumerator ScrollToCellCoroutine(int index, float speed)
         {
             bool needMoving = true;
             while(needMoving)
             {
-                yield return null;
+                yield return new WaitForEndOfFrame();
                 if(!m_Dragging)
                 {
                     float move = 0;
@@ -790,6 +790,7 @@ namespace UnityEngine.UI
 
         public virtual void OnBeginDrag(PointerEventData eventData)
         {
+            StopAllCoroutines();
             if (eventData.button != PointerEventData.InputButton.Left)
                 return;
 
