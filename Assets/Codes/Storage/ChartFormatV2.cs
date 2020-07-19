@@ -123,11 +123,11 @@ namespace V2
             {
                 beat = new int[] { -100, 0, 1 },
                 speed = new TransitionProperty<float>(1f),
-                tap = new TransitionColor(0, 0, 255),
+                tap = new TransitionColor(64, 64, 255),
                 tapGrey = new TransitionColor(128, 128, 128),
-                flick = new TransitionColor(255, 0, 0),
-                slideTick = new TransitionColor(0, 255, 0),
-                slide = new TransitionColor(0, 255, 0)
+                flick = new TransitionColor(255, 64, 64),
+                slideTick = new TransitionColor(64, 255, 64),
+                slide = new TransitionColor(64, 255, 64)
             };
         }
 

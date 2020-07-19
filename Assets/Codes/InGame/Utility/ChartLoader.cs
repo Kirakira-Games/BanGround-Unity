@@ -5,6 +5,7 @@ using System.Linq;
 using System;
 using System.IO;
 using Newtonsoft.Json;
+using Random = UnityEngine.Random;
 
 class GameNoteComparer : Comparer<GameNoteData>
 {
@@ -101,11 +102,19 @@ public static class ChartLoader
         return notes.Any(note => IsNoteFuwafuwa(note));
     }
 
+    public static void RandomizeNote(V2.Note note)
+    {
+        note.x = note.lane;
+        note.lane = -1;
+        note.y = Random.Range(0f, 1f);
+    }
+
     private static List<GameNoteData> LoadTimingGroup(ChartTiming timing, int groupId, V2.TimingGroup group)
     {
         // AnalyzeNotes
         var notes = group.notes;
         notes.ForEach(note => NormalizeBeat(note.beat));
+        notes.ForEach(RandomizeNote);
         timing.LoadTimingGroup(group);
         // Create game notes
         float prevBeat = -1e9f;

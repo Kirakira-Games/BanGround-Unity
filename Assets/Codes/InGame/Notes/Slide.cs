@@ -50,8 +50,13 @@ public class Slide : MonoBehaviour, KirakiraTracer
         notes[notes.Count - 1].isTilt = isTilt;
         for (int i = 0; i < notes.Count - 1; i++)
         {
-            notes[i].slideMesh.ResetMesh(notes[i].transform, notes[i + 1].transform,
-                notes[i].displayFuwafuwa || notes[i + 1].displayFuwafuwa);
+            notes[i].slideMesh.ResetMesh(
+                notes[i].transform,
+                notes[i + 1].transform,
+                notes[i].displayFuwafuwa || notes[i + 1].displayFuwafuwa,
+                // GameNoteType.None for slide body which does not have a note type
+                noteHead.timingGroup.GetMaterialPropertyBlock(GameNoteType.None, false)
+            );
         }
         foreach (var note in notes)
         {
