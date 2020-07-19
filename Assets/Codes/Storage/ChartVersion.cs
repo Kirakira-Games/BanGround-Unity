@@ -35,7 +35,7 @@ public static class ChartVersion
                 return null;
             }
             if (!await BGEditor.MessageBox.ShowMessage("Unsupported chart",
-                "This chart uses an unsupported standard.\nConvert? (animations and timing information will be lost)"))
+                "This chart uses an unsupported standard.\nConvert? (animations and speed information will be lost)"))
             {
                 return null;
             }
@@ -44,7 +44,7 @@ public static class ChartVersion
         else if (CanConvert(header.version))
         {
             if (!await BGEditor.MessageBox.ShowMessage("Outdated chart",
-                "This chart uses a deprecated standard.\nBut you can still play it without conversion.\nConvert? (animations and timing information will be lost)"))
+                "This chart uses a deprecated standard.\nBut you can still play it without conversion.\nConvert? (animations and speed information will be lost)"))
             {
                 return DataLoader.LoadChart<V2.Chart>(header.sid, difficulty);
             }

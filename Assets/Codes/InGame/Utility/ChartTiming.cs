@@ -111,6 +111,7 @@ public class ChartTiming
         foreach (var anim in raw)
         {
             anim.pos.z += curDist;
+            //Debug.Log("Finalize " + anim);
             curDist = anim.pos.z;
             if (!isEnd)
                 totDist = anim.pos.z;
@@ -118,22 +119,23 @@ public class ChartTiming
             if (Mathf.Approximately(anim.time, note.time))
                 isEnd = true;
         }
+        raw.ForEach(anim => anim.pos.z = anim.pos.z + 1 - totDist);
         //Debug.Log("Tot dist=" + totDist);
-        bool isStart = raw[0].pos.z <= totDist - 1;
+        bool isStart = raw[0].pos.z <= 0;
         for (int i = 0; i < raw.Count - 1; i++)
         {
             var cur = raw[i];
             var nxt = raw[i + 1];
             if (isStart)
             {
-                if (nxt.pos.z <= totDist - 1)
+                if (nxt.pos.z <= 0)
                 {
                     continue;
                 }
                 else
                 {
                     isStart = false;
-                    float ratio = Mathf.InverseLerp(cur.pos.z, nxt.pos.z, totDist - 1);
+                    float ratio = Mathf.InverseLerp(cur.pos.z, nxt.pos.z, 0);
                     ret.Add(V2.NoteAnim.LerpUnclamped(cur, nxt, ratio));
                 }
             }
@@ -156,6 +158,7 @@ public class ChartTiming
             float timeS = Mathf.Max(S.time, info.time);
             float timeT = (i == timings.points.Count - 1 || T.beatf < timings.points[i + 1].beatf) ?
                 T.time : timings.points[i + 1].time;
+            //Debug.Log($"timeT = {timeT}, timeS = {timeS}, speed = {info.speed}, totTime = {totTime}");
 
             totDist += (timeT - timeS) * info.speed / totTime; // Assume constant speed transition here
         }
@@ -196,6 +199,7 @@ public class ChartTiming
                 Debug.Assert(Mathf.Approximately(dist, curDist));
             }
             anim.pos.z = dist; // z temporarily stores the distance traveled
+            //Debug.Log("Add anim " + anim + " from " + S + " and " + T);
 
             PopulateTimingInfo(anim);
             output.Add(anim);
@@ -260,10 +264,17 @@ public class ChartTiming
         if (r_mirror)
         {
             if (data.lane != -1)
-                data.lane = 6 - data.lane;
+                data.lane = NoteUtility.LANE_COUNT - 1 - data.lane;
             else
-                data.x *= -1;
-            data.anims.ForEach(i => i.pos.x *= -1);
+                data.x = NoteUtility.LANE_COUNT - 1 - data.x;
+            data.anims.ForEach(i => i.pos.x.Set(NoteUtility.LANE_COUNT - 1 - i.pos.x));
         }
+
+        // Map real X,Y coordinates in animations
+        data.anims.ForEach(anim =>
+        {
+            anim.pos.x.Set(NoteUtility.GetXPos(anim.pos.x));
+            anim.pos.y.Set(NoteUtility.GetYPos(anim.pos.y));
+        });
     }
 }

@@ -116,9 +116,8 @@ public class Slide : MonoBehaviour, KirakiraTracer
             var intersect = FindSlideIntersection();
             if (!intersect.HasValue)
             {
-                float percentage = (float)(NoteController.audioTime - prev.time) / (next.time - prev.time);
-                percentage = Mathf.Max(0, percentage);
-                noteHead.transform.position = Vector3.LerpUnclamped(prev.judgePos, next.judgePos, percentage);
+                float ratio = Mathf.InverseLerp(prev.time, next.time, NoteController.audioTime);
+                noteHead.transform.position = Vector3.LerpUnclamped(prev.judgePos, next.judgePos, ratio);
                 enableBody = displayHead == 1 || !prev.gameObject.activeSelf;
             }
             else
