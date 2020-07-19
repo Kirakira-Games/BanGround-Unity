@@ -8,6 +8,7 @@ using System;
 using UnityEngine.Timeline;
 using System.Linq;
 using WebSocketSharp;
+using UniRx.Async;
 
 namespace AudioProvider
 {
@@ -40,6 +41,8 @@ namespace AudioProvider
         {
             if (isDisposed)
                 return;
+
+            source.Stop();
 
             isDisposed = true;
 
@@ -198,26 +201,29 @@ namespace AudioProvider
             audioMgr.AddComponent<AudioListener>();
         }
 
-        private UnityAudioClip LoadOggClip(byte[] audio, SEType type)
+        private async UniTask<UnityAudioClip> LoadOggClip(byte[] audio, SEType type)
         {
             List<float> samples = new List<float>();
             int channels = 0;
             int sampleRate = 0;
             long sampleCount = 0;
 
-            using (var decoder = new VorbisReader(new MemoryStream(audio), true))
+            await UniTask.Run(() =>
             {
-                channels = decoder.Channels;
-                sampleRate = decoder.SampleRate;
-                sampleCount = decoder.TotalSamples;
+                using (var decoder = new VorbisReader(new MemoryStream(audio), true))
+                {
+                    channels = decoder.Channels;
+                    sampleRate = decoder.SampleRate;
+                    sampleCount = decoder.TotalSamples;
 
-                var tmp = new float[channels * sampleRate / 5];
+                    var tmp = new float[channels * sampleRate / 5];
 
-                // go grab samples
-                int count;
-                while ((count = decoder.ReadSamples(tmp, 0, tmp.Length)) > 0)
-                    samples.AddRange(tmp.SubArray(0, count));
-            }
+                    // go grab samples
+                    int count;
+                    while ((count = decoder.ReadSamples(tmp, 0, tmp.Length)) > 0)
+                        samples.AddRange(tmp.SubArray(0, count));
+                }
+            });
 
             var gobj = new GameObject("UAPAudio");
             GameObject.DontDestroyOnLoad(gobj);
@@ -227,9 +233,9 @@ namespace AudioProvider
             return new UnityAudioClip(samples.ToArray(), sampleRate, channels, gobj, type, this);
         }
 
-        public ISoundEffect PrecacheSE(byte[] audio, SEType type)
+        public async UniTask<ISoundEffect> PrecacheSE(byte[] audio, SEType type)
         {
-            var result = LoadOggClip(audio, type);
+            var result = await LoadOggClip(audio, type);
 
             OnVolumeChanged += result.VolumeChanged;
             result.VolumeChanged();
@@ -257,9 +263,9 @@ namespace AudioProvider
             OnVolumeChanged?.Invoke();
         }
 
-        public ISoundTrack StreamTrack(byte[] audio)
+        public async UniTask<ISoundTrack> StreamTrack(byte[] audio)
         {
-            var result = LoadOggClip(audio, SEType.Unknown);
+            var result = await LoadOggClip(audio, SEType.Unknown);
 
             OnVolumeChanged += result.VolumeChanged;
             result.VolumeChanged();

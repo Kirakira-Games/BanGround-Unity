@@ -278,7 +278,7 @@ public class NoteController : MonoBehaviour
     static KVarRef mod_autoplay = new KVarRef("mod_autoplay");
     static KVarRef cl_sestyle = new KVarRef("cl_sestyle");
 
-    void Start()
+    async void Start()
     {
         instance = this;
         isFinished = false;
@@ -324,11 +324,11 @@ public class NoteController : MonoBehaviour
         // Sound effects
         soundEffects = new ISoundEffect[5]
         {
-            AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) +"/perfect.wav").bytes),
-            AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) +"/great.wav").bytes),
-            AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) +"/empty.wav").bytes),
-            AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) +"/empty.wav").bytes),
-            AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) +"/flick.wav").bytes)
+            await AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) +"/perfect.wav").bytes),
+            await AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) +"/great.wav").bytes),
+            await AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) +"/empty.wav").bytes),
+            await AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) +"/empty.wav").bytes),
+            await AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) +"/flick.wav").bytes)
         };
 
         // Game BGM

@@ -51,11 +51,16 @@ class ScriptSoundEffect : IDisposable
 
     public ScriptSoundEffect(string file)
     {
+        Load(file);
+    }
+
+    async void Load(string file)
+    {
         var path = ChartScript.GetChartResource(file);
 
-        if(KiraFilesystem.Instance.Exists(path))
+        if (KiraFilesystem.Instance.Exists(path))
         {
-            se = AudioManager.Instance.PrecacheSE(KiraFilesystem.Instance.Read(path));
+            se = await AudioManager.Instance.PrecacheSE(KiraFilesystem.Instance.Read(path));
         }
     }
 

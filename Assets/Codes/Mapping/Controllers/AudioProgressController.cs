@@ -86,11 +86,11 @@ namespace BGEditor
             bgm.SetTimeScale(value, true);
         }
 
-        public void Init(byte[] audio)
+        public async void Init(byte[] audio)
         {
             var hack = SettingAndMod.instance;
             // Load BGM
-            AudioManager.Instance.gameBGM = AudioManager.Provider.StreamTrack(audio);
+            AudioManager.Instance.gameBGM = await AudioManager.Provider.StreamTrack(audio);
             bgm.Play();
             bgm.Pause();
 
@@ -105,11 +105,11 @@ namespace BGEditor
             Refresh();
         }
 
-        private void Start()
+        private async void Start()
         {
             // Load SE
-            singleSE = AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) + "/perfect.wav").bytes);
-            flickSE = AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) + "/flick.wav").bytes);
+            singleSE = await AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) + "/perfect.wav").bytes);
+            flickSE = await AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) + "/flick.wav").bytes);
 
             lastBeat = float.NaN;
         }

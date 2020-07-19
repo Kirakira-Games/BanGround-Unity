@@ -31,7 +31,7 @@ public class DifficultySelect : MonoBehaviour
     static KVarRef cl_cursorter = new KVarRef("cl_cursorter");
     static KVarRef cl_lastsid = new KVarRef("cl_lastsid");
 
-    void Start()
+    async void Start()
     {
         //levels = new int[]{ 1,1,18,26,28 };
         for (int i = 0; i < cards.Length; i++)
@@ -40,7 +40,7 @@ public class DifficultySelect : MonoBehaviour
             Rects[i] = cards[i].GetComponent<RectTransform>();
             labelText[i] = labels[i].GetComponentInChildren<Text>();
             labelText[i].text = "";
-            processedVoices[i] = AudioManager.Instance.PrecacheSE(voices[i].bytes);
+            processedVoices[i] = await AudioManager.Instance.PrecacheSE(voices[i].bytes);
         }
         levelText = GameObject.Find("Text_SelectedLevel").GetComponent<Text>();
         levelText.text = "";

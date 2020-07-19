@@ -6,6 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Un4seen.Bass;
 using Un4seen.Bass.AddOn.Fx;
+using UniRx.Async;
+
+#pragma warning disable CS1998 // 异步方法缺少 "await" 运算符，将以同步方式运行
 
 namespace AudioProvider
 {
@@ -234,7 +237,7 @@ namespace AudioProvider
             }
         }
 
-        public ISoundTrack StreamTrack(byte[] audio)
+        public async UniTask<ISoundTrack> StreamTrack(byte[] audio)
         {
             var pinnedObject = GCHandle.Alloc(audio, GCHandleType.Pinned);
             var pinnedObjectPtr = pinnedObject.AddrOfPinnedObject();
@@ -257,7 +260,7 @@ namespace AudioProvider
             return st;
         }
 
-        public ISoundEffect PrecacheSE(byte[] audio, SEType type)
+        public async UniTask<ISoundEffect> PrecacheSE(byte[] audio, SEType type)
         {
             var id = Bass.BASS_SampleLoad(audio, 0, audio.Length, 65535, BASSFlag.BASS_DEFAULT);
             var se = new BassSoundEffect(id, audio, this, type);
