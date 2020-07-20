@@ -116,11 +116,11 @@ public static class ChartLoader
 
     public static void RandomizeTimingGroup(V2.TimingGroup group)
     {
-        for (int i = 1; i <= 20; i++)
+        for (int i = 1; i <= 50; i++)
         {
             group.points.Add(new V2.TimingPoint
             {
-                beat = new int[3] { i * 10, 0, 1 },
+                beat = new int[3] { i * 3, 0, 1 },
                 speed = new TransitionProperty<float>(i % 2 == 0 ? 1 : 2),
                 tap = RandomColor(),
                 flick = RandomColor(),
