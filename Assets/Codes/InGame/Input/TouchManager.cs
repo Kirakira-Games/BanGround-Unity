@@ -388,7 +388,7 @@ public class TouchManager : MonoBehaviour
 
     public void OnUpdate()
     {
-        if (UIManager.Instance.SM.Current != GameStateMachine.State.Playing) return;
+        if (UIManager.Instance.SM.HasState(GameStateMachine.State.Finished)) return;
 
         var touchFrames = provider.GetTouches();
 

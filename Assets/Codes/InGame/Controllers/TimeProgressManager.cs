@@ -33,8 +33,7 @@ public class TimeProgressManager : MonoBehaviour
             default:
                 if (gameBGM == null)
                     return;
-
-                TimeProgress.value = gameBGM.GetPlaybackTime() / (float)gameBGM.GetLength();
+                TimeProgress.value = Mathf.Clamp01(AudioTimelineSync.instance.GetTimeInMs() / (float)gameBGM.GetLength());
                 break;
         }
     }

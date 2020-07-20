@@ -11,8 +11,6 @@ public class LoaderInfo : MonoBehaviour
 {
     private mHeader musicHeader;
     private cHeader chartHeader;
-    private Chart chart;
-    private GameChartData chartData;
 
     [SerializeField] private Image songImg;
     [SerializeField] private Text songName;
@@ -34,8 +32,6 @@ public class LoaderInfo : MonoBehaviour
     {
         chartHeader = LiveSetting.CurrentHeader;
         musicHeader = DataLoader.GetMusicHeader(LiveSetting.CurrentHeader.mid);
-        chart = DataLoader.LoadChart(LiveSetting.CurrentHeader.sid, (Difficulty)LiveSetting.actualDifficulty);
-        chartData = ChartLoader.LoadChart(chart);
     }
 
     private void ShowInfo()
@@ -49,15 +45,15 @@ public class LoaderInfo : MonoBehaviour
         }
 
         songName.text = string.Format(NameFormat, musicHeader.title);
-        songBPM.text = GetBPM() + " NOTE " + chartData.numNotes;
-        songLevelAndCharter.text = string.Format(LevelAndCharterFormat, Enum.GetName(typeof(Difficulty), chart.Difficulty).ToUpper(), chart.level, chartHeader.authorNick);
+        songBPM.text = GetBPM() + " NOTE " + LiveSetting.gameChart.numNotes;
+        songLevelAndCharter.text = string.Format(LevelAndCharterFormat, LiveSetting.chart.difficulty.ToString().ToUpper(), LiveSetting.chart.level, chartHeader.authorNick);
         songArtist.text = string.Format(ArtistFormat, musicHeader.artist);
     }
 
     private string GetBPM()
     {
-        var min = chartData.bpm.Min(o => o.value);
-        var max = chartData.bpm.Max(o => o.value);
+        var min = LiveSetting.gameChart.bpm.Min(o => o.value);
+        var max = LiveSetting.gameChart.bpm.Max(o => o.value);
         return min == max ? $"BPM {min}" : $"BPM {min}-{max}";
     }
 }

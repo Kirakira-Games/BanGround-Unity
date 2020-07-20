@@ -7,19 +7,19 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
     public int lane;
     public int judgeTime;
     public int touchId;
-    public bool isGray;
     public bool judgeFuwafuwa => lane == -1;
     public bool displayFuwafuwa;
     public bool isTracingOrJudged => judgeTime != int.MinValue;
     public bool isDestroyed;
     public bool inJudgeQueue;
-    public GameNoteAnim[] anims;
+    public List<V2.NoteAnim> anims;
     private int animsHead;
 
     public GameNoteType type;
     public NoteSyncLine syncLine;
     public NoteMesh noteMesh;
     public JudgeResult judgeResult;
+    public TimingGroupController timingGroup;
 
     public Vector3 initPos;
     public Vector3 judgePos;
@@ -45,12 +45,11 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
         time = data.time;
         lane = data.lane;
         type = data.type;
-        isGray = r_graynote ? data.isGray : false;
         displayFuwafuwa = data.isFuwafuwa;
-        anims = data.anims.ToArray();
+        anims = data.anims;
 
-        initPos = anims[0].S.p;
-        judgePos = data.pos;
+        initPos = anims[0].pos;
+        judgePos = NoteUtility.ProjectVectorToParallelPlane(data.pos);
         gameObject.layer = displayFuwafuwa ? 9 : 8;
 
         if (displayFuwafuwa)
@@ -59,33 +58,43 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
         }
 
         transform.localScale = Vector3.one * NoteUtility.NOTE_SCALE * r_notesize;
+
+        // Setup material
+        noteMesh.meshRenderer.sharedMaterial = timingGroup.GetMaterial(type, noteMesh.meshRenderer.material, r_graynote && data.isGray);
     }
 
     static KVarRef r_bang_perspect = new KVarRef("r_bang_perspect");
 
-    public virtual void UpdatePosition(int audioTime)
+    public virtual void UpdatePosition()
     {
-        while (animsHead < anims.Length - 1 && audioTime > anims[animsHead].T.t)
+        while (animsHead < anims.Count - 1 && NoteController.audioTimef > anims[animsHead + 1].time)
             animsHead++;
-        while (animsHead > 0 && audioTime < anims[animsHead].S.t)
+        while (animsHead > 0 && NoteController.audioTimef < anims[animsHead].time)
             animsHead--;
 
         // Compute ratio of current animation
         var anim = anims[animsHead];
-        int timeSub = audioTime - anim.S.t;
-        float ratio = (float)timeSub / (anim.T.t - anim.S.t);
-        float pos = Mathf.Lerp(anim.S.p.z, anim.T.p.z, ratio);
-        //Debug.Log(anim + ", head = " + animsHead + ", ratio = " + ratio);
-
-        // Update position
-        Vector3 newPos = Vector3.Lerp(anim.S.p, anim.T.p, ratio);
+        Vector3 newpos;
+        if (animsHead == anims.Count - 1)
+        {
+            newpos = anim.pos;
+        }
+        else
+        {
+            var next = anims[animsHead + 1];
+            float ratio = Mathf.InverseLerp(anim.time, next.time, NoteController.audioTimef);
+            newpos = TransitionVector.Lerp(anim.pos, next.pos, ratio);
+        }
         if (r_bang_perspect)
         {
-            pos = NoteUtility.GetBangPerspective(pos);
+            // Z-pos specialization
+            newpos.z = NoteUtility.GetBangPerspective(newpos.z);
         }
-        newPos.z = Mathf.LerpUnclamped(NoteUtility.NOTE_START_Z_POS, NoteUtility.NOTE_JUDGE_Z_POS, pos);
-        newPos = NoteUtility.ProjectVectorToParallelPlane(newPos);
-        transform.position = newPos;
+        newpos.z = Mathf.LerpUnclamped(NoteUtility.NOTE_START_Z_POS, NoteUtility.NOTE_JUDGE_Z_POS, newpos.z);
+        newpos = NoteUtility.ProjectVectorToParallelPlane(newpos);
+        transform.position = newpos;
+
+        // update from timing group
     }
 
     public virtual void OnNoteDestroy()
@@ -113,7 +122,7 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
     {
         if (judgeResult == JudgeResult.None)
         {
-            UpdatePosition(NoteController.audioTime);
+            UpdatePosition();
         }
         OnNoteUpdateJudge();
     }

@@ -13,62 +13,6 @@ public enum GameNoteType
     SlideEndFlick = 5
 }
 
-public class GameBeatInfo
-{
-    public float beat;
-    public float time;
-    public float value;
-}
-
-public class GameNoteAnimState
-{
-    public int t;
-    public Vector3 p;
-
-    public override string ToString()
-    {
-        return string.Format("[{0}]: {1}", t, p);
-    }
-}
-
-public class GameNoteAnim
-{
-    public GameNoteAnimState S;
-    public GameNoteAnimState T;
-
-    public GameNoteAnimState Interpolate(float ratio)
-    {
-        return new GameNoteAnimState
-        {
-            t = Mathf.RoundToInt(Mathf.Lerp(S.t, T.t, ratio)),
-            p = Vector3.Lerp(S.p, T.p, ratio)
-        };
-    }
-
-    public GameNoteAnimState GetState(int t)
-    {
-        float ratio;
-        if (t <= S.t)
-        {
-            ratio = 0;
-        }
-        else if (t >= T.t)
-        {
-            ratio = 1;
-        }
-        else
-        {
-            ratio = (float)(t - S.t) / (T.t - S.t);
-        }
-        return Interpolate(ratio);
-    }
-
-    public override string ToString()
-    {
-        return string.Format("S: {0} => T: {1}", S, T);
-    }
-}
-
 public class GameNoteData
 {
     public int time;
@@ -78,8 +22,9 @@ public class GameNoteData
     public bool isGray;
     public bool isFuwafuwa;
     public List<GameNoteData> seg;
-    public List<GameNoteAnim> anims;
+    public List<V2.NoteAnim> anims;
     public int appearTime;
+    public int timingGroup;
 
     public void ComputeTime()
     {
@@ -92,13 +37,18 @@ public class GameNoteData
     }
 }
 
+public class GameTimingGroup
+{
+    public List<V2.TimingPoint> points = new List<V2.TimingPoint>();
+}
+
 public class GameChartData
 {
     public bool isFuwafuwa;
     public int numNotes;
-    public List<GameNoteData> notes;
-    public List<GameBeatInfo> speed;
-    public List<GameBeatInfo> bpm;
+    public GameNoteData[] notes;
+    public GameTimingGroup[] groups;
+    public V2.ValuePoint[] bpm;
 }
 
 public enum JudgeResult
@@ -132,7 +82,7 @@ public static class NoteUtility
     public const float LANE_JUDGE_WIDTH = 2.8f;
     public const float LANE_JUDGE_HEIGHT = 2.5f;
     public const float NOTE_SCALE = 1f;
-    public const float FUWAFUWA_RADIUS = 3f;
+    public const float FUWAFUWA_RADIUS = 2.5f;
     public static Plane JudgePlane;
 
     private static readonly float BANG_PERSPECTIVE_START = YTo3DXHelper(0);

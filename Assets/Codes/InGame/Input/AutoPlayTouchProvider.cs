@@ -103,7 +103,7 @@ public class AutoPlayTouchProvider : KirakiraTouchProvider
         currentId++;
     }
 
-    public void Init(List<GameNoteData> notes)
+    public void Init(GameNoteData[] notes)
     {
         currentId = 0;
         head = 0;

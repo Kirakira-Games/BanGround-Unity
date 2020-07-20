@@ -147,10 +147,12 @@ public class UIManager : MonoBehaviour
             AudioTimelineSync.instance.Seek(currentTime);
             InGameBackground.instance.seekVideo(currentTime);
             InGameBackground.instance.playVideo();
-            await UniTask.DelayFrame(1);
+            await UniTask.DelayFrame(0);
             InGameBackground.instance.pauseVideo();
             if (SM.Current != State.Rewinding)
+            {
                 await UniTask.WaitUntil(() => SM.Current == State.Rewinding);
+            }
         }
 
         // play

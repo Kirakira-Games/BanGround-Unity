@@ -14,7 +14,6 @@ public class OffsetGuide : MonoBehaviour
     {
         if (!await LiveSetting.LoadChart())
         {
-            MessageBoxController.ShowMsg(LogLevel.ERROR, "This chart is outdated and unsupported.");
             return;
         }
 

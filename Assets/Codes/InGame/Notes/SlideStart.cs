@@ -27,7 +27,7 @@ public class SlideStart : SlideNoteBase
         base.InitNote();
         var te = Instantiate(Resources.Load("Effects/effect_TapKeep"), transform) as GameObject;
         tapEffect = te.AddComponent<TapEffect>();
-        GetComponent<MeshRenderer>().material.SetTexture("_BaseMap", NoteUtility.LoadResource<Texture2D>("note_long_default"));
+        noteMesh.meshRenderer.sharedMaterial.SetTexture("_BaseMap", NoteUtility.LoadResource<Texture2D>("note_long_default"));
         //GetComponent<SpriteRenderer>().sprite = NoteUtility.LoadResource<Sprite>("note_long_default");
     }
 
