@@ -195,10 +195,11 @@ namespace BGEditor
                     Notes.UnselectAll();
                     return;
                 }
-                var note = new Note
+                var note = new V2.Note
                 {
                     lane = lane,
                     beat = beat,
+                    group = Editor.currentTimingGroup
                 };
                 if (Editor.tool == EditorTool.Single)
                 {

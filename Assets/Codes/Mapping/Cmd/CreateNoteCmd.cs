@@ -2,9 +2,9 @@
 {
     public class CreateNoteCmd : IEditorCmd
     {
-        private Note note;
+        private V2.Note note;
 
-        public CreateNoteCmd(Note note)
+        public CreateNoteCmd(V2.Note note)
         {
             this.note = note;
         }

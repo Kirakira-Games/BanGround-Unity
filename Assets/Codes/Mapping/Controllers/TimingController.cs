@@ -13,16 +13,15 @@ namespace BGEditor
         public GameObject TimingWindow;
         public IntInput Offset;
         [HideInInspector]
-        public List<Note> BpmList;
-
-        public List<Note> currentBpmList => bpmLines.Select(line => new Note
+        public List<V2.ValuePoint> BpmList = new List<V2.ValuePoint>();
+        public List<V2.ValuePoint> currentBpmList => bpmLines.Select(line => new V2.ValuePoint
         {
-            type = NoteType.BPM,
             beat = line.Beat.beat,
             value = line.Bpm.value
         }).OrderBy(note => ChartUtility.BeatToFloat(note.beat)).ToList();
 
-        private List<BPMLine> bpmLines;
+        private List<BPMLine> bpmLines = new List<BPMLine>();
+
         private ScrollRect scrollRect;
         private int waitScrollToBottom;
 
@@ -31,23 +30,11 @@ namespace BGEditor
             scrollRect = GetComponentInParent<ScrollRect>();
         }
 
-        public void Init()
-        {
-            BpmList = new List<Note>();
-            BpmList.Add(new Note
-            {
-                type = NoteType.BPM,
-                beat = new int[] { 0, 0, 1 },
-                value = 120
-            });
-            bpmLines = new List<BPMLine>();
-        }
-
         public void Show()
         {
             Blocker.gameObject.SetActive(true);
             TimingWindow.SetActive(true);
-            BpmList.ForEach(note => AddLine(note.beat, note.value));
+            BpmList.ForEach(point => AddLine(point.beat, point.value));
             Offset.SetValue(Chart.offset);
             RefreshIndex();
         }

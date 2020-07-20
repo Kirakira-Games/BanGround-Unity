@@ -93,7 +93,7 @@ public class SelectManager : MonoBehaviour
 
                 LiveSetting.DemoFile = file;
 
-                if (!await LiveSetting.LoadChart())
+                if (!await LiveSetting.LoadChart(true))
                 {
                     return;
                 }
@@ -112,8 +112,12 @@ public class SelectManager : MonoBehaviour
     });
 
     #region ChartEditor
-    public void OpenMappingScene()
+    public async void OpenMappingScene()
     {
+        if (!await LiveSetting.LoadChart(false))
+        {
+            return;
+        }
         SceneLoader.LoadScene("NewSelect", "Mapping", true);
     }
 
@@ -476,7 +480,7 @@ public class SelectManager : MonoBehaviour
 
     public async void OnEnterPressed()
     {
-        if (!await LiveSetting.LoadChart())
+        if (!await LiveSetting.LoadChart(true))
         {
             return;
         }

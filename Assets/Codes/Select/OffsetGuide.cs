@@ -12,7 +12,7 @@ public class OffsetGuide : MonoBehaviour
 
     async void StartOffsetGuide()
     {
-        if (!await LiveSetting.LoadChart())
+        if (!await LiveSetting.LoadChart(true))
         {
             return;
         }

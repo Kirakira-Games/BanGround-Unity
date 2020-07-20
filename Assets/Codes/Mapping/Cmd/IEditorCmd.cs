@@ -2,9 +2,15 @@
 {
     public interface IEditorCmd
     {
+        /// <summary>
+        /// Commit a command. DO NOT CALL THIS METHOD DIRECTLY! Use Core.Commit(cmd) instead.
+        /// </summary>
         /// <returns>Whether the commit is successful.</returns>
         bool Commit(ChartCore core);
 
+        /// <summary>
+        /// Rollback a command. DO NOT CALL THIS METHOD DIRECTLY! Use Core.Commit(cmd) instead.
+        /// </summary>
         /// <returns>Whether the rollback is successful.</returns>
         bool Rollback(ChartCore core);
     }
