@@ -42,7 +42,7 @@ namespace BGEditor
             return next.transform.localPosition.y < 0;
         }
 
-        public override void Init(Note note)
+        public override void Init(V2.Note note)
         {
             base.Init(note);
             Debug.Assert(prev == null);

@@ -4,10 +4,10 @@ namespace BGEditor
 {
     class DisconnectNoteCmdRaw : IEditorCmd
     {
-        private Note prev;
-        private Note next;
+        private V2.Note prev;
+        private V2.Note next;
 
-        public DisconnectNoteCmdRaw(Note prev, Note next)
+        public DisconnectNoteCmdRaw(V2.Note prev, V2.Note next)
         {
             this.prev = prev;
             this.next = next;
@@ -26,7 +26,7 @@ namespace BGEditor
 
     public class DisconnectNoteCmd : CmdGroup
     {
-        public DisconnectNoteCmd(Note prev, Note next, EditNoteController controller)
+        public DisconnectNoteCmd(V2.Note prev, V2.Note next, EditNoteController controller)
         {
             Add(new DisconnectNoteCmdRaw(prev, next));
             Add(new ChangeTickStackCmd(next, controller.slideIdPool.RegisterNext()));

@@ -8,11 +8,11 @@ namespace BGEditor
 {
     class ChangeNoteTypeCmd : IEditorCmd
     {
-        private Note note;
+        private V2.Note note;
         private NoteType before;
         private NoteType after;
 
-        public ChangeNoteTypeCmd(Note note, NoteType type)
+        public ChangeNoteTypeCmd(V2.Note note, NoteType type)
         {
             this.note = note;
             before = note.type;

@@ -2,13 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using UniRx.Async;
 using UnityEngine;
 
 namespace BGEditor
 {
     public static class MappingInit
     {
-        private static Chart chart;
+        private static V2.Chart chart;
 
         private static IEnumerator InitCoroutine(ChartCore core)
         {
@@ -19,9 +20,7 @@ namespace BGEditor
         public static void Init(ChartCore core)
         {
             // Load chart
-            int sid = LiveSetting.CurrentHeader.sid;
-            Difficulty difficulty = (Difficulty)LiveSetting.actualDifficulty;
-            chart = DataLoader.LoadChart<Chart>(sid, difficulty);
+            chart = LiveSetting.chart;
 
             // Load music
             core.progress.Init(KiraFilesystem.Instance.Read(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)));

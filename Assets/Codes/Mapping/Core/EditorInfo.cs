@@ -13,6 +13,7 @@
         public int gridDivision;
         public int barHeight;
         public int numBeats;
+        public int currentTimingGroup;
         public float scrollPos;
         public EditorTool tool;
 
@@ -24,6 +25,7 @@
             barHeight = 400;
             numBeats = 100;
             scrollPos = 0;
+            currentTimingGroup = 0;
             tool = EditorTool.Select;
         }
     }

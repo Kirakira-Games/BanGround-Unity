@@ -251,6 +251,23 @@ public static class DataLoader
         }
     }
 
+    public static int GetChartLevel(string path)
+    {
+        try
+        {
+            var V2chart = ProtobufHelper.LoadFromKiraFs<V2.Chart>(path);
+            if (ChartVersion.CanRead(V2chart.version))
+            {
+                return V2chart.level;
+            }
+            throw new InvalidDataException("Failed to read with V2 format, fallback to old chart.");
+        }
+        catch
+        {
+            return ProtobufHelper.LoadFromKiraFs<Chart>(path).level;
+        }
+    }
+
     /// <summary>
     /// Update songlist.bin. This will NOT update song list in game!
     /// You probably want to call ReloadSongList afterwards.
@@ -312,7 +329,7 @@ public static class DataLoader
                 var path = chart.Replace("cheader.bin", $"{diff.ToString().ToLower()}.bin");
                 if (files.Contains(path))
                 {
-                    chartHeader.difficultyLevel.Add(ProtobufHelper.LoadFromKiraFs<Chart>(path).level);
+                    chartHeader.difficultyLevel.Add(GetChartLevel(path));
                 }
                 else
                 {
@@ -375,9 +392,22 @@ public static class DataLoader
                 }
                 else
                 {
-                    Chart chart = JsonConvert.DeserializeObject<Chart>(json);
                     string des = file.FullName.Substring(0, file.FullName.Length - 5);
-                    ProtobufHelper.Save(chart, des + ".bin");
+                    try
+                    {
+                        var chart = JsonConvert.DeserializeObject<V2.Chart>(json);
+                        if (ChartVersion.CanRead(chart.version))
+                        {
+                            ProtobufHelper.Save(chart, des + ".bin");
+                            return;
+                        }
+                        throw new InvalidDataException("Failed to read with V2 format, fallback to old chart.");
+                    }
+                    catch
+                    {
+                        var chart = JsonConvert.DeserializeObject<Chart>(json);
+                        ProtobufHelper.Save(chart, des + ".bin");
+                    }
                 }
                 File.Delete(file.FullName);
             }
@@ -402,7 +432,7 @@ public static class DataLoader
                 if (binEntries.Contains(entry.FullName.Replace(".json", ".bin")))
                     continue;
 
-                var type = typeof(Chart);
+                Type type = null;
 
                 if (entry.Name == "cheader.json")
                     type = typeof(cHeader);
@@ -412,7 +442,27 @@ public static class DataLoader
                 using (var sr = new StreamReader(entry.Open()))
                 {
                     var json = sr.ReadToEnd();
-                    var obj = JsonConvert.DeserializeObject(json, type);
+                    object obj;
+                    if (type == null)
+                    {
+                        try
+                        {
+                            var chart = JsonConvert.DeserializeObject<V2.Chart>(json);
+                            if (!ChartVersion.CanRead(chart.version))
+                            {
+                                throw new InvalidDataException("Failed to read with V2 format, fallback to old chart.");
+                            }
+                            obj = chart;
+                        }
+                        catch
+                        {
+                            obj = JsonConvert.DeserializeObject<Chart>(json);
+                        }
+                    }
+                    else
+                    {
+                        obj = JsonConvert.DeserializeObject(json, type);
+                    }
 
                     var dir = Path.Combine(DataDir, entry.FullName.Replace(entry.Name, ""));
                     if (!Directory.Exists(dir))

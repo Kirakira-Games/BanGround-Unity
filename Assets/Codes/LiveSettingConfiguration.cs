@@ -206,7 +206,7 @@ public static class LiveSetting
         }
     }
 
-    public static async UniTask<bool> LoadChart()
+    public static async UniTask<bool> LoadChart(bool convertToGameChart)
     {
         chart = await ChartVersion.Process(CurrentHeader, (Difficulty)actualDifficulty);
         if (chart == null)
@@ -216,7 +216,13 @@ public static class LiveSetting
         }
         try
         {
-            gameChart = ChartLoader.LoadChart(chart);
+            if (convertToGameChart)
+            {
+                gameChart = ChartLoader.LoadChart(
+                    JsonConvert.DeserializeObject<V2.Chart>(
+                        JsonConvert.SerializeObject(chart)
+                    ));
+            }
             return true;
         }
         catch (Exception e)

@@ -8,11 +8,11 @@ namespace BGEditor
 {
     class ChangeTickStackCmd : IEditorCmd
     {
-        private Note note;
+        private V2.Note note;
         private int before;
         private int after;
 
-        public ChangeTickStackCmd(Note note, int tickstack)
+        public ChangeTickStackCmd(V2.Note note, int tickstack)
         {
             this.note = note;
             before = note.tickStack;

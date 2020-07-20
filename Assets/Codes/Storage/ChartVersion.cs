@@ -20,7 +20,7 @@ public static class ChartVersion
 
     public static V2.Chart ConvertFromV1(cHeader header, Difficulty difficulty)
     {
-        Chart chart = DataLoader.LoadChart<Chart>(header.sid, difficulty);
+        var chart = DataLoader.LoadChart<Chart>(header.sid, difficulty);
         V2.Chart newChart = V2.Chart.From(chart);
         // DataLoader.SaveChart(newChart, header.sid, difficulty);
         return newChart;
@@ -28,9 +28,18 @@ public static class ChartVersion
 
     public static async UniTask<V2.Chart> Process(cHeader header, Difficulty difficulty)
     {
-        if (!CanRead(header.version))
+        V2.Chart chart = new V2.Chart();
+        try
         {
-            if (!CanConvert(header.version))
+            chart = DataLoader.LoadChart<V2.Chart>(header.sid, difficulty);
+        }
+        catch
+        {
+            chart.version = 0;
+        }
+        if (!CanRead(chart.version))
+        {
+            if (!CanConvert(chart.version))
             {
                 return null;
             }
@@ -41,7 +50,7 @@ public static class ChartVersion
             }
             return ConvertFromV1(header, difficulty);
         }
-        else if (CanConvert(header.version))
+        else if (CanConvert(chart.version))
         {
             if (!await BGEditor.MessageBox.ShowMessage("Outdated chart",
                 "This chart uses a deprecated standard.\nBut you can still play it without conversion.\nConvert? (animations and speed information will be lost)"))
@@ -52,7 +61,7 @@ public static class ChartVersion
         }
         else
         {
-            return DataLoader.LoadChart<V2.Chart>(header.sid, difficulty);
+            return chart;
         }
     }
 }
