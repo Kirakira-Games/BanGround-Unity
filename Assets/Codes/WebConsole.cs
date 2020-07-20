@@ -37,9 +37,9 @@ public class WebConsole : MonoBehaviour
     {
         if (DataLoader.LoadAllKiraPackFromInbox())
         {
-            if (SceneManager.GetActiveScene().name == "NewSelect")
+            if (SceneManager.GetActiveScene().name == "Select")
             {
-                SceneManager.LoadScene("NewSelect");
+                SceneManager.LoadScene("Select");
             }
         }
     };

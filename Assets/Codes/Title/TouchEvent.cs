@@ -77,7 +77,7 @@ public class TouchEvent : MonoBehaviour
 
     IEnumerator delayAndSwitch()
     {
-        operation = SceneManager.LoadSceneAsync("NewSelect");
+        operation = SceneManager.LoadSceneAsync("Select");
         operation.allowSceneActivation = false;
 
         yield return new WaitForSeconds(1.2f);
