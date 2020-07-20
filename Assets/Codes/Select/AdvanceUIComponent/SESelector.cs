@@ -18,7 +18,7 @@ public class SESelector : MonoBehaviour
 
     static KVarRef cl_sestyle = new KVarRef("cl_sestyle");
 
-    private void Awake()
+    private async void Awake()
     {
         seInput = GameObject.Find("SE_Input").GetComponent<InputField>();
         perfectBtn = GameObject.Find("SE_P_Player").GetComponent<Button>();
@@ -31,18 +31,18 @@ public class SESelector : MonoBehaviour
         {
             seInput.text = (int.Parse(seInput.text) + 1).ToString();
         });
-        seInput.onValueChanged.AddListener(v =>
+        seInput.onValueChanged.AddListener(async v =>
         {
             if (int.Parse(seInput.text) < 1) seInput.text = "3";
             if (int.Parse(seInput.text) > 3) seInput.text = "1";
             perfectSE?.Dispose();
             flickSE?.Dispose();
-            perfectSE = AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)int.Parse(seInput.text)) + "/perfect.wav").bytes);
-            flickSE = AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)int.Parse(seInput.text)) + "/flick.wav").bytes);
+            perfectSE = await AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)int.Parse(seInput.text)) + "/perfect.wav").bytes);
+            flickSE = await AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)int.Parse(seInput.text)) + "/flick.wav").bytes);
         });
 
-        perfectSE = AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) + "/perfect.wav").bytes);
-        flickSE = AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) + "/flick.wav").bytes);
+        perfectSE = await AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) + "/perfect.wav").bytes);
+        flickSE = await AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) + "/flick.wav").bytes);
 
         perfectBtn.onClick.AddListener(() =>
         {

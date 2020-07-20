@@ -7,6 +7,7 @@ using UniRx.Async;
 
 using State = GameStateMachine.State;
 using UnityEditor;
+using System.Threading.Tasks;
 
 public class AudioManager : MonoBehaviour
 {
@@ -33,11 +34,14 @@ public class AudioManager : MonoBehaviour
         if (snd_engine != "Unity")
         {
             // Disable Unity Audio
-            var audioManager = UnityEditor.AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/AudioManager.asset")[0];
-            var serializedManager = new UnityEditor.SerializedObject(audioManager);
-            var prop = serializedManager.FindProperty("m_DisableAudio");
-            prop.boolValue = true;
-            serializedManager.ApplyModifiedProperties();
+            var cfg = AudioSettings.GetConfiguration();
+            cfg.dspBufferSize = 0;
+            cfg.sampleRate = 0;
+            cfg.numRealVoices = 0;
+            cfg.numVirtualVoices = 0;
+            cfg.speakerMode = AudioSpeakerMode.Stereo;
+
+            AudioSettings.Reset(cfg);
         }
 
         if (snd_engine == "Bass") 
@@ -102,11 +106,19 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    public ISoundEffect PrecacheSE(byte[] data) => Provider.PrecacheSE(data, SEType.Common);
-    public ISoundEffect PrecacheInGameSE(byte[] data) => Provider.PrecacheSE(data, SEType.InGame);
+    public async UniTask<ISoundEffect> PrecacheSE(byte[] data) => await Provider.PrecacheSE(data, SEType.Common);
+    public async UniTask<ISoundEffect> PrecacheInGameSE(byte[] data) => await Provider.PrecacheSE(data, SEType.InGame);
     public async UniTaskVoid DelayPlayInGameBGM(byte[] audio, float seconds)
     {
-        gameBGM = Provider.StreamTrack(audio);
+        if(Provider is PureUnityAudioProvider)
+        {
+            gameBGM = await ((PureUnityAudioProvider)Provider).PrecacheTrack(audio);
+        }
+        else
+        {
+            gameBGM = await Provider.StreamTrack(audio);
+        }
+        
         gameBGM.Play();
         gameBGM.Pause();
 
@@ -139,9 +151,9 @@ public class AudioManager : MonoBehaviour
         AudioTimelineSync.instance.Seek(gameBGM.GetPlaybackTime() / 1000f);
     }
     public void StopBGM() => gameBGM.Stop();
-    public ISoundTrack PlayLoopMusic(byte[] audio,bool needLoop = true, uint[] times = null, bool noFade = true)
+    public async UniTask<ISoundTrack> PlayLoopMusic(byte[] audio,bool needLoop = true, uint[] times = null, bool noFade = true)
     {
-        ISoundTrack soundTrack = Provider.StreamTrack(audio);
+        ISoundTrack soundTrack = await Provider.StreamTrack(audio);
 
         uint start = 0;
         uint end = soundTrack.GetLength();
@@ -153,6 +165,7 @@ public class AudioManager : MonoBehaviour
 
         if (needLoop)
             soundTrack.SetLoopingPoint(start, end, noFade);
+
         soundTrack.Play();
         return soundTrack;
     }

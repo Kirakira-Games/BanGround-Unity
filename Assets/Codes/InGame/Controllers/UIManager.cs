@@ -60,7 +60,7 @@ public class UIManager : MonoBehaviour
 
         pause_Btn.onClick.AddListener(OnPauseButtonClick);
         resume_Btn.onClick.AddListener(GameResume);
-        retry_Btn.onClick.AddListener(GameRetry);
+        retry_Btn.onClick.AddListener(GameRetryAsync);
         retire_Btn.onClick.AddListener(GameRetire);
 
         pause_Canvas = GameObject.Find("PauseCanvas");
@@ -169,12 +169,13 @@ public class UIManager : MonoBehaviour
         SM.PopState(State.Rewinding);
     }
 
-    public void GameRetry()
+    public async void GameRetryAsync()
     {
         Time.timeScale = 1;
 
         OnStopPlaying();
         //SceneManager.LoadScene("InGame");
+        await LiveSetting.LoadChart();
         SceneLoader.LoadScene("InGame", "InGame", true);
     }
 
@@ -202,7 +203,7 @@ public class UIManager : MonoBehaviour
         InGameBackground.instance.stopVideo();
         AudioManager.Instance.gameBGM?.Dispose();
         AudioManager.Instance.gameBGM = null;
-        StartCoroutine(ShowResult(restart));
+        ShowResult(restart);
     }
 
     IEnumerator DelayDisableGate()
@@ -211,14 +212,14 @@ public class UIManager : MonoBehaviour
         gateCanvas.SetActive(false);
     }
 
-    IEnumerator ShowResult(bool restart)
+    async void ShowResult(bool restart)
     {
         if (LiveSetting.offsetAdjustMode)
             restart = true;
 
         if (restart)
         {
-            SceneManager.LoadSceneAsync("InGame");
+            await SceneManager.LoadSceneAsync("InGame");
         }
         else
         {
@@ -228,27 +229,29 @@ public class UIManager : MonoBehaviour
             {
                 case ClearMarks.AP:
                     gateImg.sprite = Resources.Load<Sprite>("UI/ClearMark_Long/AllPerfect");
-                    resultVoice = AudioManager.Instance.PrecacheSE(APvoice.bytes);
+                    resultVoice = await AudioManager.Instance.PrecacheSE(APvoice.bytes);
                     resultVoice.PlayOneShot();
                     break;
                 case ClearMarks.FC:
                     gateImg.sprite = Resources.Load<Sprite>("UI/ClearMark_Long/FullCombo");
-                    resultVoice = AudioManager.Instance.PrecacheSE(FCvoice.bytes);
+                    resultVoice = await AudioManager.Instance.PrecacheSE(FCvoice.bytes);
                     resultVoice.PlayOneShot();
                     break;
                 case ClearMarks.CL:
                     gateImg.sprite = Resources.Load<Sprite>("UI/ClearMark_Long/Clear");
-                    resultVoice = AudioManager.Instance.PrecacheSE(CLvoice.bytes);
+                    resultVoice = await AudioManager.Instance.PrecacheSE(CLvoice.bytes);
                     resultVoice.PlayOneShot();
                     break;
                 case ClearMarks.F:
                     gateImg.sprite = Resources.Load<Sprite>("UI/ClearMark_Long/Fail");
-                    resultVoice = AudioManager.Instance.PrecacheSE(Fvoice.bytes);
+                    resultVoice = await AudioManager.Instance.PrecacheSE(Fvoice.bytes);
                     resultVoice.PlayOneShot();
                     break;
             }
             GameObject.Find("GateCanvas").GetComponent<Animator>().Play("GateClose");
-            yield return new WaitForSeconds(3);
+
+            await UniTask.Delay(3000);
+
             SceneManager.LoadSceneAsync("Result");
         }
     }
@@ -271,7 +274,7 @@ public class UIManager : MonoBehaviour
 
     private void Update()
     {
-        if (SM.Count == 1 && SM.Current != State.Finished &&
+        if (SM.Count == 1 && SM.Current != State.Finished && AudioManager.Instance.gameBGM != null &&
             AudioTimelineSync.instance.GetTimeInMs() > AudioManager.Instance.gameBGM.GetLength() + 1000 &&
             NoteController.instance.isFinished)
         {
