@@ -34,6 +34,13 @@ public class DifficultySelect : MonoBehaviour
     async void Start()
     {
         //levels = new int[]{ 1,1,18,26,28 };
+        levelText = GameObject.Find("Text_SelectedLevel").GetComponent<Text>();
+        levelText.text = "";
+        difficultyText = GameObject.Find("Text_SelectedDifficulty").GetComponent<Text>();
+        recordDisplayer = GameObject.Find("Left_Panel").GetComponent<PlayRecordDisplay>();
+        //background = GameObject.Find("KirakiraBackground").GetComponent<FixBackground>();
+        lastDifficulty = LiveSetting.actualDifficulty;
+
         for (int i = 0; i < cards.Length; i++)
         {
             cardImg[i] = cards[i].GetComponent<Image>();
@@ -42,12 +49,7 @@ public class DifficultySelect : MonoBehaviour
             labelText[i].text = "";
             processedVoices[i] = await AudioManager.Instance.PrecacheSE(voices[i].bytes);
         }
-        levelText = GameObject.Find("Text_SelectedLevel").GetComponent<Text>();
-        levelText.text = "";
-        difficultyText = GameObject.Find("Text_SelectedDifficulty").GetComponent<Text>();
-        recordDisplayer = GameObject.Find("Left_Panel").GetComponent<PlayRecordDisplay>();
-        //background = GameObject.Find("KirakiraBackground").GetComponent<FixBackground>();
-        lastDifficulty = LiveSetting.actualDifficulty;
+
     }
 
     public void OnSongChange()

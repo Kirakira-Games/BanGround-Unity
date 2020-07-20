@@ -16,6 +16,7 @@ public class AppPreLoader : MonoBehaviour
 
     void Start()
     {
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
         DataLoader.InitFileSystem();
         KVSystem.Instance.ReloadConfig();
 
