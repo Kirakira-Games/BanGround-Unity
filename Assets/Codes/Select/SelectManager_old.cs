@@ -402,7 +402,7 @@ public class SelectManager_old : MonoBehaviour
         for (float i = 0.7f; i > 0; i -= speed)
         {
             previewSound.SetVolume(i);
-            await UniTask.DelayFrame(1);
+            await UniTask.DelayFrame(0);
         }
 
         faderWorking = false;
@@ -418,7 +418,7 @@ public class SelectManager_old : MonoBehaviour
         for (float i = 0f; i < 0.7f; i += 0.02f)
         {
             previewSound.SetVolume(i);
-            await UniTask.DelayFrame(1);
+            await UniTask.DelayFrame(0);
         }
 
         faderWorking = false;
