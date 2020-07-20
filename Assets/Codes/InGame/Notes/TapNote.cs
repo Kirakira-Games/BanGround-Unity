@@ -8,7 +8,7 @@ public class TapNote : NoteBase
     {
         base.ResetNote(data);
 
-        noteMesh.meshRenderer.material.SetTexture("_BaseMap",
+        noteMesh.meshRenderer.sharedMaterial.SetTexture("_BaseMap",
             NoteUtility.LoadResource<Texture2D>("note_single_default"));
     }
 }

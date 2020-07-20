@@ -30,7 +30,7 @@ public class SlideMesh : MonoBehaviour
         transT = T;
         width = BODY_WIDTH * r_notesize;
         SetFuwafuwa(isFuwafuwa);
-        meshRenderer.material = material;
+        meshRenderer.sharedMaterial = material;
     }
 
     readonly Vector2[] uv =
