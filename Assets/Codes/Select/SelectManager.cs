@@ -371,7 +371,7 @@ public class SelectManager_old : MonoBehaviour
         if (Application.platform == RuntimePlatform.Android)
         {
             Screen.orientation = ScreenOrientation.Portrait;
-            await UniTask.DelayFrame(1);
+            await UniTask.DelayFrame(0);
         }
         var zip = DataLoader.BuildKiraPack(LiveSetting.CurrentHeader);
         var song = DataLoader.GetMusicHeader(LiveSetting.CurrentHeader.mid);
@@ -383,7 +383,7 @@ public class SelectManager_old : MonoBehaviour
             .Share();
         if (Application.platform == RuntimePlatform.Android)
         {
-            await UniTask.DelayFrame(1);
+            await UniTask.DelayFrame(0);
             Screen.orientation = prevOrientation;
         }
     }

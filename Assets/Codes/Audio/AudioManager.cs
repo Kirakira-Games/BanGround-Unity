@@ -116,7 +116,7 @@ public class AudioManager : MonoBehaviour
         AudioTimelineSync.instance.Play();
         while (AudioTimelineSync.instance.GetTimeInS() < -0.02)
         {
-            await UniTask.DelayFrame(1);
+            await UniTask.DelayFrame(0);
         }
 
         foreach (var mod in LiveSetting.attachedMods)
@@ -134,7 +134,7 @@ public class AudioManager : MonoBehaviour
         while (gameBGM.GetPlaybackTime() == 0)
         {
             AudioTimelineSync.instance.Seek(0);
-            await UniTask.DelayFrame(1);
+            await UniTask.DelayFrame(0);
         }
         AudioTimelineSync.instance.Seek(gameBGM.GetPlaybackTime() / 1000f);
     }
