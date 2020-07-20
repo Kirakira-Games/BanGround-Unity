@@ -28,7 +28,7 @@ public class TimeProgressManager : MonoBehaviour
                 TimeProgress.value = 1;
                 break;
             default:
-                TimeProgress.value = gameBGM.GetPlaybackTime() / (float)gameBGM.GetLength();
+                TimeProgress.value = Mathf.Clamp01(AudioTimelineSync.instance.GetTimeInMs() / (float)gameBGM.GetLength());
                 break;
         }
     }

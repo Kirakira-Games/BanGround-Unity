@@ -157,7 +157,7 @@ public class TransitionColor : IExtensible
 
     public static implicit operator Color(TransitionColor color)
     {
-        return new Color(color.r / 255.0f, color.g / 255.0f, color.b / 255.0f, color.a / 255.0f);
+        return new Color(color.r / 255f, color.g / 255f, color.b / 255f, color.a / 255f);
     }
 
     public static TransitionColor Lerp(TransitionColor a, TransitionColor b, float t)

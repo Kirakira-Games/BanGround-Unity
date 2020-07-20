@@ -116,7 +116,7 @@ public static class ChartLoader
 
     public static void RandomizeTimingGroup(V2.TimingGroup group)
     {
-        for (int i = 1; i <= 10; i++)
+        for (int i = 1; i <= 20; i++)
         {
             group.points.Add(new V2.TimingPoint
             {
@@ -137,6 +137,7 @@ public static class ChartLoader
         var notes = group.notes;
         notes.ForEach(note => NormalizeBeat(note.beat));
         // notes.ForEach(RandomizeNote);
+        RandomizeTimingGroup(group);
         timing.LoadTimingGroup(group);
         // Create game notes
         float prevBeat = -1e9f;
