@@ -9,6 +9,7 @@ using UnityEngine;
 using AudioProvider;
 using UnityEngine.UI;
 using System.Security.Cryptography;
+using UniRx.Async;
 
 public class TitleLoader : MonoBehaviour
 {
@@ -50,19 +51,19 @@ public class TitleLoader : MonoBehaviour
     private void Start()
     {
 
-        StartCoroutine(PlayTitle());
+        PlayTitle();
 
         //MessageBoxController.ShowMsg(LogLevel.INFO, SystemInfo.deviceUniqueIdentifier.Substring(0, 8));
     }
 
-    IEnumerator PlayTitle()
+    async void PlayTitle()
     {
         //yield return new WaitForSeconds(0.5f);
-        music = AudioManager.Instance.PlayLoopMusic(titleMusic.bytes);
+        music = await AudioManager.Instance.PlayLoopMusic(titleMusic.bytes);
         music.SetVolume(0.7f);
-        yield return new WaitForSeconds(3f);
+        await UniTask.Delay(3000); //yield return new WaitForSeconds(3f);
 
-        banGround = AudioManager.Instance.PrecacheSE(voice[UnityEngine.Random.Range(0,voice.Length)].bytes);
+        banGround = await AudioManager.Instance.PrecacheSE(voice[UnityEngine.Random.Range(0,voice.Length)].bytes);
         banGround.PlayOneShot();
 
 

@@ -7,6 +7,7 @@ using System;
 using System.IO;
 using System.Linq;
 using AudioProvider;
+using UniRx.Async;
 
 public class ResultManager : MonoBehaviour
 {
@@ -48,7 +49,7 @@ public class ResultManager : MonoBehaviour
     private FixBackground background;
     private ISoundTrack bgmST;
 
-    void Start()
+    async void Start()
     {
         cheader = LiveSetting.CurrentHeader;
         mheader = DataLoader.GetMusicHeader(cheader.mid);
@@ -61,8 +62,8 @@ public class ResultManager : MonoBehaviour
         ShowSongInfo();
         ShowBackground();
         ShowOffset();
-        StartCoroutine(ReadRank());
-        bgmST = AudioManager.Instance.PlayLoopMusic(bgmVoice.bytes);
+        ReadRank();
+        bgmST = await AudioManager.Instance.PlayLoopMusic(bgmVoice.bytes);
         bgmST.SetVolume(0.7f);
     }
 
@@ -94,19 +95,18 @@ public class ResultManager : MonoBehaviour
         background.UpdateBackground(path);
     }
 
-    IEnumerator ReadRank()
+    async void ReadRank()
     {
         if (ResultsGetter.GetRanks() != Ranks.F)
         {
-            yield return new WaitForSeconds(0.8f);
+            await UniTask.Delay(800);
 
-            var rankPlayer = AudioManager.Instance.PrecacheSE(voices[0].bytes);
+            var rankPlayer = await AudioManager.Instance.PrecacheSE(voices[0].bytes);
             rankPlayer.PlayOneShot();
         }
         TextAsset resultVoice;
 
-        yield return new WaitForSeconds(1);
-        
+        await UniTask.Delay(1000);
 
         switch (ResultsGetter.GetRanks())
         {
@@ -138,11 +138,11 @@ public class ResultManager : MonoBehaviour
 
         if (resultVoice != null)
         {
-            var resultPlayer = AudioManager.Instance.PrecacheSE(resultVoice.bytes);
+            var resultPlayer = await AudioManager.Instance.PrecacheSE(resultVoice.bytes);
             resultPlayer.PlayOneShot();
         }
 
-        yield return new WaitForSeconds(1.2f);
+        await UniTask.Delay(1200);
 
         TextAsset clearMarkVoice = null;
         TextAsset commentVoice = null;
@@ -176,12 +176,12 @@ public class ResultManager : MonoBehaviour
 
         if (clearMarkVoice != null)
         {
-            AudioManager.Instance.PrecacheSE(clearMarkVoice.bytes).PlayOneShot();
+            (await AudioManager.Instance.PrecacheSE(clearMarkVoice.bytes)).PlayOneShot();
         }
-        yield return new WaitForSeconds(lenth);
+        await UniTask.Delay((int)(lenth * 1000));
         if (commentVoice != null)
         {
-            AudioManager.Instance.PrecacheSE(commentVoice.bytes).PlayOneShot();
+            (await AudioManager.Instance.PrecacheSE(commentVoice.bytes)).PlayOneShot();
         }
     }
 

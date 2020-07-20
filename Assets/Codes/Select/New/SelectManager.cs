@@ -241,11 +241,9 @@ public class SelectManager : MonoBehaviour
             lastSong?.OnDeselect();
             currentSong.OnSelect();
             lastSong = currentSong;
-            StartCoroutine(PreviewFadeOut(0.02f));
 
             cl_lastsid.Set(currentSong.cHeader.sid);
-            StopCoroutine(PlayPreview());
-            StartCoroutine(PlayPreview());
+            PlayPreview();
         }
     }
 
@@ -277,8 +275,20 @@ public class SelectManager : MonoBehaviour
 
     #region Music Preview
     bool isFirstPlay = true;
-    IEnumerator PlayPreview()
+
+    private int lastPreviewMid = -1;
+
+    async void PlayPreview()
     {
+        await UniTask.WaitUntil(() => !faderWorking);
+
+        if (LiveSetting.CurrentHeader.mid == lastPreviewMid)
+            return;
+
+        await PreviewFadeOut(0.02f);
+
+        lastPreviewMid = LiveSetting.CurrentHeader.mid;
+
         mHeader mheader = DataLoader.GetMusicHeader(LiveSetting.CurrentHeader.mid);
         if (previewSound != null)
         {
@@ -287,57 +297,69 @@ public class SelectManager : MonoBehaviour
         }
         if (DataLoader.MusicExists(LiveSetting.CurrentHeader.mid))
         {
-            previewSound = AudioManager.Instance.PlayLoopMusic(KiraFilesystem.Instance.Read(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), true,
+            previewSound = await AudioManager.Instance.PlayLoopMusic(KiraFilesystem.Instance.Read(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), true,
                 new uint[]
                 {
-                (uint)(mheader.preview[0] * 1000),
-                (uint)(mheader.preview[1] * 1000)
-                    },
-                    false);
+                    (uint)(mheader.preview[0] * 1000),
+                    (uint)(mheader.preview[1] * 1000)
+                },
+                false
+            );
+
             if (isFirstPlay)
             {
                 previewSound?.Pause();
-                yield return new WaitForSeconds(2.2f); //给语音留个地方
+                await UniTask.Delay(2200);  //给语音留个地方
                 previewSound?.Play();
             }
-            StopCoroutine("PreviewFadeIn");
-            StartCoroutine(PreviewFadeIn());
+
+            await PreviewFadeIn();
             isFirstPlay = false;
         }
     }
 
-    IEnumerator PreviewFadeOut(float speed = 0.008F)
+    bool faderWorking = false;
+
+    async UniTask PreviewFadeOut(float speed = 0.008F)
     {
-        if (previewSound == null) yield break;
+        if (previewSound == null)
+            return;
+
+        faderWorking = true;
+
         for (float i = 0.7f; i > 0; i -= speed)
         {
-            StopCoroutine("PreviewFadeIn");
-            StopCoroutine("PreviewFadeOut");
             previewSound.SetVolume(i);
-            yield return new WaitForFixedUpdate();
+            await UniTask.DelayFrame(1);
         }
+
+        faderWorking = false;
     }
 
-    IEnumerator PreviewFadeIn()
+    async UniTask PreviewFadeIn()
     {
-        if (previewSound == null) yield break;
+        if (previewSound == null)
+            return;
+
+        faderWorking = true;
+
         for (float i = 0f; i < 0.7f; i += 0.02f)
         {
-            StopCoroutine("PreviewFadeIn");
-            StopCoroutine("PreviewFadeOut");
             previewSound.SetVolume(i);
-            yield return new WaitForFixedUpdate();
+            await UniTask.DelayFrame(1);
         }
+
+        faderWorking = false;
     }
 
-    private void PlayVoicesAtSceneIn()
+    private async void PlayVoicesAtSceneIn()
     {
-        AudioManager.Instance.PrecacheSE(voices[Random.Range(0, 3)].bytes).PlayOneShot();
+        (await AudioManager.Instance.PrecacheSE(voices[Random.Range(0, 3)].bytes)).PlayOneShot();
     }
 
-    private void PlayVoicesAtSceneOut()
+    private async void PlayVoicesAtSceneOut()
     {
-        AudioManager.Instance.PrecacheSE(voices[Random.Range(3, 7)].bytes).PlayOneShot();
+        (await AudioManager.Instance.PrecacheSE(voices[Random.Range(3, 7)].bytes)).PlayOneShot();
     }
 
     #endregion
@@ -396,7 +418,7 @@ public class SelectManager : MonoBehaviour
         //Select
         lastSong = currentSong;
         currentSong.OnSelect();
-        StartCoroutine(PlayPreview());
+        PlayPreview();
     }
 
     private void InitComponent()
@@ -458,7 +480,8 @@ public class SelectManager : MonoBehaviour
         {
             return;
         }
-        StartCoroutine(PreviewFadeOut());
+
+        await PreviewFadeOut();
         SettingAndMod.instance.SetLiveSetting();
 
         KVSystem.Instance.SaveConfig();

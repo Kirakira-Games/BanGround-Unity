@@ -19,6 +19,9 @@ public class TimeProgressManager : MonoBehaviour
 
     void Update()
     {
+        if(gameBGM == null)
+            gameBGM = AudioManager.Instance.gameBGM;
+
         switch (UIManager.Instance.SM.Current)
         {
             case State.Loading:
@@ -28,6 +31,8 @@ public class TimeProgressManager : MonoBehaviour
                 TimeProgress.value = 1;
                 break;
             default:
+                if (gameBGM == null)
+                    return;
                 TimeProgress.value = Mathf.Clamp01(AudioTimelineSync.instance.GetTimeInMs() / (float)gameBGM.GetLength());
                 break;
         }
