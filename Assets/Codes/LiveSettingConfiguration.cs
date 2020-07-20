@@ -9,95 +9,6 @@ using System;
 
 public static class LiveSetting
 {
-    /*
-    public static bool Loaded { get; private set; } = false;
-    public static void Load()
-    {
-        if (Loaded)
-            return;
-
-        Loaded = true;
-
-        if (File.Exists(settingsPath))
-        {
-            string sets = File.ReadAllText(settingsPath);
-            LiveSettingTemplate loaded = JsonConvert.DeserializeObject<LiveSettingTemplate>(sets);
-        }
-        else
-        {
-            Debug.LogWarning("Live setting file not found");
-        }
-
-        if(language == Language.AutoDetect)
-        {
-            switch(Application.systemLanguage)
-            {
-                case SystemLanguage.Chinese:
-                case SystemLanguage.ChineseSimplified:
-                    language = Language.SimplifiedChinese;
-                    break;
-                case SystemLanguage.ChineseTraditional:
-                    language = Language.TraditionalChinese;
-                    break;
-                case SystemLanguage.Japanese:
-                    language = Language.Japanese;
-                    break;
-                case SystemLanguage.Korean:
-                    language = Language.Korean;
-                    break;
-                default:
-                    language = Language.English;
-                    break;
-            }
-        }
-
-        AudioManager.Provider.SetSoundEffectVolume(seVolume, AudioProvider.SEType.Common);
-        AudioManager.Provider.SetSoundEffectVolume(igseVolume, AudioProvider.SEType.InGame);
-        AudioManager.Provider.SetSoundTrackVolume(bgmVolume);
-    }
-    */
-    /*
-    public static int judgeOffset = 0;
-    public static int audioOffset = 0;
-
-    public static float noteSpeed = 10f;
-    private static float trueNoteSpeed => noteSpeed;
-    public static float noteSize = 1f;
-    public static float meshSize = .75f;
-    public static float meshOpacity = .6f;
-
-    public static float bgmVolume = .7f;
-    public static float seVolume = .7f;
-    public static float igseVolume = .7f;
-    //public static int bufferSize = -1;
-
-    public static bool syncLineEnabled = true;
-    public static bool laneEffectEnabled = true;
-    public static bool grayNoteEnabled = true;
-    public static bool mirrowEnabled = false;
-    public static bool bangPerspective = true;
-    public static bool autoPlayEnabled = false;
-    public static bool laneLight = true;
-    public static bool shakeFlick = true;
-    public static bool dispMilisec = false;
-
-    public static float ELPValue = 0;
-    public static float offsetTransform = 1f;
-    public static float farClip = 169f;
-    public static float bgBrightness = .7f;
-    public static float laneBrightness = 0.84f;
-    public static float longBrightness = .8f;
-    */
-
-    /*
-   public static NoteStyle noteStyle = NoteStyle.Circle;
-   public static SEStyle seStyle = SEStyle.Drum;
-
-
-   public static Language language = Language.AutoDetect;
-   public static Sorter sort = Sorter.SongName;
-   */
-
     private static DemoFile _demoFile = null;
 
     public static DemoFile DemoFile 
@@ -129,7 +40,7 @@ public static class LiveSetting
     {
         get
         {
-            return offsetAdjustMode ? (int)Difficulty.Normal : cachedActualDifficulty;
+            return offsetAdjustMode ? (int)Difficulty.Easy : cachedActualDifficulty;
         }
         set
         {
@@ -137,7 +48,7 @@ public static class LiveSetting
         }
     } // actualDifficulty may differ if a chart set does not have currentDifficulty
 
-    public const int offsetAdjustChart = 9746;
+    public const int offsetAdjustChart = 99901;
     public static cHeader CurrentHeader
     {
         get
