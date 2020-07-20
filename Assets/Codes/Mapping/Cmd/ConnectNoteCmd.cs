@@ -2,10 +2,10 @@
 {
     class ConnectNoteCmdRaw : IEditorCmd
     {
-        private Note prev;
-        private Note next;
+        private V2.Note prev;
+        private V2.Note next;
 
-        public ConnectNoteCmdRaw(Note prev, Note next)
+        public ConnectNoteCmdRaw(V2.Note prev, V2.Note next)
         {
             this.prev = prev;
             this.next = next;
@@ -24,10 +24,10 @@
 
     class AdjustSlideTickTypeCmd : IEditorCmd
     {
-        private Note note;
+        private V2.Note note;
         private NoteType before;
 
-        public AdjustSlideTickTypeCmd(Note note)
+        public AdjustSlideTickTypeCmd(V2.Note note)
         {
             this.note = note;
             before = note.type;
@@ -56,7 +56,7 @@
 
     public class ConnectNoteCmd : CmdGroup
     {
-        public ConnectNoteCmd(Note prev, Note next)
+        public ConnectNoteCmd(V2.Note prev, V2.Note next)
         {
             Add(new ConnectNoteCmdRaw(prev, next));
             Add(new ChangeTickStackCmd(next, prev.tickStack));

@@ -6,7 +6,7 @@ namespace BGEditor
 {
     public abstract class EditorNoteBase : CoreMonoBehaviour, IPointerClickHandler
     {
-        public Note note { get; private set; }
+        public V2.Note note { get; private set; }
 
         protected Image image;
         public bool isSelected { get; protected set; }
@@ -35,7 +35,7 @@ namespace BGEditor
             image = GetComponent<Image>();
         }
 
-        public virtual void Init(Note note)
+        public virtual void Init(V2.Note note)
         {
             this.note = note;
             Unselect();

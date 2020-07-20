@@ -8,9 +8,9 @@ namespace BGEditor
 {
     public class EditNoteController : CoreMonoBehaviour
     {
-        private Dictionary<Note, EditorNoteBase> displayNotes;
-        public HashSet<EditorNoteBase> selectedNotes { get; private set; }
-        public IDPool slideIdPool { get; private set; }
+        private Dictionary<V2.Note, EditorNoteBase> displayNotes = new Dictionary<V2.Note, EditorNoteBase>();
+        public HashSet<EditorNoteBase> selectedNotes { get; private set; } = new HashSet<EditorNoteBase>();
+        public IDPool slideIdPool { get; private set; } = new IDPool();
 
         public EditorSlideNote singleSlideSelected {
             get
@@ -23,13 +23,6 @@ namespace BGEditor
             }
         }
 
-        public EditNoteController()
-        {
-            displayNotes = new Dictionary<Note, EditorNoteBase>();
-            selectedNotes = new HashSet<EditorNoteBase>();
-            slideIdPool = new IDPool();
-        }
-
         private void Awake()
         {
             Core.onNoteCreated.AddListener(CreateNote);
@@ -38,18 +31,18 @@ namespace BGEditor
             Core.onToolSwitched.AddListener(ToolSwitch);
         }
 
-        public EditorNoteBase Find(Note note)
+        public EditorNoteBase Find(V2.Note note)
         {
             return displayNotes[note];
         }
 
-        public void CreateNote(Note note)
+        public void CreateNote(V2.Note note)
         {
             if (note.type == NoteType.BPM)
                 return;
             Debug.Assert(!displayNotes.ContainsKey(note));
             EditorNoteBase notebase;
-            if (note.tickStack != -1)
+            if (note.tickStack > 0)
             {
                 notebase = Pool.Create<EditorSlideNote>().GetComponent<EditorSlideNote>();
             }
@@ -69,7 +62,7 @@ namespace BGEditor
             notebase.Init(note);
         }
 
-        public void RemoveNote(Note note)
+        public void RemoveNote(V2.Note note)
         {
             if (note.type == NoteType.BPM)
                 return;
@@ -78,7 +71,7 @@ namespace BGEditor
             displayNotes.Remove(note);
         }
 
-        public void ModifyNote(Note note)
+        public void ModifyNote(V2.Note note)
         {
             if (note.type == NoteType.BPM)
                 return;
@@ -88,7 +81,7 @@ namespace BGEditor
             notebase.Refresh();
         }
 
-        public void SelectNote(Note note)
+        public void SelectNote(V2.Note note)
         {
             SelectNote(Find(note));
         }
@@ -101,7 +94,7 @@ namespace BGEditor
             note.Select();
         }
 
-        public void UnselectNote(Note note)
+        public void UnselectNote(V2.Note note)
         {
             UnselectNote(Find(note));
         }
@@ -123,7 +116,7 @@ namespace BGEditor
             selectedNotes.Clear();
         }
 
-        public bool ConnectNote(Note prev, Note next)
+        public bool ConnectNote(V2.Note prev, V2.Note next)
         {
             Debug.Assert(displayNotes.ContainsKey(prev));
             var note = Find(prev) as EditorSlideNote;
@@ -155,8 +148,11 @@ namespace BGEditor
             if (Editor.tool == EditorTool.Delete)
             {
                 var tmpNotes = selectedNotes.ToArray();
+                var cmd = new CmdGroup();
                 foreach (var note in tmpNotes)
-                    note.Remove();
+                    cmd.Add(new RemoveNoteCmd(note.note));
+                var result = Core.Commit(cmd);
+                Debug.Assert(result);
                 selectedNotes.Clear();
             }
             else

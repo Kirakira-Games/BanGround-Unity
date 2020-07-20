@@ -61,8 +61,7 @@ namespace BGEditor
             Array.Clear(count, 0, count.Length);
             for (int i = 0; i < textures.Length; i++)
                 textures[i].SetPixels(colorArray[i]);
-            foreach (var note in Chart.notes)
-                CreateNote(note);
+            Chart.groups.ForEach(group => group.notes.ForEach(CreateNote));
             shouldApply = true;
         }
 
@@ -88,14 +87,14 @@ namespace BGEditor
             }
         }
 
-        private static int GetIdByNote(Note note)
+        private static int GetIdByNote(V2.Note note)
         {
-            if (note.tickStack != -1)
+            if (note.tickStack > 0)
                 return 2;
             return note.type == NoteType.Single ? 0 : 1;
         }
 
-        private void CreateNote(Note note)
+        private void CreateNote(V2.Note note)
         {
             if (!isAudioLoaded)
                 return;
@@ -108,7 +107,7 @@ namespace BGEditor
             shouldApply = true;
         }
 
-        private void RemoveNote(Note note)
+        private void RemoveNote(V2.Note note)
         {
             if (!isAudioLoaded)
                 return;

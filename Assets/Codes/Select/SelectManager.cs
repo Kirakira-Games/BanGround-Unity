@@ -349,7 +349,7 @@ public class SelectManager_old : MonoBehaviour
 
     public async void OnEnterPressed()
     {
-        if (!await LiveSetting.LoadChart())
+        if (!await LiveSetting.LoadChart(true))
         {
             return;
         }

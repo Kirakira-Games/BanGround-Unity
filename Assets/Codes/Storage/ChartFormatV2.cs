@@ -82,6 +82,11 @@ namespace V2
 
         [ProtoMember(2)]
         public float value { get; set; }
+
+        public override string ToString()
+        {
+            return $"{NoteAnim.ToString(this)}: {value}";
+        }
     }
 
     [Preserve]
@@ -176,10 +181,14 @@ namespace V2
 
         public static TimingGroup From(List<V1Note> notes)
         {
-            var ret = new TimingGroup
-            {
-                notes = notes.Where(note => note.type != NoteType.BPM).Select(note => Note.From(note)).ToList()
-            };
+            var ret = TimingGroup.Default();
+            ret.notes = notes.Where(note => note.type != NoteType.BPM).Select(note => Note.From(note)).ToList();
+            return ret;
+        }
+
+        public static TimingGroup Default()
+        {
+            var ret = new TimingGroup();
             ret.points.Add(TimingPoint.Default());
             return ret;
         }
@@ -221,6 +230,9 @@ namespace V2
         [ProtoMember(8)]
         public uint flags { get; set; }
 
+        [JsonIgnore]
+        public int group { get; set; }
+
         public static Note From(V1Note note)
         {
             return new Note
@@ -251,22 +263,22 @@ namespace V2
             => Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
         [ProtoMember(1)]
-        public int version { get; set; }
-
-        [ProtoMember(2)]
         public Difficulty difficulty { get; set; }
 
-        [ProtoMember(3)]
+        [ProtoMember(2)]
         public int level { get; set; }
 
-        [ProtoMember(4)]
+        [ProtoMember(3)]
         public int offset { get; set; }
 
-        [ProtoMember(5)]
+        [ProtoMember(4)]
         public List<TimingGroup> groups { get; set; } = new List<TimingGroup>();
 
-        [ProtoMember(6)]
+        [ProtoMember(5)]
         public List<ValuePoint> bpm { get; set; } = new List<ValuePoint>();
+
+        [ProtoMember(6)]
+        public int version { get; set; } = VERSION;
 
         public static Chart From(V1Chart old)
         {

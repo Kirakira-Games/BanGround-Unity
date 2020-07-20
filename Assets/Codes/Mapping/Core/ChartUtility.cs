@@ -1,4 +1,6 @@
-﻿namespace BGEditor
+﻿using UnityEngine;
+
+namespace BGEditor
 {
     public struct NotePosition
     {
@@ -61,9 +63,9 @@
             beat[1] %= beat[2];
         }
 
-        public static NotePosition GetPosition(Note note)
+        public static NotePosition GetPosition(V2.Note note)
         {
-            return GetPosition(note.lane, note.beat);
+            return GetPosition(note.lane == -1 ? Mathf.Clamp(Mathf.RoundToInt(note.x), 0, NoteUtility.LANE_COUNT - 1) : note.lane, note.beat);
         }
 
         public static NotePosition GetPosition(int lane, int[] beat)
@@ -71,7 +73,7 @@
             return new NotePosition(lane, beat[0] * beat[2] + beat[1], beat[2]);
         }
 
-        public static bool IsFuwafuwa(Note note)
+        public static bool IsFuwafuwa(V2.Note note)
         {
             return note.lane == -1;
         }

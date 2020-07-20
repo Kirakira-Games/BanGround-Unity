@@ -175,7 +175,7 @@ public class UIManager : MonoBehaviour
 
         OnStopPlaying();
         //SceneManager.LoadScene("InGame");
-        await LiveSetting.LoadChart();
+        await LiveSetting.LoadChart(true);
         SceneLoader.LoadScene("InGame", "InGame", true);
     }
 

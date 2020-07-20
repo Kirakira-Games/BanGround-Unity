@@ -125,18 +125,18 @@ namespace BGEditor
                 Core.SeekGrid(beat * Editor.barHeight, true);
                 if (!float.IsNaN(lastBeat))
                 {
-                    foreach (var note in Chart.notes)
+                    Chart.groups.ForEach(group => group.notes.ForEach(note =>
                     {
                         if (note.type == NoteType.BPM)
-                            continue;
+                            return;
                         float cur = ChartUtility.BeatToFloat(note.beat);
                         if (cur < lastBeat || cur >= beat)
-                            continue;
+                            return;
                         if (note.type == NoteType.Flick)
                             flickSE.PlayOneShot();
                         else
                             singleSE.PlayOneShot();
-                    }
+                    }));
                 }
                 lastBeat = beat;
             }

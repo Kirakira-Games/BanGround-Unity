@@ -4,9 +4,9 @@ namespace BGEditor
 {
     public class RemoveNoteCmd : IEditorCmd
     {
-        private Note note;
+        private V2.Note note;
 
-        public RemoveNoteCmd(Note note)
+        public RemoveNoteCmd(V2.Note note)
         {
             this.note = note;
         }
