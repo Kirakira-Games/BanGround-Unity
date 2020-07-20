@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UniRx.Async;
 using UnityEngine;
@@ -8,7 +9,7 @@ using UnityEngine.Events;
 
 namespace BGEditor
 {
-    public class NoteEvent : UnityEvent<Note> { }
+    public class NoteEvent : UnityEvent<V2.Note> { }
 
     public class ChartCore : MonoBehaviour
     {
@@ -25,7 +26,10 @@ namespace BGEditor
         public GameObject SlideNote;
 
         [HideInInspector]
-        public Chart chart { get; private set; }
+        public V2.Chart chart { get; private set; }
+
+        [HideInInspector]
+        public V2.TimingGroup group => chart.groups[editor.currentTimingGroup];
 
         [HideInInspector]
         public EditorInfo editor { get; private set; }
@@ -52,8 +56,7 @@ namespace BGEditor
         void Awake()
         {
             Instance = this;
-            chart = new Chart();
-            timing.Init();
+            chart = new V2.Chart();
 
             // Initialize events
             onTimingModified = new UnityEvent();
@@ -66,8 +69,8 @@ namespace BGEditor
             onNoteRemoved = new NoteEvent();
 
             // Add listeners
-            onAudioLoaded.AddListener(RefreshBarCount);
-            onTimingModified.AddListener(RefreshBarCount);
+            onAudioLoaded.AddListener(() => _ = RefreshBarCount());
+            onTimingModified.AddListener(() => _ = RefreshBarCount());
 
             // Initialize commands
             cmdList = new LinkedList<IEditorCmd>();
@@ -136,7 +139,7 @@ namespace BGEditor
         public void Undo() { Rollback(); }
         public void Redo() { RollbackRollback(); }
 
-        public bool CreateNote(Note note, bool allowMultiNote = false)
+        public bool CreateNote(V2.Note note, bool allowMultiNote = false)
         {
             var beat = ChartUtility.BeatToFloat(note.beat);
             if (beat < -NoteUtility.EPS)
@@ -153,12 +156,12 @@ namespace BGEditor
                 }
                 groundNotes[pos]++;
             }
-            chart.notes.Add(note);
+            chart.groups[note.group].notes.Add(note);
             onNoteCreated.Invoke(note);
             return true;
         }
 
-        public bool RemoveNote(Note note)
+        public bool RemoveNote(V2.Note note)
         {
             if (!ChartUtility.IsFuwafuwa(note))
             {
@@ -168,7 +171,7 @@ namespace BGEditor
                     return false;
                 groundNotes[pos]--;
             }
-            chart.notes.Remove(note);
+            chart.groups[note.group].notes.Remove(note);
             onNoteRemoved.Invoke(note);
             return true;
         }
@@ -213,38 +216,51 @@ namespace BGEditor
             onToolSwitched.Invoke();
         }
 
-        public void RefreshBarCount()
+        public async UniTaskVoid RefreshBarCount()
         {
             float duration = AudioManager.Instance.gameBGM.GetLength() / 1000f;
+            if (chart == null)
+            {
+                await UniTask.WaitUntil(() => chart != null);
+            }
             editor.numBeats = Mathf.CeilToInt(timing.TimeToBeat(duration));
             onGridModifed.Invoke();
         }
 
-        public Chart GetFinalizedChart()
+        public V2.Chart GetFinalizedChart()
         {
-            Chart ret = new Chart();
-            ret.Difficulty = chart.Difficulty;
-            ret.level = chart.level;
-            ret.offset = chart.offset;
+            var ret = new V2.Chart
+            {
+                difficulty = chart.difficulty,
+                level = chart.level,
+                offset = chart.offset,
+                bpm = chart.bpm
+            };
             // Slides of length 1 must be excluded
             var cmds = new CmdGroup();
-            chart.notes.Where(note =>
+            for (int i = 0; i < chart.groups.Count; i++)
             {
-                var notebase = notes.Find(note) as EditorSlideNote;
-                return notebase != null && notebase.prev == null && notebase.next == null;
-            }).ToList().ForEach(note => cmds.Add(new RemoveNoteCmd(note)));
+                var group = chart.groups[i];
+                group.notes.Where(note =>
+                {
+                    var notebase = notes.Find(note) as EditorSlideNote;
+                    return notebase != null && notebase.prev == null && notebase.next == null;
+                }).ToList().ForEach(note => cmds.Add(new RemoveNoteCmd(note)));
+            }
             Commit(cmds);
-
-            ret.notes = chart.notes.ToList();
-            ret.notes.AddRange(timing.BpmList);
-            ret.notes.Sort((lhs, rhs) =>
+            chart.groups.ForEach(group =>
             {
-                float lbeat = ChartUtility.BeatToFloat(lhs.beat);
-                float rbeat = ChartUtility.BeatToFloat(rhs.beat);
-                if (Mathf.Approximately(lbeat, rbeat))
-                    return 0;
-                return Math.Sign(lbeat - rbeat);
+                group.notes.Sort((lhs, rhs) =>
+                {
+                    float lbeat = ChartUtility.BeatToFloat(lhs.beat);
+                    float rbeat = ChartUtility.BeatToFloat(rhs.beat);
+                    if (Mathf.Approximately(lbeat, rbeat))
+                        return 0;
+                    return Math.Sign(lbeat - rbeat);
+                });
+                ret.groups.Add(group);
             });
+
             return ret;
         }
 
@@ -269,88 +285,108 @@ namespace BGEditor
             SceneLoader.LoadScene("Mapping", "NewSelect");
         }
 
-        public void LoadChart(Chart raw)
+        public static void AssignTimingGroups(V2.Chart chart)
         {
-            chart = new Chart();
-            chart.Difficulty = raw.Difficulty;
-            chart.level = raw.level;
-            chart.offset = raw.offset;
-            chart.notes = new List<Note>();
-            // We need to separate bpm notes and game notes here since they're handled differently
-            timing.BpmList.Clear();
-            var tickStackDic = new Dictionary<int, Note>();
-            var idmap = new Dictionary<int, int>();
-            foreach (var note in raw.notes)
+            for (int i = 0; i < chart.groups.Count; i++)
             {
-                if (note.type == NoteType.BPM)
-                {
-                    timing.BpmList.Add(note);
-                    continue;
-                }
-                if (ChartUtility.IsFuwafuwa(note))
-                {
-                    // TODO: handle fuwafuwa notes correctly
-                    note.lane = Mathf.Clamp(Mathf.RoundToInt(note.x), 0, NoteUtility.LANE_COUNT - 1);
-                }
-                if (note.tickStack == -1)
-                {
-                    CreateNote(note, true);
-                    continue;
-                }
-                // Note is part of a slide
-                int tickStack = note.tickStack;
-                if (tickStackDic.ContainsKey(tickStack))
-                {
-                    // slide body
-                    if (note.type == NoteType.Single)
-                    {
-                        Debug.LogWarning(ChartLoader.BeatToString(note.beat) + "Slide with multiple starts. Translated to slide tick.");
-                        note.type = NoteType.SlideTick;
-                    }
-                    note.tickStack = idmap[tickStack];
-                    var prev = tickStackDic[tickStack];
-                    CreateNote(note, true);
-                    notes.ConnectNote(prev, note);
-                }
-                else
-                {
-                    // slide start
-                    if (note.type != NoteType.Single)
-                    {
-                        if (note.type == NoteType.Flick || note.type == NoteType.SlideTickEnd)
-                        {
-                            Debug.LogWarning(ChartLoader.BeatToString(note.beat) + "Slide without a start. Translated to single note.");
-                            note.tickStack = -1;
-                            if (note.type != NoteType.Flick)
-                                note.type = NoteType.Single;
-                            CreateNote(note, true);
-                            continue;
-                        }
-                        Debug.LogWarning(ChartLoader.BeatToString(note.beat) + "Start of a slide must be 'Single' instead of '" + note.type + "'.");
-                        note.type = NoteType.Single;
-                    }
-                    int id = notes.slideIdPool.RegisterNext();
-                    idmap[note.tickStack] = id;
-                    note.tickStack = id;
-                    CreateNote(note, true);
-                }
+                chart.groups[i].notes.ForEach(note => note.group = i);
+            }
+        }
 
-                if (note.type == NoteType.SlideTickEnd || note.type == NoteType.Flick)
-                    tickStackDic.Remove(tickStack);
-                else
-                    tickStackDic[tickStack] = note;
-            }
-            if (tickStackDic.Count > 0)
+        public void LoadChart(V2.Chart raw)
+        {
+            AssignTimingGroups(raw);
+            chart = new V2.Chart
             {
-                foreach (var note in tickStackDic)
-                {
-                    note.Value.type = NoteType.SlideTickEnd;
-                }
-                notes.Refresh();
-                Debug.LogWarning("Some slides do not contain a tail. Ignored.");
+                difficulty = raw.difficulty,
+                level = raw.level,
+                offset = raw.offset,
+                bpm = raw.bpm,
+                groups = new List<V2.TimingGroup>()
+            };
+            timing.BpmList = raw.bpm;
+            for (int i = 0; i < raw.groups.Count; i++)
+            {
+                var group = new V2.TimingGroup();
+                group.points = raw.groups[i].points;
+                chart.groups.Add(group);
             }
-            onTimingModified.Invoke();
-            notes.UnselectAll();
+            for (int i = 0; i < raw.groups.Count; i++)
+            {
+                // We need to separate bpm notes and game notes here since they're handled differently
+                var tickStackDic = new Dictionary<int, V2.Note>();
+                var idmap = new Dictionary<int, int>();
+                foreach (var note in raw.groups[i].notes)
+                {
+                    if (note.type == NoteType.BPM)
+                    {
+                        Debug.LogError("BPM notes are not supported in current chart version!");
+                        continue;
+                    }
+                    if (ChartUtility.IsFuwafuwa(note))
+                    {
+                        // TODO: handle fuwafuwa notes correctly
+                    }
+                    if (note.tickStack <= 0)
+                    {
+                        CreateNote(note, true);
+                        continue;
+                    }
+                    // Note is part of a slide
+                    int tickStack = note.tickStack;
+                    if (tickStackDic.ContainsKey(tickStack))
+                    {
+                        // slide body
+                        if (note.type == NoteType.Single)
+                        {
+                            Debug.LogWarning(ChartLoader.BeatToString(note.beat) + "Slide with multiple starts. Translated to slide tick.");
+                            note.type = NoteType.SlideTick;
+                        }
+                        note.tickStack = idmap[tickStack];
+                        var prev = tickStackDic[tickStack];
+                        CreateNote(note, true);
+                        notes.ConnectNote(prev, note);
+                    }
+                    else
+                    {
+                        // slide start
+                        if (note.type != NoteType.Single)
+                        {
+                            if (note.type == NoteType.Flick || note.type == NoteType.SlideTickEnd)
+                            {
+                                Debug.LogWarning(ChartLoader.BeatToString(note.beat) + "Slide without a start. Translated to single note.");
+                                note.tickStack = 0;
+                                if (note.type != NoteType.Flick)
+                                    note.type = NoteType.Single;
+                                CreateNote(note, true);
+                                continue;
+                            }
+                            Debug.LogWarning(ChartLoader.BeatToString(note.beat) + "Start of a slide must be 'Single' instead of '" + note.type + "'.");
+                            note.type = NoteType.Single;
+                        }
+                        int id = notes.slideIdPool.RegisterNext();
+                        idmap[note.tickStack] = id;
+                        note.tickStack = id;
+                        CreateNote(note, true);
+                    }
+
+                    if (note.type == NoteType.SlideTickEnd || note.type == NoteType.Flick)
+                        tickStackDic.Remove(tickStack);
+                    else
+                        tickStackDic[tickStack] = note;
+                }
+                if (tickStackDic.Count > 0)
+                {
+                    foreach (var note in tickStackDic)
+                    {
+                        note.Value.type = NoteType.SlideTickEnd;
+                    }
+                    notes.Refresh();
+                    Debug.LogWarning("Some slides do not contain a tail. Ignored.");
+                }
+                onTimingModified.Invoke();
+                notes.UnselectAll();
+            }
         }
     }
 }

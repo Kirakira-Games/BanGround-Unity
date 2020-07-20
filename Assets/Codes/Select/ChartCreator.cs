@@ -52,14 +52,15 @@ public class ChartCreator : MonoBehaviour
         return header;
     }
 
-    private Chart CreateChart(Difficulty difficulty, int level)
+    private V2.Chart CreateChart(Difficulty difficulty, int level)
     {
-        var chart = new Chart();
-        chart.Difficulty = difficulty;
+        var chart = new V2.Chart();
+        chart.difficulty = difficulty;
         chart.level = level;
-        chart.notes.Add(new Note
+        var group = V2.TimingGroup.Default();
+        chart.groups.Add(group);
+        chart.bpm.Add(new V2.ValuePoint
         {
-            type = NoteType.BPM,
             beat = new int[] { 0, 0, 1 },
             value = 120
         });

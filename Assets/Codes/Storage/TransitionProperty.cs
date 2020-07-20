@@ -4,6 +4,7 @@ using UnityEngine.Scripting;
 using ProtoBuf;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using System;
 
 [ProtoContract()]
 public enum Transition
