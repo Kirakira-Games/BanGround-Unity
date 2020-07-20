@@ -15,11 +15,6 @@ public class TimingGroupController
     {
         this.group = group;
         materials = new Material[6];
-        /*
-        foreach (var point in group.points)
-        {
-            Debug.Log("P " + point);
-        }*/
     }
 
     public Material GetMaterial(GameNoteType type, Material current, bool isGrey = false)

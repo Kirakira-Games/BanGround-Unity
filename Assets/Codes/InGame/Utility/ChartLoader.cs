@@ -136,8 +136,7 @@ public static class ChartLoader
         // AnalyzeNotes
         var notes = group.notes;
         notes.ForEach(note => NormalizeBeat(note.beat));
-        notes.ForEach(RandomizeNote);
-        RandomizeTimingGroup(group);
+        // notes.ForEach(RandomizeNote);
         timing.LoadTimingGroup(group);
         // Create game notes
         float prevBeat = -1e9f;
