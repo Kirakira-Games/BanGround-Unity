@@ -48,12 +48,12 @@ public class SongItem : MonoBehaviour
         background.color = selectedImgColor;
 
         var path = DataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid).Item1;
-        SelectManager.instance.background.UpdateBackground(path);
+        //SelectManager_old.instance.background.UpdateBackground(path);
 
-        SelectManager.instance.difficultySelect.levels = LiveSetting.CurrentHeader.difficultyLevel.ToArray();
-        SelectManager.instance.difficultySelect.OnSongChange();
+        //SelectManager_old.instance.difficultySelect.levels = LiveSetting.CurrentHeader.difficultyLevel.ToArray();
+        //SelectManager_old.instance.difficultySelect.OnSongChange();
 
-        Enter_Btn.onClick.AddListener(() => SelectManager.instance.OnEnterPressed());
+        Enter_Btn.onClick.AddListener(() => SelectManager_old.instance.OnEnterPressed());
     }
 
     public void OnDeselect()

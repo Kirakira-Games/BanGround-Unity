@@ -197,7 +197,7 @@ public class ResultManager : MonoBehaviour
             //StartCoroutine("DelayLoadScene", "Select");
             StartCoroutine(BgmFadeOut());
             RemoveListener();
-            SceneLoader.LoadScene("Result", "NewSelect", true);
+            SceneLoader.LoadScene("Result", "Select", true);
         });
 
         button_retry.onClick.AddListener(() =>

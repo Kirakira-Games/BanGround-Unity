@@ -11,7 +11,6 @@ using Random = UnityEngine.Random;
 using UniRx.Async;
 
 #pragma warning disable 0649
-[Obsolete]
 public class SelectManager_old : MonoBehaviour
 {
     public const float scroll_Min_Speed = 50f;
@@ -329,7 +328,7 @@ public class SelectManager_old : MonoBehaviour
             StopCoroutine("PreviewFadeIn");
             StopCoroutine("PreviewFadeOut");
             //print("FadingOut");
-            previewSound.SetVolume(i);
+            previewSound?.SetVolume(i);
             yield return new WaitForFixedUpdate();
         }
     }
@@ -342,7 +341,7 @@ public class SelectManager_old : MonoBehaviour
             StopCoroutine("PreviewFadeIn");
             StopCoroutine("PreviewFadeOut");
             //print("FadingIn");
-            previewSound.SetVolume(i);
+            previewSound?.SetVolume(i);
             yield return new WaitForFixedUpdate();
         }
     }
@@ -359,12 +358,12 @@ public class SelectManager_old : MonoBehaviour
         KVSystem.Instance.SaveConfig();
 
         PlayVoicesAtSceneOut();
-        SceneLoader.LoadScene("NewSelect", "InGame", true);
+        SceneLoader.LoadScene("Select", "InGame", true);
     }
 
     public void OpenMappingScene()
     {
-        SceneLoader.LoadScene("NewSelect", "Mapping", true);
+        SceneLoader.LoadScene("Select", "Mapping", true);
     }
 
     public async void ExportKiraPack()

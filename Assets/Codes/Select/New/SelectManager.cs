@@ -54,7 +54,7 @@ public class SelectManager : MonoBehaviour
     {
         if(args.Length > 0)
         {
-            if (SceneManager.GetActiveScene().name == "NewSelect")
+            if (SceneManager.GetActiveScene().name == "Select")
             {
                 var path = args[0];
 
@@ -98,7 +98,7 @@ public class SelectManager : MonoBehaviour
                     return;
                 }
 
-                SceneLoader.LoadScene("NewSelect", "InGame", true);
+                SceneLoader.LoadScene("Select", "InGame", true);
             }
             else
             {
@@ -118,7 +118,7 @@ public class SelectManager : MonoBehaviour
         {
             return;
         }
-        SceneLoader.LoadScene("NewSelect", "Mapping", true);
+        SceneLoader.LoadScene("Select", "Mapping", true);
     }
 
     public async void ExportKiraPack()
@@ -147,7 +147,7 @@ public class SelectManager : MonoBehaviour
     public void DuplicateKiraPack()
     {
         DataLoader.DuplicateKiraPack(LiveSetting.CurrentHeader);
-        SceneManager.LoadScene("NewSelect");
+        SceneManager.LoadScene("Select");
     }
     #endregion
 
@@ -265,7 +265,7 @@ public class SelectManager : MonoBehaviour
         if (focus)
         {
             bool success = DataLoader.LoadAllKiraPackFromInbox();
-            if (success) SceneManager.LoadScene("NewSelect");
+            if (success) SceneManager.LoadScene("Select");
         }
     }
 #endif
@@ -491,7 +491,7 @@ public class SelectManager : MonoBehaviour
         KVSystem.Instance.SaveConfig();
 
         PlayVoicesAtSceneOut();
-        SceneLoader.LoadScene("NewSelect", "InGame", true);
+        SceneLoader.LoadScene("Select", "InGame", true);
     }
 
     public void RefeshSonglist()
