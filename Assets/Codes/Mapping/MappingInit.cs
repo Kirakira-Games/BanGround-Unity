@@ -21,7 +21,7 @@ namespace BGEditor
             // Load chart
             int sid = LiveSetting.CurrentHeader.sid;
             Difficulty difficulty = (Difficulty)LiveSetting.actualDifficulty;
-            chart = DataLoader.LoadChart(sid, difficulty);
+            chart = DataLoader.LoadChart<Chart>(sid, difficulty);
 
             // Load music
             core.progress.Init(KiraFilesystem.Instance.Read(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)));

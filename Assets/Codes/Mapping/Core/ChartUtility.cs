@@ -51,7 +51,7 @@
     {
         public static float BeatToFloat(int[] beat)
         {
-            return ChartLoader.BeatToFloat(beat);
+            return ChartTiming.BeatToFloat(beat);
         }
 
         public static void NormalizeBeat(int[] beat)

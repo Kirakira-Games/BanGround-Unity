@@ -49,8 +49,8 @@ public class NoteMesh : MonoBehaviour
     static private float screenYEnd;
     static private float[] cachedLength;
 
-    private MeshFilter meshFilter;
-    private MeshRenderer meshRenderer;
+    public MeshFilter meshFilter { get; private set; }
+    public MeshRenderer meshRenderer { get; private set; }
     public float width = 1;
 
     private static float GetLength(float z)

@@ -50,8 +50,13 @@ public class Slide : MonoBehaviour, KirakiraTracer
         notes[notes.Count - 1].isTilt = isTilt;
         for (int i = 0; i < notes.Count - 1; i++)
         {
-            notes[i].slideMesh.ResetMesh(notes[i].transform, notes[i + 1].transform,
-                notes[i].displayFuwafuwa || notes[i + 1].displayFuwafuwa);
+            notes[i].slideMesh.ResetMesh(
+                notes[i].transform,
+                notes[i + 1].transform,
+                notes[i].displayFuwafuwa || notes[i + 1].displayFuwafuwa,
+                // GameNoteType.None for slide body which does not have a note type
+                noteHead.timingGroup.GetMaterial(GameNoteType.None, notes[i].slideMesh.meshRenderer.material)
+            );
         }
         foreach (var note in notes)
         {
@@ -116,9 +121,8 @@ public class Slide : MonoBehaviour, KirakiraTracer
             var intersect = FindSlideIntersection();
             if (!intersect.HasValue)
             {
-                float percentage = (float)(NoteController.audioTime - prev.time) / (next.time - prev.time);
-                percentage = Mathf.Max(0, percentage);
-                noteHead.transform.position = Vector3.LerpUnclamped(prev.judgePos, next.judgePos, percentage);
+                float ratio = Mathf.InverseLerp(prev.time, next.time, NoteController.audioTime);
+                noteHead.transform.position = Vector3.LerpUnclamped(prev.judgePos, next.judgePos, ratio);
                 enableBody = displayHead == 1 || !prev.gameObject.activeSelf;
             }
             else

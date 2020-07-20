@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using UnityEngine.Networking;
 using System;
 using System.Linq;
+using ProtoBuf;
 
 public static class DataLoader
 {
@@ -141,12 +142,12 @@ public static class DataLoader
         return musicDic.ContainsKey(mid) ? musicDic[mid] : null;
     }
 
-    public static Chart LoadChart(int sid, Difficulty difficulty)
+    public static T LoadChart<T>(int sid, Difficulty difficulty) where T : IExtensible
     {
-        return ProtobufHelper.LoadFromKiraFs<Chart>(GetChartPath(sid, difficulty));
+        return ProtobufHelper.LoadFromKiraFs<T>(GetChartPath(sid, difficulty));
     }
 
-    public static void SaveChart(Chart chart, int sid, Difficulty difficulty)
+    public static void SaveChart<T>(T chart, int sid, Difficulty difficulty) where T : IExtensible
     {
         string path = Path.Combine(DataDir, GetChartPath(sid, difficulty));
         string dir = Path.GetDirectoryName(path);
