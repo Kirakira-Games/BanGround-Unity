@@ -95,12 +95,12 @@ public class SelectManager_old : MonoBehaviour
 
                 LiveSetting.DemoFile = file;
 
-                if (!await LiveSetting.LoadChart(true))
-                {
-                    return;
-                }
+                //if (!await LiveSetting.LoadChart(true))
+                //{
+                //    return;
+                //}
 
-                SceneLoader.LoadScene("Select", "InGame");
+                SceneLoader.LoadScene("Select", "InGame", () => LiveSetting.LoadChart(true));
             }
             else
             {
@@ -427,28 +427,29 @@ public class SelectManager_old : MonoBehaviour
     public async void OnEnterPressed()
     {
         MainBlocker.Instance.SetBlock(true);
-        if (!await LiveSetting.LoadChart(true))
-        {
-            MainBlocker.Instance.SetBlock(false);
-            return;
-        }
-        await PreviewFadeOut();
+        //if (!await LiveSetting.LoadChart(true))
+        //{
+        //    MainBlocker.Instance.SetBlock(false);
+        //    return;
+        //}
+        //await PreviewFadeOut();
         SettingAndMod.instance.SetLiveSetting();
 
         KVSystem.Instance.SaveConfig();
 
         PlayVoicesAtSceneOut();
-        SceneLoader.LoadScene("Select", "InGame");
+        SceneLoader.LoadScene("Select", "InGame", () => LiveSetting.LoadChart(true));
+        await PreviewFadeOut();
     }
 
     #region ChartEditor
-    public async void OpenMappingScene()
+    public void OpenMappingScene()
     {
-        if (!await LiveSetting.LoadChart(false))
-        {
-            return;
-        }
-        SceneLoader.LoadScene("Select", "Mapping");
+        //if (!await LiveSetting.LoadChart(false))
+        //{
+        //    return;
+        //}
+        SceneLoader.LoadScene("Select", "Mapping", () => LiveSetting.LoadChart(false));
     }
 
     public async void ExportKiraPack()
