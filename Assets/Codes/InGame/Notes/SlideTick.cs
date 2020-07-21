@@ -21,9 +21,9 @@ public class SlideTick : SlideNoteBase
         return JudgeResult.None;
     }
 
-    public override void InitNote()
+    public override void ResetNote(GameNoteData data)
     {
-        base.InitNote();
+        base.ResetNote(data);
         noteMesh.width = 1.2f;
         noteMesh.meshRenderer.sharedMaterial.SetTexture("_BaseMap", NoteUtility.LoadResource<Texture2D>("note_tick_default"));
         //GetComponent<SpriteRenderer>().sprite = NoteUtility.LoadResource<Sprite>("note_tick_default");
