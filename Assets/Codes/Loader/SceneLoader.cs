@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UniRx.Async;
 using UnityEngine;
@@ -14,11 +15,12 @@ public class SceneLoader : MonoBehaviour
     private Camera loaderCamera;
     private AsyncOperation loadOP;
 
-    private static UniTaskVoid? TaskVoid;
+    private static Func<UniTask<bool>> TaskVoid;
     public static Scene currentSceneName;
     private static string nextSceneName;
 
     public static bool Loading = false;
+    public static bool chartLoaded = false;
 
     void Start()
     {
@@ -38,10 +40,11 @@ public class SceneLoader : MonoBehaviour
     }
 
 
-    public static void LoadScene(string currentSceneName, string nextSceneName, UniTaskVoid? task = null)
+    public static void LoadScene(string currentSceneName, string nextSceneName, Func<UniTask<bool>> task = null)
     {
         if (Loading) return;
         Loading = true;
+        chartLoaded = false;
 
         TaskVoid = task;
 
@@ -74,16 +77,17 @@ public class SceneLoader : MonoBehaviour
     {
         try
         {
-            if(TaskVoid.HasValue)
-             await TaskVoid.Value;
+            if (TaskVoid != null)
+                if (!await TaskVoid()) throw new Exception();
         }
         catch (System.Exception)
         {
+            MainBlocker.Instance.SetBlock(false);
             SceneManager.UnloadSceneAsync("Loader");
             Loading = false;
             return;
         }
-
+        chartLoaded = true;
         await SceneManager.UnloadSceneAsync(currentSceneName);
         loadOP = SceneManager.LoadSceneAsync(nextSceneName, LoadSceneMode.Additive);
         loadOP.allowSceneActivation = false;
