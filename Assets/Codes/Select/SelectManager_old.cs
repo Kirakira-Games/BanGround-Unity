@@ -273,7 +273,7 @@ public class SelectManager_old : MonoBehaviour
         }
     }
 
-    public IEnumerator SelectNear()
+    IEnumerator SelectNear()
     {
         //yield return new WaitForSeconds(1);
         RectTransform[] rts = new RectTransform[SelectButtons.Count];
