@@ -39,9 +39,9 @@ public class SlideEnd : SlideNoteBase
         }
     }
 
-    public override void InitNote()
+    public override void ResetNote(GameNoteData data)
     {
-        base.InitNote();
+        base.ResetNote(data);
         noteMesh.meshRenderer.sharedMaterial.SetTexture("_MainTex", NoteUtility.LoadResource<Texture2D>("note_single_tint"));
         //GetComponent<SpriteRenderer>().sprite = NoteUtility.LoadResource<Sprite>("note_long_default");
     }
