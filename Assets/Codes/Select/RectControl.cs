@@ -137,7 +137,6 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         select = false;
     }
 
-    bool entering = false;
     private void OnEnterPressed()
     {
         if (!DataLoader.MusicExists(LiveSetting.CurrentHeader.mid))
@@ -145,7 +144,6 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             MessageBoxController.ShowMsg(LogLevel.INFO, "Music missing. Please import it.");
             return;
         }
-        entering = true;
         //bt.onClick.RemoveAllListeners();
         //bt.interactable = false;
         sm.OnEnterPressed();
@@ -159,7 +157,6 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     bool upProtect = false;
     public void OnPointerDown(PointerEventData eventData)
     {
-        if (entering) return;
         down = true;
         longClick = false;
         time = 0;
@@ -178,7 +175,6 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (entering) return;
         //Debug.Log("Click");
         if (!longClick) OnPressed();
         else if (time >= longClickTime + deleteTime) OnDelete();
