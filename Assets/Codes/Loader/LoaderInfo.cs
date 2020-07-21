@@ -5,6 +5,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
+using UniRx.Async;
 
 #pragma warning disable 0649
 public class LoaderInfo : MonoBehaviour
@@ -22,8 +23,10 @@ public class LoaderInfo : MonoBehaviour
     const string LevelAndCharterFormat = "{0}\n{1}"; 
     const string ArtistFormat = "{0}";
 
-    private void Start()
+    private async void Start()
     {
+        await UniTask.WaitUntil(() => SceneLoader.chartLoaded);
+
         GetInfo();
         ShowInfo();
     }

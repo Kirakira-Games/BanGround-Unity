@@ -14,15 +14,15 @@ public class OffsetGuide : MonoBehaviour
     {
         LiveSetting.offsetAdjustMode = true;
 
-        if (!await LiveSetting.LoadChart(true))
-        {
-            LiveSetting.offsetAdjustMode = false;
+        //if (!await LiveSetting.LoadChart(true))
+        //{
+        //    LiveSetting.offsetAdjustMode = false;
 
-            return;
-        }
+        //    return;
+        //}
 
         SettingAndMod.instance.SetLiveSetting();
         KVSystem.Instance.SaveConfig();
-        SceneLoader.LoadScene("Select", "InGame", true);
+        SceneLoader.LoadScene("Select", "InGame", () => LiveSetting.LoadChart(true));
     }
 }
