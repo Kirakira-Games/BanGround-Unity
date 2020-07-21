@@ -426,8 +426,10 @@ public class SelectManager_old : MonoBehaviour
 
     public async void OnEnterPressed()
     {
+        MainBlocker.Instance.SetBlock(true);
         if (!await LiveSetting.LoadChart(true))
         {
+            MainBlocker.Instance.SetBlock(false);
             return;
         }
         await PreviewFadeOut();
