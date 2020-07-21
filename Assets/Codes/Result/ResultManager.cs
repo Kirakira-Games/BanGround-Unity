@@ -197,7 +197,7 @@ public class ResultManager : MonoBehaviour
             //StartCoroutine("DelayLoadScene", "Select");
             StartCoroutine(BgmFadeOut());
             RemoveListener();
-            SceneLoader.LoadScene("Result", "Select", true);
+            SceneLoader.LoadScene("Result", "Select");
         });
 
         button_retry.onClick.AddListener(() =>
@@ -206,7 +206,7 @@ public class ResultManager : MonoBehaviour
             //StartCoroutine("DelayLoadScene","InGame" ); 
             StartCoroutine(BgmFadeOut());
             RemoveListener();
-            SceneLoader.LoadScene("Result", "InGame",true);
+            SceneLoader.LoadScene("Result", "InGame");
         });
 
     }

@@ -176,7 +176,7 @@ public class UIManager : MonoBehaviour
         OnStopPlaying();
         //SceneManager.LoadScene("InGame");
         await LiveSetting.LoadChart(true);
-        SceneLoader.LoadScene("InGame", "InGame", true);
+        SceneLoader.LoadScene("InGame", "InGame");
     }
 
     public void GameRetire()
@@ -185,7 +185,7 @@ public class UIManager : MonoBehaviour
 
         OnStopPlaying();
         //SceneManager.LoadScene("Select");
-        SceneLoader.LoadScene("InGame", "Select", true);
+        SceneLoader.LoadScene("InGame", "Select");
     }
 
     private void OnApplicationPause(bool pause)
