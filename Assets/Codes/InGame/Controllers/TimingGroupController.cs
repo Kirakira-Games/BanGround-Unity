@@ -52,11 +52,11 @@ public class TimingGroupController
         // TODO: GEEKiDoS
         materials[0]?.SetColor("_BaseColor", p.flick);
         // TODO: GEEKiDoS
-        materials[1]?.SetColor("_BaseColor", p.tap);
+        materials[1]?.SetColor("_Tint", p.tap);
         // TODO: GEEKiDoS
-        materials[2]?.SetColor("_BaseColor", p.tapGrey);
+        materials[2]?.SetColor("_Tint", p.tapGrey);
         // TODO: GEEKiDoS
-        materials[3]?.SetColor("_BaseColor", p.slideTick);
+        materials[3]?.SetColor("_Tint", p.slideTick);
         // TODO: GEEKiDoS
         materials[4]?.SetColor("_BaseColor", p.slideTick);
         Color slide = p.slide;
