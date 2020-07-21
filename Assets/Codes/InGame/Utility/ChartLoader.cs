@@ -111,7 +111,7 @@ public static class ChartLoader
 
     public static TransitionColor RandomColor()
     {
-        return new TransitionColor((byte)Random.Range(0, 255), (byte)Random.Range(0, 255), (byte)Random.Range(0, 255), (byte)Random.Range(128, 255), Transition.Linear);
+        return new TransitionColor((byte)Random.Range(0, 255), (byte)Random.Range(0, 255), (byte)Random.Range(0, 255), 255, Transition.Linear);
     }
 
     public static void RandomizeTimingGroup(V2.TimingGroup group)

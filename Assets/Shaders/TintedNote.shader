@@ -14,6 +14,7 @@
         {
             Blend SrcAlpha OneMinusSrcAlpha
             Cull Off
+            ZWrite Off
 
             CGPROGRAM
             #pragma vertex vert
@@ -38,8 +39,9 @@
 
             CBUFFER_START(UnityPerMaterial)
                 sampler2D _MainTex;
+                float4 _MainTex_ST;
                 float4 _Tint;
-            CCBUFFER_END
+            CBUFFER_END
 
             v2f vert (appdata v)
             {
