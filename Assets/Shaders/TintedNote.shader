@@ -36,9 +36,10 @@
                 float4 vertex : SV_POSITION;
             };
 
-            sampler2D _MainTex;
-            float4 _MainTex_ST;
-            float4 _Tint;
+            CBUFFER_START(UnityPerMaterial)
+                sampler2D _MainTex;
+                float4 _Tint;
+            CCBUFFER_END
 
             v2f vert (appdata v)
             {
