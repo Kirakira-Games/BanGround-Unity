@@ -27,7 +27,7 @@ public class DifficultySelect : MonoBehaviour
     Text difficultyText;
     Text levelText;
     PlayRecordDisplay recordDisplayer;
-    //private FixBackground background;
+    private FixBackground background;
 
     static KVarRef cl_cursorter = new KVarRef("cl_cursorter");
     static KVarRef cl_lastsid = new KVarRef("cl_lastsid");
@@ -39,7 +39,7 @@ public class DifficultySelect : MonoBehaviour
         levelText.text = "";
         difficultyText = GameObject.Find("Text_SelectedDifficulty").GetComponent<Text>();
         recordDisplayer = GameObject.Find("Left_Panel").GetComponent<PlayRecordDisplay>();
-        //background = GameObject.Find("KirakiraBackground").GetComponent<FixBackground>();
+        background = GameObject.Find("KirakiraBackground").GetComponent<FixBackground>();
         lastDifficulty = LiveSetting.actualDifficulty;
 
         for (int i = 0; i < cards.Length; i++)
@@ -105,8 +105,8 @@ public class DifficultySelect : MonoBehaviour
         lastDifficulty = LiveSetting.actualDifficulty;
 
         recordDisplayer.DisplayRecord();
-        //string path = DataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid).Item1;
-        //background.UpdateBackground(path);
+        string path = DataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid).Item1;
+        background.UpdateBackground(path);
         //LiveSetting.selectedDifficulty = (Difficulty)enabledCards[0];
         //print(Enum.GetName(typeof(Difficulty), LiveSetting.selectedDifficulty));
     }
