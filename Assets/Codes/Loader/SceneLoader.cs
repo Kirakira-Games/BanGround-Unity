@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UniRx.Async;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -13,9 +14,9 @@ public class SceneLoader : MonoBehaviour
     private Camera loaderCamera;
     private AsyncOperation loadOP;
 
+    private static UniTaskVoid? TaskVoid;
     public static Scene currentSceneName;
     private static string nextSceneName;
-    private static bool needOpen;
 
     public static bool Loading = false;
 
@@ -37,61 +38,66 @@ public class SceneLoader : MonoBehaviour
     }
 
 
-    public static void LoadScene(string currentSceneName, string nextSceneName, bool needOpen = false)
+    public static void LoadScene(string currentSceneName, string nextSceneName, UniTaskVoid? task = null)
     {
         if (Loading) return;
         Loading = true;
 
+        TaskVoid = task;
+
         SceneLoader.currentSceneName = SceneManager.GetSceneByName(currentSceneName);
         SceneLoader.nextSceneName = nextSceneName;
-        SceneLoader.needOpen = needOpen;
-        SceneManager.LoadSceneAsync("Loader", LoadSceneMode.Additive);
+        SceneManager.LoadScene("Loader", LoadSceneMode.Additive);
+        Debug.Log("load");
     }
 
     public void Load()
     {
         //AudioManagerOld.Instanse.PauseBGM();
 
-        StartCoroutine(LoadAsync());        
+        LoadAsync();        
     }
 
-    private IEnumerator LoadAsync()
+    private async void LoadAsync()
     {
         //关门后再加载下一场景（实际关门动画55帧）
-        //WaitForSeconds内参数包括了：关门所需时间 + 显示loading小剧场的时间
-        yield return new WaitForSeconds(2.3f);
-        yield return SceneManager.UnloadSceneAsync(currentSceneName);
+        //时间包括了：关门所需时间 + 显示loading小剧场的时间
+        await UniTask.Delay((int)(2.3f*1000));
 
         loaderCamera.enabled = true;
 
-        loadOP = SceneManager.LoadSceneAsync(nextSceneName, needOpen ? LoadSceneMode.Additive : LoadSceneMode.Single);
-        loadOP.allowSceneActivation = false;
-
         //开门动画39帧
-        //需要开门的话需要等开门动画播放完毕后再卸载Loader场景并重置Loading标志
-        if (needOpen)
-        {
-            StartCoroutine(CountDown(.5f));
-        }
-        else
-        {
-            loadOP.allowSceneActivation = true;
-            Loading = false;
-        }
+        CountDown(.5f);
     }
 
-    private IEnumerator CountDown(float seconds)
+    private async void CountDown(float seconds)
     {
+        try
+        {
+            if(TaskVoid.HasValue)
+             await TaskVoid.Value;
+        }
+        catch (System.Exception)
+        {
+            SceneManager.UnloadSceneAsync("Loader");
+            Loading = false;
+            return;
+        }
+
+        await SceneManager.UnloadSceneAsync(currentSceneName);
+        loadOP = SceneManager.LoadSceneAsync(nextSceneName, LoadSceneMode.Additive);
+        loadOP.allowSceneActivation = false;
         while (loadOP.progress < 0.9f)
         {
-            yield return new WaitForEndOfFrame();
+            await UniTask.DelayFrame(0);
         }
         loadOP.allowSceneActivation = true;
 
         //开门时间（即loading播放时间） 应减去关门所需时间
         animator.SetTrigger("Open");
         //open gate need 1f
-        yield return new WaitForSeconds(seconds);
+        await UniTask.Delay((int)(seconds * 1000));
+        MainBlocker.Instance.SetBlock(false);
         SceneManager.UnloadSceneAsync("Loader");
         Loading = false;
     }

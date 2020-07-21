@@ -100,7 +100,7 @@ public class SelectManager_old : MonoBehaviour
                     return;
                 }
 
-                SceneLoader.LoadScene("Select", "InGame", true);
+                SceneLoader.LoadScene("Select", "InGame");
             }
             else
             {
@@ -438,7 +438,7 @@ public class SelectManager_old : MonoBehaviour
         KVSystem.Instance.SaveConfig();
 
         PlayVoicesAtSceneOut();
-        SceneLoader.LoadScene("Select", "InGame", true);
+        SceneLoader.LoadScene("Select", "InGame");
     }
 
     #region ChartEditor
@@ -448,7 +448,7 @@ public class SelectManager_old : MonoBehaviour
         {
             return;
         }
-        SceneLoader.LoadScene("Select", "Mapping", true);
+        SceneLoader.LoadScene("Select", "Mapping");
     }
 
     public async void ExportKiraPack()
