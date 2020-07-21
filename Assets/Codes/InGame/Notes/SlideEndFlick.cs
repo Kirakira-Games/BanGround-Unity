@@ -22,7 +22,7 @@ public class SlideEndFlick : SlideNoteBase
     {
         base.InitNote();
 
-        noteMesh.meshRenderer.sharedMaterial.SetTexture("_BaseMap", NoteUtility.LoadResource<Texture2D>("note_flick_default"));
+        noteMesh.meshRenderer.sharedMaterial.SetTexture("_MainTex", NoteUtility.LoadResource<Texture2D>("note_flick_default"));
         //GetComponent<SpriteRenderer>().sprite = NoteUtility.LoadResource<Sprite>("note_flick_default");
         var arrow = Instantiate(Resources.Load(LiveSetting.assetDirectory + "/FlickArrow"), transform) as GameObject;
         var ps = arrow.GetComponentInChildren<ParticleSystem>().main;

@@ -42,7 +42,7 @@ public class SlideEnd : SlideNoteBase
     public override void InitNote()
     {
         base.InitNote();
-        noteMesh.meshRenderer.sharedMaterial.SetTexture("_BaseMap", NoteUtility.LoadResource<Texture2D>("note_long_default"));
+        noteMesh.meshRenderer.sharedMaterial.SetTexture("_MainTex", NoteUtility.LoadResource<Texture2D>("note_single_tint"));
         //GetComponent<SpriteRenderer>().sprite = NoteUtility.LoadResource<Sprite>("note_long_default");
     }
 
