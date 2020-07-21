@@ -38,8 +38,8 @@ public class SwitchToggle : MonoBehaviour
     {
         if (panel == "Sound_Panel")
         {
-            if (active) SelectManager.instance.previewSound?.Pause();
-            else SelectManager.instance.previewSound?.Play();
+            if (active) SelectManager_old.instance.previewSound?.Pause();
+            else SelectManager_old.instance.previewSound?.Play();
         }
         if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Dropped"))
             return;

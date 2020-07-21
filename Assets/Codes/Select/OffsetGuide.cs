@@ -23,6 +23,6 @@ public class OffsetGuide : MonoBehaviour
 
         SettingAndMod.instance.SetLiveSetting();
         KVSystem.Instance.SaveConfig();
-        SceneLoader.LoadScene("NewSelect", "InGame", true);
+        SceneLoader.LoadScene("Select", "InGame", true);
     }
 }

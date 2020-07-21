@@ -282,7 +282,7 @@ namespace BGEditor
             {
                 Save();
             }
-            SceneLoader.LoadScene("Mapping", "NewSelect");
+            SceneLoader.LoadScene("Mapping", "Select");
         }
 
         public static void AssignTimingGroups(V2.Chart chart)

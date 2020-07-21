@@ -11,7 +11,6 @@ using Random = UnityEngine.Random;
 using UniRx.Async;
 
 #pragma warning disable 0649
-[Obsolete]
 public class SelectManager_old : MonoBehaviour
 {
     public const float scroll_Min_Speed = 50f;
@@ -53,6 +52,68 @@ public class SelectManager_old : MonoBehaviour
         KVSystem.Instance.SaveConfig();
     });
 
+    static Kommand cmd_playdemo = new Kommand("demo_play", "Play a demo file", async (args) =>
+    {
+        if (args.Length > 0)
+        {
+            if (SceneManager.GetActiveScene().name == "Select")
+            {
+                var path = args[0];
+
+                if (!File.Exists(path))
+                {
+                    if (KiraFilesystem.Instance.Exists(path))
+                    {
+                        path = Path.Combine(DataLoader.DataDir, path);
+                    }
+                    else
+                    {
+                        Debug.Log("[Demo Player] File not exists");
+                        return;
+                    }
+                }
+
+                var file = DemoFile.LoadFrom(path);
+
+                var targetHeader = DataLoader.chartList.First(x => x.sid == file.sid);
+
+                if (targetHeader == null)
+                {
+                    Debug.Log("[Demo Player] Target chartset not installed.");
+                    return;
+                }
+
+                if (targetHeader.difficultyLevel[(int)file.difficulty] == -1)
+                {
+                    Debug.Log("[Demo Player] Target chart not installed.");
+                    return;
+                }
+
+                LiveSetting.currentChart = DataLoader.chartList.IndexOf(DataLoader.chartList.First(x => x.sid == file.sid));
+                LiveSetting.actualDifficulty = (int)file.difficulty;
+                LiveSetting.currentDifficulty = (int)file.difficulty;
+
+                LiveSetting.DemoFile = file;
+
+                if (!await LiveSetting.LoadChart(true))
+                {
+                    return;
+                }
+
+                SceneLoader.LoadScene("Select", "InGame", true);
+            }
+            else
+            {
+                Debug.Log("[Demo Player] Must use in select page!");
+            }
+        }
+        else
+        {
+            Debug.Log("demo_play: Play a demo file<br />Usage: demo_play <demo file>");
+        }
+    });
+
+
     private void Awake()
     {
         instance = this;
@@ -81,12 +142,12 @@ public class SelectManager_old : MonoBehaviour
 
     private async void PlayVoicesAtSceneIn()
     {
-        (await AudioManager.Instance.PrecacheSE(voices[UnityEngine.Random.Range(0,3)].bytes)).PlayOneShot();
+        (await AudioManager.Instance.PrecacheSE(voices[Random.Range(0, 3)].bytes)).PlayOneShot();
     }
 
     private async void PlayVoicesAtSceneOut()
     {
-        (await AudioManager.Instance.PrecacheSE(voices[UnityEngine.Random.Range(3, 7)].bytes)).PlayOneShot();
+        (await AudioManager.Instance.PrecacheSE(voices[Random.Range(3, 7)].bytes)).PlayOneShot();
     }
 
     private void InitComponent()
@@ -270,13 +331,12 @@ public class SelectManager_old : MonoBehaviour
         else
         {
             lastcHeader = LiveSetting.CurrentHeader; 
-            StartCoroutine(PreviewFadeOut(0.02f));
         }
 
         cl_lastsid.Set(LiveSetting.CurrentHeader.sid);
         difficultySelect.levels = LiveSetting.CurrentHeader.difficultyLevel.ToArray();
         difficultySelect.OnSongChange();
-        PlayPreviewAsync();
+        PlayPreview();
     }
 
     public void UnselectSong()
@@ -287,13 +347,23 @@ public class SelectManager_old : MonoBehaviour
         }
     }
 
-    
-
     bool isFirstPlay = true;
-    async void PlayPreviewAsync()
+    private int lastPreviewMid = -1;
+
+    async void PlayPreview()
     {
+        await UniTask.WaitUntil(() => !faderWorking);
+
+        if (LiveSetting.CurrentHeader.mid == lastPreviewMid)
+            return;
+
+        await PreviewFadeOut(0.02f);
+
+        lastPreviewMid = LiveSetting.CurrentHeader.mid;
+
         mHeader mheader = DataLoader.GetMusicHeader(LiveSetting.CurrentHeader.mid);
-        if (previewSound != null) {
+        if (previewSound != null)
+        {
             previewSound.Dispose();
             previewSound = null;
         }
@@ -304,47 +374,54 @@ public class SelectManager_old : MonoBehaviour
                 {
                     (uint)(mheader.preview[0] * 1000),
                     (uint)(mheader.preview[1] * 1000)
-                }, 
+                },
                 false
             );
 
             if (isFirstPlay)
             {
-                previewSound.Pause();
-                await UniTask.Delay(2200); //给语音留个地方
-                previewSound.Play();
+                previewSound?.Pause();
+                await UniTask.Delay(2200);  //给语音留个地方
+                previewSound?.Play();
             }
 
-            StopCoroutine("PreviewFadeIn");
-            StartCoroutine(PreviewFadeIn());
+            await PreviewFadeIn();
             isFirstPlay = false;
         }
     }
 
-    IEnumerator PreviewFadeOut(float speed =0.008F)
+    bool faderWorking = false;
+
+    async UniTask PreviewFadeOut(float speed = 0.008F)
     {
-        if (previewSound == null) yield break;
+        if (previewSound == null)
+            return;
+
+        faderWorking = true;
+
         for (float i = 0.7f; i > 0; i -= speed)
-        {   
-            StopCoroutine("PreviewFadeIn");
-            StopCoroutine("PreviewFadeOut");
-            //print("FadingOut");
+        {
             previewSound.SetVolume(i);
-            yield return new WaitForFixedUpdate();
+            await UniTask.DelayFrame(0);
         }
+
+        faderWorking = false;
     }
 
-    IEnumerator PreviewFadeIn()
+    async UniTask PreviewFadeIn()
     {
-        if (previewSound == null) yield break;
+        if (previewSound == null)
+            return;
+
+        faderWorking = true;
+
         for (float i = 0f; i < 0.7f; i += 0.02f)
         {
-            StopCoroutine("PreviewFadeIn");
-            StopCoroutine("PreviewFadeOut");
-            //print("FadingIn");
             previewSound.SetVolume(i);
-            yield return new WaitForFixedUpdate();
+            await UniTask.DelayFrame(0);
         }
+
+        faderWorking = false;
     }
 
     public async void OnEnterPressed()
@@ -353,18 +430,23 @@ public class SelectManager_old : MonoBehaviour
         {
             return;
         }
-        StartCoroutine(PreviewFadeOut());
+        await PreviewFadeOut();
         SettingAndMod.instance.SetLiveSetting();
 
         KVSystem.Instance.SaveConfig();
 
         PlayVoicesAtSceneOut();
-        SceneLoader.LoadScene("NewSelect", "InGame", true);
+        SceneLoader.LoadScene("Select", "InGame", true);
     }
 
-    public void OpenMappingScene()
+    #region ChartEditor
+    public async void OpenMappingScene()
     {
-        SceneLoader.LoadScene("NewSelect", "Mapping", true);
+        if (!await LiveSetting.LoadChart(false))
+        {
+            return;
+        }
+        SceneLoader.LoadScene("Select", "Mapping", true);
     }
 
     public async void ExportKiraPack()
@@ -395,6 +477,7 @@ public class SelectManager_old : MonoBehaviour
         DataLoader.DuplicateKiraPack(LiveSetting.CurrentHeader);
         SceneManager.LoadScene("Select");
     }
+    #endregion
 
     private void OnApplicationPause(bool pause)
     {

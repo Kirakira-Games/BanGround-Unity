@@ -4,6 +4,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
+using UnityEngine.SceneManagement;
 
 #pragma warning disable 0649
 public class DifficultySelect : MonoBehaviour
@@ -97,7 +98,8 @@ public class DifficultySelect : MonoBehaviour
         if ((Sorter)cl_cursorter == Sorter.ChartDifficulty && lastDifficulty != LiveSetting.actualDifficulty)
         {
             cl_lastsid.Set(LiveSetting.CurrentHeader.sid);
-            SelectManager.instance.RefeshSonglist();
+            //SelectManager_old.instance.RefeshSonglist();
+            SceneManager.LoadScene("Select");
         }
 
         lastDifficulty = LiveSetting.actualDifficulty;
