@@ -122,7 +122,7 @@ public static class LiveSetting
         chart = await ChartVersion.Process(CurrentHeader, (Difficulty)actualDifficulty);
         if (chart == null)
         {
-            MessageBoxController.ShowMsg(LogLevel.ERROR, "This chart is unsupported.");
+            MessageBannerController.ShowMsg(LogLevel.ERROR, "This chart is unsupported.");
             return false;
         }
         try
@@ -138,7 +138,7 @@ public static class LiveSetting
         }
         catch (Exception e)
         {
-            MessageBoxController.ShowMsg(LogLevel.ERROR, e.Message);
+            MessageBannerController.ShowMsg(LogLevel.ERROR, e.Message);
             Debug.LogError(e.StackTrace);
             return false;
         }

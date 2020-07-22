@@ -10,7 +10,7 @@ class MessageQueueItem
     public bool autoClose;
 }
 
-public class MessageBoxController : MonoBehaviour
+public class MessageBannerController : MonoBehaviour
 {
     //public static MessageBoxController Instance { get; private set; }
 
