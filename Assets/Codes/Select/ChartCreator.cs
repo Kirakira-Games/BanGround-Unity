@@ -84,7 +84,7 @@ public class ChartCreator : MonoBehaviour
         int difficulty = SelectedDifficulty();
         if (difficulty == -1)
         {
-            MessageBoxController.ShowMsg(LogLevel.INFO, "Please select a difficulty.");
+            MessageBannerController.ShowMsg(LogLevel.INFO, "Please select a difficulty.");
             return;
         }
         // Create header
@@ -109,12 +109,12 @@ public class ChartCreator : MonoBehaviour
         int difficulty = SelectedDifficulty();
         if (difficulty == -1)
         {
-            MessageBoxController.ShowMsg(LogLevel.INFO, "Please select a difficulty.");
+            MessageBannerController.ShowMsg(LogLevel.INFO, "Please select a difficulty.");
             return;
         }
         if (cHeader.difficultyLevel[difficulty] != -1)
         {
-            MessageBoxController.ShowMsg(LogLevel.INFO, "This difficulty already exists.");
+            MessageBannerController.ShowMsg(LogLevel.INFO, "This difficulty already exists.");
             return;
         }
         // Create chart
@@ -131,6 +131,6 @@ public class ChartCreator : MonoBehaviour
 
     public void 还没做好()
     {
-        MessageBoxController.ShowMsg(LogLevel.INFO, "Coming soon!");
+        MessageBannerController.ShowMsg(LogLevel.INFO, "Coming soon!");
     }
 }

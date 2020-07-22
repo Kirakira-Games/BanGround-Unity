@@ -17,7 +17,7 @@ namespace AudioProvider
         {
             if (result != RESULT.OK)
                 //throw new Exception($"FMOD Error! Result code: {Enum.GetName(typeof(RESULT), result)}");
-                MessageBoxController.ShowMsg(LogLevel.ERROR, Enum.GetName(typeof(RESULT), result), false);
+                MessageBannerController.ShowMsg(LogLevel.ERROR, Enum.GetName(typeof(RESULT), result), false);
         }
     }
 

@@ -19,7 +19,7 @@ namespace BGEditor
         {
             Instance = this;
             gameObject.SetActive(false);
-            DontDestroyOnLoad(transform.parent.gameObject);
+            //DontDestroyOnLoad(transform.parent.gameObject);
         }
 
         public static async UniTask<bool> ShowMessage(string title, string content)

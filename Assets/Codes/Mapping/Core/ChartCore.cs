@@ -267,12 +267,12 @@ namespace BGEditor
         public void Save()
         {
             DataLoader.SaveChart(GetFinalizedChart(), LiveSetting.CurrentHeader.sid, (Difficulty) LiveSetting.actualDifficulty);
-            MessageBoxController.ShowMsg(LogLevel.OK, "Chart saved.");
+            MessageBannerController.ShowMsg(LogLevel.OK, "Chart saved.");
         }
 
         public void 还没做好()
         {
-            MessageBoxController.ShowMsg(LogLevel.INFO, "Coming soon!");
+            MessageBannerController.ShowMsg(LogLevel.INFO, "Coming soon!");
         }
 
         public async void Exit()

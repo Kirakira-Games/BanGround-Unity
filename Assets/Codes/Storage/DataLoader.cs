@@ -508,7 +508,7 @@ public static class DataLoader
         }
         catch (Exception e)
         {
-            MessageBoxController.ShowMsg(LogLevel.ERROR,
+            MessageBannerController.ShowMsg(LogLevel.ERROR,
                 string.Format("Cannot Load {0}: {1}", file.Name, e.Message));
             return -1;
         }
@@ -547,7 +547,7 @@ public static class DataLoader
                 {
                     LastImportedSid = tmp;
                     LoadSuccess = true;
-                    MessageBoxController.ShowMsg(LogLevel.OK, "Loaded kirapack: ".GetLocalized() + file.Name);
+                    MessageBannerController.ShowMsg(LogLevel.OK, "Loaded kirapack: ".GetLocalized() + file.Name);
                 }
                 //File.Delete(file.FullName);
                 //}
@@ -556,7 +556,7 @@ public static class DataLoader
         }
         catch (Exception e)
         {
-            MessageBoxController.ShowMsg(LogLevel.ERROR, e.Message, false);
+            MessageBannerController.ShowMsg(LogLevel.ERROR, e.Message, false);
         }
         return LoadSuccess;
     }

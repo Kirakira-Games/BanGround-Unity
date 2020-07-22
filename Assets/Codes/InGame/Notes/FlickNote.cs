@@ -15,7 +15,7 @@ public class FlickNote : NoteBase
     public override void ResetNote(GameNoteData data)
     {
         base.ResetNote(data);
-        noteMesh.meshRenderer.sharedMaterial.SetTexture("_MainTex", NoteUtility.LoadResource<Texture2D>("note_flick_default"));
+        noteMesh.meshRenderer.sharedMaterial.SetTexture("_MainTex", NoteUtility.LoadResource<Texture2D>("note_flick_tint"));
         //GetComponent<SpriteRenderer>().sprite = NoteUtility.LoadResource<Sprite>("note_flick_default");
     }
 

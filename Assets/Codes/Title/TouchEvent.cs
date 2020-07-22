@@ -118,7 +118,7 @@ public class TouchEvent : MonoBehaviour
         }
         else
         {
-            MessageBoxController.ShowMsg(LogLevel.ERROR, result.error);
+            MessageBannerController.ShowMsg(LogLevel.ERROR, result.error);
             if (!Authenticate.isNetworkError || !usePrefKey)
             {
                 //touched = false;

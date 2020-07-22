@@ -51,7 +51,6 @@ public class SceneLoader : MonoBehaviour
         SceneLoader.currentSceneName = SceneManager.GetSceneByName(currentSceneName);
         SceneLoader.nextSceneName = nextSceneName;
         SceneManager.LoadScene("Loader", LoadSceneMode.Additive);
-        Debug.Log("load");
     }
 
     public void Load()

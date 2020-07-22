@@ -141,7 +141,7 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         if (!DataLoader.MusicExists(LiveSetting.CurrentHeader.mid))
         {
-            MessageBoxController.ShowMsg(LogLevel.INFO, "Music missing. Please import it.");
+            MessageBannerController.ShowMsg(LogLevel.INFO, "Music missing. Please import it.");
             return;
         }
         //bt.onClick.RemoveAllListeners();
@@ -223,7 +223,7 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (LiveSetting.CurrentHeader.sid == LiveSetting.offsetAdjustChart)
         {
             int index = UnityEngine.Random.Range(0, delFailMsg.Length);
-            MessageBoxController.ShowMsg(LogLevel.INFO, delFailMsg[index]);
+            MessageBannerController.ShowMsg(LogLevel.INFO, delFailMsg[index]);
             return;
         }
 
