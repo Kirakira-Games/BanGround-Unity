@@ -50,7 +50,7 @@ public class TimingGroupController
     public void SetColor(TimingPoint p)
     {
         // TODO: GEEKiDoS
-        materials[0]?.SetColor("_BaseColor", p.flick);
+        materials[0]?.SetColor("_Tint", p.flick);
         // TODO: GEEKiDoS
         materials[1]?.SetColor("_Tint", p.tap);
         // TODO: GEEKiDoS
@@ -58,7 +58,7 @@ public class TimingGroupController
         // TODO: GEEKiDoS
         materials[3]?.SetColor("_Tint", p.slideTick);
         // TODO: GEEKiDoS
-        materials[4]?.SetColor("_BaseColor", p.slideTick);
+        materials[4]?.SetColor("_Tint", p.slideTick);
         Color slide = p.slide;
         slide.a = r_brightness_long;
         // TODO: GEEKiDoS
