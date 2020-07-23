@@ -116,17 +116,28 @@ public static class ChartLoader
 
     public static void RandomizeTimingGroup(V2.TimingGroup group)
     {
+        var def = V2.TimingPoint.Default();
+        def.tap.transition = Transition.Linear;
+        def.flick.transition = Transition.Linear;
+        def.tapGrey.transition = Transition.Linear;
+        def.slideTick.transition = Transition.Linear;
+        def.slide.transition = Transition.Linear;
         for (int i = 1; i <= 50; i++)
         {
+            def.tap.a = (byte)((i & 1) * 255);
+            def.flick.a = (byte)((i & 1) * 255);
+            def.tapGrey.a = (byte)((i & 1) * 255);
+            def.slideTick.a = (byte)((i & 1) * 255);
+            def.slide.a = (byte)((i & 1) * 255);
             group.points.Add(new V2.TimingPoint
             {
                 beat = new int[3] { i * 3, 0, 1 },
                 speed = new TransitionProperty<float>(i % 2 == 0 ? 1 : 2),
-                tap = RandomColor(),
-                flick = RandomColor(),
-                tapGrey = RandomColor(),
-                slideTick = RandomColor(),
-                slide = RandomColor()
+                tap = def.tap.Copy(),
+                flick = def.flick.Copy(),
+                tapGrey = def.tapGrey.Copy(),
+                slideTick = def.slideTick.Copy(),
+                slide = def.slide.Copy()
             });
         }
     }

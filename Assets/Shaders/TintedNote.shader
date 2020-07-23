@@ -61,6 +61,7 @@
                 float mask = res.g;
                 float3 tinted = col.rgb * _Tint.rgb * mask;
                 col.rgb = tinted + (1 - mask) * col.rgb;
+                col.a = col.a * _Tint.a;
 
                 // apply fog
                 UNITY_APPLY_FOG(i.fogCoord, col);

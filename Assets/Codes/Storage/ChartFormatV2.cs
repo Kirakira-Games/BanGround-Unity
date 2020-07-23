@@ -56,7 +56,7 @@ namespace V2
             if (t.beat != null)
                 return $"[{t.beat[0]}:{t.beat[1]}/{t.beat[2]}] ";
             else
-                return $"[{t.beatf}] ";
+                return $"[{t.time}] ";
         }
 
         public override string ToString()
@@ -146,6 +146,7 @@ namespace V2
         {
             TimingPoint ret = new TimingPoint
             {
+                time = Mathf.Lerp(a.time, b.time, t),
                 speed = new TransitionProperty<float>(TransitionLib.LerpUnclamped(a.speed, b.speed, t, a.speed.transition), a.speed.transition),
                 tap = TransitionColor.LerpUnclamped(a.tap, b.tap, t),
                 tapGrey = TransitionColor.LerpUnclamped(a.tapGrey, b.tapGrey, t),

@@ -60,7 +60,7 @@ public class Slide : MonoBehaviour, KirakiraTracer
         }
         foreach (var note in notes)
         {
-            note.InitSlideNote();
+            note.ResetSlideNote();
         }
     }
 
