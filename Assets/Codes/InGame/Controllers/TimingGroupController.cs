@@ -14,30 +14,30 @@ public class TimingGroupController
     public TimingGroupController(GameTimingGroup group)
     {
         this.group = group;
-        materials = new Material[6];
+        materials = new Material[7];
     }
 
-    public Material GetMaterial(GameNoteType type, Material current, bool isGrey = false)
+    public Material GetMaterial(GameNoteType type, Material current, bool isSpecial = false)
     {
         int index;
         switch (type)
         {
             case GameNoteType.Flick:
-            case GameNoteType.SlideEndFlick:
-                index = 0;
+            case GameNoteType.SlideEndFlick: // Normal = 0, Arrow = 1
+                index = isSpecial ? 1 : 0;
                 break;
-            case GameNoteType.Single:
-                index = isGrey ? 2 : 1;
+            case GameNoteType.Single: // Normal = 2, Grey = 3
+                index = isSpecial ? 3 : 2;
                 break;
             case GameNoteType.SlideEnd:
             case GameNoteType.SlideStart:
-                index = 3;
-                break;
-            case GameNoteType.SlideTick:
                 index = 4;
                 break;
-            default: // Slide body
+            case GameNoteType.SlideTick:
                 index = 5;
+                break;
+            default:
+                index = 6;
                 break;
         }
         if (materials[index] == null)
@@ -49,25 +49,26 @@ public class TimingGroupController
 
     public void SetColor(TimingPoint p)
     {
-        // TODO: GEEKiDoS
         materials[0]?.SetColor("_Tint", p.flick);
-        // TODO: GEEKiDoS
-        materials[1]?.SetColor("_Tint", p.tap);
-        // TODO: GEEKiDoS
-        materials[2]?.SetColor("_Tint", p.tapGrey);
-        // TODO: GEEKiDoS
-        materials[3]?.SetColor("_Tint", p.slideTick);
-        // TODO: GEEKiDoS
+
+        materials[1]?.SetColor("_Tint", p.flick);
+
+        materials[2]?.SetColor("_Tint", p.tap);
+
+        materials[3]?.SetColor("_Tint", p.tapGrey);
+
         materials[4]?.SetColor("_Tint", p.slideTick);
+
+        materials[5]?.SetColor("_Tint", p.slideTick);
+
         Color slide = p.slide;
-        slide.a = r_brightness_long;
-        // TODO: GEEKiDoS
-        materials[5]?.SetColor("_BaseColor", slide);
+        slide.a *= r_brightness_long;
+        materials[6]?.SetColor("_BaseColor", slide);
     }
 
     public void OnUpdate()
     {
-        float time = NoteController.audioTime / 1000f;
+        float time = NoteController.audioTimef;
         while (ptr < group.points.Count - 1 && group.points[ptr + 1].time <= time) ptr++;
         while (ptr > 0 && group.points[ptr].time > time) ptr--;
         if (ptr == group.points.Count - 1)

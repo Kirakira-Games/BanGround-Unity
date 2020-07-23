@@ -16,19 +16,17 @@ public class FuwafuwaPillar : MonoBehaviour
         pillar.useWorldSpace = true;
         pillar.receiveShadows = false;
         pillar.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        pillar.material = Resources.Load<Material>("InGame/Materials/note_body");
         pillar.startWidth = LINE_WIDTH * r_notesize;
         pillar.endWidth = LINE_WIDTH * r_notesize;
-        pillar.startColor = Color.white;
-        pillar.endColor = Color.white;
         pillar.rendererPriority = 1;
         gameObject.layer = 8; // note
     }
 
-    public void Init(SlideNoteBase parent)
+    public void Reset(SlideNoteBase parent)
     {
         this.parent = parent;
         pillar.enabled = parent.displayFuwafuwa;
+        pillar.sharedMaterial = parent.noteMesh.meshRenderer.sharedMaterial;
     }
 
     public void OnUpdate()

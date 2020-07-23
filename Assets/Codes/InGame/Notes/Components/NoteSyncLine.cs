@@ -33,8 +33,6 @@ public class NoteSyncLine : MonoBehaviour
         lineRenderer.material = Resources.Load<Material>("InGame/Materials/sync_line");
         lineRenderer.startWidth = lineWidth * r_notesize;
         lineRenderer.endWidth = lineWidth * r_notesize;
-        lineRenderer.startColor = Color.white;
-        lineRenderer.endColor = Color.white;
         lineRenderer.rendererPriority = 1;
         return lineRenderer;
     }
@@ -84,12 +82,19 @@ public class NoteSyncLine : MonoBehaviour
 
         for (int i = 0; i < syncLines.Count; i++)
         {
+            var prev = syncNotes[i];
+            var next = syncNotes[i + 1];
+            // Set position
             var pos = new Vector3[2];
-            pos[0] = syncNotes[i].transform.position;
-            pos[1] = syncNotes[i + 1].transform.position;
+            pos[0] = prev.transform.position;
+            pos[1] = next.transform.position;
             pos[0].z += 0.01f;
             pos[1].z += 0.01f;
             syncLines[i].SetPositions(pos);
+            // Set color
+            var color =  Color.white;
+            color.a = Mathf.Min(prev.color.a, next.color.a);
+            syncLines[i].material.SetColor("_BaseColor", color);
         }
     }
 

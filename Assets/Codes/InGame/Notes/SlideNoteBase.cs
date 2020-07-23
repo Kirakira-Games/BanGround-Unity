@@ -13,7 +13,7 @@ public abstract class SlideNoteBase : NoteBase
 
     protected abstract JudgeResult TrySlideJudge(KirakiraTouch touch);
 
-    public void InitSlideNote()
+    public void ResetSlideNote()
     {
         isStickEnd = false;
         parentSlide = GetComponentInParent<Slide>();
@@ -21,7 +21,7 @@ public abstract class SlideNoteBase : NoteBase
         {
             slideMesh.meshRenderer.enabled = true;
         }
-        pillar.Init(this);
+        pillar.Reset(this);
     }
 
     public override JudgeResult TryJudge(KirakiraTouch touch)

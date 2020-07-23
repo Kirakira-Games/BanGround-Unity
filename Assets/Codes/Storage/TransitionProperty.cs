@@ -28,7 +28,7 @@ public static class TransitionLib
         switch (trans)
         {
             case Transition.Constant:
-                return t < b ? a : b;
+                return t < 1 ? a : b;
             case Transition.Linear:
                 return Mathf.LerpUnclamped(a, b, t);
             default:
@@ -42,7 +42,7 @@ public static class TransitionLib
         switch (trans)
         {
             case Transition.Constant:
-                return t < b ? a : b;
+                return t < 1 ? a : b;
             case Transition.Linear:
                 return Mathf.RoundToInt(Mathf.LerpUnclamped(a, b, t));
             default:
@@ -180,9 +180,14 @@ public class TransitionColor : IExtensible
         return ret;
     }
 
+    public TransitionColor Copy()
+    {
+        return new TransitionColor(r, g, b, a, transition);
+    }
+
     public override string ToString()
     {
-        return $"({r},{g},{b} [{transition}])";
+        return $"({r},{g},{b},{a} [{transition}])";
     }
 }
 

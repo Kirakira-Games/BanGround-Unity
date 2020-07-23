@@ -23,6 +23,7 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
 
     public Vector3 initPos;
     public Vector3 judgePos;
+    public virtual Color color => noteMesh.meshRenderer.sharedMaterial.GetColor("_Tint");
 
     public virtual void InitNote()
     {
