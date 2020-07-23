@@ -10,8 +10,8 @@ public class FlickArrow : MonoBehaviour
 
     private void Awake()
     {
-        ps = GetComponentInChildren<ParticleSystem>();
-        psRenderer = GetComponentInChildren<ParticleSystemRenderer>();
+        ps = GetComponent<ParticleSystem>();
+        psRenderer = GetComponent<ParticleSystemRenderer>();
         main = ps.main;
         main.scalingMode = ParticleSystemScalingMode.Hierarchy;
     }
