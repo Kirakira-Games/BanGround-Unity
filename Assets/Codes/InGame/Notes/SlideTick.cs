@@ -25,7 +25,7 @@ public class SlideTick : SlideNoteBase
     {
         base.ResetNote(data);
         noteMesh.width = 1.2f;
-        noteMesh.meshRenderer.sharedMaterial.SetTexture("_BaseMap", NoteUtility.LoadResource<Texture2D>("note_tick_default"));
+        noteMesh.meshRenderer.sharedMaterial.SetTexture("_MainTex", NoteUtility.LoadResource<Texture2D>("note_tick_default_tint"));
         //GetComponent<SpriteRenderer>().sprite = NoteUtility.LoadResource<Sprite>("note_tick_default");
     }
 
