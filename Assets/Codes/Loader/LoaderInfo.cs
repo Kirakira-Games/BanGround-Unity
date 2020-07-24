@@ -20,13 +20,12 @@ public class LoaderInfo : MonoBehaviour
     [SerializeField] private Text songArtist;
 
     const string NameFormat = "{0}";
-    const string LevelAndCharterFormat = "{0}\n{1}"; 
+    const string LevelAndCharterFormat = "{0} {1}\n{2}"; 
     const string ArtistFormat = "{0}";
 
-    private async void Start()
+    private void Start()
     {
-        await UniTask.WaitUntil(() => SceneLoader.chartLoaded);
-
+        SceneLoader.onTaskFinish.AddListener(AppendChartInfo);
         GetInfo();
         ShowInfo();
     }
@@ -37,9 +36,17 @@ public class LoaderInfo : MonoBehaviour
         musicHeader = DataLoader.GetMusicHeader(LiveSetting.CurrentHeader.mid);
     }
 
+    private void AppendChartInfo(bool success)
+    {
+        if (!success) return;
+        Difficulty difficulty = (Difficulty)LiveSetting.actualDifficulty;
+        songBPM.text = GetBPM() + " NOTE " + LiveSetting.gameChart.numNotes;
+        songLevelAndCharter.text = string.Format(LevelAndCharterFormat, difficulty.ToString().ToUpper(), LiveSetting.chart.level, chartHeader.authorNick);
+    }
+
     private void ShowInfo()
     {
-        //Show Info
+        // Song img
         var path = DataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid).Item1;
         if (path != null && KiraFilesystem.Instance.Exists(path))
         {
@@ -47,9 +54,17 @@ public class LoaderInfo : MonoBehaviour
             songImg.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
         }
 
+        // Song name
         songName.text = string.Format(NameFormat, musicHeader.title);
-        songBPM.text = GetBPM() + " NOTE " + LiveSetting.gameChart.numNotes;
-        songLevelAndCharter.text = string.Format(LevelAndCharterFormat, LiveSetting.chart.difficulty.ToString().ToUpper(), LiveSetting.chart.level, chartHeader.authorNick);
+
+        // BPM
+        songBPM.text = "Loading...";
+        
+        // Difficulty and charter
+        Difficulty difficulty = (Difficulty)LiveSetting.actualDifficulty;
+        songLevelAndCharter.text = string.Format(LevelAndCharterFormat, difficulty.ToString().ToUpper(), "--", chartHeader.authorNick);
+        
+        // Artist
         songArtist.text = string.Format(ArtistFormat, musicHeader.artist);
     }
 

@@ -182,7 +182,7 @@ namespace V2
 
         public static TimingGroup From(List<V1Note> notes)
         {
-            var ret = TimingGroup.Default();
+            var ret = Default();
             ret.notes = notes.Where(note => note.type != NoteType.BPM).Select(note => Note.From(note)).ToList();
             return ret;
         }
