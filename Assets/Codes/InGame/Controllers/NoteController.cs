@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.Events;
 using AudioProvider;
+using UniRx.Async;
 using JudgeQueue = PriorityQueue<int, NoteBase>;
 
 public class NoteController : MonoBehaviour
@@ -340,7 +341,7 @@ public class NoteController : MonoBehaviour
         };
 
         // Game BGM
-        _ = AudioManager.Instance.DelayPlayInGameBGM(KiraFilesystem.Instance.Read(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), WARM_UP_SECOND);
+        StartCoroutine(AudioManager.Instance.DelayPlayInGameBGM(KiraFilesystem.Instance.Read(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), WARM_UP_SECOND).ToCoroutine());
 
         // Background
         var background = GameObject.Find("InGameBackground").GetComponent<InGameBackground>();

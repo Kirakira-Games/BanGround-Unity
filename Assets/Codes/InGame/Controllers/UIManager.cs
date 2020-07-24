@@ -8,6 +8,7 @@ using System;
 using UniRx.Async;
 
 using State = GameStateMachine.State;
+using System.Threading;
 
 public class UIManager : MonoBehaviour
 {
@@ -35,6 +36,8 @@ public class UIManager : MonoBehaviour
     public GameStateMachine SM { get; private set; }
 
     static KVarRef r_brightness_lane = new KVarRef("r_brightness_lane");
+
+    public CancellationTokenSource cancellationToken = new CancellationTokenSource();
 
     private void Awake()
     {
@@ -121,18 +124,21 @@ public class UIManager : MonoBehaviour
         Time.timeScale = 1;
         pause_Canvas.SetActive(false);
 
-/*#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
-        Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Locked;
-#endif*/
-
+        /*#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+                Cursor.visible = false;
+                Cursor.lockState = CursorLockMode.Locked;
+        #endif*/
         if (SM.Current == State.Playing)
         {
-            _ = BiteTheDust();
+            _ = BiteTheDust(cancellationToken.Token);
+        }
+        else if (SM.Current == State.Loading)
+        {
+            AudioTimelineSync.instance.Play();
         }
     }
 
-    private async UniTaskVoid BiteTheDust()
+    private async UniTask BiteTheDust(CancellationToken token)
     {
         ISoundTrack bgm = AudioManager.Instance.gameBGM;
         SM.AddState(State.Rewinding);
@@ -151,21 +157,21 @@ public class UIManager : MonoBehaviour
             InGameBackground.instance.pauseVideo();
             if (SM.Current != State.Rewinding)
             {
-                await UniTask.WaitUntil(() => SM.Current == State.Rewinding);
+                await UniTask.WaitUntil(() => SM.Current == State.Rewinding, cancellationToken: token);
             }
         }
 
         // play
         uint pauseTime = bgm.GetPlaybackTime();
         bgm.Play();
-        await UniTask.WaitUntil(() => bgm.GetPlaybackTime() != pauseTime);
+        await UniTask.WaitUntil(() => bgm.GetPlaybackTime() != pauseTime, cancellationToken: token);
         AudioTimelineSync.instance.Seek(bgm.GetPlaybackTime() / 1000f);
         AudioTimelineSync.instance.Play();
         InGameBackground.instance.seekVideo(bgm.GetPlaybackTime()/1000f);
         InGameBackground.instance.playVideo();
 
         if (SM.Current != State.Rewinding)
-            await UniTask.WaitUntil(() => SM.Current == State.Rewinding);
+            await UniTask.WaitUntil(() => SM.Current == State.Rewinding, cancellationToken: token);
         SM.PopState(State.Rewinding);
     }
 
@@ -303,7 +309,9 @@ public class UIManager : MonoBehaviour
 
     private void OnDestroy()
     {
+        Instance = null;
         resultVoice?.Dispose();
+        cancellationToken.Cancel();
 
 /*#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
         Cursor.visible = true;
