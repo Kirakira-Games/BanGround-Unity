@@ -77,7 +77,7 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     void OnPressed()
     {
         if (SceneLoader.Loading) return;
-        if (!select)
+        if (!select && !SelectManager_old.instance.dh.isDragging)
         {
             StopAllCoroutines();
             sm.SelectSong(index);

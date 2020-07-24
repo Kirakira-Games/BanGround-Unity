@@ -22,7 +22,7 @@ public class SelectManager_old : MonoBehaviour
     RectTransform rt_v;
     ScrollRect rt_s;
     VerticalLayoutGroup lg;
-    DragHandler dh;
+    public DragHandler dh;
 
     //sort
     private Text sort_Text;
@@ -291,6 +291,7 @@ public class SelectManager_old : MonoBehaviour
         while (Mathf.Abs(rt_s.velocity.y) > scroll_Min_Speed || dh.isDragging)
         {
             yield return 0;
+            //yield break;
         }
         //print("select near");
         rt_s.StopMovement();
@@ -340,10 +341,11 @@ public class SelectManager_old : MonoBehaviour
 
     public void UnselectSong()
     {
-        if (LiveSetting.currentChart >= 0)
-        {
-            SelectButtons[LiveSetting.currentChart].GetComponent<RectControl>().UnSelect();
-        }
+        //if (LiveSetting.currentChart >= 0)
+        //{
+        //    SelectButtons[LiveSetting.currentChart].GetComponent<RectControl>().UnSelect();
+        //}
+        last?.UnSelect();
     }
 
     bool isFirstPlay = true;
