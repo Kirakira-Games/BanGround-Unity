@@ -19,7 +19,6 @@ public class SelectManager_old : MonoBehaviour
     private cHeader lastcHeader = new cHeader();
 
     RectTransform rt;
-    RectTransform rt_v;
     ScrollRect rt_s;
     VerticalLayoutGroup lg;
     public DragHandler dh;
@@ -161,7 +160,6 @@ public class SelectManager_old : MonoBehaviour
 
         //Main Scroll View
         rt = GameObject.Find("SongContent").GetComponent<RectTransform>();
-        rt_v = GameObject.Find("Song Scroll View").GetComponent<RectTransform>();
         rt_s = GameObject.Find("Song Scroll View").GetComponent<ScrollRect>();
         dh = GameObject.Find("Song Scroll View").GetComponent<DragHandler>();
         lg = GameObject.Find("SongContent").GetComponent<VerticalLayoutGroup>();
@@ -186,8 +184,9 @@ public class SelectManager_old : MonoBehaviour
     }
 
     //Song Selection-------------------------------
-    public void InitSongList(int selectedSid = -1)
+    public async void InitSongList(int selectedSid = -1)
     {
+        lg.enabled = true;
         // Sort SongList
         IComparer<cHeader> compare;
         switch ((Sorter)cl_cursorter)
@@ -256,8 +255,8 @@ public class SelectManager_old : MonoBehaviour
 
             LiveSetting.currentChart = DataLoader.chartList.IndexOf(DataLoader.chartList.First(x => x.sid == selectedSid));
         }
-
-        StartCoroutine(SelectDefault());
+        await SelectDefault();
+        lg.enabled = false;
     }
 
     IEnumerator SelectDefault()
