@@ -403,6 +403,9 @@ public class SelectManager_old : MonoBehaviour
 
         for (float i = 0.7f; i > 0; i -= speed)
         {
+            if (previewSound == null)
+                return;
+
             previewSound.SetVolume(i);
             await UniTask.DelayFrame(0);
         }
@@ -419,6 +422,9 @@ public class SelectManager_old : MonoBehaviour
 
         for (float i = 0f; i < 0.7f; i += 0.02f)
         {
+            if (previewSound == null)
+                return;
+
             previewSound.SetVolume(i);
             await UniTask.DelayFrame(0);
         }

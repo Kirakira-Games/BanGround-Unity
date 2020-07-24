@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using UniRx.Async;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace BanGround.API
 {
@@ -34,7 +36,7 @@ namespace BanGround.API
             };
         }
 
-        public Func<T1, Task<Result<T2>>> A<T1, T2>()
+        public Func<T1, UniTask<Result<T2>>> A<T1, T2>()
         {
             var link = APIList[(typeof(T1), typeof(T2))];
 
@@ -53,8 +55,6 @@ namespace BanGround.API
             Language = language;
         }
 
-        private WebClient webClient = new WebClient();
-
         string UA = "BanGround-Unity/Alpha (" + 
 #if UNITY_EDITOR
             "Editor"
@@ -69,13 +69,13 @@ namespace BanGround.API
 #endif
         + "); ApiRequest";
 
-        string AccessToken = "";
+        public string AccessToken = "";
 
         public Result<T> DoRequest<T>(string url, HttpRequestMethod method = HttpRequestMethod.Get, string postJson = null)
         {
             var asyncTask = DoRequestAsync<T>(url, method, postJson);
 
-            asyncTask.Wait();
+            asyncTask.RunSynchronously();
 
             return asyncTask.Result;
         }
@@ -84,32 +84,32 @@ namespace BanGround.API
         {
             var uri = new Uri(Root + url);
 
-            webClient.Headers[HttpRequestHeader.UserAgent] = UA;
-            webClient.Headers[HttpRequestHeader.ContentType] = "application/json";
-            webClient.Headers[HttpRequestHeader.Authorization] = AccessToken;
-            webClient.Headers[HttpRequestHeader.AcceptLanguage] = Language;
+            string m = "GET";
 
-            webClient.Encoding = Encoding.UTF8;
+            if (method == HttpRequestMethod.Post)
+                m = "POST";
 
-            string result = null;
-
-            if(method == HttpRequestMethod.Get)
+            using (UnityWebRequest webRequest = new UnityWebRequest(uri, m))
             {
-                result = await webClient.DownloadStringTaskAsync(uri.ToString());
-            }
-            else if(method == HttpRequestMethod.Post)
-            {
-                if (postJson == null)
-                    throw new InvalidOperationException("YOU CAN'T JUST POST WITHOUT PARAMETER, BOI");
+                webRequest.SetRequestHeader("User-Agent", UA);
+                webRequest.SetRequestHeader("Content-Type", "application/json");
+                webRequest.SetRequestHeader("Authorization", AccessToken);
+                webRequest.SetRequestHeader("Accpet-Language", Language);
 
-                result = webClient.UploadString(uri.ToString(), postJson);
-            }
-            else
-            {
-                throw new Exception("?");
-            }
+                byte[] jsonToSend = new UTF8Encoding().GetBytes(postJson);
 
-            return JsonConvert.DeserializeObject<Result<T>>(result);
+                webRequest.uploadHandler = new UploadHandlerRaw(jsonToSend);
+                webRequest.downloadHandler = new DownloadHandlerBuffer();
+
+                await webRequest.SendWebRequest();
+
+                if (webRequest.isNetworkError)
+                {
+                    throw new WebException("Network error!");
+                }
+
+                return JsonConvert.DeserializeObject<Result<T>>(webRequest.downloadHandler.text);
+            }
         }
     }
 
