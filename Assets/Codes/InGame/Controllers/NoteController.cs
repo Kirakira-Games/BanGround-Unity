@@ -416,6 +416,7 @@ public class NoteController : MonoBehaviour
         judgeTime = audioTime - o_judge;
         audioTimef = audioTime / 1000f;
         judgeTimef = judgeTime / 1000f;
+        //Debug.Log("Audio: " + audioTime);
 
         // Create notes
         UpdateNotes();
