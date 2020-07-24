@@ -218,6 +218,8 @@ public class SelectManager_old : MonoBehaviour
             Destroy(SelectButtons[i].gameObject);
         }
         SelectButtons.Clear();
+        rcs.Clear();
+        last = null;
 
         Transform pos = GameObject.Find("SongContent").transform;
         //Spawn New SongItem
