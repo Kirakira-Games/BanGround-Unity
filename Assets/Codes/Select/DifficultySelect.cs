@@ -99,7 +99,7 @@ public class DifficultySelect : MonoBehaviour
         {
             cl_lastsid.Set(LiveSetting.CurrentHeader.sid);
             //SelectManager_old.instance.RefeshSonglist();
-            SceneManager.LoadScene("Select");
+            SelectManager_old.instance.InitSongList(cl_lastsid);
         }
 
         lastDifficulty = LiveSetting.actualDifficulty;
