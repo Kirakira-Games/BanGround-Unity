@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UniRx.Async;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -7,12 +8,12 @@ using UnityEngine.UI;
 public class TouchEvent : MonoBehaviour
 {
     public bool waitingUpdate = true;
-    public bool waitingAuth = true;
-    public bool authing = false;
+    public bool waitingAuth => Authenticate.user == null;
+    public bool authing => Authenticate.isAuthing;
 
     public UserInfo usercanvas;
     public GameObject warnCanvas;
-    public InputField inputField;
+    public GameObject loginPanel;
     private AsyncOperation operation;
     private bool touched = false;
 
@@ -20,17 +21,6 @@ public class TouchEvent : MonoBehaviour
     {
         warnCanvas.SetActive(false);
         usercanvas = GameObject.Find("UserInfo").GetComponent<UserInfo>();
-        if (PlayerPrefs.HasKey("key"))
-        {
-            inputField.SetTextWithoutNotify(PlayerPrefs.GetString("key"));
-            inputField.inputType = InputField.InputType.Password;
-            inputField.asteriskChar = '☆';
-            inputField.readOnly = true;
-            inputField.transform.parent.gameObject.SetActive(false);
-        }
-        else inputField.transform.parent.gameObject.SetActive(true);
-
-        GetAuthenticationResult();
     }
 
     //private IEnumerator SwitchScene(string name)
@@ -41,13 +31,17 @@ public class TouchEvent : MonoBehaviour
     //    yield return operation;
     //}
 
-    public void ChangeAnimation()
+    public async void ChangeAnimation()
     {
-#if !UNITY_EDITOR
-        inputField.transform.parent.gameObject.SetActive(false);
-        if (!authing) GetAuthenticationResult();
-        if (waitingUpdate || waitingAuth) return;
-#endif
+//#if !UNITY_EDITOR
+        if (!authing) 
+            await GetAuthenticationResult();
+        else
+            return;
+
+        if (waitingUpdate || waitingAuth) 
+            return;
+//#endif
         if (!touched)
         {
             touched = true;
@@ -91,8 +85,17 @@ public class TouchEvent : MonoBehaviour
         operation.allowSceneActivation = true;
     }
 
-    async void GetAuthenticationResult()
+    async UniTask GetAuthenticationResult()
     {
+        if(Authenticate.user == null)
+        {
+            loginPanel.SetActive(true);
+
+            await UniTask.WaitUntil(() => Authenticate.user != null);
+        }
+
+        usercanvas.GetUserInfo();
+        /*
 //#if !UNITY_EDITOR
         authing = true;
         string uuid = AppPreLoader.UUID;
@@ -137,7 +140,7 @@ public class TouchEvent : MonoBehaviour
 //#else
 //        yield return 0;
 //#endif
+        */
     }
-
 }
 

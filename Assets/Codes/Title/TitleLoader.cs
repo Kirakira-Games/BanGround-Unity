@@ -10,6 +10,7 @@ using AudioProvider;
 using UnityEngine.UI;
 using System.Security.Cryptography;
 using UniRx.Async;
+using BanGround.API;
 
 public class TitleLoader : MonoBehaviour
 {
@@ -20,12 +21,30 @@ public class TitleLoader : MonoBehaviour
     public Material backgroundMat;
     public MeshRenderer background;
 
+    public InputField usernameField;
+    public InputField passwordField;
+
+    public GameObject loginPanel;
+    public GameObject loginPanelBlocker;
+
     public static TitleLoader instance;
 
     public ISoundTrack music;
     private ISoundEffect banGround;
 
+    private Authenticate auth = new Authenticate();
+
     const string BACKGROUND_PATH = "backgrounds";
+
+    static KVar cl_username = new KVar("cl_username", "", KVarFlags.Archive | KVarFlags.StringOnly, "Saved username");
+    static KVar cl_password = new KVar("cl_password", "", KVarFlags.Archive | KVarFlags.StringOnly, "Saved password (encryped)");
+    /*
+     * Test User for editor:
+     * Username:
+     * unity_editor
+     * Password:
+     * Nic3P4ssword
+     */
 
     private void Awake()
     {
@@ -50,8 +69,10 @@ public class TitleLoader : MonoBehaviour
 
     private void Start()
     {
-
         PlayTitle();
+
+        if (!string.IsNullOrEmpty(cl_username))
+            _ = auth.TryAuthenticate(cl_username, cl_password, true);
 
         //MessageBoxController.ShowMsg(LogLevel.INFO, SystemInfo.deviceUniqueIdentifier.Substring(0, 8));
     }
@@ -65,8 +86,40 @@ public class TitleLoader : MonoBehaviour
 
         banGround = await AudioManager.Instance.PrecacheSE(voice[UnityEngine.Random.Range(0,voice.Length)].bytes);
         banGround.PlayOneShot();
+    }
 
+    public void HideLoginPanel()
+    {
+        loginPanel.SetActive(false);
+    }
 
+    public async void SubmitLogin()
+    {
+        if (Authenticate.isAuthing)
+            return;
+
+        loginPanelBlocker.SetActive(true);
+
+        var good = await auth.TryAuthenticate(usernameField.text, passwordField.text, false);
+
+        loginPanelBlocker.SetActive(false);
+
+        if (good)
+        {
+            cl_username.Set(usernameField.text);
+            cl_password.Set(Auth.EncryptPassword(passwordField.text));
+
+            KVSystem.Instance.SaveConfig();
+
+            loginPanel.SetActive(false);
+        }
+        else
+        {
+            if(Authenticate.isNetworkError)
+                MessageBannerController.ShowMsg(LogLevel.ERROR, "Unable to connect to the server! Check your network");
+            else
+                MessageBannerController.ShowMsg(LogLevel.ERROR, "Username or Password is wrong!");
+        }
     }
 
     async void CheckUpdate()

@@ -44,7 +44,7 @@ public class ChartCreator : MonoBehaviour
         else
         {
             header.author = UserInfo.username;
-            header.authorNick = UserInfo.result.nickname;
+            header.authorNick = Authenticate.user.Nickname;
         }
         header.backgroundFile = cHeader.backgroundFile;
         header.preview = cHeader.preview.ToArray();

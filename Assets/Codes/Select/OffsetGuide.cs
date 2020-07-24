@@ -10,7 +10,7 @@ public class OffsetGuide : MonoBehaviour
         GetComponent<Button>().onClick.AddListener(StartOffsetGuide);
     }
 
-    async void StartOffsetGuide()
+    void StartOffsetGuide()
     {
         LiveSetting.offsetAdjustMode = true;
 
