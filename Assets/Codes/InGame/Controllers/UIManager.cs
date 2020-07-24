@@ -60,7 +60,7 @@ public class UIManager : MonoBehaviour
 
         pause_Btn.onClick.AddListener(OnPauseButtonClick);
         resume_Btn.onClick.AddListener(GameResume);
-        retry_Btn.onClick.AddListener(GameRetryAsync);
+        retry_Btn.onClick.AddListener(GameRetry);
         retire_Btn.onClick.AddListener(GameRetire);
 
         pause_Canvas = GameObject.Find("PauseCanvas");
@@ -169,14 +169,24 @@ public class UIManager : MonoBehaviour
         SM.PopState(State.Rewinding);
     }
 
-    public async void GameRetryAsync()
+    public void GameRetry()
     {
-        Time.timeScale = 1;
-
-        OnStopPlaying();
         //SceneManager.LoadScene("InGame");
-        await LiveSetting.LoadChart(true);
-        SceneLoader.LoadScene("InGame", "InGame");
+        //await LiveSetting.LoadChart(true);
+        Time.timeScale = 1;
+        SceneLoader.LoadScene("InGame", "InGame", () => {
+            async UniTask<bool> Retry()
+            {
+                if (await LiveSetting.LoadChart(true))
+                {
+                    OnStopPlaying();
+                    return true;
+                }
+                Time.timeScale = 0;
+                return false;
+            }
+            return Retry();
+        });
     }
 
     public void GameRetire()
@@ -252,7 +262,7 @@ public class UIManager : MonoBehaviour
 
             await UniTask.Delay(3000);
 
-            SceneManager.LoadSceneAsync("Result");
+            _ = SceneManager.LoadSceneAsync("Result");
         }
     }
 
