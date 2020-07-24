@@ -3,9 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UniRx.Async;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
 #pragma warning disable 0649
+public class SceneTaskDoneEvent : UnityEvent<bool> { }
+
 public class SceneLoader : MonoBehaviour
 {
     [SerializeField] private GameObject songInfo;
@@ -17,13 +20,15 @@ public class SceneLoader : MonoBehaviour
 
     private static Func<UniTask<bool>> TaskVoid;
     public static Scene currentSceneName;
+    public static SceneTaskDoneEvent onTaskFinish = new SceneTaskDoneEvent();
     private static string nextSceneName;
 
     public static bool Loading = false;
-    public static bool chartLoaded = false;
 
     void Start()
     {
+        onTaskFinish.RemoveAllListeners();
+
         if (nextSceneName == "InGame")
         {
             songInfo.SetActive(true);
@@ -44,7 +49,6 @@ public class SceneLoader : MonoBehaviour
     {
         if (Loading) return;
         Loading = true;
-        chartLoaded = false;
 
         TaskVoid = task;
 
@@ -57,7 +61,7 @@ public class SceneLoader : MonoBehaviour
     {
         //AudioManagerOld.Instanse.PauseBGM();
 
-        LoadAsync();        
+        LoadAsync();
     }
 
     private async void LoadAsync()
@@ -82,11 +86,12 @@ public class SceneLoader : MonoBehaviour
         catch (System.Exception)
         {
             MainBlocker.Instance.SetBlock(false);
-            SceneManager.UnloadSceneAsync("Loader");
+            _ = SceneManager.UnloadSceneAsync("Loader");
             Loading = false;
+            onTaskFinish.Invoke(false);
             return;
         }
-        chartLoaded = true;
+        onTaskFinish.Invoke(true);
         await SceneManager.UnloadSceneAsync(currentSceneName);
         loadOP = SceneManager.LoadSceneAsync(nextSceneName, LoadSceneMode.Additive);
         loadOP.allowSceneActivation = false;
@@ -101,7 +106,7 @@ public class SceneLoader : MonoBehaviour
         //open gate need 1f
         await UniTask.Delay((int)(seconds * 1000));
         MainBlocker.Instance.SetBlock(false);
-        SceneManager.UnloadSceneAsync("Loader");
+        _ = SceneManager.UnloadSceneAsync("Loader");
         Loading = false;
     }
 }
