@@ -65,7 +65,13 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         //bt = GetComponent<Button>();
         rt = GetComponent<RectTransform>();
         //bt.onClick.AddListener(OnPressed);
+
         rt.sizeDelta = new Vector2(980, 116);
+        img.color = DisabledColor;
+        title.color = Color.white;
+        title.fontStyle = FontStyle.Normal;
+        startImg.SetActive(false);
+        select = false;
     }
 
     void OnPressed()
@@ -128,6 +134,7 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     public void UnSelect()
     {
+        if (!select) return;
         StopAllCoroutines();
         rt.sizeDelta = new Vector2(980, 116);
         img.color = DisabledColor;

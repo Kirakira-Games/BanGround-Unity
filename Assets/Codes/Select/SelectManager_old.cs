@@ -9,6 +9,7 @@ using System;
 using AudioProvider;
 using Random = UnityEngine.Random;
 using UniRx.Async;
+using UnityEngine.Profiling;
 
 #pragma warning disable 0649
 public class SelectManager_old : MonoBehaviour
@@ -34,6 +35,7 @@ public class SelectManager_old : MonoBehaviour
 
     public List<cHeader> chartList => DataLoader.chartList;
     List<GameObject> SelectButtons = new List<GameObject>();
+    List<RectControl> rcs = new List<RectControl>();
 
     DifficultySelect difficultySelect;
 
@@ -52,7 +54,7 @@ public class SelectManager_old : MonoBehaviour
         KVSystem.Instance.SaveConfig();
     });
 
-    static Kommand cmd_playdemo = new Kommand("demo_play", "Play a demo file", async (args) =>
+    static Kommand cmd_playdemo = new Kommand("demo_play", "Play a demo file", args =>
     {
         if (args.Length > 0)
         {
@@ -218,10 +220,11 @@ public class SelectManager_old : MonoBehaviour
         }
         SelectButtons.Clear();
 
+        Transform pos = GameObject.Find("SongContent").transform;
         //Spawn New SongItem
         for (int i = 0; i < chartList.Count; i++)
         {
-            GameObject go = Instantiate(songItemPrefab, GameObject.Find("SongContent").transform);
+            GameObject go = Instantiate(songItemPrefab, pos);
             go.name = i.ToString();
             Text[] txt = go.GetComponentsInChildren<Text>();
 
@@ -230,7 +233,9 @@ public class SelectManager_old : MonoBehaviour
             string author = chart.authorNick;
             txt[0].text = song.title;
             txt[1].text = song.artist + " / " + author;
-            go.GetComponent<RectControl>().index = i;
+            var rc = go.GetComponent<RectControl>();
+            rc.index = i;
+            rcs.Add(rc);
             SelectButtons.Add(go);
         }
 
@@ -305,6 +310,7 @@ public class SelectManager_old : MonoBehaviour
         SelectSong(nearstIndex);
     }
 
+    RectControl last = null;
     public void SelectSong(int index)
     {
         
@@ -314,16 +320,9 @@ public class SelectManager_old : MonoBehaviour
             return;
         }
 
-        foreach (GameObject selected in SelectButtons)
-        {
-
-            RectControl rc = selected.GetComponent<RectControl>();
-            rc.StopAllCoroutines();
-            if (rc.index != index)
-                rc.UnSelect();
-            else
-                rc.OnSelect();
-        }
+        last?.UnSelect();
+        rcs[index].OnSelect();
+        last = rcs[index];
 
         LiveSetting.currentChart = index;
 
