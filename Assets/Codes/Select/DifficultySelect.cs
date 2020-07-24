@@ -94,7 +94,7 @@ public class DifficultySelect : MonoBehaviour
         levelText.text = levels[selected].ToString();
 
         LiveSetting.actualDifficulty = selected;
-        LiveSetting.currentDifficulty = selected;
+        LiveSetting.currentDifficulty.Set(selected);
         if ((Sorter)cl_cursorter == Sorter.ChartDifficulty && lastDifficulty != LiveSetting.actualDifficulty)
         {
             cl_lastsid.Set(LiveSetting.CurrentHeader.sid);

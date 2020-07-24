@@ -341,7 +341,7 @@ public class TouchManager : MonoBehaviour
 
         if (!(provider is DemoReplayTouchPrivider) && g_demoRecord)
         {
-            recorder = new DemoRecorder(LiveSetting.CurrentHeader.sid, (Difficulty)LiveSetting.currentDifficulty);
+            recorder = new DemoRecorder(LiveSetting.CurrentHeader.sid, (Difficulty)LiveSetting.currentDifficulty.Get<int>());
         }
     }
 

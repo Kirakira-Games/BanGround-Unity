@@ -91,7 +91,7 @@ public class SelectManager_old : MonoBehaviour
 
                 LiveSetting.currentChart = DataLoader.chartList.IndexOf(DataLoader.chartList.First(x => x.sid == file.sid));
                 LiveSetting.actualDifficulty = (int)file.difficulty;
-                LiveSetting.currentDifficulty = (int)file.difficulty;
+                LiveSetting.currentDifficulty.Set((int)file.difficulty);
 
                 LiveSetting.DemoFile = file;
 
