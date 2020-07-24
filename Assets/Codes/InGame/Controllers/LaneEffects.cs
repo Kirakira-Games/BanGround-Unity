@@ -67,7 +67,7 @@ public class LaneEffects : MonoBehaviour
         if (!effect)
             return;
 
-        float speed = GetSpeed(NoteController.audioTimef) * LiveSetting.SpeedCompensationSum * (r_notespeed + 1f) / 5;
+        float speed = GetSpeed(NoteController.audioTimef) * LiveSetting.SpeedCompensationSum * (r_notespeed + 4f) / 14;
         if (UIManager.Instance.SM.isRewinding)
         {
             speed = -speed;
