@@ -98,7 +98,7 @@ public class ChartCreator : MonoBehaviour
         DataLoader.SaveChart(chart, header.sid, (Difficulty) difficulty);
 
         // Reload scene
-        LiveSetting.currentDifficulty = difficulty;
+        LiveSetting.currentDifficulty.Set(difficulty);
         LiveSetting.actualDifficulty = difficulty;
         cl_lastsid.Set(header.sid);
         SceneManager.LoadScene("Select");
@@ -124,7 +124,7 @@ public class ChartCreator : MonoBehaviour
         DataLoader.SaveChart(chart, cHeader.sid, (Difficulty) difficulty);
 
         // Reload scene
-        LiveSetting.currentDifficulty = difficulty;
+        LiveSetting.currentDifficulty.Set(difficulty);
         LiveSetting.actualDifficulty = difficulty;
         SceneManager.LoadScene("Select");
     }

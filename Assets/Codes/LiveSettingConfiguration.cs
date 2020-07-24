@@ -11,7 +11,7 @@ public static class LiveSetting
 {
     private static DemoFile _demoFile = null;
 
-    public static DemoFile DemoFile 
+    public static DemoFile DemoFile
     {
         get
         {
@@ -27,14 +27,18 @@ public static class LiveSetting
 
     static KVar fs_assetpath = new KVar("fs_assetpath", "V2Assets", KVarFlags.Hidden | KVarFlags.StringOnly);
     static KVar fs_iconpath = new KVar("fs_iconpath", "UI/ClearMark/", KVarFlags.Hidden | KVarFlags.StringOnly);
+    static KVar cl_lastdiff = new KVar("cl_lastdiff", "0", KVarFlags.Archive, "Current chart set difficulty", obj =>
+    {
+        KVSystem.Instance.SaveConfig();
+    });
 
     public static string assetDirectory => fs_assetpath;
     public static string IconPath => fs_iconpath;
     private static float cachedSpeed = 0;
     private static int cachedScreenTime = 0;
 
-    public static int currentChart = 0; // Chart set index
-    public static int currentDifficulty = (int)Difficulty.Easy;
+    public static int currentChart = 0;
+    public static KVarRef currentDifficulty = new KVarRef("cl_lastdiff");
     private static int cachedActualDifficulty = currentDifficulty;
     public static int actualDifficulty
     {
