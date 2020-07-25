@@ -8,6 +8,7 @@ namespace BGEditor
 {
     public class EditNoteController : CoreMonoBehaviour
     {
+        private Dictionary<V2.Note, EditorNoteBase> inactiveNotes = new Dictionary<V2.Note, EditorNoteBase>();
         private Dictionary<V2.Note, EditorNoteBase> displayNotes = new Dictionary<V2.Note, EditorNoteBase>();
         public HashSet<EditorNoteBase> selectedNotes { get; private set; } = new HashSet<EditorNoteBase>();
         public IDPool slideIdPool { get; private set; } = new IDPool();

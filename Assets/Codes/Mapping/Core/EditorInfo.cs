@@ -11,6 +11,8 @@
         public const int MIN_BAR_HEIGHT = 60;
 
         public int gridDivision;
+        public int yDivision;
+        public float yPos;
         public int barHeight;
         public int numBeats;
         public int currentTimingGroup;
