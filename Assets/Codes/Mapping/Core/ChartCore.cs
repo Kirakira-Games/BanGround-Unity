@@ -69,8 +69,8 @@ namespace BGEditor
             onNoteRemoved = new NoteEvent();
 
             // Add listeners
-            onAudioLoaded.AddListener(() => _ = RefreshBarCount());
-            onTimingModified.AddListener(() => _ = RefreshBarCount());
+            onAudioLoaded.AddListener(RefreshBarCount);
+            onTimingModified.AddListener(RefreshBarCount);
 
             // Initialize commands
             cmdList = new LinkedList<IEditorCmd>();
@@ -216,13 +216,14 @@ namespace BGEditor
             onToolSwitched.Invoke();
         }
 
-        public async UniTaskVoid RefreshBarCount()
+        public void RefreshBarCount()
         {
-            float duration = AudioManager.Instance.gameBGM.GetLength() / 1000f;
-            if (chart == null)
+            if (chart.bpm.Count == 0)
             {
-                await UniTask.WaitUntil(() => chart != null);
+                // Timing not loaded
+                return;
             }
+            float duration = AudioManager.Instance.gameBGM.GetLength() / 1000f;
             editor.numBeats = Mathf.CeilToInt(timing.TimeToBeat(duration));
             onGridModifed.Invoke();
         }
