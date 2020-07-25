@@ -40,14 +40,16 @@ namespace BGEditor
         [HideInInspector]
         public Dictionary<NotePosition, int> groundNotes;
 
-        public UnityEvent onTimingModified;
-        public UnityEvent onGridMoved;
-        public UnityEvent onGridModifed;
-        public UnityEvent onToolSwitched;
-        public UnityEvent onAudioLoaded;
-        public NoteEvent onNoteCreated;
-        public NoteEvent onNoteModified;
-        public NoteEvent onNoteRemoved;
+        public UnityEvent onTimingModified = new UnityEvent();
+        public UnityEvent onGridMoved = new UnityEvent();
+        public UnityEvent onGridModifed = new UnityEvent();
+        public UnityEvent onToolSwitched = new UnityEvent();
+        public UnityEvent onAudioLoaded = new UnityEvent();
+        public UnityEvent onYSnapModified = new UnityEvent();
+        public UnityEvent onYPosModified = new UnityEvent();
+        public NoteEvent onNoteCreated = new NoteEvent();
+        public NoteEvent onNoteModified = new NoteEvent();
+        public NoteEvent onNoteRemoved = new NoteEvent();
 
         private LinkedList<IEditorCmd> cmdList;
         private LinkedListNode<IEditorCmd> lastCmd;
@@ -57,16 +59,6 @@ namespace BGEditor
         {
             Instance = this;
             chart = new V2.Chart();
-
-            // Initialize events
-            onTimingModified = new UnityEvent();
-            onGridMoved = new UnityEvent();
-            onGridModifed = new UnityEvent();
-            onToolSwitched = new UnityEvent();
-            onAudioLoaded = new UnityEvent();
-            onNoteCreated = new NoteEvent();
-            onNoteModified = new NoteEvent();
-            onNoteRemoved = new NoteEvent();
 
             // Add listeners
             onAudioLoaded.AddListener(RefreshBarCount);
@@ -94,6 +86,7 @@ namespace BGEditor
             pool.PostUpdate();
         }
 
+        #region IEditorCmd
         /// <summary>
         /// Commit an editor command.
         /// </summary>
@@ -138,7 +131,9 @@ namespace BGEditor
 
         public void Undo() { Rollback(); }
         public void Redo() { RollbackRollback(); }
+        #endregion
 
+        #region Note
         public bool CreateNote(V2.Note note, bool allowMultiNote = false)
         {
             var beat = ChartUtility.BeatToFloat(note.beat);
@@ -175,7 +170,9 @@ namespace BGEditor
             onNoteRemoved.Invoke(note);
             return true;
         }
+        #endregion
 
+        #region Grid
         public void SetGridDivision(int div)
         {
             if (div == editor.gridDivision)
@@ -208,14 +205,6 @@ namespace BGEditor
             SeekGrid(editor.scrollPos + delta, force);
         }
 
-        public void SwitchTool(EditorTool tool)
-        {
-            if (editor.tool == tool)
-                return;
-            editor.tool = tool;
-            onToolSwitched.Invoke();
-        }
-
         public void RefreshBarCount()
         {
             if (chart.bpm.Count == 0)
@@ -227,7 +216,36 @@ namespace BGEditor
             editor.numBeats = Mathf.CeilToInt(timing.TimeToBeat(duration));
             onGridModifed.Invoke();
         }
+        #endregion
 
+        #region FuwaFuwa
+        public void SetYDivision(int div)
+        {
+            if (div == editor.yDivision)
+                return;
+            editor.yDivision = div;
+            onYSnapModified.Invoke();
+        }
+
+        public void SetY(float y)
+        {
+            if (Mathf.Approximately(y, editor.yPos))
+                return;
+            editor.yPos = y;
+            onYPosModified.Invoke();
+        }
+
+        #endregion
+
+        public void SwitchTool(EditorTool tool)
+        {
+            if (editor.tool == tool)
+                return;
+            editor.tool = tool;
+            onToolSwitched.Invoke();
+        }
+
+        #region Chart
         public V2.Chart GetFinalizedChart()
         {
             var ret = new V2.Chart
@@ -389,5 +407,6 @@ namespace BGEditor
                 notes.UnselectAll();
             }
         }
+        #endregion
     }
 }

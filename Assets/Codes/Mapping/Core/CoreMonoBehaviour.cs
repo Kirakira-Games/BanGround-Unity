@@ -6,6 +6,7 @@ namespace BGEditor
     {
         public static ChartCore Core => ChartCore.Instance;
         public static V2.Chart Chart => Core.chart;
+        public static V2.TimingGroup Group => Core.group;
         public static EditorInfo Editor => Core.editor;
         public static ObjectPool Pool => Core.pool;
         public static GridController Grid => Core.grid;
