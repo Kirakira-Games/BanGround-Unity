@@ -6,26 +6,26 @@ using System.Threading.Tasks;
 
 namespace BGEditor
 {
-    class ChangeYLayerCmd : IEditorCmd
+    class ChangeYSnapCmd : IEditorCmd
     {
-        float prev;
-        float target;
+        int prev;
+        int target;
 
-        public ChangeYLayerCmd(float target)
+        public ChangeYSnapCmd(int target)
         {
             this.target = target;
         }
 
         public bool Commit(ChartCore core)
         {
-            prev = core.editor.yPos;
-            core.SetY(target);
+            prev = core.editor.yDivision;
+            core.SetYDivision(target);
             return true;
         }
 
         public bool Rollback(ChartCore core)
         {
-            core.SetY(prev);
+            core.SetYDivision(prev);
             return true;
         }
     }

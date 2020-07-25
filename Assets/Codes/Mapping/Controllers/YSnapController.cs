@@ -15,16 +15,28 @@ namespace BGEditor
 
         private void HandleSnapChange(int index)
         {
-            Core.SetYDivision(index == 0 ? 0 : Ys[index - 1]);
+            int target = index == 0 ? 0 : Ys[index - 1];
+            if (Editor.yDivision == target)
+                return;
+            Core.Commit(new ChangeYSnapCmd(target));
         }
 
         private void HandleYChange(float newY)
         {
-            Core.SetY(Editor.yDivision == 0 ? 0 : newY / Editor.yDivision);
+            float target = Editor.yDivision == 0 ? 0 : newY / Editor.yDivision;
+            if (Mathf.Approximately(Editor.yPos, target))
+                return;
+            Core.Commit(new ChangeYLayerCmd(target));
         }
 
         private void RefreshText()
         {
+            // Refresh slider
+            if (!Mathf.Approximately(Editor.yPos, YPosSlider.value / Editor.yDivision))
+            {
+                YPosSlider.SetValueWithoutNotify(Editor.yPos * Editor.yDivision);
+            }
+            // Refresh text
             if (Editor.yDivision == 0)
             {
                 YPosText.text = "Y: Ground";
@@ -36,6 +48,23 @@ namespace BGEditor
 
         private void RefreshSnap()
         {
+            // Refresh dropdown
+            if (Editor.yDivision == 0)
+            {
+                dropdown.SetValueWithoutNotify(0);
+            }
+            else
+            {
+                for (int i = 0; i < Ys.Length; i++)
+                {
+                    if (Ys[i] == Editor.yDivision)
+                    {
+                        dropdown.SetValueWithoutNotify(i + 1);
+                        break;
+                    }
+                }
+            }
+
             // Find nearest
             YPosSlider.maxValue = Editor.yDivision;
             if (Editor.yDivision == 0)
