@@ -2,19 +2,39 @@
 using System.Collections;
 using UnityEngine.UI;
 
-public class GridInfoText : MonoBehaviour
+namespace BGEditor
 {
-    public Text text;
-    public Image image;
-
-    void Awake()
+    public class GridInfoText : MonoBehaviour
     {
-        text = gameObject.AddComponent<Text>();
-        image = gameObject.AddComponent<Image>();
-    }
+        public Text txt;
+        public Image img;
 
-    public void Reset()
-    {
+        [HideInInspector]
+        public RectTransform rect;
 
+        public static readonly Color BG_COLOR = new Color(0, 0, 0, 0.5f);
+
+        void Awake()
+        {
+            rect = GetComponent<RectTransform>();
+        }
+
+        public void ResetLeft(Vector2 anchoredPosition, string text)
+        {
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.zero;
+            rect.pivot = Vector2.zero;
+            rect.anchoredPosition = anchoredPosition;
+            txt.text = text;
+        }
+
+        public void ResetRight(Vector2 anchoredPosition, string text)
+        {
+            rect.anchorMin = Vector2.right;
+            rect.anchorMax = Vector2.right;
+            rect.pivot = Vector2.right;
+            rect.anchoredPosition = anchoredPosition;
+            txt.text = text;
+        }
     }
 }
