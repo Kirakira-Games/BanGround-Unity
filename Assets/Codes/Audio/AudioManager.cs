@@ -23,6 +23,8 @@ public class AudioManager : MonoBehaviour
 
     private void Awake()
     {
+        if (Instance != null && Instance != this) return;
+
         KVar snd_engine = new KVar("snd_engine", "Fmod", KVarFlags.Archive | KVarFlags.StringOnly, "Sound engine type");
         KVar snd_buffer_bass = new KVar("snd_buffer_bass", "-1", KVarFlags.Archive, "Buffer type of Bass Sound Engine");
         KVar snd_buffer_fmod = new KVar("snd_buffer_fmod", "-1", KVarFlags.Archive, "Buffer size of Fmod/Unity Sound Engine");
@@ -89,6 +91,27 @@ public class AudioManager : MonoBehaviour
     private void Update()
     {
         Provider.Update();
+
+#if !UNITY_EDITOR && (UNITY_ANDROID || UNITY_STANDALONE)
+        if (Input.GetKeyUp(KeyCode.Escape) && !exiting)
+        {
+            waiting += 1.5f;
+
+            if (waiting > 1.5f)
+            {
+                exiting = true;
+                SceneManager.LoadSceneAsync("GameOver", LoadSceneMode.Additive);
+            }
+            else
+            {
+                MessageBannerController.ShowMsg(LogLevel.INFO, "Tap Again to End The Game");
+            }
+        }
+
+        waiting -= Time.deltaTime;
+        if (waiting < 0) waiting = 0;
+#endif
+
     }
 
     private void OnDestroy()
