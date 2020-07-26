@@ -12,7 +12,9 @@ namespace BGEditor
         public Text TimeText;
         public Slider AudioProgressSlider;
         public Slider PlaybackRateSlider;
-        public Text PlayButtonText;
+        public Button PlayButton;
+        public Sprite PlayImg;
+        public Sprite PauseImg;
 
         public bool canSeek => bgm != null && bgm.GetStatus() != PlaybackStatus.Unknown && bgm.GetStatus() != PlaybackStatus.Playing;
 
@@ -62,13 +64,14 @@ namespace BGEditor
         {
             lastBeat = float.NaN;
             bgm.Play();
-            PlayButtonText.text = "Pause";
+
+            PlayButton.image.sprite = PauseImg;
         }
 
         public void Pause()
         {
             bgm.Pause();
-            PlayButtonText.text = "Play";
+            PlayButton.image.sprite = PlayImg;
         }
 
         public void Switch()
@@ -169,7 +172,7 @@ namespace BGEditor
                 }
                 lastBeat = beat;
             }
-            else if (PlayButtonText.text == "Pause")
+            else if (ReferenceEquals(PlayButton.image.sprite, PauseImg))
             {
                 lastBeat = float.NaN;
                 lastTime = float.NaN;

@@ -10704,7 +10704,9 @@ MonoBehaviour:
   TimeText: {fileID: 1746565846}
   AudioProgressSlider: {fileID: 2052041219}
   PlaybackRateSlider: {fileID: 2108860136}
-  PlayButtonText: {fileID: 0}
+  PlayButton: {fileID: 570277895}
+  PlayImg: {fileID: 21300000, guid: 7085e6cb7207f244d90ec1a4d9fc8541, type: 3}
+  PauseImg: {fileID: 21300000, guid: 0184a4bd020c90642839b3b95c994887, type: 3}
 --- !u!1 &1121611250
 GameObject:
   m_ObjectHideFlags: 0
@@ -12049,7 +12051,7 @@ MonoBehaviour:
   m_Interactable: 1
   m_TargetGraphic: {fileID: 1285240848}
   toggleTransition: 1
-  graphic: {fileID: 0}
+  graphic: {fileID: 89049775}
   m_Group: {fileID: 1437371220}
   onValueChanged:
     m_PersistentCalls:
@@ -12076,7 +12078,7 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: eaa0784181819474c8bf90dc0f3e27c7, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -15556,6 +15558,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   VPadding: 200
   LineBoundingHeight: 40
+  BPMFontSize: 20
   GridParent: {fileID: 2062217392}
   Div1Color: {r: 1, g: 1, b: 1, a: 1}
   Div2Color: {r: 0.09803922, g: 0.6, b: 0.6, a: 1}
