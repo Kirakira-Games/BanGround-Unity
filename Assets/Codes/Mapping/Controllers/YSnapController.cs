@@ -95,6 +95,11 @@ namespace BGEditor
             Core.onYFilterSwitched.Invoke();
         }
 
+        public void SwitchToggle()
+        {
+            YFilter.isOn = !YFilter.isOn;
+        }
+
         void Start()
         {
             // Dropdown
