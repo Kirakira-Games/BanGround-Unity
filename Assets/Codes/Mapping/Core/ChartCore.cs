@@ -10,6 +10,7 @@ using UnityEngine.Events;
 namespace BGEditor
 {
     public class NoteEvent : UnityEvent<V2.Note> { }
+    public class ChangeEvent<T>: UnityEvent<T, T> { }
 
     public class ChartCore : MonoBehaviour
     {
@@ -45,7 +46,7 @@ namespace BGEditor
         public UnityEvent onGridModifed = new UnityEvent();
         public UnityEvent onToolSwitched = new UnityEvent();
         public UnityEvent onAudioLoaded = new UnityEvent();
-        public UnityEvent onYSnapModified = new UnityEvent();
+        public ChangeEvent<int> onYSnapModified = new ChangeEvent<int>();
         public UnityEvent onYPosModified = new UnityEvent();
         public NoteEvent onNoteCreated = new NoteEvent();
         public NoteEvent onNoteModified = new NoteEvent();
@@ -223,8 +224,9 @@ namespace BGEditor
         {
             if (div == editor.yDivision)
                 return;
+            int prev = editor.yDivision;
             editor.yDivision = div;
-            onYSnapModified.Invoke();
+            onYSnapModified.Invoke(prev, div);
         }
 
         public void SetY(float y)
