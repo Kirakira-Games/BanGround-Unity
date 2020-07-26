@@ -22,6 +22,8 @@ namespace BGEditor
         private ISoundEffect singleSE;
         private ISoundEffect flickSE;
         private float lastBeat;
+        private float lastTime;
+        private float lastTimeRecorded;
         private static KVarRef cl_sestyle = new KVarRef("cl_sestyle");
 
         public static float TimeToScrollPos(float time)
@@ -112,6 +114,7 @@ namespace BGEditor
             flickSE = await AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) + "/flick.wav").bytes);
 
             lastBeat = float.NaN;
+            lastTime = float.NaN;
         }
 
         private void Update()
@@ -121,6 +124,15 @@ namespace BGEditor
             if (bgm.GetStatus() == PlaybackStatus.Playing)
             {
                 float time = bgm.GetPlaybackTime() / 1000f;
+                if (Mathf.Approximately(time, lastTime))
+                {
+                    time += Time.realtimeSinceStartup - lastTimeRecorded;
+                }
+                else
+                {
+                    lastTime = time;
+                    lastTimeRecorded = Time.realtimeSinceStartup;
+                }
                 float beat = Timing.TimeToBeat(time);
                 Core.SeekGrid(beat * Editor.barHeight, true);
                 if (!float.IsNaN(lastBeat))
@@ -143,6 +155,8 @@ namespace BGEditor
             else if (PlayButtonText.text == "Pause")
             {
                 lastBeat = float.NaN;
+                lastTime = float.NaN;
+                lastTimeRecorded = float.NaN;
                 Pause();
             }
         }
