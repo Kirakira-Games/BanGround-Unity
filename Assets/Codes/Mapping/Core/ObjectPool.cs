@@ -41,6 +41,10 @@ namespace BGEditor
                 {
                     obj = GameObject.Instantiate(Core.SlideNote, Core.grid.transform);
                 }
+                else if (type.Equals(typeof(GridInfoText)))
+                {
+                    obj = GameObject.Instantiate(Core.GridInfoText, Core.grid.transform);
+                }
                 else
                 {
                     obj = new GameObject(type.Name);

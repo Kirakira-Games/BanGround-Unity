@@ -161,6 +161,16 @@ namespace V2
         {
             return $"{NoteAnim.ToString(this)} speed={speed} tap={tap} tapGrey={tapGrey} flick={flick} slideTick={slideTick} slide={slide}";
         }
+
+        public string ToEditorString()
+        {
+            string sTap = TransitionColor.ColoredString("口", tap);
+            string sTapGrey = TransitionColor.ColoredString("口", tapGrey);
+            string sFlick = TransitionColor.ColoredString("口", flick);
+            string sSlideTick = TransitionColor.ColoredString("口", slideTick);
+            string sSlide = TransitionColor.ColoredString("口", slide);
+            return $"Speed:{speed.value} {sTap}{sTapGrey}{sFlick}{sSlideTick}{sSlide}";
+        }
     }
 
     [Preserve]

@@ -27,6 +27,7 @@ namespace BGEditor
         public GameObject SingleNote;
         public GameObject FlickNote;
         public GameObject SlideNote;
+        public GameObject GridInfoText;
 
         [HideInInspector]
         public V2.Chart chart { get; private set; }
@@ -413,6 +414,7 @@ namespace BGEditor
                 onTimingModified.Invoke();
                 notes.UnselectAll();
             }
+            grid.Refresh();
         }
         #endregion
     }

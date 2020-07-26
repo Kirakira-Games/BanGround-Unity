@@ -41,8 +41,6 @@ namespace BGEditor
 
             var obj = new GameObject("GridParent");
             obj.transform.SetParent(transform, false);
-
-            Refresh();
         }
 
         #region Create
@@ -79,6 +77,18 @@ namespace BGEditor
             txt.fontSize = 48;
             objectsInUse.AddLast(ret);
             return txt;
+        }
+
+        private GridInfoText CreateGridInfo(Vector2 anchoredPosition, string text, bool isleft)
+        {
+            var ret = Pool.Create<GridInfoText>();
+            var info = ret.GetComponent<GridInfoText>();
+            if (isleft)
+                info.ResetLeft(anchoredPosition, text);
+            else
+                info.ResetRight(anchoredPosition, text);
+            objectsInUse.AddLast(ret);
+            return info;
         }
         #endregion
 
@@ -176,8 +186,20 @@ namespace BGEditor
                     continue;
 
                 float y = beat * Editor.barHeight - start;
-                var txt = CreateText(new Vector2(0, y), $"BPM:{Mathf.RoundToInt(bpm.value * 1000) / 1000f}");
-                txt.fontSize = BPMFontSize;
+                var info = CreateGridInfo(new Vector2(0, y), $"BPM:{Mathf.RoundToInt(bpm.value * 1000) / 1000f}", true);
+                info.rect.sizeDelta = new Vector2(160, 40);
+            }
+            // Create timing point info
+            foreach (var point in Group.points)
+            {
+                float beat = ChartUtility.BeatToFloat(point.beat);
+                beat = Mathf.Max(0, beat);
+                if (beat < startBar || beat > endBar)
+                    continue;
+
+                float y = beat * Editor.barHeight - start;
+                var info = CreateGridInfo(new Vector2(0, y), point.ToEditorString(), false);
+                info.rect.sizeDelta = new Vector2(300, 40);
             }
             Notes.Refresh();
         }

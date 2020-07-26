@@ -180,6 +180,11 @@ public class TransitionColor : IExtensible
         return ret;
     }
 
+    public static string ColoredString(string text, Color color)
+    {
+        return $"<color=#{ColorUtility.ToHtmlStringRGBA(color)}>{text}</color>";
+    }
+
     public TransitionColor Copy()
     {
         return new TransitionColor(r, g, b, a, transition);
