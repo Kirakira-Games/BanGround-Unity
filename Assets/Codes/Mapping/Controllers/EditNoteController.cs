@@ -30,6 +30,7 @@ namespace BGEditor
             Core.onNoteModified.AddListener(ModifyNote);
             Core.onToolSwitched.AddListener(ToolSwitch);
             Core.onYSnapModified.AddListener(YSnapChange);
+            Core.onYFilterSwitched.AddListener(Refresh);
         }
 
         public EditorNoteBase Find(V2.Note note)

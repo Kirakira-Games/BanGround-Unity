@@ -16,13 +16,11 @@ namespace BGEditor
             get
             {
                 if (note.group != Editor.currentTimingGroup)
-                {
                     return false;
-                }
+                if (!Editor.yFilter)
+                    return true;
                 if (note.lane == -1)
-                {
                     return Mathf.Approximately(note.y, Editor.yPos);
-                }
                 return Editor.yDivision == 0;
             }
         }
