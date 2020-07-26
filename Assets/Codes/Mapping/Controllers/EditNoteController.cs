@@ -8,7 +8,6 @@ namespace BGEditor
 {
     public class EditNoteController : CoreMonoBehaviour
     {
-        private Dictionary<V2.Note, EditorNoteBase> inactiveNotes = new Dictionary<V2.Note, EditorNoteBase>();
         private Dictionary<V2.Note, EditorNoteBase> displayNotes = new Dictionary<V2.Note, EditorNoteBase>();
         public HashSet<EditorNoteBase> selectedNotes { get; private set; } = new HashSet<EditorNoteBase>();
         public IDPool slideIdPool { get; private set; } = new IDPool();
@@ -30,6 +29,7 @@ namespace BGEditor
             Core.onNoteRemoved.AddListener(RemoveNote);
             Core.onNoteModified.AddListener(ModifyNote);
             Core.onToolSwitched.AddListener(ToolSwitch);
+            Core.onYSnapModified.AddListener(YSnapChange);
         }
 
         public EditorNoteBase Find(V2.Note note)
@@ -41,7 +41,6 @@ namespace BGEditor
         {
             if (note.type == NoteType.BPM)
                 return;
-            Debug.Assert(!displayNotes.ContainsKey(note));
             EditorNoteBase notebase;
             if (note.tickStack > 0)
             {
@@ -61,6 +60,7 @@ namespace BGEditor
             }
             displayNotes.Add(note, notebase);
             notebase.Init(note);
+            notebase.Refresh();
         }
 
         public void RemoveNote(V2.Note note)
@@ -160,6 +160,62 @@ namespace BGEditor
             {
                 UnselectAll();
             }
+        }
+
+        public V2.Note[] GetSelectedNotes()
+        {
+            var ret = new List<V2.Note>();
+            foreach (var note in selectedNotes)
+            {
+                ret.Add(note.note);
+                var slideNote = note as EditorSlideNote;
+                if (slideNote != null)
+                {
+                    while (slideNote.prev != null)
+                    {
+                        slideNote = slideNote.prev;
+                        ret.Add(slideNote.note);
+                    }
+                }
+            }
+            return ret.ToArray();
+        }
+
+        public void YSnapChange(int prev, int div)
+        {
+            if (prev == 0 || div == 0)
+            {
+                MoveY(selectedNotes.Select(x => x.note), div == 0 ? float.NaN : 0);
+            }
+        }
+
+        public void MoveY(IEnumerable<V2.Note> notes, float target)
+        {
+            if (float.IsNaN(target))
+            {
+                foreach (var note in notes)
+                {
+                    note.y = 0;
+                    if (note.lane == -1)
+                    {
+                        note.lane = Mathf.Clamp(Mathf.RoundToInt(note.x), 0, NoteUtility.LANE_COUNT - 1);
+                        note.x = 0;
+                    }
+                }
+            }
+            else
+            {
+                foreach (var note in notes)
+                {
+                    note.y = target;
+                    if (note.lane != -1)
+                    {
+                        note.x = note.lane;
+                        note.lane = -1;
+                    }
+                }
+            }
+            Refresh();
         }
     }
 }

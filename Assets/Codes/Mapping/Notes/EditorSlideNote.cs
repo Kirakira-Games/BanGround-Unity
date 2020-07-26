@@ -8,26 +8,33 @@ namespace BGEditor
 {
     public class EditorSlideNote : EditorNoteBase
     {
-        public Image noteImg;
         public EditorSlideBody bodyImg;
 
         public Sprite Long;
         public Sprite Flick;
         public Sprite SlideTick;
+        public Color slideColor;
 
         public EditorSlideNote prev { get; private set; }
         public EditorSlideNote next { get; private set; }
 
-        private void SetBodyMesh()
+        private void SetBodyMesh(bool active)
         {
             if (next == null)
             {
                 bodyImg.enabled = false;
+                bodyImg.polyCollider.enabled = false;
                 return;
             }
+            bodyImg.polyCollider.enabled = active;
             bodyImg.enabled = true;
-            var dir = next.transform.localPosition - transform.localPosition;
-            bodyImg.SetDirection(dir);
+            bodyImg.SetDirection(next.transform.localPosition - transform.localPosition);
+            if (isSelected)
+                bodyImg.SetColor(1);
+            else if (!active)
+                bodyImg.SetColor(2);
+            else
+                bodyImg.SetColor(0);
         }
 
         protected override bool IsOutOfBound()
@@ -48,22 +55,17 @@ namespace BGEditor
             Debug.Assert(prev == null);
             Debug.Assert(next == null);
             SelectSlide();
-            Refresh();
         }
 
         public override void Select()
         {
-            isSelected = true;
-            noteImg.color = Color.gray;
-            bodyImg.SetColor(1);
+            base.Select();
         }
 
         public override void Unselect()
         {
             Debug.Assert(next == null || !next.isSelected);
-            isSelected = false;
-            noteImg.color = Color.white;
-            bodyImg.SetColor(0);
+            base.Unselect();
             prev?.Unselect();
         }
 
@@ -128,33 +130,29 @@ namespace BGEditor
 
         public override void Refresh()
         {
+            bool active = isActive;
+            var color = GetColor(isSelected, active);
+            base.Refresh(active, color);
             if (IsOutOfBound())
             {
-                if (gameObject.activeSelf)
-                    gameObject.SetActive(false);
                 return;
-            }
-            else
-            {
-                if (!gameObject.activeSelf)
-                    gameObject.SetActive(true);
             }
             switch (note.type)
             {
                 case NoteType.Single:
                 case NoteType.SlideTickEnd:
-                    noteImg.sprite = Long;
+                    image.sprite = Long;
                     break;
                 case NoteType.Flick:
-                    noteImg.sprite = Flick;
+                    image.sprite = Flick;
                     break;
                 case NoteType.SlideTick:
-                    noteImg.sprite = SlideTick;
+                    image.sprite = SlideTick;
                     break;
                 default:
                     throw new NotImplementedException("Unsupported slide note type: " + note.type);
             }
-            SetBodyMesh();
+            SetBodyMesh(active);
         }
 
         public override bool Remove()
@@ -207,7 +205,7 @@ namespace BGEditor
             return Core.Commit(cmd);
         }
 
-        public override void OnPointerClick(PointerEventData eventData)
+        public override void OnClick(PointerEventData eventData)
         {
             if (eventData.button == PointerEventData.InputButton.Right || Editor.tool == EditorTool.Delete)
             {

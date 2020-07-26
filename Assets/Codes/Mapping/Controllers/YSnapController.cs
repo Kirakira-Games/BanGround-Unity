@@ -46,10 +46,10 @@ namespace BGEditor
             YPosText.text = $"Y: {y} / {Editor.yDivision}";
         }
 
-        private void RefreshSnap()
+        private void RefreshSnap(int prev, int div)
         {
             // Refresh dropdown
-            if (Editor.yDivision == 0)
+            if (div == 0)
             {
                 dropdown.SetValueWithoutNotify(0);
             }
@@ -57,7 +57,7 @@ namespace BGEditor
             {
                 for (int i = 0; i < Ys.Length; i++)
                 {
-                    if (Ys[i] == Editor.yDivision)
+                    if (Ys[i] == div)
                     {
                         dropdown.SetValueWithoutNotify(i + 1);
                         break;
@@ -66,25 +66,24 @@ namespace BGEditor
             }
 
             // Find nearest
-            YPosSlider.maxValue = Editor.yDivision;
-            if (Editor.yDivision == 0)
+            if (div == 0)
             {
-                if (YPosSlider.value > 0)
-                {
-                    YPosSlider.value = 0;
-                }
+                YPosSlider.value = 0;
+                YPosSlider.maxValue = 0;
                 RefreshText();
                 return;
             }
             int mini = 0;
-            for (int i = 1; i <= Editor.yDivision; i++)
+            for (int i = 1; i <= div; i++)
             {
-                if (Mathf.Abs((float)i / Editor.yDivision - Editor.yPos)
-                    < Mathf.Abs((float)mini / Editor.yDivision - Editor.yPos))
+                if (Mathf.Abs((float)i / div - Editor.yPos)
+                    < Mathf.Abs((float)mini / div - Editor.yPos))
                 {
                     mini = i;
                 }
             }
+            YPosSlider.SetValueWithoutNotify(0);
+            YPosSlider.maxValue = div;
             YPosSlider.value = mini;
             RefreshText();
         }

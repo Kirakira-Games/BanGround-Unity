@@ -24,7 +24,7 @@ namespace BGEditor
         public Vector3 widthDelta;
         public EditorSlideNote parent;
 
-        private PolygonCollider2D polyCollider;
+        public PolygonCollider2D polyCollider;
         private Vector3[] vertices;
 
         protected override void Awake()
@@ -32,16 +32,18 @@ namespace BGEditor
             base.Awake();
             if (materials == null)
             {
-                // init global materials
-                materials = new Material[] {
+                materials = new Material[]
+                {
+                    new Material(Resources.Load<Material>("InGame/Materials/note_body")),
                     new Material(Resources.Load<Material>("InGame/Materials/note_body")),
                     new Material(Resources.Load<Material>("InGame/Materials/note_body"))
                 };
                 materials[0].SetColor("_BaseColor", new Color(0.5843137f, 0.9019607f, 0.3019607f, 0.8f));
-                materials[1].SetColor("_BaseColor", new Color(0.5843137f, 0.9019607f, 0.3019607f, 0.4f));
+                materials[1].SetColor("_BaseColor", new Color(0.29f, 0.9019607f, 0.3019607f, 0.8f));
+                materials[2].SetColor("_BaseColor", new Color(0.5843137f, 0.9019607f, 0.3019607f, 0.3f));
             }
-            widthDelta = GetComponent<RectTransform>().rect.width * Vector3.right / 2;
             material = materials[0];
+            widthDelta = GetComponent<RectTransform>().rect.width * Vector3.right / 2;
             vertices = new Vector3[uvs.Length];
             polyCollider = GetComponent<PolygonCollider2D>();
             parent = GetComponentInParent<EditorSlideNote>();

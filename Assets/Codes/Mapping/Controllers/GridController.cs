@@ -102,17 +102,17 @@ namespace BGEditor
             return true;
         }
 
-        public Vector2 GetLocalPosition(int lane, float beat)
+        public Vector2 GetLocalPosition(float x, float beat)
         {
-            float x = (lane + 0.5f) * laneWidth;
+            x = (x + 0.5f) * laneWidth;
             float y = beat * Editor.barHeight - (Editor.scrollPos - VPadding);
             return new Vector2(x, y);
         }
 
-        public Vector2 GetLocalPosition(int lane, int[] beat)
+        public Vector2 GetLocalPosition(float x, int[] beat)
         {
             float floatbeat = ChartUtility.BeatToFloat(beat);
-            return GetLocalPosition(lane, floatbeat);
+            return GetLocalPosition(x, floatbeat);
         }
 
         public void Refresh()
@@ -180,7 +180,7 @@ namespace BGEditor
                     var body = collider.GetComponent<EditorSlideBody>();
                     if (body.enabled)
                     {
-                        body.parent.OnPointerClick(eventData);
+                        body.parent.OnClick(eventData);
                         return;
                     }
                 }
@@ -197,7 +197,9 @@ namespace BGEditor
                 }
                 var note = new V2.Note
                 {
-                    lane = lane,
+                    lane = Editor.yDivision == 0 ? lane : -1,
+                    x = Editor.yDivision == 0 ? 0 : lane,
+                    y = Editor.yPos,
                     beat = beat,
                     group = Editor.currentTimingGroup
                 };
