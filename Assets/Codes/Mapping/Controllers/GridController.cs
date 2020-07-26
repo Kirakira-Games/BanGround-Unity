@@ -11,6 +11,7 @@ namespace BGEditor
     {
         public float VPadding;
         public float LineBoundingHeight;
+        public int BPMFontSize;
 
         public GameObject GridParent;
 
@@ -44,6 +45,7 @@ namespace BGEditor
             Refresh();
         }
 
+        #region Create
         private GameObject CreateLine(float width, Vector2 anchoredPosition, Color color)
         {
             var ret = Pool.Create<Image>();
@@ -60,14 +62,15 @@ namespace BGEditor
             return ret;
         }
 
-        private GameObject CreateText(Vector2 anchoredPosition, string text)
+        private Text CreateText(Vector2 anchoredPosition, string text)
         {
             var ret = Pool.Create<Text>();
             ret.transform.SetParent(transform, false);
             var rect = ret.GetComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0, 0);
-            rect.anchorMax = new Vector2(0, 0);
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.zero;
             rect.anchoredPosition = anchoredPosition;
+            rect.sizeDelta = new Vector2(100, 100);
             var txt = rect.GetComponent<Text>();
             txt.raycastTarget = false;
             txt.text = text;
@@ -75,8 +78,9 @@ namespace BGEditor
             txt.alignment = TextAnchor.MiddleCenter;
             txt.fontSize = 48;
             objectsInUse.AddLast(ret);
-            return ret;
+            return txt;
         }
+        #endregion
 
         private bool GetLaneBeat(Vector2 pos, out int lane, out int[] beat)
         {
@@ -123,6 +127,7 @@ namespace BGEditor
             }
             objectsInUse.Clear();
 
+            // Create grid
             float start = Editor.scrollPos - VPadding;
             float end = start + gridHeight;
             int startBar = Mathf.Max(0, Mathf.FloorToInt(start / Editor.barHeight));
@@ -163,11 +168,22 @@ namespace BGEditor
                     var obj = CreateLine(width, new Vector2(0, y), color);
                 }
             }
+            // Create timing
+            foreach (var bpm in Chart.bpm)
+            {
+                float beat = ChartUtility.BeatToFloat(bpm.beat);
+                if (beat < startBar || beat > endBar)
+                    continue;
 
+                float y = beat * Editor.barHeight - start;
+                var txt = CreateText(new Vector2(0, y), $"BPM:{Mathf.RoundToInt(bpm.value * 1000) / 1000f}");
+                txt.fontSize = BPMFontSize;
+            }
             Notes.Refresh();
         }
 
-        public void OnPointerClick(PointerEventData eventData)
+        #region PointerClick
+        private void OnPointerClickNoteView(PointerEventData eventData)
         {
             // Handle click on slide body
             var ray = Cam.ScreenPointToRay(eventData.pressPosition);
@@ -238,5 +254,18 @@ namespace BGEditor
                 Notes.UnselectAll();
             }
         }
+
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            if (Editor.timingView)
+            {
+
+            }
+            else
+            {
+                OnPointerClickNoteView(eventData);
+            }
+        }
+        #endregion
     }
 }
