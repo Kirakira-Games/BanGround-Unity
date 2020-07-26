@@ -89,7 +89,8 @@ public class TouchEvent : MonoBehaviour
     {
         if(Authenticate.user == null)
         {
-            loginPanel.SetActive(true);
+            if(!Authenticate.isAuthing)
+                loginPanel.SetActive(true);
 
             await UniTask.WaitUntil(() => Authenticate.user != null);
         }
