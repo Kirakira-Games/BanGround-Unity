@@ -48,6 +48,7 @@ namespace BGEditor
         public UnityEvent onAudioLoaded = new UnityEvent();
         public ChangeEvent<int> onYSnapModified = new ChangeEvent<int>();
         public UnityEvent onYPosModified = new UnityEvent();
+        public UnityEvent onYFilterSwitched = new UnityEvent();
         public NoteEvent onNoteCreated = new NoteEvent();
         public NoteEvent onNoteModified = new NoteEvent();
         public NoteEvent onNoteRemoved = new NoteEvent();

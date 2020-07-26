@@ -10,6 +10,7 @@ namespace BGEditor
         public int DefaultIndex;
         public Slider YPosSlider;
         public Text YPosText;
+        public Toggle YFilter;
 
         private Dropdown dropdown;
 
@@ -88,6 +89,12 @@ namespace BGEditor
             RefreshText();
         }
 
+        private void HandleToggle(bool isOn)
+        {
+            Editor.yFilter = isOn;
+            Core.onYFilterSwitched.Invoke();
+        }
+
         void Start()
         {
             // Dropdown
@@ -103,6 +110,7 @@ namespace BGEditor
 
             // Slider
             YPosSlider.onValueChanged.AddListener(HandleYChange);
+            YFilter.onValueChanged.AddListener(HandleToggle);
             Core.onYSnapModified.AddListener(RefreshSnap);
             Core.onYPosModified.AddListener(RefreshText);
         }

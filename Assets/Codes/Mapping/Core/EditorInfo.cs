@@ -10,11 +10,15 @@
         public const int MAX_BAR_HEIGHT = 600;
         public const int MIN_BAR_HEIGHT = 60;
 
-        public int gridDivision;
+
         public int yDivision;
         public float yPos;
+        public bool yFilter;
+
+        public int gridDivision;
         public int barHeight;
         public int numBeats;
+
         public int currentTimingGroup;
         public float scrollPos;
         public EditorTool tool;
