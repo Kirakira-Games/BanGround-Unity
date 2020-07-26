@@ -14,7 +14,7 @@ public class AppPreLoader : MonoBehaviour
 
     private AndroidJavaObject s_ActivityContext = null;
 
-    void Start()
+    void Awake()
     {
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
         DataLoader.InitFileSystem();
@@ -36,11 +36,16 @@ public class AppPreLoader : MonoBehaviour
             }
         };
 
+    }
+
+    private void Start()
+    {
         // Init Unitask
         var playerLoop = UnityEngine.LowLevel.PlayerLoop.GetCurrentPlayerLoop();
         PlayerLoopHelper.Initialize(ref playerLoop);
 
         SceneManager.LoadScene("Title");
+
     }
 
     private void InitAudioInfo()
