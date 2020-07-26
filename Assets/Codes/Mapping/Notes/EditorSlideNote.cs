@@ -221,7 +221,7 @@ namespace BGEditor
                     SelectSlide();
                 return;
             }
-            if (Editor.tool == EditorTool.Slide)
+            if (Editor.tool == EditorTool.Slide || HotKeyManager.isCtrl)
             {
                 var prev = Notes.singleSlideSelected;
                 if (prev != null)

@@ -22,5 +22,10 @@ namespace BGEditor
                 });
             }
         }
+
+        public void SwitchTool(int tool)
+        {
+            Toggles[tool].isOn = true;
+        }
     }
 }

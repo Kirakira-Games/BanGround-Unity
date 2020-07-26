@@ -72,7 +72,7 @@ namespace BGEditor
                 Notes.UnselectAll();
                 return;
             }
-            if (Editor.tool == EditorTool.Select)
+            if (Editor.tool == EditorTool.Select || HotKeyManager.isCtrl)
             {
                 if (isSelected)
                     Notes.UnselectNote(this);

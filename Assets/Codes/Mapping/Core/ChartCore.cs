@@ -9,6 +9,7 @@ using UnityEngine.Events;
 
 namespace BGEditor
 {
+    public class BoolEvent : UnityEvent<bool> { }
     public class NoteEvent : UnityEvent<V2.Note> { }
     public class ChangeEvent<T>: UnityEvent<T, T> { }
 
@@ -20,6 +21,7 @@ namespace BGEditor
         public EditNoteController notes;
         public TimingController timing;
         public AudioProgressController progress;
+        public HotKeyManager hotkey;
         public Camera cam;
 
         public GameObject SingleNote;
@@ -46,6 +48,7 @@ namespace BGEditor
         public UnityEvent onGridModifed = new UnityEvent();
         public UnityEvent onToolSwitched = new UnityEvent();
         public UnityEvent onAudioLoaded = new UnityEvent();
+        public UnityEvent onUserChangeAudioProgress = new UnityEvent();
         public ChangeEvent<int> onYSnapModified = new ChangeEvent<int>();
         public UnityEvent onYPosModified = new UnityEvent();
         public UnityEvent onYFilterSwitched = new UnityEvent();
@@ -65,6 +68,7 @@ namespace BGEditor
             // Add listeners
             onAudioLoaded.AddListener(RefreshBarCount);
             onTimingModified.AddListener(RefreshBarCount);
+            hotkey.onScroll.AddListener((delta) => MoveGrid(delta * 30));
 
             // Initialize commands
             cmdList = new LinkedList<IEditorCmd>();

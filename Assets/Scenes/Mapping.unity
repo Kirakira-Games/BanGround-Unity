@@ -7798,6 +7798,7 @@ GameObject:
   m_Component:
   - component: {fileID: 810050435}
   - component: {fileID: 810050434}
+  - component: {fileID: 810050436}
   m_Layer: 0
   m_Name: ChartCore
   m_TagString: Untagged
@@ -7821,6 +7822,7 @@ MonoBehaviour:
   notes: {fileID: 1672627268}
   timing: {fileID: 254423521}
   progress: {fileID: 1111323045}
+  hotkey: {fileID: 810050436}
   cam: {fileID: 458680988}
   SingleNote: {fileID: 985738360263098538, guid: e45a170f490e79349aa6e7ad13ac6b6f,
     type: 3}
@@ -7863,6 +7865,349 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &810050436
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 810050433}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa73173971d14eb478ad1708e02ed4bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  HotKeys:
+  - Keys: Ctrl+S
+    OnCombo:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 810050434}
+          m_MethodName: Save
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Keys: Ctrl+Z
+    OnCombo:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 810050434}
+          m_MethodName: Undo
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Keys: Ctrl+Y
+    OnCombo:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 810050434}
+          m_MethodName: Redo
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Keys: Q
+    OnCombo:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1437371221}
+          m_MethodName: SwitchTool
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Keys: W
+    OnCombo:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1437371221}
+          m_MethodName: SwitchTool
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 1
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Keys: E
+    OnCombo:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1437371221}
+          m_MethodName: SwitchTool
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 2
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Keys: R
+    OnCombo:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1437371221}
+          m_MethodName: SwitchTool
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 3
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Keys: T
+    OnCombo:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1437371221}
+          m_MethodName: SwitchTool
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 4
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Keys: Ctrl+=
+    OnCombo:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 810050434}
+          m_MethodName: IncreaseBarHeight
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 10
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Keys: Ctrl+-
+    OnCombo:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 810050434}
+          m_MethodName: IncreaseBarHeight
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: -10
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Keys: delete
+    OnCombo:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 810050434}
+          m_MethodName: SwitchTool
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 4
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Keys: space
+    OnCombo:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1111323045}
+          m_MethodName: Switch
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: -10
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Keys: Ctrl+[
+    OnCombo:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1111323045}
+          m_MethodName: IncreasePlaybackRate
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: -1
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Keys: Ctrl+]
+    OnCombo:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1111323045}
+          m_MethodName: IncreasePlaybackRate
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 1
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Keys: Y
+    OnCombo:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 169647052}
+          m_MethodName: SwitchToggle
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: -10
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Keys: Ctrl+M
+    OnCombo:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1758230292}
+          m_MethodName: Show
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: -10
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Keys: Ctrl+T
+    OnCombo:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 254423521}
+          m_MethodName: Show
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: -10
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Keys: escape
+    OnCombo:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 810050434}
+          m_MethodName: Exit
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: -10
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Keys: left
+    OnCombo:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1111323045}
+          m_MethodName: IncreasePosition
+          m_Mode: 4
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: -10
+            m_FloatArgument: -1
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Keys: right
+    OnCombo:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1111323045}
+          m_MethodName: IncreasePosition
+          m_Mode: 4
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: -10
+            m_FloatArgument: 1
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Keys: A
+    OnCombo:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1111323045}
+          m_MethodName: IncreasePosition
+          m_Mode: 4
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: -10
+            m_FloatArgument: -1
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Keys: D
+    OnCombo:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1111323045}
+          m_MethodName: IncreasePosition
+          m_Mode: 4
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: -10
+            m_FloatArgument: 1
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &820030678
 GameObject:
   m_ObjectHideFlags: 0

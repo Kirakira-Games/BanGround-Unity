@@ -1,4 +1,6 @@
-﻿namespace BGEditor
+﻿using System;
+
+namespace BGEditor
 {
     public enum EditorTool
     {

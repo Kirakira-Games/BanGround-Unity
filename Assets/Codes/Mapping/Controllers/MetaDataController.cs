@@ -28,6 +28,8 @@ namespace BGEditor
 
         public void Show()
         {
+            if (gameObject.activeSelf)
+                return;
             // just fill in
             float duration = Progress.audioLength / 1000f;
 

@@ -32,6 +32,9 @@ namespace BGEditor
 
         public void Show()
         {
+            if (TimingWindow.activeSelf)
+                return;
+
             Blocker.gameObject.SetActive(true);
             TimingWindow.SetActive(true);
             BpmList.ForEach(point => AddLine(point.beat, point.value));

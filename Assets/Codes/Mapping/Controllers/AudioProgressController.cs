@@ -42,7 +42,7 @@ namespace BGEditor
             audioLength = bgm.GetLength();
         }
 
-        public void UpdateDisplay()
+        public void UpdateDisplay(bool isUser)
         {
             int time = Mathf.RoundToInt(ScrollPosToTime(Editor.scrollPos) * 1000);
             time = Mathf.Clamp(time, 0, (int)audioLength - 1);
@@ -53,7 +53,7 @@ namespace BGEditor
             int m = hour % 60;
             hour /= 60;
             TimeText.text = $"{hour:D1}:{m:D2}:{s:D2}.{ms:D3}";
-            if (canSeek && Math.Abs(time - bgm.GetPlaybackTime()) > 3)
+            if (isUser || (canSeek && Math.Abs(time - bgm.GetPlaybackTime()) > 3))
                 bgm.SetPlaybackTime((uint)time);
             AudioProgressSlider.SetValueWithoutNotify((float)time / audioLength);
         }
@@ -88,6 +88,19 @@ namespace BGEditor
             bgm.SetTimeScale(value, true);
         }
 
+        public void IncreasePlaybackRate(int delta)
+        {
+            PlaybackRateSlider.value = Mathf.Clamp(PlaybackRateSlider.value + delta, PlaybackRateSlider.minValue, PlaybackRateSlider.maxValue);
+        }
+
+        public void IncreasePosition(float delta)
+        {
+            float value = AudioProgressSlider.value + delta * 1000 / audioLength;
+            value = Mathf.Clamp01(value);
+            AudioProgressSlider.value = value;
+            Core.onUserChangeAudioProgress.Invoke();
+        }
+
         public async void Init(byte[] audio)
         {
             var hack = SettingAndMod.instance;
@@ -97,11 +110,15 @@ namespace BGEditor
             bgm.Pause();
 
             // Add listeners
-            AudioProgressSlider.onValueChanged.AddListener((value) => Core.SeekGrid(TimeToScrollPos(value * audioLength / 1000f)));
+            AudioProgressSlider.onValueChanged.AddListener((value) => {
+                Core.SeekGrid(TimeToScrollPos(value * audioLength / 1000f), true);
+                Core.onUserChangeAudioProgress.Invoke();
+            });
             PlaybackRateSlider.onValueChanged.AddListener(ChangePlaybackRate);
 
-            Core.onGridMoved.AddListener(UpdateDisplay);
-            Core.onTimingModified.AddListener(UpdateDisplay);
+            Core.onGridMoved.AddListener(() => UpdateDisplay(false));
+            Core.onTimingModified.AddListener(() => UpdateDisplay(false));
+            Core.onUserChangeAudioProgress.AddListener(() => UpdateDisplay(true));
             Core.onAudioLoaded.Invoke();
 
             Refresh();
