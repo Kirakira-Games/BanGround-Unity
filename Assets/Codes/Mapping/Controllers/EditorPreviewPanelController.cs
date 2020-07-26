@@ -100,7 +100,7 @@ namespace BGEditor
                 return;
 
             float row = Mathf.Clamp01(ChartUtility.BeatToFloat(note.beat) / Editor.numBeats);
-            float col = Mathf.InverseLerp(0, NoteUtility.LANE_COUNT - 1, note.lane);
+            float col = Mathf.InverseLerp(0, NoteUtility.LANE_COUNT - 1, note.lane == -1 ? note.x : note.lane);
             int id = GetIdByNote(note);
             FillNote(id, col, row, 1);
 
