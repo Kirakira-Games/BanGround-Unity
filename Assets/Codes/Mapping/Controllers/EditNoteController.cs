@@ -145,17 +145,22 @@ namespace BGEditor
             }
         }
 
+        public void RemoveAllSelected()
+        {
+            var tmpNotes = selectedNotes.ToArray();
+            var cmd = new CmdGroup();
+            foreach (var note in tmpNotes)
+                cmd.Add(new RemoveNoteCmd(note.note));
+            var result = Core.Commit(cmd);
+            Debug.Assert(result);
+            selectedNotes.Clear();
+        }
+
         public void ToolSwitch()
         {
             if (Editor.tool == EditorTool.Delete)
             {
-                var tmpNotes = selectedNotes.ToArray();
-                var cmd = new CmdGroup();
-                foreach (var note in tmpNotes)
-                    cmd.Add(new RemoveNoteCmd(note.note));
-                var result = Core.Commit(cmd);
-                Debug.Assert(result);
-                selectedNotes.Clear();
+                RemoveAllSelected();
             }
             else
             {
