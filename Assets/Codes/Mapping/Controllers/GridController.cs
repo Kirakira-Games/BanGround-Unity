@@ -168,7 +168,7 @@ namespace BGEditor
                     {
                         width = 3;
                         color = Div1Color;
-                        CreateText(new Vector2(-20, y), i.ToString());
+                        CreateText(new Vector2(-30, y), i.ToString());
                     }
                     else if (j * 2 % Editor.gridDivision == 0)
                     {

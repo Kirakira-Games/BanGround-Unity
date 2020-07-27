@@ -22,6 +22,7 @@ public class ChartTiming
 
     private delegate bool UnknownPredicate(NoteAnim anim);
     private delegate void Lerp(NoteAnim S, NoteAnim T, NoteAnim i);
+    public const float Z_MAX = 1.2f;
 
     public static float BeatToFloat(int[] beat)
     {
@@ -120,21 +121,22 @@ public class ChartTiming
         }
         raw.ForEach(anim => anim.pos.z = anim.pos.z + 1 - totDist);
         //Debug.Log("Tot dist=" + totDist);
-        bool isStart = raw[0].pos.z <= 0;
+        bool isStart = raw[0].pos.z <= 0 || raw[0].pos.z > Z_MAX;
+        bool reverse = raw[0].pos.z > Z_MAX;
         for (int i = 0; i < raw.Count - 1; i++)
         {
             var cur = raw[i];
             var nxt = raw[i + 1];
             if (isStart)
             {
-                if (nxt.pos.z <= 0)
+                if (nxt.pos.z <= 0 || nxt.pos.z > Z_MAX)
                 {
                     continue;
                 }
                 else
                 {
                     isStart = false;
-                    float ratio = Mathf.InverseLerp(cur.pos.z, nxt.pos.z, 0);
+                    float ratio = Mathf.InverseLerp(cur.pos.z, nxt.pos.z, reverse ? Z_MAX : 0f);
                     var anim = V2.NoteAnim.LerpUnclamped(cur, nxt, ratio);
                     ret.Add(anim);
                 }
@@ -150,6 +152,7 @@ public class ChartTiming
     public void GenerateAnimationRawData(V2.NoteAnim S, V2.NoteAnim T, List<V2.NoteAnim> output)
     {
         //Debug.Log("Anim: " + beatStart + " / " + beatEnd);
+        /*
         float totDist = 0;
         for (int i = GetPrevIndex(timings.points, S.beatf); i < timings.points.Count; i++)
         {
@@ -164,6 +167,7 @@ public class ChartTiming
 
             totDist += (timeT - timeS) * info.speed / totTime; // Assume constant speed transition here
         }
+        */
 
         float curDist = 0;
         for (int i = GetPrevIndex(timings.points, S.beatf); i < timings.points.Count; i++)
@@ -192,12 +196,8 @@ public class ChartTiming
                 anim = new V2.NoteAnim
                 {
                     beatf = beatT,
-                    pos = TransitionVector.LerpUnclamped(S.pos, T.pos, curDist / totDist)
+                    pos = TransitionVector.LerpUnclamped(S.pos, T.pos, Mathf.InverseLerp(S.time, T.time, timeT))
                 };
-            }
-            else
-            {
-                Debug.Assert(Mathf.Approximately(totDist, curDist));
             }
             anim.pos.z = dist; // z temporarily stores the distance traveled
             //Debug.Log("Add anim " + anim + " from " + S + " and " + T);

@@ -52,6 +52,7 @@ public class NoteMesh : MonoBehaviour
     public MeshFilter meshFilter { get; private set; }
     public MeshRenderer meshRenderer { get; private set; }
     public float width = 1;
+    private Vector3[] meshVertices;
 
     private static float GetLength(float z)
     {
@@ -78,13 +79,11 @@ public class NoteMesh : MonoBehaviour
     private Vector3[] GetVertices(Vector3 p)
     {
         float dz = GetCachedLength(p.z);
-        return new Vector3[]
-        {
-            new Vector3(-width, 0, -dz),
-            new Vector3(width, 0, -dz),
-            new Vector3(-width, 0.001f, dz),
-            new Vector3(width, 0.001f, dz)
-        };
+        meshVertices[0].z = -dz;
+        meshVertices[1].z = -dz;
+        meshVertices[2].z = dz;
+        meshVertices[3].z = dz;
+        return meshVertices;
     }
 
     public static void Init()
@@ -107,6 +106,14 @@ public class NoteMesh : MonoBehaviour
 
     private void Awake()
     {
+        meshVertices = new Vector3[]
+        {
+            new Vector3(-width, 0, 0),
+            new Vector3(width, 0, 0),
+            new Vector3(-width, 0.001f, 0),
+            new Vector3(width, 0.001f, 0)
+        };
+
         meshFilter = gameObject.AddComponent<MeshFilter>();
         meshRenderer = gameObject.AddComponent<MeshRenderer>();
 
@@ -124,7 +131,7 @@ public class NoteMesh : MonoBehaviour
         meshRenderer.sortingLayerID = sortingLayerID;
     }
 
-    private void Update()
+    public void OnUpdate()
     {
         meshFilter.mesh.SetVertices(GetVertices(transform.position));
         meshFilter.mesh.RecalculateBounds();
