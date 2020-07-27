@@ -165,6 +165,7 @@ namespace BGEditor
             var beat = ChartUtility.BeatToFloat(note.beat);
             if (beat < -NoteUtility.EPS)
                 return false;
+            /*
             if (!ChartUtility.IsFuwafuwa(note))
             {
                 var pos = ChartUtility.GetPosition(note);
@@ -177,6 +178,7 @@ namespace BGEditor
                 }
                 groundNotes[pos]++;
             }
+            */
             chart.groups[note.group].notes.Add(note);
             onNoteCreated.Invoke(note);
             return true;

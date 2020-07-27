@@ -94,8 +94,7 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
         newpos.z = Mathf.LerpUnclamped(NoteUtility.NOTE_START_Z_POS, NoteUtility.NOTE_JUDGE_Z_POS, newpos.z);
         newpos = NoteUtility.ProjectVectorToParallelPlane(newpos);
         transform.position = newpos;
-
-        // update from timing group
+        noteMesh.OnUpdate();
     }
 
     public virtual void OnNoteDestroy()
