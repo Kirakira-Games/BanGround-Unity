@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine.Events;
+using System.Linq;
 
 namespace BGEditor
 {
@@ -21,6 +22,8 @@ namespace BGEditor
         public MouseScrollEvent onScroll = new MouseScrollEvent();
 
         public HotKeyCombo[] HotKeys;
+
+        public GameObject[] blockers;
 
         private List<HotKeyCombo> mHotKeys;
         public static bool isCtrlUp { get; private set; }
@@ -110,6 +113,8 @@ namespace BGEditor
             isShiftDown = Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift);
             isCtrlUp = Input.GetKeyUp(KeyCode.LeftControl) || Input.GetKeyUp(KeyCode.RightControl);
             isShiftUp = Input.GetKeyUp(KeyCode.LeftShift) || Input.GetKeyUp(KeyCode.RightShift);
+            if (blockers.Any(blocker => blocker.activeSelf))
+                return;
             foreach (var combo in mHotKeys)
             {
                 if (Activated(combo.Keys))

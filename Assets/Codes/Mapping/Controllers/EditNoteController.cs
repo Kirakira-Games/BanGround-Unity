@@ -31,6 +31,11 @@ namespace BGEditor
             Core.onToolSwitched.AddListener(ToolSwitch);
             Core.onYSnapModified.AddListener(YSnapChange);
             Core.onYFilterSwitched.AddListener(Refresh);
+            Core.onSpeedViewSwitched.AddListener(() =>
+            {
+                UnselectAll();
+                Refresh();
+            });
         }
 
         public EditorNoteBase Find(V2.Note note)

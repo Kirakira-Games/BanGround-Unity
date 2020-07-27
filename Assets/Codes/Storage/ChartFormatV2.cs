@@ -157,6 +157,21 @@ namespace V2
             return ret;
         }
 
+        public TimingPoint Copy()
+        {
+            return new TimingPoint
+            {
+                beat = beat,
+                time = time,
+                speed = speed.Copy(),
+                tap = tap.Copy(),
+                tapGrey = tapGrey.Copy(),
+                flick = flick.Copy(),
+                slideTick = slideTick.Copy(),
+                slide = slide.Copy()
+            };
+        }
+
         public override string ToString()
         {
             return $"{NoteAnim.ToString(this)} speed={speed} tap={tap} tapGrey={tapGrey} flick={flick} slideTick={slideTick} slide={slide}";

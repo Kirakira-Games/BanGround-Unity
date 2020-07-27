@@ -28,13 +28,25 @@ public class FloatInput : MonoBehaviour
 
     public void SetValue(float value)
     {
+        if (Component == null)
+        {
+            Init();
+        }
         Component.text = value.ToString();
     }
 
-    void Awake()
+    private void Init()
     {
         Component = GetComponent<InputField>();
         Component.onValueChanged.AddListener(Validate);
         Component.text = Default.ToString();
+    }
+
+    private void Awake()
+    {
+        if (Component == null)
+        {
+            Init();
+        }
     }
 }

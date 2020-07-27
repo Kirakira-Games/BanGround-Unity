@@ -194,6 +194,38 @@ public class TransitionColor : IExtensible
     {
         return $"({r},{g},{b},{a} [{transition}])";
     }
+
+    public void Set(Color c)
+    {
+        Set((byte)Mathf.Lerp(0, 255, c.r),
+            (byte)Mathf.Lerp(0, 255, c.g),
+            (byte)Mathf.Lerp(0, 255, c.b),
+            (byte)Mathf.Lerp(0, 255, c.a)
+        );
+    }
+    public void Set(Color c, Transition transition)
+    {
+        Set((byte)Mathf.Lerp(0, 255, c.r),
+            (byte)Mathf.Lerp(0, 255, c.g),
+            (byte)Mathf.Lerp(0, 255, c.b),
+            (byte)Mathf.Lerp(0, 255, c.a),
+            transition
+        );
+    }
+
+    public void Set(byte r, byte g, byte b, byte a = 255)
+    {
+        Set(r, g, b, a, transition);
+    }
+
+    public void Set(byte r, byte g, byte b, byte a, Transition transition)
+    {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        this.a = a;
+        this.transition = transition;
+    }
 }
 
 [Preserve]
