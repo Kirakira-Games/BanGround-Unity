@@ -51,10 +51,18 @@ public class Authenticate
         }
         catch (Exception ex)
         {
-            Debug.LogError(ex.Message);
+            isAuthing = false;
+
+            if (ex.Message == "401")
+            {
+                cl_accessToken.Set("");
+                cl_refreshToken.Set("");
+
+                return false;
+            }
 
             isNetworkError = true;
-            isAuthing = false;
+            Debug.LogError(ex.Message);
 
             user = new User
             {
