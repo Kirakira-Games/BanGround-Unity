@@ -71,7 +71,9 @@ namespace BGEditor
         {
             if (save)
             {
-                BpmList = currentBpmList;
+                var current = currentBpmList;
+                BpmList.Clear();
+                current.ForEach(BpmList.Add);
                 Chart.offset = Offset.value;
                 Core.onTimingModified.Invoke();
             }

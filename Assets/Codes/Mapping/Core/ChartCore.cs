@@ -43,8 +43,8 @@ namespace BGEditor
         [HideInInspector]
         public ObjectPool pool { get; private set; }
 
-        [HideInInspector]
-        public Dictionary<NotePosition, int> groundNotes;
+        //[HideInInspector]
+        //public Dictionary<NotePosition, int> groundNotes = new Dictionary<NotePosition, int>();
 
         public UnityEvent onTimingModified = new UnityEvent();
         public UnityEvent onGridMoved = new UnityEvent();
@@ -87,7 +87,6 @@ namespace BGEditor
             lastCmd = cmdList.AddLast(new FailCommand());
 
             // Initialize ground notes
-            groundNotes = new Dictionary<NotePosition, int>();
 
             // Initialize editor info
             editor = new EditorInfo();
@@ -189,10 +188,12 @@ namespace BGEditor
             if (!ChartUtility.IsFuwafuwa(note))
             {
                 var pos = ChartUtility.GetPosition(note);
+                /*
                 Debug.Assert(groundNotes.ContainsKey(pos));
                 if (groundNotes[pos] <= 0)
                     return false;
                 groundNotes[pos]--;
+                */
             }
             chart.groups[note.group].notes.Remove(note);
             onNoteRemoved.Invoke(note);
