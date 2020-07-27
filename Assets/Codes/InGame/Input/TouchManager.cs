@@ -345,9 +345,14 @@ public class TouchManager : MonoBehaviour
         }
     }
 
+    public static float TouchDist(KirakiraTouchState touch, Vector2 note)
+    {
+        return Vector2.Distance(touch.pos, note);
+    }
+
     public static bool TouchesNote(KirakiraTouchState touch, Vector2 note)
     {
-        return Vector2.Distance(touch.pos, note) <= NoteUtility.FUWAFUWA_RADIUS;
+        return TouchDist(touch, note) <= NoteUtility.FUWAFUWA_RADIUS;
     }
 
     public static bool TouchesNote(KirakiraTouchState touch, int lane)

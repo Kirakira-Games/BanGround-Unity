@@ -190,6 +190,42 @@ public class NoteController : MonoBehaviour
         return lanes.ToArray();
     }
 
+    private NoteBase OnTouchFuwafuwa(JudgeQueue Q, KirakiraTouch touch)
+    {
+        UpdateLane(Q);
+        if (Q.Empty)
+            return null;
+        // Try to judge the front of the queue
+        float minDist = NoteUtility.FUWAFUWA_RADIUS;
+        NoteBase ret = null;
+        for (var i = Q.FirstV; i != null; i = i.Next)
+        {
+            NoteBase note = i.Value;
+            if (note.time > touch.current.time + NoteUtility.SLIDE_TICK_JUDGE_RANGE ||
+                (ret != null && ret.time != note.time))
+            {
+                break;
+            }
+            if (NoteUtility.IsSlide(note.type) && (note as SlideNoteBase).isJudging)
+            {
+                continue;
+            }
+            float dist = TouchManager.TouchDist(touch.current, note.judgePos);
+            if (dist > minDist)
+            {
+                continue;
+            }
+            JudgeResult result = note.TryJudge(touch);
+            if (result != JudgeResult.None)
+            {
+                ret = note;
+                minDist = dist;
+            }
+        }
+        //Debug.Log($"Match {touch.current} with {(ret == null ? Vector2.negativeInfinity : (Vector2)ret.judgePos)}");
+        return ret;
+    }
+
     private NoteBase OnTouch(JudgeQueue Q, KirakiraTouch touch)
     {
         UpdateLane(Q);
@@ -241,10 +277,17 @@ public class NoteController : MonoBehaviour
                 }
             }
             // Find note to judge - fuwafuwa
-            ret = OnTouch(noteQueue, touch);
-            if (ret != null && (noteToJudge == null || noteToJudge.time > ret.time))
+            ret = OnTouchFuwafuwa(noteQueue, touch);
+            if (ret != null)
             {
-                noteToJudge = ret;
+                if (noteToJudge == null || noteToJudge.time > ret.time)
+                    noteToJudge = ret;
+                else if (noteToJudge.time == ret.time &&
+                    TouchManager.TouchDist(touch.current, noteToJudge.judgePos)
+                    > TouchManager.TouchDist(touch.current, ret.judgePos))
+                {
+                    noteToJudge = ret;
+                }
             }
         }
         // A note to judge is not found
