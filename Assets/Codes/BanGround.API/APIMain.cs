@@ -107,10 +107,6 @@ namespace BanGround.API
                 {
                     throw new WebException("Network error!");
                 }
-                else if(webRequest.isHttpError)
-                {
-                    throw new WebException(webRequest.responseCode.ToString());
-                }
 
                 return JsonConvert.DeserializeObject<Result<T>>(webRequest.downloadHandler.text);
             }

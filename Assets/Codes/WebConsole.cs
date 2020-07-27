@@ -1,9 +1,15 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -93,17 +99,17 @@ public class WebConsole : MonoBehaviour
             if (path == "/")
                 path = "/index.html";
 
-            byte[] content;
+            byte[] content = null;
 
             if (path == "/log")
             {
                 content = Encoding.UTF8.GetBytes(fullLog.ToString());
             }
-            if (path == "/airdrop")
+            else if (path == "/airdrop")
             {
                 content = Encoding.UTF8.GetBytes("Hey I mean this is a PUT interface");
             }
-            if (path == "/commands")
+            else if (path == "/commands")
             {
                 ctx.Response.ContentType = "application/json";
 
@@ -180,6 +186,68 @@ public class WebConsole : MonoBehaviour
             wsi.console = this;
         });
 
+        httpSv.OnPost += (obj, ctx) =>
+        {
+            var path = ctx.Request.Url.AbsolutePath;
+
+            byte[] content = null;
+
+            if (path == "/redirect")
+            {
+                string dataStr = null;
+
+                using (var sr = new StreamReader(ctx.Request.InputStream))
+                    dataStr = sr.ReadToEnd();
+
+                var data = JToken.Parse(dataStr);
+
+                try
+                {
+                    var url = data["url"].ToString();
+                    var query = data["query"].ToString();
+
+                    using(var wc = new WebClient())
+                    {
+                        wc.Encoding = Encoding.UTF8;
+                        wc.Headers[HttpRequestHeader.ContentType] = "application/json";
+
+                        try
+                        {
+                            content = wc.UploadData(url, Encoding.UTF8.GetBytes(query));
+                        }
+                        catch(WebException webex)
+                        {
+                            var resp = (HttpWebResponse)webex.Response;
+
+                            using (var br = new BinaryReader(resp.GetResponseStream()))
+                                content = br.ReadBytes((int)resp.ContentLength);
+
+                            ctx.Response.ContentLength64 = resp.ContentLength;
+                            ctx.Response.ContentType = resp.ContentType;
+                        }
+                    }
+                }
+                catch(Exception ex)
+                {
+                    ctx.Response.StatusCode = 500;
+                    content = Encoding.UTF8.GetBytes(ex.Message);
+                }
+            }
+            else
+            {
+                ctx.Response.StatusCode = 404;
+
+                content = Encoding.UTF8.GetBytes("404");
+            }
+
+            ctx.Response.ContentLength64 = content.Length;
+
+            using (var bw = new BinaryWriter(ctx.Response.OutputStream))
+            {
+                bw.Write(content);
+            }
+        };
+
         httpSv.Start();
     }
 
@@ -205,6 +273,8 @@ public class WebConsole : MonoBehaviour
         {
             resourceList.Add(resources.Current.Key, Resources.Load<TextAsset>(resources.Current.Value).bytes);
         }
+
+        resourceList.Add("/register", Resources.Load<TextAsset>("register").bytes);
 
         new Thread(StartHttp).Start();
     }

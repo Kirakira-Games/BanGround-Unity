@@ -117,6 +117,11 @@ public class TitleLoader : MonoBehaviour
         }
     }
 
+    public void OnRegisterClicked()
+    {
+        Application.OpenURL("http://127.0.0.1:8088/register");
+    }
+
     async void CheckUpdate()
     {
         //MessageBoxController.ShowMsg(LogLevel.INFO, VersionCheck.CheckUpdate);
