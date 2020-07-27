@@ -36,8 +36,8 @@ public class TitleLoader : MonoBehaviour
 
     const string BACKGROUND_PATH = "backgrounds";
 
-    static KVar cl_username = new KVar("cl_username", "", KVarFlags.Archive | KVarFlags.StringOnly, "Saved username");
-    static KVar cl_password = new KVar("cl_password", "", KVarFlags.Archive | KVarFlags.StringOnly, "Saved password (encryped)");
+    static KVar cl_accessToken = new KVar("cl_accesstoken", "", KVarFlags.Archive | KVarFlags.StringOnly, "Saved access token", _ => KVSystem.Instance.SaveConfig());
+    static KVar cl_refreshToken = new KVar("cl_refreshtoken", "", KVarFlags.Archive | KVarFlags.StringOnly, "Saved refresh token", _ => KVSystem.Instance.SaveConfig());
     /*
      * Test User for editor:
      * Username:
@@ -71,8 +71,8 @@ public class TitleLoader : MonoBehaviour
     {
         PlayTitle();
 
-        if (!string.IsNullOrEmpty(cl_username))
-            _ = auth.TryAuthenticate(cl_username, cl_password, true);
+        if (!string.IsNullOrEmpty(cl_accessToken) && !string.IsNullOrEmpty(cl_refreshToken))
+            _ = auth.TryAuthenticate();
 
         //MessageBoxController.ShowMsg(LogLevel.INFO, SystemInfo.deviceUniqueIdentifier.Substring(0, 8));
     }
@@ -106,11 +106,6 @@ public class TitleLoader : MonoBehaviour
 
         if (good)
         {
-            cl_username.Set(usernameField.text);
-            cl_password.Set(Auth.EncryptPassword(passwordField.text));
-
-            KVSystem.Instance.SaveConfig();
-
             loginPanel.SetActive(false);
         }
         else
