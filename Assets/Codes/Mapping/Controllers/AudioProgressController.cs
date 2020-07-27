@@ -157,7 +157,7 @@ namespace BGEditor
                 Core.SeekGrid(beat * Editor.barHeight, true);
                 if (!float.IsNaN(lastBeat))
                 {
-                    Chart.groups.ForEach(group => group.notes.ForEach(note =>
+                    Group.notes.ForEach(note =>
                     {
                         if (note.type == NoteType.BPM)
                             return;
@@ -168,7 +168,7 @@ namespace BGEditor
                             flickSE.PlayOneShot();
                         else
                             singleSE.PlayOneShot();
-                    }));
+                    });
                 }
                 lastBeat = beat;
             }
