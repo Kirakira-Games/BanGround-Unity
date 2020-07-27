@@ -13,11 +13,59 @@ public class Authenticate
 
     public static User user = null;
 
-    public static string accessToken = "";
-    public static string refreshToken = "";
+    static KVarRef cl_accessToken = new KVarRef("cl_accesstoken");
+    static KVarRef cl_refreshToken = new KVarRef("cl_refreshtoken");
 
     public static bool isNetworkError;
     public static bool isAuthing = false;
+
+    public async UniTask<bool> TryAuthenticate()
+    {
+        if (string.IsNullOrEmpty(cl_accessToken) || string.IsNullOrEmpty(cl_refreshToken))
+            throw new InvalidOperationException("You can not use this while tokens are empty!");
+
+        try
+        {
+            isAuthing = true;
+
+            api.AccessToken = cl_accessToken;
+
+            var result = await api.A<RefreshAccessTokenArgs, UserAuth>()(new RefreshAccessTokenArgs
+            {
+                RefreshToken = cl_refreshToken,
+            });
+
+            if (result.Status)
+            {
+                user = result.Data.User;
+
+                cl_accessToken.Set(result.Data.AccessToken);
+                cl_refreshToken.Set(result.Data.RefreshToken);
+
+                api.AccessToken = result.Data.AccessToken;
+            }
+
+            isAuthing = false;
+
+            return result.Status;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError(ex.Message);
+
+            isNetworkError = true;
+            isAuthing = false;
+
+            user = new User
+            {
+                Avatar = "N/A",
+                Nickname = "Offline",
+                Username = "Offline"
+            };
+
+            return false;
+        }
+    }
 
     public async UniTask<bool> TryAuthenticate(string username, string password, bool encryped = true)
     {
@@ -38,8 +86,10 @@ public class Authenticate
             {
                 user = result.Data.User;
 
-                accessToken = result.Data.AccessToken;
-                refreshToken = result.Data.RefreshToken;
+                cl_accessToken.Set(result.Data.AccessToken);
+                cl_refreshToken.Set(result.Data.RefreshToken);
+
+                api.AccessToken = result.Data.AccessToken;
             }
 
             isAuthing = false;
