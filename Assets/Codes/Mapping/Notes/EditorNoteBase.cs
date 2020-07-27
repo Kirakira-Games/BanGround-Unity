@@ -110,7 +110,6 @@ namespace BGEditor
 
         public void OnPointerUp(PointerEventData eventData)
         {
-            pointerDownTime = float.NaN;
             isAdjustY = false;
             holdStart = Vector2.zero;
             if (YSlider.gameObject.activeSelf)
@@ -126,6 +125,7 @@ namespace BGEditor
             {
                 OnClick(eventData);
             }
+            pointerDownTime = float.NaN;
         }
 
         public void OnPointerEnter(PointerEventData eventData)
