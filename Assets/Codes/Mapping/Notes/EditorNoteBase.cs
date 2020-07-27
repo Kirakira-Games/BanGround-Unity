@@ -187,7 +187,7 @@ namespace BGEditor
             image.raycastTarget = active;
             image.color = color;
             // Update whether display
-            if (IsOutOfBound())
+            if (IsOutOfBound() || Editor.currentTimingGroup != note.group)
             {
                 if (gameObject.activeSelf)
                     gameObject.SetActive(false);

@@ -51,6 +51,7 @@ namespace BGEditor
         public UnityEvent onGridModifed = new UnityEvent();
         public UnityEvent onToolSwitched = new UnityEvent();
         public UnityEvent onAudioLoaded = new UnityEvent();
+        public UnityEvent onChartLoaded = new UnityEvent();
         public UnityEvent onUserChangeAudioProgress = new UnityEvent();
 
         public ChangeEvent<int> onYSnapModified = new ChangeEvent<int>();
@@ -64,6 +65,8 @@ namespace BGEditor
         public NoteEvent onNoteRemoved = new NoteEvent();
 
         public UnityEvent onTimingPointModified = new UnityEvent();
+        public UnityEvent onTimingGroupModified = new UnityEvent();
+        public UnityEvent onTimingGroupSwitched = new UnityEvent();
 
         private LinkedList<IEditorCmd> cmdList;
         private LinkedListNode<IEditorCmd> lastCmd;
@@ -422,7 +425,7 @@ namespace BGEditor
                 onTimingModified.Invoke();
                 notes.UnselectAll();
             }
-            grid.Refresh();
+            onChartLoaded.Invoke();
         }
         #endregion
     }
