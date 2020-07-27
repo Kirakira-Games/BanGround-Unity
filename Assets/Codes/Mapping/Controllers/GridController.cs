@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.Networking.NetworkSystem;
 using System;
+using V2;
 
 namespace BGEditor
 {
@@ -14,6 +15,7 @@ namespace BGEditor
         public int BPMFontSize;
 
         public GameObject GridParent;
+        public TimingPointEdit TimingPointEdit;
 
         public Color Div1Color;
         public Color Div2Color;
@@ -34,6 +36,8 @@ namespace BGEditor
 
             Core.onGridModifed.AddListener(Refresh);
             Core.onGridMoved.AddListener(Refresh);
+            Core.onTimingPointModified.AddListener(Refresh);
+            Core.onTimingModified.AddListener(Refresh);
             var rect = GetComponent<RectTransform>().rect;
             gridHeight = rect.height;
             gridWidth = rect.width;
@@ -92,6 +96,7 @@ namespace BGEditor
         }
         #endregion
 
+        #region Refresh
         private bool GetLaneBeat(Vector2 pos, out int lane, out int[] beat)
         {
             lane = -1;
@@ -203,6 +208,7 @@ namespace BGEditor
             }
             Notes.Refresh();
         }
+        #endregion
 
         #region PointerClick
         private void OnPointerClickNoteView(PointerEventData eventData)
@@ -277,16 +283,84 @@ namespace BGEditor
             }
         }
 
+        public TimingPoint GetTimingPointByBeat(float beatf)
+        {
+            foreach (var point in Group.points)
+            {
+                point.beatf = ChartUtility.BeatToFloat(point.beat);
+                if (Mathf.Approximately(beatf, Mathf.Max(0, point.beatf)))
+                {
+                    return point;
+                }
+            }
+            return null;
+        }
+
+        private void OnPointerClickSpeedView(PointerEventData eventData)
+        {
+            // Click to change or add a timing point
+            if (GetLaneBeat(eventData.pressPosition, out var _, out var beat))
+            {
+                float beatf = ChartUtility.BeatToFloat(beat);
+                var Point = GetTimingPointByBeat(beatf);
+                // Delete timing point
+                if (eventData.button == PointerEventData.InputButton.Right || Editor.tool == EditorTool.Delete)
+                {
+                    if (Point != null)
+                    {
+                        if (Point.beat[0] >= 0)
+                            Core.Commit(new RemoveTimingPointCmd(Point));
+                        else
+                            MessageBannerController.ShowMsg(LogLevel.INFO, "Cannot remove the very first timing point.");
+                    }
+                    return;
+                }
+                // Edit existing timing point
+                if (Point != null)
+                {
+                    TimingPointEdit.Point = Point;
+                    TimingPointEdit.Show();
+                    return;
+                }
+                // Add a timing point
+                for (int i = 0; i < Group.points.Count; i++)
+                {
+                    var p = Group.points[i];
+                    if (beatf < p.beatf)
+                    {
+                        Point = Group.points[i - 1].Copy();
+                        break;
+                    }
+                    if (i == Group.points.Count - 1)
+                    {
+                        Point = Group.points[i].Copy();
+                        break;
+                    }
+                }
+                Point.beat = beat;
+                Core.Commit(new AddTimingPointCmd(Point));
+                return;
+            }
+        }
+
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (Editor.timingView)
+            if (Editor.speedView)
             {
-
+                OnPointerClickSpeedView(eventData);
             }
             else
             {
                 OnPointerClickNoteView(eventData);
             }
+        }
+        #endregion
+
+        #region Handlers
+        public void OnSwitchGridView(bool isOn)
+        {
+            Editor.speedView = isOn;
+            Core.onSpeedViewSwitched.Invoke();
         }
         #endregion
     }

@@ -6,6 +6,7 @@ using System.Linq;
 using UniRx.Async;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 namespace BGEditor
 {
@@ -28,6 +29,7 @@ namespace BGEditor
         public GameObject FlickNote;
         public GameObject SlideNote;
         public GameObject GridInfoText;
+        public Button Blocker;
 
         [HideInInspector]
         public V2.Chart chart { get; private set; }
@@ -50,16 +52,22 @@ namespace BGEditor
         public UnityEvent onToolSwitched = new UnityEvent();
         public UnityEvent onAudioLoaded = new UnityEvent();
         public UnityEvent onUserChangeAudioProgress = new UnityEvent();
+
         public ChangeEvent<int> onYSnapModified = new ChangeEvent<int>();
         public UnityEvent onYPosModified = new UnityEvent();
         public UnityEvent onYFilterSwitched = new UnityEvent();
+
+        public UnityEvent onSpeedViewSwitched = new UnityEvent();
+
         public NoteEvent onNoteCreated = new NoteEvent();
         public NoteEvent onNoteModified = new NoteEvent();
         public NoteEvent onNoteRemoved = new NoteEvent();
 
+        public UnityEvent onTimingPointModified = new UnityEvent();
+
         private LinkedList<IEditorCmd> cmdList;
         private LinkedListNode<IEditorCmd> lastCmd;
-        private const int MAX_UNDO_COUNT = 100;
+        private const int MAX_UNDO_COUNT = 256;
 
         void Awake()
         {
@@ -91,6 +99,14 @@ namespace BGEditor
         private void LateUpdate()
         {
             pool.PostUpdate();
+        }
+
+        public void SwitchTool(EditorTool tool)
+        {
+            if (editor.tool == tool)
+                return;
+            editor.tool = tool;
+            onToolSwitched.Invoke();
         }
 
         #region IEditorCmd
@@ -245,14 +261,6 @@ namespace BGEditor
 
         #endregion
 
-        public void SwitchTool(EditorTool tool)
-        {
-            if (editor.tool == tool)
-                return;
-            editor.tool = tool;
-            onToolSwitched.Invoke();
-        }
-
         #region Chart
         public V2.Chart GetFinalizedChart()
         {
@@ -304,11 +312,11 @@ namespace BGEditor
 
         public async void Exit()
         {
+            if (Blocker.gameObject.activeSelf || MessageBox.Instance.gameObject.activeSelf)
+                return;
             progress.Pause();
             if (await MessageBox.ShowMessage("Exit", "Save before exit?"))
-            {
                 Save();
-            }
             SceneLoader.LoadScene("Mapping", "Select");
         }
 

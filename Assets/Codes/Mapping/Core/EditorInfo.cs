@@ -16,7 +16,7 @@ namespace BGEditor
         public int yDivision;
         public float yPos;
         public bool yFilter;
-        public bool timingView;
+        public bool speedView;
 
         public int gridDivision;
         public int barHeight;

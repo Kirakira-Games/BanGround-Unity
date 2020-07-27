@@ -8,7 +8,6 @@ namespace BGEditor
 {
     public class TimingController : CoreMonoBehaviour
     {
-        public Button Blocker;
         public GameObject Template;
         public GameObject TimingWindow;
         public IntInput Offset;

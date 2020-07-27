@@ -15,7 +15,6 @@ namespace BGEditor
         public Text DifficultyText;
         public InputField Tags;
         public FloatInput[] ChartPreview;
-        public Button Blocker;
 
         private mHeader mHeader;
         private cHeader cHeader;

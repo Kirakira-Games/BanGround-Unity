@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 namespace BGEditor
 {
@@ -14,5 +15,6 @@ namespace BGEditor
         public static EditNoteController Notes => Core.notes;
         public static TimingController Timing => Core.timing;
         public static AudioProgressController Progress => Core.progress;
+        public static Button Blocker => Core.Blocker;
     }
 }
