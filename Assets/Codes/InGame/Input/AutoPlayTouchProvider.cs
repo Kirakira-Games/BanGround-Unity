@@ -88,7 +88,7 @@ public class AutoPlayTouchProvider : KirakiraTouchProvider
                 var last = events[events.Count - 1];
                 AddTapMove(note, -Mathf.Min(note.time - last.time - 1, 20));
             }
-            pos.y += 1;
+            pos.y += 1.5f;
         }
         var screenPos = NoteController.mainCamera.WorldToScreenPoint(pos);
         var touchT = new KirakiraTouchState
