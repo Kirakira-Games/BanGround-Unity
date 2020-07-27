@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <script>
+        function PostViaRedirector(url, query) {
+            return new Promise((resolve, reject) => {
+                var xhr = new XMLHttpRequest();
+
+                xhr.open("POST", "/redirect");
+
+                xhr.onload = () => {
+                    resolve(xhr.responseText);
+                };
+
+                xhr.onerror = () => {
+                    reject(xhr.status);
+                }
+
+                xhr.send(JSON.stringify({
+                    url: url,
+                    query: JSON.stringify(query)
+                }));
+            });
+        }
+
+        async function sendEmail()
+        {
+            const result = await PostViaRedirector("https://banground.herokuapp.com/api/auth/send-verification-email", { email: "geek_ds@foxmail.com" });
+            
+            document.write(result);
+        }
+    </script>
+</head>
+<body>
+    <button onclick="sendEmail()"></button>
+    <form>
+        <input type="email" id="email">
+        <input type="text" id="username">
+        <input type="password" id="password">
+    </form>
+</body>
+</html>

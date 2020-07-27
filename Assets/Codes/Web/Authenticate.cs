@@ -44,6 +44,11 @@ public class Authenticate
 
                 api.AccessToken = result.Data.AccessToken;
             }
+            else
+            {
+                cl_accessToken.Set("");
+                cl_refreshToken.Set("");
+            }
 
             isAuthing = false;
 
@@ -52,15 +57,6 @@ public class Authenticate
         catch (Exception ex)
         {
             isAuthing = false;
-
-            if (ex.Message == "401")
-            {
-                cl_accessToken.Set("");
-                cl_refreshToken.Set("");
-
-                return false;
-            }
-
             isNetworkError = true;
             Debug.LogError(ex.Message);
 
