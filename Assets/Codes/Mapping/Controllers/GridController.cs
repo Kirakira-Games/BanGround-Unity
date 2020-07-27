@@ -72,12 +72,13 @@ namespace BGEditor
             rect.anchorMin = Vector2.zero;
             rect.anchorMax = Vector2.zero;
             rect.anchoredPosition = anchoredPosition;
-            rect.sizeDelta = new Vector2(100, 100);
+            rect.pivot = Vector2.right;
+            rect.sizeDelta = new Vector2(120, 100);
             var txt = rect.GetComponent<Text>();
             txt.raycastTarget = false;
             txt.text = text;
             txt.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-            txt.alignment = TextAnchor.MiddleCenter;
+            txt.alignment = TextAnchor.MiddleRight;
             txt.fontSize = 48;
             objectsInUse.AddLast(ret);
             return txt;
@@ -158,7 +159,7 @@ namespace BGEditor
                     {
                         width = 3;
                         color = Div1Color;
-                        CreateText(new Vector2(-50, y), i.ToString());
+                        CreateText(new Vector2(-20, y), i.ToString());
                     }
                     else if (j * 2 % Editor.gridDivision == 0)
                     {
