@@ -34,6 +34,10 @@ namespace BGEditor
             Core.onSpeedViewSwitched.AddListener(() =>
             {
                 UnselectAll();
+            });
+            Core.onTimingGroupSwitched.AddListener(() =>
+            {
+                UnselectAll();
                 Refresh();
             });
         }

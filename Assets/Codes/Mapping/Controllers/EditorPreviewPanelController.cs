@@ -18,6 +18,7 @@ namespace BGEditor
         private short[,,] count;
         private Image[] images;
         private bool isAudioLoaded = false;
+        private bool isChartLoaded = false;
         private bool shouldApply = false;
         private int horizontalPadding;
 
@@ -49,19 +50,33 @@ namespace BGEditor
                 isAudioLoaded = true;
                 Refresh();
             }
-            Core.onAudioLoaded.AddListener(() => {
-                isAudioLoaded = true;
+            else
+            {
+                Core.onAudioLoaded.AddListener(() => {
+                    isAudioLoaded = true;
+                    Refresh();
+                });
+            }
+            Core.onTimingModified.AddListener(Refresh);
+            Core.onTimingGroupSwitched.AddListener(Refresh);
+        }
+
+        private void Awake()
+        {
+            Core.onChartLoaded.AddListener(() => {
+                isChartLoaded = true;
                 Refresh();
             });
-            Core.onTimingModified.AddListener(Refresh);
         }
 
         private void Refresh()
         {
+            if (!isAudioLoaded || !isChartLoaded)
+                return;
             Array.Clear(count, 0, count.Length);
             for (int i = 0; i < textures.Length; i++)
                 textures[i].SetPixels(colorArray[i]);
-            Chart.groups.ForEach(group => group.notes.ForEach(CreateNote));
+            Group.notes.ForEach(CreateNote);
             shouldApply = true;
         }
 

@@ -29,6 +29,11 @@ namespace BGEditor
         private float laneWidth;
         private RectTransform parentRect;
 
+        private void Awake()
+        {
+            Core.onChartLoaded.AddListener(Refresh);
+        }
+
         private void Start()
         {
             objectsInUse = new LinkedList<GameObject>();
@@ -38,6 +43,7 @@ namespace BGEditor
             Core.onGridMoved.AddListener(Refresh);
             Core.onTimingPointModified.AddListener(Refresh);
             Core.onTimingModified.AddListener(Refresh);
+            Core.onTimingGroupSwitched.AddListener(Refresh);
             var rect = GetComponent<RectTransform>().rect;
             gridHeight = rect.height;
             gridWidth = rect.width;
@@ -92,6 +98,9 @@ namespace BGEditor
                 info.ResetLeft(anchoredPosition, text);
             else
                 info.ResetRight(anchoredPosition, text);
+            var color = info.img.color;
+            color.a = Editor.speedView ? 1f : 0.5f;
+            info.img.color = color;
             objectsInUse.AddLast(ret);
             return info;
         }
@@ -362,6 +371,7 @@ namespace BGEditor
         {
             Editor.speedView = isOn;
             Core.onSpeedViewSwitched.Invoke();
+            Refresh();
         }
         #endregion
     }
