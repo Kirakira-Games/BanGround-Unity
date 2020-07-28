@@ -47,7 +47,15 @@ namespace BGEditor
 
         public EditorNoteBase Find(V2.Note note)
         {
-            return displayNotes[note];
+            var set = notesByBeat[note.beat[0]];
+            foreach (var notebase in set)
+            {
+                if (ReferenceEquals(notebase.note, note))
+                {
+                    return notebase;
+                }
+            }
+            return null;
         }
 
         public void CreateNote(V2.Note note)
@@ -96,8 +104,8 @@ namespace BGEditor
         {
             if (note.type == NoteType.BPM)
                 return;
-            Debug.Assert(displayNotes.ContainsKey(note));
             var notebase = Find(note);
+            Debug.Assert(notebase != null);
             notebase.UpdatePosition();
             notebase.Refresh();
         }
@@ -139,8 +147,8 @@ namespace BGEditor
 
         public bool ConnectNote(V2.Note prev, V2.Note next)
         {
-            Debug.Assert(displayNotes.ContainsKey(prev));
             var note = Find(prev) as EditorSlideNote;
+            Debug.Assert(note != null);
             if (next == null)
             {
                 var nxt = note.next;
@@ -148,8 +156,9 @@ namespace BGEditor
                     return false;
                 for (int i = prev.beat[0] + 1; i <= nxt.note.beat[0]; i++)
                 {
-                    notesByBeat[i].Remove(note);
-                    notesByBeat[i].Remove(nxt);
+                    bool ret = notesByBeat[i].Remove(note);
+                    ret &= notesByBeat[i-1].Remove(nxt);
+                    Debug.Assert(ret);
                 }
                 return true;
             }
@@ -161,13 +170,10 @@ namespace BGEditor
                 for (int i = prev.beat[0] + 1; i <= next.beat[0]; i++)
                 {
                     if (!notesByBeat.ContainsKey(i))
-                        notesByBeat.Add(i, new HashSet<EditorNoteBase> { note, nxt });
+                        notesByBeat.Add(i, new HashSet<EditorNoteBase> { note });
                     else
-                    {
-                        var tmp = notesByBeat[i];
-                        tmp.Add(note);
-                        tmp.Add(nxt);
-                    }
+                        notesByBeat[i].Add(note);
+                    notesByBeat[i - 1].Add(nxt);
                 }
                 return true;
             }
