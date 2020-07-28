@@ -469,6 +469,9 @@ public class NoteController : MonoBehaviour
                     }
                 });
         }
+
+        // Init notes
+        NoteBase.Init();
     }
 
     static KVarRef o_judge = new KVarRef("o_judge");
