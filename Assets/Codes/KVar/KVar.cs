@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 using FS = System.IO.KiraFilesystem;
@@ -69,6 +69,7 @@ public class KVar : KonCommandBase
 
     private Action<object> m_cbValueChanged = null;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void UpdateValue(object o)
     {
         if (o is string)
@@ -97,11 +98,17 @@ public class KVar : KonCommandBase
         }
     }
 
+    readonly static Type stringType = typeof(string);
+    readonly static Type intType = typeof(int);
+    readonly static Type boolType = typeof(bool);
+    readonly static Type floatType = typeof(float);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public T Get<T>()
     {
         if (IsFlagSet(KVarFlags.StringOnly))
         {
-            if (typeof(T).Name != "String")
+            if (typeof(T) != typeof(string))
                 throw new ArgumentException("Only string is acceptable!");
 
             return (T)(object)m_stringValue;
@@ -109,21 +116,19 @@ public class KVar : KonCommandBase
 
         var type = typeof(T);
 
-        switch (type.Name)
-        {
-            case "String":
-                return (T)(object)m_stringValue;
-            case "Int32":
-                return (T)(object)m_intValue;
-            case "Single":
-                return (T)(object)m_floatValue;
-            case "Boolean":
-                return (T)(object)m_boolValue;
-            default:
-                throw new ArgumentOutOfRangeException("Type not supported");
-        }
+        if (type == stringType)
+            return (T)(object)m_stringValue;
+        else if (type == intType)
+            return (T)(object)m_intValue;
+        else if (type == boolType)
+            return (T)(object)m_floatValue;
+        else if (type == floatType)
+            return (T)(object)m_boolValue;
+        else
+            throw new ArgumentOutOfRangeException("Type not supported");
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Set<T>(T value)
     {
 #if !DEBUG
@@ -136,44 +141,45 @@ public class KVar : KonCommandBase
 
         if (IsFlagSet(KVarFlags.StringOnly))
         {
-            if (typeof(T).Name != "String")
+            if (!(value is string))
                 throw new ArgumentException("Only strings are acceptable!");
 
             m_stringValue = (string)(object)value;
             return;
         }
 
-        var type = typeof(T);
-
         object lastValue;
 
-        switch (type.Name)
+        if(value is string)
         {
-            case "String":
-                lastValue = m_stringValue;
-                m_stringValue = (string)(object)value;
-                break;
-            case "Int32":
-                lastValue = m_intValue;
-                m_intValue = (int)(object)value;
-                break;
-            case "Single":
-                lastValue = m_floatValue;
-                m_floatValue = (float)(object)value;
-                break;
-            case "Boolean":
-                lastValue = m_boolValue;
-                m_boolValue = (bool)(object)value;
-                break;
-            default:
-                throw new ArgumentOutOfRangeException("Type not supported");
+            lastValue = m_stringValue;
+            m_stringValue = (string)(object)value;
+        }
+        else if(value is int)
+        {
+            lastValue = m_intValue;
+            m_intValue = (int)(object)value;
+        }
+        else if(value is float)
+        {
+            lastValue = m_floatValue;
+            m_floatValue = (float)(object)value;
+        }
+        else if(value is bool)
+        {
+            lastValue = m_boolValue;
+            m_boolValue = (bool)(object)value;
+        }
+        else
+        {
+            throw new ArgumentOutOfRangeException("Type not supported");
         }
 
         UpdateValue(value);
-
         m_cbValueChanged?.Invoke(lastValue);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsFlagSet(KVarFlags flag)
     {
         return m_flags.HasFlag(flag);
@@ -217,7 +223,17 @@ public class KVar : KonCommandBase
 public class KVarRef
 {
     private string m_kvarName;
-    private KVar kVar { get => KVSystem.Instance.Find(m_kvarName); }
+    private KVar kvarCache = null;
+    private KVar kVar 
+    { 
+        get 
+        { 
+            if (kvarCache == null) 
+                kvarCache = KVSystem.Instance.Find(m_kvarName); 
+
+            return kvarCache; 
+        } 
+    }
 
     public T Get<T>()
     {
