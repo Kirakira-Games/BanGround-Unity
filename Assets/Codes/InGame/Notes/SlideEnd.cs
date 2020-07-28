@@ -6,13 +6,17 @@ public class SlideEnd : SlideNoteBase
 {
     public override void UpdatePosition()
     {
-        base.UpdatePosition();
         isStickEnd = false;
         if (!parentSlide) Debug.LogWarning(name);
         if (isJudging && NoteController.audioTime >= time)
         {
             isStickEnd = true;
             transform.position = judgePos;
+            noteMesh.OnUpdate();
+        }
+        else
+        {
+            base.UpdatePosition();
         }
     }
 
