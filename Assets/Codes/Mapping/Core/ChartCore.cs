@@ -185,16 +185,16 @@ namespace BGEditor
 
         public bool RemoveNote(V2.Note note)
         {
+            /*
             if (!ChartUtility.IsFuwafuwa(note))
             {
                 var pos = ChartUtility.GetPosition(note);
-                /*
                 Debug.Assert(groundNotes.ContainsKey(pos));
                 if (groundNotes[pos] <= 0)
                     return false;
                 groundNotes[pos]--;
-                */
             }
+            */
             chart.groups[note.group].notes.Remove(note);
             onNoteRemoved.Invoke(note);
             return true;

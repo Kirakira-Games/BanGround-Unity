@@ -292,7 +292,7 @@ public class UIManager : MonoBehaviour
     {
         if (SM.Count == 1 && SM.Current != State.Finished && AudioManager.Instance.gameBGM != null &&
             AudioTimelineSync.instance.GetTimeInMs() > AudioManager.Instance.gameBGM.GetLength() + 1000 &&
-            NoteController.instance.isFinished)
+            NoteController.Instance.isFinished)
         {
             SM.Transit(SM.Current, State.Finished);
             OnAudioFinish(false);

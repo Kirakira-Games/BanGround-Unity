@@ -158,8 +158,8 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
         if (!isTracingOrJudged)
             judgeTime = touch == null ? NoteController.judgeTime : touch.current.time;
         judgeResult = result;
-        NoteController.instance.Judge(this, result, touch);
-        NotePool.instance.DestroyNote(gameObject);
+        NoteController.Instance.Judge(this, result, touch);
+        NotePool.Instance.DestroyNote(this);
     }
 
     public virtual void Judge(KirakiraTouch touch, JudgeResult result)

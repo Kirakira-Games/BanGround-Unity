@@ -503,7 +503,7 @@ public class TouchManager : MonoBehaviour
                 {
                     continue;
                 }
-                NoteController.instance.UpdateTouch(GetTouchById(touch.touchId));
+                NoteController.Instance.UpdateTouch(GetTouchById(touch.touchId));
             }
 
             // Remove ended touches
