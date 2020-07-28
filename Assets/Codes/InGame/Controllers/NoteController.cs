@@ -11,7 +11,7 @@ using JudgeQueue = PriorityQueue<int, NoteBase>;
 
 public class NoteController : MonoBehaviour
 {
-    public static NoteController instance;
+    public static NoteController Instance;
     public static Camera mainCamera;
     public static Vector3 mainForward = new Vector3(0, -0.518944f, 0.8548083f);
     
@@ -43,8 +43,16 @@ public class NoteController : MonoBehaviour
 
     private ChartScript chartScript;
 
+    // Saved instances
+    private HashSet<NoteBase> notebases = new HashSet<NoteBase>();
+    private HashSet<Slide> slides = new HashSet<Slide>();
+    private List<NoteBase> notesToDestroy = new List<NoteBase>();
+    private List<Slide> slidesToDestroy = new List<Slide>();
+    private List<int> helperIntList = new List<int>();
+
     private const int WARM_UP_SECOND = 4;
 
+    #region Judge
     public TapEffectType EmitEffect(Vector3 position, JudgeResult result, GameNoteType type)
     {
         if (result == JudgeResult.Miss) return TapEffectType.None;
@@ -63,7 +71,7 @@ public class NoteController : MonoBehaviour
         else if (result == JudgeResult.Good)
             se = TapEffectType.Good;
 
-        NotePool.instance.PlayTapEffect(se, position);
+        NotePool.Instance.PlayTapEffect(se, position);
 
         return se;
     }
@@ -118,7 +126,7 @@ public class NoteController : MonoBehaviour
             NoteBase obj = Q.Top;
             if (obj.isDestroyed || obj.isTracingOrJudged)
             {
-                NotePool.instance.RemoveFromJudgeQueue(obj);
+                NotePool.Instance.RemoveFromJudgeQueue(obj);
                 Q.RemoveFirst();
             }
             else
@@ -126,49 +134,6 @@ public class NoteController : MonoBehaviour
                 break;
             }
         }
-    }
-
-    private GameObject CreateNote(GameNoteData gameNote)
-    {
-        var noteObj = NotePool.instance.GetNote(gameNote.type);
-        noteObj.transform.SetParent(transform);
-        NoteBase note = noteObj.GetComponent<NoteBase>();
-        note.timingGroup = timingGroups[gameNote.timingGroup];
-        note.ResetNote(gameNote);
-        if (note.judgeFuwafuwa)
-        {
-            noteQueue.Push(note.time, note);
-        }
-        else
-        {
-            laneQueue[note.lane].Push(note.time, note);
-        }
-        // Add sync line
-        if (!syncTable.ContainsKey(note.time) || syncTable[note.time] == null)
-        {
-            GameObject syncLineObj = new GameObject("syncLine");
-            syncLineObj.layer = 8;
-            syncLineObj.transform.SetParent(transform);
-            syncTable.Remove(note.time);
-            syncTable.Add(note.time, syncLineObj.AddComponent<NoteSyncLine>());
-        }
-        syncTable[note.time].AddNote(note);
-
-        return noteObj;
-    }
-
-    public GameObject CreateSlide(List<GameNoteData> notes)
-    {
-        GameObject obj = NotePool.instance.GetSlide();
-        obj.transform.SetParent(transform);
-        Slide slide = obj.GetComponent<Slide>();
-        slide.InitSlide();
-        foreach (GameNoteData note in notes)
-        {
-            slide.AddNote(CreateNote(note).GetComponent<NoteBase>());
-        }
-        slide.FinalizeSlide();
-        return obj;
     }
 
     public static int[] GetLanesByTouchState(KirakiraTouchState state)
@@ -305,7 +270,64 @@ public class NoteController : MonoBehaviour
             noteToJudge.Judge(touch, noteToJudge.TryJudge(touch));
         }
     }
+    #endregion
 
+    #region Create
+    private NoteBase CreateNote(GameNoteData gameNote)
+    {
+        var noteObj = NotePool.Instance.GetNote(gameNote.type);
+        noteObj.transform.SetParent(transform);
+        NoteBase note = noteObj.GetComponent<NoteBase>();
+        note.timingGroup = timingGroups[gameNote.timingGroup];
+        note.ResetNote(gameNote);
+        if (note.judgeFuwafuwa)
+        {
+            noteQueue.Push(note.time, note);
+        }
+        else
+        {
+            laneQueue[note.lane].Push(note.time, note);
+        }
+        // Add note
+        // Add sync line
+        if (!syncTable.ContainsKey(note.time) || syncTable[note.time] == null)
+        {
+            GameObject syncLineObj = new GameObject("syncLine");
+            syncLineObj.layer = 8;
+            syncLineObj.transform.SetParent(transform);
+            syncTable.Remove(note.time);
+            syncTable.Add(note.time, syncLineObj.AddComponent<NoteSyncLine>());
+        }
+        syncTable[note.time].AddNote(note);
+
+        return note;
+    }
+
+    public Slide CreateSlide(List<GameNoteData> notes)
+    {
+        var slide = NotePool.Instance.GetSlide();
+        slide.transform.SetParent(transform);
+        slide.InitSlide();
+        foreach (GameNoteData note in notes)
+        {
+            slide.AddNote(CreateNote(note));
+        }
+        slide.FinalizeSlide();
+        return slide;
+    }
+    #endregion
+
+    #region Destroy
+    public void OnNoteDestroy(NoteBase note)
+    {
+        notesToDestroy.Add(note);
+    }
+
+    public void OnSlideDestroy(Slide slide)
+    {
+        slidesToDestroy.Add(slide);
+    }
+    #endregion
     private void UpdateNotes()
     {
         while (noteHead < notes.Length)
@@ -314,11 +336,11 @@ public class NoteController : MonoBehaviour
             if (audioTime <= note.appearTime) break;
             if (note.type == GameNoteType.SlideStart)
             {
-                CreateSlide(note.seg);
+                slides.Add(CreateSlide(note.seg));
             }
             else
             {
-                CreateNote(note);
+                notebases.Add(CreateNote(note));
             }
             noteHead++;
         }
@@ -329,7 +351,7 @@ public class NoteController : MonoBehaviour
 
     async void Start()
     {
-        instance = this;
+        Instance = this;
         isFinished = false;
 
         // Main camera
@@ -358,7 +380,7 @@ public class NoteController : MonoBehaviour
 
         // Load chart
         chart = LiveSetting.gameChart;
-        NotePool.instance.Init(notes);
+        NotePool.Instance.Init(notes);
         noteHead = 0;
 
         // Compute number of notes
@@ -460,6 +482,8 @@ public class NoteController : MonoBehaviour
         judgeTime = audioTime - o_judge;
         audioTimef = audioTime / 1000f;
         judgeTimef = judgeTime / 1000f;
+        slidesToDestroy.Clear();
+        notesToDestroy.Clear();
         //Debug.Log("Audio: " + audioTime);
 
         // Create notes
@@ -480,27 +504,28 @@ public class NoteController : MonoBehaviour
         TouchManager.instance.OnUpdate();
 
         // Update each note child
-        var noteBase = transform.GetComponentsInChildren<NoteBase>();
-        var slide = transform.GetComponentsInChildren<Slide>();
-        var noteSyncLine = transform.GetComponentsInChildren<NoteSyncLine>();
-
         Profiler.BeginSample("OnNoteUpdate");
 
-        foreach (var i in noteBase)
+        foreach (var i in notebases)
         {
             i.OnNoteUpdate();
         }
         Profiler.EndSample();
 
-        foreach (var i in slide)
+        foreach (var i in slides)
         {
             i.OnSlideUpdate();
         }
 
-        foreach (var i in noteSyncLine)
+        helperIntList.Clear();
+        foreach (var i in syncTable)
         {
-            i.OnSyncLineUpdate();
+            if (i.Value == null)
+                helperIntList.Add(i.Key);
+            else
+                i.Value.OnSyncLineUpdate();
         }
+        helperIntList.ForEach(i => syncTable.Remove(i));
 
         // Update isfinished
         isFinished = noteHead >= notes.Length;
@@ -511,6 +536,10 @@ public class NoteController : MonoBehaviour
 
         // Update lane effects
         laneEffects.UpdateLaneEffects();
+
+        // Destroy objects
+        slidesToDestroy.ForEach(slide => slides.Remove(slide));
+        notesToDestroy.ForEach(note => notebases.Remove(note));
 
         chartScript.OnUpdate(audioTime);
     }

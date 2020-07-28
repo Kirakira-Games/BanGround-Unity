@@ -39,17 +39,17 @@ class NoteEventProcessor
 
 public class NotePool : MonoBehaviour
 {
-    public static NotePool instance;
+    public static NotePool Instance;
 
-    private Queue<GameObject>[] noteQueue;
-    private Queue<GameObject> slideQueue;
+    private Queue<NoteBase>[] noteQueue;
+    private Queue<Slide> slideQueue;
     private Queue<GameObject>[] teQueue;
     private Object[] tapEffects;
 
     static KVarRef r_notesize = new KVarRef("r_notesize");
     static KVarRef o_judge = new KVarRef("o_judge");
 
-    private void AddNote(Queue<GameObject> Q, GameNoteType type, int count = 1)
+    private void AddNote(Queue<NoteBase> Q, GameNoteType type, int count = 1)
     {
         var name = Enum.GetName(typeof(GameNoteType), type);
         for (int j = 0; j < count; j++)
@@ -99,7 +99,7 @@ public class NotePool : MonoBehaviour
             }
             note.InitNote();
             obj.SetActive(false);
-            Q.Enqueue(obj);
+            Q.Enqueue(note);
         }
     }
 
@@ -108,10 +108,10 @@ public class NotePool : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             var obj = new GameObject("Slide" + i);
-            obj.AddComponent<Slide>();
+            var slide = obj.AddComponent<Slide>();
             obj.SetActive(false);
             obj.transform.SetParent(transform);
-            slideQueue.Enqueue(obj);
+            slideQueue.Enqueue(slide);
         }
     }
 
@@ -173,13 +173,13 @@ public class NotePool : MonoBehaviour
         // Init notemesh
         NoteMesh.Init();
 
-        noteQueue = new Queue<GameObject>[6];
+        noteQueue = new Queue<NoteBase>[6];
         for (int i = 0; i < noteQueue.Length; i++)
         {
-            noteQueue[i] = new Queue<GameObject>();
+            noteQueue[i] = new Queue<NoteBase>();
         }
 
-        slideQueue = new Queue<GameObject>();
+        slideQueue = new Queue<Slide>();
 
         // Load Tap Effects
         tapEffects = new Object[]
@@ -254,10 +254,10 @@ public class NotePool : MonoBehaviour
 
     void Awake()
     {
-        instance = this;
+        Instance = this;
     }
 
-    public GameObject GetSlide()
+    public Slide GetSlide()
     {
         if (slideQueue.Count == 0)
         {
@@ -265,11 +265,11 @@ public class NotePool : MonoBehaviour
             AddSlide();
         }
         var slide = slideQueue.Dequeue();
-        slide.SetActive(true);
+        slide.gameObject.SetActive(true);
         return slide;
     }
 
-    public GameObject GetNote(GameNoteType type)
+    public NoteBase GetNote(GameNoteType type)
     {
         if (type == GameNoteType.None)
         {
@@ -283,29 +283,30 @@ public class NotePool : MonoBehaviour
             AddNote(Q, type);
         }
         var note = Q.Dequeue();
-        note.SetActive(true);
+        note.gameObject.SetActive(true);
         return note;
     }
 
-    public void DestroySlide(GameObject obj)
+    public void DestroySlide(Slide slide)
     {
-        obj.GetComponent<Slide>().OnNoteDestroy();
-        obj.transform.SetParent(transform);
-        obj.SetActive(false);
-        slideQueue.Enqueue(obj);
+        slide.OnNoteDestroy();
+        slide.transform.SetParent(transform);
+        slide.gameObject.SetActive(false);
+        NoteController.Instance.OnSlideDestroy(slide);
+        slideQueue.Enqueue(slide);
     }
 
-    public void DestroyNote(GameObject obj)
+    public void DestroyNote(NoteBase note)
     {
-        var note = obj.GetComponent<NoteBase>();
         var type = note.type;
         note.OnNoteDestroy();
-        obj.transform.SetParent(transform);
+        note.transform.SetParent(transform);
         note.isDestroyed = true;
-        obj.SetActive(false);
+        note.gameObject.SetActive(false);
         if (!note.inJudgeQueue)
         {
-            noteQueue[(int)type].Enqueue(obj);
+            NoteController.Instance.OnNoteDestroy(note);
+            noteQueue[(int)type].Enqueue(note);
         }
     }
 
@@ -314,7 +315,8 @@ public class NotePool : MonoBehaviour
         note.inJudgeQueue = false;
         if (note.isDestroyed)
         {
-            noteQueue[(int)note.type].Enqueue(note.gameObject);
+            NoteController.Instance.OnNoteDestroy(note);
+            noteQueue[(int)note.type].Enqueue(note);
         }
     }
 

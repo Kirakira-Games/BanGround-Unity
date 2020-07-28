@@ -22,7 +22,7 @@ public class Slide : MonoBehaviour, KirakiraTracer
         UnbindTouch();
         foreach (var note in notes)
         {
-            NotePool.instance.DestroyNote(note.gameObject);
+            NotePool.Instance.DestroyNote(note);
         }
     }
 
@@ -150,7 +150,7 @@ public class Slide : MonoBehaviour, KirakiraTracer
         UpdateDisplayHead();
         if (judgeHead >= notes.Count)
         {
-            NotePool.instance.DestroySlide(gameObject);
+            NotePool.Instance.DestroySlide(this);
             return;
         }
 
@@ -282,7 +282,7 @@ public class Slide : MonoBehaviour, KirakiraTracer
             UpdateHead();
             if (judgeHead < notes.Count)
             {
-                NoteController.instance.Judge(notes[judgeHead], JudgeResult.Miss, touch);
+                NoteController.Instance.Judge(notes[judgeHead], JudgeResult.Miss, touch);
                 judgeHead++;
             }
             UnbindTouch();
