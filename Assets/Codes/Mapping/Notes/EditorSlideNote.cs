@@ -40,11 +40,13 @@ namespace BGEditor
 
         protected override bool IsOutOfBound()
         {
-            if (prev != null && !IsOutOfBound(prev))
+            if (!IsOutOfBound(this))
                 return false;
-            if (next != null && !IsOutOfBound(next))
+            if (prev != null && prev.note.beat[0] <= Grid.EndBar)
                 return false;
-            return IsOutOfBound(this);
+            if (next != null && next.note.beat[0] >= Grid.StartBar)
+                return false;
+            return true;
         }
 
         public override void Init(V2.Note note)
