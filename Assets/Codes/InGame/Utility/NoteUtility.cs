@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.UIElements;
 
 public enum GameNoteType
 {
@@ -107,6 +108,8 @@ public static class NoteUtility
 
     public const float EPS = 1e-4f;
 
+    private static float planeDeltaZ;
+    private static float planeInitZ;
     public static void Init(Vector3 planeNormal)
     {
         JudgePlane = new Plane(planeNormal.normalized, new Vector3(0, 0, NOTE_JUDGE_Z_POS));
@@ -116,6 +119,8 @@ public static class NoteUtility
             SLIDE_END_JUDGE_RANGE[i] = (int)(SLIDE_END_JUDGE_RANGE_RAW[i] * LiveSetting.SpeedCompensationSum);
             SLIDE_END_TILT_JUDGE_RANGE[i] = (int)(SLIDE_END_TILT_JUDGE_RANGE_RAW[i] * LiveSetting.SpeedCompensationSum);
         }
+        planeInitZ = ProjectVectorToParallelPlane(new Vector3(0, 0)).z;
+        planeDeltaZ = ProjectVectorToParallelPlane(new Vector3(0, 1)).z - planeInitZ;
     }
 
     public static Vector3 GetInitPos(float lane)
@@ -130,17 +135,17 @@ public static class NoteUtility
 
     public static Vector3 ProjectVectorToParallelPlane(Vector3 position)
     {
-        position.z += GetDeltaZFromJudgePlane(position);
-        return position;
-    }
-
-    public static float GetDeltaZFromJudgePlane(Vector3 position)
-    {
         JudgePlane.Raycast(new Ray(
             new Vector3(position.x, position.y, 0),
             new Vector3(0, 0, 1)), out float dist);
         dist -= NOTE_JUDGE_Z_POS;
-        return dist;
+        position.z += dist;
+        return position;
+    }
+
+    public static float GetDeltaZFromJudgePlane(float y)
+    {
+        return planeDeltaZ * y;
     }
 
     public static bool IsFlick(GameNoteType type)
