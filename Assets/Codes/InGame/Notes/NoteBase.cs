@@ -3,6 +3,21 @@ using System.Collections.Generic;
 
 public abstract class NoteBase : MonoBehaviour, KirakiraTracer
 {
+    #region Static
+    public static bool rGreyNote;
+    public static bool rBangPerspect;
+
+    static KVarRef r_graynote = new KVarRef("r_graynote");
+    static KVarRef r_notesize = new KVarRef("r_notesize");
+    static KVarRef r_bang_perspect = new KVarRef("r_bang_perspect");
+
+    public static void Init()
+    {
+        rGreyNote = r_graynote;
+        rBangPerspect = r_bang_perspect;
+    }
+    #endregion
+
     public int time;
     public int lane;
     public int judgeTime;
@@ -29,9 +44,6 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
     {
         noteMesh = gameObject.AddComponent<NoteMesh>();
     }
-
-    static KVarRef r_graynote = new KVarRef("r_graynote");
-    static KVarRef r_notesize = new KVarRef("r_notesize");
 
     public virtual void ResetNote(GameNoteData data)
     {
@@ -61,10 +73,9 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
         transform.localScale = Vector3.one * NoteUtility.NOTE_SCALE * r_notesize;
 
         // Setup material
-        noteMesh.meshRenderer.sharedMaterial = timingGroup.GetMaterial(type, noteMesh.meshRenderer.material, r_graynote && data.isGray);
+        noteMesh.meshRenderer.sharedMaterial = timingGroup.GetMaterial(type, noteMesh.meshRenderer.material, rGreyNote && data.isGray);
     }
 
-    static KVarRef r_bang_perspect = new KVarRef("r_bang_perspect");
 
     public virtual void UpdatePosition()
     {
@@ -84,9 +95,9 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
         {
             var next = anims[animsHead + 1];
             float ratio = Mathf.InverseLerp(anim.time, next.time, NoteController.audioTimef);
-            newpos = TransitionVector.Lerp(anim.pos, next.pos, ratio);
+            newpos = TransitionVector.LerpVector(anim.pos, next.pos, ratio);
         }
-        if (r_bang_perspect)
+        if (rBangPerspect)
         {
             // Z-pos specialization
             newpos.z = NoteUtility.GetBangPerspective(newpos.z);

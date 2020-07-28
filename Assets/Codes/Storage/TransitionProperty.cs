@@ -95,6 +95,17 @@ public class TransitionProperty<T> : IExtensible
         return new TransitionProperty<T>(value, transition);
     }
 
+    public static float LerpFloat(TransitionProperty<float> a, TransitionProperty<float> b, float t)
+    {
+        t = Mathf.Clamp01(t);
+        return LerpFloatUnclamped(a, b, t);
+    }
+
+    public static float LerpFloatUnclamped(TransitionProperty<float> a, TransitionProperty<float> b, float t)
+    {
+        return TransitionLib.LerpUnclamped(a, b, t, a.transition);
+    }
+
     public static TransitionProperty<float> Lerp(TransitionProperty<float> a, TransitionProperty<float> b, float t)
     {
         t = Mathf.Clamp01(t);
@@ -265,6 +276,22 @@ public class TransitionVector : IExtensible
     public static implicit operator Vector3(TransitionVector vector)
     {
         return new Vector3(vector.x, vector.y, vector.z);
+    }
+
+    public static Vector3 LerpVector(TransitionVector a, TransitionVector b, float t)
+    {
+        t = Mathf.Clamp01(t);
+        return LerpVectorUnclamped(a, b, t);
+    }
+
+    public static Vector3 LerpVectorUnclamped(TransitionVector a, TransitionVector b, float t)
+    {
+        t = Mathf.Clamp01(t);
+        return new Vector3(
+            TransitionProperty<float>.LerpFloatUnclamped(a.x, b.x, t),
+            TransitionProperty<float>.LerpFloatUnclamped(a.y, b.y, t),
+            Mathf.LerpUnclamped(a.z, b.z, t)
+        );
     }
 
     public static TransitionVector Lerp(TransitionVector a, TransitionVector b, float t)
