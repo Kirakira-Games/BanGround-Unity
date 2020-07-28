@@ -76,9 +76,9 @@ public class NoteMesh : MonoBehaviour
         return Mathf.Lerp(cachedLength[index], cachedLength[index+1], ratio);
     }
 
-    private Vector3[] GetVertices(Vector3 p)
+    private Vector3[] GetVertices(float z)
     {
-        float dz = GetCachedLength(p.z);
+        float dz = GetCachedLength(z);
         meshVertices[0].z = -dz;
         meshVertices[1].z = -dz;
         meshVertices[2].z = dz;
@@ -120,7 +120,7 @@ public class NoteMesh : MonoBehaviour
         meshRenderer.material = mat;
         Mesh mesh = new Mesh
         {
-            vertices = GetVertices(NoteUtility.GetInitPos(3)),
+            vertices = GetVertices(NoteUtility.GetInitPos(3).z),
             uv = uv,
             normals = normals,
             triangles = indices
@@ -133,7 +133,7 @@ public class NoteMesh : MonoBehaviour
 
     public void OnUpdate()
     {
-        meshFilter.mesh.SetVertices(GetVertices(transform.position));
+        meshFilter.mesh.SetVertices(GetVertices(transform.position.z));
         meshFilter.mesh.RecalculateBounds();
     }
 }
