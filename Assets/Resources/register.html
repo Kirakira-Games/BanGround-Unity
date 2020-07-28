@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
     <script>
+        let emailVerifyToken = "<empty>";
+
         function PostViaRedirector(url, query) {
             return new Promise((resolve, reject) => {
-                var xhr = new XMLHttpRequest();
+                const xhr = new XMLHttpRequest();
 
                 xhr.open("POST", "/redirect");
 
@@ -26,20 +28,158 @@
             });
         }
 
-        async function sendEmail()
+        function EncodePassword(password) {
+            return new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+
+                xhr.open("POST", "/encode");
+
+                xhr.onload = () => {
+                    resolve(xhr.responseText);
+                };
+
+                xhr.onerror = () => {
+                    reject(xhr.status);
+                }
+
+                xhr.send(password);
+            });
+        }
+
+        async function sendVerifyEmail()
         {
-            const result = await PostViaRedirector("https://banground.herokuapp.com/api/auth/send-verification-email", { email: "geek_ds@foxmail.com" });
+            const email = document.getElementById("email");
+            const result = await PostViaRedirector("https://banground.herokuapp.com/api/auth/send-verification-email", { email: email.value });
             
-            document.write(result);
+            const response = JSON.parse(result);
+            
+            if(response.status)
+                emailVerifyToken = response.data; 
+            else
+                alert(response.error);
+        }
+
+        async function submitForm()
+        {
+            const username = document.getElementById("username").value;
+            const email = document.getElementById("email").value;
+            const code = document.getElementById("vcode").value;
+            const cdk = document.getElementById("cdk").value;
+
+            let password = document.getElementById("password").value;
+            password = await EncodePassword(password);
+
+            const result = await PostViaRedirector("https://banground.herokuapp.com/api/auth/register", {
+                username: username,
+                password: password,
+                nickname: username,
+                email: email,
+                code: code,
+                token: emailVerifyToken,
+                cdk: cdk
+            });
+
+            const response = JSON.parse(result);
+
+            console.log(response);
+
+            if(response.status)
+            {
+                alert("Register sucessful!");
+                window.close();
+            }
+            else
+            {
+                alert(response.error);
+            }
         }
     </script>
+
+    <style>
+        body {
+            overflow-y: hidden;
+        }
+
+        .dialog-title {
+            background-color: rgb(98, 215, 236);
+            width: 8em;
+            margin: auto;
+            padding: 0.5em;
+            color: #fff;
+            position: relative;
+            top: -1em;
+            left: -5em;
+            font-size: 1.5em;
+        }
+
+        .dialog-bg {
+            transform: rotate(-10deg);
+            background-color: rgb(245, 245, 245);
+            text-align: center;
+            width: calc(100vw + 500px);
+            position:fixed;
+            left: -250px;
+            top: calc(20vh);
+            padding-bottom: 3em;
+        }
+
+        form {
+            display: inline-flex;
+            flex-direction: column;
+        }
+
+        form>div {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px;
+        }
+
+        input {
+            border: none;
+            outline: none;
+            box-shadow: 5px 5px 0px rgba(0,0,0,0.2);
+            padding: 0.5em;
+            border-radius: 0;
+        }
+
+        input:active, input:focus {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        button {
+            border:none;
+            background-color: #fff;
+            padding: 0.5em;
+            color: #212121;
+            box-shadow: 5px 5px 0px rgba(0,0,0,0.2);
+        }
+    </style>
 </head>
+
 <body>
-    <button onclick="sendEmail()"></button>
-    <form>
-        <input type="email" id="email">
-        <input type="text" id="username">
-        <input type="password" id="password">
-    </form>
+    <div class="dialog-bg">
+        <div class="dialog-title">Register</div>
+        <form id="form">
+            <div><input placeholder="Email" type="email" id="email" required></div>
+            <div><input placeholder="Username" type="text" id="username" required pattern="[a-zA-Z0-9_-]{3,16}"></div>
+            <div><input placeholder="Password" type="password" id="password" required pattern="(.*)*"></div>
+            <div>
+                <div><input placeholder="Verify Code" type="text" id="vcode" required pattern="(.*)*"> <button
+                        type="button" onclick="sendVerifyEmail()">Get</button></div>
+            </div>
+            <div><input placeholder="CDK" type="text" id="cdk" required pattern="(.*)*"></div>
+            <div>
+                <button type="submit">Submit</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        document.getElementById("form").onsubmit = (e) => {
+            submitForm();
+
+            e.preventDefault();
+        }
+    </script>
 </body>
+
 </html>
