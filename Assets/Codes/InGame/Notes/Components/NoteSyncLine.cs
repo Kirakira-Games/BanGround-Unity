@@ -31,8 +31,9 @@ public class NoteSyncLine : MonoBehaviour
         lineRenderer.receiveShadows = false;
         lineRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         lineRenderer.material = Resources.Load<Material>("InGame/Materials/sync_line");
-        lineRenderer.startWidth = lineWidth * r_notesize;
-        lineRenderer.endWidth = lineWidth * r_notesize;
+        float size = r_notesize;
+        lineRenderer.startWidth = lineWidth * size;
+        lineRenderer.endWidth = lineWidth * size;
         lineRenderer.rendererPriority = 1;
         return lineRenderer;
     }
@@ -45,8 +46,6 @@ public class NoteSyncLine : MonoBehaviour
         soundEffects = new bool[5];
         totNotes = 0;
     }
-
-    static KVarRef r_syncline = new KVarRef("r_syncline");
 
     public void OnSyncLineUpdate()
     {
@@ -65,7 +64,7 @@ public class NoteSyncLine : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-        if (!r_syncline)
+        if (!NoteBase.rSyncLine)
         {
             return;
         }

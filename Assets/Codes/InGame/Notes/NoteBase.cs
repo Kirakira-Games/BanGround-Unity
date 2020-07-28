@@ -4,17 +4,20 @@ using System.Collections.Generic;
 public abstract class NoteBase : MonoBehaviour, KirakiraTracer
 {
     #region Static
-    public static bool rGreyNote;
-    public static bool rBangPerspect;
+    public static bool rGreyNote { get; private set; }
+    public static bool rBangPerspect { get; private set; }
+    public static bool rSyncLine { get; private set; }
 
     static KVarRef r_graynote = new KVarRef("r_graynote");
     static KVarRef r_notesize = new KVarRef("r_notesize");
     static KVarRef r_bang_perspect = new KVarRef("r_bang_perspect");
+    static KVarRef r_syncline = new KVarRef("r_syncline");
 
     public static void Init()
     {
         rGreyNote = r_graynote;
         rBangPerspect = r_bang_perspect;
+        rSyncLine = r_syncline;
     }
     #endregion
 
