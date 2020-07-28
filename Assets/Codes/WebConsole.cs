@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using BanGround.API;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
@@ -232,6 +233,17 @@ public class WebConsole : MonoBehaviour
                     ctx.Response.StatusCode = 500;
                     content = Encoding.UTF8.GetBytes(ex.Message);
                 }
+            }
+            else if (path == "/encode")
+            {
+                string dataStr = null;
+
+                using (var sr = new StreamReader(ctx.Request.InputStream))
+                    dataStr = sr.ReadToEnd();
+
+                var encoded = Auth.EncryptPassword(dataStr);
+
+                content = Encoding.UTF8.GetBytes(encoded);
             }
             else
             {
