@@ -202,7 +202,7 @@ namespace BGEditor
                     continue;
                 foreach (var note in notesByBeat[i])
                 {
-                    if (displayNotes.ContainsKey(note.note))
+                    if (displayNotes.ContainsKey(note.note) || note.note.group != Editor.currentTimingGroup)
                         continue;
                     displayNotes.Add(note.note, note);
                     if (!note.gameObject.activeSelf)
