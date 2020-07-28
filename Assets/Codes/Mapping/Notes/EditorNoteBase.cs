@@ -154,14 +154,15 @@ namespace BGEditor
         #endregion
 
         #region View
+        protected static bool IsOutOfBound(EditorNoteBase note)
+        {
+            int bar = note.note.beat[0];
+            return bar < Grid.StartBar || bar > Grid.EndBar;
+        }
+
         protected virtual bool IsOutOfBound()
         {
-            var pos = transform.localPosition;
-            if (pos.y < 0)
-                return true;
-            if (pos.y > maxHeight)
-                return true;
-            return false;
+            return IsOutOfBound(this);
         }
 
         public virtual void Refresh()

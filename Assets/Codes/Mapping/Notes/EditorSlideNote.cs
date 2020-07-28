@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 namespace BGEditor
 {
@@ -39,14 +40,11 @@ namespace BGEditor
 
         protected override bool IsOutOfBound()
         {
-            var pos = transform.localPosition;
-            if (pos.y > maxHeight)
-                return true;
-            if (pos.y >= 0)
+            if (prev != null && !IsOutOfBound(prev))
                 return false;
-            if (next == null)
-                return true;
-            return next.transform.localPosition.y < 0;
+            if (next != null && !IsOutOfBound(next))
+                return false;
+            return IsOutOfBound(this);
         }
 
         public override void Init(V2.Note note)
@@ -133,10 +131,8 @@ namespace BGEditor
             bool active = isActive;
             var color = GetColor(isSelected, active);
             base.Refresh(active, color);
-            if (IsOutOfBound())
-            {
+            if (!gameObject.activeSelf)
                 return;
-            }
             switch (note.type)
             {
                 case NoteType.Single:

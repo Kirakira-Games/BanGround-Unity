@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System;
 using UnityEngine.Rendering.UI;
 using System.Linq;
+using XLua;
 
 namespace BGEditor
 {
     public class EditNoteController : CoreMonoBehaviour
     {
         private Dictionary<V2.Note, EditorNoteBase> displayNotes = new Dictionary<V2.Note, EditorNoteBase>();
+        private Dictionary<int, HashSet<EditorNoteBase>> notesByBeat = new Dictionary<int, HashSet<EditorNoteBase>>();
+        private List<EditorNoteBase> updateList = new List<EditorNoteBase>();
         public HashSet<EditorNoteBase> selectedNotes { get; private set; } = new HashSet<EditorNoteBase>();
         public IDPool slideIdPool { get; private set; } = new IDPool();
 
@@ -68,7 +71,12 @@ namespace BGEditor
             {
                 throw new NotImplementedException($"NoteType {Enum.GetName(typeof(NoteType), note.type)} is unsupported.");
             }
+            // Add notes to dict
             displayNotes.Add(note, notebase);
+            if (!notesByBeat.ContainsKey(note.beat[0]))
+                notesByBeat.Add(note.beat[0], new HashSet<EditorNoteBase> { notebase });
+            else
+                notesByBeat[note.beat[0]].Add(notebase);
             notebase.Init(note);
             notebase.Refresh();
         }
@@ -77,9 +85,11 @@ namespace BGEditor
         {
             if (note.type == NoteType.BPM)
                 return;
-            Debug.Assert(displayNotes.ContainsKey(note));
-            Pool.Destroy(Find(note).gameObject);
+            var notebase = Find(note);
+            Pool.Destroy(notebase.gameObject);
             displayNotes.Remove(note);
+            bool result = notesByBeat[note.beat[0]].Remove(notebase);
+            Debug.Assert(result);
         }
 
         public void ModifyNote(V2.Note note)
@@ -132,9 +142,35 @@ namespace BGEditor
             Debug.Assert(displayNotes.ContainsKey(prev));
             var note = Find(prev) as EditorSlideNote;
             if (next == null)
-                return note.SetNext(null);
+            {
+                var nxt = note.next;
+                if (!note.SetNext(null))
+                    return false;
+                for (int i = prev.beat[0] + 1; i <= nxt.note.beat[0]; i++)
+                {
+                    notesByBeat[i].Remove(note);
+                    notesByBeat[i].Remove(nxt);
+                }
+                return true;
+            }
             else
-                return note.SetNext(Find(next) as EditorSlideNote);
+            {
+                var nxt = Find(next) as EditorSlideNote;
+                if (!note.SetNext(nxt))
+                    return false;
+                for (int i = prev.beat[0] + 1; i <= next.beat[0]; i++)
+                {
+                    if (!notesByBeat.ContainsKey(i))
+                        notesByBeat.Add(i, new HashSet<EditorNoteBase> { note, nxt });
+                    else
+                    {
+                        var tmp = notesByBeat[i];
+                        tmp.Add(note);
+                        tmp.Add(nxt);
+                    }
+                }
+                return true;
+            }
         }
 
         public void Refresh()
@@ -152,6 +188,23 @@ namespace BGEditor
             {
                 note.Value.Refresh();
             }
+            displayNotes.Clear();
+            updateList.Clear();
+            for (int i = Grid.StartBar; i <= Grid.EndBar; i++)
+            {
+                if (!notesByBeat.ContainsKey(i))
+                    continue;
+                foreach (var note in notesByBeat[i])
+                {
+                    if (displayNotes.ContainsKey(note.note))
+                        continue;
+                    displayNotes.Add(note.note, note);
+                    if (!note.gameObject.activeSelf)
+                        updateList.Add(note);
+                }
+            }
+            updateList.ForEach(note => note.UpdatePosition());
+            updateList.ForEach(note => note.Refresh());
         }
 
         public void RemoveAllSelected()
