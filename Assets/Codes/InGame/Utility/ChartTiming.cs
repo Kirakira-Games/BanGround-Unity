@@ -121,15 +121,17 @@ public class ChartTiming
         }
         raw.ForEach(anim => anim.pos.z = anim.pos.z + 1 - totDist);
         //Debug.Log("Tot dist=" + totDist);
-        bool isStart = raw[0].pos.z <= 0 || raw[0].pos.z > Z_MAX;
-        bool reverse = raw[0].pos.z > Z_MAX;
+        bool isStart = raw[0].pos.z <= 0 || raw[0].pos.z >= Z_MAX;
+        if (!isStart)
+            ret.Add(raw[0]);
+        bool reverse = raw[0].pos.z >= Z_MAX;
         for (int i = 0; i < raw.Count - 1; i++)
         {
             var cur = raw[i];
             var nxt = raw[i + 1];
             if (isStart)
             {
-                if (nxt.pos.z <= 0 || nxt.pos.z > Z_MAX)
+                if (reverse ? nxt.pos.z >= Z_MAX : nxt.pos.z <= 0)
                 {
                     continue;
                 }
