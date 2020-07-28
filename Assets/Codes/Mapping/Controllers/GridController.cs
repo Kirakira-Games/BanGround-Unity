@@ -13,6 +13,8 @@ namespace BGEditor
         public float VPadding;
         public float LineBoundingHeight;
         public int BPMFontSize;
+        public int StartBar { get; private set; }
+        public int EndBar { get; private set; }
 
         public GameObject GridParent;
         public TimingPointEdit TimingPointEdit;
@@ -155,9 +157,9 @@ namespace BGEditor
             // Create grid
             float start = Editor.scrollPos - VPadding;
             float end = start + gridHeight;
-            int startBar = Mathf.Max(0, Mathf.FloorToInt(start / Editor.barHeight));
-            int endBar = Mathf.Max(0, Mathf.FloorToInt(end / Editor.barHeight));
-            for (int i = startBar; i <= endBar; i++)
+            StartBar = Mathf.Max(0, Mathf.FloorToInt(start / Editor.barHeight));
+            EndBar = Mathf.Max(0, Mathf.FloorToInt(end / Editor.barHeight));
+            for (int i = StartBar; i <= EndBar; i++)
             {
                 for (int j = 0; j < Editor.gridDivision; j++)
                 {
@@ -197,7 +199,7 @@ namespace BGEditor
             foreach (var bpm in Chart.bpm)
             {
                 float beat = ChartUtility.BeatToFloat(bpm.beat);
-                if (beat < startBar || beat > endBar)
+                if (beat < StartBar || beat > EndBar)
                     continue;
 
                 float y = beat * Editor.barHeight - start;
@@ -209,7 +211,7 @@ namespace BGEditor
             {
                 float beat = ChartUtility.BeatToFloat(point.beat);
                 beat = Mathf.Max(0, beat);
-                if (beat < startBar || beat > endBar)
+                if (beat < StartBar || beat > EndBar)
                     continue;
 
                 float y = beat * Editor.barHeight - start;
