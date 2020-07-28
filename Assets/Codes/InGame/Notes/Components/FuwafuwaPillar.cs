@@ -34,7 +34,7 @@ public class FuwafuwaPillar : MonoBehaviour
         if (pillar.enabled && parent != null)
         {
             var pos = parent.transform.position;
-            float deltaZ = NoteUtility.GetDeltaZFromJudgePlane(pos);
+            float deltaZ = NoteUtility.GetDeltaZFromJudgePlane(pos.y);
             pillar.SetPositions(new Vector3[]
             {
                 parent.transform.position,

@@ -106,7 +106,7 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
             newpos.z = NoteUtility.GetBangPerspective(newpos.z);
         }
         newpos.z = Mathf.LerpUnclamped(NoteUtility.NOTE_START_Z_POS, NoteUtility.NOTE_JUDGE_Z_POS, newpos.z);
-        newpos = NoteUtility.ProjectVectorToParallelPlane(newpos);
+        newpos.z += NoteUtility.GetDeltaZFromJudgePlane(newpos.y);
         transform.position = newpos;
         noteMesh.OnUpdate();
     }
