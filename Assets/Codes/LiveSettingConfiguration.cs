@@ -38,8 +38,18 @@ public static class LiveSetting
     private static int cachedScreenTime = 0;
 
     public static int currentChart = 0;
+    /// <summary>
+    /// 有可能不存在！获取当前谱面难度，使用<see cref="actualDifficulty"/>。
+    /// 例如：当用户从EX难度切换到一个只有NM难度的谱面集，
+    /// currentDifficulty为Expert，而actualDifficulty为Normal。
+    /// </summary>
     public static KVarRef currentDifficulty = new KVarRef("cl_lastdiff");
     private static int cachedActualDifficulty = currentDifficulty;
+    /// <summary>
+    /// 获取当前谱面难度。一定是当前谱面集拥有的难度，但不一定是用户偏好的谱面难度。
+    /// 例如：当用户从EX难度切换到一个只有NM难度的谱面集，
+    /// currentDifficulty为Expert，而actualDifficulty为Normal。
+    /// </summary>
     public static int actualDifficulty
     {
         get
@@ -50,7 +60,7 @@ public static class LiveSetting
         {
             cachedActualDifficulty = value;
         }
-    } // actualDifficulty may differ if a chart set does not have currentDifficulty
+    }
 
     public const int offsetAdjustChart = 99901;
     public static cHeader CurrentHeader
