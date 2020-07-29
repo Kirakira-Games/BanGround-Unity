@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using UniRx.Async;
 using UnityEngine;
 using UnityEngine.UI;
