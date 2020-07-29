@@ -13,6 +13,7 @@ namespace BGEditor
         public Slider AudioProgressSlider;
         public Slider PlaybackRateSlider;
         public Button PlayButton;
+        public Toggle SEToggle;
         public Sprite PlayImg;
         public Sprite PauseImg;
 
@@ -155,7 +156,7 @@ namespace BGEditor
                 }
                 float beat = Timing.TimeToBeat(time);
                 Core.SeekGrid(beat * Editor.barHeight, true);
-                if (!float.IsNaN(lastBeat))
+                if (SEToggle.isOn && !float.IsNaN(lastBeat))
                 {
                     Group.notes.ForEach(note =>
                     {
