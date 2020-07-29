@@ -31,6 +31,8 @@ namespace BGEditor
 
         public void Show(string title, string content)
         {
+            if (gameObject.activeSelf)
+                throw new InvalidOperationException("Message box is already shown!");
             Blocker.gameObject.SetActive(true);
             gameObject.SetActive(true);
             Title.text = title;
