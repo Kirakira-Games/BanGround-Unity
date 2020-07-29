@@ -74,7 +74,7 @@ public class DemoRecorder
         demoFile = new DemoFile
         {
             sid = LiveSetting.CurrentHeader.sid,
-            difficulty = (Difficulty)LiveSetting.currentDifficulty.Get<int>()
+            difficulty = (Difficulty)LiveSetting.actualDifficulty
         };
 
         demoName = $"{chartId}_{diff:g}_{DateTime.Now.ToLongDateString()}_{DateTime.Now.ToLongTimeString()}.kirareplay".Replace(":", "-").Replace("/", "-").Replace("\\", "-");
