@@ -19,20 +19,20 @@ namespace BGEditor
         public EditorSlideNote prev { get; private set; }
         public EditorSlideNote next { get; private set; }
 
-        private void SetBodyMesh(bool active)
+        public void UpdateBodyMesh()
         {
-            if (next == null)
+            if (next == null || !gameObject.activeSelf)
             {
                 bodyImg.enabled = false;
                 bodyImg.polyCollider.enabled = false;
                 return;
             }
-            bodyImg.polyCollider.enabled = active;
+            bodyImg.polyCollider.enabled = isActiveThisFrame;
             bodyImg.enabled = true;
             bodyImg.SetDirection(next.transform.localPosition - transform.localPosition);
             if (isSelected)
                 bodyImg.SetColor(1);
-            else if (!active)
+            else if (!isActiveThisFrame)
                 bodyImg.SetColor(2);
             else
                 bodyImg.SetColor(0);
@@ -42,9 +42,9 @@ namespace BGEditor
         {
             if (!IsOutOfBound(this))
                 return false;
-            if (prev != null && prev.note.beat[0] <= Grid.EndBar)
+            if (prev != null && prev.note.beat[0] <= Grid.EndBar && note.beat[0] >= Grid.StartBar)
                 return false;
-            if (next != null && next.note.beat[0] >= Grid.StartBar)
+            if (next != null && next.note.beat[0] >= Grid.StartBar && note.beat[0] <= Grid.EndBar)
                 return false;
             return true;
         }
@@ -130,9 +130,7 @@ namespace BGEditor
 
         public override void Refresh()
         {
-            bool active = isActive;
-            var color = GetColor(isSelected, active);
-            base.Refresh(active, color);
+            base.Refresh();
             if (!gameObject.activeSelf)
                 return;
             switch (note.type)
@@ -150,7 +148,6 @@ namespace BGEditor
                 default:
                     throw new NotImplementedException("Unsupported slide note type: " + note.type);
             }
-            SetBodyMesh(active);
         }
 
         public override bool Remove()

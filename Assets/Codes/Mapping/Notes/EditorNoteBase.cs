@@ -25,6 +25,8 @@ namespace BGEditor
             }
         }
 
+        public bool isActiveThisFrame;
+
         protected float maxHeight;
         protected bool shouldRefresh;
 
@@ -165,12 +167,6 @@ namespace BGEditor
             return IsOutOfBound(this);
         }
 
-        public virtual void Refresh()
-        {
-            bool active = isActive;
-            Refresh(active, GetColor(isSelected, active));
-        }
-
         protected Color GetColor(bool selected, bool active)
         {
             Color c = selected ? new Color(0.5f, 1f, 1f) : Color.white;
@@ -178,15 +174,16 @@ namespace BGEditor
             return c;
         }
 
-        public void UpdatePosition()
+        private void UpdatePosition()
         {
             transform.localPosition = Grid.GetLocalPosition(note.lane == -1 ? note.x : note.lane, note.beat);
         }
 
-        public virtual void Refresh(bool active, Color color)
+        public virtual void Refresh()
         {
-            image.raycastTarget = active;
-            image.color = color;
+            isActiveThisFrame = isActive;
+            image.raycastTarget = isActiveThisFrame;
+            image.color = GetColor(isSelected, isActiveThisFrame);
             // Update whether display
             if (IsOutOfBound() || Editor.currentTimingGroup != note.group)
             {
@@ -197,6 +194,7 @@ namespace BGEditor
             {
                 if (!gameObject.activeSelf)
                     gameObject.SetActive(true);
+                UpdatePosition();
             }
         }
         #endregion

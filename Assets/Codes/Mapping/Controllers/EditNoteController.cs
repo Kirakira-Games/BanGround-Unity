@@ -87,6 +87,7 @@ namespace BGEditor
                 notesByBeat[note.beat[0]].Add(notebase);
             notebase.Init(note);
             notebase.Refresh();
+            (notebase as EditorSlideNote)?.UpdateBodyMesh();
         }
 
         public void RemoveNote(V2.Note note)
@@ -106,8 +107,8 @@ namespace BGEditor
                 return;
             var notebase = Find(note);
             Debug.Assert(notebase != null);
-            notebase.UpdatePosition();
             notebase.Refresh();
+            (notebase as EditorSlideNote)?.UpdateBodyMesh();
         }
 
         public void SelectNote(V2.Note note)
@@ -186,14 +187,16 @@ namespace BGEditor
                 // Have not initialized
                 return;
             }
-            foreach (var note in displayNotes)
+            var notes = displayNotes.Values.ToArray();
+            foreach (var note in notes)
             {
-                note.Value.UpdatePosition();
+                note.Refresh();
             }
-            foreach (var note in displayNotes)
+            foreach (var note in notes)
             {
-                note.Value.Refresh();
+                (note as EditorSlideNote)?.UpdateBodyMesh();
             }
+
             displayNotes.Clear();
             updateList.Clear();
             for (int i = Grid.StartBar; i <= Grid.EndBar; i++)
@@ -206,11 +209,13 @@ namespace BGEditor
                         continue;
                     displayNotes.Add(note.note, note);
                     if (!note.gameObject.activeSelf)
+                    {
                         updateList.Add(note);
+                    }
                 }
             }
-            updateList.ForEach(note => note.UpdatePosition());
             updateList.ForEach(note => note.Refresh());
+            updateList.ForEach(note => (note as EditorSlideNote)?.UpdateBodyMesh());
         }
 
         public void RemoveAllSelected()
