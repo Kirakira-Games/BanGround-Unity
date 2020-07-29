@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UniRx.Async;
 using UnityEngine;
 using UnityEngine.Events;
@@ -27,8 +25,8 @@ public class SceneLoader : MonoBehaviour
 
     void Start()
     {
-        onTaskFinish.RemoveAllListeners();
 
+        onTaskFinish.RemoveAllListeners();
         if (nextSceneName == "InGame")
         {
             songInfo.SetActive(true);
@@ -48,6 +46,8 @@ public class SceneLoader : MonoBehaviour
     public static void LoadScene(string currentSceneName, string nextSceneName, Func<UniTask<bool>> task = null)
     {
         if (Loading) return;
+        // Blocks clicks
+        MainBlocker.Instance.SetBlock(true);
         Loading = true;
 
         TaskVoid = task;
@@ -85,7 +85,6 @@ public class SceneLoader : MonoBehaviour
         }
         catch (System.Exception)
         {
-            MainBlocker.Instance.SetBlock(false);
             _ = SceneManager.UnloadSceneAsync("Loader");
             Loading = false;
             onTaskFinish.Invoke(false);
@@ -105,8 +104,12 @@ public class SceneLoader : MonoBehaviour
         animator.SetTrigger("Open");
         //open gate need 1f
         await UniTask.Delay((int)(seconds * 1000));
-        MainBlocker.Instance.SetBlock(false);
         _ = SceneManager.UnloadSceneAsync("Loader");
         Loading = false;
+    }
+
+    private void OnDestroy()
+    {
+        MainBlocker.Instance.SetBlock(false);
     }
 }
