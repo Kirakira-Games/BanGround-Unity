@@ -91,7 +91,7 @@ public class AudioManager : MonoBehaviour
     private void Update()
     {
         Provider.Update();
-
+/*
 #if !UNITY_EDITOR && (UNITY_ANDROID || UNITY_STANDALONE)
         if (Input.GetKeyUp(KeyCode.Escape) && !exiting)
         {
@@ -110,7 +110,7 @@ public class AudioManager : MonoBehaviour
 
         waiting -= Time.deltaTime;
         if (waiting < 0) waiting = 0;
-#endif
+#endif*/
 
     }
 

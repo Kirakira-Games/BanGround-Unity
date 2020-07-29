@@ -25,7 +25,6 @@ public class TitleLoader : MonoBehaviour
     public InputField passwordField;
 
     public GameObject loginPanel;
-    public GameObject loginPanelBlocker;
 
     public static TitleLoader instance;
 
@@ -98,11 +97,7 @@ public class TitleLoader : MonoBehaviour
         if (Authenticate.isAuthing)
             return;
 
-        loginPanelBlocker.SetActive(true);
-
         var good = await auth.TryAuthenticate(usernameField.text, passwordField.text, false);
-
-        loginPanelBlocker.SetActive(false);
 
         if (good)
         {

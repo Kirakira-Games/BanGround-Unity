@@ -120,9 +120,9 @@ public class KVar : KonCommandBase
             return (T)(object)m_stringValue;
         else if (type == intType)
             return (T)(object)m_intValue;
-        else if (type == boolType)
-            return (T)(object)m_floatValue;
         else if (type == floatType)
+            return (T)(object)m_floatValue;
+        else if (type == boolType)
             return (T)(object)m_boolValue;
         else
             throw new ArgumentOutOfRangeException("Type not supported");
