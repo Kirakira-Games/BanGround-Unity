@@ -22,8 +22,8 @@ public class ChartDifSort : IComparer<cHeader>
 {
     public int Compare(cHeader x, cHeader y)
     {
-        int difX = x.difficultyLevel[LiveSetting.actualDifficulty];
-        int difY = y.difficultyLevel[LiveSetting.actualDifficulty];
+        int difX = x.difficultyLevel[LiveSetting.currentDifficulty];
+        int difY = y.difficultyLevel[LiveSetting.currentDifficulty];
         int dif = difX - difY;
         return dif == 0 ? x.mid - y.mid : dif;
     }
