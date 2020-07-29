@@ -26,7 +26,7 @@ namespace BanGround.API
             { (typeof(string), typeof(SendVerificationEmailArgs)), "/api/auth/send-verification-email"},
         };
 
-        public Func<T1, Result<T2>> S<T1,T2>()
+        public Func<T1, (Result<T2>, long)> S<T1,T2>()
         {
             var link = APIList[(typeof(T1), typeof(T2))];
 
@@ -36,7 +36,7 @@ namespace BanGround.API
             };
         }
 
-        public Func<T1, UniTask<Result<T2>>> A<T1, T2>()
+        public Func<T1, UniTask<(Result<T2>, long)>> A<T1, T2>()
         {
             var link = APIList[(typeof(T1), typeof(T2))];
 
@@ -71,7 +71,7 @@ namespace BanGround.API
 
         public string AccessToken = "";
 
-        public Result<T> DoRequest<T>(string url, HttpRequestMethod method = HttpRequestMethod.Get, string postJson = null)
+        public (Result<T>, long) DoRequest<T>(string url, HttpRequestMethod method = HttpRequestMethod.Get, string postJson = null)
         {
             var asyncTask = DoRequestAsync<T>(url, method, postJson);
 
@@ -80,7 +80,7 @@ namespace BanGround.API
             return asyncTask.Result;
         }
 
-        public async Task<Result<T>> DoRequestAsync<T>(string url, HttpRequestMethod method = HttpRequestMethod.Get, string postJson = "{}")
+        public async Task<(Result<T>, long)> DoRequestAsync<T>(string url, HttpRequestMethod method = HttpRequestMethod.Get, string postJson = "{}")
         {
             var uri = new Uri(Root + url);
 
@@ -108,7 +108,7 @@ namespace BanGround.API
                     throw new WebException("Network error!");
                 }
 
-                return JsonConvert.DeserializeObject<Result<T>>(webRequest.downloadHandler.text);
+                return (JsonConvert.DeserializeObject<Result<T>>(webRequest.downloadHandler.text), webRequest.responseCode);
             }
         }
     }
