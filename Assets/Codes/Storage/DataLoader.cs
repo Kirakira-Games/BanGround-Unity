@@ -30,8 +30,8 @@ public static class DataLoader
     private const int InitialChartVersion = 6;
     private const int GameVersion = 4;
 
-    private static Dictionary<int, cHeader> chartDic;
-    private static Dictionary<int, mHeader> musicDic;
+    private static Dictionary<int, cHeader> chartDic = new Dictionary<int, cHeader>();
+    private static Dictionary<int, mHeader> musicDic = new Dictionary<int, mHeader>();
 
     public static IEnumerator Init()
     {
@@ -235,49 +235,39 @@ public static class DataLoader
         dir.Delete(true);
     }
 
-    public static void ReloadSongList()
-    {
-        songList = ProtobufHelper.Load<SongList>(SongListPath);
-
-        foreach (var music in songList.mHeaders)
-            musicDic[music.mid] = music;
-        
-        foreach (var chart in songList.cHeaders)
-            chartDic[chart.sid] = chart;
-        
-        if (LiveSetting.currentChart >= songList.cHeaders.Count)
-        {
-            LiveSetting.currentChart = Mathf.Max(0, songList.cHeaders.Count - 1);
-        }
-    }
-
     public static int GetChartLevel(string path)
     {
         try
         {
-            var V2chart = ProtobufHelper.LoadFromKiraFs<V2.Chart>(path);
-            if (ChartVersion.CanRead(V2chart.version))
+            try
             {
-                return V2chart.level;
+                var V2chart = ProtobufHelper.LoadFromKiraFs<V2.Chart>(path);
+                if (ChartVersion.CanRead(V2chart.version))
+                {
+                    return V2chart.level;
+                }
+                throw new InvalidDataException("Failed to read with V2 format, fallback to old chart.");
             }
-            throw new InvalidDataException("Failed to read with V2 format, fallback to old chart.");
+            catch
+            {
+                return ProtobufHelper.LoadFromKiraFs<Chart>(path).level;
+            }
         }
         catch
         {
-            return ProtobufHelper.LoadFromKiraFs<Chart>(path).level;
+            return -1;
         }
     }
 
     /// <summary>
-    /// Update songlist.bin. This will NOT update song list in game!
-    /// You probably want to call ReloadSongList afterwards.
+    /// Update the song list by iterating over all header files.
     /// </summary>
     public static void RefreshSongList()
     {
-        chartDic = new Dictionary<int, cHeader>();
-        musicDic = new Dictionary<int, mHeader>();
+        chartDic.Clear();
+        musicDic.Clear();
+        songList = new SongList();
 
-        var newSongList = new SongList();
         var referencedSongs = new Dictionary<mHeader, int>();
         var loadedIds = new HashSet<int>();
 
@@ -290,6 +280,8 @@ public static class DataLoader
         foreach (var music in musics)
         {
             mHeader musicHeader = ProtobufHelper.LoadFromKiraFs<mHeader>(music);
+            if (musicHeader.BPM == null || musicHeader.BPM.Length == 0)
+                musicHeader.BPM = new float[] { 120, 120 };
             if (!loadedIds.Contains(musicHeader.mid))
             {
                 referencedSongs.Add(musicHeader, 0);
@@ -322,25 +314,8 @@ public static class DataLoader
                 continue;
             }
 
-            chartHeader.difficultyLevel = new List<int>();
-
-            for (var diff = Difficulty.Easy; diff <= Difficulty.Special; diff++)
-            {
-                var path = chart.Replace("cheader.bin", $"{diff.ToString().ToLower()}.bin");
-                if (files.Contains(path))
-                {
-                    chartHeader.difficultyLevel.Add(GetChartLevel(path));
-                }
-                else
-                {
-                    chartHeader.difficultyLevel.Add(-1);
-                }
-            }
-
-            newSongList.cHeaders.Add(chartHeader);
+            songList.cHeaders.Add(chartHeader);
         }
-
-        
 
         foreach (var (song, refcount) in referencedSongs)
         {
@@ -361,12 +336,24 @@ public static class DataLoader
             }
             else
             {
-                newSongList.mHeaders.Add(song);
+                songList.mHeaders.Add(song);
             }
         }
+        
+        Debug.Log(JsonConvert.SerializeObject(songList, Formatting.Indented));
+        // ProtobufHelper.Save(songList, SongListPath);
 
-        Debug.Log(JsonConvert.SerializeObject(newSongList, Formatting.Indented));
-        ProtobufHelper.Save(newSongList, SongListPath);
+        // Populate dic data
+        foreach (var music in songList.mHeaders)
+            musicDic[music.mid] = music;
+
+        foreach (var chart in songList.cHeaders)
+            chartDic[chart.sid] = chart;
+
+        if (LiveSetting.currentChart >= songList.cHeaders.Count)
+        {
+            LiveSetting.currentChart = Mathf.Max(0, songList.cHeaders.Count - 1);
+        }
     }
 
     public static void ConvertJsonToBin(DirectoryInfo dir)

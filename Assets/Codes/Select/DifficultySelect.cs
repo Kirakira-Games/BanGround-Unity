@@ -127,9 +127,10 @@ public class DifficultySelect : MonoBehaviour
     }
     IEnumerator SwipeOutAnimation()
     {
+        /*
         int last = enabledCards.Count - 1;
         int no = enabledCards[last];
-        /* while (cardImg[no].color.a > 0)
+        while (cardImg[no].color.a > 0)
          {
              cardImg[no].color -= new Color(0, 0, 0, 0.1f);
              yield return new WaitForEndOfFrame();

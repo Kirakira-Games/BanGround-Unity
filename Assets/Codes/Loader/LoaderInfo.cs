@@ -39,9 +39,7 @@ public class LoaderInfo : MonoBehaviour
     private void AppendChartInfo(bool success)
     {
         if (!success) return;
-        Difficulty difficulty = (Difficulty)LiveSetting.actualDifficulty;
         songBPM.text = GetBPM() + " NOTE " + LiveSetting.gameChart.numNotes;
-        songLevelAndCharter.text = string.Format(LevelAndCharterFormat, difficulty.ToString().ToUpper(), LiveSetting.chart.level, chartHeader.authorNick);
     }
 
     private void ShowInfo()
@@ -62,7 +60,8 @@ public class LoaderInfo : MonoBehaviour
         
         // Difficulty and charter
         Difficulty difficulty = (Difficulty)LiveSetting.actualDifficulty;
-        songLevelAndCharter.text = string.Format(LevelAndCharterFormat, difficulty.ToString().ToUpper(), "--", chartHeader.authorNick);
+        int level = chartHeader.difficultyLevel[(int)difficulty];
+        songLevelAndCharter.text = string.Format(LevelAndCharterFormat, difficulty.ToString().ToUpper(), level, chartHeader.authorNick);
         
         // Artist
         songArtist.text = string.Format(ArtistFormat, musicHeader.artist);
