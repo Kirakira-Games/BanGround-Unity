@@ -228,8 +228,24 @@ public partial class cHeader : IExtensible
     [ProtoMember(8)]
     public List<string> tag { get; set; } = new List<string>();
 
-    [ProtoMember(9)]
-    public List<int> difficultyLevel { get; set; } = new List<int>();
+    private List<int> cachedDifficultyLevel;
+    public List<int> difficultyLevel
+    {
+        get
+        {
+            if (cachedDifficultyLevel == null)
+            {
+                cachedDifficultyLevel = new List<int>();
+
+                for (var diff = Difficulty.Easy; diff <= Difficulty.Special; diff++)
+                {
+                    var chart = DataLoader.GetChartPath(sid, diff);
+                    cachedDifficultyLevel.Add(DataLoader.GetChartLevel(chart));
+                }
+            }
+            return cachedDifficultyLevel;
+        }
+    }
 
 }
 
@@ -316,7 +332,7 @@ public partial class PlayRecords : IExtensible
         => Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
     [ProtoMember(1)]
-    public System.Collections.Generic.List<PlayResult> resultsList { get; set; } = new System.Collections.Generic.List<PlayResult>();
+    public List<PlayResult> resultsList { get; set; } = new System.Collections.Generic.List<PlayResult>();
 
     public PlayRecords()
     {

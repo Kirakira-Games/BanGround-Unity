@@ -133,7 +133,6 @@ public class SelectManager_old : MonoBehaviour
 
         DataLoader.LoadAllKiraPackFromInbox();
         DataLoader.RefreshSongList();
-        DataLoader.ReloadSongList();
 
         InitComponent();
         InitSort();
