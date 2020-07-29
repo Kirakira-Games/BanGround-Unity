@@ -6,6 +6,7 @@ using System.Text;
 using UniRx.Async;
 using BanGround.API;
 using System;
+using System.Net;
 
 public class Authenticate
 {
@@ -32,12 +33,12 @@ public class Authenticate
 
             api.AccessToken = cl_accessToken;
 
-            var result = await api.A<RefreshAccessTokenArgs, UserAuth>()(new RefreshAccessTokenArgs
+            var (result, code) = await api.A<RefreshAccessTokenArgs, UserAuth>()(new RefreshAccessTokenArgs
             {
                 RefreshToken = cl_refreshToken,
             });
 
-            if (result.Status)
+            if(code >= 200 && code < 300)
             {
                 user = result.Data.User;
 
@@ -46,10 +47,14 @@ public class Authenticate
 
                 api.AccessToken = result.Data.AccessToken;
             }
-            else
+            else if(code >= 400 && code < 500)
             {
                 cl_accessToken.Set("");
                 cl_refreshToken.Set("");
+            }
+            else if(code >= 500)
+            {
+                throw new WebException("server says i exploded.");
             }
 
             isAuthing = false;
@@ -88,7 +93,7 @@ public class Authenticate
         {
             isAuthing = true;
 
-            var result = await api.A<LoginArgs, UserAuth>()(new LoginArgs
+            var (result, code) = await api.A<LoginArgs, UserAuth>()(new LoginArgs
             {
                 Account = username,
                 Password = password
