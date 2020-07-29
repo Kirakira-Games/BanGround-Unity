@@ -24,6 +24,8 @@ public class Authenticate
         if (string.IsNullOrEmpty(cl_accessToken) || string.IsNullOrEmpty(cl_refreshToken))
             throw new InvalidOperationException("You can not use this while tokens are empty!");
 
+        LoadingBlocker.instance.Show("Loging in...");
+
         try
         {
             isAuthing = true;
@@ -52,10 +54,14 @@ public class Authenticate
 
             isAuthing = false;
 
+            LoadingBlocker.instance.Close();
+
             return result.Status;
         }
         catch (Exception ex)
         {
+            LoadingBlocker.instance.Close();
+
             isAuthing = false;
             isNetworkError = true;
             Debug.LogError(ex.Message);
@@ -73,7 +79,9 @@ public class Authenticate
 
     public async UniTask<bool> TryAuthenticate(string username, string password, bool encryped = true)
     {
-        if(!encryped)
+        LoadingBlocker.instance.Show("Loging in...");
+
+        if (!encryped)
             password = Auth.EncryptPassword(password);
 
         try
@@ -98,10 +106,14 @@ public class Authenticate
 
             isAuthing = false;
 
+            LoadingBlocker.instance.Close();
+
             return result.Status;
         }
         catch(Exception ex)
         {
+            LoadingBlocker.instance.Close();
+
             Debug.LogError(ex.Message);
 
             isNetworkError = true;

@@ -393,17 +393,14 @@ public static class DataLoader
                 else
                 {
                     string des = file.FullName.Substring(0, file.FullName.Length - 5);
-                    try
+
+                    // v2!
+                    if (json.Contains("\"version\""))
                     {
                         var chart = JsonConvert.DeserializeObject<V2.Chart>(json);
-                        if (ChartVersion.CanRead(chart.version))
-                        {
-                            ProtobufHelper.Save(chart, des + ".bin");
-                            return;
-                        }
-                        throw new InvalidDataException("Failed to read with V2 format, fallback to old chart.");
+                        ProtobufHelper.Save(chart, des + ".bin");
                     }
-                    catch
+                    else
                     {
                         var chart = JsonConvert.DeserializeObject<Chart>(json);
                         ProtobufHelper.Save(chart, des + ".bin");
@@ -445,16 +442,12 @@ public static class DataLoader
                     object obj;
                     if (type == null)
                     {
-                        try
+                        // v2!
+                        if(json.Contains("\"version\""))
                         {
-                            var chart = JsonConvert.DeserializeObject<V2.Chart>(json);
-                            if (!ChartVersion.CanRead(chart.version))
-                            {
-                                throw new InvalidDataException("Failed to read with V2 format, fallback to old chart.");
-                            }
-                            obj = chart;
+                            obj = JsonConvert.DeserializeObject<V2.Chart>(json);
                         }
-                        catch
+                        else
                         {
                             obj = JsonConvert.DeserializeObject<Chart>(json);
                         }
