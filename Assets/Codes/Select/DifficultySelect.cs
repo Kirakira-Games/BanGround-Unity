@@ -77,7 +77,7 @@ public class DifficultySelect : MonoBehaviour
 
     int lastDifficulty;
     //This Called both change button clicked and song changed
-    public void UpdateView()
+    public void UpdateView(bool overrideCurrentDifficulty = false)
     {
         if(enabledCards.Count == 0)
             return;
@@ -94,7 +94,8 @@ public class DifficultySelect : MonoBehaviour
         levelText.text = levels[selected].ToString();
 
         LiveSetting.actualDifficulty = selected;
-        LiveSetting.currentDifficulty.Set(selected);
+        if (overrideCurrentDifficulty)
+            LiveSetting.currentDifficulty.Set(selected);
         if ((Sorter)cl_cursorter == Sorter.ChartDifficulty && lastDifficulty != LiveSetting.actualDifficulty)
         {
             cl_lastsid.Set(LiveSetting.CurrentHeader.sid);
@@ -139,7 +140,7 @@ public class DifficultySelect : MonoBehaviour
          */
         //cardImg[no].color = Color.clear;
 
-        UpdateView();
+        UpdateView(true);
         yield return new WaitForEndOfFrame();
         /*cardImg[selected].color = new Color(1, 1, 1, 0);
         while (cardImg[selected].color.a < 1)
