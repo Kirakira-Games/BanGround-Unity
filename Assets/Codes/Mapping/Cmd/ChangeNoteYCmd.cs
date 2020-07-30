@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using UnityEngine;
 
 namespace BGEditor
 {
@@ -20,15 +16,15 @@ namespace BGEditor
 
         public bool Commit(ChartCore core)
         {
-            before = note.y;
-            note.y = after;
+            before = note.lane >= 0 ? float.NaN : note.y;
+            core.notes.MoveY(note, after);
             core.onNoteModified.Invoke(note);
             return true;
         }
 
         public bool Rollback(ChartCore core)
         {
-            note.y = before;
+            core.notes.MoveY(note, before);
             core.onNoteModified.Invoke(note);
             return true;
         }

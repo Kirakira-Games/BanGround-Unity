@@ -268,31 +268,33 @@ namespace BGEditor
             }
         }
 
-        public void MoveY(IEnumerable<V2.Note> notes, float target)
+        public void MoveY(V2.Note note, float target)
         {
             if (float.IsNaN(target))
             {
-                foreach (var note in notes)
+                note.y = 0;
+                if (note.lane == -1)
                 {
-                    note.y = 0;
-                    if (note.lane == -1)
-                    {
-                        note.lane = Mathf.Clamp(Mathf.RoundToInt(note.x), 0, NoteUtility.LANE_COUNT - 1);
-                        note.x = 0;
-                    }
+                    note.lane = Mathf.Clamp(Mathf.RoundToInt(note.x), 0, NoteUtility.LANE_COUNT - 1);
+                    note.x = 0;
                 }
             }
             else
             {
-                foreach (var note in notes)
+                note.y = target;
+                if (note.lane != -1)
                 {
-                    note.y = target;
-                    if (note.lane != -1)
-                    {
-                        note.x = note.lane;
-                        note.lane = -1;
-                    }
+                    note.x = note.lane;
+                    note.lane = -1;
                 }
+            }
+        }
+
+        public void MoveY(IEnumerable<V2.Note> notes, float target)
+        {
+            foreach (var note in notes)
+            {
+                MoveY(note, target);
             }
             Refresh();
         }
