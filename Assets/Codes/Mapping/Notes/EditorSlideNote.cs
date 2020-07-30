@@ -21,7 +21,7 @@ namespace BGEditor
 
         public void UpdateBodyMesh()
         {
-            if (next == null || !gameObject.activeSelf)
+            if (next == null || !gameObject.activeSelf || !next.gameObject.activeSelf)
             {
                 bodyImg.enabled = false;
                 bodyImg.polyCollider.enabled = false;
