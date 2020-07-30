@@ -164,10 +164,7 @@ public class ChartCreator : MonoBehaviour
 
         var task = WaitForAirdrop(tokenSource.Token);
 
-        LoadingBlocker.instance.Show("Waiting for airdrop (You must drop a ogg music!!!)...", () =>
-        {
-            tokenSource.Cancel();
-        });
+        LoadingBlocker.instance.Show("Waiting for airdrop (You must drop a ogg music!!!)...", tokenSource.Cancel);
 
         await task;
 
