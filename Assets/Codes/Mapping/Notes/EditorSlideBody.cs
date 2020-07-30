@@ -39,7 +39,7 @@ namespace BGEditor
                     new Material(Resources.Load<Material>("InGame/Materials/note_body"))
                 };
                 materials[0].SetColor("_BaseColor", new Color(0.5843137f, 0.9019607f, 0.3019607f, 0.8f));
-                materials[1].SetColor("_BaseColor", new Color(0.29f, 0.9019607f, 0.3019607f, 0.8f));
+                materials[1].SetColor("_BaseColor", new Color(0f, 0.9019607f, 0.3019607f, 0.8f));
                 materials[2].SetColor("_BaseColor", new Color(0.5843137f, 0.9019607f, 0.3019607f, 0.3f));
             }
             material = materials[0];
