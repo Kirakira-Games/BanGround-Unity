@@ -34,6 +34,7 @@ public class SelectManager_old : MonoBehaviour
 
     public List<cHeader> chartList => DataLoader.chartList;
     List<GameObject> SelectButtons = new List<GameObject>();
+    RectTransform[] rts;
     List<RectControl> rcs = new List<RectControl>();
 
     DifficultySelect difficultySelect;
@@ -239,6 +240,12 @@ public class SelectManager_old : MonoBehaviour
             SelectButtons.Add(go);
         }
 
+        rts = new RectTransform[SelectButtons.Count];
+        for (int i = 0; i < SelectButtons.Count; i++)
+        {
+            rts[i] = SelectButtons[i].GetComponent<RectTransform>();
+        }
+
         //lg.padding = new RectOffset(0, 0, (int)((rt_v.sizeDelta.y / 2) - 100), 0);
 
         rt.sizeDelta = new Vector2(rt.sizeDelta.x, lg.padding.top * 2 + chartList.Count * (116) + (chartList.Count - 1) * lg.spacing + (800));
@@ -281,11 +288,6 @@ public class SelectManager_old : MonoBehaviour
     IEnumerator SelectNear()
     {
         //yield return new WaitForSeconds(1);
-        RectTransform[] rts = new RectTransform[SelectButtons.Count];
-        for (int i = 0; i < SelectButtons.Count; i++)
-        {
-            rts[i] = SelectButtons[i].GetComponent<RectTransform>();
-        }
 
         yield return 0;
         while (Mathf.Abs(rt_s.velocity.y) > scroll_Min_Speed || dh.isDragging)
