@@ -116,10 +116,17 @@ namespace BGEditor
             holdStart = Vector2.zero;
             if (YSlider.gameObject.activeSelf)
             {
-                float val = YSlider.value / YSlider.maxValue;
-                if (!Mathf.Approximately(note.y, val))
+                if (Editor.yDivision == 0 && note.lane < 0)
                 {
-                    Core.Commit(new ChangeNoteYCmd(note, val));
+                    Core.Commit(new ChangeNoteYCmd(note, float.NaN));
+                }
+                else
+                {
+                    float val = YSlider.value / YSlider.maxValue;
+                    if (note.lane >= 0 || !Mathf.Approximately(note.y, val))
+                    {
+                        Core.Commit(new ChangeNoteYCmd(note, val));
+                    }
                 }
                 YSlider.gameObject.SetActive(false);
             }
