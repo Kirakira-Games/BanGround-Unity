@@ -8,7 +8,7 @@ using System.IO;
 using NVorbis;
 using System.Text;
 using System.Collections.Generic;
-
+using System.Threading;
 public class ChartCreator : MonoBehaviour
 {
     public const int ChartVersion = 1;
@@ -150,7 +150,8 @@ public class ChartCreator : MonoBehaviour
 
     public static bool RequestAirdrop = false;
     public static byte[] AirdroppedFile = null;
-    public async void WaitForAirdrop()
+
+    public async void ImportMusic()
     {
         int difficulty = SelectedDifficulty();
         if (difficulty == -1)
@@ -159,66 +160,97 @@ public class ChartCreator : MonoBehaviour
             return;
         }
 
-        RequestAirdrop = true;
-        
-        LoadingBlocker.instance.Show("Waiting for airdrop (You must drop a ogg music!!!)...");
+        CancellationTokenSource tokenSource = new CancellationTokenSource();
 
-        await UniTask.Delay(1500);
+        var task = WaitForAirdrop(tokenSource.Token);
 
-        Application.OpenURL("http://127.0.0.1:8088/");
+        LoadingBlocker.instance.Show("Waiting for airdrop (You must drop a ogg music!!!)...", () =>
+        {
+            tokenSource.Cancel();
+        });
 
-        await UniTask.WaitUntil(() => AirdroppedFile != null);
+        await task;
 
         LoadingBlocker.instance.Close();
-        RequestAirdrop = false;
-
-        var title = "New Song";
-        var artist = "Unknown Artist";
-        var len = -1.0f;
-
-        using (var stream = new MemoryStream(AirdroppedFile))
+    }
+    public async UniTask WaitForAirdrop(CancellationToken token = default)
+    {
+        try
         {
-            // check airdropped file
-            using (var br = new BinaryReader(stream, Encoding.UTF8, true))
-            {
-                if (new string(br.ReadChars(4)) != "OggS")
-                {
-                    MessageBannerController.ShowMsg(LogLevel.ERROR, "YOU MUST DROP A PROPPER OGG FILE TO CONTINUE!!!");
+            int difficulty = SelectedDifficulty();
 
-                    return;
+            RequestAirdrop = true;
+
+            await UniTask.Delay(1500, default, default, token);
+
+            Application.OpenURL("http://127.0.0.1:8088/");
+
+            await UniTask.WaitUntil(() => AirdroppedFile != null, default, token);
+
+            RequestAirdrop = false;
+
+            var title = "New Song";
+            var artist = "Unknown Artist";
+            var len = -1.0f;
+
+            using (var stream = new MemoryStream(AirdroppedFile))
+            {
+                // check airdropped file
+                using (var br = new BinaryReader(stream, Encoding.UTF8, true))
+                {
+                    if (new string(br.ReadChars(4)) != "OggS")
+                    {
+                        MessageBannerController.ShowMsg(LogLevel.ERROR, "YOU MUST DROP A PROPPER OGG FILE TO CONTINUE!!!");
+
+                        return;
+                    }
+                }
+
+                // get infomation from file
+                using (var reader = new VorbisReader(stream))
+                {
+                    title = reader.Tags.Title == string.Empty ? "New Song" : reader.Tags.Title;
+                    artist = reader.Tags.Artist == string.Empty ? "Unknown Artist" : reader.Tags.Artist;
+                    len = (float)reader.TotalTime.TotalSeconds;
                 }
             }
 
-            // get infomation from file
-            using (var reader = new VorbisReader(stream))
-            {
-                title = reader.Tags.Title == string.Empty ? "New Song" : reader.Tags.Title;
-                artist = reader.Tags.Artist == string.Empty ? "Unknown Artist" : reader.Tags.Artist;
-                len = (float)reader.TotalTime.TotalSeconds;
-            }
+            // Create mheader
+            var mheader = CreateMHeader(title, artist, len);
+            DataLoader.SaveHeader(mheader, AirdroppedFile);
+
+            // Create header
+            var header = CreateHeader(mheader.mid);
+            DataLoader.SaveHeader(header);
+
+            // Create chart
+            int clamped = Mathf.Clamp(difficulty, 0, 3);
+            int level = Random.Range(clamped * 5 + 5, clamped * 8 + 6);
+            var chart = CreateChart((Difficulty)difficulty, level);
+            DataLoader.SaveChart(chart, header.sid, (Difficulty)difficulty);
+
+            // Reload scene
+            LiveSetting.currentDifficulty.Set(difficulty);
+            LiveSetting.actualDifficulty = difficulty;
+            cl_lastsid.Set(header.sid);
+            SceneManager.LoadScene("Select");
+
+            AirdroppedFile = null;
         }
+        catch (System.OperationCanceledException)
+        {
+            MessageBannerController.ShowMsg(LogLevel.INFO, "Canceled");
 
-        // Create mheader
-        var mheader = CreateMHeader(title, artist, len);
-        DataLoader.SaveHeader(mheader, AirdroppedFile);
+            RequestAirdrop = false;
+            AirdroppedFile = null;
+        }
+        catch (System.Exception ex)
+        {
+            RequestAirdrop = false;
+            AirdroppedFile = null;
 
-        // Create header
-        var header = CreateHeader(mheader.mid);
-        DataLoader.SaveHeader(header);
-
-        // Create chart
-        int clamped = Mathf.Clamp(difficulty, 0, 3);
-        int level = Random.Range(clamped * 5 + 5, clamped * 8 + 6);
-        var chart = CreateChart((Difficulty)difficulty, level);
-        DataLoader.SaveChart(chart, header.sid, (Difficulty)difficulty);
-
-        // Reload scene
-        LiveSetting.currentDifficulty.Set(difficulty);
-        LiveSetting.actualDifficulty = difficulty;
-        cl_lastsid.Set(header.sid);
-        SceneManager.LoadScene("Select");
-
-        AirdroppedFile = null;
+            throw ex;
+        }
     }
 
     public void 还没做好()
