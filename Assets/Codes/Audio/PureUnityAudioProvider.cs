@@ -27,8 +27,6 @@ namespace AudioProvider
         VorbisReader decoder = null;
         int curStreamPosition = -1;
 
-        int startTime = 0;
-
         public UnityAudioClip(byte[] origData, GameObject obj, PureUnityAudioProvider provider)
         {
             totalClips++;
