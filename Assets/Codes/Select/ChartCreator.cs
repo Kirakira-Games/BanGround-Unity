@@ -3,6 +3,11 @@ using System.Collections;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Linq;
+using UniRx.Async;
+using System.IO;
+using NVorbis;
+using System.Text;
+using System.Collections.Generic;
 
 public class ChartCreator : MonoBehaviour
 {
@@ -30,12 +35,26 @@ public class ChartCreator : MonoBehaviour
         return -1;
     }
 
-    private cHeader CreateHeader()
+    private mHeader CreateMHeader(string title, string artist, float len)
+    {
+        var header = new mHeader
+        {
+            mid = DataLoader.GenerateMid(),
+            title = title,
+            artist = artist,
+            length = len,
+            BPM = new float[] { 0.0f },
+            preview = new float[] { 0.0f, 0.0f }
+        };
+
+        return header;
+    }
+    private cHeader CreateHeader(int mid = -1)
     {
         var header = new cHeader();
         header.version = ChartVersion;
         header.sid = DataLoader.GenerateSid();
-        header.mid = cHeader.mid;
+        header.mid = mid == -1 ? cHeader.mid : mid;
         if (UserInfo.username == null || UserInfo.username.Length == 0)
         {
             header.author = "Guest";
@@ -47,8 +66,8 @@ public class ChartCreator : MonoBehaviour
             header.authorNick = Authenticate.user.Nickname;
         }
         header.backgroundFile = cHeader.backgroundFile;
-        header.preview = cHeader.preview.ToArray();
-        header.tag = cHeader.tag.ToList();
+        header.preview = cHeader.preview == null ? new float[] { 0.0f, 0.0f } : cHeader.preview.ToArray();
+        header.tag = cHeader.tag == null ? new List<string>() : cHeader.tag.ToList();
         return header;
     }
 
@@ -127,6 +146,79 @@ public class ChartCreator : MonoBehaviour
         LiveSetting.currentDifficulty.Set(difficulty);
         LiveSetting.actualDifficulty = difficulty;
         SceneManager.LoadScene("Select");
+    }
+
+    public static bool RequestAirdrop = false;
+    public static byte[] AirdroppedFile = null;
+    public async void WaitForAirdrop()
+    {
+        int difficulty = SelectedDifficulty();
+        if (difficulty == -1)
+        {
+            MessageBannerController.ShowMsg(LogLevel.INFO, "Please select a difficulty.");
+            return;
+        }
+
+        RequestAirdrop = true;
+        
+        LoadingBlocker.instance.Show("Waiting for airdrop (You must drop a ogg music!!!)...");
+
+        await UniTask.Delay(1500);
+
+        Application.OpenURL("http://127.0.0.1:8088/");
+
+        await UniTask.WaitUntil(() => AirdroppedFile != null);
+
+        LoadingBlocker.instance.Close();
+        RequestAirdrop = false;
+
+        var title = "New Song";
+        var artist = "Unknown Artist";
+        var len = -1.0f;
+
+        using (var stream = new MemoryStream(AirdroppedFile))
+        {
+            // check airdropped file
+            using (var br = new BinaryReader(stream, Encoding.UTF8, true))
+            {
+                if (new string(br.ReadChars(4)) != "OggS")
+                {
+                    MessageBannerController.ShowMsg(LogLevel.ERROR, "YOU MUST DROP A PROPPER OGG FILE TO CONTINUE!!!");
+
+                    return;
+                }
+            }
+
+            // get infomation from file
+            using (var reader = new VorbisReader(stream))
+            {
+                title = reader.Tags.Title == string.Empty ? "New Song" : reader.Tags.Title;
+                artist = reader.Tags.Artist == string.Empty ? "Unknown Artist" : reader.Tags.Artist;
+                len = (float)reader.TotalTime.TotalSeconds;
+            }
+        }
+
+        // Create mheader
+        var mheader = CreateMHeader(title, artist, len);
+        DataLoader.SaveHeader(mheader, AirdroppedFile);
+
+        // Create header
+        var header = CreateHeader(mheader.mid);
+        DataLoader.SaveHeader(header);
+
+        // Create chart
+        int clamped = Mathf.Clamp(difficulty, 0, 3);
+        int level = Random.Range(clamped * 5 + 5, clamped * 8 + 6);
+        var chart = CreateChart((Difficulty)difficulty, level);
+        DataLoader.SaveChart(chart, header.sid, (Difficulty)difficulty);
+
+        // Reload scene
+        LiveSetting.currentDifficulty.Set(difficulty);
+        LiveSetting.actualDifficulty = difficulty;
+        cl_lastsid.Set(header.sid);
+        SceneManager.LoadScene("Select");
+
+        AirdroppedFile = null;
     }
 
     public void 还没做好()

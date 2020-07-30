@@ -171,13 +171,20 @@ public class WebConsole : MonoBehaviour
                     bytes = br.ReadBytes((int)ctx.Request.ContentLength64);
                 }
 
-                if (!Directory.Exists(DataLoader.InboxDir))
-                    Directory.CreateDirectory(DataLoader.InboxDir);
+                if(ChartCreator.RequestAirdrop)
+                {
+                    ChartCreator.AirdroppedFile = bytes;
+                }
+                else
+                {
+                    if (!Directory.Exists(DataLoader.InboxDir))
+                        Directory.CreateDirectory(DataLoader.InboxDir);
 
-                File.WriteAllBytes(Path.Combine(DataLoader.InboxDir, Guid.NewGuid().ToString("N") + ".kirapack"), bytes);
+                    File.WriteAllBytes(Path.Combine(DataLoader.InboxDir, Guid.NewGuid().ToString("N") + ".kirapack"), bytes);
 
-                if (!actionQueue.Contains(flushKirapacksAction))
-                    actionQueue.Enqueue(flushKirapacksAction);
+                    if (!actionQueue.Contains(flushKirapacksAction))
+                        actionQueue.Enqueue(flushKirapacksAction);
+                }
             }
         };
 

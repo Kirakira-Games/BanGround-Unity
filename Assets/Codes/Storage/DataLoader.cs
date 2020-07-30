@@ -165,6 +165,14 @@ public static class DataLoader
         ProtobufHelper.Save(header, path);
     }
 
+    public static void SaveHeader(mHeader header, byte[] oggFile)
+    {
+        SaveHeader(header);
+
+        string path = Path.Combine(DataDir, MusicDir, header.mid.ToString(), $"{header.mid}.ogg");
+        File.WriteAllBytes(path, oggFile);
+    }
+
     public static void SaveHeader(mHeader header)
     {
         string path = Path.Combine(DataDir, MusicDir, header.mid.ToString(), "mheader.bin");
@@ -211,6 +219,12 @@ public static class DataLoader
     {
         DateTime epochStart = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         return (int) (DateTime.UtcNow - epochStart).TotalSeconds;
+    }
+
+    public static int GenerateMid()
+    {
+        DateTime epochStart = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        return (int)(DateTime.UtcNow - epochStart).TotalSeconds;
     }
 
     public static void DuplicateKiraPack(cHeader header)
