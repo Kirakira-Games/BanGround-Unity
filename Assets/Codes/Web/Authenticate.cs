@@ -61,7 +61,7 @@ public class Authenticate
 
             LoadingBlocker.instance.Close();
 
-            return result.Status;
+            return result == null ? false : result.Status;
         }
         catch (Exception ex)
         {

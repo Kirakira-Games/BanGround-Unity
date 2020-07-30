@@ -48,7 +48,6 @@ public class NoteController : MonoBehaviour
     private HashSet<Slide> slides = new HashSet<Slide>();
     private List<NoteBase> notesToDestroy = new List<NoteBase>();
     private List<Slide> slidesToDestroy = new List<Slide>();
-    private List<int> helperIntList = new List<int>();
 
     private const int WARM_UP_SECOND = 4;
 
@@ -290,13 +289,12 @@ public class NoteController : MonoBehaviour
         }
         // Add note
         // Add sync line
-        if (!syncTable.ContainsKey(note.time) || syncTable[note.time] == null)
+        if (!syncTable.ContainsKey(note.time))
         {
-            GameObject syncLineObj = new GameObject("syncLine");
-            syncLineObj.layer = 8;
-            syncLineObj.transform.SetParent(transform);
-            syncTable.Remove(note.time);
-            syncTable.Add(note.time, syncLineObj.AddComponent<NoteSyncLine>());
+            var line = NotePool.Instance.GetSyncLine();
+            line.transform.SetParent(transform);
+            line.ResetLine(note.time);
+            syncTable.Add(note.time, line);
         }
         syncTable[note.time].AddNote(note);
 
@@ -327,7 +325,13 @@ public class NoteController : MonoBehaviour
     {
         slidesToDestroy.Add(slide);
     }
+
+    public void OnSyncLineDestroy(NoteSyncLine line)
+    {
+        syncTable.Remove(line.time);
+    }
     #endregion
+
     private void UpdateNotes()
     {
         while (noteHead < notes.Length)
@@ -520,15 +524,12 @@ public class NoteController : MonoBehaviour
             i.OnSlideUpdate();
         }
 
-        helperIntList.Clear();
-        foreach (var i in syncTable)
+        // Update sync lines
+        var values = syncTable.Values.ToArray();
+        foreach (var i in values)
         {
-            if (i.Value == null)
-                helperIntList.Add(i.Key);
-            else
-                i.Value.OnSyncLineUpdate();
+            i.OnSyncLineUpdate();
         }
-        helperIntList.ForEach(i => syncTable.Remove(i));
 
         // Update isfinished
         isFinished = noteHead >= notes.Length;

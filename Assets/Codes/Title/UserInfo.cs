@@ -21,7 +21,7 @@ public class UserInfo : MonoBehaviour
         if (Authenticate.user == null)
             return;
 
-        username_Text.text = Authenticate.user.Username;
+        username_Text.text = Authenticate.user.Nickname;
         username = Authenticate.user.Username;
 
         if (Authenticate.user.Avatar == "N/A")
