@@ -110,7 +110,9 @@ public class NotePool : MonoBehaviour
     {
         for (int i = 0; i < count; i++)
         {
-            syncLineQueue.Enqueue(new GameObject("Syncline").AddComponent<NoteSyncLine>());
+            var obj = new GameObject("Syncline");
+            obj.transform.SetParent(transform);
+            syncLineQueue.Enqueue(obj.AddComponent<NoteSyncLine>());
         }
     }
 
@@ -120,6 +122,7 @@ public class NotePool : MonoBehaviour
         {
             var obj = new GameObject("partialSyncline");
             var renderer = NoteSyncLine.CreatePartialLine(obj);
+            obj.transform.SetParent(transform);
             partialSyncLineQueue.Enqueue(renderer);
         }
     }
@@ -251,6 +254,8 @@ public class NotePool : MonoBehaviour
                 slide.Process(e.delta);
             }
         }
+        AddPartialSyncLine(total.Max);
+        AddSyncLine(total.Max);
         for (int i = 0; i < count.Length; i++)
         {
             AddNote(noteQueue[i], (GameNoteType)i, count[i].Max + 3);
