@@ -44,11 +44,14 @@ public class NotePool : MonoBehaviour
     private Queue<NoteBase>[] noteQueue;
     private Queue<Slide> slideQueue;
     private Queue<GameObject>[] teQueue;
+    private Queue<NoteSyncLine> syncLineQueue;
+    private Queue<LineRenderer> partialSyncLineQueue;
     private Object[] tapEffects;
 
     static KVarRef r_notesize = new KVarRef("r_notesize");
     static KVarRef o_judge = new KVarRef("o_judge");
 
+    #region Add
     private void AddNote(Queue<NoteBase> Q, GameNoteType type, int count = 1)
     {
         var name = Enum.GetName(typeof(GameNoteType), type);
@@ -103,6 +106,24 @@ public class NotePool : MonoBehaviour
         }
     }
 
+    private void AddSyncLine(int count = 1)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            syncLineQueue.Enqueue(new GameObject("Syncline").AddComponent<NoteSyncLine>());
+        }
+    }
+
+    private void AddPartialSyncLine(int count = 1)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            var obj = new GameObject("partialSyncline");
+            var renderer = NoteSyncLine.CreatePartialLine(obj);
+            partialSyncLineQueue.Enqueue(renderer);
+        }
+    }
+
     private void AddSlide(int count = 1)
     {
         for (int i = 0; i < count; i++)
@@ -126,6 +147,7 @@ public class NotePool : MonoBehaviour
             teQueue[effect].Enqueue(fx);
         }
     }
+    #endregion
 
     private void AddEvent(List<NoteEvent> events, GameNoteData note, int range = -1)
     {
@@ -195,6 +217,10 @@ public class NotePool : MonoBehaviour
         {
             teQueue[i] = new Queue<GameObject>();
         }
+
+        // Sync lines
+        syncLineQueue = new Queue<NoteSyncLine>();
+        partialSyncLineQueue = new Queue<LineRenderer>();
 
         // Compute resource usage
         var count = new NoteEventProcessor[(int)GameNoteType.SlideEndFlick + 1];
@@ -287,6 +313,30 @@ public class NotePool : MonoBehaviour
         return note;
     }
 
+    public LineRenderer GetPartialLine()
+    {
+        if (partialSyncLineQueue.Count == 0)
+        {
+            Debug.Log("Add partial line");
+            AddPartialSyncLine();
+        }
+        var renderer = partialSyncLineQueue.Dequeue();
+        renderer.gameObject.SetActive(true);
+        return renderer;
+    }
+
+    public NoteSyncLine GetSyncLine()
+    {
+        if (syncLineQueue.Count == 0)
+        {
+            Debug.Log("Add sync line");
+            AddSyncLine();
+        }
+        var line = syncLineQueue.Dequeue();
+        line.gameObject.SetActive(true);
+        return line;
+    }
+
     public void DestroySlide(Slide slide)
     {
         slide.OnNoteDestroy();
@@ -308,6 +358,21 @@ public class NotePool : MonoBehaviour
             NoteController.Instance.OnNoteDestroy(note);
             noteQueue[(int)type].Enqueue(note);
         }
+    }
+
+    public void DestroySyncLine(NoteSyncLine line)
+    {
+        line.transform.SetParent(transform);
+        line.gameObject.SetActive(false);
+        NoteController.Instance.OnSyncLineDestroy(line);
+        syncLineQueue.Enqueue(line);
+    }
+
+    public void DestroyPartialSyncLine(LineRenderer line)
+    {
+        line.transform.SetParent(transform);
+        line.gameObject.SetActive(false);
+        partialSyncLineQueue.Enqueue(line);
     }
 
     public void RemoveFromJudgeQueue(NoteBase note)

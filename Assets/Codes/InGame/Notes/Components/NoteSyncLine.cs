@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,38 +13,48 @@ class NoteBaseXComparer : IComparer<NoteBase>
 
 public class NoteSyncLine : MonoBehaviour
 {
-    private List<NoteBase> syncNotes;
-    private List<LineRenderer> syncLines;
-    private const float lineWidth = 0.06f;
-    private NoteBaseXComparer comparer;
+    public int time;
+
+    private List<NoteBase> syncNotes = new List<NoteBase>();
+    private List<LineRenderer> syncLines = new List<LineRenderer>();
     private int totNotes;
-    private bool[] soundEffects;
+    private bool[] soundEffects = new bool[5];
+
+    private static NoteBaseXComparer comparer = new NoteBaseXComparer();
+    private static readonly Vector3 PARTIAL_POS = new Vector3(0, -0.05f, 0);
+    private const float lineWidth = 0.06f;
 
     static KVarRef r_notesize = new KVarRef("r_notesize");
-    private LineRenderer CreateLine()
+
+    public static LineRenderer CreatePartialLine(GameObject obj)
     {
-        GameObject obj = new GameObject("partialSyncLine");
         obj.layer = 8;
-        obj.transform.SetParent(transform);
-        obj.transform.localPosition = new Vector3(0, -0.05f, 0);
         LineRenderer lineRenderer = obj.AddComponent<LineRenderer>();
         lineRenderer.useWorldSpace = false;
         lineRenderer.receiveShadows = false;
         lineRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         lineRenderer.material = Resources.Load<Material>("InGame/Materials/sync_line");
-        float size = r_notesize;
-        lineRenderer.startWidth = lineWidth * size;
-        lineRenderer.endWidth = lineWidth * size;
         lineRenderer.rendererPriority = 1;
         return lineRenderer;
     }
 
-    private void Awake()
+    private void ResetPartialLine(LineRenderer renderer)
     {
-        comparer = new NoteBaseXComparer();
-        syncNotes = new List<NoteBase>();
-        syncLines = new List<LineRenderer>();
-        soundEffects = new bool[5];
+        renderer.transform.SetParent(transform);
+        renderer.transform.localPosition = PARTIAL_POS;
+        float size = r_notesize;
+        renderer.startWidth = lineWidth * size;
+        renderer.endWidth = lineWidth * size;
+    }
+
+    public void ResetLine(int time)
+    {
+        this.time = time;
+        syncNotes.Clear();
+        syncLines.Clear();
+        for (int i = 0; i < soundEffects.Length; i++) {
+            soundEffects[i] = false;
+        }
         totNotes = 0;
     }
 
@@ -54,14 +65,18 @@ public class NoteSyncLine : MonoBehaviour
             NoteBase obj = syncNotes[i];
             if (obj.isDestroyed ||
                 obj.judgeResult != JudgeResult.None ||
-                obj.GetComponent<SlideNoteBase>()?.isStickEnd == true)
+                (obj as SlideNoteBase)?.isStickEnd == true)
             {
                 syncNotes.RemoveAt(i);
             }
         }
         if (totNotes == 0)
         {
-            Destroy(gameObject);
+            foreach (var line in syncLines)
+            {
+                NotePool.Instance.DestroyPartialSyncLine(line);
+            }
+            NotePool.Instance.DestroySyncLine(this);
             return;
         }
         if (!NoteBase.rSyncLine)
@@ -70,12 +85,14 @@ public class NoteSyncLine : MonoBehaviour
         }
         while (syncLines.Count >= syncNotes.Count && syncLines.Count != 0)
         {
-            Destroy(syncLines[syncLines.Count - 1].gameObject);
+            NotePool.Instance.DestroyPartialSyncLine(syncLines[syncLines.Count - 1]);
             syncLines.RemoveAt(syncLines.Count - 1);
         }
         while (syncLines.Count < syncNotes.Count - 1)
         {
-            syncLines.Add(CreateLine());
+            var line = NotePool.Instance.GetPartialLine();
+            ResetPartialLine(line);
+            syncLines.Add(line);
         }
         syncNotes.Sort(comparer);
 
@@ -95,6 +112,11 @@ public class NoteSyncLine : MonoBehaviour
             color.a = Mathf.Min(prev.color.a, next.color.a);
             syncLines[i].material.SetColor("_BaseColor", color);
         }
+    }
+
+    private void Awake()
+    {
+        gameObject.layer = 8;
     }
 
     public void AddNote(NoteBase note)
