@@ -169,7 +169,7 @@ namespace BGEditor
 
         protected Color GetColor(bool selected, bool active)
         {
-            Color c = selected ? new Color(0.5f, 1f, 1f) : Color.white;
+            Color c = selected ? new Color(0f, 1f, 1f) : Color.white;
             c.a = active ? 1f : 0.3f;
             return c;
         }
@@ -199,7 +199,7 @@ namespace BGEditor
         }
         #endregion
 
-        private void Update()
+        protected virtual void Update()
         {
             if (shouldRefresh)
             {

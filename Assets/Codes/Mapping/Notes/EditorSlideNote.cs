@@ -252,5 +252,13 @@ namespace BGEditor
             Notes.UnselectAll();
             SelectSlide();
         }
+
+        protected override void Update()
+        {
+            bool doRefresh = shouldRefresh;
+            base.Update();
+            if (doRefresh)
+                UpdateBodyMesh();
+        }
     }
 }
