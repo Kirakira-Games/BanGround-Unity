@@ -53,10 +53,14 @@ namespace BGEditor
             Core.onTimingGroupSwitched.Invoke();
         }
 
-        private void Switch(int index)
+        public void Switch(int index)
         {
             if (index < Chart.groups.Count)
             {
+                if (groupDropdown.value != index)
+                {
+                    groupDropdown.SetValueWithoutNotify(index);
+                }
                 Editor.currentTimingGroup = index;
                 Core.onTimingGroupSwitched.Invoke();
                 return;
