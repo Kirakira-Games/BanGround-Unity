@@ -5,7 +5,7 @@ public class FuwafuwaPillar : MonoBehaviour
 {
     private SlideNoteBase parent;
     private LineRenderer pillar;
-    private const float LINE_WIDTH = 0.2f;
+    private const float LINE_WIDTH = 0.3f;
 
     static KVarRef r_notesize = new KVarRef("r_notesize");
 
@@ -22,11 +22,11 @@ public class FuwafuwaPillar : MonoBehaviour
         gameObject.layer = 8; // note
     }
 
-    public void Reset(SlideNoteBase parent)
+    public void Reset(SlideNoteBase parent, Material material)
     {
         this.parent = parent;
         pillar.enabled = parent.displayFuwafuwa;
-        pillar.sharedMaterial = parent.noteMesh.meshRenderer.sharedMaterial;
+        pillar.sharedMaterial = material;
     }
 
     public void OnUpdate()
