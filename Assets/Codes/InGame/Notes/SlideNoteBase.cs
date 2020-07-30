@@ -13,15 +13,15 @@ public abstract class SlideNoteBase : NoteBase
 
     protected abstract JudgeResult TrySlideJudge(KirakiraTouch touch);
 
-    public void ResetSlideNote()
+    public void ResetSlideNote(Slide parent, Material material)
     {
         isStickEnd = false;
-        parentSlide = GetComponentInParent<Slide>();
+        parentSlide = parent;
         if (!NoteUtility.IsSlideEnd(type))
         {
             slideMesh.meshRenderer.enabled = true;
         }
-        pillar.Reset(this);
+        pillar.Reset(this, material);
     }
 
     public override JudgeResult TryJudge(KirakiraTouch touch)
