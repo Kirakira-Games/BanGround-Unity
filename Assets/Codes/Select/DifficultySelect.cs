@@ -96,7 +96,7 @@ public class DifficultySelect : MonoBehaviour
         LiveSetting.actualDifficulty = selected;
         if (overrideCurrentDifficulty)
             LiveSetting.currentDifficulty.Set(selected);
-        if ((Sorter)cl_cursorter == Sorter.ChartDifficulty && lastDifficulty != LiveSetting.actualDifficulty)
+        if ((Sorter)cl_cursorter == Sorter.ChartDifficulty && lastDifficulty != LiveSetting.currentDifficulty)
         {
             cl_lastsid.Set(LiveSetting.CurrentHeader.sid);
             //SelectManager_old.instance.RefeshSonglist();
