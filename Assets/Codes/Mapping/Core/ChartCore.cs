@@ -25,6 +25,7 @@ namespace BGEditor
         public HotKeyManager hotkey;
         public Camera cam;
         public EditorToolTip tooltip;
+        public MultiNoteDetector multinote;
 
         public GameObject SingleNote;
         public GameObject FlickNote;
@@ -88,6 +89,7 @@ namespace BGEditor
             lastCmd = cmdList.AddLast(new FailCommand());
 
             // Initialize ground notes
+            multinote = new MultiNoteDetector(this);
 
             // Initialize editor info
             editor = new EditorInfo();
@@ -165,20 +167,15 @@ namespace BGEditor
             var beat = ChartUtility.BeatToFloat(note.beat);
             if (beat < -NoteUtility.EPS)
                 return false;
-            /*
-            if (!ChartUtility.IsFuwafuwa(note))
+
+            if (allowMultiNote)
+                multinote.Put(note);
+            else if (!multinote.TryPut(note))
             {
-                var pos = ChartUtility.GetPosition(note);
-                if (!groundNotes.ContainsKey(pos))
-                    groundNotes.Add(pos, 0);
-                if (groundNotes[pos] > 0 && !allowMultiNote)
-                {
-                    Debug.Log(pos + " was a duplicate.");
-                    return false;
-                }
-                groundNotes[pos]++;
+                MessageBannerController.ShowMsg(LogLevel.INFO, "Cannot put multiple notes at the same position.");
+                return false;
             }
-            */
+
             chart.groups[note.group].notes.Add(note);
             onNoteCreated.Invoke(note);
             return true;
@@ -186,16 +183,8 @@ namespace BGEditor
 
         public bool RemoveNote(V2.Note note)
         {
-            /*
-            if (!ChartUtility.IsFuwafuwa(note))
-            {
-                var pos = ChartUtility.GetPosition(note);
-                Debug.Assert(groundNotes.ContainsKey(pos));
-                if (groundNotes[pos] <= 0)
-                    return false;
-                groundNotes[pos]--;
-            }
-            */
+            multinote.Remove(note);
+
             chart.groups[note.group].notes.Remove(note);
             onNoteRemoved.Invoke(note);
             return true;
