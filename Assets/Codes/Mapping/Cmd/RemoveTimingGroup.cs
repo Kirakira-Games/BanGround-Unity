@@ -24,6 +24,7 @@ namespace BGEditor
             group = groups[index];
 
             core.chart.groups.RemoveAt(index);
+            group.notes.ForEach(core.multinote.Remove);
             if (core.editor.currentTimingGroup == core.chart.groups.Count)
                 core.editor.currentTimingGroup--;
             group.notes.ForEach(note => note.group = -1);
@@ -39,6 +40,7 @@ namespace BGEditor
                 groups.Add(group);
             else
                 groups.Insert(index, group);
+            group.notes.ForEach(core.multinote.Put);
             core.editor.currentTimingGroup = index;
             ChartCore.AssignTimingGroups(core.chart);
             core.onTimingGroupModified.Invoke();
