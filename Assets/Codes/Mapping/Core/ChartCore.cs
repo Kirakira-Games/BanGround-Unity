@@ -24,6 +24,8 @@ namespace BGEditor
         public AudioProgressController progress;
         public HotKeyManager hotkey;
         public Camera cam;
+        public EditorToolTip tooltip;
+        public MultiNoteDetector multinote;
 
         public GameObject SingleNote;
         public GameObject FlickNote;
@@ -62,6 +64,7 @@ namespace BGEditor
 
         public NoteEvent onNoteCreated = new NoteEvent();
         public NoteEvent onNoteModified = new NoteEvent();
+        public NoteEvent onNoteYModified = new NoteEvent();
         public NoteEvent onNoteRemoved = new NoteEvent();
 
         public UnityEvent onTimingPointModified = new UnityEvent();
@@ -76,17 +79,18 @@ namespace BGEditor
         {
             Instance = this;
             chart = new V2.Chart();
+            tooltip = EditorToolTip.Create(transform);
 
             // Add listeners
             onAudioLoaded.AddListener(RefreshBarCount);
             onTimingModified.AddListener(RefreshBarCount);
-            hotkey.onScroll.AddListener((delta) => MoveGrid(delta * 30));
 
             // Initialize commands
             cmdList = new LinkedList<IEditorCmd>();
             lastCmd = cmdList.AddLast(new FailCommand());
 
             // Initialize ground notes
+            multinote = new MultiNoteDetector(this);
 
             // Initialize editor info
             editor = new EditorInfo();
@@ -164,20 +168,15 @@ namespace BGEditor
             var beat = ChartUtility.BeatToFloat(note.beat);
             if (beat < -NoteUtility.EPS)
                 return false;
-            /*
-            if (!ChartUtility.IsFuwafuwa(note))
+
+            if (allowMultiNote)
+                multinote.Put(note);
+            else if (!multinote.TryPut(note))
             {
-                var pos = ChartUtility.GetPosition(note);
-                if (!groundNotes.ContainsKey(pos))
-                    groundNotes.Add(pos, 0);
-                if (groundNotes[pos] > 0 && !allowMultiNote)
-                {
-                    Debug.Log(pos + " was a duplicate.");
-                    return false;
-                }
-                groundNotes[pos]++;
+                MessageBannerController.ShowMsg(LogLevel.INFO, "Cannot put multiple notes at the same position.");
+                return false;
             }
-            */
+
             chart.groups[note.group].notes.Add(note);
             onNoteCreated.Invoke(note);
             return true;
@@ -185,16 +184,8 @@ namespace BGEditor
 
         public bool RemoveNote(V2.Note note)
         {
-            /*
-            if (!ChartUtility.IsFuwafuwa(note))
-            {
-                var pos = ChartUtility.GetPosition(note);
-                Debug.Assert(groundNotes.ContainsKey(pos));
-                if (groundNotes[pos] <= 0)
-                    return false;
-                groundNotes[pos]--;
-            }
-            */
+            multinote.Remove(note);
+
             chart.groups[note.group].notes.Remove(note);
             onNoteRemoved.Invoke(note);
             return true;
@@ -254,6 +245,8 @@ namespace BGEditor
                 return;
             int prev = editor.yDivision;
             editor.yDivision = div;
+            if (div == 0)
+                editor.yPos = 0;
             onYSnapModified.Invoke(prev, div);
         }
 
@@ -429,6 +422,7 @@ namespace BGEditor
                 notes.UnselectAll();
             }
             onChartLoaded.Invoke();
+            hotkey.onScroll.AddListener((delta) => MoveGrid(delta * 30));
         }
         #endregion
     }

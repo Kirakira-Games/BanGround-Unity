@@ -24,7 +24,9 @@ namespace BGEditor
 
         private void HandleYChange(float newY)
         {
-            float target = Editor.yDivision == 0 ? 0 : newY / Editor.yDivision;
+            if (Editor.yDivision == 0)
+                return;
+            float target = newY / Editor.yDivision;
             if (Mathf.Approximately(Editor.yPos, target))
                 return;
             Core.Commit(new ChangeYLayerCmd(target));

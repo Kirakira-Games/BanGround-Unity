@@ -179,11 +179,11 @@ namespace V2
 
         public string ToEditorString()
         {
-            string sTap = TransitionColor.ColoredString("口", tap);
-            string sTapGrey = TransitionColor.ColoredString("口", tapGrey);
-            string sFlick = TransitionColor.ColoredString("口", flick);
-            string sSlideTick = TransitionColor.ColoredString("口", slideTick);
-            string sSlide = TransitionColor.ColoredString("口", slide);
+            string sTap = TransitionColor.ColoredString("〇", tap);
+            string sTapGrey = TransitionColor.ColoredString("〇", tapGrey);
+            string sFlick = TransitionColor.ColoredString("〇", flick);
+            string sSlideTick = TransitionColor.ColoredString("〇", slideTick);
+            string sSlide = TransitionColor.ColoredString("〇", slide);
             return $"Speed:{speed.value} {sTap}{sTapGrey}{sFlick}{sSlideTick}{sSlide}";
         }
     }
@@ -252,6 +252,7 @@ namespace V2
 
         [ProtoMember(7)]
         public float y { get; set; }
+        public float yOrNaN => lane >= 0 ? float.NaN : y;
 
         [ProtoMember(8)]
         public uint flags { get; set; }
