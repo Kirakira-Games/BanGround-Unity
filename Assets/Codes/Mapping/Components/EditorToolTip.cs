@@ -8,7 +8,7 @@ public class EditorToolTip : MonoBehaviour
 {
     public Text text;
 
-    private V2.Note note;
+    private EditorNoteBase note;
     private float y;
 
     public static EditorToolTip Create(Transform parent)
@@ -34,7 +34,7 @@ public class EditorToolTip : MonoBehaviour
     public void Show(EditorNoteBase note)
     {
         if (this.note != null) return;
-        this.note = note.note;
+        this.note = note;
         y = note.note.yOrNaN;
         transform.SetParent(note.transform, false);
         UpdateText();
@@ -43,7 +43,7 @@ public class EditorToolTip : MonoBehaviour
 
     public void Hide(EditorNoteBase note)
     {
-        if (ReferenceEquals(note.note, this.note))
+        if (ReferenceEquals(note, this.note))
         {
             this.note = null;
             gameObject.SetActive(false);
