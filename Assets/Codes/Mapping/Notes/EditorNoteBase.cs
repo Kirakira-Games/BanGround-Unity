@@ -99,12 +99,14 @@ namespace BGEditor
             holdStart = Input.mousePosition;
             if (Editor.tool == EditorTool.Select)
             {
+                YSlider.wholeNumbers = false;
                 YSlider.maxValue = 1;
                 YSlider.value = note.y;
                 YSlider.interactable = false;
             }
             else
             {
+                YSlider.wholeNumbers = true;
                 YSlider.maxValue = Editor.yDivision;
                 YSlider.value = Mathf.RoundToInt(note.y / (1f / Editor.yDivision));
                 YSlider.interactable = true;
