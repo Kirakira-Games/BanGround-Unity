@@ -16,7 +16,7 @@ namespace BGEditor
 
         public bool Commit(ChartCore core)
         {
-            before = note.lane >= 0 ? float.NaN : note.y;
+            before = note.yOrNaN;
             core.notes.MoveY(note, after);
             core.onNoteModified.Invoke(note);
             return true;

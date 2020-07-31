@@ -24,6 +24,7 @@ namespace BGEditor
         public AudioProgressController progress;
         public HotKeyManager hotkey;
         public Camera cam;
+        public EditorToolTip tooltip;
 
         public GameObject SingleNote;
         public GameObject FlickNote;
@@ -76,11 +77,11 @@ namespace BGEditor
         {
             Instance = this;
             chart = new V2.Chart();
+            tooltip = EditorToolTip.Create(transform);
 
             // Add listeners
             onAudioLoaded.AddListener(RefreshBarCount);
             onTimingModified.AddListener(RefreshBarCount);
-            hotkey.onScroll.AddListener((delta) => MoveGrid(delta * 30));
 
             // Initialize commands
             cmdList = new LinkedList<IEditorCmd>();
@@ -429,6 +430,7 @@ namespace BGEditor
                 notes.UnselectAll();
             }
             onChartLoaded.Invoke();
+            hotkey.onScroll.AddListener((delta) => MoveGrid(delta * 30));
         }
         #endregion
     }
