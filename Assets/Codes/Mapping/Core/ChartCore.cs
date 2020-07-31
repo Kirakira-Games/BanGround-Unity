@@ -255,6 +255,8 @@ namespace BGEditor
                 return;
             int prev = editor.yDivision;
             editor.yDivision = div;
+            if (div == 0)
+                editor.yPos = 0;
             onYSnapModified.Invoke(prev, div);
         }
 
