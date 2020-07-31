@@ -40,7 +40,7 @@ public class MultiNoteDetector
 
     public MultiNoteDetector(ChartCore core)
     {
-        core.onNoteModified.AddListener(OnNoteModified);
+        core.onNoteYModified.AddListener(OnNoteModified);
     }
 
     public void Put(V2.Note note)

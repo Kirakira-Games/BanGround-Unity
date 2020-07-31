@@ -289,6 +289,7 @@ namespace BGEditor
                     note.lane = -1;
                 }
             }
+            Core.onNoteYModified.Invoke(note);
         }
 
         public void MoveY(IEnumerable<V2.Note> notes, float target)

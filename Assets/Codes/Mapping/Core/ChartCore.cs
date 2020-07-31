@@ -64,6 +64,7 @@ namespace BGEditor
 
         public NoteEvent onNoteCreated = new NoteEvent();
         public NoteEvent onNoteModified = new NoteEvent();
+        public NoteEvent onNoteYModified = new NoteEvent();
         public NoteEvent onNoteRemoved = new NoteEvent();
 
         public UnityEvent onTimingPointModified = new UnityEvent();
