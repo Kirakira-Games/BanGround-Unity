@@ -208,7 +208,7 @@ namespace BGEditor
                 Notes.UnselectAll();
                 return;
             }
-            if (Editor.tool == EditorTool.Select)
+            if (Editor.tool == EditorTool.Select || HotKeyManager.isCtrl)
             {
                 if (isSelected)
                     UnselectSlide();
@@ -216,7 +216,7 @@ namespace BGEditor
                     SelectSlide();
                 return;
             }
-            if (Editor.tool == EditorTool.Slide || HotKeyManager.isCtrl)
+            if (Editor.tool == EditorTool.Slide)
             {
                 var prev = Notes.singleSlideSelected;
                 if (prev != null)
