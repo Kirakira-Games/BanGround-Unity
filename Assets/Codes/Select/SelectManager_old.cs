@@ -353,6 +353,20 @@ public class SelectManager_old : MonoBehaviour
     bool isFirstPlay = true;
     private int lastPreviewMid = -1;
 
+    private uint[] GetPreviewPos()
+    {
+        var ret = new uint[2];
+        var preview = LiveSetting.CurrentHeader.preview;
+        if (preview == null || preview.Length == 0)
+        {
+            mHeader mheader = DataLoader.GetMusicHeader(LiveSetting.CurrentHeader.mid);
+            preview = mheader.preview;
+        }
+        ret[0] = (uint)(preview[0] * 1000);
+        ret[1] = preview.Length > 1 ? (uint)(preview[1] * 1000) : ret[0];
+        return ret;
+    }
+
     async void PlayPreview()
     {
         await UniTask.WaitUntil(() => !faderWorking);
@@ -364,7 +378,6 @@ public class SelectManager_old : MonoBehaviour
 
         lastPreviewMid = LiveSetting.CurrentHeader.mid;
 
-        mHeader mheader = DataLoader.GetMusicHeader(LiveSetting.CurrentHeader.mid);
         if (previewSound != null)
         {
             previewSound.Dispose();
@@ -373,11 +386,7 @@ public class SelectManager_old : MonoBehaviour
         if (DataLoader.MusicExists(LiveSetting.CurrentHeader.mid))
         {
             previewSound = await AudioManager.Instance.PlayLoopMusic(KiraFilesystem.Instance.Read(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), true,
-                new uint[]
-                {
-                    (uint)(mheader.preview[0] * 1000),
-                    (uint)(mheader.preview[1] * 1000)
-                },
+                GetPreviewPos(),
                 false
             );
 
