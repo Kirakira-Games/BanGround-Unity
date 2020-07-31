@@ -33,6 +33,7 @@ public class FloatInput : MonoBehaviour
             Init();
         }
         Component.text = value.ToString();
+        this.value = value;
     }
 
     private void Init()
