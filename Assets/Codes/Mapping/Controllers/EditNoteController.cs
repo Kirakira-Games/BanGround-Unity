@@ -95,6 +95,7 @@ namespace BGEditor
             if (note.type == NoteType.BPM)
                 return;
             var notebase = Find(note);
+            Core.tooltip.Hide(notebase);
             Pool.Destroy(notebase.gameObject);
             displayNotes.Remove(note);
             bool result = notesByBeat[note.beat[0]].Remove(notebase);
@@ -264,7 +265,7 @@ namespace BGEditor
         {
             if (prev == 0 || div == 0)
             {
-                MoveY(selectedNotes.Select(x => x.note), div == 0 ? float.NaN : 0);
+                MoveY(GetSelectedNotes(), div == 0 ? float.NaN : 0);
             }
         }
 
@@ -288,6 +289,7 @@ namespace BGEditor
                     note.lane = -1;
                 }
             }
+            Core.onNoteYModified.Invoke(note);
         }
 
         public void MoveY(IEnumerable<V2.Note> notes, float target)
