@@ -95,6 +95,7 @@ namespace BGEditor
             if (note.type == NoteType.BPM)
                 return;
             var notebase = Find(note);
+            Core.tooltip.Hide(notebase);
             Pool.Destroy(notebase.gameObject);
             displayNotes.Remove(note);
             bool result = notesByBeat[note.beat[0]].Remove(notebase);
