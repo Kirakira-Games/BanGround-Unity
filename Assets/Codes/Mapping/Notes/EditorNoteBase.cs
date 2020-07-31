@@ -161,8 +161,6 @@ namespace BGEditor
         public void OnPointerExit(PointerEventData eventData)
         {
             isHover = false;
-            if (!isAdjustY)
-                Core.tooltip.Hide(this);
         }
 
         public void OnMove()
@@ -218,7 +216,10 @@ namespace BGEditor
             if (IsOutOfBound() || Editor.currentTimingGroup != note.group)
             {
                 if (gameObject.activeSelf)
+                {
+                    Core.tooltip.Hide(this);
                     gameObject.SetActive(false);
+                }
             }
             else
             {
@@ -244,6 +245,10 @@ namespace BGEditor
                 {
                     OnHold();
                 }
+            }
+            if (!isHover && !isAdjustY)
+            {
+                Core.tooltip.Hide(this);
             }
         }
     }
