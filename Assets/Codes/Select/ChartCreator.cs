@@ -55,6 +55,7 @@ public class ChartCreator : MonoBehaviour
         header.version = ChartVersion;
         header.sid = DataLoader.GenerateSid();
         header.mid = mid == -1 ? cHeader.mid : mid;
+        bool copyInfo = header.mid == cHeader.mid;
         if (UserInfo.username == null || UserInfo.username.Length == 0)
         {
             header.author = "Guest";
@@ -66,8 +67,8 @@ public class ChartCreator : MonoBehaviour
             header.authorNick = Authenticate.user.Nickname;
         }
         header.backgroundFile = cHeader.backgroundFile;
-        header.preview = cHeader.preview == null ? new float[] { 0.0f, 0.0f } : cHeader.preview.ToArray();
-        header.tag = cHeader.tag == null ? new List<string>() : cHeader.tag.ToList();
+        header.preview = (!copyInfo || cHeader.preview == null) ? new float[] { 0.0f, 0.0f } : cHeader.preview.ToArray();
+        header.tag = (!copyInfo || cHeader.tag == null) ? new List<string>() : cHeader.tag.ToList();
         return header;
     }
 
@@ -199,7 +200,7 @@ public class ChartCreator : MonoBehaviour
                     {
                         MessageBannerController.ShowMsg(LogLevel.ERROR, "YOU MUST DROP A PROPPER OGG FILE TO CONTINUE!!!");
 
-                        return;
+                        throw new InvalidDataException("YOU MUST DROP A PROPPER OGG FILE TO CONTINUE!!!");
                     }
                 }
 
