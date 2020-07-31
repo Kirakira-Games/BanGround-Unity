@@ -97,8 +97,18 @@ namespace BGEditor
                 return;
             isAdjustY = true;
             holdStart = Input.mousePosition;
-            YSlider.maxValue = Editor.yDivision;
-            YSlider.value = Mathf.RoundToInt(note.y / (1f / Editor.yDivision));
+            if (Editor.tool == EditorTool.Select)
+            {
+                YSlider.maxValue = 1;
+                YSlider.value = note.y;
+                YSlider.interactable = false;
+            }
+            else
+            {
+                YSlider.maxValue = Editor.yDivision;
+                YSlider.value = Mathf.RoundToInt(note.y / (1f / Editor.yDivision));
+                YSlider.interactable = true;
+            }
             YSlider.gameObject.SetActive(true);
         }
 
@@ -112,48 +122,61 @@ namespace BGEditor
 
         public void OnPointerUp(PointerEventData eventData)
         {
-            isAdjustY = false;
-            holdStart = Vector2.zero;
-            if (YSlider.gameObject.activeSelf)
+            if (isAdjustY)
             {
-                if (Editor.yDivision == 0 && note.lane < 0)
+                if (YSlider.interactable)
                 {
-                    Core.Commit(new ChangeNoteYCmd(note, float.NaN));
-                }
-                else
-                {
-                    float val = YSlider.value / YSlider.maxValue;
-                    if (note.lane >= 0 || !Mathf.Approximately(note.y, val))
+                    if (Editor.yDivision == 0 && note.lane < 0)
                     {
-                        Core.Commit(new ChangeNoteYCmd(note, val));
+                        Core.Commit(new ChangeNoteYCmd(note, float.NaN));
+                    }
+                    else
+                    {
+                        float val = YSlider.value / YSlider.maxValue;
+                        if (note.lane >= 0 || !Mathf.Approximately(note.y, val))
+                        {
+                            Core.Commit(new ChangeNoteYCmd(note, val));
+                        }
                     }
                 }
-                YSlider.gameObject.SetActive(false);
+                if (!isHover)
+                    Core.tooltip.Hide(this);
             }
             if (isHover && (float.IsNaN(pointerDownTime) || pointerDownTime <= HOLD_TIME))
             {
                 OnClick(eventData);
             }
+            isAdjustY = false;
+            holdStart = Vector2.zero;
             pointerDownTime = float.NaN;
+            YSlider.gameObject.SetActive(false);
         }
 
         public void OnPointerEnter(PointerEventData eventData)
         {
             isHover = true;
+            Core.tooltip.Show(this);
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
             isHover = false;
+            if (!isAdjustY)
+                Core.tooltip.Hide(this);
         }
 
         public void OnMove()
         {
             if (isAdjustY)
             {
-                float y = ((Vector2)Input.mousePosition - holdStart).y;
-                y = y / SLIDER_HEIGHT + note.y;
-                YSlider.value = Mathf.RoundToInt(Mathf.Lerp(0, YSlider.maxValue, y));
+                if (YSlider.interactable)
+                {
+                    float y = ((Vector2)Input.mousePosition - holdStart).y;
+                    y = y / SLIDER_HEIGHT + note.y;
+                    y = Mathf.RoundToInt(Mathf.Lerp(0, YSlider.maxValue, y));
+                    YSlider.value = y;
+                    Core.tooltip.UpdateY(Editor.yDivision == 0 ? float.NaN : y / YSlider.maxValue);
+                }
             }
             else
             {
