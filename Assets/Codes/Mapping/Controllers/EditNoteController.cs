@@ -265,7 +265,7 @@ namespace BGEditor
         {
             if (prev == 0 || div == 0)
             {
-                MoveY(selectedNotes.Select(x => x.note), div == 0 ? float.NaN : 0);
+                MoveY(GetSelectedNotes(), div == 0 ? float.NaN : 0);
             }
         }
 
