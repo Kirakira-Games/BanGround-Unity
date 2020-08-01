@@ -44,6 +44,25 @@ public class InGameBackground : MonoBehaviour
     //        RenderSettings.skybox = cacheMat;
     //}
 
+    public void SetBackground(Texture2D tex)
+    {
+        Color color = new Color(r_brightness_bg, r_brightness_bg, r_brightness_bg);
+
+        vp.enabled = false;
+
+        float ratio = tex.width / (float)tex.height;
+
+        Material mat = Instantiate(bgSkybox);
+        mat.SetTexture("_MainTex", tex);
+        mat.SetColor("_Tint", color);
+        mat.SetFloat("_TexRatio", ratio);
+
+        //RenderSettings.skybox = mat;
+        mesh.sharedMaterial = mat;
+        Destroy(cacheMat);
+        cacheMat = mat;
+    }
+
     public void SetBackground(string path, int type)
     {
         if (path == null || (type == 0 && !KiraFilesystem.Instance.Exists(path)))
