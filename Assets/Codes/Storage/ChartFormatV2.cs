@@ -1,12 +1,14 @@
 ﻿#pragma warning disable CS1591, CS0612, CS3021, IDE1006
-using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
 using ProtoBuf;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Scripting;
 using V1Chart = Chart;
 using V1Note = Note;
+using ChartUtility = BGEditor.ChartUtility;
 
 namespace V2
 {
@@ -306,6 +308,54 @@ namespace V2
 
         [ProtoMember(6)]
         public int version { get; set; } = VERSION;
+
+        public float BeatToTime(float beat)
+        {
+            float ret = offset / 1000f;
+
+            for (int i = 0; i < bpm.Count; i++)
+            {
+                var cur = bpm[i];
+                float start = ChartUtility.BeatToFloat(cur.beat);
+                float end = i == bpm.Count - 1 ? 1e9f : ChartUtility.BeatToFloat(bpm[i + 1].beat);
+                float timeperbeat = 60 / cur.value;
+                if (beat <= end)
+                {
+                    ret += (beat - start) * timeperbeat;
+                    return ret;
+                }
+                ret += (end - start) * timeperbeat;
+            }
+
+            throw new ArgumentOutOfRangeException(beat + " cannot be converted to time.");
+        }
+
+        public float BeatToTime(int[] beat) { return BeatToTime(ChartUtility.BeatToFloat(beat)); }
+        public int BeatToTimeMS(float beat) { return Mathf.RoundToInt(BeatToTime(beat) * 1000); }
+        public int BeatToTimeMS(int[] beat) { return BeatToTimeMS(ChartUtility.BeatToFloat(beat)); }
+
+        public float TimeToBeat(float audioTimef)
+        {
+            audioTimef -= offset / 1000f;
+            if (audioTimef - NoteUtility.EPS <= 0)
+                return 0;
+
+            for (int i = 0; i < bpm.Count; i++)
+            {
+                var cur = bpm[i];
+                float timeperbeat = 60 / cur.value;
+                float start = ChartUtility.BeatToFloat(cur.beat);
+                float end = i == bpm.Count - 1 ? 1e9f : ChartUtility.BeatToFloat(bpm[i + 1].beat);
+                float duration = (end - start) * timeperbeat;
+                if (audioTimef <= duration)
+                {
+                    return start + audioTimef / timeperbeat;
+                }
+                audioTimef -= duration;
+            }
+
+            throw new ArgumentOutOfRangeException(audioTimef + " cannot be converted to beat.");
+        }
 
         public static Chart From(V1Chart old)
         {
