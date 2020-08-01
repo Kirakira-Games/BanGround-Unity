@@ -192,6 +192,43 @@ class ScriptModel : IDisposable
     }
 }
 
+[LuaCallCSharp]
+class ScriptTexture
+{
+    public Texture2D tex;
+
+    public ScriptTexture(string file)
+    {
+        var path = ChartScript.GetChartResource(file);
+        tex = KiraFilesystem.Instance.ReadTexture2D(path);
+    }
+}
+
+[LuaCallCSharp]
+class ScriptEnvironment
+{
+    public void SetBackground(ScriptTexture tex)
+    {
+        InGameBackground.instance.SetBackground(tex.tex);
+    }
+    public void SetLaneBackground(ScriptTexture tex)
+    {
+        var mesh = GameObject.Find("LaneBackground").GetComponent<MeshRenderer>();
+        var material = UnityEngine.Object.Instantiate(mesh.sharedMaterial);
+        material.SetTexture("_BaseMap", tex.tex);
+
+        mesh.sharedMaterial = material;
+    }
+    public void SetJudgeLineColor(float r, float g, float b)
+    {
+        var mesh = GameObject.Find("JudgeLine").GetComponent<MeshRenderer>();
+        var material = UnityEngine.Object.Instantiate(mesh.sharedMaterial);
+        material.SetColor("_BaseColor", new Color(r, g, b));
+
+        mesh.sharedMaterial = material;
+    }
+}
+
 [CSharpCallLua]
 class ChartScript : IDisposable
 {
