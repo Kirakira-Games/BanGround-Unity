@@ -31,13 +31,13 @@ namespace BGEditor
 
         public static float TimeToScrollPos(float time)
         {
-            float beat = Timing.TimeToBeat(time);
+            float beat = Chart.TimeToBeat(time);
             return Editor.barHeight * beat;
         }
 
         public static float ScrollPosToTime(float pos)
         {
-            return Timing.BeatToTime(pos / Editor.barHeight);
+            return Chart.BeatToTime(pos / Editor.barHeight);
         }
 
         public void Refresh()
@@ -154,7 +154,7 @@ namespace BGEditor
                     lastTime = time;
                     lastTimeRecorded = Time.realtimeSinceStartup;
                 }
-                float beat = Timing.TimeToBeat(time);
+                float beat = Chart.TimeToBeat(time);
                 Core.SeekGrid(beat * Editor.barHeight, true);
                 if (SEToggle.isOn && !float.IsNaN(lastBeat))
                 {

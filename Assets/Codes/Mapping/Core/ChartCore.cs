@@ -233,7 +233,7 @@ namespace BGEditor
                 return;
             }
             float duration = AudioManager.Instance.gameBGM.GetLength() / 1000f;
-            editor.numBeats = Mathf.CeilToInt(timing.TimeToBeat(duration));
+            editor.numBeats = Mathf.CeilToInt(chart.TimeToBeat(duration));
             onGridModifed.Invoke();
         }
         #endregion
