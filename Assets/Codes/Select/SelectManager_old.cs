@@ -486,7 +486,11 @@ public class SelectManager_old : MonoBehaviour
             .SetTitle("Share Kirapack")
             .SetText(song.title)
             .Share();
-        if (Application.platform == RuntimePlatform.Android)
+        if (Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.WindowsEditor)
+        {
+            System.Diagnostics.Process.Start("explorer.exe", string.Format("/select,\"{0}\"", zip.Replace("/", "\\")));
+        }
+        else if (Application.platform == RuntimePlatform.Android)
         {
             await UniTask.DelayFrame(0);
             Screen.orientation = prevOrientation;
