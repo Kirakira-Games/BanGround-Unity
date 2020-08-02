@@ -9,7 +9,7 @@ namespace Assets.Codes
 {
     class func_rotate : MonoBehaviour
     {
-        public float speed;
+        public float speed = -1.0f;
 
         private Vector3 angles;
 

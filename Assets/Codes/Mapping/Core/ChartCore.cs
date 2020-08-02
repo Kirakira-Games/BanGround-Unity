@@ -27,6 +27,9 @@ namespace BGEditor
         public EditorToolTip tooltip;
         public MultiNoteDetector multinote;
 
+        public GameObject scriptEditorCanvas;
+        public ScriptEditor scriptEditor;
+
         public GameObject SingleNote;
         public GameObject FlickNote;
         public GameObject SlideNote;
@@ -301,6 +304,10 @@ namespace BGEditor
         public void Save()
         {
             DataLoader.SaveChart(GetFinalizedChart(), LiveSetting.CurrentHeader.sid, (Difficulty) LiveSetting.actualDifficulty);
+
+            if (!string.IsNullOrEmpty(scriptEditor.Code))
+                DataLoader.SaveChartScript(scriptEditor.Code, LiveSetting.CurrentHeader.sid, (Difficulty)LiveSetting.actualDifficulty);
+
             MessageBannerController.ShowMsg(LogLevel.OK, "Chart saved.");
         }
 
@@ -421,6 +428,10 @@ namespace BGEditor
                 onTimingModified.Invoke();
                 notes.UnselectAll();
             }
+
+            if (KiraFilesystem.Instance.Exists(DataLoader.GetChartScriptPath(LiveSetting.CurrentHeader.sid, (Difficulty)LiveSetting.actualDifficulty)))
+                scriptEditor.Code = KiraFilesystem.Instance.ReadString(DataLoader.GetChartScriptPath(LiveSetting.CurrentHeader.sid, (Difficulty)LiveSetting.actualDifficulty));
+
             onChartLoaded.Invoke();
             hotkey.onScroll.AddListener((delta) => MoveGrid(delta * 30));
         }
