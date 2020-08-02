@@ -114,7 +114,7 @@ public class TitleLoader : MonoBehaviour
 
     public void OnRegisterClicked()
     {
-        Application.OpenURL("http://127.0.0.1:8088/register");
+        Application.OpenURL("https://banground.live/user/reg");
     }
 
     async void CheckUpdate()

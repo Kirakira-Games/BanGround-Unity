@@ -16,6 +16,9 @@ public class AppPreLoader : MonoBehaviour
 
     void Awake()
     {
+        Physics.autoSimulation = false;
+        Physics2D.autoSimulation = false;
+
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
         DataLoader.InitFileSystem();
         KVSystem.Instance.ReloadConfig();

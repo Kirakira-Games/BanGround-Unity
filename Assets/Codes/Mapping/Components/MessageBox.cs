@@ -7,10 +7,10 @@ namespace BGEditor
 {
     class MessageBox : MonoBehaviour
     {
-        public static MessageBox Instance;
-        public Text Title;
-        public Text Content;
-        public Button Blocker;
+        public static MessageBox Instance = null;
+        public Text Title = null;
+        public Text Content = null;
+        public Button Blocker = null;
         public int result { get; private set; }
 
         private void Awake()

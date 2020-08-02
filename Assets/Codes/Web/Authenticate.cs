@@ -10,7 +10,7 @@ using System.Net;
 
 public class Authenticate
 {
-    private readonly APIMain api = new APIMain("https://banground.herokuapp.com", "zh-CN");
+    private readonly APIMain api = new APIMain("https://banground.live", "zh-CN");
 
     public static User user = null;
 

@@ -27,7 +27,7 @@ public class ComboManager : MonoBehaviour
     private GradeColorChange scoreDisplay;
     private Image[] comboImg;
     private Sprite[] comboSprite;
-    private ClearFlag flag = ClearFlag.AP;
+    //private ClearFlag flag = ClearFlag.AP;
 
     private void Awake()
     {

@@ -107,6 +107,9 @@ namespace BGEditor
 
         void Update()
         {
+            if (ChartCore.Instance.scriptEditorCanvas.activeInHierarchy)
+                return;
+
             isCtrl = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
             isShift = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
             isCtrlDown = Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl);
