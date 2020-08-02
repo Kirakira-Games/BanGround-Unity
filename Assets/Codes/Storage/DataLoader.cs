@@ -98,6 +98,11 @@ public static class DataLoader
         return ChartDir + sid + "/" + difficulty.ToString("G").ToLower() + ".bin";
     }
 
+    public static string GetChartScriptPath(int sid, Difficulty difficulty)
+    {
+        return GetChartPath(sid, difficulty).Replace(".bin", ".lua");
+    }
+
     public static cHeader GetChartHeader(int sid)
     {
         return chartDic.ContainsKey(sid) ? chartDic[sid] : null;
@@ -154,6 +159,15 @@ public static class DataLoader
         if (!Directory.Exists(dir))
             Directory.CreateDirectory(dir);
         ProtobufHelper.Save(chart, path);
+    }
+
+    public static void SaveChartScript(string script, int sid, Difficulty difficulty)
+    {
+        string path = Path.Combine(DataDir, GetChartScriptPath(sid, difficulty));
+        string dir = Path.GetDirectoryName(path);
+        if (!Directory.Exists(dir))
+            Directory.CreateDirectory(dir);
+        File.WriteAllText(path, script);
     }
 
     public static void SaveHeader(cHeader header)
