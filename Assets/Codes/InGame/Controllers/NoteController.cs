@@ -545,7 +545,7 @@ public class NoteController : MonoBehaviour
         slidesToDestroy.ForEach(slide => slides.Remove(slide));
         notesToDestroy.ForEach(note => notebases.Remove(note));
 
-        chartScript.OnUpdate(audioTime);
+        chartScript?.OnUpdate(audioTime);
     }
 
     private void OnDestroy()
