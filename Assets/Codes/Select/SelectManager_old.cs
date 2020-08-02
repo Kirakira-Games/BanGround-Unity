@@ -295,7 +295,6 @@ public class SelectManager_old : MonoBehaviour
             yield return 0;
             //yield break;
         }
-        //print("select near");
         rt_s.StopMovement();
         var destPos = 0 - rt.anchoredPosition.y - lg.padding.top - 100;
         float nearestDistance = 9999f;
@@ -313,13 +312,15 @@ public class SelectManager_old : MonoBehaviour
         SelectSong(nearstIndex);
     }
 
-    RectControl last = null;
+    private RectControl last = null;
+    private Coroutine selectCoroutine = null;
     public void SelectSong(int index)
     {
-        
         if (index == -1)
         {
-            StartCoroutine(SelectNear());
+            if (selectCoroutine != null)
+                StopCoroutine(selectCoroutine);
+            selectCoroutine = StartCoroutine(SelectNear());
             return;
         }
 
