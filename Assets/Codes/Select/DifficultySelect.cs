@@ -103,7 +103,7 @@ public class DifficultySelect : MonoBehaviour
             SelectManager_old.instance.InitSongList(cl_lastsid);
         }
 
-        lastDifficulty = LiveSetting.actualDifficulty;
+        lastDifficulty = LiveSetting.currentDifficulty;
 
         recordDisplayer.DisplayRecord();
         string path = DataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid).Item1;
