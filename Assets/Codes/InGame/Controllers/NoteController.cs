@@ -436,7 +436,7 @@ public class NoteController : MonoBehaviour
         // Check if adjusting offset
         if (LiveSetting.offsetAdjustMode)
         {
-            GameObject.Find("infoCanvas").GetComponent<Canvas>().enabled = false;
+            GameObject.Find("infoCanvas").SetActive(false);
             LiveSetting.attachedMods.Clear();
         }
         else
