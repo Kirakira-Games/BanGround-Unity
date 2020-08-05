@@ -2,9 +2,13 @@
 using System.Diagnostics;
 using System;
 using System.Collections.Generic;
+using Zenject;
 
 public class AudioTimelineSync : MonoBehaviour
 {
+    [Inject]
+    private IAudioManager audioManager;
+
     public static AudioTimelineSync instance;
 
     private Stopwatch watch;
@@ -90,7 +94,7 @@ public class AudioTimelineSync : MonoBehaviour
     {
         if (UIManager.Instance.SM.Base == GameStateMachine.State.Finished)
             return;
-        var bgm = AudioManager.Instance?.gameBGM;
+        var bgm = audioManager.gameBGM;
         if (bgm == null || bgm.GetStatus() != AudioProvider.PlaybackStatus.Playing)
             return;
         // Audio sync test

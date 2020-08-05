@@ -8,9 +8,13 @@ using System.IO;
 using System.Linq;
 using AudioProvider;
 using UniRx.Async;
+using Zenject;
 
 public class ResultManager : MonoBehaviour
 {
+    [Inject]
+    private IAudioManager audioManager;
+
     private Button button_back;
     private Button button_retry;
 
@@ -63,7 +67,7 @@ public class ResultManager : MonoBehaviour
         ShowBackground();
         ShowOffset();
         ReadRank();
-        bgmST = await AudioManager.Instance.PlayLoopMusic(bgmVoice.bytes);
+        bgmST = await audioManager.PlayLoopMusic(bgmVoice.bytes);
         bgmST.SetVolume(0.7f);
     }
 
@@ -101,7 +105,7 @@ public class ResultManager : MonoBehaviour
         {
             await UniTask.Delay(800);
 
-            var rankPlayer = await AudioManager.Instance.PrecacheSE(voices[0].bytes);
+            var rankPlayer = await audioManager.PrecacheSE(voices[0].bytes);
             rankPlayer.PlayOneShot();
         }
         TextAsset resultVoice;
@@ -138,7 +142,7 @@ public class ResultManager : MonoBehaviour
 
         if (resultVoice != null)
         {
-            var resultPlayer = await AudioManager.Instance.PrecacheSE(resultVoice.bytes);
+            var resultPlayer = await audioManager.PrecacheSE(resultVoice.bytes);
             resultPlayer.PlayOneShot();
         }
 
@@ -176,12 +180,12 @@ public class ResultManager : MonoBehaviour
 
         if (clearMarkVoice != null)
         {
-            (await AudioManager.Instance.PrecacheSE(clearMarkVoice.bytes)).PlayOneShot();
+            (await audioManager.PrecacheSE(clearMarkVoice.bytes)).PlayOneShot();
         }
         await UniTask.Delay((int)(lenth * 1000));
         if (commentVoice != null)
         {
-            (await AudioManager.Instance.PrecacheSE(commentVoice.bytes)).PlayOneShot();
+            (await audioManager.PrecacheSE(commentVoice.bytes)).PlayOneShot();
         }
     }
 

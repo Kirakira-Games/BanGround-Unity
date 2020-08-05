@@ -1,16 +1,19 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
 
 #pragma warning disable 0649
 public class OneShootAudioCustom : MonoBehaviour
 {
+    [Inject]
+    private IAudioManager audioManager;
 
     [SerializeField] private TextAsset sound;
     // Start is called before the first frame update
     async void Start()
     {
-        (await AudioManager.Instance.PrecacheSE(sound.bytes)).PlayOneShot();
+        (await audioManager.PrecacheSE(sound.bytes)).PlayOneShot();
 
     }
 

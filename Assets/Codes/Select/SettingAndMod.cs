@@ -4,12 +4,14 @@ using System.Linq;
 using AudioProvider;
 using UnityEngine;
 using UnityEngine.UI;
-using System.IO;
-using Newtonsoft.Json;
+using Zenject;
 
 public class SettingAndMod : MonoBehaviour
 {
     public static SettingAndMod instance;
+
+    [Inject]
+    private IAudioManager audioManager;
 
     private Button setting_Open_Btn;
     private Button setting_Close_Btn;
@@ -215,9 +217,9 @@ public class SettingAndMod : MonoBehaviour
         setting_Close_Btn.gameObject.SetActive(false);
         KVSystem.Instance.SaveConfig();
         SelectManager_old.instance.previewSound?.Play();
-        AudioManager.Provider.SetSoundEffectVolume(snd_se_volume, SEType.Common);
-        AudioManager.Provider.SetSoundEffectVolume(snd_igse_volume, SEType.InGame);
-        AudioManager.Provider.SetSoundTrackVolume(snd_bgm_volume);
+        audioManager.Provider.SetSoundEffectVolume(snd_se_volume, SEType.Common);
+        audioManager.Provider.SetSoundEffectVolume(snd_igse_volume, SEType.InGame);
+        audioManager.Provider.SetSoundTrackVolume(snd_bgm_volume);
     }
     void OpenMod()
     {

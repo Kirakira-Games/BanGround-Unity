@@ -6,14 +6,10 @@ using AudioProvider;
 using UniRx.Async;
 
 using State = GameStateMachine.State;
-using UnityEditor;
-using System.Threading.Tasks;
 
-public class AudioManager : MonoBehaviour
+public class AudioManager : MonoBehaviour, IAudioManager
 {
-    public static AudioManager Instance { get; private set; }
-
-    public static IAudioProvider Provider { get; private set; }
+    public IAudioProvider Provider { get; private set; }
 
     public ISoundTrack gameBGM { get; set; }
 
@@ -23,8 +19,6 @@ public class AudioManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != this) return;
-
         KVar snd_engine = new KVar("snd_engine", "Fmod", KVarFlags.Archive | KVarFlags.StringOnly, "Sound engine type");
         KVar snd_buffer_bass = new KVar("snd_buffer_bass", "-1", KVarFlags.Archive, "Buffer type of Bass Sound Engine");
         KVar snd_buffer_fmod = new KVar("snd_buffer_fmod", "-1", KVarFlags.Archive, "Buffer size of Fmod/Unity Sound Engine");
@@ -84,7 +78,6 @@ public class AudioManager : MonoBehaviour
         Provider.SetSoundEffectVolume(snd_igse_volume, SEType.InGame);
         Provider.SetSoundTrackVolume(snd_bgm_volume);
 
-        Instance = this;
         DontDestroyOnLoad(gameObject);
     }
 

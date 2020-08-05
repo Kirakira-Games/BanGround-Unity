@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
-using System.IO;
-using UnityEngine.SceneManagement;
+using Zenject;
 
 #pragma warning disable 0649
 public class DifficultySelect : MonoBehaviour
 {
+    [Inject]
+    private IAudioManager audioManager;
+
     public static readonly string[] DIFFICULTY_ABBR = { "EZ", "NM", "HD", "EX", "SP" };
     public GameObject[] cards = new GameObject[5];
     public GameObject[] labels = new GameObject[5];
@@ -48,7 +50,7 @@ public class DifficultySelect : MonoBehaviour
             Rects[i] = cards[i].GetComponent<RectTransform>();
             labelText[i] = labels[i].GetComponentInChildren<Text>();
             labelText[i].text = "";
-            processedVoices[i] = await AudioManager.Instance.PrecacheSE(voices[i].bytes);
+            processedVoices[i] = await audioManager.PrecacheSE(voices[i].bytes);
         }
 
     }

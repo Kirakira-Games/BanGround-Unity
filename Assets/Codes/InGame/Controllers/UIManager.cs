@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 using AudioProvider;
 using System;
 using UniRx.Async;
+using Zenject;
 
 using State = GameStateMachine.State;
 using System.Threading;
@@ -13,6 +14,9 @@ using System.Threading;
 public class UIManager : MonoBehaviour
 {
     public static UIManager Instance;
+
+    [Inject]
+    private IAudioManager audioManager;
 
     private const float BiteTime = 2;
 
@@ -108,7 +112,7 @@ public class UIManager : MonoBehaviour
         InGameBackground.instance.pauseVideo();
         Time.timeScale = 0;
         AudioTimelineSync.instance.Pause();
-        AudioManager.Instance.gameBGM.Pause();
+        audioManager.gameBGM.Pause();
         pause_Canvas.SetActive(true);
         SM.AddState(State.Paused);
 
@@ -140,7 +144,7 @@ public class UIManager : MonoBehaviour
 
     private async UniTask BiteTheDust(CancellationToken token)
     {
-        ISoundTrack bgm = AudioManager.Instance.gameBGM;
+        ISoundTrack bgm = audioManager.gameBGM;
         SM.AddState(State.Rewinding);
         float currentTime = AudioTimelineSync.instance.GetTimeInS();
         float targetTime = Mathf.Max(0, currentTime - BiteTime);
@@ -217,8 +221,8 @@ public class UIManager : MonoBehaviour
             restart = true;
 
         InGameBackground.instance.stopVideo();
-        AudioManager.Instance.gameBGM?.Dispose();
-        AudioManager.Instance.gameBGM = null;
+        audioManager.gameBGM?.Dispose();
+        audioManager.gameBGM = null;
         ShowResult(restart);
     }
 
@@ -245,22 +249,22 @@ public class UIManager : MonoBehaviour
             {
                 case ClearMarks.AP:
                     gateImg.sprite = Resources.Load<Sprite>("UI/ClearMark_Long/AllPerfect");
-                    resultVoice = await AudioManager.Instance.PrecacheSE(APvoice.bytes);
+                    resultVoice = await audioManager.PrecacheSE(APvoice.bytes);
                     resultVoice.PlayOneShot();
                     break;
                 case ClearMarks.FC:
                     gateImg.sprite = Resources.Load<Sprite>("UI/ClearMark_Long/FullCombo");
-                    resultVoice = await AudioManager.Instance.PrecacheSE(FCvoice.bytes);
+                    resultVoice = await audioManager.PrecacheSE(FCvoice.bytes);
                     resultVoice.PlayOneShot();
                     break;
                 case ClearMarks.CL:
                     gateImg.sprite = Resources.Load<Sprite>("UI/ClearMark_Long/Clear");
-                    resultVoice = await AudioManager.Instance.PrecacheSE(CLvoice.bytes);
+                    resultVoice = await audioManager.PrecacheSE(CLvoice.bytes);
                     resultVoice.PlayOneShot();
                     break;
                 case ClearMarks.F:
                     gateImg.sprite = Resources.Load<Sprite>("UI/ClearMark_Long/Fail");
-                    resultVoice = await AudioManager.Instance.PrecacheSE(Fvoice.bytes);
+                    resultVoice = await audioManager.PrecacheSE(Fvoice.bytes);
                     resultVoice.PlayOneShot();
                     break;
             }
@@ -274,8 +278,8 @@ public class UIManager : MonoBehaviour
 
     private void OnStopPlaying()
     {
-        AudioManager.Instance.gameBGM?.Pause();
-        AudioManager.Instance.StopAllCoroutines();
+        audioManager.gameBGM?.Pause();
+        audioManager.StopAllCoroutines();
 
         pause_Btn.onClick.RemoveAllListeners();
         resume_Btn.onClick.RemoveAllListeners();
@@ -290,8 +294,8 @@ public class UIManager : MonoBehaviour
 
     private void Update()
     {
-        if (SM.Count == 1 && SM.Current != State.Finished && AudioManager.Instance.gameBGM != null &&
-            AudioTimelineSync.instance.GetTimeInMs() > AudioManager.Instance.gameBGM.GetLength() + 1000 &&
+        if (SM.Count == 1 && SM.Current != State.Finished && audioManager.gameBGM != null &&
+            AudioTimelineSync.instance.GetTimeInMs() > audioManager.gameBGM.GetLength() + 1000 &&
             NoteController.Instance.isFinished)
         {
             SM.Transit(SM.Current, State.Finished);

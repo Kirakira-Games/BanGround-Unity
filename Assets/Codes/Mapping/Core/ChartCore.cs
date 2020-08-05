@@ -7,6 +7,7 @@ using UniRx.Async;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using Zenject;
 
 namespace BGEditor
 {
@@ -17,6 +18,9 @@ namespace BGEditor
     public class ChartCore : MonoBehaviour
     {
         public static ChartCore Instance;
+
+        [Inject]
+        private IAudioManager audioManager;
 
         public GridController grid;
         public EditNoteController notes;
@@ -235,7 +239,7 @@ namespace BGEditor
                 // Timing not loaded
                 return;
             }
-            float duration = AudioManager.Instance.gameBGM.GetLength() / 1000f;
+            float duration = audioManager.gameBGM.GetLength() / 1000f;
             editor.numBeats = Mathf.CeilToInt(chart.TimeToBeat(duration));
             onGridModifed.Invoke();
         }

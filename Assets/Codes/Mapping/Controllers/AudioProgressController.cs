@@ -4,11 +4,15 @@ using UnityEngine.UI;
 using AudioProvider;
 using System;
 using FMOD;
+using Zenject;
 
 namespace BGEditor
 {
     public class AudioProgressController : CoreMonoBehaviour
     {
+        [Inject]
+        private IAudioManager audioManager;
+
         public Text TimeText;
         public Slider AudioProgressSlider;
         public Slider PlaybackRateSlider;
@@ -21,7 +25,7 @@ namespace BGEditor
 
         public uint audioLength { get; private set; }
 
-        private ISoundTrack bgm => AudioManager.Instance.gameBGM;
+        private ISoundTrack bgm => audioManager.gameBGM;
         private ISoundEffect singleSE;
         private ISoundEffect flickSE;
         private float lastBeat;
@@ -109,7 +113,7 @@ namespace BGEditor
         {
             var hack = SettingAndMod.instance;
             // Load BGM
-            AudioManager.Instance.gameBGM = await AudioManager.Provider.StreamTrack(audio);
+            audioManager.gameBGM = await audioManager.Provider.StreamTrack(audio);
             bgm.Play();
             bgm.Pause();
 
@@ -131,8 +135,8 @@ namespace BGEditor
         private async void Start()
         {
             // Load SE
-            singleSE = await AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) + "/perfect.wav").bytes);
-            flickSE = await AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) + "/flick.wav").bytes);
+            singleSE = await audioManager.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) + "/perfect.wav").bytes);
+            flickSE = await audioManager.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) + "/flick.wav").bytes);
 
             lastBeat = float.NaN;
             lastTime = float.NaN;

@@ -9,11 +9,14 @@ using System;
 using AudioProvider;
 using Random = UnityEngine.Random;
 using UniRx.Async;
-using UnityEngine.Profiling;
+using Zenject;
 
 #pragma warning disable 0649
 public class SelectManager_old : MonoBehaviour
 {
+    [Inject]
+    private IAudioManager audioManager;
+
     public const float scroll_Min_Speed = 50f;
 
     private cHeader lastcHeader = new cHeader();
@@ -143,12 +146,12 @@ public class SelectManager_old : MonoBehaviour
 
     private async void PlayVoicesAtSceneIn()
     {
-        (await AudioManager.Instance.PrecacheSE(voices[Random.Range(0, 3)].bytes)).PlayOneShot();
+        (await audioManager.PrecacheSE(voices[Random.Range(0, 3)].bytes)).PlayOneShot();
     }
 
     private async void PlayVoicesAtSceneOut()
     {
-        (await AudioManager.Instance.PrecacheSE(voices[Random.Range(3, 7)].bytes)).PlayOneShot();
+        (await audioManager.PrecacheSE(voices[Random.Range(3, 7)].bytes)).PlayOneShot();
     }
 
     private void InitComponent()
@@ -386,7 +389,7 @@ public class SelectManager_old : MonoBehaviour
         }
         if (DataLoader.MusicExists(LiveSetting.CurrentHeader.mid))
         {
-            previewSound = await AudioManager.Instance.PlayLoopMusic(KiraFilesystem.Instance.Read(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), true,
+            previewSound = await audioManager.PlayLoopMusic(KiraFilesystem.Instance.Read(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), true,
                 GetPreviewPos(),
                 false
             );
