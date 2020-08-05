@@ -8,9 +8,13 @@ using UnityEngine.Events;
 using AudioProvider;
 using UniRx.Async;
 using JudgeQueue = PriorityQueue<int, NoteBase>;
+using Zenject;
 
 public class NoteController : MonoBehaviour
 {
+    [Inject]
+    private IAudioManager audioManager;
+
     public static NoteController Instance;
     public static Camera mainCamera;
     public static Vector3 mainForward = new Vector3(0, -0.518944f, 0.8548083f);
@@ -402,15 +406,15 @@ public class NoteController : MonoBehaviour
         // Sound effects
         soundEffects = new ISoundEffect[5]
         {
-            await AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) +"/perfect.wav").bytes),
-            await AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) +"/great.wav").bytes),
-            await AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) +"/empty.wav").bytes),
-            await AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) +"/empty.wav").bytes),
-            await AudioManager.Instance.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) +"/flick.wav").bytes)
+            await audioManager.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) +"/perfect.wav").bytes),
+            await audioManager.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) +"/great.wav").bytes),
+            await audioManager.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) +"/empty.wav").bytes),
+            await audioManager.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) +"/empty.wav").bytes),
+            await audioManager.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) +"/flick.wav").bytes)
         };
 
         // Game BGM
-        StartCoroutine(AudioManager.Instance.DelayPlayInGameBGM(KiraFilesystem.Instance.Read(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), WARM_UP_SECOND).ToCoroutine());
+        StartCoroutine(audioManager.DelayPlayInGameBGM(KiraFilesystem.Instance.Read(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), WARM_UP_SECOND).ToCoroutine());
 
         // Background
         var background = GameObject.Find("InGameBackground").GetComponent<InGameBackground>();
@@ -447,7 +451,7 @@ public class NoteController : MonoBehaviour
         chartScript = new ChartScript(LiveSetting.CurrentHeader.sid, (Difficulty)LiveSetting.actualDifficulty);
 
         //Set Play Mod Event
-        //AudioManager.Instance.restart = false;
+        //audioManager.restart = false;
         onJudge = null;
         foreach (var mod in LiveSetting.attachedMods)
         {
@@ -457,7 +461,7 @@ public class NoteController : MonoBehaviour
                     if (result != JudgeResult.Perfect && result != JudgeResult.Great)
                     {
                         UIManager.Instance.SM.Transit(UIManager.Instance.SM.Current, GameStateMachine.State.Finished);
-                        AudioManager.Instance.StopBGM();
+                        audioManager.StopBGM();
                         UIManager.Instance.OnAudioFinish(true);
                     }
                 });
@@ -468,7 +472,7 @@ public class NoteController : MonoBehaviour
                     if (result != JudgeResult.Perfect)
                     {
                         UIManager.Instance.SM.Transit(UIManager.Instance.SM.Current, GameStateMachine.State.Finished);
-                        AudioManager.Instance.StopBGM();
+                        audioManager.StopBGM();
                         GameObject.Find("UIManager").GetComponent<UIManager>().OnAudioFinish(true);
                     }
                 });

@@ -4,9 +4,13 @@ using UnityEngine;
 using UnityEngine.UI;
 using AudioProvider;
 using State = GameStateMachine.State;
+using Zenject;
 
 public class TimeProgressManager : MonoBehaviour
 {
+    [Inject]
+    private IAudioManager audioManager;
+
     private Slider TimeProgress;
     private uint audioLength;
     private ISoundTrack gameBGM;
@@ -14,13 +18,13 @@ public class TimeProgressManager : MonoBehaviour
     void Start()
     {
         TimeProgress = GetComponent<Slider>();
-        gameBGM = AudioManager.Instance.gameBGM;
+        gameBGM = audioManager.gameBGM;
     }
 
     void Update()
     {
         if(gameBGM == null)
-            gameBGM = AudioManager.Instance.gameBGM;
+            gameBGM = audioManager.gameBGM;
 
         switch (UIManager.Instance.SM.Current)
         {

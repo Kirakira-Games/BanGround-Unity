@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using XLua;
 using System.IO;
 using UnityEngine;
 using AudioProvider;
 using SELib;
+using Zenject;
 
 [LuaCallCSharp]
 class ChartCamera
@@ -48,6 +46,8 @@ class ChartCamera
 class ScriptSoundEffect : IDisposable
 {
     ISoundEffect se;
+    [Inject]
+    private IAudioManager audioManager;
 
     public ScriptSoundEffect(string file)
     {
@@ -60,7 +60,7 @@ class ScriptSoundEffect : IDisposable
 
         if (KiraFilesystem.Instance.Exists(path))
         {
-            se = await AudioManager.Instance.PrecacheSE(KiraFilesystem.Instance.Read(path));
+            se = await audioManager.PrecacheSE(KiraFilesystem.Instance.Read(path));
         }
     }
 

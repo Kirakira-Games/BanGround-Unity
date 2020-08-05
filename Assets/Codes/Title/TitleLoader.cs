@@ -1,19 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Collections;
-using System.Linq;
-using System.Text;
-using System.IO;
-using UnityEngine.Networking;
-using Newtonsoft.Json;
+﻿using System.IO;
 using UnityEngine;
 using AudioProvider;
 using UnityEngine.UI;
-using System.Security.Cryptography;
 using UniRx.Async;
-using BanGround.API;
+using Zenject;
 
 public class TitleLoader : MonoBehaviour
 {
+    [Inject]
+    private IAudioManager audioManager;
+
     public TextAsset titleMusic;
     public TextAsset[] voice;
     public Text Title;
@@ -79,11 +75,11 @@ public class TitleLoader : MonoBehaviour
     async void PlayTitle()
     {
         //yield return new WaitForSeconds(0.5f);
-        music = await AudioManager.Instance.PlayLoopMusic(titleMusic.bytes);
+        music = await audioManager.PlayLoopMusic(titleMusic.bytes);
         music.SetVolume(0.7f);
         await UniTask.Delay(3000); //yield return new WaitForSeconds(3f);
 
-        banGround = await AudioManager.Instance.PrecacheSE(voice[UnityEngine.Random.Range(0,voice.Length)].bytes);
+        banGround = await audioManager.PrecacheSE(voice[UnityEngine.Random.Range(0,voice.Length)].bytes);
         banGround.PlayOneShot();
     }
 

@@ -2,18 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 #pragma warning disable 0414
 
 public class FPSCounter : MonoBehaviour
 {
-    Text text;
-    int frameInSec = 0;
-    int freamTimeInSec = 0;
-    float lastClearTime = -1;
-    int lastFPS = 0;
+    [Inject]
+    private IAudioManager audioManager;
 
-    float lostFocusTime = 0;
+    private Text text;
+    private int frameInSec = 0;
+    private float lastClearTime = -1;
+    private int lastFPS = 0;
 
     void Awake()
     {
@@ -34,9 +35,9 @@ public class FPSCounter : MonoBehaviour
         string str = $"FPS : {lastFPS}";
 
         // Audio diff display
-        if (AudioTimelineSync.instance != null && AudioManager.Instance.gameBGM != null)
+        if (AudioTimelineSync.instance != null && audioManager.gameBGM != null)
         {
-            uint audioTime = AudioManager.Instance.gameBGM.GetPlaybackTime();
+            uint audioTime = audioManager.gameBGM.GetPlaybackTime();
             int syncTime = AudioTimelineSync.instance.GetTimeInMs();
             str += $"\nS: {audioTime}/{syncTime}";
             /*

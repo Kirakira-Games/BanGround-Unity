@@ -6,9 +6,13 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using AudioProvider;
+using Zenject;
 
 public class SESelector : MonoBehaviour
 {
+    [Inject]
+    private IAudioManager audioManager;
+
     private InputField seInput;
 
     private Button perfectBtn;
@@ -37,12 +41,12 @@ public class SESelector : MonoBehaviour
             if (int.Parse(seInput.text) > 3) seInput.text = "1";
             perfectSE?.Dispose();
             flickSE?.Dispose();
-            perfectSE = await AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)int.Parse(seInput.text)) + "/perfect.wav").bytes);
-            flickSE = await AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)int.Parse(seInput.text)) + "/flick.wav").bytes);
+            perfectSE = await audioManager.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)int.Parse(seInput.text)) + "/perfect.wav").bytes);
+            flickSE = await audioManager.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)int.Parse(seInput.text)) + "/flick.wav").bytes);
         });
 
-        perfectSE = await AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) + "/perfect.wav").bytes);
-        flickSE = await AudioManager.Instance.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) + "/flick.wav").bytes);
+        perfectSE = await audioManager.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) + "/perfect.wav").bytes);
+        flickSE = await audioManager.PrecacheSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) + "/flick.wav").bytes);
 
         perfectBtn.onClick.AddListener(() =>
         {
