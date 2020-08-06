@@ -20,24 +20,12 @@ public class AppPreLoader : MonoBehaviour
         Physics2D.autoSimulation = false;
 
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
-        DataLoader.InitFileSystem();
         KVSystem.Instance.ReloadConfig();
 
         Screen.orientation = ScreenOrientation.AutoRotation;
         Application.targetFrameRate = 120;
         InitAudioInfo();
         GetUUID();
-
-        Application.deepLinkActivated += (url) =>
-        {
-            if (DataLoader.LoadAllKiraPackFromInbox())
-            {
-                if (SceneManager.GetActiveScene().name == "Select")
-                {
-                    SceneManager.LoadScene("Select");
-                }
-            }
-        };
 
     }
 
@@ -48,7 +36,6 @@ public class AppPreLoader : MonoBehaviour
         PlayerLoopHelper.Initialize(ref playerLoop);
 
         SceneManager.LoadScene("Title");
-
     }
 
     private void InitAudioInfo()

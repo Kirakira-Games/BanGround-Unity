@@ -481,7 +481,7 @@ public class KVSystem : IEnumerable<KonCommandBase>
                 }
             }
         }
-            
+
         var path = Path.Combine(DataLoader.DataDir, "config.cfg");
 
         if (File.Exists(path))

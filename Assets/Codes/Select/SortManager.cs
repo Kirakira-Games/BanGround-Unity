@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using UnityEngine.Assertions.Must;
+using Zenject;
 
 [JsonConverter(typeof(StringEnumConverter))]
 public enum Sorter
@@ -20,8 +20,16 @@ public enum Sorter
 
 public class ChartDifSort : IComparer<cHeader>
 {
+    private IDataLoader dataLoader;
+    public ChartDifSort(IDataLoader dataLoader)
+    {
+        this.dataLoader = dataLoader;
+    }
+
     public int Compare(cHeader x, cHeader y)
     {
+        x.LoadDifficultyLevels(dataLoader);
+        y.LoadDifficultyLevels(dataLoader);
         int difX = x.difficultyLevel[LiveSetting.currentDifficulty];
         int difY = y.difficultyLevel[LiveSetting.currentDifficulty];
         int dif = difX - difY;
@@ -31,10 +39,16 @@ public class ChartDifSort : IComparer<cHeader>
 
 public class SongNameSort : IComparer<cHeader>
 {
+    private IDataLoader dataLoader;
+    public SongNameSort(IDataLoader dataLoader)
+    {
+        this.dataLoader = dataLoader;
+    }
+
     public int Compare(cHeader x, cHeader y)
     {
-        mHeader xm = DataLoader.GetMusicHeader(x.mid);
-        mHeader ym = DataLoader.GetMusicHeader(y.mid);
+        mHeader xm = dataLoader.GetMusicHeader(x.mid);
+        mHeader ym = dataLoader.GetMusicHeader(y.mid);
         int dif = string.Compare(xm.title, ym.title);
         return dif == 0 ? x.mid - y.mid : dif;
     }
@@ -42,10 +56,16 @@ public class SongNameSort : IComparer<cHeader>
 
 public class SongArtistSort : IComparer<cHeader>
 {
+    private IDataLoader dataLoader;
+    public SongArtistSort(IDataLoader dataLoader)
+    {
+        this.dataLoader = dataLoader;
+    }
+
     public int Compare(cHeader x, cHeader y)
     {
-        mHeader xm = DataLoader.GetMusicHeader(x.mid);
-        mHeader ym = DataLoader.GetMusicHeader(y.mid);
+        mHeader xm = dataLoader.GetMusicHeader(x.mid);
+        mHeader ym = dataLoader.GetMusicHeader(y.mid);
         int dif = string.Compare(xm.artist, ym.artist);
         return dif == 0 ? x.mid - y.mid : dif;
     }

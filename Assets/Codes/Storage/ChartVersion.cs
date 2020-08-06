@@ -3,35 +3,40 @@ using System.Collections;
 using UniRx.Async;
 using System;
 using Newtonsoft.Json;
+using Zenject;
 
-public static class ChartVersion
+public class ChartVersion : IChartVersion
 {
+    public static IChartVersion Instance; // Temporary singleton for refactoring. TODO: Remove.
+    [Inject]
+    private IDataLoader dataLoader;
+
     const int VERSION = 2;
 
-    public static bool CanRead(int version)
+    public bool CanRead(int version)
     {
         return version == VERSION;
     }
 
-    public static bool CanConvert(int version)
+    public bool CanConvert(int version)
     {
         return version <= 1;
     }
 
-    public static V2.Chart ConvertFromV1(cHeader header, Difficulty difficulty)
+    public V2.Chart ConvertFromV1(cHeader header, Difficulty difficulty)
     {
-        var chart = DataLoader.LoadChart<Chart>(header.sid, difficulty);
+        var chart = dataLoader.LoadChart<Chart>(header.sid, difficulty);
         V2.Chart newChart = V2.Chart.From(chart);
-        DataLoader.SaveChart(newChart, header.sid, difficulty);
+        dataLoader.SaveChart(newChart, header.sid, difficulty);
         return newChart;
     }
 
-    public static async UniTask<V2.Chart> Process(cHeader header, Difficulty difficulty)
+    public async UniTask<V2.Chart> Process(cHeader header, Difficulty difficulty)
     {
         V2.Chart chart = new V2.Chart();
         try
         {
-            chart = DataLoader.LoadChart<V2.Chart>(header.sid, difficulty);
+            chart = dataLoader.LoadChart<V2.Chart>(header.sid, difficulty);
         }
         catch
         {
@@ -55,7 +60,7 @@ public static class ChartVersion
             if (!await BGEditor.MessageBox.ShowMessage("Outdated chart",
                 "This chart uses a deprecated standard.\nBut you can still play it without conversion.\nConvert? (animations and speed information will be lost)"))
             {
-                return DataLoader.LoadChart<V2.Chart>(header.sid, difficulty);
+                return dataLoader.LoadChart<V2.Chart>(header.sid, difficulty);
             }
             return ConvertFromV1(header, difficulty);
         }

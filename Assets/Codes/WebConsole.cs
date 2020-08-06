@@ -17,6 +17,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using WebSocketSharp;
 using WebSocketSharp.Server;
+using Zenject;
 
 public class WebConsole : MonoBehaviour
 {
@@ -40,16 +41,22 @@ public class WebConsole : MonoBehaviour
 
     Dictionary<string, byte[]> resourceList = new Dictionary<string, byte[]>();
 
-    Action flushKirapacksAction = () =>
+    Action flushKirapacksAction;
+
+    [Inject]
+    private void Inject(IDataLoader dataLoader)
     {
-        if (DataLoader.LoadAllKiraPackFromInbox())
+        flushKirapacksAction = () =>
         {
-            if (SceneManager.GetActiveScene().name == "Select")
+            if (dataLoader.LoadAllKiraPackFromInbox())
             {
-                SceneManager.LoadScene("Select");
+                if (SceneManager.GetActiveScene().name == "Select")
+                {
+                    SceneManager.LoadScene("Select");
+                }
             }
-        }
-    };
+        };
+    }
 
     Queue<Action> actionQueue = new Queue<Action>();
     List<WebSocketInterface> webSockets = new List<WebSocketInterface>();

@@ -18,7 +18,7 @@ public class AndroidCallback : AndroidJavaProxy
 
     public void onFileImport()
     {
-        //if (DataLoader.LoadAllKiraPackFromInbox())
+        //if (dataLoader.LoadAllKiraPackFromInbox())
         //{
         //    if (SceneManager.GetActiveScene().name == "Select")
         //    {

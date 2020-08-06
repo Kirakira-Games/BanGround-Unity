@@ -8,6 +8,7 @@ using ProtoBuf;
 using System.Linq;
 using UnityEngine.Scripting;
 using ProtoBuf.Meta;
+using Zenject;
 
 [JsonConverter(typeof(StringEnumConverter))]
 [ProtoContract()]
@@ -228,25 +229,18 @@ public partial class cHeader : IExtensible
     [ProtoMember(8)]
     public List<string> tag { get; set; } = new List<string>();
 
-    private List<int> cachedDifficultyLevel;
-    public List<int> difficultyLevel
+    public List<int> difficultyLevel;
+    public void LoadDifficultyLevels(IDataLoader dataLoader)
     {
-        get
+        if (difficultyLevel != null)
+            return;
+        difficultyLevel = new List<int>();
+        for (var diff = Difficulty.Easy; diff <= Difficulty.Special; diff++)
         {
-            if (cachedDifficultyLevel == null)
-            {
-                cachedDifficultyLevel = new List<int>();
-
-                for (var diff = Difficulty.Easy; diff <= Difficulty.Special; diff++)
-                {
-                    var chart = DataLoader.GetChartPath(sid, diff);
-                    cachedDifficultyLevel.Add(DataLoader.GetChartLevel(chart));
-                }
-            }
-            return cachedDifficultyLevel;
+            var chart = dataLoader.GetChartPath(sid, diff);
+            difficultyLevel.Add(dataLoader.GetChartLevel(chart));
         }
     }
-
 }
 
 [Preserve]

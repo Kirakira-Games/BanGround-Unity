@@ -1,11 +1,15 @@
 ﻿using UnityEngine.UI;
 using System;
 using System.Linq;
+using Zenject;
 
 namespace BGEditor
 {
     public class MetaDataController : CoreMonoBehaviour
     {
+        [Inject]
+        private IDataLoader dataLoader;
+
         public InputField Title;
         public InputField Artist;
         public FloatInput[] BPM;
@@ -22,7 +26,7 @@ namespace BGEditor
         private void Awake()
         {
             cHeader = LiveSetting.CurrentHeader;
-            mHeader = DataLoader.GetMusicHeader(cHeader.mid);
+            mHeader = dataLoader.GetMusicHeader(cHeader.mid);
         }
 
         public void Show()
@@ -101,8 +105,8 @@ namespace BGEditor
                 ChartPreview[1 ^ swap].value
             };
 
-            DataLoader.SaveHeader(mHeader);
-            DataLoader.SaveHeader(cHeader);
+            dataLoader.SaveHeader(mHeader);
+            dataLoader.SaveHeader(cHeader);
             Core.Save();
         }
 

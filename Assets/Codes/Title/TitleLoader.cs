@@ -41,11 +41,12 @@ public class TitleLoader : MonoBehaviour
      * Nic3P4ssword
      */
 
-    private void Awake()
+    [Inject]
+    private void Inject(IDataLoader dataLoader)
     {
         instance = this;
         CheckUpdate();
-        StartCoroutine(DataLoader.Init());
+        _ = dataLoader.Init();
 
         var backgrounds = KiraFilesystem.Instance.ListFiles(filename => filename.StartsWith(BACKGROUND_PATH));
 

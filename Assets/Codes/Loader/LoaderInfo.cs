@@ -5,11 +5,14 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
-using UniRx.Async;
+using Zenject;
 
 #pragma warning disable 0649
 public class LoaderInfo : MonoBehaviour
 {
+    [Inject]
+    private IDataLoader dataLoader;
+
     private mHeader musicHeader;
     private cHeader chartHeader;
 
@@ -33,7 +36,7 @@ public class LoaderInfo : MonoBehaviour
     private void GetInfo()
     {
         chartHeader = LiveSetting.CurrentHeader;
-        musicHeader = DataLoader.GetMusicHeader(LiveSetting.CurrentHeader.mid);
+        musicHeader = dataLoader.GetMusicHeader(LiveSetting.CurrentHeader.mid);
     }
 
     private void AppendChartInfo(bool success)
@@ -45,7 +48,7 @@ public class LoaderInfo : MonoBehaviour
     private void ShowInfo()
     {
         // Song img
-        var path = DataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid).Item1;
+        var path = dataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid).Item1;
         if (path != null && KiraFilesystem.Instance.Exists(path))
         {
             var tex = KiraFilesystem.Instance.ReadTexture2D(path);

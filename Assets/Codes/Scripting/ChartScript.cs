@@ -237,9 +237,9 @@ class ChartScript : IDisposable
 
     private static int sid;
 
-    public static string GetChartResource(string filename)
+    public static string GetChartResource(string file)
     {
-        return DataLoader.ChartDir + sid + "/" + filename;
+        return DataLoader.Instance.GetChartResource(sid, file);
     }
 
     public static string GetChartScriptPath(Difficulty difficulty)

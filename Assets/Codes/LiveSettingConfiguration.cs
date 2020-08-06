@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using System.IO;
 using UniRx.Async;
 using System;
+using Zenject;
 
 public static class LiveSetting
 {
@@ -69,11 +70,13 @@ public static class LiveSetting
         {
             if (offsetAdjustMode)
             {
-                return DataLoader.chartList.Where((x) => x.sid == offsetAdjustChart).First();
+                var ret = DataLoader.Instance.chartList.Where((x) => x.sid == offsetAdjustChart).First();
+                ret.LoadDifficultyLevels(DataLoader.Instance);
+                return ret;
             }
             else
             {
-                return DataLoader.chartList[currentChart];
+                return DataLoader.Instance.chartList[currentChart];
             }
         }
     }
@@ -133,7 +136,7 @@ public static class LiveSetting
 
     public static async UniTask<bool> LoadChart(bool convertToGameChart)
     {
-        chart = await ChartVersion.Process(CurrentHeader, (Difficulty)actualDifficulty);
+        chart = await ChartVersion.Instance.Process(CurrentHeader, (Difficulty)actualDifficulty);
         if (chart == null)
         {
             MessageBannerController.ShowMsg(LogLevel.ERROR, "This chart is unsupported.");
