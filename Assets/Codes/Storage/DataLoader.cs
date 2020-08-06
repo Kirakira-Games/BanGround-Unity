@@ -8,32 +8,39 @@ using UnityEngine.Networking;
 using System;
 using System.Linq;
 using ProtoBuf;
+using UnityEngine.SceneManagement;
+using UniRx.Async;
+using Zenject;
 
-public static class DataLoader
+public class DataLoader : IDataLoader
 {
+    public static IDataLoader Instance; // Temporary singleton for refactoring. TODO: Remove.
     public static readonly string DataDir = Application.persistentDataPath + "/data/";
     public static readonly string ChartDir = "chart/";
     public static readonly string MusicDir = "music/";
-    public static readonly string SkinDir = "skin/";
-    public static readonly string KirapackDir = Application.persistentDataPath + "/kirapack/";
-    public static readonly string FSDir = DataDir + "filesystem/";
-    public static readonly string FSIndex = DataDir + "filesystem/fsindex.bin";
+    private static readonly string SkinDir = "skin/";
+    private static readonly string KirapackDir = Application.persistentDataPath + "/kirapack/";
+    private static readonly string FSDir = DataDir + "filesystem/";
+    private static readonly string FSIndex = DataDir + "filesystem/fsindex.bin";
     public static readonly string InboxDir = Application.persistentDataPath + "/Inbox/";
-    public static readonly string SongListPath = DataDir + "songlist.bin";
-    public static int LastImportedSid = -1;
+    private static readonly string SongListPath = DataDir + "songlist.bin";
+    public int LastImportedSid { get; set; } = -1;
 
-    public static SongList songList;
-    public static List<mHeader> musicList => songList.mHeaders;
-    public static List<cHeader> chartList => songList.cHeaders;
-    public static bool loaded => songList != null;
+    [Inject]
+    IChartVersion chartVersion;
+
+    private SongList songList;
+    public List<mHeader> musicList => songList.mHeaders;
+    public List<cHeader> chartList => songList.cHeaders;
+    public bool loaded => songList != null;
 
     private const int InitialChartVersion = 6;
     private const int GameVersion = 4;
 
-    private static Dictionary<int, cHeader> chartDic = new Dictionary<int, cHeader>();
-    private static Dictionary<int, mHeader> musicDic = new Dictionary<int, mHeader>();
+    private Dictionary<int, cHeader> chartDic = new Dictionary<int, cHeader>();
+    private Dictionary<int, mHeader> musicDic = new Dictionary<int, mHeader>();
 
-    public static IEnumerator Init()
+    public async UniTaskVoid Init()
     {
         LastImportedSid = -1;
         // Delete save files of old versions
@@ -53,18 +60,25 @@ public static class DataLoader
         if (!File.Exists(SongListPath) || PlayerPrefs.GetInt("InitialChartVersion") != InitialChartVersion)
         {
             Debug.Log("Load initial charts...");
-            yield return CopyFileFromStreamingAssetsToPersistentDataPath("/Initial.kirapack");
+            await CopyFileFromStreamingAssetsToPersistentDataPath("/Initial.kirapack");
             LoadKiraPack(new FileInfo(Application.persistentDataPath + "/Initial.kirapack"));
             PlayerPrefs.SetInt("InitialChartVersion", InitialChartVersion);
         }
 
-#if UNITY_ANDROID && false
-        AndroidCallback.Init();
-#endif
-
+        // Register deep link
+        Application.deepLinkActivated += (url) =>
+        {
+            if (LoadAllKiraPackFromInbox())
+            {
+                if (SceneManager.GetActiveScene().name == "Select")
+                {
+                    SceneManager.LoadScene("Select");
+                }
+            }
+        };
     }
 
-    public static void InitFileSystem()
+    public void InitFileSystem()
     {
         // Create directories
         if (!Directory.Exists(Path.Combine(DataDir, ChartDir)))
@@ -83,34 +97,39 @@ public static class DataLoader
         new KiraFilesystem(FSIndex, DataDir);
     }
 
-    public static string GetMusicPath(int mid)
+    public string GetMusicPath(int mid)
     {
         return MusicDir + mid + "/" + mid + ".ogg";
     }
 
-    public static bool MusicExists(int mid)
+    public bool MusicExists(int mid)
     {
         return KiraFilesystem.Instance.Exists(GetMusicPath(mid));
     }
 
-    public static string GetChartPath(int sid, Difficulty difficulty)
+    public string GetChartResource(int sid, string filename)
+    {
+        return ChartDir + sid + "/" + filename;
+    }
+
+    public string GetChartPath(int sid, Difficulty difficulty)
     {
         return ChartDir + sid + "/" + difficulty.ToString("G").ToLower() + ".bin";
     }
 
-    public static string GetChartScriptPath(int sid, Difficulty difficulty)
+    public string GetChartScriptPath(int sid, Difficulty difficulty)
     {
         return GetChartPath(sid, difficulty).Replace(".bin", ".lua");
     }
 
-    public static cHeader GetChartHeader(int sid)
+    public cHeader GetChartHeader(int sid)
     {
         return chartDic.ContainsKey(sid) ? chartDic[sid] : null;
     }
 
-    static KVarRef r_usevideo = new KVarRef("r_usevideo");
+    private KVarRef r_usevideo = new KVarRef("r_usevideo");
 
-    public static (string, int) GetBackgroundPath(int sid, bool forceImg = true)
+    public (string, int) GetBackgroundPath(int sid, bool forceImg = true)
     {
         var header = GetChartHeader(sid);
         if (header != null)
@@ -132,7 +151,7 @@ public static class DataLoader
         return (null, 0);
     }
 
-    public static int GetMidBySid(int sid)
+    public int GetMidBySid(int sid)
     {
         var header = GetChartHeader(sid);
         if (header != null)
@@ -142,17 +161,17 @@ public static class DataLoader
         return -1;
     }
 
-    public static mHeader GetMusicHeader(int mid)
+    public mHeader GetMusicHeader(int mid)
     {
         return musicDic.ContainsKey(mid) ? musicDic[mid] : null;
     }
 
-    public static T LoadChart<T>(int sid, Difficulty difficulty) where T : IExtensible
+    public T LoadChart<T>(int sid, Difficulty difficulty) where T : IExtensible
     {
         return ProtobufHelper.LoadFromKiraFs<T>(GetChartPath(sid, difficulty));
     }
 
-    public static void SaveChart<T>(T chart, int sid, Difficulty difficulty) where T : IExtensible
+    public void SaveChart<T>(T chart, int sid, Difficulty difficulty) where T : IExtensible
     {
         string path = Path.Combine(DataDir, GetChartPath(sid, difficulty));
         string dir = Path.GetDirectoryName(path);
@@ -161,7 +180,7 @@ public static class DataLoader
         ProtobufHelper.Save(chart, path);
     }
 
-    public static void SaveChartScript(string script, int sid, Difficulty difficulty)
+    public void SaveChartScript(string script, int sid, Difficulty difficulty)
     {
         string path = Path.Combine(DataDir, GetChartScriptPath(sid, difficulty));
         string dir = Path.GetDirectoryName(path);
@@ -170,7 +189,7 @@ public static class DataLoader
         File.WriteAllText(path, script);
     }
 
-    public static void SaveHeader(cHeader header)
+    public void SaveHeader(cHeader header)
     {
         string path = Path.Combine(DataDir, ChartDir, header.sid.ToString(), "cheader.bin");
         string dir = Path.GetDirectoryName(path);
@@ -179,7 +198,7 @@ public static class DataLoader
         ProtobufHelper.Save(header, path);
     }
 
-    public static void SaveHeader(mHeader header, byte[] oggFile)
+    public void SaveHeader(mHeader header, byte[] oggFile)
     {
         SaveHeader(header);
 
@@ -187,7 +206,7 @@ public static class DataLoader
         File.WriteAllBytes(path, oggFile);
     }
 
-    public static void SaveHeader(mHeader header)
+    public void SaveHeader(mHeader header)
     {
         string path = Path.Combine(DataDir, MusicDir, header.mid.ToString(), "mheader.bin");
         string dir = Path.GetDirectoryName(path);
@@ -196,7 +215,7 @@ public static class DataLoader
         ProtobufHelper.Save(header, path);
     }
 
-    private static void ExtractRelatedFiles(cHeader header, DirectoryInfo dir)
+    private void ExtractRelatedFiles(cHeader header, DirectoryInfo dir)
     {
         if (dir.Exists)
             dir.Delete(true);
@@ -217,7 +236,7 @@ public static class DataLoader
         }
     }
 
-    public static string BuildKiraPack(cHeader header)
+    public string BuildKiraPack(cHeader header)
     {
         var dir = new DirectoryInfo(Path.Combine(KirapackDir, "temp/"));
         ExtractRelatedFiles(header, dir);
@@ -229,19 +248,19 @@ public static class DataLoader
         return zippath;
     }
 
-    public static int GenerateSid()
-    {
-        DateTime epochStart = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-        return (int) (DateTime.UtcNow - epochStart).TotalSeconds;
-    }
-
-    public static int GenerateMid()
+    public int GenerateSid()
     {
         DateTime epochStart = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         return (int)(DateTime.UtcNow - epochStart).TotalSeconds;
     }
 
-    public static void DuplicateKiraPack(cHeader header)
+    public int GenerateMid()
+    {
+        DateTime epochStart = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        return (int)(DateTime.UtcNow - epochStart).TotalSeconds;
+    }
+
+    public void DuplicateKiraPack(cHeader header)
     {
         var dir = new DirectoryInfo(Path.Combine(KirapackDir, "temp/"));
         ExtractRelatedFiles(header, dir);
@@ -263,14 +282,14 @@ public static class DataLoader
         dir.Delete(true);
     }
 
-    public static int GetChartLevel(string path)
+    public int GetChartLevel(string path)
     {
         try
         {
             try
             {
                 var V2chart = ProtobufHelper.LoadFromKiraFs<V2.Chart>(path);
-                if (ChartVersion.CanRead(V2chart.version))
+                if (chartVersion.CanRead(V2chart.version))
                 {
                     return V2chart.level;
                 }
@@ -290,7 +309,7 @@ public static class DataLoader
     /// <summary>
     /// Update the song list by iterating over all header files.
     /// </summary>
-    public static void RefreshSongList()
+    public void RefreshSongList()
     {
         chartDic.Clear();
         musicDic.Clear();
@@ -322,7 +341,7 @@ public static class DataLoader
                      where x.EndsWith("cheader.bin")
                      select x;
 
-        foreach(var chart in charts)
+        foreach (var chart in charts)
         {
             cHeader chartHeader = ProtobufHelper.LoadFromKiraFs<cHeader>(chart);
             if (loadedIds.Contains(chartHeader.sid))
@@ -347,7 +366,7 @@ public static class DataLoader
 
         foreach (var (song, refcount) in referencedSongs)
         {
-            if(refcount == 0)
+            if (refcount == 0)
             {
                 var musicDir = $"music/{song.mid}";
 
@@ -367,7 +386,7 @@ public static class DataLoader
                 songList.mHeaders.Add(song);
             }
         }
-        
+
         Debug.Log(JsonConvert.SerializeObject(songList, Formatting.Indented));
         // ProtobufHelper.Save(songList, SongListPath);
 
@@ -384,7 +403,7 @@ public static class DataLoader
         }
     }
 
-    public static void ConvertJsonToBin(DirectoryInfo dir)
+    public void ConvertJsonToBin(DirectoryInfo dir)
     {
         FileInfo[] files = dir.GetFiles();
         foreach (FileInfo file in files)
@@ -426,7 +445,7 @@ public static class DataLoader
         }
     }
 
-    private static void ConvertBin(string kirapack)
+    private void ConvertBin(string kirapack)
     {
         using (var zip = ZipFile.OpenRead(kirapack))
         {
@@ -458,7 +477,7 @@ public static class DataLoader
                     if (type == null)
                     {
                         // v2!
-                        if(json.Contains("\"version\""))
+                        if (json.Contains("\"version\""))
                         {
                             obj = JsonConvert.DeserializeObject<V2.Chart>(json);
                         }
@@ -482,11 +501,11 @@ public static class DataLoader
         }
     }
 
-    public static int LoadKiraPack(FileInfo file)
+    public int LoadKiraPack(FileInfo file)
     {
         string path = Path.Combine(FSDir, Guid.NewGuid().ToString("N"));
 
-        if (!file.Exists) 
+        if (!file.Exists)
             return -1;
 
         Debug.Log($"Load kirapack: {file.FullName}");
@@ -522,7 +541,7 @@ public static class DataLoader
         }
     }
 
-    public static bool LoadAllKiraPackFromInbox()
+    public bool LoadAllKiraPackFromInbox()
     {
         bool LoadSuccess = false;
         try
@@ -569,10 +588,10 @@ public static class DataLoader
         return LoadSuccess;
     }
 
-    private static IEnumerator CopyFileFromStreamingAssetsToPersistentDataPath(string relativePath)
+    private async UniTaskVoid CopyFileFromStreamingAssetsToPersistentDataPath(string relativePath)
     {
         string streamingPath;
-        if (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.Android)  
+        if (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.Android)
         {
             streamingPath = Application.streamingAssetsPath + relativePath;
         }
@@ -581,11 +600,9 @@ public static class DataLoader
             streamingPath = "file://" + Application.streamingAssetsPath + relativePath;
         }
 
-        Debug.Log(streamingPath);
-
         using (UnityWebRequest webRequest = UnityWebRequest.Get(streamingPath))
         {
-            yield return webRequest.SendWebRequest();
+            await webRequest.SendWebRequest();
             string directory = Path.GetDirectoryName(Application.persistentDataPath + relativePath);
             if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
             using (var writer = File.Create(Application.persistentDataPath + relativePath))

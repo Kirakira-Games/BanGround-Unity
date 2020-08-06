@@ -14,6 +14,8 @@ public class ResultManager : MonoBehaviour
 {
     [Inject]
     private IAudioManager audioManager;
+    [Inject]
+    private IDataLoader dataLoader;
 
     private Button button_back;
     private Button button_retry;
@@ -56,7 +58,7 @@ public class ResultManager : MonoBehaviour
     async void Start()
     {
         cheader = LiveSetting.CurrentHeader;
-        mheader = DataLoader.GetMusicHeader(cheader.mid);
+        mheader = dataLoader.GetMusicHeader(cheader.mid);
 
         SetBtnObject();
         GetResultObjectAndComponent();
@@ -95,7 +97,7 @@ public class ResultManager : MonoBehaviour
     private void ShowBackground()
     {
         background = GameObject.Find("Background").GetComponent<FixBackground>();
-        string path = DataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid).Item1;
+        string path = dataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid).Item1;
         background.UpdateBackground(path);
     }
 

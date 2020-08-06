@@ -9,8 +9,13 @@ using NVorbis;
 using System.Text;
 using System.Collections.Generic;
 using System.Threading;
+using Zenject;
+
 public class ChartCreator : MonoBehaviour
 {
+    [Inject]
+    private IDataLoader dataLoader;
+
     public const int ChartVersion = 1;
     public Button Blocker;
     public Toggle[] Toggles;
@@ -39,7 +44,7 @@ public class ChartCreator : MonoBehaviour
     {
         var header = new mHeader
         {
-            mid = DataLoader.GenerateMid(),
+            mid = dataLoader.GenerateMid(),
             title = title,
             artist = artist,
             length = len,
@@ -53,7 +58,7 @@ public class ChartCreator : MonoBehaviour
     {
         var header = new cHeader();
         header.version = ChartVersion;
-        header.sid = DataLoader.GenerateSid();
+        header.sid = dataLoader.GenerateSid();
         header.mid = mid == -1 ? cHeader.mid : mid;
         bool copyInfo = header.mid == cHeader.mid;
         if (UserInfo.username == null || UserInfo.username.Length == 0)
@@ -95,7 +100,7 @@ public class ChartCreator : MonoBehaviour
 
     public void Duplicate()
     {
-        DataLoader.DuplicateKiraPack(cHeader);
+        dataLoader.DuplicateKiraPack(cHeader);
         SceneManager.LoadScene("Select");
     }
 
@@ -109,13 +114,13 @@ public class ChartCreator : MonoBehaviour
         }
         // Create header
         var header = CreateHeader();
-        DataLoader.SaveHeader(header);
+        dataLoader.SaveHeader(header);
 
         // Create chart
         int clamped = Mathf.Clamp(difficulty, 0, 3);
         int level = Random.Range(clamped * 5 + 5, clamped * 8 + 6);
         var chart = CreateChart((Difficulty) difficulty, level);
-        DataLoader.SaveChart(chart, header.sid, (Difficulty) difficulty);
+        dataLoader.SaveChart(chart, header.sid, (Difficulty) difficulty);
 
         // Reload scene
         LiveSetting.currentDifficulty.Set(difficulty);
@@ -141,7 +146,7 @@ public class ChartCreator : MonoBehaviour
         int clamped = Mathf.Clamp(difficulty, 0, 3);
         int level = Random.Range(clamped * 5 + 5, clamped * 8 + 6);
         var chart = CreateChart((Difficulty) difficulty, level);
-        DataLoader.SaveChart(chart, cHeader.sid, (Difficulty) difficulty);
+        dataLoader.SaveChart(chart, cHeader.sid, (Difficulty) difficulty);
 
         // Reload scene
         LiveSetting.currentDifficulty.Set(difficulty);
@@ -215,17 +220,17 @@ public class ChartCreator : MonoBehaviour
 
             // Create mheader
             var mheader = CreateMHeader(title, artist, len);
-            DataLoader.SaveHeader(mheader, AirdroppedFile);
+            dataLoader.SaveHeader(mheader, AirdroppedFile);
 
             // Create header
             var header = CreateHeader(mheader.mid);
-            DataLoader.SaveHeader(header);
+            dataLoader.SaveHeader(header);
 
             // Create chart
             int clamped = Mathf.Clamp(difficulty, 0, 3);
             int level = Random.Range(clamped * 5 + 5, clamped * 8 + 6);
             var chart = CreateChart((Difficulty)difficulty, level);
-            DataLoader.SaveChart(chart, header.sid, (Difficulty)difficulty);
+            dataLoader.SaveChart(chart, header.sid, (Difficulty)difficulty);
 
             // Reload scene
             LiveSetting.currentDifficulty.Set(difficulty);

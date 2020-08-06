@@ -15,7 +15,11 @@ using Zenject;
 public class SelectManager_old : MonoBehaviour
 {
     [Inject]
+    DiContainer _container;
+    [Inject]
     private IAudioManager audioManager;
+    [Inject]
+    private IDataLoader dataLoader;
 
     public const float scroll_Min_Speed = 50f;
 
@@ -35,7 +39,7 @@ public class SelectManager_old : MonoBehaviour
     [SerializeField] 
     private TextAsset[] voices;
 
-    public List<cHeader> chartList => DataLoader.chartList;
+    public List<cHeader> chartList => dataLoader.chartList;
     List<GameObject> SelectButtons = new List<GameObject>();
     RectTransform[] rts;
     List<RectControl> rcs = new List<RectControl>();
@@ -57,68 +61,76 @@ public class SelectManager_old : MonoBehaviour
         KVSystem.Instance.SaveConfig();
     });
 
-    static Kommand cmd_playdemo = new Kommand("demo_play", "Play a demo file", args =>
-    {
-        if (args.Length > 0)
-        {
-            if (SceneManager.GetActiveScene().name == "Select")
-            {
-                var path = args[0];
+    static Kommand cmd_playdemo;
 
-                if (!File.Exists(path))
+    [Inject]
+    private void Inject()
+    {
+        if (cmd_playdemo == null)
+        {
+            cmd_playdemo = new Kommand("demo_play", "Play a demo file", args =>
+            {
+                if (args.Length > 0)
                 {
-                    if (KiraFilesystem.Instance.Exists(path))
+                    if (SceneManager.GetActiveScene().name == "Select")
                     {
-                        path = Path.Combine(DataLoader.DataDir, path);
+                        var path = args[0];
+
+                        if (!File.Exists(path))
+                        {
+                            if (KiraFilesystem.Instance.Exists(path))
+                            {
+                                path = Path.Combine(DataLoader.DataDir, path);
+                            }
+                            else
+                            {
+                                Debug.Log("[Demo Player] File not exists");
+                                return;
+                            }
+                        }
+
+                        var file = DemoFile.LoadFrom(path);
+
+                        var targetHeader = dataLoader.chartList.First(x => x.sid == file.sid);
+
+                        if (targetHeader == null)
+                        {
+                            Debug.Log("[Demo Player] Target chartset not installed.");
+                            return;
+                        }
+
+                        if (targetHeader.difficultyLevel[(int)file.difficulty] == -1)
+                        {
+                            Debug.Log("[Demo Player] Target chart not installed.");
+                            return;
+                        }
+
+                        LiveSetting.currentChart = dataLoader.chartList.IndexOf(dataLoader.chartList.First(x => x.sid == file.sid));
+                        LiveSetting.actualDifficulty = (int)file.difficulty;
+                        LiveSetting.currentDifficulty.Set((int)file.difficulty);
+
+                        LiveSetting.DemoFile = file;
+
+                        //if (!await LiveSetting.LoadChart(true))
+                        //{
+                        //    return;
+                        //}
+
+                        SceneLoader.LoadScene("Select", "InGame", () => LiveSetting.LoadChart(true));
                     }
                     else
                     {
-                        Debug.Log("[Demo Player] File not exists");
-                        return;
+                        Debug.Log("[Demo Player] Must use in select page!");
                     }
                 }
-
-                var file = DemoFile.LoadFrom(path);
-
-                var targetHeader = DataLoader.chartList.First(x => x.sid == file.sid);
-
-                if (targetHeader == null)
+                else
                 {
-                    Debug.Log("[Demo Player] Target chartset not installed.");
-                    return;
+                    Debug.Log("demo_play: Play a demo file<br />Usage: demo_play <demo file>");
                 }
-
-                if (targetHeader.difficultyLevel[(int)file.difficulty] == -1)
-                {
-                    Debug.Log("[Demo Player] Target chart not installed.");
-                    return;
-                }
-
-                LiveSetting.currentChart = DataLoader.chartList.IndexOf(DataLoader.chartList.First(x => x.sid == file.sid));
-                LiveSetting.actualDifficulty = (int)file.difficulty;
-                LiveSetting.currentDifficulty.Set((int)file.difficulty);
-
-                LiveSetting.DemoFile = file;
-
-                //if (!await LiveSetting.LoadChart(true))
-                //{
-                //    return;
-                //}
-
-                SceneLoader.LoadScene("Select", "InGame", () => LiveSetting.LoadChart(true));
-            }
-            else
-            {
-                Debug.Log("[Demo Player] Must use in select page!");
-            }
+            });
         }
-        else
-        {
-            Debug.Log("demo_play: Play a demo file<br />Usage: demo_play <demo file>");
-        }
-    });
-
-
+    }
+    
     private void Awake()
     {
         instance = this;
@@ -135,8 +147,8 @@ public class SelectManager_old : MonoBehaviour
 
         int selectedSid = cl_lastsid;
 
-        DataLoader.LoadAllKiraPackFromInbox();
-        DataLoader.RefreshSongList();
+        dataLoader.LoadAllKiraPackFromInbox();
+        dataLoader.RefreshSongList();
 
         InitComponent();
         InitSort();
@@ -195,13 +207,13 @@ public class SelectManager_old : MonoBehaviour
         switch ((Sorter)cl_cursorter)
         {
             case Sorter.ChartDifficulty:
-                compare = new ChartDifSort();
+                compare = new ChartDifSort(dataLoader);
                 break;
             case Sorter.SongName:
-                compare = new SongNameSort();
+                compare = new SongNameSort(dataLoader);
                 break;
             case Sorter.SongArtist:
-                compare = new SongArtistSort();
+                compare = new SongArtistSort(dataLoader);
                 break;
             case Sorter.ChartAuthor:
                 compare = new ChartAuthorSort();
@@ -210,7 +222,7 @@ public class SelectManager_old : MonoBehaviour
                 compare = new ChartScoreSort();
                 break;
             default:
-                compare = new SongNameSort();
+                compare = new SongNameSort(dataLoader);
                 break;
         }
         chartList.Sort(compare);
@@ -228,12 +240,12 @@ public class SelectManager_old : MonoBehaviour
         //Spawn New SongItem
         for (int i = 0; i < chartList.Count; i++)
         {
-            GameObject go = Instantiate(songItemPrefab, pos);
+            GameObject go = _container.InstantiatePrefab(songItemPrefab, pos);
             go.name = i.ToString();
             Text[] txt = go.GetComponentsInChildren<Text>();
 
             cHeader chart = chartList[i];
-            mHeader song = DataLoader.GetMusicHeader(chart.mid);
+            mHeader song = dataLoader.GetMusicHeader(chart.mid);
             string author = chart.authorNick;
             txt[0].text = song.title;
             txt[1].text = song.artist + " / " + author;
@@ -254,17 +266,17 @@ public class SelectManager_old : MonoBehaviour
         rt.sizeDelta = new Vector2(rt.sizeDelta.x, lg.padding.top * 2 + chartList.Count * (116) + (chartList.Count - 1) * lg.spacing + (800));
 
         // After import, select imported chart
-        if (DataLoader.LastImportedSid != -1)
+        if (dataLoader.LastImportedSid != -1)
         {
-            selectedSid = DataLoader.LastImportedSid;
-            DataLoader.LastImportedSid = -1;
+            selectedSid = dataLoader.LastImportedSid;
+            dataLoader.LastImportedSid = -1;
         }
         if (selectedSid != -1)
         {
-            if (DataLoader.chartList.Find(item => item.sid == selectedSid) == null)
-                selectedSid = DataLoader.chartList[Random.Range(0, DataLoader.chartList.Count)].sid;
+            if (dataLoader.chartList.Find(item => item.sid == selectedSid) == null)
+                selectedSid = dataLoader.chartList[Random.Range(0, dataLoader.chartList.Count)].sid;
 
-            LiveSetting.currentChart = DataLoader.chartList.IndexOf(DataLoader.chartList.First(x => x.sid == selectedSid));
+            LiveSetting.currentChart = dataLoader.chartList.IndexOf(dataLoader.chartList.First(x => x.sid == selectedSid));
         }
         await SelectDefault();
         lg.enabled = false;
@@ -273,7 +285,7 @@ public class SelectManager_old : MonoBehaviour
     IEnumerator SelectDefault()
     {
         var background = GameObject.Find("KirakiraBackground").GetComponent<FixBackground>();
-        var path = DataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid).Item1;
+        var path = dataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid).Item1;
         background.UpdateBackground(path);
 
         yield return new WaitForEndOfFrame();
@@ -340,6 +352,7 @@ public class SelectManager_old : MonoBehaviour
         }
 
         cl_lastsid.Set(LiveSetting.CurrentHeader.sid);
+        LiveSetting.CurrentHeader.LoadDifficultyLevels(dataLoader);
         difficultySelect.levels = LiveSetting.CurrentHeader.difficultyLevel.ToArray();
         difficultySelect.OnSongChange();
         PlayPreview();
@@ -363,7 +376,7 @@ public class SelectManager_old : MonoBehaviour
         var preview = LiveSetting.CurrentHeader.preview;
         if (preview == null || preview.Length == 0)
         {
-            mHeader mheader = DataLoader.GetMusicHeader(LiveSetting.CurrentHeader.mid);
+            mHeader mheader = dataLoader.GetMusicHeader(LiveSetting.CurrentHeader.mid);
             preview = mheader.preview;
         }
         ret[0] = (uint)(preview[0] * 1000);
@@ -387,9 +400,9 @@ public class SelectManager_old : MonoBehaviour
             previewSound.Dispose();
             previewSound = null;
         }
-        if (DataLoader.MusicExists(LiveSetting.CurrentHeader.mid))
+        if (dataLoader.MusicExists(LiveSetting.CurrentHeader.mid))
         {
-            previewSound = await audioManager.PlayLoopMusic(KiraFilesystem.Instance.Read(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), true,
+            previewSound = await audioManager.PlayLoopMusic(KiraFilesystem.Instance.Read(dataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), true,
                 GetPreviewPos(),
                 false
             );
@@ -481,8 +494,8 @@ public class SelectManager_old : MonoBehaviour
             Screen.orientation = ScreenOrientation.Portrait;
             await UniTask.DelayFrame(0);
         }
-        var zip = DataLoader.BuildKiraPack(LiveSetting.CurrentHeader);
-        var song = DataLoader.GetMusicHeader(LiveSetting.CurrentHeader.mid);
+        var zip = dataLoader.BuildKiraPack(LiveSetting.CurrentHeader);
+        var song = dataLoader.GetMusicHeader(LiveSetting.CurrentHeader.mid);
         new NativeShare()
             .AddFile(zip)
             .SetSubject("Share " + song.title)
@@ -502,7 +515,7 @@ public class SelectManager_old : MonoBehaviour
 
     public void DuplicateKiraPack()
     {
-        DataLoader.DuplicateKiraPack(LiveSetting.CurrentHeader);
+        dataLoader.DuplicateKiraPack(LiveSetting.CurrentHeader);
         SceneManager.LoadScene("Select");
     }
     #endregion
@@ -520,7 +533,7 @@ public class SelectManager_old : MonoBehaviour
     {
         if (focus)
         {
-            bool success = DataLoader.LoadAllKiraPackFromInbox();
+            bool success = dataLoader.LoadAllKiraPackFromInbox();
             if (success) SceneManager.LoadScene("Select");
         }
     }

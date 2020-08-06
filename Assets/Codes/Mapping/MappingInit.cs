@@ -23,7 +23,7 @@ namespace BGEditor
             chart = LiveSetting.chart;
 
             // Load music
-            core.progress.Init(KiraFilesystem.Instance.Read(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)));
+            core.progress.Init(KiraFilesystem.Instance.Read(DataLoader.Instance.GetMusicPath(LiveSetting.CurrentHeader.mid)));
 
             core.StartCoroutine(InitCoroutine(core));
         }

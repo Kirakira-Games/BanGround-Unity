@@ -21,6 +21,8 @@ namespace BGEditor
 
         [Inject]
         private IAudioManager audioManager;
+        [Inject]
+        private IDataLoader dataLoader;
 
         public GridController grid;
         public EditNoteController notes;
@@ -307,10 +309,10 @@ namespace BGEditor
 
         public void Save()
         {
-            DataLoader.SaveChart(GetFinalizedChart(), LiveSetting.CurrentHeader.sid, (Difficulty) LiveSetting.actualDifficulty);
+            dataLoader.SaveChart(GetFinalizedChart(), LiveSetting.CurrentHeader.sid, (Difficulty) LiveSetting.actualDifficulty);
 
             if (!string.IsNullOrEmpty(scriptEditor.Code))
-                DataLoader.SaveChartScript(scriptEditor.Code, LiveSetting.CurrentHeader.sid, (Difficulty)LiveSetting.actualDifficulty);
+                dataLoader.SaveChartScript(scriptEditor.Code, LiveSetting.CurrentHeader.sid, (Difficulty)LiveSetting.actualDifficulty);
 
             MessageBannerController.ShowMsg(LogLevel.OK, "Chart saved.");
         }
@@ -433,8 +435,8 @@ namespace BGEditor
                 notes.UnselectAll();
             }
 
-            if (KiraFilesystem.Instance.Exists(DataLoader.GetChartScriptPath(LiveSetting.CurrentHeader.sid, (Difficulty)LiveSetting.actualDifficulty)))
-                scriptEditor.Code = KiraFilesystem.Instance.ReadString(DataLoader.GetChartScriptPath(LiveSetting.CurrentHeader.sid, (Difficulty)LiveSetting.actualDifficulty));
+            if (KiraFilesystem.Instance.Exists(dataLoader.GetChartScriptPath(LiveSetting.CurrentHeader.sid, (Difficulty)LiveSetting.actualDifficulty)))
+                scriptEditor.Code = KiraFilesystem.Instance.ReadString(dataLoader.GetChartScriptPath(LiveSetting.CurrentHeader.sid, (Difficulty)LiveSetting.actualDifficulty));
 
             onChartLoaded.Invoke();
             hotkey.onScroll.AddListener((delta) => MoveGrid(delta * 30));

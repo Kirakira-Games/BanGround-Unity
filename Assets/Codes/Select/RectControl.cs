@@ -6,12 +6,15 @@ using UnityEngine.EventSystems;
 using System;
 using System.IO;
 using System.Linq;
-using UnityEngine.Networking.NetworkSystem;
+using Zenject;
 
 #pragma warning disable 0649
 #pragma warning disable 0414
 public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerClickHandler, IPointerExitHandler
 {
+    [Inject]
+    private IDataLoader dataLoader;
+
     RectTransform rt_m;
     RectTransform rt_v;
     RectTransform rt;
@@ -150,7 +153,7 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     private void OnEnterPressed()
     {
-        if (!DataLoader.MusicExists(LiveSetting.CurrentHeader.mid))
+        if (!dataLoader.MusicExists(LiveSetting.CurrentHeader.mid))
         {
             MessageBannerController.ShowMsg(LogLevel.INFO, "Music missing. Please import it.");
             return;
@@ -227,7 +230,7 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     private void OnDelete()
     {
-        /*var file = DataLoader.GetChartPath(LiveSetting.CurrentHeader.sid, (Difficulty)LiveSetting.actualDifficulty);
+        /*var file = dataLoader.GetChartPath(LiveSetting.CurrentHeader.sid, (Difficulty)LiveSetting.actualDifficulty);
         var path = new System.IO.FileInfo(file).Directory.FullName;
         //Debug.Log(path);
         System.IO.Directory.Delete(path, true);*/

@@ -14,6 +14,8 @@ public class NoteController : MonoBehaviour
 {
     [Inject]
     private IAudioManager audioManager;
+    [Inject]
+    private IDataLoader dataLoader;
 
     public static NoteController Instance;
     public static Camera mainCamera;
@@ -414,11 +416,11 @@ public class NoteController : MonoBehaviour
         };
 
         // Game BGM
-        StartCoroutine(audioManager.DelayPlayInGameBGM(KiraFilesystem.Instance.Read(DataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), WARM_UP_SECOND).ToCoroutine());
+        StartCoroutine(audioManager.DelayPlayInGameBGM(KiraFilesystem.Instance.Read(dataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), WARM_UP_SECOND).ToCoroutine());
 
         // Background
         var background = GameObject.Find("InGameBackground").GetComponent<InGameBackground>();
-        var (bg, bgtype) = DataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid, false);
+        var (bg, bgtype) = dataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid, false);
         if (bgtype == 1)
         {
             var videoPath = KiraFilesystem.Instance.Extract(bg);
@@ -431,7 +433,7 @@ public class NoteController : MonoBehaviour
 
 
         //background = GameObject.Find("dokidokiBackground").GetComponent<FixBackground>();
-        //background.UpdateBackground(DataLoader.GetBackgroundPath(sid));
+        //background.UpdateBackground(dataLoader.GetBackgroundPath(sid));
 
         // Lane Effects
         laneEffects = GameObject.Find("Effects").GetComponent<LaneEffects>();

@@ -10,6 +10,8 @@ public class DifficultySelect : MonoBehaviour
 {
     [Inject]
     private IAudioManager audioManager;
+    [Inject]
+    private IDataLoader dataLoader;
 
     public static readonly string[] DIFFICULTY_ABBR = { "EZ", "NM", "HD", "EX", "SP" };
     public GameObject[] cards = new GameObject[5];
@@ -108,7 +110,7 @@ public class DifficultySelect : MonoBehaviour
         lastDifficulty = LiveSetting.currentDifficulty;
 
         recordDisplayer.DisplayRecord();
-        string path = DataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid).Item1;
+        string path = dataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid).Item1;
         background.UpdateBackground(path);
         //LiveSetting.selectedDifficulty = (Difficulty)enabledCards[0];
         //print(Enum.GetName(typeof(Difficulty), LiveSetting.selectedDifficulty));
