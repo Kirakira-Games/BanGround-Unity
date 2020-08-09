@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using AudioProvider;
 using UniRx.Async;
+using Zenject;
 
 using State = GameStateMachine.State;
 
@@ -13,16 +14,23 @@ public class AudioManager : MonoBehaviour, IAudioManager
 
     public ISoundTrack gameBGM { get; set; }
 
-    static KVar snd_bgm_volume = new KVar("snd_bgm_volume", "0.7", KVarFlags.Archive, "BGM volume");
-    static KVar snd_se_volume = new KVar("snd_se_volume", "0.7", KVarFlags.Archive, "Sound effect volume");
-    static KVar snd_igse_volume = new KVar("snd_igse_volume", "0.7", KVarFlags.Archive, "In-game sound effect volume");
+    [Inject(Id = "snd_bgm_volume")]
+    KVar snd_bgm_volume;
+    [Inject(Id = "snd_se_volume")]
+    KVar snd_se_volume;
+    [Inject(Id = "snd_igse_volume")]
+    KVar snd_igse_volume;
+
+    [Inject(Id = "snd_engine")]
+    KVar snd_engine;
+    [Inject(Id = "snd_buffer_bass")]
+    KVar snd_buffer_bass;
+    [Inject(Id = "snd_buffer_fmod")]
+    KVar snd_buffer_fmod;
+
 
     private void Awake()
     {
-        KVar snd_engine = new KVar("snd_engine", "Fmod", KVarFlags.Archive | KVarFlags.StringOnly, "Sound engine type");
-        KVar snd_buffer_bass = new KVar("snd_buffer_bass", "-1", KVarFlags.Archive, "Buffer type of Bass Sound Engine");
-        KVar snd_buffer_fmod = new KVar("snd_buffer_fmod", "-1", KVarFlags.Archive, "Buffer size of Fmod/Unity Sound Engine");
-
         int bufferIndex;
 
         if (!AppPreLoader.init) return;
@@ -77,8 +85,6 @@ public class AudioManager : MonoBehaviour, IAudioManager
         Provider.SetSoundEffectVolume(snd_se_volume, SEType.Common);
         Provider.SetSoundEffectVolume(snd_igse_volume, SEType.InGame);
         Provider.SetSoundTrackVolume(snd_bgm_volume);
-
-        DontDestroyOnLoad(gameObject);
     }
 
     private void Update()

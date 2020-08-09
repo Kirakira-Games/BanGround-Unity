@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using UnityEditor.UIElements;
 using UnityEngine;
-
+using Zenject;
 using FS = System.IO.KiraFilesystem;
 
 [Flags]
@@ -30,33 +31,53 @@ public class KonCommandBase
     public string Description { get; protected set; }
 }
 
-// Kommand = Kirakira Command
+// Kirakira Command
 public class Kommand : KonCommandBase
 {
     private Action<string[]> command;
 
     public void Invoke(string[] args = null) => command(args);
 
-    public Kommand(string name, string help, Action<string[]> command)
+    public class KommandInfo
     {
-        Name = name;
-        Description = help;
-        this.command = command;
-
-        KVSystem.Instance.Add(this);
+        public string Name;
+        public string Help;
+        public Action<string[]> Command;
     }
 
-    public Kommand(string name, string help, Action command)
+    public static KommandInfo C(string name, string help, Action<string[]> command) => new KommandInfo
     {
-        Name = name;
-        Description = help;
-        this.command = _ => command();
+        Name = name,
+        Help = help,
+        Command = command
+    };
 
-        KVSystem.Instance.Add(this);
+    public static KommandInfo C(string name, string help, Action command) => new KommandInfo
+    {
+        Name = name,
+        Help = help,
+        Command = _ => command()
+    };
+
+    [Inject]
+    public Kommand() { }
+
+    public static Action<InjectContext, object> OnInit(KommandInfo info)
+    {
+        return (_, obj) =>
+        {
+            var me = obj as Kommand;
+
+            me.Name = info.Name;
+            me.Description = info.Help;
+            me.command = info.Command;
+
+            KVSystem.Instance.Add(me);
+        };
     }
 }
 
-// KVar == Kirakira Variable
+// Kirakira Variable
 public class KVar : KonCommandBase
 {
     public string Default { get; private set; }
@@ -68,6 +89,7 @@ public class KVar : KonCommandBase
     private bool m_boolValue = false;
 
     private Action<object> m_cbValueChanged = null;
+    private Action<object, IKVSystem> m_cbValueChangedAlt = null;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void UpdateValue(object o)
@@ -177,6 +199,7 @@ public class KVar : KonCommandBase
 
         UpdateValue(value);
         m_cbValueChanged?.Invoke(lastValue);
+        m_cbValueChangedAlt?.Invoke(lastValue, KVSystem.Instance);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -185,28 +208,41 @@ public class KVar : KonCommandBase
         return m_flags.HasFlag(flag);
     }
 
-    /// <summary>
-    /// Create a KVar
-    /// </summary>
-    /// <param name="name">Name of the KVar</param>
-    /// <param name="defaultValue">Default Value</param>
-    /// <param name="flag">Flags</param>
-    /// <param name="help">Help string</param>
-    /// <param name="callback">Callback that will be called after value changed</param>
-    public KVar(string name, string defaultValue, KVarFlags flag = 0, string help = "", Action<object> callback = null)
+    public class KVarInfo
     {
-        Name = name;
-        Description = help;
-        Default = defaultValue;
+        public string Name;
+        public string DefaultValue;
+        public KVarFlags Flag = 0;
+        public string Help = "";
+        public Action<object> Callback = null;
+        public Action<object, IKVSystem> CallbackAlt = null;
+    }
 
-        m_stringValue = defaultValue;
-        m_flags = flag;
-        m_cbValueChanged = callback;
+    public static KVarInfo C(string name, string defaultValue, KVarFlags flag = 0, string help = "", Action<object> callback = null) => new KVarInfo { Name = name, DefaultValue = defaultValue, Flag = flag, Help = help, Callback = callback };
+    public static KVarInfo C(string name, string defaultValue, KVarFlags flag, string help, Action<object, IKVSystem> callback) => new KVarInfo { Name = name, DefaultValue = defaultValue, Flag = flag, Help = help, CallbackAlt = callback };
 
-        if (!IsFlagSet(KVarFlags.StringOnly))
-            UpdateValue(m_stringValue);
+    [Inject]
+    public KVar() {}
 
-        KVSystem.Instance.Add(this);
+    public static Action<InjectContext, object> OnInit(KVarInfo info)
+    {
+        return (_, obj) =>
+        {
+            var me = obj as KVar;
+
+            me.Name = info.Name;
+            me.Description = info.Help;
+            me.Default = info.DefaultValue;
+            me.m_stringValue = info.DefaultValue;
+            me.m_flags = info.Flag;
+            me.m_cbValueChanged = info.Callback;
+            me.m_cbValueChangedAlt = info.CallbackAlt;
+
+            if (!me.IsFlagSet(KVarFlags.StringOnly))
+                me.UpdateValue(me.m_stringValue);
+
+            KVSystem.Instance.Add(me);
+        };
     }
 
     public static implicit operator string(KVar kVar) => kVar.Get<string>();
@@ -263,9 +299,9 @@ public class KVarRef
     public static explicit operator Sorter(KVarRef kVar) => (Sorter)kVar.Get<int>();
 }
 
-public class KVSystem : IEnumerable<KonCommandBase>
+public class KVSystem : IKVSystem
 {
-    public static KVSystem Instance = new KVSystem();
+    public static KVSystem Instance;
 
     // All commands
     private Dictionary<string, KonCommandBase> m_allCmds = new Dictionary<string, KonCommandBase>();
@@ -274,85 +310,13 @@ public class KVSystem : IEnumerable<KonCommandBase>
     private Dictionary<string, string> m_wfaValues = new Dictionary<string, string>();
 
     // g_cheats KVar, for CanCheat check
-    private KVar cheat;
+    private KVarRef cheat = new KVarRef("g_cheats");
 
-    public bool CanCheat
-    {
-        get
-        {
-            return cheat.Get<bool>();
-        }
-    }
+    public bool CanCheat => cheat.Get<bool>();
 
     KVSystem()
     {
-        // Hack?
-        Instance = this;
-
-        // g for Global
-        cheat = new KVar("g_cheats", "0", KVarFlags.None, "Enable Cheats");
-
-        new Kommand("savecfg", "Save configs", SaveConfig);
-        new Kommand("exec", "Execute a config file", (string[] args) =>
-        {
-            if (args == null || args.Length == 0)
-                Debug.Log("Useage: exec <cfg file name>");
-
-            var filename = args[0];
-            if (!filename.EndsWith(".cfg"))
-                filename += ".cfg";
-
-            if (FS.Instance.Exists(filename))
-            {
-                string[] cfg = FS.Instance.ReadString(filename).Replace("\r", "").Split('\n');
-
-                cfg.All(line => {
-                    ExecuteLine(line);
-                    return true;
-                });
-            }
-        });
-
-        new Kommand("echo", "Repeater", (string[] args) =>
-        {
-            var str = "";
-            args.All(arg =>
-            {
-                str += arg + " ";
-                return true;
-            });
-
-            Debug.Log(str);
-        });
-
-        new Kommand("help", "List available kommands and kvars", () =>
-        {
-            var table = "<table cellspacing=\"5\"><tr><td>Name</td><td>Type</td><td>Description</td></tr>\n" +
-                        "<tr><td height=\"1\" colspan=\"3\" style=\"background-color:#0c0;\"></td></tr>";
-
-            foreach (var (name, cmd) in m_allCmds)
-            {
-                bool show = true;
-                string type = "Kommand";
-
-                if(cmd is KVar kVar)
-                {
-                    if (kVar.IsFlagSet(KVarFlags.Hidden)
-#if !DEBUG
-                        || kVar.IsFlagSet(KVarFlags.DevelopmentOnly)
-#endif
-                    ) show = false;
-
-                    type = "KVar";
-                }
-
-                if (show)
-                    table += $"<tr><td>{name}</td><td>{type}</td><td>{cmd.Description}</td></tr>";
-            }
-
-            table += "</table>";
-            Debug.Log(table);
-        });
+        Instance = this;  // TODO: Remove
     }
 
     public unsafe static string[] CommandLineToArgs(string str)

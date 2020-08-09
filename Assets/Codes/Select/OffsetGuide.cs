@@ -2,9 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 public class OffsetGuide : MonoBehaviour
 {
+    [Inject]
+    IKVSystem kvSystem;
+
     void Start()
     {
         GetComponent<Button>().onClick.AddListener(StartOffsetGuide);
@@ -22,7 +26,7 @@ public class OffsetGuide : MonoBehaviour
         //}
 
         SettingAndMod.instance.SetLiveSetting();
-        KVSystem.Instance.SaveConfig();
+        kvSystem.SaveConfig();
         SceneLoader.LoadScene("Select", "InGame", () => LiveSetting.LoadChart(true));
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 using UnityEngine;
+using Zenject;
 
 public class LocalizedStrings : MonoBehaviour
 {
@@ -9,7 +10,8 @@ public class LocalizedStrings : MonoBehaviour
 
     public static LocalizedStrings Instanse = null;
 
-    static KVar cl_language = new KVar("cl_language", "-1", KVarFlags.Archive);
+    [Inject(Id = "cl_language")]
+    KVar cl_language;
 
     private void Awake()
     {

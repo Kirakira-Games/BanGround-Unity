@@ -7,6 +7,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.IO.Compression;
 using Newtonsoft.Json;
 using System.Linq;
+using Zenject;
 
 public interface KirakiraTouchProvider
 {
@@ -213,8 +214,8 @@ public class TouchManager : MonoBehaviour
     private HashSet<KirakiraTouch> exchanged;
     private DemoRecorder recorder = null;
 
-
-    public static KVar g_demoRecord = new KVar("g_demoRecord", "1", KVarFlags.Archive, "Enables demo recording.");
+    [Inject(Id = "g_demoRecord")]
+    public KVar g_demoRecord;
 
     public static int EvalResult(JudgeResult result)
     {

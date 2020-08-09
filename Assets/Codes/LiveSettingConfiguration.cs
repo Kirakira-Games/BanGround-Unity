@@ -26,12 +26,9 @@ public static class LiveSetting
         }
     }
 
-    static KVar fs_assetpath = new KVar("fs_assetpath", "V2Assets", KVarFlags.Hidden | KVarFlags.StringOnly);
-    static KVar fs_iconpath = new KVar("fs_iconpath", "UI/ClearMark/", KVarFlags.Hidden | KVarFlags.StringOnly);
-    static KVar cl_lastdiff = new KVar("cl_lastdiff", "0", KVarFlags.Archive, "Current chart set difficulty", obj =>
-    {
-        KVSystem.Instance.SaveConfig();
-    });
+    static KVarRef fs_assetpath = new KVarRef("fs_assetpath");
+    static KVarRef fs_iconpath = new KVarRef("fs_iconpath");
+    static KVarRef cl_lastdiff = new KVarRef("cl_lastdiff");
 
     public static string assetDirectory => fs_assetpath;
     public static string IconPath => fs_iconpath;

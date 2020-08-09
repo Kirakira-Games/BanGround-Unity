@@ -12,6 +12,8 @@ public class SettingAndMod : MonoBehaviour
 
     [Inject]
     private IAudioManager audioManager;
+    [Inject]
+    IKVSystem kvSystem;
 
     private Button setting_Open_Btn;
     private Button setting_Close_Btn;
@@ -70,8 +72,10 @@ public class SettingAndMod : MonoBehaviour
     */
 
     // o for Offset
-    static KVar o_judge = new KVar("o_judge", "0", KVarFlags.Archive, "Judge offset");
-    static KVar o_audio = new KVar("o_audio", "0", KVarFlags.Archive, "Audio offset");
+    [Inject(Id = "o_judge")]
+    KVar o_judge;
+    [Inject(Id = "o_audio")]
+    KVar o_audio;
 
     // snd for Sound
     static KVarRef snd_bgm_volume = new KVarRef("snd_bgm_volume");
@@ -79,37 +83,58 @@ public class SettingAndMod : MonoBehaviour
     static KVarRef snd_igse_volume = new KVarRef("snd_igse_volume");
 
     // r for Render
-    static KVar r_notespeed = new KVar("r_notespeed", "10.0", KVarFlags.Archive, "Note speed for rendering");
-    static KVar r_notesize = new KVar("r_notesize", "1.0", KVarFlags.Archive, "Note size for rendering");
+    [Inject(Id = "r_notespeed")]
+    KVar r_notespeed;
+    [Inject(Id = "r_notesize")]
+    KVar r_notesize;
 
-    static KVar r_syncline = new KVar("r_syncline", "1", KVarFlags.Archive, "Show syncline");
-    static KVar r_lanefx = new KVar("r_lanefx", "1", KVarFlags.Archive, "Show lane effects while clicking on lanes");
-    static KVar r_graynote = new KVar("r_graynote", "1", KVarFlags.Archive, "Enables the \"Off-beat coloring\" aka grey notes");
-    static KVar r_mirror = new KVar("r_mirror", "0", KVarFlags.Archive, "Mirror the chart");
-    static KVar r_bang_perspect = new KVar("r_bang_perspect", "1", KVarFlags.Archive, "Use BanG Dream style perspect instead of read 3d perspect");
-    static KVar r_shake_flick = new KVar("r_shake_flick", "1", KVarFlags.Archive, "Shake the screen while flicker note judged");
+    [Inject(Id = "r_syncline")]
+    KVar r_syncline;
+    [Inject(Id = "r_lanefx")]
+    KVar r_lanefx;
+    [Inject(Id = "r_graynote")]
+    KVar r_graynote;
+    [Inject(Id = "r_mirror")]
+    KVar r_mirror;
+    [Inject(Id = "r_bang_perspect")]
+    KVar r_bang_perspect;
+    [Inject(Id = "r_shake_flick")]
+    KVar r_shake_flick;
 
-    static KVar r_usevideo = new KVar("r_usevideo", "1", KVarFlags.Archive, "Use video for background (If present)");
+    [Inject(Id = "r_usevideo")]
+    KVar r_usevideo;
 
-    static KVar r_farclip = new KVar("r_farclip", "196.0", KVarFlags.Archive, "Far clip of note camera (means length of lane)");
-    static KVar r_brightness_bg = new KVar("r_brightness_bg", "0.7", KVarFlags.Archive, "Background brightness");
-    static KVar r_brightness_lane = new KVar("r_brightness_lane", "0.84", KVarFlags.Archive, "Lane brightness");
-    static KVar r_brightness_long = new KVar("r_brightness_long", "0.8", KVarFlags.Archive, "Brightness of Longs or Slides");
-    static KVar r_showeffect = new KVar("r_showeffect", "1", KVarFlags.Archive, "Show LaneParticleEffect");
-    static KVar r_lowresolution = new KVar("r_lowresolution", "0", KVarFlags.Archive, "Low Resolution(0.7x)");
+    [Inject(Id = "r_farclip")]
+    KVar r_farclip;
+    [Inject(Id = "r_brightness_bg")]
+    KVar r_brightness_bg;
+    [Inject(Id = "r_brightness_lane")]
+    KVar r_brightness_lane;
+    [Inject(Id = "r_brightness_long")]
+    KVar r_brightness_long;
+    [Inject(Id = "r_showeffect")]
+    KVar r_showeffect;
+    [Inject(Id = "r_lowresolution")]
+    KVar r_lowresolution;
 
     // cl for Client
-    static KVar cl_showms = new KVar("cl_showms", "0", KVarFlags.Archive);
-    static KVar cl_elp = new KVar("cl_elp", "0", KVarFlags.Archive);
-    static KVar cl_offset_transform = new KVar("cl_offset_transform", "1", KVarFlags.Archive);
+    [Inject(Id = "cl_showms")]
+    KVar cl_showms;
+    [Inject(Id = "cl_elp")]
+    KVar cl_elp;
+    [Inject(Id = "cl_offset_transform")]
+    KVar cl_offset_transform;
 
-    static KVar cl_notestyle = new KVar("cl_notestyle", "0", KVarFlags.Archive);
-    static KVar cl_sestyle = new KVar("cl_sestyle", "1", KVarFlags.Archive);
+    [Inject(Id = "cl_notestyle")]
+    KVar cl_notestyle;
+    [Inject(Id = "cl_sestyle")]
+    KVar cl_sestyle;
 
     static KVarRef cl_language = new KVarRef("cl_language");
 
     // mod for Mod
-    static KVar mod_autoplay = new KVar("mod_autoplay", "0");
+    [Inject(Id = "mod_autoplay")]
+    KVar mod_autoplay;
     /*
      * End
      */
@@ -215,7 +240,7 @@ public class SettingAndMod : MonoBehaviour
         GameObject.Find("Setting_Canvas").GetComponent<Animator>().SetTrigger("SwitchSetting");
         SetLiveSetting();
         setting_Close_Btn.gameObject.SetActive(false);
-        KVSystem.Instance.SaveConfig();
+        kvSystem.SaveConfig();
         SelectManager_old.instance.previewSound?.Play();
         audioManager.Provider.SetSoundEffectVolume(snd_se_volume, SEType.Common);
         audioManager.Provider.SetSoundEffectVolume(snd_igse_volume, SEType.InGame);
