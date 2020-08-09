@@ -320,7 +320,7 @@ namespace AudioProvider
 
         public void Init(int sampleRate, uint bufferLength)
         {
-            KVar ao_output = new KVar("snd_output", ((int)OUTPUTTYPE.AUTODETECT).ToString(), KVarFlags.Archive);
+            var ao_output = new KVarRef("snd_output");
             FMODUtil.ErrCheck(
                 Factory.System_Create(out fmodSystem)
             );

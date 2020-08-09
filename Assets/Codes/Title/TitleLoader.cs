@@ -31,8 +31,10 @@ public class TitleLoader : MonoBehaviour
 
     const string BACKGROUND_PATH = "backgrounds";
 
-    static KVar cl_accessToken = new KVar("cl_accesstoken", "", KVarFlags.Archive | KVarFlags.StringOnly, "Saved access token", _ => KVSystem.Instance.SaveConfig());
-    static KVar cl_refreshToken = new KVar("cl_refreshtoken", "", KVarFlags.Archive | KVarFlags.StringOnly, "Saved refresh token", _ => KVSystem.Instance.SaveConfig());
+    [Inject(Id = "cl_accesstoken")]
+    KVar cl_accessToken;
+    [Inject(Id = "cl_refreshtoken")]
+    KVar cl_refreshToken;
     /*
      * Test User for editor:
      * Username:

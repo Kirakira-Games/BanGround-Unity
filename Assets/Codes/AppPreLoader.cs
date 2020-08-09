@@ -4,9 +4,13 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Runtime.InteropServices;
 using UniRx.Async;
+using Zenject;
 
 public class AppPreLoader : MonoBehaviour
 {
+    [Inject]
+    IKVSystem kvSystem;
+
     public static int sampleRate = -1;
     public static int bufferSize = -1;
     public static bool init = false;
@@ -20,13 +24,11 @@ public class AppPreLoader : MonoBehaviour
         Physics2D.autoSimulation = false;
 
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
-        KVSystem.Instance.ReloadConfig();
 
         Screen.orientation = ScreenOrientation.AutoRotation;
         Application.targetFrameRate = 120;
         InitAudioInfo();
         GetUUID();
-
     }
 
     private void Start()

@@ -20,6 +20,8 @@ public class SelectManager_old : MonoBehaviour
     private IAudioManager audioManager;
     [Inject]
     private IDataLoader dataLoader;
+    [Inject]
+    IKVSystem kvSystem;
 
     public const float scroll_Min_Speed = 50f;
 
@@ -51,85 +53,13 @@ public class SelectManager_old : MonoBehaviour
     [HideInInspector] 
     public ISoundTrack previewSound;
 
-    static KVar cl_cursorter = new KVar("cl_cursorter", "1", KVarFlags.Archive, "Current sorter type", obj =>
-    {
-        KVSystem.Instance.SaveConfig();
-    });
+    [Inject(Id = "cl_cursorter")]
+    KVar cl_cursorter;
 
-    static KVar cl_lastsid = new KVar("cl_lastsid", "-1", KVarFlags.Archive, "Current chart set id", obj =>
-    {
-        KVSystem.Instance.SaveConfig();
-    });
+    [Inject(Id = "cl_lastsid")]
+    KVar cl_lastsid;
 
     static Kommand cmd_playdemo;
-
-    [Inject]
-    private void Inject()
-    {
-        if (cmd_playdemo == null)
-        {
-            cmd_playdemo = new Kommand("demo_play", "Play a demo file", args =>
-            {
-                if (args.Length > 0)
-                {
-                    if (SceneManager.GetActiveScene().name == "Select")
-                    {
-                        var path = args[0];
-
-                        if (!File.Exists(path))
-                        {
-                            if (KiraFilesystem.Instance.Exists(path))
-                            {
-                                path = Path.Combine(DataLoader.DataDir, path);
-                            }
-                            else
-                            {
-                                Debug.Log("[Demo Player] File not exists");
-                                return;
-                            }
-                        }
-
-                        var file = DemoFile.LoadFrom(path);
-
-                        var targetHeader = dataLoader.chartList.First(x => x.sid == file.sid);
-
-                        if (targetHeader == null)
-                        {
-                            Debug.Log("[Demo Player] Target chartset not installed.");
-                            return;
-                        }
-
-                        if (targetHeader.difficultyLevel[(int)file.difficulty] == -1)
-                        {
-                            Debug.Log("[Demo Player] Target chart not installed.");
-                            return;
-                        }
-
-                        LiveSetting.currentChart = dataLoader.chartList.IndexOf(dataLoader.chartList.First(x => x.sid == file.sid));
-                        LiveSetting.actualDifficulty = (int)file.difficulty;
-                        LiveSetting.currentDifficulty.Set((int)file.difficulty);
-
-                        LiveSetting.DemoFile = file;
-
-                        //if (!await LiveSetting.LoadChart(true))
-                        //{
-                        //    return;
-                        //}
-
-                        SceneLoader.LoadScene("Select", "InGame", () => LiveSetting.LoadChart(true));
-                    }
-                    else
-                    {
-                        Debug.Log("[Demo Player] Must use in select page!");
-                    }
-                }
-                else
-                {
-                    Debug.Log("demo_play: Play a demo file<br />Usage: demo_play <demo file>");
-                }
-            });
-        }
-    }
     
     private void Awake()
     {
@@ -469,7 +399,7 @@ public class SelectManager_old : MonoBehaviour
         //await PreviewFadeOut();
         SettingAndMod.instance.SetLiveSetting();
 
-        KVSystem.Instance.SaveConfig();
+        kvSystem.SaveConfig();
 
         PlayVoicesAtSceneOut();
         SceneLoader.LoadScene("Select", "InGame", () => LiveSetting.LoadChart(true));

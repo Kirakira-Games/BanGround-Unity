@@ -21,6 +21,9 @@ using Zenject;
 
 public class WebConsole : MonoBehaviour
 {
+    [Inject]
+    IKVSystem kvSystem;
+
     StringBuilder fullLog = new StringBuilder(0x10000);
 
     public string FullLog
@@ -80,7 +83,7 @@ public class WebConsole : MonoBehaviour
 
             console.Action = () =>
             {
-                KVSystem.Instance.ExecuteLine(e.Data, true);
+                console.kvSystem.ExecuteLine(e.Data, true);
             };
         }
 
@@ -126,7 +129,7 @@ public class WebConsole : MonoBehaviour
 
                 json.Append("[");
 
-                foreach (var item in KVSystem.Instance)
+                foreach (var item in kvSystem)
                 {
                     if (!first)
                     {
