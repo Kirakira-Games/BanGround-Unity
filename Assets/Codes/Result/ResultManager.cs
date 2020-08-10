@@ -323,7 +323,8 @@ public class ResultManager : MonoBehaviour
         }
     }
 
-    static KVarRef mod_autoplay = new KVarRef("mod_autoplay");
+    [Inject(Id = "mod_autoplay")]
+    KVar mod_autoplay;
     private void ShowSongInfo()
     {
         level_Text.text = Enum.GetName(typeof(Difficulty), LiveSetting.actualDifficulty).ToUpper() + " " +

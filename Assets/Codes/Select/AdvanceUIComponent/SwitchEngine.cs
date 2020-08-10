@@ -2,18 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 public class SwitchEngine : MonoBehaviour
 {
     ToggleGroup tg;
     Toggle[] engineTgs;
 
+    [Inject(Id = "snd_engine")]
+    KVar snd_engine;
+
     void Start()
     {
         tg = GetComponent<ToggleGroup>();
         engineTgs = GetComponentsInChildren<Toggle>(true);
-
-        KVarRef snd_engine = new KVarRef("snd_engine");
 
         engineTgs[0].onValueChanged.AddListener(on =>
         {

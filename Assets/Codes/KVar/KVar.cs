@@ -34,6 +34,8 @@ public class KonCommandBase
 // Kirakira Command
 public class Kommand : KonCommandBase
 {
+    IKVSystem _kvSystem;
+
     private Action<string[]> command;
 
     public void Invoke(string[] args = null) => command(args);
@@ -59,8 +61,10 @@ public class Kommand : KonCommandBase
         Command = _ => command()
     };
 
-    [Inject]
-    public Kommand() { }
+    public Kommand(IKVSystem kvSystem) 
+    {
+        _kvSystem = kvSystem;
+    }
 
     public static Action<InjectContext, object> OnInit(KommandInfo info)
     {
@@ -72,7 +76,7 @@ public class Kommand : KonCommandBase
             me.Description = info.Help;
             me.command = info.Command;
 
-            KVSystem.Instance.Add(me);
+            me._kvSystem.Add(me);
         };
     }
 }
@@ -80,6 +84,8 @@ public class Kommand : KonCommandBase
 // Kirakira Variable
 public class KVar : KonCommandBase
 {
+    IKVSystem _kvSystem;
+
     public string Default { get; private set; }
 
     private KVarFlags m_flags;
@@ -158,7 +164,7 @@ public class KVar : KonCommandBase
             throw new AccessViolationException("KVar is read only!");
 #endif
 
-        if (IsFlagSet(KVarFlags.Cheat) && !KVSystem.Instance.CanCheat)
+        if (IsFlagSet(KVarFlags.Cheat) && !_kvSystem.CanCheat)
             throw new AccessViolationException("KVar is inwriteable while cheat not enabled only!");
 
         if (IsFlagSet(KVarFlags.StringOnly))
@@ -199,7 +205,7 @@ public class KVar : KonCommandBase
 
         UpdateValue(value);
         m_cbValueChanged?.Invoke(lastValue);
-        m_cbValueChangedAlt?.Invoke(lastValue, KVSystem.Instance);
+        m_cbValueChangedAlt?.Invoke(lastValue, _kvSystem);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -221,8 +227,10 @@ public class KVar : KonCommandBase
     public static KVarInfo C(string name, string defaultValue, KVarFlags flag = 0, string help = "", Action<object> callback = null) => new KVarInfo { Name = name, DefaultValue = defaultValue, Flag = flag, Help = help, Callback = callback };
     public static KVarInfo C(string name, string defaultValue, KVarFlags flag, string help, Action<object, IKVSystem> callback) => new KVarInfo { Name = name, DefaultValue = defaultValue, Flag = flag, Help = help, CallbackAlt = callback };
 
-    [Inject]
-    public KVar() {}
+    public KVar(IKVSystem kvSystem) 
+    {
+        _kvSystem = kvSystem;
+    }
 
     public static Action<InjectContext, object> OnInit(KVarInfo info)
     {
@@ -241,7 +249,7 @@ public class KVar : KonCommandBase
             if (!me.IsFlagSet(KVarFlags.StringOnly))
                 me.UpdateValue(me.m_stringValue);
 
-            KVSystem.Instance.Add(me);
+            me._kvSystem.Add(me);
         };
     }
 

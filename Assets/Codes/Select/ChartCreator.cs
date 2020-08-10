@@ -21,7 +21,8 @@ public class ChartCreator : MonoBehaviour
     public Toggle[] Toggles;
 
     private cHeader cHeader => LiveSetting.CurrentHeader;
-    private static KVarRef cl_lastsid = new KVarRef("cl_lastsid");
+    [Inject(Id = "cl_lastsid")]
+    private KVarRef cl_lastsid;
 
     public void Show()
     {

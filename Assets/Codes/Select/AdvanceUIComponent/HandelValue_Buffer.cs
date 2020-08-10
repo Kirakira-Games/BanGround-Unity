@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 public class HandelValue_Buffer : MonoBehaviour
 {
@@ -10,6 +11,13 @@ public class HandelValue_Buffer : MonoBehaviour
 
     private Slider slider;
     private Text valueText;
+
+    [Inject(Id = "snd_engine")]
+    KVar snd_engine;
+    [Inject(Id = "snd_buffer_bass")]
+    KVar snd_buffer_bass;
+    [Inject(Id = "snd_buffer_fmod")]
+    KVar snd_buffer_fmod;
 
     void Start()
     {
@@ -22,10 +30,6 @@ public class HandelValue_Buffer : MonoBehaviour
             GameObject.Find("BufferSize_Input").SetActive(false);
             return;
         }
-
-        KVarRef snd_engine = new KVarRef("snd_engine");
-        KVarRef snd_buffer_bass = new KVarRef("snd_buffer_bass");
-        KVarRef snd_buffer_fmod = new KVarRef("snd_buffer_fmod");
 
         if (snd_engine == "Bass")
         {

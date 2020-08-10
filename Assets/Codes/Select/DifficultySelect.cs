@@ -33,8 +33,10 @@ public class DifficultySelect : MonoBehaviour
     PlayRecordDisplay recordDisplayer;
     private FixBackground background;
 
-    static KVarRef cl_cursorter = new KVarRef("cl_cursorter");
-    static KVarRef cl_lastsid = new KVarRef("cl_lastsid");
+    [Inject(Id = "cl_cursorter")]
+    KVar cl_cursorter;
+    [Inject(Id = "cl_lastsid")]
+    KVar cl_lastsid;
 
     async void Start()
     {
