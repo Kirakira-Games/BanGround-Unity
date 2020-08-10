@@ -1,3 +1,4 @@
+using AudioProvider;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -40,7 +41,9 @@ public class GlobalInstaller : MonoInstaller
             if (obj is ValidationMarker) return;
             ChartVersion.Instance = obj as IChartVersion; // TODO: Remove
         }).NonLazy();
+
         // Audio Manager
+        Container.Bind<IAudioProvider>().FromFactory<AudioProviderFactory>().AsSingle().NonLazy();
         Container.Bind<IAudioManager>().To<AudioManager>().FromNewComponentOnNewGameObject().AsSingle().NonLazy();
     }
 
