@@ -10,6 +10,7 @@ using State = GameStateMachine.State;
 
 public class AudioManager : MonoBehaviour, IAudioManager
 {
+    [Inject]
     public IAudioProvider Provider { get; private set; }
 
     public ISoundTrack gameBGM { get; set; }
@@ -31,7 +32,7 @@ public class AudioManager : MonoBehaviour, IAudioManager
 
     private void Awake()
     {
-        int bufferIndex;
+        int bufferIndex = -1;
 
         if (!AppPreLoader.init) return;
 
@@ -56,8 +57,6 @@ public class AudioManager : MonoBehaviour, IAudioManager
                 snd_buffer_bass.Set(5);
                 bufferIndex = 5;
             }
-            Provider = new BassAudioProvider();
-            Provider.Init(AppPreLoader.sampleRate, (uint)(AppPreLoader.bufferSize * HandelValue_Buffer.BassBufferScale[bufferIndex]));
         }
         else if(snd_engine == "Fmod")
         {
@@ -67,8 +66,6 @@ public class AudioManager : MonoBehaviour, IAudioManager
                 snd_buffer_fmod.Set(2);
                 bufferIndex = 2;
             }
-            Provider = new FmodAudioProvider();
-            Provider.Init(AppPreLoader.sampleRate, (uint)(AppPreLoader.bufferSize / HandelValue_Buffer.FmodBufferScale[bufferIndex]));
         }
         else if(snd_engine == "Unity")
         {
@@ -78,9 +75,8 @@ public class AudioManager : MonoBehaviour, IAudioManager
                 snd_buffer_fmod.Set(2);
                 bufferIndex = 2;
             }
-            Provider = new PureUnityAudioProvider();
-            Provider.Init(AppPreLoader.sampleRate, (uint)(AppPreLoader.bufferSize / HandelValue_Buffer.FmodBufferScale[bufferIndex]));
         }
+        Provider.Init(AppPreLoader.sampleRate, (uint)(AppPreLoader.bufferSize / HandelValue_Buffer.FmodBufferScale[bufferIndex]));
 
         Provider.SetSoundEffectVolume(snd_se_volume, SEType.Common);
         Provider.SetSoundEffectVolume(snd_igse_volume, SEType.InGame);

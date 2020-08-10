@@ -22,7 +22,7 @@ public class ChartCreator : MonoBehaviour
 
     private cHeader cHeader => LiveSetting.CurrentHeader;
     [Inject(Id = "cl_lastsid")]
-    private KVarRef cl_lastsid;
+    private KVar cl_lastsid;
 
     public void Show()
     {

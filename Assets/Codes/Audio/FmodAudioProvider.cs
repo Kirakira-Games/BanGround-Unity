@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using FMOD;
 using UniRx.Async;
+using Zenject;
 
 #pragma warning disable CS1998 // 异步方法缺少 "await" 运算符，将以同步方式运行
 
@@ -318,9 +319,12 @@ namespace AudioProvider
         public event FmodEventHandler OnVolumeChanged;
         public event FmodEventHandler OnUnload;
 
+        [Inject(Id = "snd_output")]
+        private KVar snd_output;
+
         public void Init(int sampleRate, uint bufferLength)
         {
-            var ao_output = new KVarRef("snd_output");
+            int ao_output = snd_output;
             FMODUtil.ErrCheck(
                 Factory.System_Create(out fmodSystem)
             );
@@ -334,8 +338,8 @@ namespace AudioProvider
                 fmodSystem.setDSPBufferSize(512, 4);
             }
             fmodSystem.setSoftwareFormat(sampleRate, SPEAKERMODE.STEREO, 0);
-            fmodSystem.setOutput((OUTPUTTYPE)ao_output.Get<int>());
-            UnityEngine.Debug.Log($"Init FMOD with OUTPUTTYPE:{Enum.GetName(typeof(OUTPUTTYPE), ao_output.Get<int>())}");
+            fmodSystem.setOutput((OUTPUTTYPE)ao_output);
+            UnityEngine.Debug.Log($"Init FMOD with OUTPUTTYPE:{Enum.GetName(typeof(OUTPUTTYPE), ao_output)}");
 
             FMODUtil.ErrCheck(
                 fmodSystem.init(512, INITFLAGS.NORMAL, IntPtr.Zero)
