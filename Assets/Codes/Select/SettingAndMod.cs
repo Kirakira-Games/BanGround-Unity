@@ -78,9 +78,12 @@ public class SettingAndMod : MonoBehaviour
     KVar o_audio;
 
     // snd for Sound
-    static KVarRef snd_bgm_volume = new KVarRef("snd_bgm_volume");
-    static KVarRef snd_se_volume = new KVarRef("snd_se_volume");
-    static KVarRef snd_igse_volume = new KVarRef("snd_igse_volume");
+    [Inject(Id = "snd_bgm_volume")]
+    KVar snd_bgm_volume;
+    [Inject(Id = "snd_se_volume")]
+    KVar snd_se_volume;
+    [Inject(Id = "snd_igse_volume")]
+    KVar snd_igse_volume;
 
     // r for Render
     [Inject(Id = "r_notespeed")]
@@ -130,7 +133,8 @@ public class SettingAndMod : MonoBehaviour
     [Inject(Id = "cl_sestyle")]
     KVar cl_sestyle;
 
-    static KVarRef cl_language = new KVarRef("cl_language");
+    [Inject(Id = "cl_language")]
+    KVar cl_language;
 
     // mod for Mod
     [Inject(Id = "mod_autoplay")]

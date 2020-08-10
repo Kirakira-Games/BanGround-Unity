@@ -20,7 +20,8 @@ public class SESelector : MonoBehaviour
     private ISoundEffect perfectSE;
     private ISoundEffect flickSE;
 
-    static KVarRef cl_sestyle = new KVarRef("cl_sestyle");
+    [Inject(Id = "cl_sestyle")]
+    KVar cl_sestyle;
 
     private async void Awake()
     {

@@ -127,7 +127,8 @@ public class DataLoader : IDataLoader
         return chartDic.ContainsKey(sid) ? chartDic[sid] : null;
     }
 
-    private KVarRef r_usevideo = new KVarRef("r_usevideo");
+    [Inject(Id = "r_usevideo")]
+    KVar r_usevideo;
 
     public (string, int) GetBackgroundPath(int sid, bool forceImg = true)
     {

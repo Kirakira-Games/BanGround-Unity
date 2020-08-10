@@ -154,8 +154,8 @@ public class TitleLoader : MonoBehaviour
         }
     }
 
-
-    static KVarRef cl_language = new KVarRef("cl_language");
+    [Inject(Id = "cl_language")]
+    KVar cl_language;
 
     private void OnDestroy()
     {
