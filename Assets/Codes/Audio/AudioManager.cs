@@ -57,6 +57,7 @@ public class AudioManager : MonoBehaviour, IAudioManager
                 snd_buffer_bass.Set(5);
                 bufferIndex = 5;
             }
+            Provider.Init(AppPreLoader.sampleRate, (uint)(AppPreLoader.bufferSize / HandelValue_Buffer.BassBufferScale[bufferIndex]));
         }
         else if(snd_engine == "Fmod")
         {
@@ -66,6 +67,7 @@ public class AudioManager : MonoBehaviour, IAudioManager
                 snd_buffer_fmod.Set(2);
                 bufferIndex = 2;
             }
+            Provider.Init(AppPreLoader.sampleRate, (uint)(AppPreLoader.bufferSize / HandelValue_Buffer.FmodBufferScale[bufferIndex]));
         }
         else if(snd_engine == "Unity")
         {
@@ -75,8 +77,8 @@ public class AudioManager : MonoBehaviour, IAudioManager
                 snd_buffer_fmod.Set(2);
                 bufferIndex = 2;
             }
+            Provider.Init(AppPreLoader.sampleRate, (uint)(AppPreLoader.bufferSize / HandelValue_Buffer.FmodBufferScale[bufferIndex]));
         }
-        Provider.Init(AppPreLoader.sampleRate, (uint)(AppPreLoader.bufferSize / HandelValue_Buffer.FmodBufferScale[bufferIndex]));
 
         Provider.SetSoundEffectVolume(snd_se_volume, SEType.Common);
         Provider.SetSoundEffectVolume(snd_igse_volume, SEType.InGame);
