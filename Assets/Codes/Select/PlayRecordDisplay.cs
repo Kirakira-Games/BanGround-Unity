@@ -2,9 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 public class PlayRecordDisplay : MonoBehaviour
 {
+    [Inject]
+    private ILiveSetting liveSetting;
+
     RawImage Rank;
     RawImage clearMark;
     Text score;
@@ -25,8 +29,8 @@ public class PlayRecordDisplay : MonoBehaviour
         PlayResult a = new PlayResult();
         for (int i = 0; i < playRecords.resultsList.Count; i++)
         {
-            if (playRecords.resultsList[i].ChartId == LiveSetting.CurrentHeader.sid &&
-                playRecords.resultsList[i].Difficulty == (Difficulty)LiveSetting.actualDifficulty)
+            if (playRecords.resultsList[i].ChartId == liveSetting.CurrentHeader.sid &&
+                playRecords.resultsList[i].Difficulty == (Difficulty)liveSetting.actualDifficulty)
             {
                 count++;
                 a = playRecords.resultsList[i];
@@ -53,28 +57,28 @@ public class PlayRecordDisplay : MonoBehaviour
         switch (a.ranks)
         {
             case Ranks.SSS:
-                rank = Resources.Load(LiveSetting.IconPath + "SSS") as Texture2D;
+                rank = Resources.Load(liveSetting.IconPath + "SSS") as Texture2D;
                 break;
             case Ranks.SS:
-                rank = Resources.Load(LiveSetting.IconPath + "SS") as Texture2D;
+                rank = Resources.Load(liveSetting.IconPath + "SS") as Texture2D;
                 break;
             case Ranks.S:
-                rank = Resources.Load(LiveSetting.IconPath + "S") as Texture2D;
+                rank = Resources.Load(liveSetting.IconPath + "S") as Texture2D;
                 break;
             case Ranks.A:
-                rank = Resources.Load(LiveSetting.IconPath + "A") as Texture2D;
+                rank = Resources.Load(liveSetting.IconPath + "A") as Texture2D;
                 break;
             case Ranks.B:
-                rank = Resources.Load(LiveSetting.IconPath + "B") as Texture2D;
+                rank = Resources.Load(liveSetting.IconPath + "B") as Texture2D;
                 break;
             case Ranks.C:
-                rank = Resources.Load(LiveSetting.IconPath + "C") as Texture2D;
+                rank = Resources.Load(liveSetting.IconPath + "C") as Texture2D;
                 break;
             case Ranks.D:
-                rank = Resources.Load(LiveSetting.IconPath + "D") as Texture2D;
+                rank = Resources.Load(liveSetting.IconPath + "D") as Texture2D;
                 break;
             case Ranks.F:
-                rank = Resources.Load(LiveSetting.IconPath + "F") as Texture2D;
+                rank = Resources.Load(liveSetting.IconPath + "F") as Texture2D;
                 break;
             default:
                 rank = null;
@@ -87,13 +91,13 @@ public class PlayRecordDisplay : MonoBehaviour
         switch (a.clearMark)
         {
             case ClearMarks.AP:
-                mark = Resources.Load(LiveSetting.IconPath + "AP") as Texture2D;
+                mark = Resources.Load(liveSetting.IconPath + "AP") as Texture2D;
                 break;
             case ClearMarks.FC:
-                mark = Resources.Load(LiveSetting.IconPath + "FC") as Texture2D;
+                mark = Resources.Load(liveSetting.IconPath + "FC") as Texture2D;
                 break;
             case ClearMarks.CL:
-                mark = Resources.Load(LiveSetting.IconPath + "CL") as Texture2D;
+                mark = Resources.Load(liveSetting.IconPath + "CL") as Texture2D;
                 break;
             case ClearMarks.F:
                 clearMark.enabled = false;

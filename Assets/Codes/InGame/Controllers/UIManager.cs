@@ -16,6 +16,8 @@ public class UIManager : MonoBehaviour
     public static UIManager Instance;
 
     [Inject]
+    private ILiveSetting liveSetting;
+    [Inject]
     private IAudioManager audioManager;
 
     private const float BiteTime = 2;
@@ -56,7 +58,7 @@ public class UIManager : MonoBehaviour
         //bg_SR = GameObject.Find("dokidokiBackground").GetComponent<SpriteRenderer>();
         lan_MR = GameObject.Find("LaneBackground").GetComponent<MeshRenderer>();
         
-        //var bgColor = LiveSetting.bgBrightness;
+        //var bgColor = liveSetting.bgBrightness;
         //bg_SR.color = new Color(bgColor, bgColor, bgColor);
         lan_MR.material.SetColor("_BaseColor", new Color(1f, 1f, 1f, r_brightness_lane));
 
@@ -105,7 +107,7 @@ public class UIManager : MonoBehaviour
 
     private void GamePause()
     {
-        if (SM.Current == State.Paused || SM.Current == State.Finished || LiveSetting.offsetAdjustMode)
+        if (SM.Current == State.Paused || SM.Current == State.Finished || liveSetting.offsetAdjustMode)
         {
             return;
         }
@@ -182,12 +184,12 @@ public class UIManager : MonoBehaviour
     public void GameRetry()
     {
         //SceneManager.LoadScene("InGame");
-        //await LiveSetting.LoadChart(true);
+        //await liveSetting.LoadChart(true);
         Time.timeScale = 1;
         SceneLoader.LoadScene("InGame", "InGame", () => {
             async UniTask<bool> Retry()
             {
-                if (await LiveSetting.LoadChart(true))
+                if (await liveSetting.LoadChart(true))
                 {
                     OnStopPlaying();
                     return true;
@@ -217,7 +219,7 @@ public class UIManager : MonoBehaviour
     public void OnAudioFinish(bool restart)
     {
         if (SceneLoader.Loading || SM.Base == State.Loading) return;
-        if (LiveSetting.offsetAdjustMode)
+        if (liveSetting.offsetAdjustMode)
             restart = true;
 
         InGameBackground.instance.stopVideo();
@@ -234,7 +236,7 @@ public class UIManager : MonoBehaviour
 
     async void ShowResult(bool restart)
     {
-        if (LiveSetting.offsetAdjustMode)
+        if (liveSetting.offsetAdjustMode)
             restart = true;
 
         if (restart)

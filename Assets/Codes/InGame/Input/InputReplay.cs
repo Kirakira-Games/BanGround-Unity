@@ -3,11 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-using Zenject;
 
 public class ReplayFrame
 {
@@ -70,12 +65,12 @@ public class DemoRecorder
     string demoName;
     DemoFile demoFile;
 
-    public DemoRecorder(int chartId, Difficulty diff)
+    public DemoRecorder(ILiveSetting liveSetting, int chartId, Difficulty diff)
     {
         demoFile = new DemoFile
         {
-            sid = LiveSetting.CurrentHeader.sid,
-            difficulty = (Difficulty)LiveSetting.actualDifficulty
+            sid = liveSetting.CurrentHeader.sid,
+            difficulty = (Difficulty)liveSetting.actualDifficulty
         };
 
         demoName = $"{chartId}_{diff:g}_{DateTime.Now.ToLongDateString()}_{DateTime.Now.ToLongTimeString()}.kirareplay".Replace(":", "-").Replace("/", "-").Replace("\\", "-");

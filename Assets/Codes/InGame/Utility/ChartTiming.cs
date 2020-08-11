@@ -4,6 +4,7 @@ using V2;
 using System.Runtime.CompilerServices;
 using System.Linq;
 using UnityEngine.Rendering;
+using Zenject;
 
 class IWithTimingComparer : IComparer<IWithTiming>
 {
@@ -29,9 +30,9 @@ public class ChartTiming
         return beat[0] + (float)beat[1] / beat[2];
     }
 
-    public ChartTiming(List<ValuePoint> bpms, int offset)
+    public ChartTiming(ILiveSetting liveSetting, List<ValuePoint> bpms, int offset)
     {
-        totTime = LiveSetting.NoteScreenTime / 1000f;
+        totTime = liveSetting.NoteScreenTime / 1000f;
         this.bpms = bpms;
         bpms.ForEach(bpm => bpm.beatf = BeatToFloat(bpm.beat));
         bpms.Sort(new IWithTimingComparer());

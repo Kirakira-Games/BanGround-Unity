@@ -12,6 +12,8 @@ public class AudioManager : MonoBehaviour, IAudioManager
 {
     [Inject]
     public IAudioProvider Provider { get; private set; }
+    [Inject]
+    private ILiveSetting liveSetting;
 
     public ISoundTrack gameBGM { get; set; }
 
@@ -149,7 +151,7 @@ public class AudioManager : MonoBehaviour, IAudioManager
 
         await UniTask.WaitUntil(() => AudioTimelineSync.instance.GetTimeInS() >= -0.02, cancellationToken: UIManager.Instance.cancellationToken.Token);
 
-        foreach (var mod in LiveSetting.attachedMods)
+        foreach (var mod in liveSetting.attachedMods)
         {
             if (mod is AudioMod)
                 (mod as AudioMod).ApplyMod(gameBGM);

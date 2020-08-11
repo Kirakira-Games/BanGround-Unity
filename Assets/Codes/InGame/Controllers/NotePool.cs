@@ -193,7 +193,7 @@ public class NotePool : MonoBehaviour
         }
     }
 
-    public void Init(GameNoteData[] notes)
+    public void Init(ILiveSetting liveSetting, GameNoteData[] notes)
     {
         // Init notemesh
         NoteMesh.Init();
@@ -265,7 +265,7 @@ public class NotePool : MonoBehaviour
         // Tap effects
         events.Clear();
         total.Clear();
-        int deltaTime = Mathf.RoundToInt(500 * LiveSetting.SpeedCompensationSum + NoteUtility.SLIDE_END_FLICK_JUDGE_RANGE);
+        int deltaTime = Mathf.RoundToInt(500 * liveSetting.SpeedCompensationSum + NoteUtility.SLIDE_END_FLICK_JUDGE_RANGE);
         // create events
         foreach (var note in notes)
         {

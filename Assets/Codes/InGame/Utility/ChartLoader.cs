@@ -242,7 +242,7 @@ public static class ChartLoader
     public static GameChartData LoadChart(V2.Chart chart)
     {
         numNotes = 0;
-        var timing = new ChartTiming(chart.bpm, chart.offset);
+        var timing = new ChartTiming(LiveSetting.Instance, chart.bpm, chart.offset);
         List<GameNoteData> gameNotes = new List<GameNoteData>();
         for (int i = 0; i < chart.groups.Count; i++)
         {

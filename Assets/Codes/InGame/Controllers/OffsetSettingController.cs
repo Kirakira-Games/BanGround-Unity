@@ -2,9 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 public class OffsetSettingController : MonoBehaviour
 {
+    [Inject]
+    private ILiveSetting liveSetting;
+
     private Text offsetText;
     private const int RECENT_COUNT = 10;
     private Queue<int> recentQueue;
@@ -60,7 +64,7 @@ public class OffsetSettingController : MonoBehaviour
 
     public void SaveAndExit()
     {
-        LiveSetting.offsetAdjustMode = false;
+        liveSetting.offsetAdjustMode = false;
         UIManager.Instance.GameRetire();
     }
 }

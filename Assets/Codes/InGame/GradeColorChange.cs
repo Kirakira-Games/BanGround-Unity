@@ -2,11 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 public class GradeColorChange : MonoBehaviour
 {
     public Color startColor;
     public Color endColor;
+
+    [Inject]
+    private ILiveSetting liveSetting;
     
     Slider sld;
     Image fill;
@@ -31,7 +35,7 @@ public class GradeColorChange : MonoBehaviour
     {
         float modScoreMultiplier = 1.0f;
 
-        foreach (var mod in LiveSetting.attachedMods)
+        foreach (var mod in liveSetting.attachedMods)
             modScoreMultiplier *= mod.ScoreMultiplier;
 
         score = _score * modScoreMultiplier;
@@ -40,7 +44,8 @@ public class GradeColorChange : MonoBehaviour
         
     }
 
-    void ScoreAddAnimation() {
+    void ScoreAddAnimation()
+    {
         if (displayScore < score)
             displayScore += (score - displayScore) * 0.5;
         scoreTxt.text = string.Format("{0:0000000}", displayScore * 1000000);

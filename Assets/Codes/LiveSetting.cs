@@ -8,11 +8,22 @@ using UniRx.Async;
 using System;
 using Zenject;
 
-public static class LiveSetting
+public class LiveSetting : ILiveSetting
 {
-    private static DemoFile _demoFile = null;
+    public static ILiveSetting Instance;
 
-    public static DemoFile DemoFile
+    [Inject]
+    private IDataLoader dataLoader;
+    [Inject(Id = "fs_assetpath")]
+    private KVar fs_assetpath;
+    [Inject(Id = "fs_iconpath")]
+    private KVar fs_iconpath;
+    [Inject(Id = "r_notespeed")]
+    private KVar r_notespeed;
+
+    private DemoFile _demoFile = null;
+
+    public DemoFile DemoFile
     {
         get
         {
@@ -26,29 +37,22 @@ public static class LiveSetting
         }
     }
 
-    static KVarRef fs_assetpath = new KVarRef("fs_assetpath");
-    static KVarRef fs_iconpath = new KVarRef("fs_iconpath");
-    static KVarRef cl_lastdiff = new KVarRef("cl_lastdiff");
+    public string assetDirectory => fs_assetpath;
+    public string IconPath => fs_iconpath;
 
-    public static string assetDirectory => fs_assetpath;
-    public static string IconPath => fs_iconpath;
-    private static float cachedSpeed = 0;
-    private static int cachedScreenTime = 0;
+    public int currentChart { get; set; } = 0;
+    private int cachedActualDifficulty;
 
-    public static int currentChart = 0;
-    /// <summary>
-    /// 有可能不存在！获取当前谱面难度，使用<see cref="actualDifficulty"/>。
-    /// 例如：当用户从EX难度切换到一个只有NM难度的谱面集，
-    /// currentDifficulty为Expert，而actualDifficulty为Normal。
-    /// </summary>
-    public static KVarRef currentDifficulty = new KVarRef("cl_lastdiff");
-    private static int cachedActualDifficulty = currentDifficulty;
+    public LiveSetting([Inject(Id = "cl_lastdiff")] KVar cl_lastdiff)
+    {
+        cachedActualDifficulty = cl_lastdiff;
+    }
     /// <summary>
     /// 获取当前谱面难度。一定是当前谱面集拥有的难度，但不一定是用户偏好的谱面难度。
     /// 例如：当用户从EX难度切换到一个只有NM难度的谱面集，
     /// currentDifficulty为Expert，而actualDifficulty为Normal。
     /// </summary>
-    public static int actualDifficulty
+    public int actualDifficulty
     {
         get
         {
@@ -61,35 +65,35 @@ public static class LiveSetting
     }
 
     public const int offsetAdjustChart = 99901;
-    public static cHeader CurrentHeader
+    public cHeader CurrentHeader
     {
         get
         {
             if (offsetAdjustMode)
             {
-                var ret = DataLoader.Instance.chartList.Where((x) => x.sid == offsetAdjustChart).First();
-                ret.LoadDifficultyLevels(DataLoader.Instance);
+                var ret = dataLoader.chartList.Where((x) => x.sid == offsetAdjustChart).First();
+                ret.LoadDifficultyLevels(dataLoader);
                 return ret;
             }
             else
             {
-                return DataLoader.Instance.chartList[currentChart];
+                return dataLoader.chartList[currentChart];
             }
         }
     }
-    public static V2.Chart chart;
-    public static GameChartData gameChart;
+    public V2.Chart chart { get; private set; }
+    public GameChartData gameChart { get; private set; }
 
     public static readonly string settingsPath = Application.persistentDataPath + "/LiveSettings.json";
     public static readonly string scoresPath = Application.persistentDataPath + "/Scores.bin";
 
-    public static List<ModBase> attachedMods = new List<ModBase>();
-    public static float SpeedCompensationSum = 1.0f;
-    public static bool offsetAdjustMode = false;
+    public List<ModBase> attachedMods { get; set; } = new List<ModBase>();
+    public float SpeedCompensationSum { get; set; } = 1.0f;
+    public bool offsetAdjustMode { get; set; } = false;
 
     //public static bool fullScreen;
 
-    public static bool AddMod(ModBase mod)
+    public bool AddMod(ModBase mod)
     {
         if (mod == null) return false;
         if (!attachedMods.Contains(mod))
@@ -107,7 +111,7 @@ public static class LiveSetting
         return true;
     }
 
-    public static void RemoveMod(ModBase mod)
+    public void RemoveMod(ModBase mod)
     {
         if (attachedMods.Contains(mod))
         {
@@ -120,7 +124,7 @@ public static class LiveSetting
         }
     }
 
-    public static void RemoveAllMods()
+    public void RemoveAllMods()
     {
         foreach (var mod in attachedMods)
         {
@@ -131,7 +135,7 @@ public static class LiveSetting
         }
     }
 
-    public static async UniTask<bool> LoadChart(bool convertToGameChart)
+    public async UniTask<bool> LoadChart(bool convertToGameChart)
     {
         chart = await ChartVersion.Instance.Process(CurrentHeader, (Difficulty)actualDifficulty);
         if (chart == null)
@@ -158,21 +162,7 @@ public static class LiveSetting
         }
     }
 
-    static KVarRef r_notespeed = new KVarRef("r_notespeed");
-
-    public static int NoteScreenTime
-    {
-        get
-        {
-            if (cachedSpeed != r_notespeed)
-            {
-                cachedSpeed = r_notespeed;
-                cachedScreenTime = (int)(-540f * r_notespeed + 6500);
-            }
-
-            return (int)(cachedScreenTime * SpeedCompensationSum);
-        }
-    }
+    public int NoteScreenTime => (int)((-540f * r_notespeed + 6500) * SpeedCompensationSum);
 }
 
 public enum NoteStyle

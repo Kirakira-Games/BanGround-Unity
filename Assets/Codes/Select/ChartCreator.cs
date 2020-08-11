@@ -15,12 +15,16 @@ public class ChartCreator : MonoBehaviour
 {
     [Inject]
     private IDataLoader dataLoader;
+    [Inject]
+    private ILiveSetting liveSetting;
+    [Inject(Id = "cl_lastdiff")]
+    private KVar cl_lastdiff;
 
     public const int ChartVersion = 1;
     public Button Blocker;
     public Toggle[] Toggles;
 
-    private cHeader cHeader => LiveSetting.CurrentHeader;
+    private cHeader cHeader => liveSetting.CurrentHeader;
     [Inject(Id = "cl_lastsid")]
     private KVar cl_lastsid;
 
@@ -28,7 +32,7 @@ public class ChartCreator : MonoBehaviour
     {
         Blocker.gameObject.SetActive(true);
         gameObject.SetActive(true);
-        Toggles[LiveSetting.actualDifficulty].isOn = true;
+        Toggles[liveSetting.actualDifficulty].isOn = true;
     }
 
     private int SelectedDifficulty()
@@ -124,8 +128,8 @@ public class ChartCreator : MonoBehaviour
         dataLoader.SaveChart(chart, header.sid, (Difficulty) difficulty);
 
         // Reload scene
-        LiveSetting.currentDifficulty.Set(difficulty);
-        LiveSetting.actualDifficulty = difficulty;
+        cl_lastdiff.Set(difficulty);
+        liveSetting.actualDifficulty = difficulty;
         cl_lastsid.Set(header.sid);
         SceneManager.LoadScene("Select");
     }
@@ -150,8 +154,8 @@ public class ChartCreator : MonoBehaviour
         dataLoader.SaveChart(chart, cHeader.sid, (Difficulty) difficulty);
 
         // Reload scene
-        LiveSetting.currentDifficulty.Set(difficulty);
-        LiveSetting.actualDifficulty = difficulty;
+        cl_lastdiff.Set(difficulty);
+        liveSetting.actualDifficulty = difficulty;
         SceneManager.LoadScene("Select");
     }
 
@@ -234,8 +238,8 @@ public class ChartCreator : MonoBehaviour
             dataLoader.SaveChart(chart, header.sid, (Difficulty)difficulty);
 
             // Reload scene
-            LiveSetting.currentDifficulty.Set(difficulty);
-            LiveSetting.actualDifficulty = difficulty;
+            cl_lastdiff.Set(difficulty);
+            liveSetting.actualDifficulty = difficulty;
             cl_lastsid.Set(header.sid);
             SceneManager.LoadScene("Select");
 

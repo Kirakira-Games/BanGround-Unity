@@ -350,7 +350,7 @@ public partial class PlayRecords : IExtensible
     {
         ProtobufHelper.Save(a, LiveSetting.scoresPath);
         string json = JsonConvert.SerializeObject(a);
-        //File.WriteAllText(LiveSetting.scoresPath,json);
+        //File.WriteAllText(liveSetting.scoresPath,json);
         return json;
     }
 }

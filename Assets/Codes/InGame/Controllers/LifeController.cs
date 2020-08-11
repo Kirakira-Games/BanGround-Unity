@@ -2,9 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 public class LifeController : MonoBehaviour
 {
+    [Inject]
+    private ILiveSetting liveSetting;
+
     public static LifeController instance;
     public static List<float> lifePerSecond;
     public float lifePoint { get; private set; }
@@ -25,7 +29,7 @@ public class LifeController : MonoBehaviour
         lifeTxt = GetComponentInChildren<Text>();
         fill = GameObject.Find("LifeFill").GetComponent<Image>();
         UpdateDisplay();
-        level = LiveSetting.CurrentHeader.difficultyLevel[LiveSetting.actualDifficulty];
+        level = liveSetting.CurrentHeader.difficultyLevel[liveSetting.actualDifficulty];
         StartCoroutine(LifeRecorder());
     }
 

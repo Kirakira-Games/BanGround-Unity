@@ -16,6 +16,8 @@ public class NoteController : MonoBehaviour
     private IAudioManager audioManager;
     [Inject]
     private IDataLoader dataLoader;
+    [Inject]
+    private ILiveSetting liveSetting;
 
     public static NoteController Instance;
     public static Camera mainCamera;
@@ -389,8 +391,8 @@ public class NoteController : MonoBehaviour
         noteQueue = new JudgeQueue();
 
         // Load chart
-        chart = LiveSetting.gameChart;
-        NotePool.Instance.Init(notes);
+        chart = liveSetting.gameChart;
+        NotePool.Instance.Init(liveSetting, notes);
         noteHead = 0;
 
         // Compute number of notes
@@ -416,11 +418,11 @@ public class NoteController : MonoBehaviour
         };
 
         // Game BGM
-        StartCoroutine(audioManager.DelayPlayInGameBGM(KiraFilesystem.Instance.Read(dataLoader.GetMusicPath(LiveSetting.CurrentHeader.mid)), WARM_UP_SECOND).ToCoroutine());
+        StartCoroutine(audioManager.DelayPlayInGameBGM(KiraFilesystem.Instance.Read(dataLoader.GetMusicPath(liveSetting.CurrentHeader.mid)), WARM_UP_SECOND).ToCoroutine());
 
         // Background
         var background = GameObject.Find("InGameBackground").GetComponent<InGameBackground>();
-        var (bg, bgtype) = dataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid, false);
+        var (bg, bgtype) = dataLoader.GetBackgroundPath(liveSetting.CurrentHeader.sid, false);
         if (bgtype == 1)
         {
             var videoPath = KiraFilesystem.Instance.Extract(bg);
@@ -440,22 +442,22 @@ public class NoteController : MonoBehaviour
         laneEffects.Init(chart.groups[0]);
 
         // Check if adjusting offset
-        if (LiveSetting.offsetAdjustMode)
+        if (liveSetting.offsetAdjustMode)
         {
             GameObject.Find("infoCanvas").GetComponent<Canvas>().enabled = false;
-            LiveSetting.attachedMods.Clear();
+            liveSetting.attachedMods.Clear();
         }
         else
         {
             GameObject.Find("settingsCanvas").GetComponent<Canvas>().enabled = false;
         }
 
-        chartScript = new ChartScript(LiveSetting.CurrentHeader.sid, (Difficulty)LiveSetting.actualDifficulty);
+        chartScript = new ChartScript(liveSetting.CurrentHeader.sid, (Difficulty)liveSetting.actualDifficulty);
 
         //Set Play Mod Event
         //audioManager.restart = false;
         onJudge = null;
-        foreach (var mod in LiveSetting.attachedMods)
+        foreach (var mod in liveSetting.attachedMods)
         {
             if (mod is SuddenDeathMod)
                 onJudge += ((JudgeResult result) =>

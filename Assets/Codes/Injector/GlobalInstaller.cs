@@ -45,6 +45,13 @@ public class GlobalInstaller : MonoInstaller
         // Audio Manager
         Container.Bind<IAudioProvider>().FromFactory<AudioProviderFactory>().AsSingle().NonLazy();
         Container.Bind<IAudioManager>().To<AudioManager>().FromNewComponentOnNewGameObject().AsSingle().NonLazy();
+
+        // Live Setting
+        Container.Bind<ILiveSetting>().To<LiveSetting>().AsSingle().OnInstantiated((contxet, obj) =>
+        {
+            if (obj is ValidationMarker) return;
+            LiveSetting.Instance = obj as ILiveSetting; // TODO: Remove
+        }).NonLazy();
     }
 
     void RegisterKonCommands()
@@ -171,6 +178,7 @@ public class GlobalInstaller : MonoInstaller
                 table += "</table>";
                 Debug.Log(table);
             }),
+            /* TODO(GEEKiDoS)
             Kommand.C("demo_play", "Play a demo file", args =>
             {
                 if (args.Length > 0)
@@ -208,13 +216,13 @@ public class GlobalInstaller : MonoInstaller
                             return;
                         }
 
-                        LiveSetting.currentChart = dataLoader.chartList.IndexOf(dataLoader.chartList.First(x => x.sid == file.sid));
-                        LiveSetting.actualDifficulty = (int)file.difficulty;
-                        LiveSetting.currentDifficulty.Set((int)file.difficulty);
+                        LiveSetting.Instance.currentChart = dataLoader.chartList.IndexOf(dataLoader.chartList.First(x => x.sid == file.sid));
+                        LiveSetting.Instance.actualDifficulty = (int)file.difficulty;
+                        LiveSetting.Instance.cl_lastdiff_temp.Set((int)file.difficulty);
 
-                        LiveSetting.DemoFile = file;
+                        LiveSetting.Instance.DemoFile = file;
 
-                        SceneLoader.LoadScene("Select", "InGame", () => LiveSetting.LoadChart(true));
+                        SceneLoader.LoadScene("Select", "InGame", () => LiveSetting.Instance.LoadChart(true));
                     }
                     else
                     {
@@ -225,7 +233,7 @@ public class GlobalInstaller : MonoInstaller
                 {
                     Debug.Log("demo_play: Play a demo file<br />Usage: demo_play <demo file>");
                 }
-            }),
+            }),*/
         };
 
         foreach (var info in cmdInfos)

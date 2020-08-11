@@ -23,7 +23,7 @@ public class SlideEndFlick : SlideNoteBase
     public override void InitNote()
     {
         base.InitNote();
-        flickArrow = (Instantiate(Resources.Load(LiveSetting.assetDirectory + "/FlickArrow"), transform) as GameObject).GetComponent<FlickArrow>();
+        flickArrow = (Instantiate(Resources.Load(LiveSetting.Instance.assetDirectory + "/FlickArrow"), transform) as GameObject).GetComponent<FlickArrow>();
     }
 
     public override void ResetNote(GameNoteData data)
