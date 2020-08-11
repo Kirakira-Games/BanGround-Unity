@@ -16,6 +16,8 @@ public class ResultManager : MonoBehaviour
     private IAudioManager audioManager;
     [Inject]
     private IDataLoader dataLoader;
+    [Inject]
+    private ILiveSetting liveSetting;
 
     private Button button_back;
     private Button button_retry;
@@ -57,7 +59,7 @@ public class ResultManager : MonoBehaviour
 
     async void Start()
     {
-        cheader = LiveSetting.CurrentHeader;
+        cheader = liveSetting.CurrentHeader;
         mheader = dataLoader.GetMusicHeader(cheader.mid);
 
         SetBtnObject();
@@ -97,7 +99,7 @@ public class ResultManager : MonoBehaviour
     private void ShowBackground()
     {
         background = GameObject.Find("Background").GetComponent<FixBackground>();
-        string path = dataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid).Item1;
+        string path = dataLoader.GetBackgroundPath(liveSetting.CurrentHeader.sid).Item1;
         background.UpdateBackground(path);
     }
 
@@ -277,28 +279,28 @@ public class ResultManager : MonoBehaviour
         switch (playResult.ranks)
         {
             case Ranks.SSS:
-                rank = Resources.Load(LiveSetting.IconPath + "SSS") as Texture2D;
+                rank = Resources.Load(liveSetting.IconPath + "SSS") as Texture2D;
                 break;
             case Ranks.SS:
-                rank = Resources.Load(LiveSetting.IconPath + "SS") as Texture2D;
+                rank = Resources.Load(liveSetting.IconPath + "SS") as Texture2D;
                 break;
             case Ranks.S:
-                rank = Resources.Load(LiveSetting.IconPath + "S") as Texture2D;
+                rank = Resources.Load(liveSetting.IconPath + "S") as Texture2D;
                 break;
             case Ranks.A:
-                rank = Resources.Load(LiveSetting.IconPath + "A") as Texture2D;
+                rank = Resources.Load(liveSetting.IconPath + "A") as Texture2D;
                 break;
             case Ranks.B:
-                rank = Resources.Load(LiveSetting.IconPath + "B") as Texture2D;
+                rank = Resources.Load(liveSetting.IconPath + "B") as Texture2D;
                 break;
             case Ranks.C:
-                rank = Resources.Load(LiveSetting.IconPath + "C") as Texture2D;
+                rank = Resources.Load(liveSetting.IconPath + "C") as Texture2D;
                 break;
             case Ranks.D:
-                rank = Resources.Load(LiveSetting.IconPath + "D") as Texture2D;
+                rank = Resources.Load(liveSetting.IconPath + "D") as Texture2D;
                 break;
             case Ranks.F:
-                rank = Resources.Load(LiveSetting.IconPath + "F") as Texture2D;
+                rank = Resources.Load(liveSetting.IconPath + "F") as Texture2D;
                 break;
         }
         rankIcon.texture = rank;
@@ -308,13 +310,13 @@ public class ResultManager : MonoBehaviour
         switch (playResult.clearMark)
         {
             case ClearMarks.AP:
-                markIcon.texture = Resources.Load(LiveSetting.IconPath + "AP") as Texture2D;
+                markIcon.texture = Resources.Load(liveSetting.IconPath + "AP") as Texture2D;
                 break;
             case ClearMarks.FC:
-                markIcon.texture = Resources.Load(LiveSetting.IconPath + "FC") as Texture2D;
+                markIcon.texture = Resources.Load(liveSetting.IconPath + "FC") as Texture2D;
                 break;
             case ClearMarks.CL:
-                markIcon.texture = Resources.Load(LiveSetting.IconPath + "CL") as Texture2D;
+                markIcon.texture = Resources.Load(liveSetting.IconPath + "CL") as Texture2D;
                 break;
             case ClearMarks.F:
                 markIcon.texture = null;
@@ -327,18 +329,18 @@ public class ResultManager : MonoBehaviour
     KVar mod_autoplay;
     private void ShowSongInfo()
     {
-        level_Text.text = Enum.GetName(typeof(Difficulty), LiveSetting.actualDifficulty).ToUpper() + " " +
-            cheader.difficultyLevel[LiveSetting.actualDifficulty];
+        level_Text.text = Enum.GetName(typeof(Difficulty), liveSetting.actualDifficulty).ToUpper() + " " +
+            cheader.difficultyLevel[liveSetting.actualDifficulty];
         songName_Text.text = mheader.title;
         acc_Text.text = mod_autoplay ? "AUTOPLAY" : string.Format("{0:P2}", Mathf.FloorToInt((float)playResult.Acc * 10000) / 10000f);
-        difficultCard.sprite = Resources.Load<Sprite>("UI/DifficultyCards/" + Enum.GetName(typeof(Difficulty), LiveSetting.actualDifficulty));
+        difficultCard.sprite = Resources.Load<Sprite>("UI/DifficultyCards/" + Enum.GetName(typeof(Difficulty), liveSetting.actualDifficulty));
     }
 
     private void ReadScores()
     {
         float modScoreMultiplier = 1.0f;
 
-        foreach (var mod in LiveSetting.attachedMods)
+        foreach (var mod in liveSetting.attachedMods)
             modScoreMultiplier *= mod.ScoreMultiplier;
 
         playResult.Score = (ComboManager.score / ComboManager.maxScore) * 1000000 * modScoreMultiplier;
@@ -346,10 +348,10 @@ public class ResultManager : MonoBehaviour
         playResult.clearMark = ResultsGetter.GetClearMark();
         playResult.Acc = ResultsGetter.GetAcc();
         playResult.ChartId = cheader.sid;
-        playResult.Difficulty = (Difficulty)LiveSetting.actualDifficulty;
+        playResult.Difficulty = (Difficulty)liveSetting.actualDifficulty;
         PlayRecords pr = PlayRecords.OpenRecord();
 
-        var resultList = pr.resultsList.Where((x) => x.ChartId == cheader.sid && x.Difficulty == (Difficulty)LiveSetting.actualDifficulty);
+        var resultList = pr.resultsList.Where((x) => x.ChartId == cheader.sid && x.Difficulty == (Difficulty)liveSetting.actualDifficulty);
         if (resultList.Count() == 1) 
         {
             var result = resultList.First();
@@ -371,7 +373,7 @@ public class ResultManager : MonoBehaviour
         //int count = 0;
         //for(int i =0;i<pr.resultsList.Count;i++)
         //{
-        //    if (pr.resultsList[i].FolderName == LiveSetting.selectedFolder && pr.resultsList[i].ChartName == LiveSetting.selectedChart)
+        //    if (pr.resultsList[i].FolderName == liveSetting.selectedFolder && pr.resultsList[i].ChartName == liveSetting.selectedChart)
         //    {
         //        count++;
         //        lastScore = pr.resultsList[i].Score;

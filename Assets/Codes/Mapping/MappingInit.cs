@@ -20,10 +20,10 @@ namespace BGEditor
         public static void Init(ChartCore core)
         {
             // Load chart
-            chart = LiveSetting.chart;
+            chart = LiveSetting.Instance.chart;
 
             // Load music
-            core.progress.Init(KiraFilesystem.Instance.Read(DataLoader.Instance.GetMusicPath(LiveSetting.CurrentHeader.mid)));
+            core.progress.Init(KiraFilesystem.Instance.Read(DataLoader.Instance.GetMusicPath(LiveSetting.Instance.CurrentHeader.mid)));
 
             core.StartCoroutine(InitCoroutine(core));
         }

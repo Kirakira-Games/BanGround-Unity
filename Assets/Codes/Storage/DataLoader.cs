@@ -27,7 +27,9 @@ public class DataLoader : IDataLoader
     public int LastImportedSid { get; set; } = -1;
 
     [Inject]
-    IChartVersion chartVersion;
+    private IChartVersion chartVersion;
+    [Inject(Id = "cl_lastdiff")]
+    private KVar cl_lastdiff;
 
     private SongList songList;
     public List<mHeader> musicList => songList.mHeaders;
@@ -398,9 +400,9 @@ public class DataLoader : IDataLoader
         foreach (var chart in songList.cHeaders)
             chartDic[chart.sid] = chart;
 
-        if (LiveSetting.currentChart >= songList.cHeaders.Count)
+        if (cl_lastdiff >= songList.cHeaders.Count)
         {
-            LiveSetting.currentChart = Mathf.Max(0, songList.cHeaders.Count - 1);
+            cl_lastdiff.Set(Mathf.Max(0, songList.cHeaders.Count - 1));
         }
     }
 

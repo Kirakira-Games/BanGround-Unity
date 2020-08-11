@@ -21,17 +21,20 @@ public enum Sorter
 public class ChartDifSort : IComparer<cHeader>
 {
     private IDataLoader dataLoader;
-    public ChartDifSort(IDataLoader dataLoader)
+    private int difficulty;
+
+    public ChartDifSort(IDataLoader dataLoader, int difficulty)
     {
         this.dataLoader = dataLoader;
+        this.difficulty = difficulty;
     }
 
     public int Compare(cHeader x, cHeader y)
     {
         x.LoadDifficultyLevels(dataLoader);
         y.LoadDifficultyLevels(dataLoader);
-        int difX = x.difficultyLevel[LiveSetting.currentDifficulty];
-        int difY = y.difficultyLevel[LiveSetting.currentDifficulty];
+        int difX = x.difficultyLevel[difficulty];
+        int difY = y.difficultyLevel[difficulty];
         int dif = difX - difY;
         return dif == 0 ? x.mid - y.mid : dif;
     }

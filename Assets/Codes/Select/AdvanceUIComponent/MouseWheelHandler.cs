@@ -8,16 +8,18 @@ public class MouseWheelHandler : MonoBehaviour,IScrollHandler
 {
     [Inject]
     private IDataLoader dataLoader;
+    [Inject]
+    private ILiveSetting liveSetting;
 
     //FUCK:THis wont work after the double mouse game play
     public void OnScroll(PointerEventData p)
     {
         if (p.scrollDelta.y > NoteUtility.EPS)
         {
-            if (LiveSetting.currentChart < dataLoader.chartList.Count-1)
-                SelectManager_old.instance.SelectSong(LiveSetting.currentChart + 1);
+            if (liveSetting.currentChart < dataLoader.chartList.Count-1)
+                SelectManager_old.instance.SelectSong(liveSetting.currentChart + 1);
         }
         else if (p.scrollDelta.y < -NoteUtility.EPS)
-            SelectManager_old.instance.SelectSong(LiveSetting.currentChart - 1);
+            SelectManager_old.instance.SelectSong(liveSetting.currentChart - 1);
     }
 }

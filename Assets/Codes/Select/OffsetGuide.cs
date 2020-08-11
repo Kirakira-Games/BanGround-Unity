@@ -7,7 +7,9 @@ using Zenject;
 public class OffsetGuide : MonoBehaviour
 {
     [Inject]
-    IKVSystem kvSystem;
+    private IKVSystem kvSystem;
+    [Inject]
+    private ILiveSetting liveSetting;
 
     void Start()
     {
@@ -16,17 +18,17 @@ public class OffsetGuide : MonoBehaviour
 
     void StartOffsetGuide()
     {
-        LiveSetting.offsetAdjustMode = true;
+        liveSetting.offsetAdjustMode = true;
 
-        //if (!await LiveSetting.LoadChart(true))
+        //if (!await liveSetting.LoadChart(true))
         //{
-        //    LiveSetting.offsetAdjustMode = false;
+        //    liveSetting.offsetAdjustMode = false;
 
         //    return;
         //}
 
         SettingAndMod.instance.SetLiveSetting();
         kvSystem.SaveConfig();
-        SceneLoader.LoadScene("Select", "InGame", () => LiveSetting.LoadChart(true));
+        SceneLoader.LoadScene("Select", "InGame", () => liveSetting.LoadChart(true));
     }
 }

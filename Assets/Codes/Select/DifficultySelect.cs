@@ -12,6 +12,15 @@ public class DifficultySelect : MonoBehaviour
     private IAudioManager audioManager;
     [Inject]
     private IDataLoader dataLoader;
+    [Inject]
+    private ILiveSetting liveSetting;
+
+    [Inject(Id = "cl_cursorter")]
+    private KVar cl_cursorter;
+    [Inject(Id = "cl_lastsid")]
+    private KVar cl_lastsid;
+    [Inject(Id = "cl_lastdiff")]
+    private KVar cl_lastdiff;
 
     public static readonly string[] DIFFICULTY_ABBR = { "EZ", "NM", "HD", "EX", "SP" };
     public GameObject[] cards = new GameObject[5];
@@ -33,11 +42,6 @@ public class DifficultySelect : MonoBehaviour
     PlayRecordDisplay recordDisplayer;
     private FixBackground background;
 
-    [Inject(Id = "cl_cursorter")]
-    KVar cl_cursorter;
-    [Inject(Id = "cl_lastsid")]
-    KVar cl_lastsid;
-
     async void Start()
     {
         //levels = new int[]{ 1,1,18,26,28 };
@@ -46,7 +50,7 @@ public class DifficultySelect : MonoBehaviour
         difficultyText = GameObject.Find("Text_SelectedDifficulty").GetComponent<Text>();
         recordDisplayer = GameObject.Find("Left_Panel").GetComponent<PlayRecordDisplay>();
         background = GameObject.Find("KirakiraBackground").GetComponent<FixBackground>();
-        lastDifficulty = LiveSetting.actualDifficulty;
+        lastDifficulty = liveSetting.actualDifficulty;
 
         for (int i = 0; i < cards.Length; i++)
         {
@@ -64,7 +68,7 @@ public class DifficultySelect : MonoBehaviour
         enabledCards = new List<int>();
         for (int i = 0; i < cards.Length; i++) //找出需要被激活的卡片
         {
-            int index = (i + LiveSetting.currentDifficulty) % cards.Length;
+            int index = (i + cl_lastdiff) % cards.Length;
             if (levels[index] < 0)//没有此难度的话
             {
                 cards[index].SetActive(false);
@@ -99,23 +103,23 @@ public class DifficultySelect : MonoBehaviour
         difficultyText.text = Enum.GetName(typeof(Difficulty), selected).ToUpper();
         levelText.text = levels[selected].ToString();
 
-        LiveSetting.actualDifficulty = selected;
+        liveSetting.actualDifficulty = selected;
         if (overrideCurrentDifficulty)
-            LiveSetting.currentDifficulty.Set(selected);
-        if ((Sorter)cl_cursorter == Sorter.ChartDifficulty && lastDifficulty != LiveSetting.currentDifficulty)
+            cl_lastdiff.Set(selected);
+        if ((Sorter)cl_cursorter == Sorter.ChartDifficulty && lastDifficulty != cl_lastdiff.Get<int>())
         {
-            cl_lastsid.Set(LiveSetting.CurrentHeader.sid);
+            cl_lastsid.Set(liveSetting.CurrentHeader.sid);
             //SelectManager_old.instance.RefeshSonglist();
             SelectManager_old.instance.InitSongList(cl_lastsid);
         }
 
-        lastDifficulty = LiveSetting.currentDifficulty;
+        lastDifficulty = cl_lastdiff.Get<int>();
 
         recordDisplayer.DisplayRecord();
-        string path = dataLoader.GetBackgroundPath(LiveSetting.CurrentHeader.sid).Item1;
+        string path = dataLoader.GetBackgroundPath(liveSetting.CurrentHeader.sid).Item1;
         background.UpdateBackground(path);
-        //LiveSetting.selectedDifficulty = (Difficulty)enabledCards[0];
-        //print(Enum.GetName(typeof(Difficulty), LiveSetting.selectedDifficulty));
+        //liveSetting.selectedDifficulty = (Difficulty)enabledCards[0];
+        //print(Enum.GetName(typeof(Difficulty), liveSetting.selectedDifficulty));
     }
 
     //This called on the change button clicked

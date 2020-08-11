@@ -9,6 +9,8 @@ namespace BGEditor
     {
         [Inject]
         private IDataLoader dataLoader;
+        [Inject]
+        private ILiveSetting liveSetting;
 
         public InputField Title;
         public InputField Artist;
@@ -25,7 +27,7 @@ namespace BGEditor
 
         private void Awake()
         {
-            cHeader = LiveSetting.CurrentHeader;
+            cHeader = liveSetting.CurrentHeader;
             mHeader = dataLoader.GetMusicHeader(cHeader.mid);
         }
 
@@ -56,8 +58,8 @@ namespace BGEditor
             }
 
             Designer.text = cHeader.authorNick;
-            Difficulty.SetValue(cHeader.difficultyLevel[LiveSetting.actualDifficulty]);
-            DifficultyText.text = Enum.GetName(typeof(Difficulty), LiveSetting.actualDifficulty);
+            Difficulty.SetValue(cHeader.difficultyLevel[liveSetting.actualDifficulty]);
+            DifficultyText.text = Enum.GetName(typeof(Difficulty), liveSetting.actualDifficulty);
             Tags.text = string.Join(",", cHeader.tag);
             ChartPreview[0].MaxVal = duration;
             ChartPreview[1].MaxVal = duration;
@@ -92,7 +94,7 @@ namespace BGEditor
             };
 
             cHeader.authorNick = Designer.text;
-            cHeader.difficultyLevel[LiveSetting.actualDifficulty] = Difficulty.value;
+            cHeader.difficultyLevel[liveSetting.actualDifficulty] = Difficulty.value;
             Chart.level = Difficulty.value;
             cHeader.tag = (from tag in Tags.text.Split(',')
                           where tag.Trim().Length > 0

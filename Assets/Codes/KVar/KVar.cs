@@ -70,6 +70,8 @@ public class Kommand : KonCommandBase
     {
         return (_, obj) =>
         {
+            if (obj is ValidationMarker)
+                return;
             var me = obj as Kommand;
 
             me.Name = info.Name;
@@ -236,6 +238,8 @@ public class KVar : KonCommandBase
     {
         return (_, obj) =>
         {
+            if (obj is ValidationMarker)
+                return;
             var me = obj as KVar;
 
             me.Name = info.Name;

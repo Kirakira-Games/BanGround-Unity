@@ -209,13 +209,15 @@ public class TouchManager : MonoBehaviour
     public static TouchManager instance;
     public static KirakiraTouchProvider provider;
 
+    [Inject(Id = "g_demoRecord")]
+    private KVar g_demoRecord;
+    [Inject]
+    private ILiveSetting liveSetting;
+
     private Dictionary<int, KirakiraTouch> touchTable;
     private Dictionary<(KirakiraTracer, int), JudgeResult> traceCache;
     private HashSet<KirakiraTouch> exchanged;
     private DemoRecorder recorder = null;
-
-    [Inject(Id = "g_demoRecord")]
-    public KVar g_demoRecord;
 
     public static int EvalResult(JudgeResult result)
     {
@@ -315,7 +317,7 @@ public class TouchManager : MonoBehaviour
         KirakiraTouch.flickDistPixels = Mathf.Min(Screen.height / 20, NoteUtility.FLICK_JUDGE_DIST / 2.54f * KirakiraTouch.dpi);
 
         // Touch provider
-        var demoFile = LiveSetting.DemoFile;
+        var demoFile = liveSetting.DemoFile;
 
         if (demoFile != null)
         {
@@ -342,7 +344,7 @@ public class TouchManager : MonoBehaviour
 
         if (!(provider is DemoReplayTouchPrivider) && g_demoRecord)
         {
-            recorder = new DemoRecorder(LiveSetting.CurrentHeader.sid, (Difficulty)LiveSetting.actualDifficulty);
+            recorder = new DemoRecorder(liveSetting, liveSetting.CurrentHeader.sid, (Difficulty)liveSetting.actualDifficulty);
         }
     }
 

@@ -13,7 +13,9 @@ public class SettingAndMod : MonoBehaviour
     [Inject]
     private IAudioManager audioManager;
     [Inject]
-    IKVSystem kvSystem;
+    private IKVSystem kvSystem;
+    [Inject]
+    private ILiveSetting liveSetting;
 
     private Button setting_Open_Btn;
     private Button setting_Close_Btn;
@@ -301,10 +303,10 @@ public class SettingAndMod : MonoBehaviour
     {
         auto_Tog.isOn = mod_autoplay;
 
-        speedDown_Tog.SetStep(LiveSetting.attachedMods);
-        speedUp_Tog.SetStep(LiveSetting.attachedMods);
-        suddenDeath_Tog.isOn = LiveSetting.attachedMods.Contains(SuddenDeathMod.Instance);
-        perfect_Tog.isOn = LiveSetting.attachedMods.Contains(PerfectMod.Instance);
+        speedDown_Tog.SetStep(liveSetting.attachedMods);
+        speedUp_Tog.SetStep(liveSetting.attachedMods);
+        suddenDeath_Tog.isOn = liveSetting.attachedMods.Contains(SuddenDeathMod.Instance);
+        perfect_Tog.isOn = liveSetting.attachedMods.Contains(PerfectMod.Instance);
     }
 
     public void OnLanuageChanged(int value)
@@ -369,14 +371,14 @@ public class SettingAndMod : MonoBehaviour
             cl_notestyle.Set((int)noteToggles.GetStyle());
             cl_sestyle.Set((int)seSelector.GetSE());
 
-            LiveSetting.RemoveAllMods();
-            LiveSetting.attachedMods.Clear();
-            LiveSetting.AddMod(speedUp_Tog.GetStep());
-            LiveSetting.AddMod(speedDown_Tog.GetStep());
+            liveSetting.RemoveAllMods();
+            liveSetting.attachedMods.Clear();
+            liveSetting.AddMod(speedUp_Tog.GetStep());
+            liveSetting.AddMod(speedDown_Tog.GetStep());
 
-            if (suddenDeath_Tog.isOn) LiveSetting.AddMod(SuddenDeathMod.Instance);
+            if (suddenDeath_Tog.isOn) liveSetting.AddMod(SuddenDeathMod.Instance);
 
-            if (perfect_Tog.isOn) LiveSetting.AddMod(PerfectMod.Instance);
+            if (perfect_Tog.isOn) liveSetting.AddMod(PerfectMod.Instance);
         }
         catch (System.Exception e)
         {

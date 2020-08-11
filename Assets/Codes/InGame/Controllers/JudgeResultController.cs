@@ -54,7 +54,7 @@ public class JudgeResultController : MonoBehaviour
     public void DisplayJudgeOffset(NoteBase note, int result)
     {
         //if (offsetRenderer == null) return;
-        //if (LiveSetting.autoPlayEnabled) return;
+        //if (liveSetting.autoPlayEnabled) return;
         if (note is SlideTick)
         {
             offsetRenderer.sprite = null;

@@ -2,18 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 #pragma warning disable 0649
 public class ModIconDisplay : MonoBehaviour
 {
-    [SerializeField] private Image[] icons;
+    [Inject]
+    private ILiveSetting liveSetting;
+
+    [SerializeField]
+    private Image[] icons;
 
     static KVarRef mod_autoplay = new KVarRef("mod_autoplay");
     private void Start()
     {
         //icons = GetComponentsInChildren<Image>(true);
 
-        foreach (var mod in LiveSetting.attachedMods)
+        foreach (var mod in liveSetting.attachedMods)
         {
             if (mod is DoubleMod) icons[0].gameObject.SetActive(true);
             else if (mod is HalfMod) icons[1].gameObject.SetActive(true);
