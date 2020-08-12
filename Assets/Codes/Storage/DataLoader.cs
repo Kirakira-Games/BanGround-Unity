@@ -11,6 +11,7 @@ using ProtoBuf;
 using UnityEngine.SceneManagement;
 using UniRx.Async;
 using Zenject;
+using UnityEngine.Events;
 
 public class DataLoader : IDataLoader
 {
@@ -32,6 +33,7 @@ public class DataLoader : IDataLoader
     private KVar cl_lastdiff;
 
     private SongList songList;
+    public UnityEvent onSongListRefreshed { get; } = new UnityEvent();
     public List<mHeader> musicList => songList.mHeaders;
     public List<cHeader> chartList => songList.cHeaders;
     public bool loaded => songList != null;
@@ -404,6 +406,8 @@ public class DataLoader : IDataLoader
         {
             cl_lastdiff.Set(Mathf.Max(0, songList.cHeaders.Count - 1));
         }
+
+        onSongListRefreshed.Invoke();
     }
 
     public void ConvertJsonToBin(DirectoryInfo dir)
