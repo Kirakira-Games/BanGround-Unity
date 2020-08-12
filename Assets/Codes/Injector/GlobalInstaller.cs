@@ -52,6 +52,9 @@ public class GlobalInstaller : MonoInstaller
             if (obj is ValidationMarker) return;
             LiveSetting.Instance = obj as ILiveSetting; // TODO: Remove
         }).NonLazy();
+
+        // Sorter Factory
+        Container.Bind<ISorterFactory>().To<SorterFactory>().AsSingle().NonLazy();
     }
 
     void RegisterKonCommands()
