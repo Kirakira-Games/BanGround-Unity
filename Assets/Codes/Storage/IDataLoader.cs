@@ -3,9 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UniRx.Async;
+using UnityEngine.Events;
 
 public interface IDataLoader
 {
+    UnityEvent onSongListRefreshed { get; }
     List<cHeader> chartList { get; }
     bool loaded { get; }
     List<mHeader> musicList { get; }
