@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -97,5 +98,39 @@ public class ChartScoreSort : IComparer<cHeader>
         int dif = (int)(resultX - resultY);
         return dif == 0 ? x.mid - y.mid : dif;
         //DAMN:The selector could select a different song if score was changed
+    }
+}
+
+public interface ISorterFactory
+{
+    IComparer<cHeader> Create();
+}
+
+public class SorterFactory : ISorterFactory
+{
+    [Inject]
+    private IDataLoader dataLoader;
+    [Inject(Id = "cl_cursorter")]
+    private KVar cl_cursorter;
+    [Inject(Id = "cl_lastdiff")]
+    private KVar cl_lastdiff;
+
+    public IComparer<cHeader> Create()
+    {
+        switch ((Sorter)cl_cursorter)
+        {
+            case Sorter.ChartDifficulty:
+                return new ChartDifSort(dataLoader, cl_lastdiff);
+            case Sorter.SongName:
+                return new SongNameSort(dataLoader);
+            case Sorter.SongArtist:
+                return new SongArtistSort(dataLoader);
+            case Sorter.ChartAuthor:
+                return new ChartAuthorSort();
+            case Sorter.ChartScore:
+                return new ChartScoreSort();
+            default:
+                return new SongNameSort(dataLoader);
+        }
     }
 }
