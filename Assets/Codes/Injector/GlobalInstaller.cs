@@ -119,6 +119,8 @@ public class GlobalInstaller : MonoInstaller
             KVar.C("snd_output", ((int)FMOD.OUTPUTTYPE.AUTODETECT).ToString(), KVarFlags.Archive),
 
             KVar.C("cl_language", "-1", KVarFlags.Archive),
+
+            KVar.C("cl_currentdemo", "", KVarFlags.StringOnly, "Current demo file"),
         };
 
         foreach (var info in varInfos)

@@ -9,6 +9,7 @@ using System.Linq;
 using UnityEngine.Scripting;
 using ProtoBuf.Meta;
 using Zenject;
+using UnityEngine;
 
 [JsonConverter(typeof(StringEnumConverter))]
 [ProtoContract()]
@@ -335,9 +336,9 @@ public partial class PlayRecords : IExtensible
 
     public static PlayRecords OpenRecord()
     {
-        if (File.Exists(LiveSetting.scoresPath))
+        if (File.Exists(Application.persistentDataPath + "/Scores.bin"))
         {
-            return ProtobufHelper.Load<PlayRecords>(LiveSetting.scoresPath);
+            return ProtobufHelper.Load<PlayRecords>(Application.persistentDataPath + "/Scores.bin");
         }
         else
         {
@@ -346,10 +347,10 @@ public partial class PlayRecords : IExtensible
         
     }
 
-    public static string SaveRecord(PlayRecords a)
+    public string Save()
     {
-        ProtobufHelper.Save(a, LiveSetting.scoresPath);
-        string json = JsonConvert.SerializeObject(a);
+        ProtobufHelper.Save(this, Application.persistentDataPath + "/Scores.bin");
+        string json = JsonConvert.SerializeObject(this);
         //File.WriteAllText(liveSetting.scoresPath,json);
         return json;
     }

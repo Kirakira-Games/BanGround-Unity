@@ -211,6 +211,8 @@ public class TouchManager : MonoBehaviour
 
     [Inject(Id = "g_demoRecord")]
     private KVar g_demoRecord;
+    [Inject(Id = "cl_currentdemo")]
+    private KVar cl_currentDemo;
     [Inject]
     private ILiveSetting liveSetting;
     [Inject]
@@ -319,11 +321,9 @@ public class TouchManager : MonoBehaviour
         KirakiraTouch.flickDistPixels = Mathf.Min(Screen.height / 20, NoteUtility.FLICK_JUDGE_DIST / 2.54f * KirakiraTouch.dpi);
 
         // Touch provider
-        var demoFile = liveSetting.DemoFile;
-
-        if (demoFile != null)
+        if(cl_currentDemo != "")
         {
-            provider = new DemoReplayTouchPrivider(demoFile);
+            provider = new DemoReplayTouchPrivider(DemoFile.LoadFrom(cl_currentDemo));
         }
         else if (modManager.isAutoplay)
         {
