@@ -9,21 +9,16 @@ namespace BGEditor
 {
     public static class MappingInit
     {
-        private static V2.Chart chart;
-
         private static IEnumerator InitCoroutine(ChartCore core)
         {
             yield return new WaitForEndOfFrame();
-            core.LoadChart(chart);
+            core.LoadChart();
         }
 
         public static void Init(ChartCore core)
         {
-            // Load chart
-            chart = LiveSetting.Instance.chart;
-
             // Load music
-            core.progress.Init(KiraFilesystem.Instance.Read(DataLoader.Instance.GetMusicPath(LiveSetting.Instance.CurrentHeader.mid)));
+            core.progress.Init();
 
             core.StartCoroutine(InitCoroutine(core));
         }

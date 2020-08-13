@@ -8,6 +8,8 @@ public class PlayRecordDisplay : MonoBehaviour
 {
     [Inject]
     private ILiveSetting liveSetting;
+    [Inject]
+    private IChartListManager chartListManager;
 
     RawImage Rank;
     RawImage clearMark;
@@ -29,8 +31,8 @@ public class PlayRecordDisplay : MonoBehaviour
         PlayResult a = new PlayResult();
         for (int i = 0; i < playRecords.resultsList.Count; i++)
         {
-            if (playRecords.resultsList[i].ChartId == liveSetting.CurrentHeader.sid &&
-                playRecords.resultsList[i].Difficulty == (Difficulty)liveSetting.actualDifficulty)
+            if (playRecords.resultsList[i].ChartId == chartListManager.current.header.sid &&
+                playRecords.resultsList[i].Difficulty == chartListManager.current.difficulty)
             {
                 count++;
                 a = playRecords.resultsList[i];

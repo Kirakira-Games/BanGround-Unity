@@ -16,7 +16,7 @@ public class ChartCreator : MonoBehaviour
     [Inject]
     private IDataLoader dataLoader;
     [Inject]
-    private ILiveSetting liveSetting;
+    private IChartListManager chartListManager;
     [Inject(Id = "cl_lastdiff")]
     private KVar cl_lastdiff;
 
@@ -24,7 +24,7 @@ public class ChartCreator : MonoBehaviour
     public Button Blocker;
     public Toggle[] Toggles;
 
-    private cHeader cHeader => liveSetting.CurrentHeader;
+    private cHeader cHeader => chartListManager.current.header;
     [Inject(Id = "cl_lastsid")]
     private KVar cl_lastsid;
 
@@ -32,7 +32,7 @@ public class ChartCreator : MonoBehaviour
     {
         Blocker.gameObject.SetActive(true);
         gameObject.SetActive(true);
-        Toggles[liveSetting.actualDifficulty].isOn = true;
+        Toggles[(int)chartListManager.current.difficulty].isOn = true;
     }
 
     private int SelectedDifficulty()
@@ -129,7 +129,6 @@ public class ChartCreator : MonoBehaviour
 
         // Reload scene
         cl_lastdiff.Set(difficulty);
-        liveSetting.actualDifficulty = difficulty;
         cl_lastsid.Set(header.sid);
         SceneManager.LoadScene("Select");
     }
@@ -155,7 +154,7 @@ public class ChartCreator : MonoBehaviour
 
         // Reload scene
         cl_lastdiff.Set(difficulty);
-        liveSetting.actualDifficulty = difficulty;
+        chartListManager.current.difficulty = (Difficulty) difficulty;
         SceneManager.LoadScene("Select");
     }
 
@@ -239,7 +238,7 @@ public class ChartCreator : MonoBehaviour
 
             // Reload scene
             cl_lastdiff.Set(difficulty);
-            liveSetting.actualDifficulty = difficulty;
+            chartListManager.current.difficulty = (Difficulty) difficulty;
             cl_lastsid.Set(header.sid);
             SceneManager.LoadScene("Select");
 

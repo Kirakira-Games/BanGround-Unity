@@ -13,7 +13,7 @@ public class LoaderInfo : MonoBehaviour
     [Inject]
     private IDataLoader dataLoader;
     [Inject]
-    private ILiveSetting liveSetting;
+    private IChartListManager chartListManager;
 
     private mHeader musicHeader;
     private cHeader chartHeader;
@@ -37,20 +37,20 @@ public class LoaderInfo : MonoBehaviour
 
     private void GetInfo()
     {
-        chartHeader = liveSetting.CurrentHeader;
-        musicHeader = dataLoader.GetMusicHeader(liveSetting.CurrentHeader.mid);
+        chartHeader = chartListManager.current.header;
+        musicHeader = dataLoader.GetMusicHeader(chartListManager.current.header.mid);
     }
 
     private void AppendChartInfo(bool success)
     {
         if (!success) return;
-        songBPM.text = GetBPM() + " NOTE " + liveSetting.gameChart.numNotes;
+        songBPM.text = GetBPM() + " NOTE " + chartListManager.gameChart.numNotes;
     }
 
     private void ShowInfo()
     {
         // Song img
-        var path = dataLoader.GetBackgroundPath(liveSetting.CurrentHeader.sid).Item1;
+        var path = dataLoader.GetBackgroundPath(chartListManager.current.header.sid).Item1;
         if (path != null && KiraFilesystem.Instance.Exists(path))
         {
             var tex = KiraFilesystem.Instance.ReadTexture2D(path);
@@ -64,7 +64,7 @@ public class LoaderInfo : MonoBehaviour
         songBPM.text = "Loading...";
         
         // Difficulty and charter
-        Difficulty difficulty = (Difficulty)liveSetting.actualDifficulty;
+        Difficulty difficulty = (Difficulty)chartListManager.current.difficulty;
         int level = chartHeader.difficultyLevel[(int)difficulty];
         songLevelAndCharter.text = string.Format(LevelAndCharterFormat, difficulty.ToString().ToUpper(), level, chartHeader.authorNick);
         
@@ -74,8 +74,8 @@ public class LoaderInfo : MonoBehaviour
 
     private string GetBPM()
     {
-        var min = liveSetting.gameChart.bpm.Min(o => o.value);
-        var max = liveSetting.gameChart.bpm.Max(o => o.value);
+        var min = chartListManager.gameChart.bpm.Min(o => o.value);
+        var max = chartListManager.gameChart.bpm.Max(o => o.value);
         return min == max ? $"BPM {min}" : $"BPM {min}-{max}";
     }
 }

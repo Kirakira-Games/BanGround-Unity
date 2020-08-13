@@ -12,8 +12,6 @@ public class LiveSetting : ILiveSetting
 {
     public static ILiveSetting Instance;
 
-    [Inject]
-    private IDataLoader dataLoader;
     [Inject(Id = "fs_assetpath")]
     private KVar fs_assetpath;
     [Inject(Id = "fs_iconpath")]
@@ -40,49 +38,8 @@ public class LiveSetting : ILiveSetting
     public string assetDirectory => fs_assetpath;
     public string IconPath => fs_iconpath;
 
-    public int currentChart { get; set; } = 0;
-    private int cachedActualDifficulty;
-
-    public LiveSetting([Inject(Id = "cl_lastdiff")] KVar cl_lastdiff)
-    {
-        cachedActualDifficulty = cl_lastdiff;
-    }
-    /// <summary>
-    /// 获取当前谱面难度。一定是当前谱面集拥有的难度，但不一定是用户偏好的谱面难度。
-    /// 例如：当用户从EX难度切换到一个只有NM难度的谱面集，
-    /// currentDifficulty为Expert，而actualDifficulty为Normal。
-    /// </summary>
-    public int actualDifficulty
-    {
-        get
-        {
-            return offsetAdjustMode ? (int)Difficulty.Easy : cachedActualDifficulty;
-        }
-        set
-        {
-            cachedActualDifficulty = value;
-        }
-    }
-
-    public const int offsetAdjustChart = 99901;
-    public cHeader CurrentHeader
-    {
-        get
-        {
-            if (offsetAdjustMode)
-            {
-                var ret = dataLoader.chartList.Where((x) => x.sid == offsetAdjustChart).First();
-                ret.LoadDifficultyLevels(dataLoader);
-                return ret;
-            }
-            else
-            {
-                return dataLoader.chartList[currentChart];
-            }
-        }
-    }
-    public V2.Chart chart { get; private set; }
-    public GameChartData gameChart { get; private set; }
+    public int offsetAdjustChart { get; private set; } = 99901;
+    public Difficulty offsetAdjustDiff { get; private set; } = Difficulty.Easy;
 
     public static readonly string settingsPath = Application.persistentDataPath + "/LiveSettings.json";
     public static readonly string scoresPath = Application.persistentDataPath + "/Scores.bin";
@@ -132,33 +89,6 @@ public class LiveSetting : ILiveSetting
             {
                 SpeedCompensationSum /= (mod as AudioMod).SpeedCompensation;
             }
-        }
-    }
-
-    public async UniTask<bool> LoadChart(bool convertToGameChart)
-    {
-        chart = await ChartVersion.Instance.Process(CurrentHeader, (Difficulty)actualDifficulty);
-        if (chart == null)
-        {
-            MessageBannerController.ShowMsg(LogLevel.ERROR, "This chart is unsupported.");
-            return false;
-        }
-        try
-        {
-            if (convertToGameChart)
-            {
-                gameChart = ChartLoader.LoadChart(
-                    JsonConvert.DeserializeObject<V2.Chart>(
-                        JsonConvert.SerializeObject(chart)
-                    ));
-            }
-            return true;
-        }
-        catch (Exception e)
-        {
-            MessageBannerController.ShowMsg(LogLevel.ERROR, e.Message);
-            Debug.LogError(e.StackTrace);
-            return false;
         }
     }
 

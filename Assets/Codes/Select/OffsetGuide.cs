@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using FMOD.Studio;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,6 +11,8 @@ public class OffsetGuide : MonoBehaviour
     private IKVSystem kvSystem;
     [Inject]
     private ILiveSetting liveSetting;
+    [Inject]
+    private IChartListManager chartListManager;
 
     void Start()
     {
@@ -19,6 +22,7 @@ public class OffsetGuide : MonoBehaviour
     void StartOffsetGuide()
     {
         liveSetting.offsetAdjustMode = true;
+        chartListManager.ForceChart(liveSetting.offsetAdjustChart, liveSetting.offsetAdjustDiff);
 
         //if (!await liveSetting.LoadChart(true))
         //{
@@ -29,6 +33,13 @@ public class OffsetGuide : MonoBehaviour
 
         SettingAndMod.instance.SetLiveSetting();
         kvSystem.SaveConfig();
-        SceneLoader.LoadScene("Select", "InGame", () => liveSetting.LoadChart(true));
+        SceneLoader.LoadScene("Select", "InGame", async () =>
+        {
+            if (!await chartListManager.LoadChart(true))
+            {
+                return false;
+            }
+            return true;
+        });
     }
 }

@@ -8,6 +8,8 @@ public class OffsetSettingController : MonoBehaviour
 {
     [Inject]
     private ILiveSetting liveSetting;
+    [Inject]
+    private IChartListManager chartListManager;
 
     private Text offsetText;
     private const int RECENT_COUNT = 10;
@@ -65,6 +67,7 @@ public class OffsetSettingController : MonoBehaviour
     public void SaveAndExit()
     {
         liveSetting.offsetAdjustMode = false;
+        chartListManager.ClearForcedChart();
         UIManager.Instance.GameRetire();
     }
 }

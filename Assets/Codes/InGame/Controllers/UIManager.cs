@@ -19,6 +19,8 @@ public class UIManager : MonoBehaviour
     private ILiveSetting liveSetting;
     [Inject]
     private IAudioManager audioManager;
+    [Inject]
+    private IChartListManager chartListManager;
 
     private const float BiteTime = 2;
 
@@ -189,7 +191,7 @@ public class UIManager : MonoBehaviour
         SceneLoader.LoadScene("InGame", "InGame", () => {
             async UniTask<bool> Retry()
             {
-                if (await liveSetting.LoadChart(true))
+                if (await chartListManager.LoadChart(true))
                 {
                     OnStopPlaying();
                     return true;

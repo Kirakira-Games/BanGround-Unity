@@ -16,6 +16,8 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     private IDataLoader dataLoader;
     [Inject]
     private ILiveSetting liveSetting;
+    [Inject]
+    private IChartListManager chartListManager;
 
     RectTransform rt_m;
     RectTransform rt_v;
@@ -155,7 +157,7 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     private void OnEnterPressed()
     {
-        if (!dataLoader.MusicExists(liveSetting.CurrentHeader.mid))
+        if (!dataLoader.MusicExists(chartListManager.current.header.mid))
         {
             MessageBannerController.ShowMsg(LogLevel.INFO, "Music missing. Please import it.");
             return;
@@ -232,18 +234,18 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     private void OnDelete()
     {
-        /*var file = dataLoader.GetChartPath(liveSetting.CurrentHeader.sid, (Difficulty)liveSetting.actualDifficulty);
+        /*var file = dataLoader.GetChartPath(chartListManager.current.header.sid, (Difficulty)chartListManager.current.difficulty);
         var path = new System.IO.FileInfo(file).Directory.FullName;
         //Debug.Log(path);
         System.IO.Directory.Delete(path, true);*/
-        if (liveSetting.CurrentHeader.sid == LiveSetting.offsetAdjustChart)
+        if (chartListManager.current.header.sid == liveSetting.offsetAdjustChart)
         {
             int index = UnityEngine.Random.Range(0, delFailMsg.Length);
             MessageBannerController.ShowMsg(LogLevel.INFO, delFailMsg[index]);
             return;
         }
 
-        var chartDir = $"chart/{liveSetting.CurrentHeader.sid}";
+        var chartDir = $"chart/{chartListManager.current.header.sid}";
 
         var files = KiraFilesystem.Instance.ListFiles(name => name.Contains(chartDir));
         files.All(item => 

@@ -213,6 +213,8 @@ public class TouchManager : MonoBehaviour
     private KVar g_demoRecord;
     [Inject]
     private ILiveSetting liveSetting;
+    [Inject]
+    private IChartListManager chartListManager;
 
     private Dictionary<int, KirakiraTouch> touchTable;
     private Dictionary<(KirakiraTracer, int), JudgeResult> traceCache;
@@ -344,7 +346,7 @@ public class TouchManager : MonoBehaviour
 
         if (!(provider is DemoReplayTouchPrivider) && g_demoRecord)
         {
-            recorder = new DemoRecorder(liveSetting, liveSetting.CurrentHeader.sid, (Difficulty)liveSetting.actualDifficulty);
+            recorder = new DemoRecorder(chartListManager.current.header.sid, chartListManager.current.difficulty);
         }
     }
 

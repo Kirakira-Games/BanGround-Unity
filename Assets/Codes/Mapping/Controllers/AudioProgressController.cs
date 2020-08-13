@@ -5,13 +5,18 @@ using AudioProvider;
 using System;
 using FMOD;
 using Zenject;
+using System.IO;
 
 namespace BGEditor
 {
     public class AudioProgressController : CoreMonoBehaviour
     {
         [Inject]
+        private IDataLoader dataLoader;
+        [Inject]
         private IAudioManager audioManager;
+        [Inject]
+        private IChartListManager chartListManager;
 
         public Text TimeText;
         public Slider AudioProgressSlider;
@@ -109,8 +114,9 @@ namespace BGEditor
             Core.onUserChangeAudioProgress.Invoke();
         }
 
-        public async void Init(byte[] audio)
+        public async void Init()
         {
+            byte[] audio = KiraFilesystem.Instance.Read(dataLoader.GetMusicPath(chartListManager.current.header.mid));
             var hack = SettingAndMod.instance;
             // Load BGM
             audioManager.gameBGM = await audioManager.Provider.StreamTrack(audio);
