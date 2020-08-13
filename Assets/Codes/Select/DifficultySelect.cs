@@ -13,33 +13,31 @@ public class DifficultySelect : MonoBehaviour
     [Inject]
     private IDataLoader dataLoader;
     [Inject]
-    private ILiveSetting liveSetting;
+    private IChartListManager chartListManager;
 
     [Inject(Id = "cl_cursorter")]
     private KVar cl_cursorter;
-    [Inject(Id = "cl_lastsid")]
-    private KVar cl_lastsid;
     [Inject(Id = "cl_lastdiff")]
     private KVar cl_lastdiff;
 
     public static readonly string[] DIFFICULTY_ABBR = { "EZ", "NM", "HD", "EX", "SP" };
     public GameObject[] cards = new GameObject[5];
     public GameObject[] labels = new GameObject[5];
-    Text[] labelText = new Text[5];
-    Image[] cardImg = new Image[5];
-    RectTransform[] Rects = new RectTransform[5];
-    public int[] levels = new int[5];
+    private Text[] labelText = new Text[5];
+    private Image[] cardImg = new Image[5];
+    private RectTransform[] Rects = new RectTransform[5];
+    private List<int> levels => chartListManager.current.header.difficultyLevel;
 
     [SerializeField] 
-    private TextAsset[] voices;
-    AudioProvider.ISoundEffect[] processedVoices = new AudioProvider.ISoundEffect[5];
+    TextAsset[] voices;
+    private AudioProvider.ISoundEffect[] processedVoices = new AudioProvider.ISoundEffect[5];
 
 
-    List<int> enabledCards = new List<int>();
-    int selected = 0;
-    Text difficultyText;
-    Text levelText;
-    PlayRecordDisplay recordDisplayer;
+    private List<int> enabledCards = new List<int>();
+    private int selected => enabledCards[0];
+    private Text difficultyText;
+    private Text levelText;
+    private PlayRecordDisplay recordDisplayer;
     private FixBackground background;
 
     async void Start()
@@ -50,7 +48,6 @@ public class DifficultySelect : MonoBehaviour
         difficultyText = GameObject.Find("Text_SelectedDifficulty").GetComponent<Text>();
         recordDisplayer = GameObject.Find("Left_Panel").GetComponent<PlayRecordDisplay>();
         background = GameObject.Find("KirakiraBackground").GetComponent<FixBackground>();
-        lastDifficulty = liveSetting.actualDifficulty;
 
         for (int i = 0; i < cards.Length; i++)
         {
@@ -61,8 +58,13 @@ public class DifficultySelect : MonoBehaviour
             processedVoices[i] = await audioManager.PrecacheSE(voices[i].bytes);
         }
 
+        // Register listeners
+        chartListManager.onChartListUpdated.AddListener(OnSongChange);
+        chartListManager.onSelectedChartUpdated.AddListener(OnSongChange);
+        chartListManager.onDifficultyUpdated.AddListener(UpdateView);
     }
 
+    #region View
     public void OnSongChange()
     {
         enabledCards = new List<int>();
@@ -85,9 +87,8 @@ public class DifficultySelect : MonoBehaviour
         UpdateView();
     }
 
-    int lastDifficulty;
     //This Called both change button clicked and song changed
-    public void UpdateView(bool overrideCurrentDifficulty = false)
+    public void UpdateView()
     {
         if(enabledCards.Count == 0)
             return;
@@ -98,69 +99,52 @@ public class DifficultySelect : MonoBehaviour
             Rects[enabledCards[i]].SetAsFirstSibling();
             cardImg[enabledCards[i]].color = new Color(1, 1, 1, 0);
         }
-        selected = enabledCards[0]; //最顶上一层
         cardImg[selected].color = Color.white;
         difficultyText.text = Enum.GetName(typeof(Difficulty), selected).ToUpper();
         levelText.text = levels[selected].ToString();
 
-        liveSetting.actualDifficulty = selected;
-        if (overrideCurrentDifficulty)
-            cl_lastdiff.Set(selected);
-        if ((Sorter)cl_cursorter == Sorter.ChartDifficulty && lastDifficulty != cl_lastdiff.Get<int>())
-        {
-            cl_lastsid.Set(liveSetting.CurrentHeader.sid);
-            //SelectManager_old.instance.RefeshSonglist();
-            SelectManager_old.instance.InitSongList(cl_lastsid);
-        }
-
-        lastDifficulty = cl_lastdiff.Get<int>();
-
         recordDisplayer.DisplayRecord();
-        string path = dataLoader.GetBackgroundPath(liveSetting.CurrentHeader.sid).Item1;
+        string path = dataLoader.GetBackgroundPath(chartListManager.current.header.sid).Item1;
         background.UpdateBackground(path);
         //liveSetting.selectedDifficulty = (Difficulty)enabledCards[0];
         //print(Enum.GetName(typeof(Difficulty), liveSetting.selectedDifficulty));
     }
+    #endregion
 
+    #region Controller
     //This called on the change button clicked
     public void OnSwipeNext()
     {
         if (enabledCards.Count <= 1)
             return;
-        List<int> oldList = enabledCards;
-        enabledCards = new List<int>();
-        for (int i = 1; i < oldList.Count; i++)
+
+        var firstCard = enabledCards[0];
+        enabledCards.RemoveAt(0);
+        enabledCards.Add(firstCard);
+
+        chartListManager.SelectDifficulty((Difficulty)selected);
+
+        if ((Sorter)cl_cursorter == Sorter.ChartDifficulty)
         {
-            enabledCards.Add(oldList[i]);
+            chartListManager.SortChart();
+            return;
         }
-        enabledCards.Add(oldList[0]);
+
         StartCoroutine(SwipeOutAnimation());
     }
+
     IEnumerator SwipeOutAnimation()
     {
-        /*
-        int last = enabledCards.Count - 1;
-        int no = enabledCards[last];
-        while (cardImg[no].color.a > 0)
-         {
-             cardImg[no].color -= new Color(0, 0, 0, 0.1f);
-             yield return new WaitForEndOfFrame();
-         }
-         //cards[no].SetActive(false);
-         */
-        //cardImg[no].color = Color.clear;
-
-        UpdateView(true);
         yield return new WaitForEndOfFrame();
-        /*cardImg[selected].color = new Color(1, 1, 1, 0);
-        while (cardImg[selected].color.a < 1)
-        {
-            cardImg[selected].color += new Color(0, 0, 0, 0.1f);
-            yield return new WaitForEndOfFrame();
-        }
-        cardImg[selected].color = Color.white;*/
 
         processedVoices[selected].PlayOneShot();
     }
+    #endregion
 
+    private void OnDestroy()
+    {
+        chartListManager.onChartListUpdated.RemoveListener(OnSongChange);
+        chartListManager.onSelectedChartUpdated.RemoveListener(OnSongChange);
+        chartListManager.onDifficultyUpdated.RemoveListener(UpdateView);
+    }
 }

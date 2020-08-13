@@ -55,6 +55,9 @@ public class GlobalInstaller : MonoInstaller
 
         // Sorter Factory
         Container.Bind<ISorterFactory>().To<SorterFactory>().AsSingle().NonLazy();
+
+        // Chart List Manager
+        Container.Bind<IChartListManager>().To<ChartListManager>().AsSingle().NonLazy();
     }
 
     void RegisterKonCommands()

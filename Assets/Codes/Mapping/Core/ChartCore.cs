@@ -24,7 +24,7 @@ namespace BGEditor
         [Inject]
         private IDataLoader dataLoader;
         [Inject]
-        private ILiveSetting liveSetting;
+        private IChartListManager chartListManager;
 
         public GridController grid;
         public EditNoteController notes;
@@ -311,10 +311,10 @@ namespace BGEditor
 
         public void Save()
         {
-            dataLoader.SaveChart(GetFinalizedChart(), liveSetting.CurrentHeader.sid, (Difficulty) liveSetting.actualDifficulty);
+            dataLoader.SaveChart(GetFinalizedChart(), chartListManager.current.header.sid, (Difficulty) chartListManager.current.difficulty);
 
             if (!string.IsNullOrEmpty(scriptEditor.Code))
-                dataLoader.SaveChartScript(scriptEditor.Code, liveSetting.CurrentHeader.sid, (Difficulty)liveSetting.actualDifficulty);
+                dataLoader.SaveChartScript(scriptEditor.Code, chartListManager.current.header.sid, (Difficulty)chartListManager.current.difficulty);
 
             MessageBannerController.ShowMsg(LogLevel.OK, "Chart saved.");
         }
@@ -342,8 +342,9 @@ namespace BGEditor
             }
         }
 
-        public void LoadChart(V2.Chart raw)
+        public void LoadChart()
         {
+            V2.Chart raw = chartListManager.chart;
             AssignTimingGroups(raw);
             chart = new V2.Chart
             {
@@ -437,8 +438,8 @@ namespace BGEditor
                 notes.UnselectAll();
             }
 
-            if (KiraFilesystem.Instance.Exists(dataLoader.GetChartScriptPath(liveSetting.CurrentHeader.sid, (Difficulty)liveSetting.actualDifficulty)))
-                scriptEditor.Code = KiraFilesystem.Instance.ReadString(dataLoader.GetChartScriptPath(liveSetting.CurrentHeader.sid, (Difficulty)liveSetting.actualDifficulty));
+            if (KiraFilesystem.Instance.Exists(dataLoader.GetChartScriptPath(chartListManager.current.header.sid, (Difficulty)chartListManager.current.difficulty)))
+                scriptEditor.Code = KiraFilesystem.Instance.ReadString(dataLoader.GetChartScriptPath(chartListManager.current.header.sid, (Difficulty)chartListManager.current.difficulty));
 
             onChartLoaded.Invoke();
             hotkey.onScroll.AddListener((delta) => MoveGrid(delta * 30));

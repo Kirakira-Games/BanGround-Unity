@@ -18,6 +18,8 @@ public class NoteController : MonoBehaviour
     private IDataLoader dataLoader;
     [Inject]
     private ILiveSetting liveSetting;
+    [Inject]
+    private IChartListManager chartListManager;
 
     public static NoteController Instance;
     public static Camera mainCamera;
@@ -391,7 +393,7 @@ public class NoteController : MonoBehaviour
         noteQueue = new JudgeQueue();
 
         // Load chart
-        chart = liveSetting.gameChart;
+        chart = chartListManager.gameChart;
         NotePool.Instance.Init(liveSetting, notes);
         noteHead = 0;
 
@@ -418,11 +420,11 @@ public class NoteController : MonoBehaviour
         };
 
         // Game BGM
-        StartCoroutine(audioManager.DelayPlayInGameBGM(KiraFilesystem.Instance.Read(dataLoader.GetMusicPath(liveSetting.CurrentHeader.mid)), WARM_UP_SECOND).ToCoroutine());
+        StartCoroutine(audioManager.DelayPlayInGameBGM(KiraFilesystem.Instance.Read(dataLoader.GetMusicPath(chartListManager.current.header.mid)), WARM_UP_SECOND).ToCoroutine());
 
         // Background
         var background = GameObject.Find("InGameBackground").GetComponent<InGameBackground>();
-        var (bg, bgtype) = dataLoader.GetBackgroundPath(liveSetting.CurrentHeader.sid, false);
+        var (bg, bgtype) = dataLoader.GetBackgroundPath(chartListManager.current.header.sid, false);
         if (bgtype == 1)
         {
             var videoPath = KiraFilesystem.Instance.Extract(bg);
@@ -452,7 +454,7 @@ public class NoteController : MonoBehaviour
             GameObject.Find("settingsCanvas").GetComponent<Canvas>().enabled = false;
         }
 
-        chartScript = new ChartScript(liveSetting.CurrentHeader.sid, (Difficulty)liveSetting.actualDifficulty);
+        chartScript = new ChartScript(chartListManager.current.header.sid, (Difficulty)chartListManager.current.difficulty);
 
         //Set Play Mod Event
         //audioManager.restart = false;

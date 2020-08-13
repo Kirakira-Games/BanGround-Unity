@@ -31,6 +31,8 @@ public class DataLoader : IDataLoader
     private IChartVersion chartVersion;
     [Inject(Id = "cl_lastdiff")]
     private KVar cl_lastdiff;
+    [Inject(Id = "cl_lastsid")]
+    private KVar cl_lastsid;
 
     private SongList songList;
     public UnityEvent onSongListRefreshed { get; } = new UnityEvent();
@@ -579,7 +581,7 @@ public class DataLoader : IDataLoader
                 int tmp = LoadKiraPack(file);
                 if (tmp != -1)
                 {
-                    LastImportedSid = tmp;
+                    cl_lastsid.Set(tmp);
                     LoadSuccess = true;
                     MessageBannerController.ShowMsg(LogLevel.OK, "Loaded kirapack: ".GetLocalized() + file.Name);
                 }

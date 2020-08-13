@@ -9,17 +9,17 @@ public class MouseWheelHandler : MonoBehaviour,IScrollHandler
     [Inject]
     private IDataLoader dataLoader;
     [Inject]
-    private ILiveSetting liveSetting;
+    private IChartListManager chartListManager;
 
     //FUCK:THis wont work after the double mouse game play
     public void OnScroll(PointerEventData p)
     {
         if (p.scrollDelta.y > NoteUtility.EPS)
         {
-            if (liveSetting.currentChart < dataLoader.chartList.Count-1)
-                SelectManager_old.instance.SelectSong(liveSetting.currentChart + 1);
+            if (chartListManager.current.index < dataLoader.chartList.Count-1)
+                SelectManager_old.instance.SelectSong(chartListManager.current.index + 1);
         }
         else if (p.scrollDelta.y < -NoteUtility.EPS)
-            SelectManager_old.instance.SelectSong(liveSetting.currentChart - 1);
+            SelectManager_old.instance.SelectSong(chartListManager.current.index - 1);
     }
 }

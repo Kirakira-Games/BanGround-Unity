@@ -18,6 +18,8 @@ public class ResultManager : MonoBehaviour
     private IDataLoader dataLoader;
     [Inject]
     private ILiveSetting liveSetting;
+    [Inject]
+    private IChartListManager chartListManager;
 
     private Button button_back;
     private Button button_retry;
@@ -59,7 +61,7 @@ public class ResultManager : MonoBehaviour
 
     async void Start()
     {
-        cheader = liveSetting.CurrentHeader;
+        cheader = chartListManager.current.header;
         mheader = dataLoader.GetMusicHeader(cheader.mid);
 
         SetBtnObject();
@@ -99,7 +101,7 @@ public class ResultManager : MonoBehaviour
     private void ShowBackground()
     {
         background = GameObject.Find("Background").GetComponent<FixBackground>();
-        string path = dataLoader.GetBackgroundPath(liveSetting.CurrentHeader.sid).Item1;
+        string path = dataLoader.GetBackgroundPath(chartListManager.current.header.sid).Item1;
         background.UpdateBackground(path);
     }
 
@@ -329,11 +331,11 @@ public class ResultManager : MonoBehaviour
     KVar mod_autoplay;
     private void ShowSongInfo()
     {
-        level_Text.text = Enum.GetName(typeof(Difficulty), liveSetting.actualDifficulty).ToUpper() + " " +
-            cheader.difficultyLevel[liveSetting.actualDifficulty];
+        level_Text.text = Enum.GetName(typeof(Difficulty), chartListManager.current.difficulty).ToUpper() + " " +
+            cheader.difficultyLevel[(int)chartListManager.current.difficulty];
         songName_Text.text = mheader.title;
         acc_Text.text = mod_autoplay ? "AUTOPLAY" : string.Format("{0:P2}", Mathf.FloorToInt((float)playResult.Acc * 10000) / 10000f);
-        difficultCard.sprite = Resources.Load<Sprite>("UI/DifficultyCards/" + Enum.GetName(typeof(Difficulty), liveSetting.actualDifficulty));
+        difficultCard.sprite = Resources.Load<Sprite>("UI/DifficultyCards/" + Enum.GetName(typeof(Difficulty), chartListManager.current.difficulty));
     }
 
     private void ReadScores()
@@ -348,10 +350,10 @@ public class ResultManager : MonoBehaviour
         playResult.clearMark = ResultsGetter.GetClearMark();
         playResult.Acc = ResultsGetter.GetAcc();
         playResult.ChartId = cheader.sid;
-        playResult.Difficulty = (Difficulty)liveSetting.actualDifficulty;
+        playResult.Difficulty = (Difficulty)chartListManager.current.difficulty;
         PlayRecords pr = PlayRecords.OpenRecord();
 
-        var resultList = pr.resultsList.Where((x) => x.ChartId == cheader.sid && x.Difficulty == (Difficulty)liveSetting.actualDifficulty);
+        var resultList = pr.resultsList.Where((x) => x.ChartId == cheader.sid && x.Difficulty == (Difficulty)chartListManager.current.difficulty);
         if (resultList.Count() == 1) 
         {
             var result = resultList.First();

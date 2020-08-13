@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using Zenject;
 using UnityEngine.PlayerLoop;
 using UnityEngine.Events;
+using UniRx.Async;
+using System;
+using Newtonsoft.Json;
 
 public class ChartIndexInfo
 {
@@ -11,10 +14,11 @@ public class ChartIndexInfo
     public Difficulty difficulty;
 }
 
-public class ChartListManager
+public class ChartListManager : IChartListManager
 {
-    [Inject]
     private IDataLoader dataLoader;
+    private ISorterFactory sorterFactory;
+
     [Inject(Id = "cl_lastsid")]
     private KVar cl_lastsid;
     [Inject(Id = "cl_lastdiff")]
@@ -27,19 +31,29 @@ public class ChartListManager
     public UnityEvent onSelectedChartUpdated { get; } = new UnityEvent();
 
     /// <summary>
-    /// This difficulty might be different from <see cref="current"/>,
-    /// which is more reliable for actually selected difficulty.
-    /// </summary>
-    public Difficulty currentDifficulty { get; private set; }
-
-    /// <summary>
     /// Current chart, either <see cref="selectedChart"/> or <see cref="forceChart"/>
     /// </summary>
     public ChartIndexInfo current => forceChart.header == null ? selectedChart : forceChart;
+
+    public V2.Chart chart { get; private set; }
+    public GameChartData gameChart { get; private set; }
+
     // Currently selected chart.
     private ChartIndexInfo selectedChart = new ChartIndexInfo();
     // Force to play this chart. Used in offset adjust mode.
     private ChartIndexInfo forceChart = new ChartIndexInfo();
+
+    public ChartListManager(IDataLoader dataLoader, ISorterFactory sorterFactory)
+    {
+        this.dataLoader = dataLoader;
+        this.sorterFactory = sorterFactory;
+        dataLoader.onSongListRefreshed.AddListener(() =>
+        {
+            SortChart();
+            SelectChartBySid(cl_lastsid);
+            SelectDifficulty((Difficulty)cl_lastdiff.Get<int>());
+        });
+    }
 
     private void UpdateActualDifficulty()
     {
@@ -49,15 +63,20 @@ public class ChartListManager
         {
             difficulty = (difficulty + 1) % ((int)Difficulty.Special + 1);
         }
-        selectedChart.difficulty = (Difficulty) difficulty;
+        if (selectedChart.difficulty == (Difficulty)difficulty)
+            return;
+        selectedChart.difficulty = (Difficulty)difficulty;
         onDifficultyUpdated.Invoke();
     }
 
     public void SelectChartByIndex(int index)
     {
         index = Mathf.Clamp(index, 0, chartList.Count - 1);
+        if (cl_lastsid == chartList[index].sid && selectedChart.header != null)
+            return;
         selectedChart.index = index;
         selectedChart.header = chartList[index];
+        selectedChart.header.LoadDifficultyLevels(dataLoader);
         cl_lastsid.Set(selectedChart.header.sid);
         UpdateActualDifficulty();
         onSelectedChartUpdated.Invoke();
@@ -69,6 +88,10 @@ public class ChartListManager
         if (index != -1)
         {
             SelectChartByIndex(index);
+        }
+        else
+        {
+            Debug.LogWarning("Cannot find chart with sid " + sid);
         }
     }
 
@@ -91,14 +114,42 @@ public class ChartListManager
         {
             forceChart.index = index;
             forceChart.header = chartList[index];
+            forceChart.header.LoadDifficultyLevels(dataLoader);
             forceChart.difficulty = difficulty;
         }
     }
 
-    public void SortChart(IComparer<cHeader> comparer)
+    public void SortChart()
     {
-        chartList.Sort(comparer);
-        SelectChartBySid(selectedChart.header.sid);
+        chartList.Sort(sorterFactory.Create());
+        SelectChartBySid(cl_lastsid);
         onChartListUpdated.Invoke();
+    }
+
+    public async UniTask<bool> LoadChart(bool convertToGameChart)
+    {
+        chart = await ChartVersion.Instance.Process(current.header, current.difficulty);
+        if (chart == null)
+        {
+            MessageBannerController.ShowMsg(LogLevel.ERROR, "This chart is unsupported.");
+            return false;
+        }
+        try
+        {
+            if (convertToGameChart)
+            {
+                gameChart = ChartLoader.LoadChart(
+                    JsonConvert.DeserializeObject<V2.Chart>(
+                        JsonConvert.SerializeObject(chart)
+                    ));
+            }
+            return true;
+        }
+        catch (Exception e)
+        {
+            MessageBannerController.ShowMsg(LogLevel.ERROR, e.Message);
+            Debug.LogError(e.StackTrace);
+            return false;
+        }
     }
 }

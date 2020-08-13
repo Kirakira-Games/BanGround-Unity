@@ -65,12 +65,12 @@ public class DemoRecorder
     string demoName;
     DemoFile demoFile;
 
-    public DemoRecorder(ILiveSetting liveSetting, int chartId, Difficulty diff)
+    public DemoRecorder(int chartId, Difficulty diff)
     {
         demoFile = new DemoFile
         {
-            sid = liveSetting.CurrentHeader.sid,
-            difficulty = (Difficulty)liveSetting.actualDifficulty
+            sid = chartId,
+            difficulty = diff
         };
 
         demoName = $"{chartId}_{diff:g}_{DateTime.Now.ToLongDateString()}_{DateTime.Now.ToLongTimeString()}.kirareplay".Replace(":", "-").Replace("/", "-").Replace("\\", "-");

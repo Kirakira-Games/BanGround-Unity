@@ -7,7 +7,7 @@ using Zenject;
 public class LifeController : MonoBehaviour
 {
     [Inject]
-    private ILiveSetting liveSetting;
+    private IChartListManager chartListManager;
 
     public static LifeController instance;
     public static List<float> lifePerSecond;
@@ -29,7 +29,7 @@ public class LifeController : MonoBehaviour
         lifeTxt = GetComponentInChildren<Text>();
         fill = GameObject.Find("LifeFill").GetComponent<Image>();
         UpdateDisplay();
-        level = liveSetting.CurrentHeader.difficultyLevel[liveSetting.actualDifficulty];
+        level = chartListManager.current.header.difficultyLevel[(int)chartListManager.current.difficulty];
         StartCoroutine(LifeRecorder());
     }
 

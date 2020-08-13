@@ -15,7 +15,7 @@ using Zenject;
 public class SelectManager_old : MonoBehaviour
 {
     [Inject]
-    DiContainer _container;
+    private DiContainer _container;
     [Inject]
     private IAudioManager audioManager;
     [Inject]
@@ -23,21 +23,15 @@ public class SelectManager_old : MonoBehaviour
     [Inject]
     private IKVSystem kvSystem;
     [Inject]
-    private ILiveSetting liveSetting;
+    private IChartListManager chartListManager;
     [Inject(Id = "cl_cursorter")]
     private KVar cl_cursorter;
-    [Inject(Id = "cl_lastsid")]
-    private KVar cl_lastsid;
-    [Inject(Id = "cl_lastdiff")]
-    private KVar cl_lastdiff;
 
     public const float scroll_Min_Speed = 50f;
 
-    private cHeader lastcHeader = new cHeader();
-
-    RectTransform rt;
-    ScrollRect rt_s;
-    VerticalLayoutGroup lg;
+    private RectTransform rt;
+    private ScrollRect rt_s;
+    private VerticalLayoutGroup lg;
     public DragHandler dh;
 
     //sort
@@ -50,18 +44,14 @@ public class SelectManager_old : MonoBehaviour
     private TextAsset[] voices;
 
     public List<cHeader> chartList => dataLoader.chartList;
-    List<GameObject> SelectButtons = new List<GameObject>();
-    RectTransform[] rts;
-    List<RectControl> rcs = new List<RectControl>();
-
-    DifficultySelect difficultySelect;
+    private List<GameObject> SelectButtons = new List<GameObject>();
+    private RectTransform[] rts;
+    private List<RectControl> rcs = new List<RectControl>();
 
     public static SelectManager_old instance;
 
     [HideInInspector] 
     public ISoundTrack previewSound;
-
-    static Kommand cmd_playdemo;
     
     private void Awake()
     {
@@ -74,17 +64,16 @@ public class SelectManager_old : MonoBehaviour
         Screen.autorotateToLandscapeLeft = true;
         Screen.autorotateToLandscapeRight = true;
 
+        InitComponent();
         GameObject.Find("UserInfo").GetComponent<UserInfo>().GetUserInfo();
 
-
-        int selectedSid = cl_lastsid;
+        // Register callback
+        chartListManager.onChartListUpdated.AddListener(RefreshSongList);
 
         dataLoader.LoadAllKiraPackFromInbox();
         dataLoader.RefreshSongList();
 
-        InitComponent();
-        InitSort();
-        InitSongList(selectedSid);
+        sort_Text.text = Enum.GetName(typeof(Sorter), (Sorter)cl_cursorter);
         PlayVoicesAtSceneIn();
     }
 
@@ -110,54 +99,36 @@ public class SelectManager_old : MonoBehaviour
         rt_s = GameObject.Find("Song Scroll View").GetComponent<ScrollRect>();
         dh = GameObject.Find("Song Scroll View").GetComponent<DragHandler>();
         lg = GameObject.Find("SongContent").GetComponent<VerticalLayoutGroup>();
-
-        difficultySelect = GameObject.Find("DifficultySelect").GetComponent<DifficultySelect>();
     }
 
-    //---------------------------------------------
+    #region Controller
     void SwitchSort()
     {
-        cl_cursorter.Set(cl_cursorter + 1);
-        if (cl_cursorter > 4) 
-            cl_cursorter.Set(0);
-
+        cl_cursorter.Set((cl_cursorter + 1) % 5);
         sort_Text.text = Enum.GetName(typeof(Sorter), (Sorter)cl_cursorter);
-        InitSongList(liveSetting.CurrentHeader.sid);
+        chartListManager.SortChart();
     }
 
-    void InitSort()
+    public async void OnEnterPressed()
     {
-        sort_Text.text = Enum.GetName(typeof(Sorter), (Sorter)cl_cursorter);
+        //if (!await liveSetting.LoadChart(true))
+        //{
+        //    MainBlocker.Instance.SetBlock(false);
+        //    return;
+        //}
+        //await PreviewFadeOut();
+        SettingAndMod.instance.SetLiveSetting();
+
+        kvSystem.SaveConfig();
+
+        PlayVoicesAtSceneOut();
+        SceneLoader.LoadScene("Select", "InGame", () => chartListManager.LoadChart(true));
+        await PreviewFadeOut();
     }
 
-    //Song Selection-------------------------------
-    public async void InitSongList(int selectedSid = -1)
+    public async void RefreshSongList()
     {
         lg.enabled = true;
-        // Sort SongList
-        IComparer<cHeader> compare;
-        switch ((Sorter)cl_cursorter)
-        {
-            case Sorter.ChartDifficulty:
-                compare = new ChartDifSort(dataLoader, cl_lastdiff);
-                break;
-            case Sorter.SongName:
-                compare = new SongNameSort(dataLoader);
-                break;
-            case Sorter.SongArtist:
-                compare = new SongArtistSort(dataLoader);
-                break;
-            case Sorter.ChartAuthor:
-                compare = new ChartAuthorSort();
-                break;
-            case Sorter.ChartScore:
-                compare = new ChartScoreSort();
-                break;
-            default:
-                compare = new SongNameSort(dataLoader);
-                break;
-        }
-        chartList.Sort(compare);
 
         //Remove Old SongItem
         for (int i = SelectButtons.Count - 1; i >= 0; i--) 
@@ -197,19 +168,6 @@ public class SelectManager_old : MonoBehaviour
 
         rt.sizeDelta = new Vector2(rt.sizeDelta.x, lg.padding.top * 2 + chartList.Count * (116) + (chartList.Count - 1) * lg.spacing + (800));
 
-        // After import, select imported chart
-        if (dataLoader.LastImportedSid != -1)
-        {
-            selectedSid = dataLoader.LastImportedSid;
-            dataLoader.LastImportedSid = -1;
-        }
-        if (selectedSid != -1)
-        {
-            if (dataLoader.chartList.Find(item => item.sid == selectedSid) == null)
-                selectedSid = dataLoader.chartList[Random.Range(0, dataLoader.chartList.Count)].sid;
-
-            liveSetting.currentChart = dataLoader.chartList.IndexOf(dataLoader.chartList.First(x => x.sid == selectedSid));
-        }
         await SelectDefault();
         lg.enabled = false;
     }
@@ -217,14 +175,14 @@ public class SelectManager_old : MonoBehaviour
     IEnumerator SelectDefault()
     {
         var background = GameObject.Find("KirakiraBackground").GetComponent<FixBackground>();
-        var path = dataLoader.GetBackgroundPath(liveSetting.CurrentHeader.sid).Item1;
+        var path = dataLoader.GetBackgroundPath(chartListManager.current.header.sid).Item1;
         background.UpdateBackground(path);
 
         yield return new WaitForEndOfFrame();
 
         try
         {
-            SelectSong(liveSetting.currentChart);
+            SelectSong(chartListManager.current.index);
         } 
         catch
         {
@@ -275,40 +233,26 @@ public class SelectManager_old : MonoBehaviour
         rcs[index].OnSelect();
         last = rcs[index];
 
-        liveSetting.currentChart = index;
+        chartListManager.SelectChartByIndex(index);
 
-        if (lastcHeader == liveSetting.CurrentHeader) return;
-        else
-        {
-            lastcHeader = liveSetting.CurrentHeader; 
-        }
-
-        cl_lastsid.Set(liveSetting.CurrentHeader.sid);
-        liveSetting.CurrentHeader.LoadDifficultyLevels(dataLoader);
-        difficultySelect.levels = liveSetting.CurrentHeader.difficultyLevel.ToArray();
-        difficultySelect.OnSongChange();
         PlayPreview();
     }
 
     public void UnselectSong()
     {
-        //if (liveSetting.currentChart >= 0)
-        //{
-        //    SelectButtons[liveSetting.currentChart].GetComponent<RectControl>().UnSelect();
-        //}
         last?.UnSelect();
     }
 
-    bool isFirstPlay = true;
+    private bool isFirstPlay = true;
     private int lastPreviewMid = -1;
 
     private uint[] GetPreviewPos()
     {
         var ret = new uint[2];
-        var preview = liveSetting.CurrentHeader.preview;
+        var preview = chartListManager.current.header.preview;
         if (preview == null || preview.Length == 0)
         {
-            mHeader mheader = dataLoader.GetMusicHeader(liveSetting.CurrentHeader.mid);
+            mHeader mheader = dataLoader.GetMusicHeader(chartListManager.current.header.mid);
             preview = mheader.preview;
         }
         ret[0] = (uint)(preview[0] * 1000);
@@ -320,21 +264,21 @@ public class SelectManager_old : MonoBehaviour
     {
         await UniTask.WaitUntil(() => !faderWorking);
 
-        if (liveSetting.CurrentHeader.mid == lastPreviewMid)
+        if (chartListManager.current.header.mid == lastPreviewMid)
             return;
 
         await PreviewFadeOut(0.02f);
 
-        lastPreviewMid = liveSetting.CurrentHeader.mid;
+        lastPreviewMid = chartListManager.current.header.mid;
 
         if (previewSound != null)
         {
             previewSound.Dispose();
             previewSound = null;
         }
-        if (dataLoader.MusicExists(liveSetting.CurrentHeader.mid))
+        if (dataLoader.MusicExists(lastPreviewMid))
         {
-            previewSound = await audioManager.PlayLoopMusic(KiraFilesystem.Instance.Read(dataLoader.GetMusicPath(liveSetting.CurrentHeader.mid)), true,
+            previewSound = await audioManager.PlayLoopMusic(KiraFilesystem.Instance.Read(dataLoader.GetMusicPath(lastPreviewMid)), true,
                 GetPreviewPos(),
                 false
             );
@@ -344,14 +288,14 @@ public class SelectManager_old : MonoBehaviour
                 previewSound?.Pause();
                 await UniTask.Delay(2200);  //给语音留个地方
                 previewSound?.Play();
+                isFirstPlay = false;
             }
 
             await PreviewFadeIn();
-            isFirstPlay = false;
         }
     }
 
-    bool faderWorking = false;
+    private bool faderWorking = false;
 
     async UniTask PreviewFadeOut(float speed = 0.008F)
     {
@@ -390,23 +334,7 @@ public class SelectManager_old : MonoBehaviour
 
         faderWorking = false;
     }
-
-    public async void OnEnterPressed()
-    {
-        //if (!await liveSetting.LoadChart(true))
-        //{
-        //    MainBlocker.Instance.SetBlock(false);
-        //    return;
-        //}
-        //await PreviewFadeOut();
-        SettingAndMod.instance.SetLiveSetting();
-
-        kvSystem.SaveConfig();
-
-        PlayVoicesAtSceneOut();
-        SceneLoader.LoadScene("Select", "InGame", () => liveSetting.LoadChart(true));
-        await PreviewFadeOut();
-    }
+    #endregion
 
     #region ChartEditor
     public void OpenMappingScene()
@@ -415,7 +343,7 @@ public class SelectManager_old : MonoBehaviour
         //{
         //    return;
         //}
-        SceneLoader.LoadScene("Select", "Mapping", () => liveSetting.LoadChart(false));
+        SceneLoader.LoadScene("Select", "Mapping", () => chartListManager.LoadChart(false));
     }
 
     public async void ExportKiraPack()
@@ -426,8 +354,8 @@ public class SelectManager_old : MonoBehaviour
             Screen.orientation = ScreenOrientation.Portrait;
             await UniTask.DelayFrame(0);
         }
-        var zip = dataLoader.BuildKiraPack(liveSetting.CurrentHeader);
-        var song = dataLoader.GetMusicHeader(liveSetting.CurrentHeader.mid);
+        var zip = dataLoader.BuildKiraPack(chartListManager.current.header);
+        var song = dataLoader.GetMusicHeader(chartListManager.current.header.mid);
         new NativeShare()
             .AddFile(zip)
             .SetSubject("Share " + song.title)
@@ -447,7 +375,7 @@ public class SelectManager_old : MonoBehaviour
 
     public void DuplicateKiraPack()
     {
-        dataLoader.DuplicateKiraPack(liveSetting.CurrentHeader);
+        dataLoader.DuplicateKiraPack(chartListManager.current.header);
         SceneManager.LoadScene("Select");
     }
     #endregion
@@ -475,6 +403,7 @@ public class SelectManager_old : MonoBehaviour
     {
         previewSound?.Dispose();
         SlideMesh.cacheMat = null;
+        chartListManager.onChartListUpdated.RemoveListener(RefreshSongList);
     }
 }
 
