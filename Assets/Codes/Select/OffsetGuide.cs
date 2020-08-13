@@ -10,8 +10,6 @@ public class OffsetGuide : MonoBehaviour
     [Inject]
     private IKVSystem kvSystem;
     [Inject]
-    private ILiveSetting liveSetting;
-    [Inject]
     private IChartListManager chartListManager;
 
     void Start()
@@ -21,8 +19,7 @@ public class OffsetGuide : MonoBehaviour
 
     void StartOffsetGuide()
     {
-        liveSetting.offsetAdjustMode = true;
-        chartListManager.ForceChart(liveSetting.offsetAdjustChart, liveSetting.offsetAdjustDiff);
+        chartListManager.ForceOffsetChart();
 
         //if (!await liveSetting.LoadChart(true))
         //{

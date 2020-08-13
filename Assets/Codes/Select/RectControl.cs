@@ -15,8 +15,6 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     [Inject]
     private IDataLoader dataLoader;
     [Inject]
-    private ILiveSetting liveSetting;
-    [Inject]
     private IChartListManager chartListManager;
 
     RectTransform rt_m;
@@ -238,7 +236,7 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         var path = new System.IO.FileInfo(file).Directory.FullName;
         //Debug.Log(path);
         System.IO.Directory.Delete(path, true);*/
-        if (chartListManager.current.header.sid == liveSetting.offsetAdjustChart)
+        if (chartListManager.current.header.sid == chartListManager.offsetAdjustSid)
         {
             int index = UnityEngine.Random.Range(0, delFailMsg.Length);
             MessageBannerController.ShowMsg(LogLevel.INFO, delFailMsg[index]);

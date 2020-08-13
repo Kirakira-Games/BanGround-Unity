@@ -444,7 +444,7 @@ public class NoteController : MonoBehaviour
         laneEffects.Init(chart.groups[0]);
 
         // Check if adjusting offset
-        if (liveSetting.offsetAdjustMode)
+        if (chartListManager.offsetAdjustMode)
         {
             GameObject.Find("infoCanvas").GetComponent<Canvas>().enabled = false;
             liveSetting.attachedMods.Clear();

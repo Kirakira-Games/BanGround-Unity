@@ -109,7 +109,7 @@ public class UIManager : MonoBehaviour
 
     private void GamePause()
     {
-        if (SM.Current == State.Paused || SM.Current == State.Finished || liveSetting.offsetAdjustMode)
+        if (SM.Current == State.Paused || SM.Current == State.Finished || chartListManager.offsetAdjustMode)
         {
             return;
         }
@@ -221,7 +221,7 @@ public class UIManager : MonoBehaviour
     public void OnAudioFinish(bool restart)
     {
         if (SceneLoader.Loading || SM.Base == State.Loading) return;
-        if (liveSetting.offsetAdjustMode)
+        if (chartListManager.offsetAdjustMode)
             restart = true;
 
         InGameBackground.instance.stopVideo();
@@ -238,7 +238,7 @@ public class UIManager : MonoBehaviour
 
     async void ShowResult(bool restart)
     {
-        if (liveSetting.offsetAdjustMode)
+        if (chartListManager.offsetAdjustMode)
             restart = true;
 
         if (restart)

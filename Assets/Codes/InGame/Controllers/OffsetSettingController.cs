@@ -66,7 +66,6 @@ public class OffsetSettingController : MonoBehaviour
 
     public void SaveAndExit()
     {
-        liveSetting.offsetAdjustMode = false;
         chartListManager.ClearForcedChart();
         UIManager.Instance.GameRetire();
     }
