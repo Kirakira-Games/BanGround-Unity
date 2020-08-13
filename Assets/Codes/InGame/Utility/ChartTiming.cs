@@ -30,9 +30,9 @@ public class ChartTiming
         return beat[0] + (float)beat[1] / beat[2];
     }
 
-    public ChartTiming(ILiveSetting liveSetting, List<ValuePoint> bpms, int offset)
+    public ChartTiming(List<ValuePoint> bpms, int offset, int noteScreenTime)
     {
-        totTime = liveSetting.NoteScreenTime / 1000f;
+        totTime = noteScreenTime / 1000f;
         this.bpms = bpms;
         bpms.ForEach(bpm => bpm.beatf = BeatToFloat(bpm.beat));
         bpms.Sort(new IWithTimingComparer());

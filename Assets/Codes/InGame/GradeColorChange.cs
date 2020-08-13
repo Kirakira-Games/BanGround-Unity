@@ -10,8 +10,8 @@ public class GradeColorChange : MonoBehaviour
     public Color endColor;
 
     [Inject]
-    private ILiveSetting liveSetting;
-    
+    private IModManager modManager;
+
     Slider sld;
     Image fill;
     Text txt;
@@ -35,7 +35,7 @@ public class GradeColorChange : MonoBehaviour
     {
         float modScoreMultiplier = 1.0f;
 
-        foreach (var mod in liveSetting.attachedMods)
+        foreach (var mod in modManager.attachedMods)
             modScoreMultiplier *= mod.ScoreMultiplier;
 
         score = _score * modScoreMultiplier;
