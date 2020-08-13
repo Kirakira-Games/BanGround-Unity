@@ -1,15 +1,19 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
 
 public class FlickNote : NoteBase
 {
+    [Inject(Id = "fs_assetpath")]
+    private KVar fs_assetpath;
+
     protected FlickArrow flickArrow;
 
     public override void InitNote()
     {
         base.InitNote();
-        flickArrow = (Instantiate(Resources.Load(LiveSetting.Instance.assetDirectory + "/FlickArrow"), transform) as GameObject).GetComponent<FlickArrow>();
+        flickArrow = (Instantiate(Resources.Load(fs_assetpath.Get<string>() + "/FlickArrow"), transform) as GameObject).GetComponent<FlickArrow>();
     }
 
     public override void ResetNote(GameNoteData data)

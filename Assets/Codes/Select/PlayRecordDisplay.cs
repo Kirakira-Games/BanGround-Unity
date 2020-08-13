@@ -7,9 +7,10 @@ using Zenject;
 public class PlayRecordDisplay : MonoBehaviour
 {
     [Inject]
-    private ILiveSetting liveSetting;
-    [Inject]
     private IChartListManager chartListManager;
+
+    [Inject(Id = "fs_iconpath")]
+    private KVar fs_iconpath;
 
     RawImage Rank;
     RawImage clearMark;
@@ -59,28 +60,28 @@ public class PlayRecordDisplay : MonoBehaviour
         switch (a.ranks)
         {
             case Ranks.SSS:
-                rank = Resources.Load(liveSetting.IconPath + "SSS") as Texture2D;
+                rank = Resources.Load(fs_iconpath + "SSS") as Texture2D;
                 break;
             case Ranks.SS:
-                rank = Resources.Load(liveSetting.IconPath + "SS") as Texture2D;
+                rank = Resources.Load(fs_iconpath + "SS") as Texture2D;
                 break;
             case Ranks.S:
-                rank = Resources.Load(liveSetting.IconPath + "S") as Texture2D;
+                rank = Resources.Load(fs_iconpath + "S") as Texture2D;
                 break;
             case Ranks.A:
-                rank = Resources.Load(liveSetting.IconPath + "A") as Texture2D;
+                rank = Resources.Load(fs_iconpath + "A") as Texture2D;
                 break;
             case Ranks.B:
-                rank = Resources.Load(liveSetting.IconPath + "B") as Texture2D;
+                rank = Resources.Load(fs_iconpath + "B") as Texture2D;
                 break;
             case Ranks.C:
-                rank = Resources.Load(liveSetting.IconPath + "C") as Texture2D;
+                rank = Resources.Load(fs_iconpath + "C") as Texture2D;
                 break;
             case Ranks.D:
-                rank = Resources.Load(liveSetting.IconPath + "D") as Texture2D;
+                rank = Resources.Load(fs_iconpath + "D") as Texture2D;
                 break;
             case Ranks.F:
-                rank = Resources.Load(liveSetting.IconPath + "F") as Texture2D;
+                rank = Resources.Load(fs_iconpath + "F") as Texture2D;
                 break;
             default:
                 rank = null;
@@ -93,13 +94,13 @@ public class PlayRecordDisplay : MonoBehaviour
         switch (a.clearMark)
         {
             case ClearMarks.AP:
-                mark = Resources.Load(liveSetting.IconPath + "AP") as Texture2D;
+                mark = Resources.Load(fs_iconpath + "AP") as Texture2D;
                 break;
             case ClearMarks.FC:
-                mark = Resources.Load(liveSetting.IconPath + "FC") as Texture2D;
+                mark = Resources.Load(fs_iconpath + "FC") as Texture2D;
                 break;
             case ClearMarks.CL:
-                mark = Resources.Load(liveSetting.IconPath + "CL") as Texture2D;
+                mark = Resources.Load(fs_iconpath + "CL") as Texture2D;
                 break;
             case ClearMarks.F:
                 clearMark.enabled = false;

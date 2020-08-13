@@ -17,11 +17,12 @@ public class ResultManager : MonoBehaviour
     [Inject]
     private IDataLoader dataLoader;
     [Inject]
-    private ILiveSetting liveSetting;
-    [Inject]
     private IModManager modManager;
     [Inject]
     private IChartListManager chartListManager;
+
+    [Inject(Id = "fs_iconpath")]
+    private KVar fs_iconpath;
 
     private Button button_back;
     private Button button_retry;
@@ -283,28 +284,28 @@ public class ResultManager : MonoBehaviour
         switch (playResult.ranks)
         {
             case Ranks.SSS:
-                rank = Resources.Load(liveSetting.IconPath + "SSS") as Texture2D;
+                rank = Resources.Load(fs_iconpath + "SSS") as Texture2D;
                 break;
             case Ranks.SS:
-                rank = Resources.Load(liveSetting.IconPath + "SS") as Texture2D;
+                rank = Resources.Load(fs_iconpath + "SS") as Texture2D;
                 break;
             case Ranks.S:
-                rank = Resources.Load(liveSetting.IconPath + "S") as Texture2D;
+                rank = Resources.Load(fs_iconpath + "S") as Texture2D;
                 break;
             case Ranks.A:
-                rank = Resources.Load(liveSetting.IconPath + "A") as Texture2D;
+                rank = Resources.Load(fs_iconpath + "A") as Texture2D;
                 break;
             case Ranks.B:
-                rank = Resources.Load(liveSetting.IconPath + "B") as Texture2D;
+                rank = Resources.Load(fs_iconpath + "B") as Texture2D;
                 break;
             case Ranks.C:
-                rank = Resources.Load(liveSetting.IconPath + "C") as Texture2D;
+                rank = Resources.Load(fs_iconpath + "C") as Texture2D;
                 break;
             case Ranks.D:
-                rank = Resources.Load(liveSetting.IconPath + "D") as Texture2D;
+                rank = Resources.Load(fs_iconpath + "D") as Texture2D;
                 break;
             case Ranks.F:
-                rank = Resources.Load(liveSetting.IconPath + "F") as Texture2D;
+                rank = Resources.Load(fs_iconpath + "F") as Texture2D;
                 break;
         }
         rankIcon.texture = rank;
@@ -314,13 +315,13 @@ public class ResultManager : MonoBehaviour
         switch (playResult.clearMark)
         {
             case ClearMarks.AP:
-                markIcon.texture = Resources.Load(liveSetting.IconPath + "AP") as Texture2D;
+                markIcon.texture = Resources.Load(fs_iconpath + "AP") as Texture2D;
                 break;
             case ClearMarks.FC:
-                markIcon.texture = Resources.Load(liveSetting.IconPath + "FC") as Texture2D;
+                markIcon.texture = Resources.Load(fs_iconpath + "FC") as Texture2D;
                 break;
             case ClearMarks.CL:
-                markIcon.texture = Resources.Load(liveSetting.IconPath + "CL") as Texture2D;
+                markIcon.texture = Resources.Load(fs_iconpath + "CL") as Texture2D;
                 break;
             case ClearMarks.F:
                 markIcon.texture = null;
@@ -393,7 +394,7 @@ public class ResultManager : MonoBehaviour
         //    pr.resultsList.Add(playResult);
         //}
         if (!modManager.isAutoplay)
-            print("Record Saved" + PlayRecords.SaveRecord(pr));
+            print("Record Saved" + pr.Save());
         else
             print("Autoplay score not saved");
     }
