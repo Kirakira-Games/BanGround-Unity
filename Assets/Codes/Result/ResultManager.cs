@@ -19,6 +19,8 @@ public class ResultManager : MonoBehaviour
     [Inject]
     private ILiveSetting liveSetting;
     [Inject]
+    private IModManager modManager;
+    [Inject]
     private IChartListManager chartListManager;
 
     private Button button_back;
@@ -342,7 +344,7 @@ public class ResultManager : MonoBehaviour
     {
         float modScoreMultiplier = 1.0f;
 
-        foreach (var mod in liveSetting.attachedMods)
+        foreach (var mod in modManager.attachedMods)
             modScoreMultiplier *= mod.ScoreMultiplier;
 
         playResult.Score = (ComboManager.score / ComboManager.maxScore) * 1000000 * modScoreMultiplier;

@@ -11,7 +11,7 @@ using Zenject;
 public class InGameBackground : MonoBehaviour
 {
     [Inject]
-    private ILiveSetting liveSetting;
+    private IModManager modManager;
     //[SerializeField] private Texture defaultTex;
     [SerializeField] 
     private Material bgSkybox;
@@ -104,7 +104,7 @@ public class InGameBackground : MonoBehaviour
                 pauseVideo();
                 mesh.enabled = false;
                 vp.targetCameraAlpha = r_brightness_bg;
-                foreach(ModBase m in liveSetting.attachedMods)
+                foreach(ModBase m in modManager.attachedMods)
                 {
                     if (m is AudioMod)
                         vp.playbackSpeed = (m as AudioMod).SpeedCompensation;

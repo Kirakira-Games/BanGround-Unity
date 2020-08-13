@@ -58,6 +58,9 @@ public class GlobalInstaller : MonoInstaller
 
         // Chart List Manager
         Container.Bind<IChartListManager>().To<ChartListManager>().AsSingle().NonLazy();
+
+        // Mod Manager
+        Container.Bind<IModManager>().To<ModManager>().AsSingle().NonLazy();
     }
 
     void RegisterKonCommands()

@@ -6,7 +6,7 @@ using Zenject;
 public class LaneEffects : MonoBehaviour
 {
     [Inject]
-    private ILiveSetting liveSetting;
+    private IModManager modManager;
 
     private ParticleSystem[] ps;
     private List<TimingPoint> speed;
@@ -71,7 +71,7 @@ public class LaneEffects : MonoBehaviour
         if (!effect)
             return;
 
-        float speed = GetSpeed(NoteController.audioTimef) * liveSetting.SpeedCompensationSum * (r_notespeed + 4f) / 14;
+        float speed = GetSpeed(NoteController.audioTimef) * modManager.SpeedCompensationSum * (r_notespeed + 4f) / 14;
         if (UIManager.Instance.SM.isRewinding)
         {
             speed = -speed;

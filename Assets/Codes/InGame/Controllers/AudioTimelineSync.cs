@@ -9,7 +9,7 @@ public class AudioTimelineSync : MonoBehaviour
     [Inject]
     private IAudioManager audioManager;
     [Inject]
-    private ILiveSetting liveSetting;
+    private IModManager modManager;
 
     public static AudioTimelineSync instance;
 
@@ -28,20 +28,20 @@ public class AudioTimelineSync : MonoBehaviour
 
     public static float BGMTimeToRealtime(float t)
     {
-        return t / LiveSetting.Instance.SpeedCompensationSum;
+        return t / ModManager.Instance.SpeedCompensationSum;
     }
     public static int BGMTimeToRealtime(int t)
     {
-        return Mathf.RoundToInt(t / LiveSetting.Instance.SpeedCompensationSum);
+        return Mathf.RoundToInt(t / ModManager.Instance.SpeedCompensationSum);
     }
 
     public static float RealTimeToBGMTime(float t)
     {
-        return t * LiveSetting.Instance.SpeedCompensationSum;
+        return t * ModManager.Instance.SpeedCompensationSum;
     }
     public static int RealTimeToBGMTime(int t)
     {
-        return Mathf.RoundToInt(t * LiveSetting.Instance.SpeedCompensationSum);
+        return Mathf.RoundToInt(t * ModManager.Instance.SpeedCompensationSum);
     }
 
     public float TimeSinceStartupToBGMTime(float t)
@@ -79,7 +79,7 @@ public class AudioTimelineSync : MonoBehaviour
 
     public float GetTimeInS()
     {
-        return (float)((watch.Elapsed.TotalSeconds + deltaTime) * liveSetting.SpeedCompensationSum);
+        return (float)((watch.Elapsed.TotalSeconds + deltaTime) * modManager.SpeedCompensationSum);
     }
 
     public int GetTimeInMs()
@@ -89,7 +89,7 @@ public class AudioTimelineSync : MonoBehaviour
 
     public void Seek(float targetTime)
     {
-        deltaTime = (float)(targetTime / liveSetting.SpeedCompensationSum - watch.Elapsed.TotalSeconds);
+        deltaTime = (float)(targetTime / modManager.SpeedCompensationSum - watch.Elapsed.TotalSeconds);
     }
 
     private void Update()

@@ -8,7 +8,7 @@ using Zenject;
 public class ModIconDisplay : MonoBehaviour
 {
     [Inject]
-    private ILiveSetting liveSetting;
+    private IModManager modManager;
 
     [SerializeField]
     private Image[] icons;
@@ -18,7 +18,7 @@ public class ModIconDisplay : MonoBehaviour
     {
         //icons = GetComponentsInChildren<Image>(true);
 
-        foreach (var mod in liveSetting.attachedMods)
+        foreach (var mod in modManager.attachedMods)
         {
             if (mod is DoubleMod) icons[0].gameObject.SetActive(true);
             else if (mod is HalfMod) icons[1].gameObject.SetActive(true);

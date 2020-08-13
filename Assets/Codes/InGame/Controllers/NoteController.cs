@@ -17,9 +17,9 @@ public class NoteController : MonoBehaviour
     [Inject]
     private IDataLoader dataLoader;
     [Inject]
-    private ILiveSetting liveSetting;
-    [Inject]
     private IChartListManager chartListManager;
+    [Inject]
+    private IModManager modManager;
 
     public static NoteController Instance;
     public static Camera mainCamera;
@@ -394,7 +394,7 @@ public class NoteController : MonoBehaviour
 
         // Load chart
         chart = chartListManager.gameChart;
-        NotePool.Instance.Init(liveSetting, notes);
+        NotePool.Instance.Init(modManager, notes);
         noteHead = 0;
 
         // Compute number of notes
@@ -447,7 +447,7 @@ public class NoteController : MonoBehaviour
         if (chartListManager.offsetAdjustMode)
         {
             GameObject.Find("infoCanvas").GetComponent<Canvas>().enabled = false;
-            liveSetting.attachedMods.Clear();
+            modManager.attachedMods.Clear();
         }
         else
         {
@@ -459,7 +459,7 @@ public class NoteController : MonoBehaviour
         //Set Play Mod Event
         //audioManager.restart = false;
         onJudge = null;
-        foreach (var mod in liveSetting.attachedMods)
+        foreach (var mod in modManager.attachedMods)
         {
             if (mod is SuddenDeathMod)
                 onJudge += ((JudgeResult result) =>
