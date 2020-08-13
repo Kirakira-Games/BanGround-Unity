@@ -215,6 +215,8 @@ public class TouchManager : MonoBehaviour
     private ILiveSetting liveSetting;
     [Inject]
     private IChartListManager chartListManager;
+    [Inject]
+    private IModManager modManager;
 
     private Dictionary<int, KirakiraTouch> touchTable;
     private Dictionary<(KirakiraTracer, int), JudgeResult> traceCache;
@@ -307,8 +309,6 @@ public class TouchManager : MonoBehaviour
 #endif
     }
 
-    static KVarRef mod_autoplay = new KVarRef("mod_autoplay");
-
     private void Awake()
     {
         instance = this;
@@ -325,7 +325,7 @@ public class TouchManager : MonoBehaviour
         {
             provider = new DemoReplayTouchPrivider(demoFile);
         }
-        else if (mod_autoplay)
+        else if (modManager.isAutoplay)
         {
             GameObject.Find("MouseCanvas").SetActive(false);
             provider = new AutoPlayTouchProvider();

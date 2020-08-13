@@ -11,6 +11,8 @@ public class ModManager : IModManager
 
     public bool isSuppressingMods { get; private set; } = false;
 
+    public bool isAutoplay => attachedMods.Any(mod => mod is AutoPlayMod);
+
     private List<ModBase> mAttachedMods = new List<ModBase>();
     private List<ModBase> emptyMods = new List<ModBase>();
     public List<ModBase> attachedMods => isSuppressingMods ? emptyMods : mAttachedMods;

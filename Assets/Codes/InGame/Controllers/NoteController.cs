@@ -360,7 +360,6 @@ public class NoteController : MonoBehaviour
         }
     }
 
-    static KVarRef mod_autoplay = new KVarRef("mod_autoplay");
     static KVarRef cl_sestyle = new KVarRef("cl_sestyle");
 
     async void Start()
@@ -404,7 +403,7 @@ public class NoteController : MonoBehaviour
         timingGroups = chart.groups.Select(g => new TimingGroupController(g)).ToArray();
 
         // Check AutoPlay
-        if (mod_autoplay)
+        if (modManager.isAutoplay)
         {
             (TouchManager.provider as AutoPlayTouchProvider).Init(notes);
         }
@@ -447,7 +446,6 @@ public class NoteController : MonoBehaviour
         if (chartListManager.offsetAdjustMode)
         {
             GameObject.Find("infoCanvas").GetComponent<Canvas>().enabled = false;
-            modManager.attachedMods.Clear();
         }
         else
         {

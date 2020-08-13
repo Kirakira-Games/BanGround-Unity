@@ -11,6 +11,8 @@ public class OffsetGuide : MonoBehaviour
     private IKVSystem kvSystem;
     [Inject]
     private IChartListManager chartListManager;
+    [Inject]
+    private IModManager modManager;
 
     void Start()
     {
@@ -20,6 +22,7 @@ public class OffsetGuide : MonoBehaviour
     void StartOffsetGuide()
     {
         chartListManager.ForceOffsetChart();
+        modManager.SuppressAllMods(true);
 
         //if (!await liveSetting.LoadChart(true))
         //{
@@ -34,6 +37,8 @@ public class OffsetGuide : MonoBehaviour
         {
             if (!await chartListManager.LoadChart(true))
             {
+                modManager.SuppressAllMods(false);
+                chartListManager.ClearForcedChart();
                 return false;
             }
             return true;
