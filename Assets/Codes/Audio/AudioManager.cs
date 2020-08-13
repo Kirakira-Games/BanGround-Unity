@@ -34,7 +34,7 @@ public class AudioManager : MonoBehaviour, IAudioManager
 
     private void Awake()
     {
-        int bufferIndex = -1;
+        int bufferIndex;
 
         if (!AppPreLoader.init) return;
 

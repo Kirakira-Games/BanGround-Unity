@@ -96,8 +96,6 @@ public class GlobalInstaller : MonoInstaller
             KVar.C("cl_notestyle", "0", KVarFlags.Archive),
             KVar.C("cl_sestyle", "1", KVarFlags.Archive),
 
-            KVar.C("mod_autoplay", "0"),
-
             KVar.C("fs_assetpath", "V2Assets", KVarFlags.Hidden | KVarFlags.StringOnly),
             KVar.C("fs_iconpath", "UI/ClearMark/", KVarFlags.Hidden | KVarFlags.StringOnly),
 

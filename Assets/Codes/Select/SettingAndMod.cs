@@ -138,9 +138,6 @@ public class SettingAndMod : MonoBehaviour
     [Inject(Id = "cl_language")]
     KVar cl_language;
 
-    // mod for Mod
-    [Inject(Id = "mod_autoplay")]
-    KVar mod_autoplay;
     /*
      * End
      */
@@ -301,7 +298,7 @@ public class SettingAndMod : MonoBehaviour
     }
     void GetModStatus()
     {
-        auto_Tog.isOn = mod_autoplay;
+        auto_Tog.isOn = modManager.isAutoplay;
 
         speedDown_Tog.SetStep(modManager.attachedMods);
         speedUp_Tog.SetStep(modManager.attachedMods);
@@ -330,7 +327,6 @@ public class SettingAndMod : MonoBehaviour
             r_syncline.Set(syncLine_Tog.isOn);
             r_graynote.Set(offBeat_Tog.isOn);
             r_mirror.Set(mirrow_Tog.isOn);
-            mod_autoplay.Set(auto_Tog.isOn);
             r_bang_perspect.Set(persp_Tog.isOn);
             cl_elp.Set(ELP_Slider.value);
             r_lanefx.Set(laneLight_Tog.isOn);
@@ -378,6 +374,8 @@ public class SettingAndMod : MonoBehaviour
             if (suddenDeath_Tog.isOn) modManager.AddMod(SuddenDeathMod.Instance);
 
             if (perfect_Tog.isOn) modManager.AddMod(PerfectMod.Instance);
+
+            if (auto_Tog.isOn) modManager.AddMod(AutoPlayMod.Instance);
         }
         catch (System.Exception e)
         {

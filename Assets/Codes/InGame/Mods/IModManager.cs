@@ -4,6 +4,7 @@ public interface IModManager
 {
     List<ModBase> attachedMods { get; }
     bool isSuppressingMods { get; }
+    bool isAutoplay { get; }
     float SpeedCompensationSum { get; }
     int NoteScreenTime { get; }
 

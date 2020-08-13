@@ -13,7 +13,6 @@ public class ModIconDisplay : MonoBehaviour
     [SerializeField]
     private Image[] icons;
 
-    static KVarRef mod_autoplay = new KVarRef("mod_autoplay");
     private void Start()
     {
         //icons = GetComponentsInChildren<Image>(true);
@@ -27,6 +26,6 @@ public class ModIconDisplay : MonoBehaviour
             else if (mod is NightCoreMod) icons[5].gameObject.SetActive(true);
             else if (mod is DayCoreMod) icons[6].gameObject.SetActive(true);
         }
-        if (mod_autoplay) icons[2].gameObject.SetActive(true);
+        if (modManager.isAutoplay) icons[2].gameObject.SetActive(true);
     }
 }

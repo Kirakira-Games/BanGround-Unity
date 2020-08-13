@@ -7,9 +7,9 @@ using Zenject;
 public class OffsetSettingController : MonoBehaviour
 {
     [Inject]
-    private ILiveSetting liveSetting;
-    [Inject]
     private IChartListManager chartListManager;
+    [Inject]
+    private IModManager modManager;
 
     private Text offsetText;
     private const int RECENT_COUNT = 10;
@@ -66,6 +66,7 @@ public class OffsetSettingController : MonoBehaviour
 
     public void SaveAndExit()
     {
+        modManager.SuppressAllMods(false);
         chartListManager.ClearForcedChart();
         UIManager.Instance.GameRetire();
     }

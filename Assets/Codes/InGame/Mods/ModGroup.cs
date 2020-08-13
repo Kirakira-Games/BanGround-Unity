@@ -15,7 +15,11 @@ public class AudioMod : ModBase
     public virtual void ApplyMod(ISoundTrack soundTrack){}
 }
 
-public class PlayMod : ModBase{ }
+public class PlayMod : ModBase { }
+public class AutoPlayMod : PlayMod
+{
+    public static AutoPlayMod Instance = new AutoPlayMod();
+}
 public class SuddenDeathMod : PlayMod 
 {
     public static SuddenDeathMod Instance = new SuddenDeathMod();
