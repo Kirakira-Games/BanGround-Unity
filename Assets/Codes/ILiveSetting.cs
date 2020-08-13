@@ -8,9 +8,6 @@ public interface ILiveSetting
     DemoFile DemoFile { get; set; }
     string IconPath { get; }
     int NoteScreenTime { get; }
-    bool offsetAdjustMode { get; set; }
-    int offsetAdjustChart { get; }
-    Difficulty offsetAdjustDiff { get; }
     float SpeedCompensationSum { get; set; }
 
     bool AddMod(ModBase mod);

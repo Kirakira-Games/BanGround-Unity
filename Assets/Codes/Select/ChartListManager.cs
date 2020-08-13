@@ -19,6 +19,10 @@ public class ChartListManager : IChartListManager
     private IDataLoader dataLoader;
     private ISorterFactory sorterFactory;
 
+    public int offsetAdjustSid { get; private set; } = 99901;
+    public Difficulty offsetAdjustDiff { get; private set; } = Difficulty.Easy;
+    public bool offsetAdjustMode { get; private set; } = false;
+
     [Inject(Id = "cl_lastsid")]
     private KVar cl_lastsid;
     [Inject(Id = "cl_lastdiff")]
@@ -104,10 +108,13 @@ public class ChartListManager : IChartListManager
     public void ClearForcedChart()
     {
         forceChart.header = null;
+        offsetAdjustMode = false;
     }
 
     public void ForceChart(int sid, Difficulty difficulty)
     {
+        ClearForcedChart();
+
         int index = chartList.FindIndex((header) => header.sid == sid);
 
         if (index != -1)
@@ -117,6 +124,12 @@ public class ChartListManager : IChartListManager
             forceChart.header.LoadDifficultyLevels(dataLoader);
             forceChart.difficulty = difficulty;
         }
+    }
+
+    public void ForceOffsetChart()
+    {
+        ForceChart(offsetAdjustSid, offsetAdjustDiff);
+        offsetAdjustMode = true;
     }
 
     public void SortChart()

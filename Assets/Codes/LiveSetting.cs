@@ -38,15 +38,11 @@ public class LiveSetting : ILiveSetting
     public string assetDirectory => fs_assetpath;
     public string IconPath => fs_iconpath;
 
-    public int offsetAdjustChart { get; private set; } = 99901;
-    public Difficulty offsetAdjustDiff { get; private set; } = Difficulty.Easy;
-
     public static readonly string settingsPath = Application.persistentDataPath + "/LiveSettings.json";
     public static readonly string scoresPath = Application.persistentDataPath + "/Scores.bin";
 
     public List<ModBase> attachedMods { get; set; } = new List<ModBase>();
     public float SpeedCompensationSum { get; set; } = 1.0f;
-    public bool offsetAdjustMode { get; set; } = false;
 
     //public static bool fullScreen;
 
