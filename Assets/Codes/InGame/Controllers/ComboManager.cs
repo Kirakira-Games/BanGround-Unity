@@ -22,7 +22,6 @@ public class ComboManager : MonoBehaviour
     private int[] combo;
 
     //[SerializeField] private Material[] comboMat;
-    private Text comboText;
     private Animator comboAnimator;
     private GradeColorChange scoreDisplay;
     private Image[] comboImg;
@@ -45,7 +44,6 @@ public class ComboManager : MonoBehaviour
     private void Start()
     {
         scoreDisplay = GameObject.Find("Grades").GetComponent<GradeColorChange>();
-        //comboText = GameObject.Find("Combo_Nmber").GetComponent<Text>();
         comboAnimator = GameObject.Find("Combos").GetComponent<Animator>();
         comboImg = GameObject.Find("Grid").GetComponentsInChildren<Image>(true);
         comboSprite = Resources.LoadAll<Sprite>("UI/comboCount");
