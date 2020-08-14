@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -16,7 +15,6 @@ public class OffsetSettingController : MonoBehaviour
     private Queue<int> recentQueue;
     private int sum;
 
-    private static KVarRef r_notespeed = new KVarRef("r_notespeed");
     private static KVarRef r_notesize = new KVarRef("r_notesize");
     private static KVarRef o_judge = new KVarRef("o_judge");
     private static KVarRef o_audio = new KVarRef("o_audio");
