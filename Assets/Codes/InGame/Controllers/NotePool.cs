@@ -4,6 +4,7 @@ using System;
 using UnityEngine.Rendering;
 using Object = UnityEngine.Object;
 using System.Collections;
+using Zenject;
 
 class NoteEvent : IComparable<NoteEvent>
 {
@@ -41,6 +42,7 @@ public class NotePool : MonoBehaviour
 {
     public static NotePool Instance;
 
+
     private Queue<NoteBase>[] noteQueue;
     private Queue<Slide> slideQueue;
     private Queue<GameObject>[] teQueue;
@@ -48,8 +50,12 @@ public class NotePool : MonoBehaviour
     private Queue<LineRenderer> partialSyncLineQueue;
     private Object[] tapEffects;
 
-    static KVarRef r_notesize = new KVarRef("r_notesize");
-    static KVarRef o_judge = new KVarRef("o_judge");
+    [Inject]
+    private IResourceLoader resourceLoader;
+    [Inject(Id = "r_notesize")]
+    private KVar r_notesize;
+    [Inject(Id = "o_judge")]
+    private KVar o_judge;
 
     #region Add
     private void AddNote(Queue<NoteBase> Q, GameNoteType type, int count = 1)
@@ -83,6 +89,7 @@ public class NotePool : MonoBehaviour
                     break;
             }
             note.isDestroyed = true;
+            note.resourceLoader = resourceLoader;
 
             if (NoteUtility.IsSlide(type))
             {
@@ -96,7 +103,7 @@ public class NotePool : MonoBehaviour
                     var mesh = new GameObject("SlideBody");
                     mesh.transform.SetParent(obj.transform);
                     slideNote.slideMesh = mesh.AddComponent<SlideMesh>();
-                    slideNote.slideMesh.InitMesh();
+                    slideNote.slideMesh.InitMesh(resourceLoader);
                     //mesh.AddComponent<NoteRotation>().needRot = false;
                 }
             }

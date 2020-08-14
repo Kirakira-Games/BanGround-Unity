@@ -179,15 +179,6 @@ public static class NoteUtility
 
     static KVarRef cl_notestyle = new KVarRef("cl_notestyle");
 
-    public static T LoadResource<T>(string name) where T: Object
-    {
-        return Resources.Load<T>(LiveSetting.Instance.assetDirectory + "/" + System.Enum.GetName(typeof(NoteStyle), (NoteStyle)cl_notestyle) +"/"+ name);
-    }
-    public static Object LoadResource(string name) 
-    {
-        return Resources.Load(LiveSetting.Instance.assetDirectory + "/" + System.Enum.GetName(typeof(NoteStyle), (NoteStyle)cl_notestyle) + "/" + name);
-    }
-
     public static bool IsTouchContinuing(Touch touch)
     {
         return touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Stationary;

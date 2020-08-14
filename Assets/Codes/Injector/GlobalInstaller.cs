@@ -46,13 +46,6 @@ public class GlobalInstaller : MonoInstaller
         Container.Bind<IAudioProvider>().FromFactory<AudioProviderFactory>().AsSingle().NonLazy();
         Container.Bind<IAudioManager>().To<AudioManager>().FromNewComponentOnNewGameObject().AsSingle().NonLazy();
 
-        // Live Setting
-        Container.Bind<ILiveSetting>().To<LiveSetting>().AsSingle().OnInstantiated((contxet, obj) =>
-        {
-            if (obj is ValidationMarker) return;
-            LiveSetting.Instance = obj as ILiveSetting; // TODO: Remove
-        }).NonLazy();
-
         // Sorter Factory
         Container.Bind<ISorterFactory>().To<SorterFactory>().AsSingle().NonLazy();
 
@@ -61,6 +54,9 @@ public class GlobalInstaller : MonoInstaller
 
         // Mod Manager
         Container.Bind<IModManager>().To<ModManager>().AsSingle().NonLazy();
+
+        // Resource Loader
+        Container.Bind<IResourceLoader>().To<ResourceLoader>().AsSingle().NonLazy();
     }
 
     void RegisterKonCommands()
@@ -97,7 +93,7 @@ public class GlobalInstaller : MonoInstaller
             KVar.C("cl_sestyle", "1", KVarFlags.Archive),
 
             KVar.C("fs_assetpath", "V2Assets", KVarFlags.Hidden | KVarFlags.StringOnly),
-            KVar.C("fs_iconpath", "UI/ClearMark/", KVarFlags.Hidden | KVarFlags.StringOnly),
+            KVar.C("fs_iconpath", "UI/ClearMark", KVarFlags.Hidden | KVarFlags.StringOnly),
 
             KVar.C("cl_lastdiff", "0", KVarFlags.Archive, "Current chart set difficulty", (_, kvSystem) => kvSystem.SaveConfig()),
             KVar.C("cl_cursorter", "1", KVarFlags.Archive, "Current sorter type", (_, kvSystem) => kvSystem.SaveConfig()),

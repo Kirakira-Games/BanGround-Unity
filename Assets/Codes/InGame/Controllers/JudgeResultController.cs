@@ -2,9 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 public class JudgeResultController : MonoBehaviour
 {
+    [Inject]
+    private IResourceLoader resourceLoader;
+
     public static JudgeResultController instance;
 
     private Sprite[] judges;
@@ -24,11 +28,11 @@ public class JudgeResultController : MonoBehaviour
         judges = new Sprite[(int)JudgeResult.Miss + 1];
         for (int i = 0; i <= (int)JudgeResult.Miss; i++)
         {
-            judges[i] = NoteUtility.LoadResource<Sprite>("judge_" + i);
+            judges[i] = resourceLoader.LoadSkinResource<Sprite>("judge_" + i);
         }
 
-        early = NoteUtility.LoadResource<Sprite>("early");
-        late = NoteUtility.LoadResource<Sprite>("late");
+        early = resourceLoader.LoadSkinResource<Sprite>("early");
+        late = resourceLoader.LoadSkinResource<Sprite>("late");
 
         animator = GetComponent<Animator>();
         resultRenderer = GetComponent<SpriteRenderer>();

@@ -20,6 +20,8 @@ public class NoteController : MonoBehaviour
     private IChartListManager chartListManager;
     [Inject]
     private IModManager modManager;
+    [Inject]
+    private IResourceLoader resourceLoader;
 
     public static NoteController Instance;
     public static Camera mainCamera;
@@ -411,11 +413,11 @@ public class NoteController : MonoBehaviour
         // Sound effects
         soundEffects = new ISoundEffect[5]
         {
-            await audioManager.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) +"/perfect.wav").bytes),
-            await audioManager.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) +"/great.wav").bytes),
-            await audioManager.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) +"/empty.wav").bytes),
-            await audioManager.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) +"/empty.wav").bytes),
-            await audioManager.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + System.Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) +"/flick.wav").bytes)
+            await audioManager.PrecacheInGameSE(resourceLoader.LoadSEResource<TextAsset>("perfect.wav").bytes),
+            await audioManager.PrecacheInGameSE(resourceLoader.LoadSEResource<TextAsset>("great.wav").bytes),
+            await audioManager.PrecacheInGameSE(resourceLoader.LoadSEResource<TextAsset>("empty.wav").bytes),
+            await audioManager.PrecacheInGameSE(resourceLoader.LoadSEResource<TextAsset>("empty.wav").bytes),
+            await audioManager.PrecacheInGameSE(resourceLoader.LoadSEResource<TextAsset>("flick.wav").bytes)
         };
 
         // Game BGM

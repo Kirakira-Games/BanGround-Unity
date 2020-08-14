@@ -61,7 +61,7 @@ public class SlideMesh : MonoBehaviour
         meshFilter.mesh.RecalculateNormals();
     }
 
-    public void InitMesh()
+    public void InitMesh(IResourceLoader resourceLoader)
     {
         meshRenderer = gameObject.AddComponent<MeshRenderer>();
         meshFilter = gameObject.AddComponent<MeshFilter>();
@@ -90,7 +90,7 @@ public class SlideMesh : MonoBehaviour
         {
             Material material = Resources.Load<Material>("InGame/Materials/note_body");
             cacheMat = Instantiate(material);
-            cacheMat.mainTexture = NoteUtility.LoadResource<Texture2D>("long_note_mask");
+            cacheMat.mainTexture = resourceLoader.LoadSkinResource<Texture2D>("long_note_mask");
             //cacheMat.SetColor("_BaseColor", new Color(0.5843137f, 0.9019607f, 0.3019607f, r_brightness_long));
         }
         meshRenderer.material = cacheMat;

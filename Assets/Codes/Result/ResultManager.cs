@@ -20,6 +20,8 @@ public class ResultManager : MonoBehaviour
     private IModManager modManager;
     [Inject]
     private IChartListManager chartListManager;
+    [Inject]
+    private IResourceLoader resourceLoader;
 
     [Inject(Id = "fs_iconpath")]
     private KVar fs_iconpath;
@@ -279,49 +281,20 @@ public class ResultManager : MonoBehaviour
     private void ShowRank()
     {
         //Set Rank
-        var rank = new Texture2D(0,0);
-        
-        switch (playResult.ranks)
-        {
-            case Ranks.SSS:
-                rank = Resources.Load(fs_iconpath + "SSS") as Texture2D;
-                break;
-            case Ranks.SS:
-                rank = Resources.Load(fs_iconpath + "SS") as Texture2D;
-                break;
-            case Ranks.S:
-                rank = Resources.Load(fs_iconpath + "S") as Texture2D;
-                break;
-            case Ranks.A:
-                rank = Resources.Load(fs_iconpath + "A") as Texture2D;
-                break;
-            case Ranks.B:
-                rank = Resources.Load(fs_iconpath + "B") as Texture2D;
-                break;
-            case Ranks.C:
-                rank = Resources.Load(fs_iconpath + "C") as Texture2D;
-                break;
-            case Ranks.D:
-                rank = Resources.Load(fs_iconpath + "D") as Texture2D;
-                break;
-            case Ranks.F:
-                rank = Resources.Load(fs_iconpath + "F") as Texture2D;
-                break;
-        }
-        rankIcon.texture = rank;
+        rankIcon.texture = resourceLoader.LoadIconResource<Texture2D>(playResult.ranks.ToString());
 
         //Set Mark
         
         switch (playResult.clearMark)
         {
             case ClearMarks.AP:
-                markIcon.texture = Resources.Load(fs_iconpath + "AP") as Texture2D;
+                markIcon.texture = resourceLoader.LoadIconResource<Texture2D>("AP") as Texture2D;
                 break;
             case ClearMarks.FC:
-                markIcon.texture = Resources.Load(fs_iconpath + "FC") as Texture2D;
+                markIcon.texture = resourceLoader.LoadIconResource<Texture2D>("FC") as Texture2D;
                 break;
             case ClearMarks.CL:
-                markIcon.texture = Resources.Load(fs_iconpath + "CL") as Texture2D;
+                markIcon.texture = resourceLoader.LoadIconResource<Texture2D>("CL") as Texture2D;
                 break;
             case ClearMarks.F:
                 markIcon.texture = null;

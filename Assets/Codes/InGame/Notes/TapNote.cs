@@ -9,6 +9,6 @@ public class TapNote : NoteBase
         base.ResetNote(data);
 
         noteMesh.meshRenderer.sharedMaterial.SetTexture("_MainTex",
-            NoteUtility.LoadResource<Texture2D>("note_single_tint"));
+            resourceLoader.LoadSkinResource<Texture2D>("note_single_tint"));
     }
 }
