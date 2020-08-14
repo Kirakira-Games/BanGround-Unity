@@ -16,8 +16,6 @@ public class UIManager : MonoBehaviour
     public static UIManager Instance;
 
     [Inject]
-    private ILiveSetting liveSetting;
-    [Inject]
     private IAudioManager audioManager;
     [Inject]
     private IChartListManager chartListManager;

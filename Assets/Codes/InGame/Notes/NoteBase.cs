@@ -38,6 +38,7 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
     public NoteMesh noteMesh;
     public JudgeResult judgeResult;
     public TimingGroupController timingGroup;
+    public IResourceLoader resourceLoader;
 
     public Vector3 initPos;
     public Vector3 judgePos;

@@ -17,6 +17,8 @@ namespace BGEditor
         private IAudioManager audioManager;
         [Inject]
         private IChartListManager chartListManager;
+        [Inject]
+        private IResourceLoader resourceLoader;
 
         public Text TimeText;
         public Slider AudioProgressSlider;
@@ -36,7 +38,6 @@ namespace BGEditor
         private float lastBeat;
         private float lastTime;
         private float lastTimeRecorded;
-        private static KVarRef cl_sestyle = new KVarRef("cl_sestyle");
 
         public static float TimeToScrollPos(float time)
         {
@@ -141,8 +142,8 @@ namespace BGEditor
         private async void Start()
         {
             // Load SE
-            singleSE = await audioManager.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) + "/perfect.wav").bytes);
-            flickSE = await audioManager.PrecacheInGameSE(Resources.Load<TextAsset>("SoundEffects/" + Enum.GetName(typeof(SEStyle), (SEStyle)cl_sestyle) + "/flick.wav").bytes);
+            singleSE = await audioManager.PrecacheInGameSE(resourceLoader.LoadSEResource<TextAsset>("perfect.wav").bytes);
+            flickSE = await audioManager.PrecacheInGameSE(resourceLoader.LoadSEResource<TextAsset>("flick.wav").bytes);
 
             lastBeat = float.NaN;
             lastTime = float.NaN;

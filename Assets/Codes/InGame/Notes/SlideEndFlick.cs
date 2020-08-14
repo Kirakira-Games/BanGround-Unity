@@ -27,16 +27,16 @@ public class SlideEndFlick : SlideNoteBase
     public override void InitNote()
     {
         base.InitNote();
-        flickArrow = (Instantiate(Resources.Load(fs_assetpath.Get<string>() + "/FlickArrow"), transform) as GameObject).GetComponent<FlickArrow>();
+        flickArrow = Instantiate(resourceLoader.LoadResource<GameObject>("FlickArrow"), transform).GetComponent<FlickArrow>();
     }
 
     public override void ResetNote(GameNoteData data)
     {
         base.ResetNote(data);
 
-        noteMesh.meshRenderer.sharedMaterial.SetTexture("_MainTex", NoteUtility.LoadResource<Texture2D>("note_flick_tint"));
+        noteMesh.meshRenderer.sharedMaterial.SetTexture("_MainTex", resourceLoader.LoadSkinResource<Texture2D>("note_flick_tint"));
         flickArrow.Reset(timingGroup);
-        //GetComponent<SpriteRenderer>().sprite = NoteUtility.LoadResource<Sprite>("note_flick_default");
+        //GetComponent<SpriteRenderer>().sprite = resourceLoader.LoadSkinResource<Sprite>("note_flick_default");
     }
 
     public override void Judge(KirakiraTouch touch, JudgeResult result)

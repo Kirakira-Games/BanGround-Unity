@@ -46,8 +46,8 @@ public class SlideEnd : SlideNoteBase
     public override void ResetNote(GameNoteData data)
     {
         base.ResetNote(data);
-        noteMesh.meshRenderer.sharedMaterial.SetTexture("_MainTex", NoteUtility.LoadResource<Texture2D>("note_single_tint"));
-        //GetComponent<SpriteRenderer>().sprite = NoteUtility.LoadResource<Sprite>("note_long_default");
+        noteMesh.meshRenderer.sharedMaterial.SetTexture("_MainTex", resourceLoader.LoadSkinResource<Texture2D>("note_single_tint"));
+        //GetComponent<SpriteRenderer>().sprite = resourceLoader.LoadSkinResource<Sprite>("note_long_default");
     }
 
     protected override void OnNoteUpdateJudge()

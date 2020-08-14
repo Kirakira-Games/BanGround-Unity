@@ -214,8 +214,6 @@ public class TouchManager : MonoBehaviour
     [Inject(Id = "cl_currentdemo")]
     private KVar cl_currentDemo;
     [Inject]
-    private ILiveSetting liveSetting;
-    [Inject]
     private IChartListManager chartListManager;
     [Inject]
     private IModManager modManager;
