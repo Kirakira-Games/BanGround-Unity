@@ -38,6 +38,7 @@ public class NoteController : MonoBehaviour
     public static bool hasFuwafuwaNote => numFuwafuwaNotes > 0;
     public bool isFinished { get; private set; }
 
+    public FuwafuwaLane fuwafuwaLane;
     private JudgeQueue noteQueue;
     private JudgeQueue[] laneQueue;
     private Dictionary<int, NoteSyncLine> syncTable;
@@ -381,7 +382,7 @@ public class NoteController : MonoBehaviour
 
         // Init fuwafuwa lane
         numFuwafuwaNotes = 0;
-        FuwafuwaLane.instance.Init();
+        fuwafuwaLane.Init();
 
         // Create tables for fast lookup
         syncTable = new Dictionary<int, NoteSyncLine>();
