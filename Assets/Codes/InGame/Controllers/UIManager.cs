@@ -19,6 +19,8 @@ public class UIManager : MonoBehaviour
     private IAudioManager audioManager;
     [Inject]
     private IChartListManager chartListManager;
+    [Inject]
+    private IAudioTimelineSync audioTimelineSync;
 
     private const float BiteTime = 2;
 
@@ -113,7 +115,7 @@ public class UIManager : MonoBehaviour
         }
         InGameBackground.instance.pauseVideo();
         Time.timeScale = 0;
-        AudioTimelineSync.instance.Pause();
+        audioTimelineSync.Pause();
         audioManager.gameBGM.Pause();
         pause_Canvas.SetActive(true);
         SM.AddState(State.Paused);
@@ -140,7 +142,7 @@ public class UIManager : MonoBehaviour
         }
         else if (SM.Current == State.Loading)
         {
-            AudioTimelineSync.instance.Play();
+            audioTimelineSync.Play();
         }
     }
 
@@ -148,7 +150,7 @@ public class UIManager : MonoBehaviour
     {
         ISoundTrack bgm = audioManager.gameBGM;
         SM.AddState(State.Rewinding);
-        float currentTime = AudioTimelineSync.instance.GetTimeInS();
+        float currentTime = audioTimelineSync.time;
         float targetTime = Mathf.Max(0, currentTime - BiteTime);
 
         // rewind
@@ -156,7 +158,7 @@ public class UIManager : MonoBehaviour
         while (currentTime > targetTime)
         {
             currentTime -= Time.deltaTime;
-            AudioTimelineSync.instance.Seek(currentTime);
+            audioTimelineSync.time = currentTime;
             InGameBackground.instance.seekVideo(currentTime);
             InGameBackground.instance.playVideo();
             await UniTask.DelayFrame(0);
@@ -171,8 +173,8 @@ public class UIManager : MonoBehaviour
         uint pauseTime = bgm.GetPlaybackTime();
         bgm.Play();
         await UniTask.WaitUntil(() => bgm.GetPlaybackTime() != pauseTime, cancellationToken: token);
-        AudioTimelineSync.instance.Seek(bgm.GetPlaybackTime() / 1000f);
-        AudioTimelineSync.instance.Play();
+        audioTimelineSync.timeInMs = (int)bgm.GetPlaybackTime();
+        audioTimelineSync.Play();
         InGameBackground.instance.seekVideo(bgm.GetPlaybackTime()/1000f);
         InGameBackground.instance.playVideo();
 
@@ -297,7 +299,7 @@ public class UIManager : MonoBehaviour
     private void Update()
     {
         if (SM.Count == 1 && SM.Current != State.Finished && audioManager.gameBGM != null &&
-            AudioTimelineSync.instance.GetTimeInMs() > audioManager.gameBGM.GetLength() + 1000 &&
+            audioTimelineSync.timeInMs > audioManager.gameBGM.GetLength() + 1000 &&
             NoteController.Instance.isFinished)
         {
             SM.Transit(SM.Current, State.Finished);

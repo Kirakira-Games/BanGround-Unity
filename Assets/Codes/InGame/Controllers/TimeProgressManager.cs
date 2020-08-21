@@ -10,6 +10,8 @@ public class TimeProgressManager : MonoBehaviour
 {
     [Inject]
     private IAudioManager audioManager;
+    [Inject]
+    private IAudioTimelineSync audioTimelineSync;
 
     private Slider TimeProgress;
     private uint audioLength;
@@ -37,7 +39,7 @@ public class TimeProgressManager : MonoBehaviour
             default:
                 if (gameBGM == null)
                     return;
-                TimeProgress.value = Mathf.Clamp01(AudioTimelineSync.instance.GetTimeInMs() / (float)gameBGM.GetLength());
+                TimeProgress.value = Mathf.Clamp01(audioTimelineSync.timeInMs / (float)gameBGM.GetLength());
                 break;
         }
     }
