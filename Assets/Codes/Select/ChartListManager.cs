@@ -76,7 +76,9 @@ public class ChartListManager : IChartListManager
     public void SelectChartByIndex(int index)
     {
         index = Mathf.Clamp(index, 0, chartList.Count - 1);
-        if (cl_lastsid == chartList[index].sid && selectedChart.header != null)
+        if (cl_lastsid == chartList[index].sid
+            && selectedChart.header != null
+            && selectedChart.index == index)
             return;
         selectedChart.index = index;
         selectedChart.header = chartList[index];
