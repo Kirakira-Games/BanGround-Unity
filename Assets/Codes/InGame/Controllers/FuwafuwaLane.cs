@@ -1,9 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class FuwafuwaLane : MonoBehaviour
+public interface IInitable
 {
-    public static FuwafuwaLane instance;
+    void Init();
+}
+
+public class FuwafuwaLane : MonoBehaviour, IInitable
+{
     public Animator animator;
     private int Showing;
     private int Show;
@@ -11,7 +15,6 @@ public class FuwafuwaLane : MonoBehaviour
 
     private void Awake()
     {
-        instance = this;
         Show = Animator.StringToHash("Show");
         Hide = Animator.StringToHash("Hide");
     }
