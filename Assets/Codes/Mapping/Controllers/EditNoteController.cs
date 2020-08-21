@@ -221,10 +221,10 @@ namespace BGEditor
 
         public void RemoveAllSelected()
         {
-            var tmpNotes = selectedNotes.ToArray();
+            var tmpNotes = GetSelectedNotes();
             var cmd = new CmdGroup();
             foreach (var note in tmpNotes)
-                cmd.Add(new RemoveNoteCmd(note.note));
+                cmd.Add(new RemoveNoteCmd(note));
             var result = Core.Commit(cmd);
             Debug.Assert(result);
             selectedNotes.Clear();
