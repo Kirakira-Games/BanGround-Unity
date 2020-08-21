@@ -22,6 +22,8 @@ public class NoteController : MonoBehaviour
     private IModManager modManager;
     [Inject]
     private IResourceLoader resourceLoader;
+    [Inject]
+    private IAudioTimelineSync audioTimelineSync;
 
     public static NoteController Instance;
     public static Camera mainCamera;
@@ -421,7 +423,7 @@ public class NoteController : MonoBehaviour
         };
 
         // Game BGM
-        StartCoroutine(audioManager.DelayPlayInGameBGM(KiraFilesystem.Instance.Read(dataLoader.GetMusicPath(chartListManager.current.header.mid)), WARM_UP_SECOND).ToCoroutine());
+        StartCoroutine(audioManager.DelayPlayInGameBGM(audioTimelineSync, KiraFilesystem.Instance.Read(dataLoader.GetMusicPath(chartListManager.current.header.mid)), WARM_UP_SECOND).ToCoroutine());
 
         // Background
         var background = GameObject.Find("InGameBackground").GetComponent<InGameBackground>();
@@ -495,7 +497,7 @@ public class NoteController : MonoBehaviour
     {
         if (SceneLoader.Loading || UIManager.Instance.SM.Base == GameStateMachine.State.Finished || Time.timeScale == 0) return;
 
-        audioTime = AudioTimelineSync.instance.GetTimeInMs() + AudioTimelineSync.RealTimeToBGMTime(o_audio);
+        audioTime = audioTimelineSync.timeInMs + audioTimelineSync.RealTimeToBGMTime(o_audio);
         judgeTime = audioTime - o_judge;
         audioTimef = audioTime / 1000f;
         judgeTimef = judgeTime / 1000f;

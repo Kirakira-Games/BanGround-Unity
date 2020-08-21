@@ -130,7 +130,7 @@ public class AudioManager : MonoBehaviour, IAudioManager
 
     public async UniTask<ISoundEffect> PrecacheSE(byte[] data) => await Provider.PrecacheSE(data, SEType.Common);
     public async UniTask<ISoundEffect> PrecacheInGameSE(byte[] data) => await Provider.PrecacheSE(data, SEType.InGame);
-    public async UniTask DelayPlayInGameBGM(byte[] audio, float seconds)
+    public async UniTask DelayPlayInGameBGM(IAudioTimelineSync audioTimelineSync, byte[] audio, float seconds)
     {
         if(Provider is PureUnityAudioProvider)
         {
@@ -146,10 +146,10 @@ public class AudioManager : MonoBehaviour, IAudioManager
 
         await UniTask.WaitUntil(() => SceneLoader.Loading == false, cancellationToken: UIManager.Instance.cancellationToken.Token);
 
-        AudioTimelineSync.instance.Seek(-seconds);
-        AudioTimelineSync.instance.Play();
+        audioTimelineSync.time = -seconds;
+        audioTimelineSync.Play();
 
-        await UniTask.WaitUntil(() => AudioTimelineSync.instance.GetTimeInS() >= -0.02, cancellationToken: UIManager.Instance.cancellationToken.Token);
+        await UniTask.WaitUntil(() => audioTimelineSync.time >= -0.02, cancellationToken: UIManager.Instance.cancellationToken.Token);
 
         foreach (var mod in modManager.attachedMods)
         {
@@ -164,7 +164,7 @@ public class AudioManager : MonoBehaviour, IAudioManager
         UIManager.Instance.SM.Transit(State.Loading, State.Playing);
 
         await UniTask.WaitUntil(() => gameBGM.GetPlaybackTime() > 0, cancellationToken: UIManager.Instance.cancellationToken.Token);
-        AudioTimelineSync.instance.Seek(gameBGM.GetPlaybackTime() / 1000f);
+        audioTimelineSync.timeInMs = (int)gameBGM.GetPlaybackTime();
     }
     public void StopBGM() => gameBGM.Stop();
     public async UniTask<ISoundTrack> PlayLoopMusic(byte[] audio,bool needLoop = true, uint[] times = null, bool noFade = true)

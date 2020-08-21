@@ -127,6 +127,7 @@ public class KirakiraTouch
     /// </summary>
     public HashSet<int> exchangable;
 
+    private IAudioTimelineSync audioTimelineSync;
     private PriorityQueue<float, KirakiraTouchState> timeline;
     public static int INVALID_DURATION => NoteUtility.SLIDE_TICK_JUDGE_RANGE << 1;
     public static Vector3 INVALID_POSITION => new Vector3(0, 0, -1e3f);
@@ -141,8 +142,9 @@ public class KirakiraTouch
         return Vector2.Distance(p, q) >= flickDistPixels;
     }
 
-    public KirakiraTouch()
+    public KirakiraTouch(IAudioTimelineSync audioTimelineSync)
     {
+        this.audioTimelineSync = audioTimelineSync;
         timeline = new PriorityQueue<float, KirakiraTouchState>();
         exchangable = new HashSet<int>();
         Reset();
@@ -158,9 +160,9 @@ public class KirakiraTouch
         timeSinceFlick = INVALID_DURATION;
     }
 
-    public static int RealtimeToBGMMs(float t1, float t2)
+    public int RealtimeToBGMMs(float t1, float t2)
     {
-        return Mathf.RoundToInt(AudioTimelineSync.RealTimeToBGMTime(t2 - t1) * 1000);
+        return Mathf.RoundToInt(audioTimelineSync.RealTimeToBGMTime(t2 - t1) * 1000);
     }
 
     public void OnUpdate(KirakiraTouchState state)
@@ -217,6 +219,8 @@ public class TouchManager : MonoBehaviour
     private IChartListManager chartListManager;
     [Inject]
     private IModManager modManager;
+    [Inject]
+    private IAudioTimelineSync audioTimelineSync;
 
     private Dictionary<int, KirakiraTouch> touchTable;
     private Dictionary<(KirakiraTracer, int), JudgeResult> traceCache;
@@ -241,7 +245,7 @@ public class TouchManager : MonoBehaviour
         Debug.Assert(id != -1);
         if (!touchTable.ContainsKey(id))
         {
-            var ret = new KirakiraTouch();
+            var ret = new KirakiraTouch(audioTimelineSync);
             touchTable.Add(id, ret);
         }
         return touchTable[id];

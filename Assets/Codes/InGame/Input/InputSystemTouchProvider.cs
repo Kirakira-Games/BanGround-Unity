@@ -37,7 +37,7 @@ public class InputSystemTouchProvider : KirakiraTouchProvider
             ret[i] = new KirakiraTouchState
             {
                 touchId = touch.touchId,
-                time = Mathf.RoundToInt(AudioTimelineSync.instance.TimeSinceStartupToBGMTime((float)touch.time) * 1000) - o_judge,
+                time = Mathf.RoundToInt(audioTimelineSync.TimeSinceStartupToBGMTime((float)touch.time) * 1000) - o_judge,
                 realtime = (float)touch.time,
                 screenPos = touch.screenPosition,
                 pos = pos,

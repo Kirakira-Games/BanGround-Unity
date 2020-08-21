@@ -4,49 +4,42 @@ using System;
 using System.Collections.Generic;
 using Zenject;
 
-public class AudioTimelineSync : MonoBehaviour
+public class AudioTimelineSync : MonoBehaviour, IAudioTimelineSync
 {
     [Inject]
     private IAudioManager audioManager;
     [Inject]
     private IModManager modManager;
 
-    public static AudioTimelineSync instance;
-
-    private Stopwatch watch;
+    private Stopwatch watch = new Stopwatch();
     private float deltaTime;
 
     // Sync display
     public float smoothAudioDiff => syncQueue.Count == 0 ? float.NaN : totDiff / syncQueue.Count;
-    private Queue<float> syncQueue;
+    private Queue<float> syncQueue = new Queue<float>();
     private const int QUEUE_SIZE = 10;
     private const float DIFF_TOLERANCE = 0.1f;
     private const float UNSYNC_LIMIT = 10f;
     private float totDiff;
     private uint prevAudioTime;
-    private static float adjustLimit;
+    private float adjustLimit;
 
-    public static float BGMTimeToRealtime(float t)
+    public float BGMTimeToRealtime(float t)
     {
-        return t / ModManager.Instance.SpeedCompensationSum;
+        return t / modManager.SpeedCompensationSum;
     }
-    public static int BGMTimeToRealtime(int t)
+    public int BGMTimeToRealtime(int t)
     {
-        return Mathf.RoundToInt(t / ModManager.Instance.SpeedCompensationSum);
-    }
-
-    public static float RealTimeToBGMTime(float t)
-    {
-        return t * ModManager.Instance.SpeedCompensationSum;
-    }
-    public static int RealTimeToBGMTime(int t)
-    {
-        return Mathf.RoundToInt(t * ModManager.Instance.SpeedCompensationSum);
+        return Mathf.RoundToInt(t / modManager.SpeedCompensationSum);
     }
 
-    public float TimeSinceStartupToBGMTime(float t)
+    public float RealTimeToBGMTime(float t)
     {
-        throw new NotImplementedException();
+        return t * modManager.SpeedCompensationSum;
+    }
+    public int RealTimeToBGMTime(int t)
+    {
+        return Mathf.RoundToInt(t * modManager.SpeedCompensationSum);
     }
 
     private void ClearSync()
@@ -58,9 +51,6 @@ public class AudioTimelineSync : MonoBehaviour
 
     private void Awake()
     {
-        instance = this;
-        watch = new Stopwatch();
-        syncQueue = new Queue<float>();
         ClearSync();
         deltaTime = -1e3f;
         adjustLimit = Time.smoothDeltaTime * 0.2f;
@@ -77,19 +67,27 @@ public class AudioTimelineSync : MonoBehaviour
         watch.Stop();
     }
 
-    public float GetTimeInS()
+    public float time
     {
-        return (float)((watch.Elapsed.TotalSeconds + deltaTime) * modManager.SpeedCompensationSum);
+        get
+        {
+            return (float)((watch.Elapsed.TotalSeconds + deltaTime) * modManager.SpeedCompensationSum);
+        }
+        set
+        {
+            deltaTime = (float)(value / modManager.SpeedCompensationSum - watch.Elapsed.TotalSeconds);
+        }
     }
-
-    public int GetTimeInMs()
+    public int timeInMs
     {
-        return Mathf.RoundToInt(GetTimeInS() * 1000);
-    }
-
-    public void Seek(float targetTime)
-    {
-        deltaTime = (float)(targetTime / modManager.SpeedCompensationSum - watch.Elapsed.TotalSeconds);
+        get
+        {
+            return Mathf.RoundToInt(time * 1000);
+        }
+        set
+        {
+            time = value / 1000f;
+        }
     }
 
     private void Update()
@@ -104,7 +102,7 @@ public class AudioTimelineSync : MonoBehaviour
         if (audioTime == prevAudioTime)
             return;
         prevAudioTime = audioTime;
-        float diff = BGMTimeToRealtime(audioTime / 1000f - GetTimeInS());
+        float diff = BGMTimeToRealtime(audioTime / 1000f - time);
         // too unsync
         if (diff < -UNSYNC_LIMIT)
             return;

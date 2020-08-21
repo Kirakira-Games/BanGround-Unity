@@ -10,6 +10,8 @@ public class FPSCounter : MonoBehaviour
 {
     [Inject]
     private IAudioManager audioManager;
+    [Inject(Optional = true)]
+    private IAudioTimelineSync audioTimelineSync;
 
     private Text text;
     private int frameInSec = 0;
@@ -35,20 +37,11 @@ public class FPSCounter : MonoBehaviour
         string str = $"FPS : {lastFPS}";
 
         // Audio diff display
-        if (AudioTimelineSync.instance != null && audioManager.gameBGM != null)
+        if (audioTimelineSync != null && audioManager.gameBGM != null)
         {
             uint audioTime = audioManager.gameBGM.GetPlaybackTime();
-            int syncTime = AudioTimelineSync.instance.GetTimeInMs();
+            int syncTime = audioTimelineSync.timeInMs;
             str += $"\nS: {audioTime}/{syncTime}";
-            /*
-            float? audioDiff = AudioTimelineSync.instance?.smoothAudioDiff;
-            if (audioDiff.HasValue && !float.IsNaN(audioDiff.Value))
-            {
-                int diff = Mathf.RoundToInt(audioDiff.Value * 1000);
-                string diffStr = diff >= 0 ? "+" + diff : diff.ToString();
-                str += $"\nSync: {diffStr}ms";
-            }
-            */
         }
 
         text.text = str;
