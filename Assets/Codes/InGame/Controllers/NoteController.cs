@@ -10,7 +10,7 @@ using UniRx.Async;
 using JudgeQueue = PriorityQueue<int, NoteBase>;
 using Zenject;
 
-public class NoteController : MonoBehaviour
+public class NoteController : MonoBehaviour, INoteController
 {
     [Inject]
     private IAudioManager audioManager;
@@ -25,17 +25,21 @@ public class NoteController : MonoBehaviour
     [Inject]
     private IAudioTimelineSync audioTimelineSync;
 
-    public static NoteController Instance;
+    [Inject(Id = "o_judge")]
+    private KVar o_judge;
+    [Inject(Id = "o_audio")]
+    private KVar o_audio;
+
     public static Camera mainCamera;
     public static Vector3 mainForward = new Vector3(0, -0.518944f, 0.8548083f);
-    
+
     public static int audioTime { get; private set; }
     public static int judgeTime { get; private set; }
     public static float audioTimef { get; private set; }
     public static float judgeTimef { get; private set; }
 
-    public static int numFuwafuwaNotes;
-    public static bool hasFuwafuwaNote => numFuwafuwaNotes > 0;
+    public int numFuwafuwaNotes { get; set; }
+    public bool hasFuwafuwaNote => numFuwafuwaNotes > 0;
     public bool isFinished { get; private set; }
 
     public FuwafuwaLane fuwafuwaLane;
@@ -67,7 +71,7 @@ public class NoteController : MonoBehaviour
     private const int WARM_UP_SECOND = 4;
 
     #region Judge
-    public TapEffectType EmitEffect(Vector3 position, JudgeResult result, GameNoteType type)
+    private TapEffectType EmitEffect(Vector3 position, JudgeResult result, GameNoteType type)
     {
         if (result == JudgeResult.Miss) return TapEffectType.None;
 
@@ -106,7 +110,7 @@ public class NoteController : MonoBehaviour
         }
 
         // 粉键震动
-        if (r_shake_flick && (notebase.type == GameNoteType.Flick || notebase.type == GameNoteType.SlideEndFlick)&&result <= JudgeResult.Great)
+        if (r_shake_flick && (notebase.type == GameNoteType.Flick || notebase.type == GameNoteType.SlideEndFlick) && result <= JudgeResult.Great)
             cameraAnimation.Play("vibe");
 
         // Tap effect
@@ -150,7 +154,7 @@ public class NoteController : MonoBehaviour
         }
     }
 
-    public static int[] GetLanesByTouchState(KirakiraTouchState state)
+    private int[] GetLanesByTouchState(KirakiraTouchState state)
     {
         var lanes = new List<int>();
         var dists = new float[NoteUtility.LANE_COUNT];
@@ -320,7 +324,7 @@ public class NoteController : MonoBehaviour
     {
         var slide = NotePool.Instance.GetSlide();
         slide.transform.SetParent(transform);
-        slide.InitSlide();
+        slide.InitSlide(this);
         foreach (GameNoteData note in notes)
         {
             slide.AddNote(CreateNote(note));
@@ -369,7 +373,6 @@ public class NoteController : MonoBehaviour
 
     async void Start()
     {
-        Instance = this;
         isFinished = false;
 
         // Main camera
@@ -491,9 +494,6 @@ public class NoteController : MonoBehaviour
         NoteBase.Init();
     }
 
-    static KVarRef o_judge = new KVarRef("o_judge");
-    static KVarRef o_audio = new KVarRef("o_audio");
-
     void Update()
     {
         if (SceneLoader.Loading || UIManager.Instance.SM.Base == GameStateMachine.State.Finished || Time.timeScale == 0) return;
@@ -563,7 +563,7 @@ public class NoteController : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (soundEffects != null) 
+        if (soundEffects != null)
         {
             for (int i = 0; i < soundEffects.Length; i++)
             {

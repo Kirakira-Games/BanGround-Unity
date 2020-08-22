@@ -21,6 +21,8 @@ public class UIManager : MonoBehaviour
     private IChartListManager chartListManager;
     [Inject]
     private IAudioTimelineSync audioTimelineSync;
+    [Inject]
+    private INoteController noteController;
 
     private const float BiteTime = 2;
 
@@ -300,7 +302,7 @@ public class UIManager : MonoBehaviour
     {
         if (SM.Count == 1 && SM.Current != State.Finished && audioManager.gameBGM != null &&
             audioTimelineSync.timeInMs > audioManager.gameBGM.GetLength() + 1000 &&
-            NoteController.Instance.isFinished)
+            noteController.isFinished)
         {
             SM.Transit(SM.Current, State.Finished);
             OnAudioFinish(false);

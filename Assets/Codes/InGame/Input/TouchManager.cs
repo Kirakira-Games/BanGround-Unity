@@ -221,6 +221,8 @@ public class TouchManager : MonoBehaviour
     private IModManager modManager;
     [Inject]
     private IAudioTimelineSync audioTimelineSync;
+    [Inject]
+    private INoteController noteController;
 
     private Dictionary<int, KirakiraTouch> touchTable;
     private Dictionary<(KirakiraTracer, int), JudgeResult> traceCache;
@@ -510,7 +512,7 @@ public class TouchManager : MonoBehaviour
                 {
                     continue;
                 }
-                NoteController.Instance.UpdateTouch(GetTouchById(touch.touchId));
+                noteController.UpdateTouch(GetTouchById(touch.touchId));
             }
 
             // Remove ended touches
