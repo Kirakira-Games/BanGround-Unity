@@ -47,7 +47,7 @@ public class UIManager : MonoBehaviour
 
     static KVarRef r_brightness_lane = new KVarRef("r_brightness_lane");
 
-    public CancellationTokenSource cancellationToken = new CancellationTokenSource();
+    private CancellationTokenSource cancellationToken = new CancellationTokenSource();
 
     private void Awake()
     {

@@ -2,6 +2,7 @@
 using System.Collections;
 using UniRx.Async;
 using AudioProvider;
+using System.Threading;
 
 public interface IAudioManager
 {
@@ -9,7 +10,7 @@ public interface IAudioManager
     ISoundTrack gameBGM { get; set; }
     UniTask<ISoundEffect> PrecacheSE(byte[] data);
     UniTask<ISoundEffect> PrecacheInGameSE(byte[] data);
-    UniTask DelayPlayInGameBGM(IAudioTimelineSync audioTimelineSync, byte[] audio, float seconds);
+    UniTaskVoid DelayPlayInGameBGM(IAudioTimelineSync audioTimelineSync, byte[] audio, float seconds, CancellationTokenSource cts = default);
     UniTask<ISoundTrack> PlayLoopMusic(byte[] audio, bool needLoop = true, uint[] times = null, bool noFade = true);
     void StopBGM();
     void StopAllCoroutines();
