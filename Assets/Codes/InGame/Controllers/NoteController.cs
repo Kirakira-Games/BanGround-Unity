@@ -9,6 +9,7 @@ using AudioProvider;
 using UniRx.Async;
 using JudgeQueue = PriorityQueue<int, NoteBase>;
 using Zenject;
+using System.Threading;
 
 public class NoteController : MonoBehaviour, INoteController
 {
@@ -69,6 +70,8 @@ public class NoteController : MonoBehaviour, INoteController
     private List<Slide> slidesToDestroy = new List<Slide>();
 
     private const int WARM_UP_SECOND = 4;
+
+    private CancellationTokenSource cancellationToken = new CancellationTokenSource();
 
     #region Judge
     private TapEffectType EmitEffect(Vector3 position, JudgeResult result, GameNoteType type)
@@ -427,7 +430,7 @@ public class NoteController : MonoBehaviour, INoteController
         };
 
         // Game BGM
-        StartCoroutine(audioManager.DelayPlayInGameBGM(audioTimelineSync, KiraFilesystem.Instance.Read(dataLoader.GetMusicPath(chartListManager.current.header.mid)), WARM_UP_SECOND).ToCoroutine());
+        audioManager.DelayPlayInGameBGM(audioTimelineSync, KiraFilesystem.Instance.Read(dataLoader.GetMusicPath(chartListManager.current.header.mid)), WARM_UP_SECOND, cancellationToken);
 
         // Background
         var background = GameObject.Find("InGameBackground").GetComponent<InGameBackground>();
@@ -563,7 +566,8 @@ public class NoteController : MonoBehaviour, INoteController
 
     private void OnDestroy()
     {
-        if (soundEffects != null)
+        cancellationToken.Cancel();
+        if (soundEffects != null) 
         {
             for (int i = 0; i < soundEffects.Length; i++)
             {
