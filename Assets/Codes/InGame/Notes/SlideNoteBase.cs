@@ -49,7 +49,7 @@ public abstract class SlideNoteBase : NoteBase
         else
         {
             judgeResult = result;
-            NoteController.Instance.Judge(this, result, touch);
+            noteController.Judge(this, result, touch);
         }
     }
 }

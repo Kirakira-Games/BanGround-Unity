@@ -52,6 +52,8 @@ public class NotePool : MonoBehaviour
 
     [Inject]
     private IResourceLoader resourceLoader;
+    [Inject]
+    private INoteController noteController;
     [Inject(Id = "r_notesize")]
     private KVar r_notesize;
     [Inject(Id = "o_judge")]
@@ -89,7 +91,6 @@ public class NotePool : MonoBehaviour
                     break;
             }
             note.isDestroyed = true;
-            note.resourceLoader = resourceLoader;
 
             if (NoteUtility.IsSlide(type))
             {
@@ -107,7 +108,7 @@ public class NotePool : MonoBehaviour
                     //mesh.AddComponent<NoteRotation>().needRot = false;
                 }
             }
-            note.InitNote();
+            note.InitNote(resourceLoader, noteController);
             obj.SetActive(false);
             Q.Enqueue(note);
         }
@@ -354,7 +355,7 @@ public class NotePool : MonoBehaviour
         slide.OnNoteDestroy();
         slide.transform.SetParent(transform);
         slide.gameObject.SetActive(false);
-        NoteController.Instance.OnSlideDestroy(slide);
+        noteController.OnSlideDestroy(slide);
         slideQueue.Enqueue(slide);
     }
 
@@ -367,7 +368,7 @@ public class NotePool : MonoBehaviour
         note.gameObject.SetActive(false);
         if (!note.inJudgeQueue)
         {
-            NoteController.Instance.OnNoteDestroy(note);
+            noteController.OnNoteDestroy(note);
             noteQueue[(int)type].Enqueue(note);
         }
     }
@@ -376,7 +377,7 @@ public class NotePool : MonoBehaviour
     {
         line.transform.SetParent(transform);
         line.gameObject.SetActive(false);
-        NoteController.Instance.OnSyncLineDestroy(line);
+        noteController.OnSyncLineDestroy(line);
         syncLineQueue.Enqueue(line);
     }
 
@@ -392,7 +393,7 @@ public class NotePool : MonoBehaviour
         note.inJudgeQueue = false;
         if (note.isDestroyed)
         {
-            NoteController.Instance.OnNoteDestroy(note);
+            noteController.OnNoteDestroy(note);
             noteQueue[(int)note.type].Enqueue(note);
         }
     }

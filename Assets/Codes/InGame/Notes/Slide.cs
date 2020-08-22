@@ -12,6 +12,8 @@ public class Slide : MonoBehaviour, KirakiraTracer
     private SlideStart noteHead;
     public bool isJudging => touchId != -1;
 
+    private INoteController noteController;
+
     public int GetTouchId()
     {
         return touchId;
@@ -26,8 +28,9 @@ public class Slide : MonoBehaviour, KirakiraTracer
         }
     }
 
-    public void InitSlide()
+    public void InitSlide(INoteController noteController)
     {
+        this.noteController = noteController;
         notes = new List<SlideNoteBase>();
         touchId = -1;
         judgeHead = 0;
@@ -283,7 +286,7 @@ public class Slide : MonoBehaviour, KirakiraTracer
             UpdateHead();
             if (judgeHead < notes.Count)
             {
-                NoteController.Instance.Judge(notes[judgeHead], JudgeResult.Miss, touch);
+                noteController.Judge(notes[judgeHead], JudgeResult.Miss, touch);
                 judgeHead++;
             }
             UnbindTouch();

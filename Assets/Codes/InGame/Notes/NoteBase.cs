@@ -38,14 +38,17 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
     public NoteMesh noteMesh;
     public JudgeResult judgeResult;
     public TimingGroupController timingGroup;
-    public IResourceLoader resourceLoader;
+    protected IResourceLoader resourceLoader;
+    protected INoteController noteController;
 
     public Vector3 initPos;
     public Vector3 judgePos;
     public virtual Color color => noteMesh.meshRenderer.sharedMaterial.GetColor("_Tint");
 
-    public virtual void InitNote()
+    public virtual void InitNote(IResourceLoader resourceLoader, INoteController noteController)
     {
+        this.resourceLoader = resourceLoader;
+        this.noteController = noteController;
         noteMesh = gameObject.AddComponent<NoteMesh>();
     }
 
@@ -71,7 +74,7 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
 
         if (displayFuwafuwa)
         {
-            NoteController.numFuwafuwaNotes++;
+            noteController.numFuwafuwaNotes++;
         }
 
         transform.localScale = Vector3.one * NoteUtility.NOTE_SCALE * r_notesize;
@@ -120,7 +123,7 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
         }
         if (displayFuwafuwa)
         {
-            NoteController.numFuwafuwaNotes--;
+            noteController.numFuwafuwaNotes--;
         }
     }
 
@@ -173,7 +176,7 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
         if (!isTracingOrJudged)
             judgeTime = touch == null ? NoteController.judgeTime : touch.current.time;
         judgeResult = result;
-        NoteController.Instance.Judge(this, result, touch);
+        noteController.Judge(this, result, touch);
         NotePool.Instance.DestroyNote(this);
     }
 

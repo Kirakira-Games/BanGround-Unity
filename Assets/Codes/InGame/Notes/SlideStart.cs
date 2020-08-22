@@ -22,9 +22,9 @@ public class SlideStart : SlideNoteBase
         }
     }
 
-    public override void InitNote()
+    public override void InitNote(IResourceLoader resourceLoader, INoteController noteController)
     {
-        base.InitNote();
+        base.InitNote(resourceLoader, noteController);
         var te = Instantiate(Resources.Load("Effects/effect_TapKeep"), transform) as GameObject;
         tapEffect = te.AddComponent<TapEffect>();
     }

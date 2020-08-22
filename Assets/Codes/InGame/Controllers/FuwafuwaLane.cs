@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Zenject;
 
 public interface IInitable
 {
@@ -9,9 +10,10 @@ public interface IInitable
 public class FuwafuwaLane : MonoBehaviour, IInitable
 {
     public Animator animator;
-    private int Showing;
     private int Show;
     private int Hide;
+    [Inject]
+    private INoteController noteController;
 
     private void Awake()
     {
@@ -39,7 +41,7 @@ public class FuwafuwaLane : MonoBehaviour, IInitable
 
     void Update()
     {
-        if (NoteController.hasFuwafuwaNote)
+        if (noteController.hasFuwafuwaNote)
         {
             if (!IsShowing())
             {
