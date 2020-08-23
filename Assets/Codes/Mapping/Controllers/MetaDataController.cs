@@ -16,6 +16,8 @@ namespace BGEditor
         private IChartListManager chartListManager;
         [Inject]
         private IAudioProgressController Progress;
+        [Inject]
+        private IMessageBox messageBox;
         [Inject(Id = "Blocker")]
         private Button Blocker;
 
@@ -123,7 +125,7 @@ namespace BGEditor
         {
             if (save)
             {
-                if (!await MessageBox.ShowMessage("Save Metadata", "To overwrite metadata, your chart will be saved. Continue?"))
+                if (!await messageBox.ShowMessage("Save Metadata", "To overwrite metadata, your chart will be saved. Continue?"))
                     return;
                 Save();
             }

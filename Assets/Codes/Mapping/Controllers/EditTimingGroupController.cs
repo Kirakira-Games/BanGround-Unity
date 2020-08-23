@@ -12,6 +12,10 @@ namespace BGEditor
         private IChartCore Core;
         [Inject]
         private IEditorInfo Editor;
+        [Inject]
+        private IMessageBannerController messageBannerController;
+        [Inject]
+        private IMessageBox messageBox;
 
         public Dropdown groupDropdown;
         public Button deleteButton;
@@ -22,10 +26,10 @@ namespace BGEditor
         {
             if (Core.chart.groups.Count <= 1)
             {
-                MessageBannerController.ShowMsg(LogLevel.INFO, "You cannot remove the last timing group.");
+                messageBannerController.ShowMsg(LogLevel.INFO, "You cannot remove the last timing group.");
                 return;
             }
-            if (!await MessageBox.ShowMessage("Remove Timing Group", "Confirm: Current timing group, notes, and speed information will be lost."))
+            if (!await messageBox.ShowMessage("Remove Timing Group", "Confirm: Current timing group, notes, and speed information will be lost."))
             {
                 return;
             }

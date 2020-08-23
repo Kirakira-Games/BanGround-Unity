@@ -9,6 +9,8 @@ public class TitleLoader : MonoBehaviour
 {
     [Inject]
     private IAudioManager audioManager;
+    [Inject]
+    private IMessageBannerController messageBannerController;
 
     public TextAsset titleMusic;
     public TextAsset[] voice;
@@ -105,9 +107,9 @@ public class TitleLoader : MonoBehaviour
         else
         {
             if(Authenticate.isNetworkError)
-                MessageBannerController.ShowMsg(LogLevel.ERROR, "Unable to connect to the server! Check your network");
+                messageBannerController.ShowMsg(LogLevel.ERROR, "Unable to connect to the server! Check your network");
             else
-                MessageBannerController.ShowMsg(LogLevel.ERROR, "Username or Password is wrong!");
+                messageBannerController.ShowMsg(LogLevel.ERROR, "Username or Password is wrong!");
         }
     }
 
@@ -126,7 +128,7 @@ public class TitleLoader : MonoBehaviour
         if (check == null || check.response == null || check.response.result == false) 
         {
             //网络错误
-            MessageBannerController.ShowMsg(LogLevel.ERROR, VersionCheck.CheckError, false);
+            messageBannerController.ShowMsg(LogLevel.ERROR, VersionCheck.CheckError, false);
             te.waitingUpdate = false; // 椰叶先别强制更新罢
         }
         else if (Application.version != check.response.data.version)
@@ -136,20 +138,20 @@ public class TitleLoader : MonoBehaviour
             {
                 string result = string.Format(VersionCheck.UpdateForce, check.response.data.version);
                 //强制更新
-                MessageBannerController.ShowMsg(LogLevel.ERROR, result, false);
+                messageBannerController.ShowMsg(LogLevel.ERROR, result, false);
             }
             else
             {
                 string result = string.Format(VersionCheck.UpdateNotForce, check.response.data.version);
                 //不强制更新
-                MessageBannerController.ShowMsg(LogLevel.OK, result, true);
+                messageBannerController.ShowMsg(LogLevel.OK, result, true);
                 te.waitingUpdate = false;
             }
         }
         else
         {
             //无更新
-            MessageBannerController.ShowMsg(LogLevel.OK, VersionCheck.NoUpdate, true);
+            messageBannerController.ShowMsg(LogLevel.OK, VersionCheck.NoUpdate, true);
             te.waitingUpdate = false;
         }
     }

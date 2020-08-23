@@ -16,6 +16,8 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     private IDataLoader dataLoader;
     [Inject]
     private IChartListManager chartListManager;
+    [Inject]
+    private IMessageBannerController messageBannerController;
 
     RectTransform rt_m;
     RectTransform rt_v;
@@ -157,7 +159,7 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         if (!dataLoader.MusicExists(chartListManager.current.header.mid))
         {
-            MessageBannerController.ShowMsg(LogLevel.INFO, "Music missing. Please import it.");
+            messageBannerController.ShowMsg(LogLevel.INFO, "Music missing. Please import it.");
             return;
         }
         //bt.onClick.RemoveAllListeners();
@@ -239,7 +241,7 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (chartListManager.current.header.sid == chartListManager.offsetAdjustSid)
         {
             int index = UnityEngine.Random.Range(0, delFailMsg.Length);
-            MessageBannerController.ShowMsg(LogLevel.INFO, delFailMsg[index]);
+            messageBannerController.ShowMsg(LogLevel.INFO, delFailMsg[index]);
             return;
         }
 

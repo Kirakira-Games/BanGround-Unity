@@ -19,6 +19,8 @@ namespace BGEditor
         private IEditorInfo Editor;
         [Inject]
         private IEditNoteController Notes;
+        [Inject]
+        private IMessageBannerController messageBannerController;
 
         public float VPadding;
         public float LineBoundingHeight;
@@ -333,7 +335,7 @@ namespace BGEditor
                         if (Point.beat[0] >= 0)
                             Core.Commit(new RemoveTimingPointCmd(Point));
                         else
-                            MessageBannerController.ShowMsg(LogLevel.INFO, "Cannot remove the very first timing point.");
+                            messageBannerController.ShowMsg(LogLevel.INFO, "Cannot remove the very first timing point.");
                     }
                     return;
                 }

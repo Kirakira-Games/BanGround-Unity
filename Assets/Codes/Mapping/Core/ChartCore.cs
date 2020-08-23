@@ -33,6 +33,10 @@ namespace BGEditor
         private IAudioProgressController progress;
         [Inject]
         private IEditNoteController notes;
+        [Inject]
+        private IMessageBannerController messageBannerController;
+        [Inject]
+        private IMessageBox messageBox;
 
         public EditorToolTip tooltip { get; private set; }
         public MultiNoteDetector multinote { get; private set; }
@@ -177,7 +181,7 @@ namespace BGEditor
                 multinote.Put(note);
             else if (!multinote.TryPut(note))
             {
-                MessageBannerController.ShowMsg(LogLevel.INFO, "Cannot put multiple notes at the same position.");
+                messageBannerController.ShowMsg(LogLevel.INFO, "Cannot put multiple notes at the same position.");
                 return false;
             }
 
@@ -309,20 +313,20 @@ namespace BGEditor
             if (!string.IsNullOrEmpty(scriptEditor.Code))
                 dataLoader.SaveChartScript(scriptEditor.Code, chartListManager.current.header.sid, (Difficulty)chartListManager.current.difficulty);
 
-            MessageBannerController.ShowMsg(LogLevel.OK, "Chart saved.");
+            messageBannerController.ShowMsg(LogLevel.OK, "Chart saved.");
         }
 
         public void 还没做好()
         {
-            MessageBannerController.ShowMsg(LogLevel.INFO, "Coming soon!");
+            messageBannerController.ShowMsg(LogLevel.INFO, "Coming soon!");
         }
 
         public async void Exit()
         {
-            if (Blocker.gameObject.activeSelf || MessageBox.Instance.gameObject.activeSelf)
+            if (Blocker.gameObject.activeSelf || messageBox.isActive)
                 return;
             progress.Pause();
-            if (await MessageBox.ShowMessage("Exit", "Save before exit?"))
+            if (await messageBox.ShowMessage("Exit", "Save before exit?"))
                 Save();
             SceneLoader.LoadScene("Mapping", "Select");
         }
