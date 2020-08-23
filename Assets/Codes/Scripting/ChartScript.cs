@@ -207,9 +207,15 @@ class ScriptTexture
 [LuaCallCSharp]
 class ScriptEnvironment
 {
+    private IInGameBackground inGameBackground;
+
+    public ScriptEnvironment()
+    {
+        inGameBackground = GameObject.Find("InGameBackground").GetComponent<InGameBackground>();
+    }
     public void SetBackground(ScriptTexture tex)
     {
-        InGameBackground.instance.SetBackground(tex.tex);
+        inGameBackground.SetBackground(tex.tex);
     }
     public void SetLaneBackground(ScriptTexture tex)
     {
