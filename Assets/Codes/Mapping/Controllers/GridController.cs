@@ -5,11 +5,21 @@ using UnityEngine.EventSystems;
 using UnityEngine.Networking.NetworkSystem;
 using System;
 using V2;
+using Zenject;
 
 namespace BGEditor
 {
-    public class GridController : CoreMonoBehaviour, IPointerClickHandler
+    public class GridController : MonoBehaviour, IPointerClickHandler, IGridController
     {
+        [Inject]
+        private IChartCore Core;
+        [Inject]
+        private IObjectPool Pool;
+        [Inject]
+        private IEditorInfo Editor;
+        [Inject]
+        private IEditNoteController Notes;
+
         public float VPadding;
         public float LineBoundingHeight;
         public int BPMFontSize;
@@ -113,7 +123,7 @@ namespace BGEditor
         {
             lane = -1;
             beat = new int[3];
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, pos, Cam, out var point);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, pos, Core.cam, out var point);
 
             // Compute beat
             float actualY = point.y + Editor.scrollPos - VPadding;
@@ -196,7 +206,7 @@ namespace BGEditor
                 }
             }
             // Create timing
-            foreach (var bpm in Chart.bpm)
+            foreach (var bpm in Core.chart.bpm)
             {
                 float beat = ChartUtility.BeatToFloat(bpm.beat);
                 if (beat < StartBar || beat > EndBar)
@@ -207,7 +217,7 @@ namespace BGEditor
                 info.rect.sizeDelta = new Vector2(160, 40);
             }
             // Create timing point info
-            foreach (var point in Group.points)
+            foreach (var point in Core.group.points)
             {
                 float beat = ChartUtility.BeatToFloat(point.beat);
                 beat = Mathf.Max(0, beat);
@@ -226,7 +236,7 @@ namespace BGEditor
         private void OnPointerClickNoteView(PointerEventData eventData)
         {
             // Handle click on slide body
-            var ray = Cam.ScreenPointToRay(eventData.pressPosition);
+            var ray = Core.cam.ScreenPointToRay(eventData.pressPosition);
             var hits = Physics2D.GetRayIntersectionAll(ray);
             foreach (var hit in hits)
             {
@@ -276,7 +286,7 @@ namespace BGEditor
                     {
                         var cmds = new CmdGroup();
                         cmds.Add(new CreateNoteCmd(note));
-                        cmds.Add(new ConnectNoteCmd(prev.note, note));
+                        cmds.Add(new ConnectNoteCmd(Notes, prev.note, note));
                         if (Core.Commit(cmds))
                             return;
                         Notes.UnselectAll();
@@ -297,7 +307,7 @@ namespace BGEditor
 
         public TimingPoint GetTimingPointByBeat(float beatf)
         {
-            foreach (var point in Group.points)
+            foreach (var point in Core.group.points)
             {
                 point.beatf = ChartUtility.BeatToFloat(point.beat);
                 if (Mathf.Approximately(beatf, Mathf.Max(0, point.beatf)))
@@ -335,17 +345,17 @@ namespace BGEditor
                     return;
                 }
                 // Add a timing point
-                for (int i = 0; i < Group.points.Count; i++)
+                for (int i = 0; i < Core.group.points.Count; i++)
                 {
-                    var p = Group.points[i];
+                    var p = Core.group.points[i];
                     if (beatf < p.beatf)
                     {
-                        Point = Group.points[i - 1].Copy();
+                        Point = Core.group.points[i - 1].Copy();
                         break;
                     }
-                    if (i == Group.points.Count - 1)
+                    if (i == Core.group.points.Count - 1)
                     {
-                        Point = Group.points[i].Copy();
+                        Point = Core.group.points[i].Copy();
                         break;
                     }
                 }

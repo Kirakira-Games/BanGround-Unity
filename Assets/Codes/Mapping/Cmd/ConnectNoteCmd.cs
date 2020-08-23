@@ -4,21 +4,23 @@
     {
         private V2.Note prev;
         private V2.Note next;
+        private IEditNoteController Notes;
 
-        public ConnectNoteCmdRaw(V2.Note prev, V2.Note next)
+        public ConnectNoteCmdRaw(IEditNoteController notes, V2.Note prev, V2.Note next)
         {
+            Notes = notes;
             this.prev = prev;
             this.next = next;
         }
 
-        public bool Commit(ChartCore core)
+        public bool Commit(IChartCore core)
         {
-            return core.notes.ConnectNote(prev, next);
+            return Notes.ConnectNote(prev, next);
         }
 
-        public bool Rollback(ChartCore core)
+        public bool Rollback(IChartCore core)
         {
-            return core.notes.ConnectNote(prev, null);
+            return Notes.ConnectNote(prev, null);
         }
     }
 
@@ -26,16 +28,18 @@
     {
         private V2.Note note;
         private NoteType before;
+        private IEditNoteController Notes;
 
-        public AdjustSlideTickTypeCmd(V2.Note note)
+        public AdjustSlideTickTypeCmd(IEditNoteController notes, V2.Note note)
         {
+            Notes = notes;
             this.note = note;
             before = note.type;
         }
 
-        public bool Commit(ChartCore core)
+        public bool Commit(IChartCore core)
         {
-            var notebase = core.notes.Find(note) as EditorSlideNote;
+            var notebase = Notes.Find(note) as EditorSlideNote;
             if (notebase.prev == null)
                 note.type = NoteType.Single;
             else if (notebase.next == null)
@@ -46,7 +50,7 @@
             return true;
         }
 
-        public bool Rollback(ChartCore core)
+        public bool Rollback(IChartCore core)
         {
             note.type = before;
             core.onNoteModified.Invoke(note);
@@ -56,12 +60,12 @@
 
     public class ConnectNoteCmd : CmdGroup
     {
-        public ConnectNoteCmd(V2.Note prev, V2.Note next)
+        public ConnectNoteCmd(IEditNoteController notes, V2.Note prev, V2.Note next)
         {
-            Add(new ConnectNoteCmdRaw(prev, next));
-            Add(new ChangeTickStackCmd(next, prev.tickStack));
-            Add(new AdjustSlideTickTypeCmd(prev));
-            Add(new AdjustSlideTickTypeCmd(next));
+            Add(new ConnectNoteCmdRaw(notes, prev, next));
+            Add(new ChangeTickStackCmd(notes, next, prev.tickStack));
+            Add(new AdjustSlideTickTypeCmd(notes, prev));
+            Add(new AdjustSlideTickTypeCmd(notes, next));
         }
     }
 }

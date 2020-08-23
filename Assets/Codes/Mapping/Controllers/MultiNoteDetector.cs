@@ -38,7 +38,7 @@ public class MultiNoteDetector
     private Dictionary<V2.Note, NotePosition> NoteToPosition = new Dictionary<V2.Note, NotePosition>();
     private Dictionary<NotePosition, int> PositionCount = new Dictionary<NotePosition, int>();
 
-    public MultiNoteDetector(ChartCore core)
+    public MultiNoteDetector(IChartCore core)
     {
         core.onNoteYModified.AddListener(OnNoteModified);
     }

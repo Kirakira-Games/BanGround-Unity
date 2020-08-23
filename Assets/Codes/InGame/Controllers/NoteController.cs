@@ -430,7 +430,7 @@ public class NoteController : MonoBehaviour, INoteController
         };
 
         // Game BGM
-        audioManager.DelayPlayInGameBGM(audioTimelineSync, KiraFilesystem.Instance.Read(dataLoader.GetMusicPath(chartListManager.current.header.mid)), WARM_UP_SECOND, cancellationToken);
+        _ = audioManager.DelayPlayInGameBGM(audioTimelineSync, KiraFilesystem.Instance.Read(dataLoader.GetMusicPath(chartListManager.current.header.mid)), WARM_UP_SECOND, cancellationToken);
 
         // Background
         var background = GameObject.Find("InGameBackground").GetComponent<InGameBackground>();

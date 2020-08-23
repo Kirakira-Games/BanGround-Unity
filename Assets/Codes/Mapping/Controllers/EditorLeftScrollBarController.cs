@@ -2,11 +2,17 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Zenject;
 
 namespace BGEditor
 {
-    public class EditorLeftScrollBarController : CoreMonoBehaviour, IDragHandler, IPointerDownHandler, IPointerUpHandler
+    public class EditorLeftScrollBarController : MonoBehaviour, IDragHandler, IPointerDownHandler, IPointerUpHandler
     {
+        [Inject]
+        private IChartCore Core;
+        [Inject]
+        private IEditorInfo Editor;
+
         public Canvas canvas;
         public Image PosIndicator;
         public float PaddingBottom;
@@ -27,7 +33,7 @@ namespace BGEditor
 
         private void Seek(Vector2 pos)
         {
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, pos, Cam, out var point);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, pos, Core.cam, out var point);
             float x = Mathf.InverseLerp(PaddingBottom, rectTransform.rect.height - PaddingTop, point.y);
             Core.SeekGrid(Mathf.Lerp(0, Editor.maxHeight, x));
         }

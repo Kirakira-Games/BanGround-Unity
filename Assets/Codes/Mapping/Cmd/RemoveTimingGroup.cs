@@ -10,13 +10,15 @@ namespace BGEditor
     {
         private int index;
         private V2.TimingGroup group;
+        private IEditorInfo Editor;
 
-        public RemoveTimingGroupCmd(int index)
+        public RemoveTimingGroupCmd(IEditorInfo editor, int index)
         {
+            Editor = editor;
             this.index = index;
         }
 
-        public bool Commit(ChartCore core)
+        public bool Commit(IChartCore core)
         {
             var groups = core.chart.groups;
             if (index < 0 || index >= groups.Count)
@@ -25,15 +27,15 @@ namespace BGEditor
 
             core.chart.groups.RemoveAt(index);
             group.notes.ForEach(core.multinote.Remove);
-            if (core.editor.currentTimingGroup == core.chart.groups.Count)
-                core.editor.currentTimingGroup--;
+            if (Editor.currentTimingGroup == core.chart.groups.Count)
+                Editor.currentTimingGroup--;
             group.notes.ForEach(note => note.group = -1);
-            ChartCore.AssignTimingGroups(core.chart);
+            core.AssignTimingGroups(core.chart);
             core.onTimingGroupModified.Invoke();
             return true;
         }
 
-        public bool Rollback(ChartCore core)
+        public bool Rollback(IChartCore core)
         {
             var groups = core.chart.groups;
             if (index == groups.Count)
@@ -41,8 +43,8 @@ namespace BGEditor
             else
                 groups.Insert(index, group);
             group.notes.ForEach(core.multinote.Put);
-            core.editor.currentTimingGroup = index;
-            ChartCore.AssignTimingGroups(core.chart);
+            Editor.currentTimingGroup = index;
+            core.AssignTimingGroups(core.chart);
             core.onTimingGroupModified.Invoke();
             return true;
         }

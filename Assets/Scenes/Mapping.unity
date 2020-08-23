@@ -9460,15 +9460,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ece04c4295bc9cc4b8ff121c14b4eedd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  grid: {fileID: 1672627265}
-  notes: {fileID: 1672627268}
-  timing: {fileID: 254423521}
-  progress: {fileID: 1111323045}
-  hotkey: {fileID: 810050436}
-  cam: {fileID: 458680988}
-  tooltip: {fileID: 0}
-  scriptEditorCanvas: {fileID: 1509019626}
   scriptEditor: {fileID: 1631110703}
+  Camera: {fileID: 458680988}
+  timing: {fileID: 254423521}
+  hotkey: {fileID: 810050436}
   SingleNote: {fileID: 985738360263098538, guid: e45a170f490e79349aa6e7ad13ac6b6f,
     type: 3}
   FlickNote: {fileID: 5839510501118655355, guid: 523916279e41b9545973aed8a13b6336,
@@ -9477,46 +9472,6 @@ MonoBehaviour:
     type: 3}
   GridInfoText: {fileID: 7387886436271677611, guid: be2205417beacb142bddf254ce7b8303,
     type: 3}
-  Blocker: {fileID: 1394433297}
-  onTimingModified:
-    m_PersistentCalls:
-      m_Calls: []
-  onGridMoved:
-    m_PersistentCalls:
-      m_Calls: []
-  onGridModifed:
-    m_PersistentCalls:
-      m_Calls: []
-  onToolSwitched:
-    m_PersistentCalls:
-      m_Calls: []
-  onAudioLoaded:
-    m_PersistentCalls:
-      m_Calls: []
-  onChartLoaded:
-    m_PersistentCalls:
-      m_Calls: []
-  onUserChangeAudioProgress:
-    m_PersistentCalls:
-      m_Calls: []
-  onYPosModified:
-    m_PersistentCalls:
-      m_Calls: []
-  onYFilterSwitched:
-    m_PersistentCalls:
-      m_Calls: []
-  onSpeedViewSwitched:
-    m_PersistentCalls:
-      m_Calls: []
-  onTimingPointModified:
-    m_PersistentCalls:
-      m_Calls: []
-  onTimingGroupModified:
-    m_PersistentCalls:
-      m_Calls: []
-  onTimingGroupSwitched:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!4 &810050435
 Transform:
   m_ObjectHideFlags: 0
@@ -10012,6 +9967,7 @@ MonoBehaviour:
   blockers:
   - {fileID: 1394433293}
   - {fileID: 31939947}
+  - {fileID: 1509019626}
 --- !u!1 &820030678
 GameObject:
   m_ObjectHideFlags: 0
@@ -10561,6 +10517,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6ad58574f252784eb77107974628c08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  chartCore: {fileID: 810050434}
+  editNoteController: {fileID: 1672627268}
+  audioProgress: {fileID: 1111323045}
+  blocker: {fileID: 1394433297}
+  gridController: {fileID: 1672627265}
 --- !u!114 &895990084
 MonoBehaviour:
   m_ObjectHideFlags: 0

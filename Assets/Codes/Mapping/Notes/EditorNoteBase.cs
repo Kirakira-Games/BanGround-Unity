@@ -1,11 +1,21 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Zenject;
 
 namespace BGEditor
 {
-    public abstract class EditorNoteBase : CoreMonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler
+    public abstract class EditorNoteBase : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler
     {
+        [Inject]
+        protected IChartCore Core;
+        [Inject]
+        protected IEditNoteController Notes;
+        [Inject]
+        protected IGridController Grid;
+        [Inject]
+        protected IEditorInfo Editor;
+
         public V2.Note note { get; private set; }
         public Image image;
         public Slider YSlider;
@@ -130,14 +140,14 @@ namespace BGEditor
                 {
                     if (Editor.yDivision == 0 && note.lane < 0)
                     {
-                        Core.Commit(new ChangeNoteYCmd(note, float.NaN));
+                        Core.Commit(new ChangeNoteYCmd(Notes, note, float.NaN));
                     }
                     else
                     {
                         float val = YSlider.value / YSlider.maxValue;
                         if (note.lane >= 0 || !Mathf.Approximately(note.y, val))
                         {
-                            Core.Commit(new ChangeNoteYCmd(note, val));
+                            Core.Commit(new ChangeNoteYCmd(Notes, note, val));
                         }
                     }
                 }
@@ -186,15 +196,15 @@ namespace BGEditor
         #endregion
 
         #region View
-        protected static bool IsOutOfBound(EditorNoteBase note)
+        protected bool IsStrictlyOutOfBound()
         {
-            int bar = note.note.beat[0];
+            int bar = note.beat[0];
             return bar < Grid.StartBar || bar > Grid.EndBar;
         }
 
         protected virtual bool IsOutOfBound()
         {
-            return IsOutOfBound(this);
+            return IsStrictlyOutOfBound();
         }
 
         protected Color GetColor(bool selected, bool active)

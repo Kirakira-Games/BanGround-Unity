@@ -11,12 +11,12 @@ namespace BGEditor
             this.note = note;
         }
 
-        public bool Commit(ChartCore core)
+        public bool Commit(IChartCore core)
         {
             return core.RemoveNote(note);
         }
 
-        public bool Rollback(ChartCore core)
+        public bool Rollback(IChartCore core)
         {
             return core.CreateNote(note);
         }

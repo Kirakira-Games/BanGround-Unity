@@ -3,28 +3,32 @@ namespace BGEditor
 {
     class ChangeYLayerCmd : IEditorCmd
     {
-        float prev;
-        float target;
-        V2.Note[] selected;
+        private float prev;
+        private float target;
+        private V2.Note[] selected;
+        private IEditNoteController Notes;
+        private IEditorInfo Editor;
 
-        public ChangeYLayerCmd(float target)
+        public ChangeYLayerCmd(IEditNoteController notes, IEditorInfo editor, float target)
         {
+            Notes = notes;
+            Editor = editor;
             this.target = target;
         }
 
-        public bool Commit(ChartCore core)
+        public bool Commit(IChartCore core)
         {
-            prev = core.editor.yPos;
-            selected = core.notes.GetSelectedNotes();
+            prev = Editor.yPos;
+            selected = Notes.GetSelectedNotes();
             core.SetY(target);
-            core.notes.MoveY(selected, target);
+            Notes.MoveY(selected, target);
             return true;
         }
 
-        public bool Rollback(ChartCore core)
+        public bool Rollback(IChartCore core)
         {
             core.SetY(prev);
-            core.notes.MoveY(selected, prev);
+            Notes.MoveY(selected, prev);
             return true;
         }
     }

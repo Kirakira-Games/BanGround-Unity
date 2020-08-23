@@ -16,7 +16,7 @@ namespace BGEditor
             this.point = point;
         }
 
-        public bool Commit(ChartCore core)
+        public bool Commit(IChartCore core)
         {
             group = core.group;
             float beat = ChartUtility.BeatToFloat(point.beat);
@@ -38,7 +38,7 @@ namespace BGEditor
             return true;
         }
 
-        public bool Rollback(ChartCore core)
+        public bool Rollback(IChartCore core)
         {
             group.points.Remove(point);
             core.onTimingPointModified.Invoke();

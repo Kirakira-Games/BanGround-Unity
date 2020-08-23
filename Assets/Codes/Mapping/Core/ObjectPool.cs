@@ -1,26 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
 
 namespace BGEditor
 {
-    public class ObjectPool
+    public class ObjectPool : IObjectPool
     {
         private Dictionary<Type, LinkedList<GameObject>> pool;
         private Dictionary<GameObject, Type> typeLookup;
         private HashSet<GameObject> recycledThisFrame;
 
-        private ChartCore Core;
+        [Inject]
+        private IGridController Grid;
+        [Inject]
+        private DiContainer diContainer;
+
+        private GameObject SingleNote;
+        private GameObject FlickNote;
+        private GameObject SlideNote;
+        private GameObject GridInfoText;
+
+        public void Init(GameObject SingleNote, GameObject FlickNote, GameObject SlideNote, GameObject GridInfoText)
+        {
+            this.SingleNote = SingleNote;
+            this.FlickNote = FlickNote;
+            this.SlideNote = SlideNote;
+            this.GridInfoText = GridInfoText;
+        }
 
         public ObjectPool()
         {
             pool = new Dictionary<Type, LinkedList<GameObject>>();
-            Core = ChartCore.Instance;
             typeLookup = new Dictionary<GameObject, Type>();
             recycledThisFrame = new HashSet<GameObject>();
         }
 
-        public GameObject Create<T>() where T: MonoBehaviour
+        public GameObject Create<T>() where T : MonoBehaviour
         {
             var type = typeof(T);
             if (!pool.ContainsKey(type))
@@ -31,19 +47,19 @@ namespace BGEditor
                 GameObject obj;
                 if (type.Equals(typeof(EditorSingleNote)))
                 {
-                    obj = GameObject.Instantiate(Core.SingleNote, Core.grid.transform);
+                    obj = diContainer.InstantiatePrefab(SingleNote, Grid.transform);
                 }
                 else if (type.Equals(typeof(EditorFlickNote)))
                 {
-                    obj = GameObject.Instantiate(Core.FlickNote, Core.grid.transform);
+                    obj = diContainer.InstantiatePrefab(FlickNote, Grid.transform);
                 }
                 else if (type.Equals(typeof(EditorSlideNote)))
                 {
-                    obj = GameObject.Instantiate(Core.SlideNote, Core.grid.transform);
+                    obj = diContainer.InstantiatePrefab(SlideNote, Grid.transform);
                 }
                 else if (type.Equals(typeof(GridInfoText)))
                 {
-                    obj = GameObject.Instantiate(Core.GridInfoText, Core.grid.transform);
+                    obj = diContainer.InstantiatePrefab(GridInfoText, Grid.transform);
                 }
                 else
                 {

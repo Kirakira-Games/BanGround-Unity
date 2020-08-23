@@ -17,9 +17,6 @@ namespace BGEditor
 
         public static void Init(ChartCore core)
         {
-            // Load music
-            core.progress.Init();
-
             core.StartCoroutine(InitCoroutine(core));
         }
     }

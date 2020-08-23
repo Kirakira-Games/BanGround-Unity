@@ -6,32 +6,34 @@ namespace BGEditor
     {
         private V2.Note prev;
         private V2.Note next;
+        private IEditNoteController Notes;
 
-        public DisconnectNoteCmdRaw(V2.Note prev, V2.Note next)
+        public DisconnectNoteCmdRaw(IEditNoteController notes, V2.Note prev, V2.Note next)
         {
+            Notes = notes;
             this.prev = prev;
             this.next = next;
         }
 
-        public bool Commit(ChartCore core)
+        public bool Commit(IChartCore core)
         {
-            return core.notes.ConnectNote(prev, null);
+            return Notes.ConnectNote(prev, null);
         }
 
-        public bool Rollback(ChartCore core)
+        public bool Rollback(IChartCore core)
         {
-            return core.notes.ConnectNote(prev, next);
+            return Notes.ConnectNote(prev, next);
         }
     }
 
     public class DisconnectNoteCmd : CmdGroup
     {
-        public DisconnectNoteCmd(V2.Note prev, V2.Note next, EditNoteController controller)
+        public DisconnectNoteCmd(IEditNoteController notes, V2.Note prev, V2.Note next)
         {
-            Add(new DisconnectNoteCmdRaw(prev, next));
-            Add(new ChangeTickStackCmd(next, controller.slideIdPool.RegisterNext()));
-            Add(new AdjustSlideTickTypeCmd(prev));
-            Add(new AdjustSlideTickTypeCmd(next));
+            Add(new DisconnectNoteCmdRaw(notes, prev, next));
+            Add(new ChangeTickStackCmd(notes, next, notes.slideIdPool.RegisterNext()));
+            Add(new AdjustSlideTickTypeCmd(notes, prev));
+            Add(new AdjustSlideTickTypeCmd(notes, next));
         }
     }
 }

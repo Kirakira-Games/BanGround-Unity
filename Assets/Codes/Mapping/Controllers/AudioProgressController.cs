@@ -1,15 +1,13 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEngine.UI;
 using AudioProvider;
 using System;
-using FMOD;
 using Zenject;
 using System.IO;
 
 namespace BGEditor
 {
-    public class AudioProgressController : CoreMonoBehaviour
+    public class AudioProgressController : MonoBehaviour, IAudioProgressController
     {
         [Inject]
         private IDataLoader dataLoader;
@@ -19,6 +17,10 @@ namespace BGEditor
         private IChartListManager chartListManager;
         [Inject]
         private IResourceLoader resourceLoader;
+        [Inject]
+        private IChartCore Core;
+        [Inject]
+        private IEditorInfo Editor;
 
         public Text TimeText;
         public Slider AudioProgressSlider;
@@ -39,15 +41,15 @@ namespace BGEditor
         private float lastTime;
         private float lastTimeRecorded;
 
-        public static float TimeToScrollPos(float time)
+        public float TimeToScrollPos(float time)
         {
-            float beat = Chart.TimeToBeat(time);
+            float beat = Core.chart.TimeToBeat(time);
             return Editor.barHeight * beat;
         }
 
-        public static float ScrollPosToTime(float pos)
+        public float ScrollPosToTime(float pos)
         {
-            return Chart.BeatToTime(pos / Editor.barHeight);
+            return Core.chart.BeatToTime(pos / Editor.barHeight);
         }
 
         public void Refresh()
@@ -118,14 +120,14 @@ namespace BGEditor
         public async void Init()
         {
             byte[] audio = KiraFilesystem.Instance.Read(dataLoader.GetMusicPath(chartListManager.current.header.mid));
-            var hack = SettingAndMod.instance;
             // Load BGM
             audioManager.gameBGM = await audioManager.Provider.StreamTrack(audio);
             bgm.Play();
             bgm.Pause();
 
             // Add listeners
-            AudioProgressSlider.onValueChanged.AddListener((value) => {
+            AudioProgressSlider.onValueChanged.AddListener((value) =>
+            {
                 Core.SeekGrid(TimeToScrollPos(value * audioLength / 1000f), true);
                 Core.onUserChangeAudioProgress.Invoke();
             });
@@ -165,11 +167,11 @@ namespace BGEditor
                     lastTime = time;
                     lastTimeRecorded = Time.realtimeSinceStartup;
                 }
-                float beat = Chart.TimeToBeat(time);
+                float beat = Core.chart.TimeToBeat(time);
                 Core.SeekGrid(beat * Editor.barHeight, true);
                 if (SEToggle.isOn && !float.IsNaN(lastBeat))
                 {
-                    Group.notes.ForEach(note =>
+                    Core.group.notes.ForEach(note =>
                     {
                         if (note.type == NoteType.BPM)
                             return;

@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using Zenject;
 
 namespace BGEditor
 {
-    public class YSnapController : CoreMonoBehaviour
+    public class YSnapController : MonoBehaviour
     {
         public int[] Ys;
         public int DefaultIndex;
@@ -13,13 +14,19 @@ namespace BGEditor
         public Toggle YFilter;
 
         private Dropdown dropdown;
+        [Inject]
+        private IEditorInfo Editor;
+        [Inject]
+        private IChartCore Core;
+        [Inject]
+        private IEditNoteController Notes;
 
         private void HandleSnapChange(int index)
         {
             int target = index == 0 ? 0 : Ys[index - 1];
             if (Editor.yDivision == target)
                 return;
-            Core.Commit(new ChangeYSnapCmd(target));
+            Core.Commit(new ChangeYSnapCmd(Editor, target));
         }
 
         private void HandleYChange(float newY)
@@ -29,7 +36,7 @@ namespace BGEditor
             float target = newY / Editor.yDivision;
             if (Mathf.Approximately(Editor.yPos, target))
                 return;
-            Core.Commit(new ChangeYLayerCmd(target));
+            Core.Commit(new ChangeYLayerCmd(Notes, Editor, target));
         }
 
         private void RefreshText()

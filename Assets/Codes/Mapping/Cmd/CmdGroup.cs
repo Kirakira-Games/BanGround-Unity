@@ -6,7 +6,7 @@ namespace BGEditor
     {
         public LinkedList<IEditorCmd> cmds = new LinkedList<IEditorCmd>();
 
-        public virtual bool Commit(ChartCore core)
+        public virtual bool Commit(IChartCore core)
         {
             for (var i = cmds.First; i != null; i = i.Next)
             {
@@ -24,7 +24,7 @@ namespace BGEditor
             return true;
         }
 
-        public virtual bool Rollback(ChartCore core)
+        public virtual bool Rollback(IChartCore core)
         {
             for (var i = cmds.Last; i != null; i = i.Previous)
             {

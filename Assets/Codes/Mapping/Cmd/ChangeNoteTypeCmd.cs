@@ -19,14 +19,14 @@ namespace BGEditor
             after = type;
         }
 
-        public bool Commit(ChartCore core)
+        public bool Commit(IChartCore core)
         {
             note.type = after;
             core.onNoteModified.Invoke(note);
             return true;
         }
 
-        public bool Rollback(ChartCore core)
+        public bool Rollback(IChartCore core)
         {
             note.type = before;
             core.onNoteModified.Invoke(note);

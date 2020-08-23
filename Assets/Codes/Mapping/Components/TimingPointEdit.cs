@@ -1,14 +1,18 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
-using System.Text.RegularExpressions;
 using UniRx.Async;
-using FMOD.Studio;
+using Zenject;
 
 namespace BGEditor
 {
-    public class TimingPointEdit : CoreMonoBehaviour
+    public class TimingPointEdit : MonoBehaviour
     {
+        [Inject(Id = "Blocker")]
+        private Button Blocker;
+        [Inject]
+        private IChartCore Core;
+
         public FloatInput Speed;
         public ColorPicker ColorPick;
         public Text BeatText;

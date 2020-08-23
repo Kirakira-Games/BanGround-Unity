@@ -40,7 +40,7 @@ namespace BGEditor
 
         protected override bool IsOutOfBound()
         {
-            if (!IsOutOfBound(this))
+            if (!IsStrictlyOutOfBound())
                 return false;
             if (prev != null && prev.note.beat[0] <= Grid.EndBar && note.beat[0] >= Grid.StartBar)
                 return false;
@@ -163,7 +163,7 @@ namespace BGEditor
                     Debug.Assert(i.isSelected);
                     if (i.prev != null)
                     {
-                        cmds.Add(new DisconnectNoteCmd(i.prev.note, i.note, Notes));
+                        cmds.Add(new DisconnectNoteCmd(Notes, i.prev.note, i.note));
                     }
                     cmds.Add(new RemoveNoteCmd(i.note));
                     i = i.prev;
@@ -179,21 +179,21 @@ namespace BGEditor
             var cmd = new CmdGroup();
             if (prev == null)
             {
-                cmd.Add(new DisconnectNoteCmd(note, next.note, Notes));
+                cmd.Add(new DisconnectNoteCmd(Notes, note, next.note));
                 cmd.Add(new RemoveNoteCmd(note));
                 if (next.next == null)
                     cmd.Add(new RemoveNoteCmd(next.note));
             }
             else if (next == null)
             {
-                cmd.Add(new DisconnectNoteCmd(prev.note, note, Notes));
+                cmd.Add(new DisconnectNoteCmd(Notes, prev.note, note));
                 cmd.Add(new RemoveNoteCmd(note));
                 if (prev.prev == null)
                     cmd.Add(new RemoveNoteCmd(prev.note));
             }
             else
             {
-                cmd.Add(new DisconnectNoteCmd(note, next.note, Notes));
+                cmd.Add(new DisconnectNoteCmd(Notes, note, next.note));
                 if (next.next == null)
                     cmd.Add(new RemoveNoteCmd(next.note));
             }
@@ -221,7 +221,7 @@ namespace BGEditor
                 var prev = Notes.singleSlideSelected;
                 if (prev != null)
                 {
-                    Core.Commit(new ConnectNoteCmd(prev.note, note));
+                    Core.Commit(new ConnectNoteCmd(Notes, prev.note, note));
                     return;
                 }
             }

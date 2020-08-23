@@ -7,24 +7,26 @@ namespace BGEditor
         private V2.Note note;
         private float before;
         private float after;
+        private IEditNoteController Notes;
 
-        public ChangeNoteYCmd(V2.Note note, float y)
+        public ChangeNoteYCmd(IEditNoteController notes, V2.Note note, float y)
         {
+            Notes = notes;
             this.note = note;
             after = y;
         }
 
-        public bool Commit(ChartCore core)
+        public bool Commit(IChartCore core)
         {
             before = note.yOrNaN;
-            core.notes.MoveY(note, after);
+            Notes.MoveY(note, after);
             core.onNoteModified.Invoke(note);
             return true;
         }
 
-        public bool Rollback(ChartCore core)
+        public bool Rollback(IChartCore core)
         {
-            core.notes.MoveY(note, before);
+            Notes.MoveY(note, before);
             core.onNoteModified.Invoke(note);
             return true;
         }
