@@ -23,6 +23,8 @@ public class UIManager : MonoBehaviour
     private IAudioTimelineSync audioTimelineSync;
     [Inject]
     private INoteController noteController;
+    [Inject]
+    private IInGameBackground inGameBackground;
 
     private const float BiteTime = 2;
 
@@ -115,7 +117,7 @@ public class UIManager : MonoBehaviour
         {
             return;
         }
-        InGameBackground.instance.pauseVideo();
+        inGameBackground.pauseVideo();
         Time.timeScale = 0;
         audioTimelineSync.Pause();
         audioManager.gameBGM.Pause();
@@ -161,10 +163,10 @@ public class UIManager : MonoBehaviour
         {
             currentTime -= Time.deltaTime;
             audioTimelineSync.time = currentTime;
-            InGameBackground.instance.seekVideo(currentTime);
-            InGameBackground.instance.playVideo();
+            inGameBackground.seekVideo(currentTime);
+            inGameBackground.playVideo();
             await UniTask.DelayFrame(0);
-            InGameBackground.instance.pauseVideo();
+            inGameBackground.pauseVideo();
             if (SM.Current != State.Rewinding)
             {
                 await UniTask.WaitUntil(() => SM.Current == State.Rewinding, cancellationToken: token);
@@ -177,8 +179,8 @@ public class UIManager : MonoBehaviour
         await UniTask.WaitUntil(() => bgm.GetPlaybackTime() != pauseTime, cancellationToken: token);
         audioTimelineSync.timeInMs = (int)bgm.GetPlaybackTime();
         audioTimelineSync.Play();
-        InGameBackground.instance.seekVideo(bgm.GetPlaybackTime()/1000f);
-        InGameBackground.instance.playVideo();
+        inGameBackground.seekVideo(bgm.GetPlaybackTime()/1000f);
+        inGameBackground.playVideo();
 
         if (SM.Current != State.Rewinding)
             await UniTask.WaitUntil(() => SM.Current == State.Rewinding, cancellationToken: token);
@@ -226,7 +228,7 @@ public class UIManager : MonoBehaviour
         if (chartListManager.offsetAdjustMode)
             restart = true;
 
-        InGameBackground.instance.stopVideo();
+        inGameBackground.stopVideo();
         audioManager.gameBGM?.Dispose();
         audioManager.gameBGM = null;
         ShowResult(restart);

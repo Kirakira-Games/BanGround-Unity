@@ -15,8 +15,8 @@ public class AudioManager : MonoBehaviour, IAudioManager
     public IAudioProvider Provider { get; private set; }
     [Inject]
     private IModManager modManager;
-    [Inject]
-    private IMessageBannerController messageBannerController;
+    [Inject(Optional = true)]
+    private IInGameBackground inGameBackground;
 
     public ISoundTrack gameBGM { get; set; }
 
@@ -162,7 +162,7 @@ public class AudioManager : MonoBehaviour, IAudioManager
 
         if (UIManager.Instance.SM.Count > 1)
             await UniTask.WaitUntil(() => UIManager.Instance.SM.Count == 1, cancellationToken: cts.Token);
-        InGameBackground.instance.playVideo();
+        inGameBackground.playVideo();
         gameBGM.Play();
         UIManager.Instance.SM.Transit(State.Loading, State.Playing);
 

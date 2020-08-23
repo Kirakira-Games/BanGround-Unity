@@ -8,24 +8,21 @@ using UnityEngine.Networking;
 using Zenject;
 
 #pragma warning disable 0649
-public class InGameBackground : MonoBehaviour
+public class InGameBackground : MonoBehaviour, IInGameBackground
 {
     [Inject]
     private IModManager modManager;
     //[SerializeField] private Texture defaultTex;
-    [SerializeField] 
+    [SerializeField]
     private Material bgSkybox;
     private Material cacheMat = null;
     private MeshRenderer mesh;
     private VideoPlayer vp;
 
-    public static InGameBackground instance;
-
     static KVarRef r_brightness_bg = new KVarRef("r_brightness_bg");
 
     private void Awake()
     {
-        instance = this;
         mesh = GetComponent<MeshRenderer>();
         Color color = new Color(r_brightness_bg, r_brightness_bg, r_brightness_bg);
         Material mat = Instantiate(bgSkybox);
@@ -104,7 +101,7 @@ public class InGameBackground : MonoBehaviour
                 pauseVideo();
                 mesh.enabled = false;
                 vp.targetCameraAlpha = r_brightness_bg;
-                foreach(ModBase m in modManager.attachedMods)
+                foreach (ModBase m in modManager.attachedMods)
                 {
                     if (m is AudioMod)
                         vp.playbackSpeed = (m as AudioMod).SpeedCompensation;
