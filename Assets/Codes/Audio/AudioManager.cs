@@ -15,6 +15,8 @@ public class AudioManager : MonoBehaviour, IAudioManager
     public IAudioProvider Provider { get; private set; }
     [Inject]
     private IModManager modManager;
+    [Inject]
+    private IMessageBannerController messageBannerController;
 
     public ISoundTrack gameBGM { get; set; }
 
@@ -104,7 +106,7 @@ public class AudioManager : MonoBehaviour, IAudioManager
             }
             else
             {
-                MessageBannerController.ShowMsg(LogLevel.INFO, "Tap Again to End The Game");
+                messageBannerController.ShowMsg(LogLevel.INFO, "Tap Again to End The Game");
             }
         }
 

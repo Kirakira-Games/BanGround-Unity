@@ -19,6 +19,8 @@ public class ChartCreator : MonoBehaviour
     private IChartListManager chartListManager;
     [Inject(Id = "cl_lastdiff")]
     private KVar cl_lastdiff;
+    [Inject]
+    private IMessageBannerController messageBannerController;
 
     public const int ChartVersion = 1;
     public Button Blocker;
@@ -114,7 +116,7 @@ public class ChartCreator : MonoBehaviour
         int difficulty = SelectedDifficulty();
         if (difficulty == -1)
         {
-            MessageBannerController.ShowMsg(LogLevel.INFO, "Please select a difficulty.");
+            messageBannerController.ShowMsg(LogLevel.INFO, "Please select a difficulty.");
             return;
         }
         // Create header
@@ -138,12 +140,12 @@ public class ChartCreator : MonoBehaviour
         int difficulty = SelectedDifficulty();
         if (difficulty == -1)
         {
-            MessageBannerController.ShowMsg(LogLevel.INFO, "Please select a difficulty.");
+            messageBannerController.ShowMsg(LogLevel.INFO, "Please select a difficulty.");
             return;
         }
         if (cHeader.difficultyLevel[difficulty] != -1)
         {
-            MessageBannerController.ShowMsg(LogLevel.INFO, "This difficulty already exists.");
+            messageBannerController.ShowMsg(LogLevel.INFO, "This difficulty already exists.");
             return;
         }
         // Create chart
@@ -166,7 +168,7 @@ public class ChartCreator : MonoBehaviour
         int difficulty = SelectedDifficulty();
         if (difficulty == -1)
         {
-            MessageBannerController.ShowMsg(LogLevel.INFO, "Please select a difficulty.");
+            messageBannerController.ShowMsg(LogLevel.INFO, "Please select a difficulty.");
             return;
         }
 
@@ -207,7 +209,7 @@ public class ChartCreator : MonoBehaviour
                 {
                     if (new string(br.ReadChars(4)) != "OggS")
                     {
-                        MessageBannerController.ShowMsg(LogLevel.ERROR, "YOU MUST DROP A PROPPER OGG FILE TO CONTINUE!!!");
+                        messageBannerController.ShowMsg(LogLevel.ERROR, "YOU MUST DROP A PROPPER OGG FILE TO CONTINUE!!!");
 
                         throw new InvalidDataException("YOU MUST DROP A PROPPER OGG FILE TO CONTINUE!!!");
                     }
@@ -246,7 +248,7 @@ public class ChartCreator : MonoBehaviour
         }
         catch (System.OperationCanceledException)
         {
-            MessageBannerController.ShowMsg(LogLevel.INFO, "Canceled");
+            messageBannerController.ShowMsg(LogLevel.INFO, "Canceled");
 
             RequestAirdrop = false;
             AirdroppedFile = null;
@@ -262,6 +264,6 @@ public class ChartCreator : MonoBehaviour
 
     public void 还没做好()
     {
-        MessageBannerController.ShowMsg(LogLevel.INFO, "Coming soon!");
+        messageBannerController.ShowMsg(LogLevel.INFO, "Coming soon!");
     }
 }

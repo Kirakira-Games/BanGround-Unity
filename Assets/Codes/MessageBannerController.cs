@@ -10,7 +10,7 @@ class MessageQueueItem
     public bool autoClose;
 }
 
-public class MessageBannerController : MonoBehaviour
+public class MessageBannerController : MonoBehaviour, IMessageBannerController
 {
     //public static MessageBoxController Instance { get; private set; }
 
@@ -23,7 +23,7 @@ public class MessageBannerController : MonoBehaviour
     //Resize
     private LayoutElement layout;
 
-    private static Queue<MessageQueueItem> msgQueue = new Queue<MessageQueueItem>();
+    private Queue<MessageQueueItem> msgQueue = new Queue<MessageQueueItem>();
 
     private void Awake()
     {
@@ -63,7 +63,7 @@ public class MessageBannerController : MonoBehaviour
     /// </summary>
     /// <param name="level"></param>
     /// <param name="content"></param>
-    public static void ShowMsg(LogLevel level, string content, bool autoClose = true)
+    public void ShowMsg(LogLevel level, string content, bool autoClose = true)
     {
         msgQueue.Enqueue(new MessageQueueItem
         {

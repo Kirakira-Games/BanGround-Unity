@@ -30,6 +30,8 @@ public class DataLoader : IDataLoader
 
     [Inject]
     private IChartVersion chartVersion;
+    [Inject]
+    private IMessageBannerController messageBannerController;
     [Inject(Id = "cl_lastdiff")]
     private KVar cl_lastdiff;
     [Inject(Id = "cl_lastsid")]
@@ -545,7 +547,7 @@ public class DataLoader : IDataLoader
         }
         catch (Exception e)
         {
-            MessageBannerController.ShowMsg(LogLevel.ERROR,
+            messageBannerController.ShowMsg(LogLevel.ERROR,
                 string.Format("Cannot Load {0}: {1}", file.Name, e.Message));
             return -1;
         }
@@ -584,7 +586,7 @@ public class DataLoader : IDataLoader
                 {
                     cl_lastsid.Set(tmp);
                     LoadSuccess = true;
-                    MessageBannerController.ShowMsg(LogLevel.OK, "Loaded kirapack: ".GetLocalized() + file.Name);
+                    messageBannerController.ShowMsg(LogLevel.OK, "Loaded kirapack: ".GetLocalized() + file.Name);
                 }
                 //File.Delete(file.FullName);
                 //}
@@ -593,7 +595,7 @@ public class DataLoader : IDataLoader
         }
         catch (Exception e)
         {
-            MessageBannerController.ShowMsg(LogLevel.ERROR, e.Message, false);
+            messageBannerController.ShowMsg(LogLevel.ERROR, e.Message, false);
         }
         return LoadSuccess;
     }

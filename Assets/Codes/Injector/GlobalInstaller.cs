@@ -1,4 +1,5 @@
 using AudioProvider;
+using BGEditor;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -7,6 +8,9 @@ using Zenject;
 
 public class GlobalInstaller : MonoInstaller
 {
+    public MessageBannerController messageBannerController;
+    public MessageBox messageBox;
+
     private IKVSystem kvSystem;
     private IDataLoader dataLoader;
 
@@ -57,6 +61,10 @@ public class GlobalInstaller : MonoInstaller
 
         // Resource Loader
         Container.Bind<IResourceLoader>().To<ResourceLoader>().AsSingle().NonLazy();
+
+        // Message Canvas
+        Container.Bind<IMessageBox>().FromInstance(messageBox);
+        Container.Bind<IMessageBannerController>().FromInstance(messageBannerController);
     }
 
     void RegisterKonCommands()

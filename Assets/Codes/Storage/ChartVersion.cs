@@ -4,12 +4,15 @@ using UniRx.Async;
 using System;
 using Newtonsoft.Json;
 using Zenject;
+using BGEditor;
 
 public class ChartVersion : IChartVersion
 {
     public static IChartVersion Instance; // Temporary singleton for refactoring. TODO: Remove.
     [Inject]
     private IDataLoader dataLoader;
+    [Inject]
+    private IMessageBox messageBox;
 
     const int VERSION = 2;
 
@@ -48,7 +51,7 @@ public class ChartVersion : IChartVersion
             {
                 return null;
             }
-            if (!await BGEditor.MessageBox.ShowMessage("Unsupported chart",
+            if (!await messageBox.ShowMessage("Unsupported chart",
                 "This chart uses an unsupported standard.\nConvert? (animations and speed information will be lost)"))
             {
                 return null;
@@ -57,7 +60,7 @@ public class ChartVersion : IChartVersion
         }
         else if (CanConvert(chart.version))
         {
-            if (!await BGEditor.MessageBox.ShowMessage("Outdated chart",
+            if (!await messageBox.ShowMessage("Outdated chart",
                 "This chart uses a deprecated standard.\nBut you can still play it without conversion.\nConvert? (animations and speed information will be lost)"))
             {
                 return dataLoader.LoadChart<V2.Chart>(header.sid, difficulty);

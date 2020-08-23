@@ -3,46 +3,42 @@ using UniRx.Async;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace BGEditor
+public class MessageBox : MonoBehaviour, IMessageBox
 {
-    class MessageBox : MonoBehaviour
+    public Text Title;
+    public Text Content;
+    public Button Blocker;
+    private int result;
+
+    private void Awake()
     {
-        public static MessageBox Instance = null;
-        public Text Title = null;
-        public Text Content = null;
-        public Button Blocker = null;
-        public int result { get; private set; }
+        gameObject.SetActive(false);
+    }
 
-        private void Awake()
-        {
-            Instance = this;
-            gameObject.SetActive(false);
-            //DontDestroyOnLoad(transform.parent.gameObject);
-        }
+    public async UniTask<bool> ShowMessage(string title, string content)
+    {
+        Show(title, content);
+        await UniTask.WaitUntil(() => result != -1);
+        return result == 1;
+    }
 
-        public static async UniTask<bool> ShowMessage(string title, string content)
-        {
-            Instance.Show(title, content);
-            await UniTask.WaitUntil(() => Instance.result != -1);
-            return Instance.result == 1;
-        }
+    public bool isActive => gameObject.activeSelf;
 
-        public void Show(string title, string content)
-        {
-            if (gameObject.activeSelf)
-                throw new InvalidOperationException("Message box is already shown!");
-            Blocker.gameObject.SetActive(true);
-            gameObject.SetActive(true);
-            Title.text = title;
-            Content.text = content;
-            result = -1;
-        }
+    private void Show(string title, string content)
+    {
+        if (gameObject.activeSelf)
+            throw new InvalidOperationException("Message box is already shown!");
+        Blocker.gameObject.SetActive(true);
+        gameObject.SetActive(true);
+        Title.text = title;
+        Content.text = content;
+        result = -1;
+    }
 
-        public void SetResult(int res)
-        {
-            result = res;
-            Blocker.gameObject.SetActive(false);
-            gameObject.SetActive(false);
-        }
+    public void SetResult(int res)
+    {
+        result = res;
+        Blocker.gameObject.SetActive(false);
+        gameObject.SetActive(false);
     }
 }

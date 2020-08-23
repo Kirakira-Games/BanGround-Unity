@@ -14,11 +14,13 @@ namespace AudioProvider
 {
     internal class FMODUtil
     {
+        public static IMessageBannerController messageBannerController;
+
         internal static void ErrCheck(RESULT result)
         {
             if (result != RESULT.OK)
                 //throw new Exception($"FMOD Error! Result code: {Enum.GetName(typeof(RESULT), result)}");
-                MessageBannerController.ShowMsg(LogLevel.ERROR, Enum.GetName(typeof(RESULT), result), false);
+                messageBannerController.ShowMsg(LogLevel.ERROR, Enum.GetName(typeof(RESULT), result), false);
         }
     }
 
@@ -321,9 +323,13 @@ namespace AudioProvider
 
         [Inject(Id = "snd_output")]
         private KVar snd_output;
+        [Inject]
+        private IMessageBannerController messageBannerController;
 
         public void Init(int sampleRate, uint bufferLength)
         {
+            FMODUtil.messageBannerController = messageBannerController;
+
             int ao_output = snd_output;
             FMODUtil.ErrCheck(
                 Factory.System_Create(out fmodSystem)

@@ -27,6 +27,8 @@ public class ChartListManager : IChartListManager
     private KVar cl_lastsid;
     [Inject(Id = "cl_lastdiff")]
     private KVar cl_lastdiff;
+    [Inject]
+    private IMessageBannerController messageBannerController;
 
     public List<cHeader> chartList => dataLoader.chartList;
 
@@ -146,7 +148,7 @@ public class ChartListManager : IChartListManager
         chart = await ChartVersion.Instance.Process(current.header, current.difficulty);
         if (chart == null)
         {
-            MessageBannerController.ShowMsg(LogLevel.ERROR, "This chart is unsupported.");
+            messageBannerController.ShowMsg(LogLevel.ERROR, "This chart is unsupported.");
             return false;
         }
         try
@@ -162,7 +164,7 @@ public class ChartListManager : IChartListManager
         }
         catch (Exception e)
         {
-            MessageBannerController.ShowMsg(LogLevel.ERROR, e.Message);
+            messageBannerController.ShowMsg(LogLevel.ERROR, e.Message);
             Debug.LogError(e.StackTrace);
             return false;
         }
