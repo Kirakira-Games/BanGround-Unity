@@ -3,11 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 namespace BGEditor
 {
-    public class EditorPreviewPanelController : CoreMonoBehaviour
+    public class EditorPreviewPanelController : MonoBehaviour
     {
+        [Inject]
+        private IChartCore Core;
+        [Inject]
+        private IAudioProgressController Progress;
+        [Inject]
+        private IEditorInfo Editor;
+
         public Color[] FillColors;
         public int NoteHalfHeight;
         public int NoteHalfWidth;
@@ -76,7 +84,7 @@ namespace BGEditor
             Array.Clear(count, 0, count.Length);
             for (int i = 0; i < textures.Length; i++)
                 textures[i].SetPixels(colorArray[i]);
-            Group.notes.ForEach(CreateNote);
+            Core.group.notes.ForEach(CreateNote);
             shouldApply = true;
         }
 

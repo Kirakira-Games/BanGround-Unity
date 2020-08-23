@@ -7,35 +7,24 @@ namespace BGEditor
         Select, Single, Flick, Slide, Delete
     }
 
-    public class EditorInfo
+    public class EditorInfo : IEditorInfo
     {
         public const int MAX_BAR_HEIGHT = 600;
         public const int MIN_BAR_HEIGHT = 60;
 
+        public int yDivision { get; set; }
+        public float yPos { get; set; }
+        public bool yFilter { get; set; }
+        public bool speedView { get; set; }
 
-        public int yDivision;
-        public float yPos;
-        public bool yFilter;
-        public bool speedView;
+        public int gridDivision { get; set; } = 4;
+        public int barHeight { get; set; } = 300;
+        public int numBeats { get; set; } = 100;
 
-        public int gridDivision;
-        public int barHeight;
-        public int numBeats;
-
-        public int currentTimingGroup;
-        public float scrollPos;
-        public EditorTool tool;
+        public int currentTimingGroup { get; set; } = 0;
+        public float scrollPos { get; set; } = 0;
+        public EditorTool tool { get; set; } = EditorTool.Select;
 
         public int maxHeight => barHeight * numBeats;
-
-        public EditorInfo()
-        {
-            gridDivision = 4;
-            barHeight = 400;
-            numBeats = 100;
-            scrollPos = 0;
-            currentTimingGroup = 0;
-            tool = EditorTool.Select;
-        }
     }
 }

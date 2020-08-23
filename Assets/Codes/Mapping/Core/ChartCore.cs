@@ -15,34 +15,39 @@ namespace BGEditor
     public class NoteEvent : UnityEvent<V2.Note> { }
     public class ChangeEvent<T>: UnityEvent<T, T> { }
 
-    public class ChartCore : MonoBehaviour
+    public class ChartCore : MonoBehaviour, IChartCore
     {
-        public static ChartCore Instance;
-
         [Inject]
         private IAudioManager audioManager;
         [Inject]
         private IDataLoader dataLoader;
         [Inject]
         private IChartListManager chartListManager;
+        [Inject]
+        private IEditorInfo editor;
+        [Inject]
+        private IObjectPool pool;
+        [Inject(Id = "Blocker")]
+        private Button Blocker;
+        [Inject]
+        private IAudioProgressController progress;
+        [Inject]
+        private IEditNoteController notes;
 
-        public GridController grid;
-        public EditNoteController notes;
-        public TimingController timing;
-        public AudioProgressController progress;
-        public HotKeyManager hotkey;
-        public Camera cam;
-        public EditorToolTip tooltip;
-        public MultiNoteDetector multinote;
+        public EditorToolTip tooltip { get; private set; }
+        public MultiNoteDetector multinote { get; private set; }
 
-        public GameObject scriptEditorCanvas;
         public ScriptEditor scriptEditor;
+
+        public Camera Camera;
+        public Camera cam => Camera;
+        public TimingController timing;
+        public HotKeyManager hotkey;
 
         public GameObject SingleNote;
         public GameObject FlickNote;
         public GameObject SlideNote;
         public GameObject GridInfoText;
-        public Button Blocker;
 
         [HideInInspector]
         public V2.Chart chart { get; private set; }
@@ -50,37 +55,28 @@ namespace BGEditor
         [HideInInspector]
         public V2.TimingGroup group => chart.groups[editor.currentTimingGroup];
 
-        [HideInInspector]
-        public EditorInfo editor { get; private set; }
+        public UnityEvent onTimingModified { get; } = new UnityEvent();
+        public UnityEvent onGridMoved { get; } = new UnityEvent();
+        public UnityEvent onGridModifed { get; } = new UnityEvent();
+        public UnityEvent onToolSwitched { get; } = new UnityEvent();
+        public UnityEvent onAudioLoaded { get; } = new UnityEvent();
+        public UnityEvent onChartLoaded { get; } = new UnityEvent();
+        public UnityEvent onUserChangeAudioProgress { get; } = new UnityEvent();
 
-        [HideInInspector]
-        public ObjectPool pool { get; private set; }
+        public ChangeEvent<int> onYSnapModified { get; } = new ChangeEvent<int>();
+        public UnityEvent onYPosModified { get; } = new UnityEvent();
+        public UnityEvent onYFilterSwitched { get; } = new UnityEvent();
 
-        //[HideInInspector]
-        //public Dictionary<NotePosition, int> groundNotes = new Dictionary<NotePosition, int>();
+        public UnityEvent onSpeedViewSwitched { get; } = new UnityEvent();
 
-        public UnityEvent onTimingModified = new UnityEvent();
-        public UnityEvent onGridMoved = new UnityEvent();
-        public UnityEvent onGridModifed = new UnityEvent();
-        public UnityEvent onToolSwitched = new UnityEvent();
-        public UnityEvent onAudioLoaded = new UnityEvent();
-        public UnityEvent onChartLoaded = new UnityEvent();
-        public UnityEvent onUserChangeAudioProgress = new UnityEvent();
+        public NoteEvent onNoteCreated { get; } = new NoteEvent();
+        public NoteEvent onNoteModified { get; } = new NoteEvent();
+        public NoteEvent onNoteYModified { get; } = new NoteEvent();
+        public NoteEvent onNoteRemoved { get; } = new NoteEvent();
 
-        public ChangeEvent<int> onYSnapModified = new ChangeEvent<int>();
-        public UnityEvent onYPosModified = new UnityEvent();
-        public UnityEvent onYFilterSwitched = new UnityEvent();
-
-        public UnityEvent onSpeedViewSwitched = new UnityEvent();
-
-        public NoteEvent onNoteCreated = new NoteEvent();
-        public NoteEvent onNoteModified = new NoteEvent();
-        public NoteEvent onNoteYModified = new NoteEvent();
-        public NoteEvent onNoteRemoved = new NoteEvent();
-
-        public UnityEvent onTimingPointModified = new UnityEvent();
-        public UnityEvent onTimingGroupModified = new UnityEvent();
-        public UnityEvent onTimingGroupSwitched = new UnityEvent();
+        public UnityEvent onTimingPointModified { get; } = new UnityEvent();
+        public UnityEvent onTimingGroupModified { get; } = new UnityEvent();
+        public UnityEvent onTimingGroupSwitched { get; } = new UnityEvent();
 
         private LinkedList<IEditorCmd> cmdList;
         private LinkedListNode<IEditorCmd> lastCmd;
@@ -88,9 +84,11 @@ namespace BGEditor
 
         void Awake()
         {
-            Instance = this;
             chart = new V2.Chart();
             tooltip = EditorToolTip.Create(transform);
+
+            // Init object pool
+            pool.Init(SingleNote, FlickNote, SlideNote, GridInfoText);
 
             // Add listeners
             onAudioLoaded.AddListener(RefreshBarCount);
@@ -103,13 +101,8 @@ namespace BGEditor
             // Initialize ground notes
             multinote = new MultiNoteDetector(this);
 
-            // Initialize editor info
-            editor = new EditorInfo();
-
-            // Initialize object pool
-            pool = new ObjectPool();
-
             // Load chart and music
+            progress.Init();
             MappingInit.Init(this);
         }
 
@@ -311,7 +304,7 @@ namespace BGEditor
 
         public void Save()
         {
-            dataLoader.SaveChart(GetFinalizedChart(), chartListManager.current.header.sid, (Difficulty) chartListManager.current.difficulty);
+            dataLoader.SaveChart(GetFinalizedChart(), chartListManager.current.header.sid, (Difficulty)chartListManager.current.difficulty);
 
             if (!string.IsNullOrEmpty(scriptEditor.Code))
                 dataLoader.SaveChartScript(scriptEditor.Code, chartListManager.current.header.sid, (Difficulty)chartListManager.current.difficulty);
@@ -334,7 +327,7 @@ namespace BGEditor
             SceneLoader.LoadScene("Mapping", "Select");
         }
 
-        public static void AssignTimingGroups(V2.Chart chart)
+        public void AssignTimingGroups(V2.Chart chart)
         {
             for (int i = 0; i < chart.groups.Count; i++)
             {

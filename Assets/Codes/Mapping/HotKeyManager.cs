@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System;
 using UnityEngine.Events;
 using System.Linq;
+using Zenject;
 
 namespace BGEditor
 {
@@ -17,7 +18,8 @@ namespace BGEditor
 
     public class HotKeyManager : MonoBehaviour
     {
-        public static HotKeyManager Instance;
+        [Inject]
+        private IChartCore Core;
 
         public MouseScrollEvent onScroll = new MouseScrollEvent();
 
@@ -35,7 +37,6 @@ namespace BGEditor
 
         void Awake()
         {
-            Instance = this;
             mHotKeys = new List<HotKeyCombo>(HotKeys);
         }
 
@@ -107,17 +108,15 @@ namespace BGEditor
 
         void Update()
         {
-            if (ChartCore.Instance.scriptEditorCanvas.activeInHierarchy)
-                return;
-
             isCtrl = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
             isShift = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
             isCtrlDown = Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl);
             isShiftDown = Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift);
             isCtrlUp = Input.GetKeyUp(KeyCode.LeftControl) || Input.GetKeyUp(KeyCode.RightControl);
             isShiftUp = Input.GetKeyUp(KeyCode.LeftShift) || Input.GetKeyUp(KeyCode.RightShift);
-            if (blockers.Any(blocker => blocker.activeSelf))
+            if (blockers.Any(blocker => blocker.activeInHierarchy))
                 return;
+
             foreach (var combo in mHotKeys)
             {
                 if (Activated(combo.Keys))

@@ -2,15 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine.UI;
 using System.Linq;
-using System;
+using Zenject;
 
 namespace BGEditor
 {
-    public class TimingController : CoreMonoBehaviour
+    public class TimingController : MonoBehaviour
     {
         public GameObject Template;
         public GameObject TimingWindow;
         public IntInput Offset;
+
+        [Inject]
+        private IChartCore Core;
+        [Inject(Id = "Blocker")]
+        private Button Blocker;
+
         [HideInInspector]
         public List<V2.ValuePoint> BpmList = new List<V2.ValuePoint>();
         public List<V2.ValuePoint> currentBpmList => bpmLines.Select(line => new V2.ValuePoint
@@ -37,7 +43,7 @@ namespace BGEditor
             Blocker.gameObject.SetActive(true);
             TimingWindow.SetActive(true);
             BpmList.ForEach(point => AddLine(point.beat, point.value));
-            Offset.SetValue(Chart.offset);
+            Offset.SetValue(Core.chart.offset);
             RefreshIndex();
         }
 
@@ -74,7 +80,7 @@ namespace BGEditor
                 var current = currentBpmList;
                 BpmList.Clear();
                 current.ForEach(BpmList.Add);
-                Chart.offset = Offset.value;
+                Core.chart.offset = Offset.value;
                 Core.onTimingModified.Invoke();
             }
             bpmLines.ForEach(line => Destroy(line.gameObject));

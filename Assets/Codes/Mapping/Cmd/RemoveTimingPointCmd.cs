@@ -17,7 +17,7 @@ namespace BGEditor
             this.point = point;
         }
 
-        public bool Commit(ChartCore core)
+        public bool Commit(IChartCore core)
         {
             group = core.group;
             index = group.points.IndexOf(point);
@@ -27,7 +27,7 @@ namespace BGEditor
             return true;
         }
 
-        public bool Rollback(ChartCore core)
+        public bool Rollback(IChartCore core)
         {
             if (index < 0) return false;
             if (index >= group.points.Count)

@@ -8,22 +8,24 @@ namespace BGEditor
 {
     class ChangeYSnapCmd : IEditorCmd
     {
-        int prev;
-        int target;
+        private int prev;
+        private int target;
+        private IEditorInfo Editor;
 
-        public ChangeYSnapCmd(int target)
+        public ChangeYSnapCmd(IEditorInfo editor, int target)
         {
+            Editor = editor;
             this.target = target;
         }
 
-        public bool Commit(ChartCore core)
+        public bool Commit(IChartCore core)
         {
-            prev = core.editor.yDivision;
+            prev = Editor.yDivision;
             core.SetYDivision(target);
             return true;
         }
 
-        public bool Rollback(ChartCore core)
+        public bool Rollback(IChartCore core)
         {
             core.SetYDivision(prev);
             return true;

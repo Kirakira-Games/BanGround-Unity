@@ -1,21 +1,30 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System;
-using UnityEngine.Rendering.UI;
 using System.Linq;
-using XLua;
+using Zenject;
 
 namespace BGEditor
 {
-    public class EditNoteController : CoreMonoBehaviour
+    public class EditNoteController : MonoBehaviour, IEditNoteController
     {
+        [Inject]
+        private IChartCore Core;
+        [Inject]
+        private IObjectPool Pool;
+        [Inject]
+        private IEditorInfo Editor;
+        [Inject]
+        private IGridController Grid;
+
         private Dictionary<V2.Note, EditorNoteBase> displayNotes = new Dictionary<V2.Note, EditorNoteBase>();
         private Dictionary<int, HashSet<EditorNoteBase>> notesByBeat = new Dictionary<int, HashSet<EditorNoteBase>>();
         private List<EditorNoteBase> updateList = new List<EditorNoteBase>();
         public HashSet<EditorNoteBase> selectedNotes { get; private set; } = new HashSet<EditorNoteBase>();
         public IDPool slideIdPool { get; private set; } = new IDPool();
 
-        public EditorSlideNote singleSlideSelected {
+        public EditorSlideNote singleSlideSelected
+        {
             get
             {
                 if (selectedNotes.Count != 1)
@@ -159,7 +168,7 @@ namespace BGEditor
                 for (int i = prev.beat[0] + 1; i <= nxt.note.beat[0]; i++)
                 {
                     bool ret = notesByBeat[i].Remove(note);
-                    ret &= notesByBeat[i-1].Remove(nxt);
+                    ret &= notesByBeat[i - 1].Remove(nxt);
                     Debug.Assert(ret);
                 }
                 return true;

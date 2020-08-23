@@ -1,11 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using Zenject;
 
 namespace BGEditor
 {
-    public class BeatSnapController : CoreMonoBehaviour
+    public class BeatSnapController : MonoBehaviour
     {
+        [Inject]
+        IChartCore Core;
+
         public int[] Beats;
         public int DefaultIndex;
 

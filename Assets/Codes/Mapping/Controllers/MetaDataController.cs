@@ -1,16 +1,23 @@
-﻿using UnityEngine.UI;
+﻿using UnityEngine;
+using UnityEngine.UI;
 using System;
 using System.Linq;
 using Zenject;
 
 namespace BGEditor
 {
-    public class MetaDataController : CoreMonoBehaviour
+    public class MetaDataController : MonoBehaviour
     {
+        [Inject]
+        private IChartCore Core;
         [Inject]
         private IDataLoader dataLoader;
         [Inject]
         private IChartListManager chartListManager;
+        [Inject]
+        private IAudioProgressController Progress;
+        [Inject(Id = "Blocker")]
+        private Button Blocker;
 
         public InputField Title;
         public InputField Artist;
@@ -95,7 +102,7 @@ namespace BGEditor
 
             cHeader.authorNick = Designer.text;
             cHeader.difficultyLevel[(int)chartListManager.current.difficulty] = Difficulty.value;
-            Chart.level = Difficulty.value;
+            Core.chart.level = Difficulty.value;
             cHeader.tag = (from tag in Tags.text.Split(',')
                           where tag.Trim().Length > 0
                           select tag.Trim())

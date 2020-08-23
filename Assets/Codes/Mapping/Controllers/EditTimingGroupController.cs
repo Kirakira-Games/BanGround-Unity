@@ -2,11 +2,17 @@
 using System.Collections;
 using UnityEngine.UI;
 using UniRx.Async;
+using Zenject;
 
 namespace BGEditor
 {
-    public class EditTimingGroupController : CoreMonoBehaviour
+    public class EditTimingGroupController : MonoBehaviour
     {
+        [Inject]
+        private IChartCore Core;
+        [Inject]
+        private IEditorInfo Editor;
+
         public Dropdown groupDropdown;
         public Button deleteButton;
 
@@ -14,7 +20,7 @@ namespace BGEditor
 
         private async UniTaskVoid OnDelete()
         {
-            if (Chart.groups.Count <= 1)
+            if (Core.chart.groups.Count <= 1)
             {
                 MessageBannerController.ShowMsg(LogLevel.INFO, "You cannot remove the last timing group.");
                 return;
@@ -23,28 +29,28 @@ namespace BGEditor
             {
                 return;
             }
-            Core.Commit(new RemoveTimingGroupCmd(Editor.currentTimingGroup));
+            Core.Commit(new RemoveTimingGroupCmd(Editor, Editor.currentTimingGroup));
         }
 
         public void Add()
         {
-            if (Chart.groups.Count >= MAX_TIMING_GROUP)
+            if (Core.chart.groups.Count >= MAX_TIMING_GROUP)
             {
                 Debug.LogWarning("User is not allowed to have more than 9 timing groups.");
                 return;
             }
-            Core.Commit(new AddTimingGroupCmd());
+            Core.Commit(new AddTimingGroupCmd(Editor));
         }
 
         private void Refresh()
         {
             groupDropdown.SetValueWithoutNotify(0);
             groupDropdown.ClearOptions();
-            for (int i = 1; i <= Chart.groups.Count; i++)
+            for (int i = 1; i <= Core.chart.groups.Count; i++)
             {
                 groupDropdown.options.Add(new Dropdown.OptionData(i.ToString()));
             }
-            if (Chart.groups.Count < MAX_TIMING_GROUP)
+            if (Core.chart.groups.Count < MAX_TIMING_GROUP)
             {
                 groupDropdown.options.Add(new Dropdown.OptionData("New..."));
             }
@@ -55,7 +61,7 @@ namespace BGEditor
 
         public void Switch(int index)
         {
-            if (index < Chart.groups.Count)
+            if (index < Core.chart.groups.Count)
             {
                 if (groupDropdown.value != index)
                 {
@@ -65,7 +71,7 @@ namespace BGEditor
                 Core.onTimingGroupSwitched.Invoke();
                 return;
             }
-            if (index == Chart.groups.Count)
+            if (index == Core.chart.groups.Count)
             {
                 Add();
                 return;

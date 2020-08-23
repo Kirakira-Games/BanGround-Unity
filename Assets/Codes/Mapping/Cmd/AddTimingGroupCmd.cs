@@ -9,21 +9,28 @@ namespace BGEditor
 {
     class AddTimingGroupCmd : IEditorCmd
     {
-        public bool Commit(ChartCore core)
+        private IEditorInfo Editor;
+
+        public AddTimingGroupCmd(IEditorInfo editor)
+        {
+            Editor = editor;
+        }
+
+        public bool Commit(IChartCore core)
         {
             core.chart.groups.Add(V2.TimingGroup.Default());
-            core.editor.currentTimingGroup = core.chart.groups.Count - 1;
+            Editor.currentTimingGroup = core.chart.groups.Count - 1;
             core.onTimingGroupModified.Invoke();
             return true;
         }
 
-        public bool Rollback(ChartCore core)
+        public bool Rollback(IChartCore core)
         {
             if (core.chart.groups.Count <= 1)
                 return false;
             core.chart.groups.RemoveAt(core.chart.groups.Count - 1);
-            if (core.editor.currentTimingGroup == core.chart.groups.Count)
-                core.editor.currentTimingGroup--;
+            if (Editor.currentTimingGroup == core.chart.groups.Count)
+                Editor.currentTimingGroup--;
             core.onTimingGroupModified.Invoke();
             return true;
         }

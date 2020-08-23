@@ -2,11 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 namespace BGEditor
 {
-    public class ToolController : CoreMonoBehaviour
+    public class ToolController : MonoBehaviour
     {
+        [Inject]
+        IChartCore Core;
+
         public Toggle[] Toggles;
 
         protected void Awake()
