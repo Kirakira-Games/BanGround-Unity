@@ -5,7 +5,7 @@ using UnityEngine;
 /// <summary>
 /// Layout: A stack of states. The base must be Loading, Playing, or Finished.
 /// </summary>
-public class GameStateMachine
+public class GameStateMachine : IGameStateMachine
 {
     public enum State { Loading, Paused, Playing, Rewinding, Finished }
     private LinkedList<State> stateStack;
@@ -18,6 +18,7 @@ public class GameStateMachine
 
     public bool isPaused => Current == State.Paused;
     public bool isRewinding => HasState(State.Rewinding);
+    public bool inSimpleState => Count == 1;
     public int Count => stateStack.Count;
 
     public bool HasState(State state)

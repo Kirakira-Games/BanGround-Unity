@@ -223,6 +223,8 @@ public class TouchManager : MonoBehaviour
     private IAudioTimelineSync audioTimelineSync;
     [Inject]
     private INoteController noteController;
+    [Inject]
+    private IGameStateMachine SM;
 
     private Dictionary<int, KirakiraTouch> touchTable;
     private Dictionary<(KirakiraTracer, int), JudgeResult> traceCache;
@@ -332,7 +334,7 @@ public class TouchManager : MonoBehaviour
         else if (modManager.isAutoplay)
         {
             GameObject.Find("MouseCanvas").SetActive(false);
-            provider = new AutoPlayTouchProvider();
+            provider = new AutoPlayTouchProvider(SM);
         }
         else
         {
@@ -402,7 +404,7 @@ public class TouchManager : MonoBehaviour
 
     public void OnUpdate()
     {
-        if (UIManager.Instance.SM.HasState(GameStateMachine.State.Finished)) return;
+        if (SM.HasState(GameStateMachine.State.Finished)) return;
 
         var touchFrames = provider.GetTouches();
 

@@ -11,10 +11,8 @@ using Zenject;
 using State = GameStateMachine.State;
 using System.Threading;
 
-public class UIManager : MonoBehaviour
+public class UIManager : MonoBehaviour, IUIManager
 {
-    public static UIManager Instance;
-
     [Inject]
     private IAudioManager audioManager;
     [Inject]
@@ -25,10 +23,14 @@ public class UIManager : MonoBehaviour
     private INoteController noteController;
     [Inject]
     private IInGameBackground inGameBackground;
+    [Inject]
+    private IGameStateMachine SM;
+
+    [Inject(Id = "r_brightness_lane")]
+    private KVar r_brightness_lane;
 
     private const float BiteTime = 2;
 
-    SpriteRenderer bg_SR;
     MeshRenderer lan_MR;
 
     GameObject pause_Canvas;
@@ -45,16 +47,11 @@ public class UIManager : MonoBehaviour
     GameObject gateCanvas;
 
     private ISoundEffect resultVoice;
-    public GameStateMachine SM { get; private set; }
-
-    static KVarRef r_brightness_lane = new KVarRef("r_brightness_lane");
 
     private CancellationTokenSource cancellationToken = new CancellationTokenSource();
 
     private void Awake()
     {
-        Instance = this;
-        SM = new GameStateMachine();
         KVarRef lowResolution = new KVarRef("r_lowresolution");
         QualitySettings.SetQualityLevel(lowResolution ? 0 : 1);
     }
@@ -63,7 +60,7 @@ public class UIManager : MonoBehaviour
     {
         //bg_SR = GameObject.Find("dokidokiBackground").GetComponent<SpriteRenderer>();
         lan_MR = GameObject.Find("LaneBackground").GetComponent<MeshRenderer>();
-        
+
         //var bgColor = liveSetting.bgBrightness;
         //bg_SR.color = new Color(bgColor, bgColor, bgColor);
         lan_MR.material.SetColor("_BaseColor", new Color(1f, 1f, 1f, r_brightness_lane));
@@ -84,10 +81,10 @@ public class UIManager : MonoBehaviour
         gateCanvas = GameObject.Find("GateCanvas");
         StartCoroutine(DelayDisableGate());
 
-/*#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
-        Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Locked;
-#endif*/
+        /*#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+                Cursor.visible = false;
+                Cursor.lockState = CursorLockMode.Locked;
+        #endif*/
 
         //Screen.orientation = ScreenOrientation.;
         //MessageBoxController.ShowMsg(LogLevel.INFO, Screen.orientation.ToString());
@@ -124,10 +121,10 @@ public class UIManager : MonoBehaviour
         pause_Canvas.SetActive(true);
         SM.AddState(State.Paused);
 
-/*#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
-        Cursor.visible = true;
-        Cursor.lockState = CursorLockMode.Confined;
-#endif*/
+        /*#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.Confined;
+        #endif*/
     }
 
     private void GameResume()
@@ -179,7 +176,7 @@ public class UIManager : MonoBehaviour
         await UniTask.WaitUntil(() => bgm.GetPlaybackTime() != pauseTime, cancellationToken: token);
         audioTimelineSync.timeInMs = (int)bgm.GetPlaybackTime();
         audioTimelineSync.Play();
-        inGameBackground.seekVideo(bgm.GetPlaybackTime()/1000f);
+        inGameBackground.seekVideo(bgm.GetPlaybackTime() / 1000f);
         inGameBackground.playVideo();
 
         if (SM.Current != State.Rewinding)
@@ -192,7 +189,8 @@ public class UIManager : MonoBehaviour
         //SceneManager.LoadScene("InGame");
         //await liveSetting.LoadChart(true);
         Time.timeScale = 1;
-        SceneLoader.LoadScene("InGame", "InGame", () => {
+        SceneLoader.LoadScene("InGame", "InGame", () =>
+        {
             async UniTask<bool> Retry()
             {
                 if (await chartListManager.LoadChart(true))
@@ -234,13 +232,13 @@ public class UIManager : MonoBehaviour
         ShowResult(restart);
     }
 
-    IEnumerator DelayDisableGate()
+    private IEnumerator DelayDisableGate()
     {
         yield return new WaitForSeconds(3f);
         gateCanvas.SetActive(false);
     }
 
-    async void ShowResult(bool restart)
+    private async void ShowResult(bool restart)
     {
         if (chartListManager.offsetAdjustMode)
             restart = true;
@@ -294,15 +292,15 @@ public class UIManager : MonoBehaviour
         retire_Btn.onClick.RemoveAllListeners();
         retry_Btn.onClick.RemoveAllListeners();
 
-/*#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
-        Cursor.visible = true;
-        Cursor.lockState = CursorLockMode.None;
-#endif*/
+        /*#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None;
+        #endif*/
     }
 
     private void Update()
     {
-        if (SM.Count == 1 && SM.Current != State.Finished && audioManager.gameBGM != null &&
+        if (SM.inSimpleState && SM.Current != State.Finished && audioManager.gameBGM != null &&
             audioTimelineSync.timeInMs > audioManager.gameBGM.GetLength() + 1000 &&
             noteController.isFinished)
         {
@@ -310,24 +308,23 @@ public class UIManager : MonoBehaviour
             OnAudioFinish(false);
         }
 
-/*#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
-        // TODO: Maybe move this
-        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Tilde))
-        {
-            OnPauseButtonClick();
-        }
-#endif*/
+        /*#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+                // TODO: Maybe move this
+                if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.Tilde))
+                {
+                    OnPauseButtonClick();
+                }
+        #endif*/
     }
 
     private void OnDestroy()
     {
-        Instance = null;
         resultVoice?.Dispose();
         cancellationToken.Cancel();
 
-/*#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
-        Cursor.visible = true;
-        Cursor.lockState = CursorLockMode.None;
-#endif*/
+        /*#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None;
+        #endif*/
     }
 }

@@ -9,6 +9,8 @@ public class OffsetSettingController : MonoBehaviour
     private IChartListManager chartListManager;
     [Inject]
     private IModManager modManager;
+    [Inject]
+    private IUIManager UI;
 
     private Text offsetText;
     private const int RECENT_COUNT = 10;
@@ -66,6 +68,6 @@ public class OffsetSettingController : MonoBehaviour
     {
         modManager.SuppressAllMods(false);
         chartListManager.ClearForcedChart();
-        UIManager.Instance.GameRetire();
+        UI.GameRetire();
     }
 }
