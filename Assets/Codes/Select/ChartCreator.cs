@@ -17,10 +17,13 @@ public class ChartCreator : MonoBehaviour
     private IDataLoader dataLoader;
     [Inject]
     private IChartListManager chartListManager;
-    [Inject(Id = "cl_lastdiff")]
-    private KVar cl_lastdiff;
     [Inject]
     private IMessageBannerController messageBannerController;
+    [Inject]
+    private ICancellationTokenStore Cancel;
+
+    [Inject(Id = "cl_lastdiff")]
+    private KVar cl_lastdiff;
 
     public const int ChartVersion = 1;
     public Button Blocker;

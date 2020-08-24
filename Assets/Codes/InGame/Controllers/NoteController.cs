@@ -75,8 +75,6 @@ public class NoteController : MonoBehaviour, INoteController
 
     private const int WARM_UP_SECOND = 4;
 
-    private CancellationTokenSource cancellationToken = new CancellationTokenSource();
-
     #region Judge
     private TapEffectType EmitEffect(Vector3 position, JudgeResult result, GameNoteType type)
     {
@@ -575,7 +573,6 @@ public class NoteController : MonoBehaviour, INoteController
 
     private void OnDestroy()
     {
-        cancellationToken.Cancel();
         if (soundEffects != null) 
         {
             for (int i = 0; i < soundEffects.Length; i++)
