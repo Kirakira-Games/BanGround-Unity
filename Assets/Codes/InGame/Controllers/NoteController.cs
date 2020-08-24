@@ -430,7 +430,12 @@ public class NoteController : MonoBehaviour, INoteController
         };
 
         // Game BGM
-        _ = audioManager.DelayPlayInGameBGM(audioTimelineSync, KiraFilesystem.Instance.Read(dataLoader.GetMusicPath(chartListManager.current.header.mid)), WARM_UP_SECOND, cancellationToken);
+        _ = audioManager.StreamGameBGMTrack(KiraFilesystem.Instance.Read(dataLoader.GetMusicPath(chartListManager.current.header.mid)))
+            .ContinueWith((bgm) => {
+                modManager.attachedMods.ForEach(mod => (mod as AudioMod)?.ApplyMod(bgm));
+                audioTimelineSync.time = -WARM_UP_SECOND;
+                audioTimelineSync.Play();
+            });
 
         // Background
         var background = GameObject.Find("InGameBackground").GetComponent<InGameBackground>();
