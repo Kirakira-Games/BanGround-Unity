@@ -433,7 +433,7 @@ public class NoteController : MonoBehaviour, INoteController
         _ = audioManager.StreamGameBGMTrack(KiraFilesystem.Instance.Read(dataLoader.GetMusicPath(chartListManager.current.header.mid)))
             .ContinueWith((bgm) => {
                 modManager.attachedMods.ForEach(mod => (mod as AudioMod)?.ApplyMod(bgm));
-                audioTimelineSync.time = -WARM_UP_SECOND;
+                audioTimelineSync.time = -audioTimelineSync.RealTimeToBGMTime(WARM_UP_SECOND);
                 audioTimelineSync.Play();
             });
 
