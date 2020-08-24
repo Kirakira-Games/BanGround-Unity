@@ -65,6 +65,9 @@ public class GlobalInstaller : MonoInstaller
         // Message Canvas
         Container.Bind<IMessageBox>().FromInstance(messageBox);
         Container.Bind<IMessageBannerController>().FromInstance(messageBannerController);
+
+        // Cancellation Token Store
+        Container.Bind<ICancellationTokenStore>().To<CancellationTokenStore>().AsSingle().NonLazy();
     }
 
     void RegisterKonCommands()

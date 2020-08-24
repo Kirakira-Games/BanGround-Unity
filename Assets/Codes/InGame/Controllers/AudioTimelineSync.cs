@@ -16,6 +16,8 @@ public class AudioTimelineSync : MonoBehaviour, IAudioTimelineSync
     private IInGameBackground inGameBackground;
     [Inject]
     private IGameStateMachine SM;
+    [Inject]
+    private ICancellationTokenStore Cancel;
 
     private Stopwatch watch = new Stopwatch();
     private float deltaTime;
@@ -90,7 +92,7 @@ public class AudioTimelineSync : MonoBehaviour, IAudioTimelineSync
         gameBGM.Play();
         SM.Transit(GameStateMachine.State.Loading, GameStateMachine.State.Playing);
 
-        await UniTask.WaitUntil(() => gameBGM.GetPlaybackTime() > 0); // TODO: cancellationToken: cts.Token;
+        await UniTask.WaitUntil(() => gameBGM.GetPlaybackTime() > 0, cancellationToken: Cancel.sceneToken);
         timeInMs = (int)gameBGM.GetPlaybackTime();
     }
 
