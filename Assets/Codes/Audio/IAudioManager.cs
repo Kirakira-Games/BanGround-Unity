@@ -10,7 +10,7 @@ public interface IAudioManager
     ISoundTrack gameBGM { get; set; }
     UniTask<ISoundEffect> PrecacheSE(byte[] data);
     UniTask<ISoundEffect> PrecacheInGameSE(byte[] data);
-    UniTaskVoid DelayPlayInGameBGM(IAudioTimelineSync audioTimelineSync, byte[] audio, float seconds, CancellationTokenSource cts = default);
+    UniTask<ISoundTrack> StreamGameBGMTrack(byte[] data);
     UniTask<ISoundTrack> PlayLoopMusic(byte[] audio, bool needLoop = true, uint[] times = null, bool noFade = true);
     void StopBGM();
     void StopAllCoroutines();

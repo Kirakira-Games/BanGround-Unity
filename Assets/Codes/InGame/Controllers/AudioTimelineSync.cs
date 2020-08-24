@@ -3,6 +3,8 @@ using System.Diagnostics;
 using System;
 using System.Collections.Generic;
 using Zenject;
+using AudioProvider;
+using UniRx.Async;
 
 public class AudioTimelineSync : MonoBehaviour, IAudioTimelineSync
 {
@@ -10,6 +12,8 @@ public class AudioTimelineSync : MonoBehaviour, IAudioTimelineSync
     private IAudioManager audioManager;
     [Inject]
     private IModManager modManager;
+    [Inject]
+    private IInGameBackground inGameBackground;
 
     private Stopwatch watch = new Stopwatch();
     private float deltaTime;
@@ -69,40 +73,45 @@ public class AudioTimelineSync : MonoBehaviour, IAudioTimelineSync
 
     public float time
     {
-        get
-        {
-            return (float)((watch.Elapsed.TotalSeconds + deltaTime) * modManager.SpeedCompensationSum);
-        }
-        set
-        {
-            deltaTime = (float)(value / modManager.SpeedCompensationSum - watch.Elapsed.TotalSeconds);
-        }
+        get => (float)((watch.Elapsed.TotalSeconds + deltaTime) * modManager.SpeedCompensationSum);
+        set { deltaTime = (float)(value / modManager.SpeedCompensationSum - watch.Elapsed.TotalSeconds); }
     }
     public int timeInMs
     {
-        get
-        {
-            return Mathf.RoundToInt(time * 1000);
-        }
-        set
-        {
-            time = value / 1000f;
-        }
+        get => Mathf.RoundToInt(time * 1000);
+        set { time = value / 1000f; }
+    }
+
+    private async UniTaskVoid StartPlaying(ISoundTrack gameBGM)
+    {
+        inGameBackground.playVideo();
+        gameBGM.Play();
+        UIManager.Instance.SM.Transit(GameStateMachine.State.Loading, GameStateMachine.State.Playing);
+
+        await UniTask.WaitUntil(() => gameBGM.GetPlaybackTime() > 0); // TODO: cancellationToken: cts.Token;
+        timeInMs = (int)gameBGM.GetPlaybackTime();
     }
 
     private void Update()
     {
-        if (UIManager.Instance.SM.Base == GameStateMachine.State.Finished)
-            return;
         var bgm = audioManager.gameBGM;
-        if (bgm == null || bgm.GetStatus() != AudioProvider.PlaybackStatus.Playing)
+        if (UIManager.Instance.SM.Base == GameStateMachine.State.Finished || bgm == null)
             return;
+        float currentTime = time;
+        if (bgm.GetStatus() != PlaybackStatus.Playing)
+        {
+            if (currentTime >= -0.02 && UIManager.Instance.SM.Current == GameStateMachine.State.Loading)
+            {
+                _ = StartPlaying(bgm);
+            }
+            return;
+        }
         // Audio sync test
         uint audioTime = bgm.GetPlaybackTime();
         if (audioTime == prevAudioTime)
             return;
         prevAudioTime = audioTime;
-        float diff = BGMTimeToRealtime(audioTime / 1000f - time);
+        float diff = BGMTimeToRealtime(audioTime / 1000f - currentTime);
         // too unsync
         if (diff < -UNSYNC_LIMIT)
             return;

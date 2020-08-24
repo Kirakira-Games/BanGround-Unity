@@ -6,17 +6,10 @@ using AudioProvider;
 using UniRx.Async;
 using Zenject;
 
-using State = GameStateMachine.State;
-using System.Threading;
-
 public class AudioManager : MonoBehaviour, IAudioManager
 {
     [Inject]
     public IAudioProvider Provider { get; private set; }
-    [Inject]
-    private IModManager modManager;
-    [Inject(Optional = true)]
-    private IInGameBackground inGameBackground;
 
     public ISoundTrack gameBGM { get; set; }
 
@@ -133,41 +126,17 @@ public class AudioManager : MonoBehaviour, IAudioManager
 
     public async UniTask<ISoundEffect> PrecacheSE(byte[] data) => await Provider.PrecacheSE(data, SEType.Common);
     public async UniTask<ISoundEffect> PrecacheInGameSE(byte[] data) => await Provider.PrecacheSE(data, SEType.InGame);
-    public async UniTaskVoid DelayPlayInGameBGM(IAudioTimelineSync audioTimelineSync, byte[] audio, float seconds, CancellationTokenSource cts = default)
+    public async UniTask<ISoundTrack> StreamGameBGMTrack(byte[] data)
     {
-        if(Provider is PureUnityAudioProvider)
+        if (Provider is PureUnityAudioProvider)
         {
-            gameBGM = await ((PureUnityAudioProvider)Provider).PrecacheTrack(audio);
+            gameBGM = await ((PureUnityAudioProvider)Provider).PrecacheTrack(data);
         }
         else
         {
-            gameBGM = await Provider.StreamTrack(audio);
+            gameBGM = await Provider.StreamTrack(data);
         }
-        
-        gameBGM.Play();
-        gameBGM.Pause();
-
-        await UniTask.WaitUntil(() => SceneLoader.Loading == false, cancellationToken: cts.Token);
-
-        audioTimelineSync.time = -seconds;
-        audioTimelineSync.Play();
-
-        await UniTask.WaitUntil(() => audioTimelineSync.time >= -0.02, cancellationToken: cts.Token);
-
-        foreach (var mod in modManager.attachedMods)
-        {
-            if (mod is AudioMod)
-                (mod as AudioMod).ApplyMod(gameBGM);
-        }
-
-        if (UIManager.Instance.SM.Count > 1)
-            await UniTask.WaitUntil(() => UIManager.Instance.SM.Count == 1, cancellationToken: cts.Token);
-        inGameBackground.playVideo();
-        gameBGM.Play();
-        UIManager.Instance.SM.Transit(State.Loading, State.Playing);
-
-        await UniTask.WaitUntil(() => gameBGM.GetPlaybackTime() > 0, cancellationToken: cts.Token);
-        audioTimelineSync.timeInMs = (int)gameBGM.GetPlaybackTime();
+        return gameBGM;
     }
     public void StopBGM() => gameBGM.Stop();
     public async UniTask<ISoundTrack> PlayLoopMusic(byte[] audio,bool needLoop = true, uint[] times = null, bool noFade = true)
