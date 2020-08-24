@@ -3,23 +3,19 @@ using System.Collections.Generic;
 
 public class AutoPlayTouchProvider : KirakiraTouchProvider
 {
-    private List<KirakiraTouchState> events;
-    private LinkedList<KirakiraTouchState> delayedQueue;
-    private Dictionary<int, int> touchIdMap;
-    private Dictionary<int, KirakiraTouchState> touchStateMap;
-    private LinkedList<int> touchIdPool;
-    private HashSet<int> existsId;
+    private List<KirakiraTouchState> events = new List<KirakiraTouchState>();
+    private LinkedList<KirakiraTouchState> delayedQueue = new LinkedList<KirakiraTouchState>();
+    private Dictionary<int, int> touchIdMap = new Dictionary<int, int>();
+    private Dictionary<int, KirakiraTouchState> touchStateMap = new Dictionary<int, KirakiraTouchState>();
+    private LinkedList<int> touchIdPool = new LinkedList<int>();
+    private HashSet<int> existsId = new HashSet<int>();
     private int head;
     private int currentId;
+    private IGameStateMachine SM;
 
-    public AutoPlayTouchProvider()
+    public AutoPlayTouchProvider(IGameStateMachine SM)
     {
-        events = new List<KirakiraTouchState>();
-        touchIdMap = new Dictionary<int, int>();
-        touchStateMap = new Dictionary<int, KirakiraTouchState>();
-        touchIdPool = new LinkedList<int>();
-        delayedQueue = new LinkedList<KirakiraTouchState>();
-        existsId = new HashSet<int>();
+        this.SM = SM;
     }
 
     private int GetId(int id)
@@ -185,7 +181,7 @@ public class AutoPlayTouchProvider : KirakiraTouchProvider
 
         while (head < events.Count && events[head].time <= NoteController.audioTime)
         {
-            if (UIManager.Instance.SM.isRewinding) break;
+            if (SM.isRewinding) break;
             var cur = events[head];
             if (cur.phase == KirakiraTouchPhase.Began)
             {

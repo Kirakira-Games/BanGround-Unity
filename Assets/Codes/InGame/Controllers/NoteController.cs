@@ -25,6 +25,10 @@ public class NoteController : MonoBehaviour, INoteController
     private IResourceLoader resourceLoader;
     [Inject]
     private IAudioTimelineSync audioTimelineSync;
+    [Inject]
+    private IGameStateMachine SM;
+    [Inject]
+    private IUIManager UI;
 
     [Inject(Id = "o_judge")]
     private KVar o_judge;
@@ -250,7 +254,7 @@ public class NoteController : MonoBehaviour, INoteController
         int[] lanes = GetLanesByTouchState(touch.current);
 
         NoteBase noteToJudge = null;
-        if (UIManager.Instance.SM.Count == 1)
+        if (SM.inSimpleState)
         {
             NoteBase ret;
             // Find note to judge - non-fuwafuwa
@@ -480,9 +484,9 @@ public class NoteController : MonoBehaviour, INoteController
                 {
                     if (result != JudgeResult.Perfect && result != JudgeResult.Great)
                     {
-                        UIManager.Instance.SM.Transit(UIManager.Instance.SM.Current, GameStateMachine.State.Finished);
+                        SM.Transit(SM.Current, GameStateMachine.State.Finished);
                         audioManager.StopBGM();
-                        UIManager.Instance.OnAudioFinish(true);
+                        UI.OnAudioFinish(true);
                     }
                 });
 
@@ -491,7 +495,7 @@ public class NoteController : MonoBehaviour, INoteController
                 {
                     if (result != JudgeResult.Perfect)
                     {
-                        UIManager.Instance.SM.Transit(UIManager.Instance.SM.Current, GameStateMachine.State.Finished);
+                        SM.Transit(SM.Current, GameStateMachine.State.Finished);
                         audioManager.StopBGM();
                         GameObject.Find("UIManager").GetComponent<UIManager>().OnAudioFinish(true);
                     }
@@ -504,7 +508,7 @@ public class NoteController : MonoBehaviour, INoteController
 
     void Update()
     {
-        if (SceneLoader.Loading || UIManager.Instance.SM.Base == GameStateMachine.State.Finished || Time.timeScale == 0) return;
+        if (SceneLoader.Loading || SM.Base == GameStateMachine.State.Finished || Time.timeScale == 0) return;
 
         audioTime = audioTimelineSync.timeInMs + audioTimelineSync.RealTimeToBGMTime(o_audio);
         judgeTime = audioTime - o_judge;

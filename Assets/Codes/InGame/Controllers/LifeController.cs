@@ -8,6 +8,8 @@ public class LifeController : MonoBehaviour
 {
     [Inject]
     private IChartListManager chartListManager;
+    [Inject]
+    private IGameStateMachine SM;
 
     public static LifeController instance;
     public static List<float> lifePerSecond;
@@ -65,7 +67,7 @@ public class LifeController : MonoBehaviour
     {
         while (true)//不知道会不会在场景结束被destroy
         {
-            if (UIManager.Instance.SM.Base == GameStateMachine.State.Playing)
+            if (SM.Base == GameStateMachine.State.Playing)
                 lifePerSecond.Add(lifePoint / 100.0f);
             yield return new WaitForSeconds(0.2f);
         }

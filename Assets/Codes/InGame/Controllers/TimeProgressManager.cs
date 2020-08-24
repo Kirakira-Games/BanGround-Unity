@@ -12,6 +12,8 @@ public class TimeProgressManager : MonoBehaviour
     private IAudioManager audioManager;
     [Inject]
     private IAudioTimelineSync audioTimelineSync;
+    [Inject]
+    private IGameStateMachine SM;
 
     private Slider TimeProgress;
     private uint audioLength;
@@ -28,7 +30,7 @@ public class TimeProgressManager : MonoBehaviour
         if(gameBGM == null)
             gameBGM = audioManager.gameBGM;
 
-        switch (UIManager.Instance.SM.Current)
+        switch (SM.Current)
         {
             case State.Loading:
                 TimeProgress.value = 0;

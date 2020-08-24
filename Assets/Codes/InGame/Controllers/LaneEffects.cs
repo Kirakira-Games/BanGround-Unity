@@ -7,6 +7,8 @@ public class LaneEffects : MonoBehaviour
 {
     [Inject]
     private IModManager modManager;
+    [Inject]
+    private IGameStateMachine SM;
 
     private ParticleSystem[] ps;
     private List<TimingPoint> speed;
@@ -72,7 +74,7 @@ public class LaneEffects : MonoBehaviour
             return;
 
         float speed = GetSpeed(NoteController.audioTimef) * modManager.SpeedCompensationSum * (r_notespeed + 4f) / 14;
-        if (UIManager.Instance.SM.isRewinding)
+        if (SM.isRewinding)
         {
             speed = -speed;
         }
