@@ -1,16 +1,10 @@
-﻿using BanGround.API;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -258,7 +252,7 @@ public class WebConsole : MonoBehaviour
                 using (var sr = new StreamReader(ctx.Request.InputStream))
                     dataStr = sr.ReadToEnd();
 
-                var encoded = Auth.EncryptPassword(dataStr);
+                var encoded = Web.Auth.Util.EncryptPassword(dataStr);
 
                 content = Encoding.UTF8.GetBytes(encoded);
             }
