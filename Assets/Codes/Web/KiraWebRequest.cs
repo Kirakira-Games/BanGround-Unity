@@ -131,7 +131,7 @@ namespace Web
                     var result = JsonConvert.DeserializeObject<Result<Resp>>(req.downloadHandler.text);
                     if (result.status == false)
                         throw new KiraWebException(req.responseCode, new KiraErrorMessage(result.error));
-                    Debug.Log("[KWR] Resp: " + JsonConvert.SerializeObject(result.data));
+                    Debug.Log("[KWR] Response: " + JsonConvert.SerializeObject(result.data));
                     return result.data;
                 }
                 Debug.Log("[KWR] Success without response text.");
