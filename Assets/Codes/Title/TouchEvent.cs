@@ -8,10 +8,9 @@ using UnityEngine.UI;
 public class TouchEvent : MonoBehaviour
 {
     public bool waitingUpdate = true;
-    public bool waitingAuth => Authenticate.user == null;
-    public bool authing => Authenticate.isAuthing;
+    public bool authing = false;
 
-    public UserInfo usercanvas;
+    public UserInfo userCanvas;
     public GameObject warnCanvas;
     public GameObject loginPanel;
     private AsyncOperation operation;
@@ -20,33 +19,28 @@ public class TouchEvent : MonoBehaviour
     private void Start()
     {
         warnCanvas.SetActive(false);
-        usercanvas = GameObject.Find("UserInfo").GetComponent<UserInfo>();
+        userCanvas = GameObject.Find("UserInfo").GetComponent<UserInfo>();
     }
-
-    //private IEnumerator SwitchScene(string name)
-    //{
-    //    yield return new WaitForSeconds(4f);
-    //    operation = SceneManager.LoadSceneAsync(name);
-    //    operation.allowSceneActivation = false;
-    //    yield return operation;
-    //}
 
     public async void ChangeAnimation()
     {
-//#if !UNITY_EDITOR
-        if (!authing) 
-            await GetAuthenticationResult();
-        else
+        if (authing)
             return;
 
-        if (waitingUpdate || waitingAuth) 
+        if (UserInfo.user == null)
+        {
+            authing = true;
+            await GetAuthenticationResult();
+            authing = false;
+        }
+
+        if (waitingUpdate) 
             return;
-//#endif
+
         if (!touched)
         {
             touched = true;
             StartSwitch();
-            //StartCoroutine(GetAuthenticationResult());
         }
     }
 
@@ -55,7 +49,6 @@ public class TouchEvent : MonoBehaviour
         GameObject.Find("MainCanvas").GetComponent<Animator>().SetBool("Touched", true);
         warnCanvas.SetActive(true);
 
-        //StartCoroutine(SwitchScene("Select"));
         StartCoroutine(delayAndSwitch());
         StartCoroutine(TurndownMusic());
     }
@@ -80,68 +73,14 @@ public class TouchEvent : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
 
-        //SwitchScene("Select");
-        //SceneLoader.LoadScene("Title", "Select", true);
         operation.allowSceneActivation = true;
     }
 
     async UniTask GetAuthenticationResult()
     {
-        if(Authenticate.user == null)
-        {
-            if(!Authenticate.isAuthing)
-                loginPanel.SetActive(true);
-
-            await UniTask.WaitUntil(() => Authenticate.user != null);
-        }
-
-        usercanvas.GetUserInfo();
-        /*
-//#if !UNITY_EDITOR
-        authing = true;
-        string uuid = AppPreLoader.UUID;
-        string key = inputField.text;
-        bool usePrefKey = false;
-        if (PlayerPrefs.HasKey("key") && inputField.text == PlayerPrefs.GetString("key"))
-        {
-            usePrefKey = true;
-        }
-        var result = await Authenticate.TryAuthenticate(key, uuid);
-        if (result.status)
-        {
-            if (!usePrefKey)
-            {
-                PlayerPrefs.SetString("key", key);
-                PlayerPrefs.Save();
-            }
-            waitingAuth = false;
-            UserInfo.username = result.username;
-            usercanvas.GetUserInfo();
-            //Debug.Log(Authenticate.result.username);
-            //MessageBoxController.ShowMsg(LogLevel.OK, "Authenticate successful");
-        }
-        else
-        {
-            messageBannerController.ShowMsg(LogLevel.ERROR, result.error);
-            if (!Authenticate.isNetworkError || !usePrefKey)
-            {
-                //touched = false;
-                inputField.readOnly = false;
-                inputField.inputType = InputField.InputType.Standard;
-                inputField.transform.parent.gameObject.SetActive(true);
-                authing = false;
-                return;
-            }
-            else
-            {
-                waitingAuth = false;
-            }
-        }
-        authing = false;
-//#else
-//        yield return 0;
-//#endif
-        */
+        loginPanel.SetActive(true);
+        await UniTask.WaitUntil(() => UserInfo.user != null);
+        userCanvas.GetUserInfo().Forget();
     }
 }
 

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Web;
 using Zenject;
 
 public class GlobalInstaller : MonoInstaller
@@ -68,6 +69,9 @@ public class GlobalInstaller : MonoInstaller
 
         // Cancellation Token Store
         Container.Bind<ICancellationTokenStore>().To<CancellationTokenStore>().AsSingle().NonLazy();
+
+        // Kira Web Request
+        Container.Bind<IKiraWebRequest>().To<KiraWebRequest>().AsSingle().NonLazy();
     }
 
     void RegisterKonCommands()

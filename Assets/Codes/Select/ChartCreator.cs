@@ -10,6 +10,7 @@ using System.Text;
 using System.Collections.Generic;
 using System.Threading;
 using Zenject;
+using WebSocketSharp;
 
 public class ChartCreator : MonoBehaviour
 {
@@ -71,15 +72,15 @@ public class ChartCreator : MonoBehaviour
         header.sid = dataLoader.GenerateSid();
         header.mid = mid == -1 ? cHeader.mid : mid;
         bool copyInfo = header.mid == cHeader.mid;
-        if (UserInfo.username == null || UserInfo.username.Length == 0)
+        if (UserInfo.isOffline)
         {
             header.author = "Guest";
             header.authorNick = "Guest";
         }
         else
         {
-            header.author = UserInfo.username;
-            header.authorNick = Authenticate.user.Nickname;
+            header.author = UserInfo.user.Username;
+            header.authorNick = UserInfo.user.Nickname;
         }
         header.backgroundFile = cHeader.backgroundFile;
         header.preview = (!copyInfo || cHeader.preview == null) ? new float[] { 0.0f, 0.0f } : cHeader.preview.ToArray();

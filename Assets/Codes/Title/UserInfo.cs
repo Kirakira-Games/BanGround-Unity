@@ -2,13 +2,15 @@
 using UnityEngine.UI;
 using UnityEngine.Networking;
 using UniRx.Async;
+using Zenject;
+using Web.Auth;
 
 public class UserInfo : MonoBehaviour
 {
+    public static User user;
+    public static bool isOffline;
     private Text username_Text;
     private Image userAvatar;
-
-    public static string username;
 
     private void Start()
     {
@@ -16,18 +18,17 @@ public class UserInfo : MonoBehaviour
         userAvatar = GameObject.Find("Avatar").GetComponent<Image>();
     }
 
-    public async void GetUserInfo()
+    public async UniTaskVoid GetUserInfo()
     {
-        if (Authenticate.user == null)
+        if (user == null)
             return;
 
-        username_Text.text = Authenticate.user.Nickname;
-        username = Authenticate.user.Username;
+        username_Text.text = user.Nickname;
 
-        if (Authenticate.user.Avatar == "N/A")
+        if (user.Avatar == "N/A")
             return;
 
-        using (UnityWebRequest ub = UnityWebRequestTexture.GetTexture(Authenticate.user.Avatar))
+        using (UnityWebRequest ub = UnityWebRequestTexture.GetTexture(user.Avatar))
         {
             await ub.SendWebRequest();
             var tex = DownloadHandlerTexture.GetContent(ub);

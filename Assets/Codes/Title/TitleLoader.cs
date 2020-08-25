@@ -4,6 +4,9 @@ using AudioProvider;
 using UnityEngine.UI;
 using UniRx.Async;
 using Zenject;
+using Web;
+using Web.Auth;
+using System;
 
 public class TitleLoader : MonoBehaviour
 {
@@ -11,6 +14,11 @@ public class TitleLoader : MonoBehaviour
     private IAudioManager audioManager;
     [Inject]
     private IMessageBannerController messageBannerController;
+    [Inject]
+    private IKiraWebRequest web;
+
+    [Inject(Id = "cl_language")]
+    KVar cl_language;
 
     public TextAsset titleMusic;
     public TextAsset[] voice;
@@ -18,6 +26,7 @@ public class TitleLoader : MonoBehaviour
     public Text touchStart;
     public Material backgroundMat;
     public MeshRenderer background;
+    public UserInfo userCanvas;
 
     public InputField usernameField;
     public InputField passwordField;
@@ -28,15 +37,9 @@ public class TitleLoader : MonoBehaviour
 
     public ISoundTrack music;
     private ISoundEffect banGround;
-
-    private Authenticate auth = new Authenticate();
+    private bool isAuthing;
 
     const string BACKGROUND_PATH = "backgrounds";
-
-    [Inject(Id = "cl_accesstoken")]
-    KVar cl_accessToken;
-    [Inject(Id = "cl_refreshtoken")]
-    KVar cl_refreshToken;
     /*
      * Test User for editor:
      * Username:
@@ -56,7 +59,7 @@ public class TitleLoader : MonoBehaviour
 
         if (backgrounds.Length != 0)
         {
-            var tex = KiraFilesystem.Instance.ReadTexture2D(backgrounds[Random.Range(0, backgrounds.Length)]);
+            var tex = KiraFilesystem.Instance.ReadTexture2D(backgrounds[UnityEngine.Random.Range(0, backgrounds.Length)]);
 
             var matCopy = Instantiate(backgroundMat);
 
@@ -67,19 +70,39 @@ public class TitleLoader : MonoBehaviour
         }
     }
 
-    private void Start()
+    private async void Start()
     {
         PlayTitle();
 
-        if (!string.IsNullOrEmpty(cl_accessToken) && !string.IsNullOrEmpty(cl_refreshToken))
-            _ = auth.TryAuthenticate();
-
-        //MessageBoxController.ShowMsg(LogLevel.INFO, SystemInfo.deviceUniqueIdentifier.Substring(0, 8));
+        if (!string.IsNullOrEmpty(web.AccessToken) && !string.IsNullOrEmpty(web.RefreshToken))
+        {
+            LoadingBlocker.instance.Show("Logging in...");
+            try
+            {
+                await web.DoRefreshAccessToken();
+                userCanvas.GetUserInfo().Forget();
+            }
+            catch (KiraWebException e)
+            {
+                if (e.isNetworkError)
+                {
+                    UserInfo.user = new User
+                    {
+                        Avatar = "N/A",
+                        Nickname = "Offline",
+                        Username = "Offline"
+                    };
+                    UserInfo.isOffline = true;
+                }
+                userCanvas.GetUserInfo().Forget();
+            }
+            catch { }
+            LoadingBlocker.instance.Close();
+        }
     }
 
     async void PlayTitle()
     {
-        //yield return new WaitForSeconds(0.5f);
         music = await audioManager.PlayLoopMusic(titleMusic.bytes);
         music.SetVolume(0.7f);
         await UniTask.Delay(3000); //yield return new WaitForSeconds(3f);
@@ -95,22 +118,27 @@ public class TitleLoader : MonoBehaviour
 
     public async void SubmitLogin()
     {
-        if (Authenticate.isAuthing)
+        if (isAuthing)
             return;
 
-        var good = await auth.TryAuthenticate(usernameField.text, passwordField.text, false);
-
-        if (good)
+        isAuthing = true;
+        try
         {
+            await web.DoLogin(usernameField.text, passwordField.text);
             loginPanel.SetActive(false);
         }
-        else
+        catch (KiraWebException e)
         {
-            if(Authenticate.isNetworkError)
+            if (e.isNetworkError)
                 messageBannerController.ShowMsg(LogLevel.ERROR, "Unable to connect to the server! Check your network");
             else
                 messageBannerController.ShowMsg(LogLevel.ERROR, "Username or Password is wrong!");
         }
+        catch (Exception e)
+        {
+            messageBannerController.ShowMsg(LogLevel.ERROR, e.Message);
+        }
+        isAuthing = false;
     }
 
     public void OnRegisterClicked()
@@ -155,9 +183,6 @@ public class TitleLoader : MonoBehaviour
             te.waitingUpdate = false;
         }
     }
-
-    [Inject(Id = "cl_language")]
-    KVar cl_language;
 
     private void OnDestroy()
     {
