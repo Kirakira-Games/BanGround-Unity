@@ -341,7 +341,7 @@ namespace AudioProvider
             }
             else
             {
-                fmodSystem.setDSPBufferSize(512, 4);
+                fmodSystem.setDSPBufferSize(256, 4);
             }
             fmodSystem.setSoftwareFormat(sampleRate, SPEAKERMODE.STEREO, 0);
             fmodSystem.setOutput((OUTPUTTYPE)ao_output);
