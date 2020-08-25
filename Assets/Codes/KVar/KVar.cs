@@ -140,7 +140,6 @@ public class KVar : KonCommandBase
         {
             if (typeof(T) != typeof(string))
                 throw new ArgumentException("Only string is acceptable!");
-
             return (T)(object)m_stringValue;
         }
 
