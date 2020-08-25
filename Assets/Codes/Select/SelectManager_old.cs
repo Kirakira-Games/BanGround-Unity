@@ -65,7 +65,7 @@ public class SelectManager_old : MonoBehaviour
         Screen.autorotateToLandscapeRight = true;
 
         InitComponent();
-        GameObject.Find("UserInfo").GetComponent<UserInfo>().GetUserInfo();
+        GameObject.Find("UserInfo").GetComponent<UserInfo>().GetUserInfo().Forget();
 
         // Register callback
         chartListManager.onChartListUpdated.AddListener(RefreshSongList);
