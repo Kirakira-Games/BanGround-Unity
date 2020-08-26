@@ -1,25 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using Zenject;
 
 public abstract class NoteBase : MonoBehaviour, KirakiraTracer
 {
-    #region Static
-    public static bool rGreyNote { get; private set; }
-    public static bool rBangPerspect { get; private set; }
-    public static bool rSyncLine { get; private set; }
-
-    static KVarRef r_graynote = new KVarRef("r_graynote");
-    static KVarRef r_notesize = new KVarRef("r_notesize");
-    static KVarRef r_bang_perspect = new KVarRef("r_bang_perspect");
-    static KVarRef r_syncline = new KVarRef("r_syncline");
-
-    public static void Init()
-    {
-        rGreyNote = r_graynote;
-        rBangPerspect = r_bang_perspect;
-        rSyncLine = r_syncline;
-    }
-    #endregion
+    private KVar r_graynote;
+    private KVar r_notesize;
+    private KVar r_bang_perspect;
 
     public int time;
     public int lane;
@@ -44,6 +31,13 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
     public Vector3 initPos;
     public Vector3 judgePos;
     public virtual Color color => noteMesh.meshRenderer.sharedMaterial.GetColor("_Tint");
+
+    public void Inject(KVar r_graynote, KVar r_notesize, KVar r_bang_perspect)
+    {
+        this.r_graynote = r_graynote;
+        this.r_notesize = r_notesize;
+        this.r_bang_perspect = r_bang_perspect;
+    }
 
     public virtual void InitNote(IResourceLoader resourceLoader, INoteController noteController)
     {
@@ -80,7 +74,7 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
         transform.localScale = Vector3.one * NoteUtility.NOTE_SCALE * r_notesize;
 
         // Setup material
-        noteMesh.meshRenderer.sharedMaterial = timingGroup.GetMaterial(type, noteMesh.meshRenderer.material, rGreyNote && data.isGray);
+        noteMesh.meshRenderer.sharedMaterial = timingGroup.GetMaterial(type, noteMesh.meshRenderer.material, r_graynote && data.isGray);
     }
 
 
@@ -104,7 +98,7 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
             float ratio = Mathf.InverseLerp(anim.time, next.time, NoteController.audioTimef);
             newpos = TransitionVector.LerpVector(anim.pos, next.pos, ratio);
         }
-        if (rBangPerspect)
+        if (r_bang_perspect)
         {
             // Z-pos specialization
             newpos.z = NoteUtility.GetBangPerspective(newpos.z);

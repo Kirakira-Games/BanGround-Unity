@@ -1,16 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
 
 public class NoteCamera : MonoBehaviour
 {
-    Camera noteCamera;
-
-    static KVarRef r_farclip = new KVarRef("r_farclip");
-
-    void Awake()
+    [Inject]
+    void Inject([Inject(Id = "r_farclip")]KVar r_farclip)
     {
-        noteCamera = GetComponent<Camera>();
+        var noteCamera = GetComponent<Camera>();
         noteCamera.farClipPlane = r_farclip;
     }
 }

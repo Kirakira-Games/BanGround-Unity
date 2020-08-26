@@ -41,7 +41,7 @@ public class ResourceLoader : IResourceLoader
 
     public T LoadIconResource<T>(string path) where T : Object
     {
-        string iconpath = fs_iconpath.Get<string>();
+        string iconpath = fs_iconpath;
         if (iconpath.EndsWith("/"))
         {
             iconpath = iconpath.Remove(iconpath.Length - 1);

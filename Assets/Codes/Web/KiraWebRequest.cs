@@ -81,12 +81,12 @@ namespace Web
         public string Language => "zh-CN";
         public string AccessToken
         {
-            get => cl_accesstoken.Get<string>();
+            get => cl_accesstoken;
             set => cl_accesstoken.Set(value);
         }
         public string RefreshToken
         {
-            get => cl_refreshtoken.Get<string>();
+            get => cl_refreshtoken;
             set => cl_refreshtoken.Set(value);
         }
 

@@ -9,10 +9,11 @@ public class TimingGroupController
     private GameTimingGroup group;
     private int ptr = 0;
     public Material[] materials;
-    static KVarRef r_brightness_long = new KVarRef("r_brightness_long");
+    KVar r_brightness_long;
 
-    public TimingGroupController(GameTimingGroup group)
+    public TimingGroupController(GameTimingGroup group, KVar r_brightness_long)
     {
+        this.r_brightness_long = r_brightness_long;
         this.group = group;
         materials = new Material[7];
     }

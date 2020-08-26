@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class FuwafuwaPillar : MonoBehaviour
 {
@@ -7,7 +6,11 @@ public class FuwafuwaPillar : MonoBehaviour
     private LineRenderer pillar;
     private const float LINE_WIDTH = 0.3f;
 
-    static KVarRef r_notesize = new KVarRef("r_notesize");
+    public void Inject(KVar r_notesize)
+    {
+        pillar.startWidth = LINE_WIDTH * r_notesize;
+        pillar.endWidth = LINE_WIDTH * r_notesize;
+    }
 
     private void Awake()
     {
@@ -16,8 +19,6 @@ public class FuwafuwaPillar : MonoBehaviour
         pillar.useWorldSpace = true;
         pillar.receiveShadows = false;
         pillar.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        pillar.startWidth = LINE_WIDTH * r_notesize;
-        pillar.endWidth = LINE_WIDTH * r_notesize;
         pillar.rendererPriority = 1;
         gameObject.layer = 8; // note
     }

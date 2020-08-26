@@ -128,35 +128,6 @@ public class KVar : KonCommandBase
         }
     }
 
-    readonly static Type stringType = typeof(string);
-    readonly static Type intType = typeof(int);
-    readonly static Type boolType = typeof(bool);
-    readonly static Type floatType = typeof(float);
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public T Get<T>()
-    {
-        if (IsFlagSet(KVarFlags.StringOnly))
-        {
-            if (typeof(T) != typeof(string))
-                throw new ArgumentException("Only string is acceptable!");
-            return (T)(object)m_stringValue;
-        }
-
-        var type = typeof(T);
-
-        if (type == stringType)
-            return (T)(object)m_stringValue;
-        else if (type == intType)
-            return (T)(object)m_intValue;
-        else if (type == floatType)
-            return (T)(object)m_floatValue;
-        else if (type == boolType)
-            return (T)(object)m_boolValue;
-        else
-            throw new ArgumentOutOfRangeException("Type not supported");
-    }
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Set<T>(T value)
     {
@@ -261,58 +232,20 @@ public class KVar : KonCommandBase
         };
     }
 
-    public static implicit operator string(KVar kVar) => kVar.Get<string>();
-    public static implicit operator int(KVar kVar) => kVar.Get<int>();
-    public static implicit operator float(KVar kVar) => kVar.Get<float>();
-    public static implicit operator bool(KVar kVar) => kVar.Get<bool>();
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator string(KVar kVar) => kVar.m_stringValue;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator int(KVar kVar) { if (kVar.IsFlagSet(KVarFlags.StringOnly)) throw new ArgumentException("Only strings are acceptable!"); return kVar.m_intValue; }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator float(KVar kVar) { if (kVar.IsFlagSet(KVarFlags.StringOnly)) throw new ArgumentException("Only strings are acceptable!"); return kVar.m_floatValue; }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator bool(KVar kVar) { if (kVar.IsFlagSet(KVarFlags.StringOnly)) throw new ArgumentException("Only strings are acceptable!"); return kVar.m_boolValue; }
 
     // ---------------------------------
-    public static explicit operator SEStyle(KVar kVar) => (SEStyle)kVar.Get<int>();
-    public static explicit operator NoteStyle(KVar kVar) => (NoteStyle)kVar.Get<int>();
-    public static explicit operator Sorter(KVar kVar) => (Sorter)kVar.Get<int>();
-}
-
-public class KVarRef
-{
-    private string m_kvarName;
-    private KVar kvarCache = null;
-    private KVar kVar 
-    { 
-        get 
-        { 
-            if (kvarCache == null) 
-                kvarCache = KVSystem.Instance.Find(m_kvarName); 
-
-            return kvarCache; 
-        } 
-    }
-
-    public T Get<T>()
-    {
-        return kVar.Get<T>();
-    }
-
-    public void Set<T>(T value)
-    {
-        kVar.Set(value);
-    }
-
-    public bool IsFlagSet(KVarFlags flag) => kVar.IsFlagSet(flag);
-
-    public KVarRef(string name)
-    {
-        m_kvarName = name;
-    }
-
-    public static implicit operator string(KVarRef kVar) => kVar.Get<string>();
-    public static implicit operator int(KVarRef kVar) => kVar.Get<int>();
-    public static implicit operator float(KVarRef kVar) => kVar.Get<float>();
-    public static implicit operator bool(KVarRef kVar) => kVar.Get<bool>();
-
-    // ---------------------------------
-    public static explicit operator SEStyle(KVarRef kVar) => (SEStyle)kVar.Get<int>();
-    public static explicit operator NoteStyle(KVarRef kVar) => (NoteStyle)kVar.Get<int>();
-    public static explicit operator Sorter(KVarRef kVar) => (Sorter)kVar.Get<int>();
+    public static explicit operator SEStyle(KVar kVar) => (SEStyle)(int)kVar;
+    public static explicit operator NoteStyle(KVar kVar) => (NoteStyle)(int)kVar;
+    public static explicit operator Sorter(KVar kVar) => (Sorter)(int)kVar;
+    public static explicit operator Difficulty(KVar kVar) => (Difficulty)(int)kVar;
 }
 
 public class KVSystem : IKVSystem
@@ -328,9 +261,18 @@ public class KVSystem : IKVSystem
     private Dictionary<string, string> m_wfaValues = new Dictionary<string, string>();
 
     // g_cheats KVar, for CanCheat check
-    private KVarRef cheat = new KVarRef("g_cheats");
+    KVar cheat;
 
-    public bool CanCheat => cheat.Get<bool>();
+    public bool CanCheat
+    {
+        get
+        {
+            if (cheat == null)
+                cheat = Find("g_cheats");
+
+            return cheat;
+        }
+    }
 
     KVSystem()
     {
@@ -408,7 +350,7 @@ public class KVSystem : IKVSystem
                 {
                     if (userInput)
                     {
-                        Debug.Log($"KVar: {cmdName} - {kVar.Get<string>()} (Default: {kVar.Default})");
+                        Debug.Log($"KVar: {cmdName} - {(string)kVar} (Default: {kVar.Default})");
 
                         if (!string.IsNullOrEmpty(kVar.Description))
                             Debug.Log(kVar.Description);
@@ -467,7 +409,7 @@ public class KVSystem : IKVSystem
             {
                 if (var.IsFlagSet(KVarFlags.Archive))
                 {
-                    cfg = $"{cfg}{name} {var.Get<string>()}\n";
+                    cfg = $"{cfg}{name} {(string)var}\n";
                 }
             }
         }

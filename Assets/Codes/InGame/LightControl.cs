@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
 
 public class LightControl : MonoBehaviour
 {
@@ -23,7 +24,8 @@ public class LightControl : MonoBehaviour
         }
     }
 
-    static KVarRef r_lanefx = new KVarRef("r_lanefx"); 
+    [Inject(Id = "r_lanefx")]
+    KVar r_lanefx; 
 
     public void TriggerLight(int lane, int result = -2)
     {

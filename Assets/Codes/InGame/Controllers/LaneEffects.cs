@@ -15,7 +15,8 @@ public class LaneEffects : MonoBehaviour
     private float prevSpeed;
     private Quaternion[] rotation;
 
-    static KVarRef effect = new KVarRef("r_showeffect");
+    [Inject(Id = "r_showeffect")]
+    KVar effect;
 
     public static TimingPoint GetIndexByTime(List<TimingPoint> list, float time)
     {
@@ -66,7 +67,8 @@ public class LaneEffects : MonoBehaviour
         };
     }
 
-    static KVarRef r_notespeed = new KVarRef("r_notespeed");
+    [Inject(Id = "r_notespeed")]
+    KVar r_notespeed;
 
     public void UpdateLaneEffects()
     {

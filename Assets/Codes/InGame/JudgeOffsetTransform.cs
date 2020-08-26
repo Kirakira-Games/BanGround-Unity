@@ -1,10 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
 
 public class JudgeOffsetTransform : MonoBehaviour
 {
-    static KVarRef cl_offset_transform = new KVarRef("cl_offset_transform");
+    [Inject(Id = "cl_offset_transform")]
+    KVar cl_offset_transform;
 
     // Start is called before the first frame update
     void Start()

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
+using Zenject;
 
 // 绿条
 public class SlideMesh : MonoBehaviour
@@ -17,9 +18,13 @@ public class SlideMesh : MonoBehaviour
     public static Material cacheMat = null;
     public static readonly Vector3 initPos = new Vector3(0, -0.01f);
 
-    static KVarRef r_brightness_long = new KVarRef("r_brightness_long");
-    static KVarRef r_notesize = new KVarRef("r_notesize");
+    KVar r_notesize;
     private float width;
+
+    public void Inject(KVar r_notesize)
+    {
+        this.r_notesize = r_notesize;
+    }
 
     public void ResetMesh(Transform S, Transform T, bool isFuwafuwa, Material material)
     {

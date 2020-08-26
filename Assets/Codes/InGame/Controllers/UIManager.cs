@@ -50,11 +50,18 @@ public class UIManager : MonoBehaviour, IUIManager
 
     private ISoundEffect resultVoice;
 
+    [Inject]
+    void Inject([Inject(Id = "r_lowresolution")] KVar lowResolution)
+    {
+        QualitySettings.SetQualityLevel(lowResolution ? 0 : 1);
+    }
+
+/*
     private void Awake()
     {
         KVarRef lowResolution = new KVarRef("r_lowresolution");
         QualitySettings.SetQualityLevel(lowResolution ? 0 : 1);
-    }
+    }*/
 
     void Start()
     {
