@@ -131,7 +131,7 @@ namespace V2
                 beat = new int[] { -100, 0, 1 },
                 speed = new TransitionProperty<float>(1f),
                 tap = new TransitionColor(113, 237, 255),
-                tapGrey = new TransitionColor(246, 246, 246),
+                tapGrey = new TransitionColor(180, 180, 180),
                 flick = new TransitionColor(255, 59, 114),
                 slideTick = new TransitionColor(84, 230, 44),
                 slide = new TransitionColor(84, 230, 44)
