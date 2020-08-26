@@ -38,6 +38,8 @@ public class SettingAndMod : MonoBehaviour
     private NoteStyleToggleGroup noteToggles;
     private SESelector seSelector;
 
+    public Toggle soundTog;
+
     /* Mods     */
 
     // Auto
@@ -233,7 +235,7 @@ public class SettingAndMod : MonoBehaviour
         //GetModStatus();
         GameObject.Find("Setting_Canvas").GetComponent<Animator>().SetTrigger("SwitchSetting");
         setting_Close_Btn.gameObject.SetActive(true);
-        if (GameObject.Find("SoundToggle").GetComponent<Toggle>().isOn)
+        if (soundTog.isOn)
         {
             SelectManager_old.instance.previewSound?.Pause();
         }

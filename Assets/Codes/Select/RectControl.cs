@@ -40,7 +40,7 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public Color SelectedColor = Color.white;
     public Color DisabledColor = Color.clear;
 
-    public static Color UnselectColor = new Color(0.4f, 0.4f, 0.4f, 1);
+    public static Color UnselectColor = new Color(1, 1, 1, 0.75f);
 
     bool select = false;
 
