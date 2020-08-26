@@ -52,8 +52,10 @@ public class JudgeResultController : MonoBehaviour
         animator.Play("Play", -1, 0);
     }
 
-    static KVarRef cl_showms = new KVarRef("cl_showms");
-    static KVarRef cl_elp = new KVarRef("cl_elp");
+    [Inject(Id = "cl_showms")]
+    KVar cl_showms;
+    [Inject(Id = "cl_elp")]
+    KVar cl_elp;
 
     public void DisplayJudgeOffset(NoteBase note, int result)
     {

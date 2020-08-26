@@ -177,8 +177,6 @@ public static class NoteUtility
         }
     }
 
-    static KVarRef cl_notestyle = new KVarRef("cl_notestyle");
-
     public static bool IsTouchContinuing(Touch touch)
     {
         return touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Stationary;

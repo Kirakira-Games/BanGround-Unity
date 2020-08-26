@@ -30,8 +30,10 @@ public class ChartTiming
         return beat[0] + (float)beat[1] / beat[2];
     }
 
-    public ChartTiming(List<ValuePoint> bpms, int offset, int noteScreenTime)
+    public ChartTiming(List<ValuePoint> bpms, int offset, int noteScreenTime, KVar r_mirror)
     {
+        this.r_mirror = r_mirror;
+
         totTime = noteScreenTime / 1000f;
         this.bpms = bpms;
         bpms.ForEach(bpm => bpm.beatf = BeatToFloat(bpm.beat));
@@ -210,7 +212,8 @@ public class ChartTiming
         }
     }
 
-    static KVarRef r_mirror = new KVarRef("r_mirror");
+    KVar r_mirror;
+
     public void AddAnimation(V2.Note data)
     {
         Debug.Assert(data.beat != null);

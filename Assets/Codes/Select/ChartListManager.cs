@@ -6,6 +6,7 @@ using UnityEngine.Events;
 using UniRx.Async;
 using System;
 using Newtonsoft.Json;
+using System.Linq;
 
 public class ChartIndexInfo
 {
@@ -57,18 +58,22 @@ public class ChartListManager : IChartListManager
         {
             SortChart();
             SelectChartBySid(cl_lastsid);
-            SelectDifficulty((Difficulty)cl_lastdiff.Get<int>());
+            SelectDifficulty((Difficulty)cl_lastdiff);
         });
     }
 
     private void UpdateActualDifficulty()
     {
         var header = selectedChart.header;
-        int difficulty = cl_lastdiff.Get<int>();
-        while (header.difficultyLevel[difficulty] == -1)
+        int difficulty = cl_lastdiff;
+
+        int circleshit = 0;
+
+        while (header.difficultyLevel[difficulty] == -1 && ++circleshit < 6)
         {
             difficulty = (difficulty + 1) % ((int)Difficulty.Special + 1);
         }
+
         if (selectedChart.difficulty == (Difficulty)difficulty)
             return;
         selectedChart.difficulty = (Difficulty)difficulty;
@@ -143,6 +148,9 @@ public class ChartListManager : IChartListManager
         onChartListUpdated.Invoke();
     }
 
+    [Inject(Id = "r_mirror")]
+    KVar r_mirror;
+
     public async UniTask<bool> LoadChart(bool convertToGameChart)
     {
         chart = await ChartVersion.Instance.Process(current.header, current.difficulty);
@@ -155,8 +163,8 @@ public class ChartListManager : IChartListManager
         {
             if (convertToGameChart)
             {
-                gameChart = ChartLoader.LoadChart(
-                    JsonConvert.DeserializeObject<V2.Chart>(
+                gameChart = LoadChartInternal(
+                        JsonConvert.DeserializeObject<V2.Chart>(
                         JsonConvert.SerializeObject(chart)
                     ));
             }
@@ -168,5 +176,28 @@ public class ChartListManager : IChartListManager
             Debug.LogError(e.StackTrace);
             return false;
         }
+    }
+
+    private GameChartData LoadChartInternal(V2.Chart chart)
+    {
+        ChartLoader.numNotes = 0;
+        var timing = new ChartTiming(chart.bpm, chart.offset, ModManager.Instance.NoteScreenTime, r_mirror);
+        List<GameNoteData> gameNotes = new List<GameNoteData>();
+        for (int i = 0; i < chart.groups.Count; i++)
+        {
+            ChartLoader.LoadTimingGroup(timing, i, chart.groups[i]).ForEach(note => gameNotes.Add(note));
+        }
+
+        // Sort notes by animation order
+        gameNotes.Sort(new GameNoteComparer());
+
+        return new GameChartData
+        {
+            isFuwafuwa = ChartLoader.IsChartFuwafuwa(gameNotes),
+            numNotes = ChartLoader.numNotes,
+            notes = gameNotes.ToArray(),
+            groups = chart.groups.Select(x => ChartLoader.ToGameTimingGroup(x)).ToArray(),
+            bpm = chart.bpm.ToArray()
+        };
     }
 }

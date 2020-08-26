@@ -19,7 +19,8 @@ public class InGameBackground : MonoBehaviour, IInGameBackground
     private MeshRenderer mesh;
     private VideoPlayer vp;
 
-    static KVarRef r_brightness_bg = new KVarRef("r_brightness_bg");
+    [Inject(Id = "r_brightness_bg")]
+    KVar r_brightness_bg;
 
     private void Awake()
     {

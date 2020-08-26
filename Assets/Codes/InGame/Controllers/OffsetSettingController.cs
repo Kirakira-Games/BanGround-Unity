@@ -17,9 +17,12 @@ public class OffsetSettingController : MonoBehaviour
     private Queue<int> recentQueue;
     private int sum;
 
-    private static KVarRef r_notesize = new KVarRef("r_notesize");
-    private static KVarRef o_judge = new KVarRef("o_judge");
-    private static KVarRef o_audio = new KVarRef("o_audio");
+    [Inject(Id = "r_notesize")]
+    KVar r_notesize;
+    [Inject(Id = "o_judge")]
+    KVar o_judge;
+    [Inject(Id = "o_audio")]
+    KVar o_audio;
 
     private InputField noteSize;
     private InputField judgeOffset;
@@ -37,11 +40,11 @@ public class OffsetSettingController : MonoBehaviour
         //var noteSpeed = GameObject.Find("Speed_Input").GetComponent<InputField>();
         //noteSpeed.text = string.Format("{0:f1}", r_notespeed.Get<float>());
         noteSize = GameObject.Find("Size_Input").GetComponent<InputField>();
-        noteSize.text = string.Format("{0:f1}", r_notesize.Get<float>());
+        noteSize.text = string.Format("{0:f1}", (float)r_notesize);
         judgeOffset = GameObject.Find("Judge_Input").GetComponent<InputField>();
-        judgeOffset.text = o_judge.Get<int>().ToString();
+        judgeOffset.text = o_judge;
         audioOffset = GameObject.Find("Audio_Input").GetComponent<InputField>();
-        audioOffset.text = o_audio.Get<int>().ToString();
+        audioOffset.text = o_audio;
     }
 
     public void Add(int offset)

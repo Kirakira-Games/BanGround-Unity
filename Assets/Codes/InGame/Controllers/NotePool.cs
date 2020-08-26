@@ -58,6 +58,12 @@ public class NotePool : MonoBehaviour
     private KVar r_notesize;
     [Inject(Id = "o_judge")]
     private KVar o_judge;
+    [Inject(Id = "r_graynote")]
+    private KVar r_graynote;
+    [Inject(Id = "r_bang_perspect")]
+    private KVar r_bang_perspect;
+    [Inject(Id = "r_syncline")]
+    KVar r_syncline;
 
     #region Add
     private void AddNote(Queue<NoteBase> Q, GameNoteType type, int count = 1)
@@ -90,6 +96,7 @@ public class NotePool : MonoBehaviour
                     note = obj.AddComponent<SlideEndFlick>();
                     break;
             }
+            note.Inject(r_graynote, r_notesize, r_bang_perspect);
             note.isDestroyed = true;
 
             if (NoteUtility.IsSlide(type))
@@ -98,6 +105,7 @@ public class NotePool : MonoBehaviour
                 var pillar = new GameObject("Pillar");
                 pillar.transform.SetParent(obj.transform);
                 slideNote.pillar = pillar.AddComponent<FuwafuwaPillar>();
+                slideNote.pillar.Inject(r_notesize);
 
                 if (!NoteUtility.IsSlideEnd(type))
                 {
@@ -105,6 +113,7 @@ public class NotePool : MonoBehaviour
                     mesh.transform.SetParent(obj.transform);
                     slideNote.slideMesh = mesh.AddComponent<SlideMesh>();
                     slideNote.slideMesh.InitMesh(resourceLoader);
+                    slideNote.slideMesh.Inject(r_notesize);
                     //mesh.AddComponent<NoteRotation>().needRot = false;
                 }
             }
@@ -120,7 +129,10 @@ public class NotePool : MonoBehaviour
         {
             var obj = new GameObject("Syncline");
             obj.transform.SetParent(transform);
-            syncLineQueue.Enqueue(obj.AddComponent<NoteSyncLine>());
+            var line = obj.AddComponent<NoteSyncLine>();
+            syncLineQueue.Enqueue(line);
+
+            line.Inject(r_notesize, r_syncline);
         }
     }
 

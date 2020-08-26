@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
 
 class NoteBaseXComparer : IComparer<NoteBase>
 {
@@ -24,7 +25,14 @@ public class NoteSyncLine : MonoBehaviour
     private static readonly Vector3 PARTIAL_POS = new Vector3(0, -0.05f, 0);
     private const float lineWidth = 0.06f;
 
-    static KVarRef r_notesize = new KVarRef("r_notesize");
+    KVar r_notesize;
+    KVar r_syncline;
+
+    public void Inject(KVar r_notesize, KVar r_syncline)
+    {
+        this.r_notesize = r_notesize;
+        this.r_syncline = r_syncline;
+    }
 
     public static LineRenderer CreatePartialLine(GameObject obj)
     {
@@ -79,7 +87,7 @@ public class NoteSyncLine : MonoBehaviour
             NotePool.Instance.DestroySyncLine(this);
             return;
         }
-        if (!NoteBase.rSyncLine)
+        if (!r_syncline)
         {
             return;
         }

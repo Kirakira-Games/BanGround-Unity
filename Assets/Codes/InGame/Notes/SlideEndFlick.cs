@@ -1,13 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Zenject;
 
 public class SlideEndFlick : SlideNoteBase
 {
-    [Inject(Id = "fs_assetpath")]
-    private KVar fs_assetpath;
-
     protected FlickArrow flickArrow;
 
     protected override JudgeResult TrySlideJudge(KirakiraTouch touch)

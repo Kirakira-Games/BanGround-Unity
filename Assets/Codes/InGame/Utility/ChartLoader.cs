@@ -142,7 +142,7 @@ public static class ChartLoader
         }
     }
 
-    private static List<GameNoteData> LoadTimingGroup(ChartTiming timing, int groupId, V2.TimingGroup group)
+    internal static List<GameNoteData> LoadTimingGroup(ChartTiming timing, int groupId, V2.TimingGroup group)
     {
         // AnalyzeNotes
         var notes = group.notes;
@@ -236,29 +236,6 @@ public static class ChartLoader
         return new GameTimingGroup
         {
             points = group.points
-        };
-    }
-
-    public static GameChartData LoadChart(V2.Chart chart)
-    {
-        numNotes = 0;
-        var timing = new ChartTiming(chart.bpm, chart.offset, ModManager.Instance.NoteScreenTime);
-        List<GameNoteData> gameNotes = new List<GameNoteData>();
-        for (int i = 0; i < chart.groups.Count; i++)
-        {
-            LoadTimingGroup(timing, i, chart.groups[i]).ForEach(note => gameNotes.Add(note));
-        }
-
-        // Sort notes by animation order
-        gameNotes.Sort(new GameNoteComparer());
-
-        return new GameChartData
-        {
-            isFuwafuwa = IsChartFuwafuwa(gameNotes),
-            numNotes = numNotes,
-            notes = gameNotes.ToArray(),
-            groups = chart.groups.Select(x => ToGameTimingGroup(x)).ToArray(),
-            bpm = chart.bpm.ToArray()
         };
     }
 }

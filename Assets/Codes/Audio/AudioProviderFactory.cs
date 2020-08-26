@@ -17,7 +17,7 @@ public class AudioProviderFactory : IFactory<IAudioProvider>
 
     public IAudioProvider Create()
     {
-        switch (snd_engine.Get<string>())
+        switch ((string)snd_engine)
         {
             case "Bass":
                 return container.Instantiate<BassAudioProvider>();

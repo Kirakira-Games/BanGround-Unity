@@ -1,13 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
 
 public class LaneTransform : MonoBehaviour
 {
     float desScaleZ;
     float desPosZ;
 
-    static KVarRef r_farclip = new KVarRef("r_farclip");
+    [Inject(Id = "r_farclip")]
+    KVar r_farclip;
     void Start()
     {
         desScaleZ = r_farclip * 0.11838f - 1.00623f;

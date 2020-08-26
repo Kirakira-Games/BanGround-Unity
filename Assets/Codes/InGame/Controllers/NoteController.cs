@@ -99,7 +99,8 @@ public class NoteController : MonoBehaviour, INoteController
         return se;
     }
 
-    static KVarRef r_shake_flick = new KVarRef("r_shake_flick");
+    [Inject(Id = "r_shake_flick")]
+    KVar r_shake_flick;
 
     // Judge a note as result
     public void Judge(NoteBase notebase, JudgeResult result, KirakiraTouch touch)
@@ -374,7 +375,8 @@ public class NoteController : MonoBehaviour, INoteController
         }
     }
 
-    static KVarRef cl_sestyle = new KVarRef("cl_sestyle");
+    [Inject(Id = "r_brightness_long")]
+    KVar r_brightness_long;
 
     async void Start()
     {
@@ -413,7 +415,7 @@ public class NoteController : MonoBehaviour, INoteController
         ComboManager.manager.Init(chart.numNotes);
 
         // Timing groups
-        timingGroups = chart.groups.Select(g => new TimingGroupController(g)).ToArray();
+        timingGroups = chart.groups.Select(g => new TimingGroupController(g, r_brightness_long)).ToArray();
 
         // Check AutoPlay
         if (modManager.isAutoplay)
@@ -499,9 +501,6 @@ public class NoteController : MonoBehaviour, INoteController
                     }
                 });
         }
-
-        // Init notes
-        NoteBase.Init();
     }
 
     void Update()
