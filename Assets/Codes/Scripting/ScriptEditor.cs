@@ -5,6 +5,159 @@ using UnityEngine.UI;
 using System;
 using Antlr4.Runtime;
 using System.Linq;
+using Antlr4.Runtime.Misc;
+
+class StringColor
+{
+    public int startPos;
+    public int endPos;
+
+    public string color;
+
+    public void Modify(ref string str)
+    {
+        str = str.Insert(endPos + 1, "</color>");
+        str = str.Insert(startPos, "<color=" + color + ">");
+    }
+}
+
+class LuaHighlighter : LuaBaseVisitor<bool>
+{
+    string code;
+
+    private List<StringColor> colors = new List<StringColor>();
+    private LuaParser.ChunkContext AST;
+
+    Dictionary<string, string> HighLightColors = new Dictionary<string, string>
+        {
+            { "KEYWORDS", "#c678dd" },
+            { "OPERATORS", "#56b6c2" },
+            { "COMMENT", "#7f848e" },
+            { "LINE_COMMENT", "#7f848e" },
+            { "INT", "#d19a66" },
+            { "FLOAT", "#d19a66" },
+            { "HEX", "#d19a66" },
+            { "HEX_FLOAT", "#d19a66" },
+        };
+
+    private static readonly string[] _KeyWords =
+    {
+            "'break'", "'goto'", "'do'", "'end'", "'while'", "'repeat'",
+            "'until'", "'if'", "'then'", "'elseif'", "'else'", "'for'",
+            "'in'", "'function'", "'local'", "'return'", "'nil'", "'false'", "'true'"
+        };
+
+    private static readonly string[] _Operators =
+    {
+            "'='", "'...'", "'or'", "'and'", "'<='", "'>='", "'~='", "'=='", "'..'", "'+'","'<'", "'>'",
+            "'-'", "'*'", "'/'", "'%'", "'&'", "'|'", "'~'", "'<<'", "'>>'", "'not'", "'#'", "'^'"
+        };
+
+    public LuaHighlighter(string str)
+    {
+        code = str;
+
+        var stream = new AntlrInputStream(code);
+        var lexer = new LuaLexer(stream);
+        var tokenStream = new CommonTokenStream(lexer);
+        var parser = new LuaParser(tokenStream);
+
+        tokenStream.Fill();
+        var tokens = tokenStream.GetTokens();
+
+        foreach (var token in tokens)
+        {
+            var style = lexer.Vocabulary.GetDisplayName(token.Type);
+
+            if (_KeyWords.Contains(style))
+                style = "KEYWORDS";
+            else if (_Operators.Contains(style))
+                style = "OPERATORS";
+
+            if (HighLightColors.ContainsKey(style))
+            {
+                colors.Add(new StringColor
+                {
+                    color = HighLightColors[style],
+                    startPos = token.StartIndex,
+                    endPos = token.StopIndex
+                });
+            }
+        }
+
+        AST = parser.chunk();
+    }
+
+    public override bool VisitParlist([NotNull] LuaParser.ParlistContext context)
+    {
+        var childs = context.namelist().NAME();
+
+        foreach (var par in childs)
+        {
+            colors.Add(new StringColor
+            {
+                color = "#e06c75",
+                startPos = par.Symbol.StartIndex,
+                endPos = par.Symbol.StopIndex
+            });
+        }
+
+        return base.VisitParlist(context);
+    }
+
+    public override bool VisitString([NotNull] LuaParser.StringContext context)
+    {
+        colors.Add(new StringColor
+        {
+            color = "#98c379",
+            startPos = context.Start.StartIndex,
+            endPos = context.Start.StopIndex
+        });
+
+        return base.VisitString(context);
+    }
+
+    public override bool VisitVar([NotNull] LuaParser.VarContext context)
+    {
+        colors.Add(new StringColor
+        {
+            color = "#61afef",
+            startPos = context.Start.StartIndex,
+            endPos = context.Start.StopIndex
+        });
+
+        return base.VisitVar(context);
+    }
+
+    public override bool VisitFuncname([NotNull] LuaParser.FuncnameContext context)
+    {
+        colors.Add(new StringColor
+        {
+            color = "#56b6c2",
+            startPos = context.Start.StartIndex,
+            endPos = context.Start.StopIndex
+        });
+
+        return base.VisitFuncname(context);
+    }
+
+    public string GetHighlightedCode()
+    {
+        Visit(AST);
+
+        colors.Sort((a, b) =>
+        {
+            return b.startPos - a.startPos;
+        });
+
+        string result = code;
+
+        foreach (var color in colors)
+            color.Modify(ref result);
+
+        return result;
+    }
+}
 
 public class ScriptEditor : MonoBehaviour
 {
@@ -21,37 +174,7 @@ public class ScriptEditor : MonoBehaviour
     private int cursorPos = 0;
     private float lineHeight = 0.0f;
 
-    private const string _NormalColor = "#abb2bf";
-
     public string Code { get { return input.text; } set { input.text = value; } }
-
-    Dictionary<string, string> HighLightColors = new Dictionary<string, string>
-    {
-        { "KEYWORDS", "#c678dd" },
-        { "OPERATORS", "#56b6c2" },
-        { "NORMALSTRING", "#98c379" },
-        { "CHARSTRING", "#98c379" },
-        { "LONGSTRING", "#98c379" },
-        { "COMMENT", "#7f848e" },
-        { "LINE_COMMENT", "#7f848e" },
-        { "INT", "#d19a66" },
-        { "FLOAT", "#d19a66" },
-        { "HEX", "#d19a66" },
-        { "HEX_FLOAT", "#d19a66" },
-    };
-
-    private static readonly string[] _KeyWords =
-    {
-        "'break'", "'goto'", "'do'", "'end'", "'while'", "'repeat'",
-        "'until'", "'if'", "'then'", "'elseif'", "'else'", "'for'",
-        "'in'", "'function'", "'local'", "'return'", "'nil'", "'false'", "'true'"
-    };
-
-    private static readonly string[] _Operators =
-    {
-        "'='", "'...'", "'or'", "'and'", "'<='", "'>='", "'~='", "'=='", "'..'", "'+'","'<'", "'>'",
-        "'-'", "'*'", "'/'", "'%'", "'&'", "'|'", "'~'", "'<<'", "'>>'", "'not'", "'#'", "'^'"
-    };
 
     // Start is called before the first frame update
     void Start()
@@ -67,31 +190,9 @@ public class ScriptEditor : MonoBehaviour
         if(codeChanged)
         {
             codeChanged = false;
-            
-            var stream = new AntlrInputStream(input.text);
-            var lexer = new LuaLexer(stream);
-            var tokenStream = new CommonTokenStream(lexer);
-            tokenStream.Fill();
-            var tokens = tokenStream.GetTokens();
 
-            highlightedCode = input.text;
-
-            for (int i = tokens.Count - 1; i >= 0; i--)
-            {
-                var token = tokens[i];
-
-                var style = lexer.Vocabulary.GetDisplayName(token.Type);
-
-                if (_KeyWords.Contains(style))
-                    style = "KEYWORDS";
-                else if (_Operators.Contains(style))
-                    style = "OPERATORS";
-
-                var color = HighLightColors.ContainsKey(style) ? HighLightColors[style] : _NormalColor;
-
-                highlightedCode = highlightedCode.Insert(token.StopIndex + 1, "</color>");
-                highlightedCode = highlightedCode.Insert(token.StartIndex, "<color=" + color + ">");
-            }
+            var highlighter = new LuaHighlighter(input.text);
+            highlightedCode = highlighter.GetHighlightedCode();
 
             displayText.text = highlightedCode;
         }
