@@ -126,13 +126,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_chunk; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterChunk(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitChunk(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitChunk(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -173,13 +170,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_block; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterBlock(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitBlock(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitBlock(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -269,13 +263,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_stat; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterStat(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitStat(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitStat(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -489,13 +480,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_attnamelist; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterAttnamelist(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitAttnamelist(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitAttnamelist(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -544,13 +532,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_attrib; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterAttrib(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitAttrib(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitAttrib(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -595,13 +580,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_retstat; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterRetstat(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitRetstat(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitRetstat(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -652,13 +634,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_label; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterLabel(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitLabel(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitLabel(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -695,13 +674,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_funcname; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterFuncname(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitFuncname(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitFuncname(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -763,13 +739,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_varlist; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterVarlist(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitVarlist(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitVarlist(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -819,13 +792,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_namelist; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterNamelist(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitNamelist(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitNamelist(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -879,13 +849,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_explist; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterExplist(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitExplist(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitExplist(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -979,13 +946,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_exp; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterExp(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitExp(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitExp(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -1199,13 +1163,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_prefixexp; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterPrefixexp(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitPrefixexp(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitPrefixexp(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -1261,13 +1222,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_functioncall; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterFunctioncall(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitFunctioncall(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitFunctioncall(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -1324,13 +1282,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_varOrExp; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterVarOrExp(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitVarOrExp(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitVarOrExp(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -1385,13 +1340,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_var; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterVar(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitVar(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitVar(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -1466,13 +1418,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_varSuffix; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterVarSuffix(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitVarSuffix(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitVarSuffix(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -1539,13 +1488,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_nameAndArgs; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterNameAndArgs(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitNameAndArgs(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitNameAndArgs(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -1596,13 +1542,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_args; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterArgs(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitArgs(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitArgs(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -1669,13 +1612,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_functiondef; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterFunctiondef(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitFunctiondef(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitFunctiondef(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -1713,13 +1653,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_funcbody; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterFuncbody(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitFuncbody(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitFuncbody(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -1766,13 +1703,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_parlist; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterParlist(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitParlist(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitParlist(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -1831,13 +1765,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_tableconstructor; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterTableconstructor(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitTableconstructor(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitTableconstructor(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -1891,13 +1822,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_fieldlist; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterFieldlist(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitFieldlist(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitFieldlist(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -1962,13 +1890,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_field; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterField(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitField(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitField(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -2023,13 +1948,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_fieldsep; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterFieldsep(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitFieldsep(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitFieldsep(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -2069,13 +1991,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_operatorOr; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterOperatorOr(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitOperatorOr(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitOperatorOr(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -2106,13 +2025,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_operatorAnd; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterOperatorAnd(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitOperatorAnd(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitOperatorAnd(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -2143,13 +2059,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_operatorComparison; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterOperatorComparison(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitOperatorComparison(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitOperatorComparison(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -2189,13 +2102,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_operatorStrcat; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterOperatorStrcat(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitOperatorStrcat(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitOperatorStrcat(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -2226,13 +2136,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_operatorAddSub; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterOperatorAddSub(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitOperatorAddSub(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitOperatorAddSub(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -2272,13 +2179,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_operatorMulDivMod; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterOperatorMulDivMod(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitOperatorMulDivMod(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitOperatorMulDivMod(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -2318,13 +2222,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_operatorBitwise; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterOperatorBitwise(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitOperatorBitwise(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitOperatorBitwise(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -2364,13 +2265,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_operatorUnary; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterOperatorUnary(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitOperatorUnary(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitOperatorUnary(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -2410,13 +2308,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_operatorPower; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterOperatorPower(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitOperatorPower(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitOperatorPower(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -2451,13 +2346,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_number; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterNumber(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitNumber(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitNumber(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
@@ -2500,13 +2392,10 @@ public partial class LuaParser : Parser {
 		{
 		}
 		public override int RuleIndex { get { return RULE_string; } }
-		public override void EnterRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.EnterString(this);
-		}
-		public override void ExitRule(IParseTreeListener listener) {
-			ILuaListener typedListener = listener as ILuaListener;
-			if (typedListener != null) typedListener.ExitString(this);
+		public override TResult Accept<TResult>(IParseTreeVisitor<TResult> visitor) {
+			ILuaVisitor<TResult> typedVisitor = visitor as ILuaVisitor<TResult>;
+			if (typedVisitor != null) return typedVisitor.VisitString(this);
+			else return visitor.VisitChildren(this);
 		}
 	}
 
