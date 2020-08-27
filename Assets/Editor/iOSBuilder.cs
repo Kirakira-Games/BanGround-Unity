@@ -53,16 +53,15 @@ public static class iOSBuilder
 
     private static void UpdateProject(string targetPath)
     {
-        string projPath = targetPath + "/Unity-iPhone.xcodeproj/project.pbxproj";
+        string projectPath = PBXProject.GetPBXProjectPath(targetPath);
 
-        PBXProject proj = new PBXProject();
-        proj.ReadFromString(File.ReadAllText(projPath));
+        PBXProject pbxProject = new PBXProject();
+        pbxProject.ReadFromFile(projectPath);
+        string[] targetGuids = new string[2] { pbxProject.GetUnityMainTargetGuid(), pbxProject.GetUnityFrameworkTargetGuid() };
 
-        string target = proj.TargetGuidByName("Unity-iPhone");
+        pbxProject.SetBuildProperty(targetGuids, "ENABLE_BITCODE", "NO");
+        pbxProject.WriteToFile(projectPath);
 
-        proj.SetBuildProperty(target, "ENABLE_BITCODE", "NO");
-
-        File.WriteAllText(projPath, proj.WriteToString());
         Debug.Log("Write Project Succeed!");
     }
 
