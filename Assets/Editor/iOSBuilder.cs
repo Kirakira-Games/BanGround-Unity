@@ -1,12 +1,8 @@
 ﻿#if UNITY_IOS
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.Callbacks;
-using UnityEditor.iOS;
 using UnityEditor.iOS.Xcode;
-using UnityEditor.EditorTools;
 using System.IO;
 
 public static class iOSBuilder
@@ -75,6 +71,11 @@ public static class iOSBuilder
     {
         if (target != BuildTarget.iOS) return;
 
+        OnPostCloudExport(targetPath);
+    }
+
+    public static void OnPostCloudExport(string targetPath)
+    {
         UpdateInfo(targetPath);
         UpdateProject(targetPath);
     }
