@@ -11,11 +11,8 @@ using System.IO;
 
 public static class iOSBuilder
 {
-    [PostProcessBuild(100)]
-    public static void OnPostProcessBuild(BuildTarget target, string targetPath)
+    private static void UpdateInfo(string targetPath)
     {
-        if (target != BuildTarget.iOS) return;
-
         string path = Path.GetFullPath(targetPath);
         PlistDocument document = new PlistDocument();
         document.ReadFromFile(Path.Combine(path, "info.plist"));
@@ -56,6 +53,30 @@ public static class iOSBuilder
 
         document.WriteToFile(Path.Combine(path, "info.plist"));
         Debug.Log("Write Plist Succeed!");
+    }
+
+    private static void UpdateProject(string targetPath)
+    {
+        string projPath = targetPath + "/Unity-iPhone.xcodeproj/project.pbxproj";
+
+        PBXProject proj = new PBXProject();
+        proj.ReadFromString(File.ReadAllText(projPath));
+
+        string target = proj.TargetGuidByName("Unity-iPhone");
+
+        proj.SetBuildProperty(target, "ENABLE_BITCODE", "YES");
+
+        File.WriteAllText(projPath, proj.WriteToString());
+        Debug.Log("Write Project Succeed!");
+    }
+
+    [PostProcessBuild(100)]
+    public static void OnPostProcessBuild(BuildTarget target, string targetPath)
+    {
+        if (target != BuildTarget.iOS) return;
+
+        UpdateInfo(targetPath);
+        UpdateProject(targetPath);
     }
 }
 #endif
