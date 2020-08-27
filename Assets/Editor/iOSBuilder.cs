@@ -64,7 +64,7 @@ public static class iOSBuilder
 
         string target = proj.TargetGuidByName("Unity-iPhone");
 
-        proj.SetBuildProperty(target, "ENABLE_BITCODE", "YES");
+        proj.SetBuildProperty(target, "ENABLE_BITCODE", "NO");
 
         File.WriteAllText(projPath, proj.WriteToString());
         Debug.Log("Write Project Succeed!");
