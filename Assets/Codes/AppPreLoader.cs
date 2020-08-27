@@ -87,14 +87,3 @@ public class AppPreLoader : MonoBehaviour
         UUID = SystemInfo.deviceUniqueIdentifier;
     }
 }
-public class UUIDToolExtern
-{
-#if UNITY_IOS && !UNITY_EDITOR
-    [DllImport("__Internal")]
-    private static extern string _getUUIDInKeychain();
-    public static string getUUIDInKeychain()
-    {
-        return _getUUIDInKeychain();
-    }
-#endif
-}
