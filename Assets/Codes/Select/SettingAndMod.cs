@@ -21,6 +21,7 @@ public class SettingAndMod : MonoBehaviour
     private Button setting_Close_Btn;
     private Button mod_Open_Btn;
     private Button mod_Close_Btn;
+    private Button Open_LunarConsole;
 
     private Toggle syncLine_Tog;
     private Toggle offBeat_Tog;
@@ -155,6 +156,7 @@ public class SettingAndMod : MonoBehaviour
         setting_Close_Btn = GameObject.Find("SettingButton_Close").GetComponent<Button>();
         mod_Open_Btn = GameObject.Find("ModOpenBtn").GetComponent<Button>();
         mod_Close_Btn = GameObject.Find("ModButton_Close").GetComponent<Button>();
+        Open_LunarConsole = GameObject.Find("OpenConsole").GetComponent<Button>();//
 
         syncLine_Tog = GameObject.Find("Sync_Toggle").GetComponent<Toggle>();
         offBeat_Tog = GameObject.Find("Offbeat_Toggle").GetComponent<Toggle>();
@@ -199,6 +201,8 @@ public class SettingAndMod : MonoBehaviour
         setting_Close_Btn.onClick.AddListener(CloseSetting);
         mod_Open_Btn.onClick.AddListener(OpenMod);
         mod_Close_Btn.onClick.AddListener(CloseMod);
+        
+
 
         GameObject.Find("Speed>").GetComponent<Button>().onClick.AddListener(() => { speed_Input.text = (float.Parse(speed_Input.text) + 0.1f).ToString(); });
         GameObject.Find("Speed<").GetComponent<Button>().onClick.AddListener(() => { speed_Input.text = (float.Parse(speed_Input.text) - 0.1f).ToString(); });
@@ -226,6 +230,8 @@ public class SettingAndMod : MonoBehaviour
         GameObject.Find("AudOff>").GetComponent<Button>().onClick.AddListener(() => { audio_Input.text = (float.Parse(audio_Input.text) + 1f).ToString(); });
         GameObject.Find("AudOff<").GetComponent<Button>().onClick.AddListener(() => { audio_Input.text = (float.Parse(audio_Input.text) - 1f).ToString(); });
         //live setting init
+
+        
 
         setting_Close_Btn.gameObject.SetActive(false);
     }
@@ -395,6 +401,7 @@ public class SettingAndMod : MonoBehaviour
     {
         initCompoinents();
         GetLiveSetting();
+        Open_LunarConsole.onClick.AddListener(() => { LunarConsolePlugin.LunarConsole.Show(); });
     }
-
 }
+   
