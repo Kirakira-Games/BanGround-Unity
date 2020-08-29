@@ -11,6 +11,7 @@ public class GlobalInstaller : MonoInstaller
 {
     public MessageBannerController messageBannerController;
     public MessageBox messageBox;
+    public FPSCounter fpsCounter;
 
     private IKVSystem kvSystem;
     private IDataLoader dataLoader;
@@ -72,6 +73,9 @@ public class GlobalInstaller : MonoInstaller
 
         // Kira Web Request
         Container.Bind<IKiraWebRequest>().To<KiraWebRequest>().AsSingle().NonLazy();
+
+        // FPS Counter
+        Container.Bind<IFPSCounter>().FromInstance(fpsCounter);
     }
 
     void RegisterKonCommands()

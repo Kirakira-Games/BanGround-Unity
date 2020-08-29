@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Diagnostics;
-using System;
 using System.Collections.Generic;
 using Zenject;
 using AudioProvider;
@@ -18,7 +17,10 @@ public class AudioTimelineSync : MonoBehaviour, IAudioTimelineSync
     private IGameStateMachine SM;
     [Inject]
     private ICancellationTokenStore Cancel;
+    [Inject(Optional = true)]
+    private IFPSCounter fpsCounter;
 
+    private ISoundTrack bgm;
     private Stopwatch watch = new Stopwatch();
     private float deltaTime;
 
@@ -96,10 +98,9 @@ public class AudioTimelineSync : MonoBehaviour, IAudioTimelineSync
         timeInMs = (int)gameBGM.GetPlaybackTime();
     }
 
-    private void Update()
+    private void UpdateSync()
     {
-        var bgm = audioManager.gameBGM;
-        if (SM.Base == GameStateMachine.State.Finished || bgm == null)
+        if (SM.Base == GameStateMachine.State.Finished)
             return;
         float currentTime = time;
         if (bgm.GetStatus() != PlaybackStatus.Playing)
@@ -138,5 +139,15 @@ public class AudioTimelineSync : MonoBehaviour, IAudioTimelineSync
                 adjust = adjustLimit * Mathf.Sign(diff);
         }
         deltaTime += adjust;
+    }
+
+    private void Update()
+    {
+        if (bgm == null)
+            bgm = audioManager.gameBGM;
+        if (bgm == null)
+            return;
+        UpdateSync();
+        fpsCounter?.AppendExtraInfo($"S: {bgm.GetPlaybackTime()}/{timeInMs}");
     }
 }

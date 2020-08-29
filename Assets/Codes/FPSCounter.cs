@@ -1,17 +1,26 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
 #pragma warning disable 0414
 
-public class FPSCounter : MonoBehaviour
+public class FPSCounter : MonoBehaviour, IFPSCounter
 {
     [Inject]
     private IAudioManager audioManager;
     [Inject(Optional = true)]
     private IAudioTimelineSync audioTimelineSync;
+
+    private string extraMsg;
+
+    public void AppendExtraInfo(string info)
+    {
+        info = "\n" + info;
+        if (extraMsg == null)
+            extraMsg = info;
+        else
+            extraMsg += info;
+    }
 
     private Text text;
     private int frameInSec = 0;
@@ -31,19 +40,12 @@ public class FPSCounter : MonoBehaviour
             lastClearTime = Time.time;
         }
 
+        string str = $"FPS : {lastFPS}{extraMsg ?? ""}";
+        extraMsg = null;
+
         if (Time.timeScale == 0) return;
+
         frameInSec++;
-
-        string str = $"FPS : {lastFPS}";
-
-        // Audio diff display TODO: fix
-        if (audioTimelineSync != null && audioManager.gameBGM != null)
-        {
-            uint audioTime = audioManager.gameBGM.GetPlaybackTime();
-            int syncTime = audioTimelineSync.timeInMs;
-            str += $"\nS: {audioTime}/{syncTime}";
-        }
-
         text.text = str;
     }
 }
