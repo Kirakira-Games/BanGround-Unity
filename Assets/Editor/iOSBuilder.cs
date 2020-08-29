@@ -1,21 +1,14 @@
-﻿#if UNITY_IOS && UNITY_EDITOR
-using System.Collections;
-using System.Collections.Generic;
+﻿#if UNITY_IOS
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.Callbacks;
-using UnityEditor.iOS;
 using UnityEditor.iOS.Xcode;
-using UnityEditor.EditorTools;
 using System.IO;
 
 public static class iOSBuilder
 {
-    [PostProcessBuild(100)]
-    public static void OnPostProcessBuild(BuildTarget target, string targetPath)
+    private static void UpdateInfo(string targetPath)
     {
-        if (target != BuildTarget.iOS) return;
-
         string path = Path.GetFullPath(targetPath);
         PlistDocument document = new PlistDocument();
         document.ReadFromFile(Path.Combine(path, "info.plist"));
@@ -56,6 +49,34 @@ public static class iOSBuilder
 
         document.WriteToFile(Path.Combine(path, "info.plist"));
         Debug.Log("Write Plist Succeed!");
+    }
+
+    private static void UpdateProject(string targetPath)
+    {
+        string projectPath = PBXProject.GetPBXProjectPath(targetPath);
+
+        PBXProject pbxProject = new PBXProject();
+        pbxProject.ReadFromFile(projectPath);
+        string[] targetGuids = new string[2] { pbxProject.GetUnityMainTargetGuid(), pbxProject.GetUnityFrameworkTargetGuid() };
+
+        pbxProject.SetBuildProperty(targetGuids, "ENABLE_BITCODE", "NO");
+        pbxProject.WriteToFile(projectPath);
+
+        Debug.Log("Write Project Succeed!");
+    }
+
+    [PostProcessBuild(100)]
+    public static void OnPostProcessBuild(BuildTarget target, string targetPath)
+    {
+        if (target != BuildTarget.iOS) return;
+
+        OnPostCloudExport(targetPath);
+    }
+
+    public static void OnPostCloudExport(string targetPath)
+    {
+        UpdateInfo(targetPath);
+        UpdateProject(targetPath);
     }
 }
 #endif
