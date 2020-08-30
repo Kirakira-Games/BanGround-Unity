@@ -22,6 +22,9 @@ namespace Web.Auth
 
     public class User
     {
+        [JsonProperty("id")]
+        public int Id;
+
         [JsonProperty("username")]
         public string Username;
 
