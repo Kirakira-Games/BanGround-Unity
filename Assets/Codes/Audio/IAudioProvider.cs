@@ -25,6 +25,8 @@ namespace AudioProvider
 
     public interface ISoundTrack : IDisposable
     {
+        bool Disposed { get; }
+
         void Play();
         void Pause();
         [Obsolete]
@@ -44,6 +46,8 @@ namespace AudioProvider
 
     public interface ISoundEffect : IDisposable
     {
+        bool Disposed { get; }
+
         void PlayOneShot();
     }
 
