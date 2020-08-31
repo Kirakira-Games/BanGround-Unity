@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UniRx.Async;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Zenject;
 
@@ -20,7 +21,7 @@ class LatencyOffsetGuide : MonoBehaviour
     public Button resetButton;
     public Button okButton;
     public Button backButton;
-    public Button touchButton;
+    public LatencyTestButton touchButton;
     public Button openButton;
 
     int[] offsets = { 0, 0, 0, 0 };
@@ -47,7 +48,8 @@ class LatencyOffsetGuide : MonoBehaviour
 
     private void Awake()
     {
-        touchButton.onClick.AddListener(OnClick);
+        touchButton.OnClick += OnClick;
+
         openButton.onClick.AddListener(OnOpen);
         resetButton.onClick.AddListener(OnReset);
         backButton.onClick.AddListener(OnClose);
@@ -72,7 +74,7 @@ class LatencyOffsetGuide : MonoBehaviour
         OnReset();
     }
 
-    public void OnClick()
+    public void OnClick(PointerEventData eventData)
     {
         var time = watch.ElapsedMilliseconds;
 
