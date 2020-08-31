@@ -141,6 +141,7 @@ namespace Web
             private void Create()
             {
                 webRequest = new UnityWebRequest(context.ServerAddr + url, method);
+                webRequest.timeout = 15;
                 webRequest.downloadHandler = new DownloadHandlerBuffer();
                 webRequest.SetRequestHeader("User-Agent", context.UA);
                 webRequest.SetRequestHeader("Accpet-Language", context.Language);
