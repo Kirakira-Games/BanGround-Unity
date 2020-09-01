@@ -44,7 +44,7 @@ class LatencyOffsetGuide : MonoBehaviour
 
     Stopwatch watch = new Stopwatch();
 
-    int[] timePoints = { 2000, 4000, 6000, 8000 };
+    int[] timePoints = { 6000, 8000, 10000, 12000 };
 
     private void Awake()
     {
@@ -169,7 +169,7 @@ class LatencyOffsetGuide : MonoBehaviour
 #if !USE_SE
         await Task.Delay(500);
         bgm.PlayOneShot();
-        await Task.Delay(8000);
+        await Task.Delay(12500);
 #else
         await Task.Delay(500);
         kick.PlayOneShot();
