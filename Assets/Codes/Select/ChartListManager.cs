@@ -104,7 +104,7 @@ public class ChartListManager : IChartListManager
         }
         else
         {
-            Debug.LogWarning("Cannot find chart with sid " + sid);
+            SelectChartByIndex(UnityEngine.Random.Range(0, chartList.Count));
         }
     }
 
