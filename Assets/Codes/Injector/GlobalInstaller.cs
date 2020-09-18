@@ -12,6 +12,7 @@ public class GlobalInstaller : MonoInstaller
     public MessageBannerController messageBannerController;
     public MessageBox messageBox;
     public FPSCounter fpsCounter;
+    public LoadingBlocker loadingBlocker;
 
     private IKVSystem kvSystem;
     private IDataLoader dataLoader;
@@ -76,6 +77,9 @@ public class GlobalInstaller : MonoInstaller
 
         // FPS Counter
         Container.Bind<IFPSCounter>().FromInstance(fpsCounter);
+
+        // Loading blocker
+        Container.Bind<ILoadingBlocker>().FromInstance(loadingBlocker);
     }
 
     void RegisterKonCommands()

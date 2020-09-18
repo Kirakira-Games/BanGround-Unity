@@ -4,19 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class LoadingBlocker : MonoBehaviour
+public class LoadingBlocker : MonoBehaviour, ILoadingBlocker
 {
     public Text text;
     public Button cancelButton;
 
-    public static LoadingBlocker instance;
-
     private Action action = null;
-    private void Awake()
-    {
-        instance = this;
-        DontDestroyOnLoad(gameObject);
-    }
 
     private void Start()
     {
@@ -24,17 +17,21 @@ public class LoadingBlocker : MonoBehaviour
     }
 
     public void OnCancel() => action();
-    public void Show(string message, Action cancelAction = null)
+
+    // TODO: Add progress bar display
+    public void Show(string message, Action cancelAction = null, bool showProgress = false)
     {
-        text.text = message;
+        SetText(message, showProgress);
+
         gameObject.SetActive(true);
 
-        if (cancelAction == null)
-            cancelButton.gameObject.SetActive(false);
-        else
-            cancelButton.gameObject.SetActive(true);
-
+        cancelButton.gameObject.SetActive(cancelAction != null);
         action = cancelAction;
+    }
+
+    public void SetText(string message, bool showProgress = false)
+    {
+        text.text = message;
     }
 
     public void Close()

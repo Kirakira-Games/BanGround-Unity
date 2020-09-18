@@ -16,6 +16,8 @@ public class TitleLoader : MonoBehaviour
     private IMessageBannerController messageBannerController;
     [Inject]
     private IKiraWebRequest web;
+    [Inject]
+    private ILoadingBlocker loadingBlocker;
 
     [Inject(Id = "cl_language")]
     KVar cl_language;
@@ -76,7 +78,7 @@ public class TitleLoader : MonoBehaviour
 
         if (!string.IsNullOrEmpty(web.AccessToken) && !string.IsNullOrEmpty(web.RefreshToken))
         {
-            LoadingBlocker.instance.Show("Logging in...");
+            loadingBlocker.Show("Logging in...");
             try
             {
                 await web.DoRefreshAccessToken();
@@ -97,7 +99,7 @@ public class TitleLoader : MonoBehaviour
                 userCanvas.GetUserInfo().Forget();
             }
             catch { }
-            LoadingBlocker.instance.Close();
+            loadingBlocker.Close();
         }
     }
 

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using System.Runtime.InteropServices;
 using UniRx.Async;
 using Zenject;
+using Newtonsoft.Json;
 
 public class AppPreLoader : MonoBehaviour
 {
@@ -27,6 +27,7 @@ public class AppPreLoader : MonoBehaviour
 
         Screen.orientation = ScreenOrientation.AutoRotation;
         Application.targetFrameRate = 120;
+
         InitAudioInfo();
         GetUUID();
     }
@@ -36,6 +37,12 @@ public class AppPreLoader : MonoBehaviour
         // Init Unitask
         var playerLoop = UnityEngine.LowLevel.PlayerLoop.GetCurrentPlayerLoop();
         PlayerLoopHelper.Initialize(ref playerLoop);
+
+        // Init Json.Net
+        JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+        {
+            MissingMemberHandling = MissingMemberHandling.Ignore
+        };
 
         SceneManager.LoadScene("Title");
     }
