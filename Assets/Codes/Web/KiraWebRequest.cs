@@ -10,7 +10,30 @@ using UnityEngine.Events;
 namespace Web
 {
     using Auth;
+    using Newtonsoft.Json.Linq;
     using WebSocketSharp;
+
+    public class LongToStringConverter : JsonConverter
+    {
+        public override bool CanWrite => true;
+        public override bool CanRead => true;
+
+        public override bool CanConvert(Type objectType)
+        {
+            return true;
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            serializer.Serialize(writer, value.ToString());
+        }
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            JToken token = JToken.Load(reader);
+            return token.ToObject<long>();
+        }
+    }
 
     internal class Result<T>
     {
