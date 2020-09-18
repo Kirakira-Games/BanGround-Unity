@@ -4,6 +4,7 @@ using UnityEngine.Networking;
 using UniRx.Async;
 using Zenject;
 using Web.Auth;
+using WebSocketSharp;
 
 public class UserInfo : MonoBehaviour
 {
@@ -25,7 +26,7 @@ public class UserInfo : MonoBehaviour
 
         username_Text.text = user.Nickname;
 
-        if (user.Avatar == "N/A")
+        if (user.Avatar == "N/A" || string.IsNullOrEmpty(user.Avatar))
             return;
 
         using (UnityWebRequest ub = UnityWebRequestTexture.GetTexture(user.Avatar))
