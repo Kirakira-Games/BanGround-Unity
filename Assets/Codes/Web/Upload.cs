@@ -1,5 +1,5 @@
-﻿using Boo.Lang;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using UniRx.Async;
 using UnityEngine;

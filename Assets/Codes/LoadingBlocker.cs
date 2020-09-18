@@ -10,6 +10,8 @@ public class LoadingBlocker : MonoBehaviour, ILoadingBlocker
     public Button cancelButton;
 
     private Action action = null;
+    private string progress;
+    private string message;
 
     private void Start()
     {
@@ -21,6 +23,7 @@ public class LoadingBlocker : MonoBehaviour, ILoadingBlocker
     // TODO: Add progress bar display
     public void Show(string message, Action cancelAction = null, bool showProgress = false)
     {
+        progress = "";
         SetText(message, showProgress);
 
         gameObject.SetActive(true);
@@ -31,11 +34,23 @@ public class LoadingBlocker : MonoBehaviour, ILoadingBlocker
 
     public void SetText(string message, bool showProgress = false)
     {
-        text.text = message;
+        this.message = message;
+        UpdateText();
+    }
+
+    private void UpdateText()
+    {
+        text.text = message + " " + progress;
     }
 
     public void Close()
     {
         gameObject.SetActive(false);
+    }
+
+    public void SetProgress(int current, int max)
+    {
+        progress = $"({current}/{max})";
+        UpdateText();
     }
 }
