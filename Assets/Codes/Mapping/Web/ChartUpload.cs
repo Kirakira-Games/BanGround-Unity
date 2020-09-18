@@ -10,9 +10,16 @@ namespace BGEditor
         [Inject]
         IDataLoader dataLoader;
 
-        public int PreUploadChart(int cid)
-        {
+        [Inject]
+        IKiraWebRequest web;
 
+        public void UploadChart(int cid)
+        {
+            var source = IDRouterUtil.GetSource(cid, out int id);
+            if (source == ChartSource.Local)
+            {
+
+            }
         }
     }
 }
