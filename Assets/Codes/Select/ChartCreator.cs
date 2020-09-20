@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Linq;
@@ -10,7 +9,6 @@ using System.Text;
 using System.Collections.Generic;
 using System.Threading;
 using Zenject;
-using WebSocketSharp;
 
 public class ChartCreator : MonoBehaviour
 {
@@ -21,7 +19,7 @@ public class ChartCreator : MonoBehaviour
     [Inject]
     private IMessageBannerController messageBannerController;
     [Inject]
-    private ICancellationTokenStore Cancel;
+    private ILoadingBlocker loadingBlocker;
 
     [Inject(Id = "cl_lastdiff")]
     private KVar cl_lastdiff;
@@ -180,11 +178,11 @@ public class ChartCreator : MonoBehaviour
 
         var task = WaitForAirdrop(tokenSource.Token);
 
-        LoadingBlocker.instance.Show("Waiting for airdrop (You must drop a ogg music!!!)...", tokenSource.Cancel);
+        loadingBlocker.Show("Waiting for airdrop (You must drop a ogg music!!!)...", tokenSource.Cancel);
 
         await task;
 
-        LoadingBlocker.instance.Close();
+        loadingBlocker.Close();
     }
     public async UniTask WaitForAirdrop(CancellationToken token = default)
     {

@@ -22,19 +22,19 @@ public class TouchEvent : MonoBehaviour
         userCanvas = GameObject.Find("UserInfo").GetComponent<UserInfo>();
     }
 
-    public async void ChangeAnimation()
+    public async void OnStartButtonClick()
     {
         if (authing)
             return;
 
-        if (UserInfo.user == null)
+        //开始游戏前必定触发一次登陆动作
+        if (UserInfo.user == null) 
         {
-            authing = true;
             await GetAuthenticationResult();
-            authing = false;
+            return;
         }
 
-        if (waitingUpdate) 
+        if (waitingUpdate)
             return;
 
         if (!touched)
@@ -42,6 +42,22 @@ public class TouchEvent : MonoBehaviour
             touched = true;
             StartSwitch();
         }
+    }
+
+    public async void OnCommunityButtonClick()
+    {
+        //必须要在线状态才能进社区
+        if (UserInfo.user == null || UserInfo.isOffline) 
+        {
+            await GetAuthenticationResult();
+            return;
+        }
+        SceneLoader.LoadScene("Title", "Community");
+    }
+
+    public async void OnLoginButtonClick()
+    {
+        await GetAuthenticationResult();
     }
 
     void StartSwitch()
@@ -76,11 +92,20 @@ public class TouchEvent : MonoBehaviour
         operation.allowSceneActivation = true;
     }
 
-    async UniTask GetAuthenticationResult()
+    private async UniTask GetAuthenticationResult()
     {
+        authing = true;
+
         loginPanel.SetActive(true);
+        if (UserInfo.isOffline)
+        {
+            UserInfo.user = null;
+        }
         await UniTask.WaitUntil(() => UserInfo.user != null);
         userCanvas.GetUserInfo().Forget();
+        loginPanel.SetActive(false);
+
+        authing = false;
     }
 }
 
