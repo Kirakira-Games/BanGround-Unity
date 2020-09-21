@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
 using Zenject;
+using BanGround;
 
 #pragma warning disable 0649
 public class LoaderInfo : MonoBehaviour
@@ -14,6 +15,8 @@ public class LoaderInfo : MonoBehaviour
     private IDataLoader dataLoader;
     [Inject]
     private IChartListManager chartListManager;
+    [Inject]
+    private IFileSystem fs;
 
     private mHeader musicHeader;
     private cHeader chartHeader;
@@ -51,9 +54,9 @@ public class LoaderInfo : MonoBehaviour
     {
         // Song img
         var path = dataLoader.GetBackgroundPath(chartListManager.current.header.sid).Item1;
-        if (path != null && KiraFilesystem.Instance.Exists(path))
+        if (path != null && fs.FileExists(path))
         {
-            var tex = KiraFilesystem.Instance.ReadTexture2D(path);
+            var tex = fs.GetFile(path).ReadAsTexture();
             songImg.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
         }
 

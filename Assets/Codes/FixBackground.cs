@@ -1,8 +1,10 @@
-﻿using System.Collections;
+﻿using BanGround;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.Networking;
+using Zenject;
 
 public class FixBackground : MonoBehaviour
 {
@@ -39,9 +41,12 @@ public class FixBackground : MonoBehaviour
         transform.localScale = Vector3.one * scale;
     }
 
+    [Inject]
+    IFileSystem fs;
+
     public void UpdateBackground(string path)
     {
-        if (path == null || !KiraFilesystem.Instance.Exists(path))
+        if (path == null || !fs.FileExists(path))
         {
             render.sprite = defaultSprite;
             UpdateScale();
@@ -53,7 +58,7 @@ public class FixBackground : MonoBehaviour
 
     protected void GetAndSetBG(string path)
     {
-        var tex = KiraFilesystem.Instance.ReadTexture2D(path);
+        var tex = fs.GetFile(path).ReadAsTexture();
         render.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
         UpdateScale();
     }

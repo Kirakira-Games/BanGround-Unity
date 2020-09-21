@@ -7,6 +7,7 @@ using System;
 using System.IO;
 using System.Linq;
 using Zenject;
+using BanGround;
 
 #pragma warning disable 0649
 #pragma warning disable 0414
@@ -18,6 +19,8 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     private IChartListManager chartListManager;
     [Inject]
     private IMessageBannerController messageBannerController;
+    [Inject]
+    private IFileSystem fs;
 
     RectTransform rt_m;
     RectTransform rt_v;
@@ -247,14 +250,13 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
         var chartDir = $"chart/{chartListManager.current.header.sid}";
 
-        var files = KiraFilesystem.Instance.ListFiles(name => name.Contains(chartDir));
+        var files = fs.Find(file => file.Name.Contains(chartDir));
+
         files.All(item => 
         {
-            KiraFilesystem.Instance.RemoveFileFromIndex(item);
+            item.Delete();
             return true;
         });
-
-        KiraFilesystem.Instance.SaveIndex();
 
         UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Select");
     }

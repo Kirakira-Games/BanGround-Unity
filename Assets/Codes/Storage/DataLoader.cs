@@ -12,6 +12,8 @@ using UnityEngine.SceneManagement;
 using UniRx.Async;
 using Zenject;
 using UnityEngine.Events;
+using BanGround;
+using System.Runtime.Serialization.Formatters.Binary;
 
 public class DataLoader : IDataLoader
 {
@@ -32,6 +34,8 @@ public class DataLoader : IDataLoader
     private IChartVersion chartVersion;
     [Inject]
     private IMessageBannerController messageBannerController;
+    [Inject]
+    private IFileSystem fs;
     [Inject(Id = "cl_lastdiff")]
     private KVar cl_lastdiff;
     [Inject(Id = "cl_lastsid")]
@@ -103,7 +107,36 @@ public class DataLoader : IDataLoader
             Directory.CreateDirectory(FSDir);
         }
 
-        new KiraFilesystem(FSIndex, DataDir);
+        if(File.Exists(FSIndex))
+        {
+            Dictionary<string, string> index;
+
+            using (FileStream fs = File.OpenRead(FSIndex))
+            {
+                var bf = new BinaryFormatter();
+                index = bf.Deserialize(fs) as Dictionary<string, string>;
+            }
+
+            List<string> kirapacks = new List<string>();
+
+            foreach(var (_, kirapack) in index)
+            {
+                if(!kirapacks.Contains(kirapack))
+                {
+                    if(File.Exists(kirapack))
+                    {
+                        File.Move(kirapack, kirapack + ".kpak");
+                    }
+                }
+            }
+
+            File.Delete(FSIndex);
+        }
+
+        fs.Init();
+
+        fs.AddSearchPath(DataDir);
+        fs.AddSearchPath(FSDir);
     }
 
     public string GetMusicPath(int mid)
@@ -113,7 +146,7 @@ public class DataLoader : IDataLoader
 
     public bool MusicExists(int mid)
     {
-        return KiraFilesystem.Instance.Exists(GetMusicPath(mid));
+        return fs.FileExists(GetMusicPath(mid));
     }
 
     public string GetChartResource(int sid, string filename)
@@ -178,7 +211,7 @@ public class DataLoader : IDataLoader
 
     public T LoadChart<T>(int sid, Difficulty difficulty) where T : IExtensible
     {
-        return ProtobufHelper.LoadFromKiraFs<T>(GetChartPath(sid, difficulty));
+        return ProtobufHelper.Load<T>(fs.GetFile(GetChartPath(sid, difficulty)));
     }
 
     public void SaveChart<T>(T chart, int sid, Difficulty difficulty) where T : IExtensible
@@ -229,20 +262,24 @@ public class DataLoader : IDataLoader
     {
         if (dir.Exists)
             dir.Delete(true);
+
         dir.Create();
+
         // Find possible related files
-        var files = KiraFilesystem.Instance.ListFiles((path) =>
+        var files = fs.Find((file) =>
         {
-            path = path.Replace("\\", "/");
+            var path = file.Name;
+
             return path.StartsWith(ChartDir + header.sid + "/") ||
                 path.StartsWith(MusicDir + header.mid + "/");
         });
+
         foreach (var file in files)
         {
-            var dirpath = Path.Combine(dir.FullName, Path.GetDirectoryName(file));
+            var dirpath = Path.Combine(dir.FullName, Path.GetDirectoryName(file.Name));
             if (!Directory.Exists(dirpath))
                 Directory.CreateDirectory(dirpath);
-            File.WriteAllBytes(Path.Combine(dir.FullName, file), KiraFilesystem.Instance.Read(file));
+            File.WriteAllBytes(Path.Combine(dir.FullName, file.Name), file.ReadToEnd());
         }
     }
 
@@ -298,7 +335,7 @@ public class DataLoader : IDataLoader
         {
             try
             {
-                var V2chart = ProtobufHelper.LoadFromKiraFs<V2.Chart>(path);
+                var V2chart = ProtobufHelper.Load<V2.Chart>(fs.GetFile(path));
                 if (chartVersion.CanRead(V2chart.version))
                 {
                     return V2chart.level;
@@ -307,7 +344,7 @@ public class DataLoader : IDataLoader
             }
             catch
             {
-                return ProtobufHelper.LoadFromKiraFs<Chart>(path).level;
+                return ProtobufHelper.Load<Chart>(fs.GetFile(path)).level;
             }
         }
         catch
@@ -328,15 +365,13 @@ public class DataLoader : IDataLoader
         var referencedSongs = new Dictionary<mHeader, int>();
         var loadedIds = new HashSet<int>();
 
-        var files = KiraFilesystem.Instance.ListFiles();
-
-        var musics = from x in files
-                     where x.EndsWith("mheader.bin")
+        var musics = from x in fs
+                     where x.Name.EndsWith("mheader.bin")
                      select x;
 
         foreach (var music in musics)
         {
-            mHeader musicHeader = ProtobufHelper.LoadFromKiraFs<mHeader>(music);
+            mHeader musicHeader = ProtobufHelper.Load<mHeader>(music);
             if (musicHeader.BPM == null || musicHeader.BPM.Length == 0)
                 musicHeader.BPM = new float[] { 120, 120 };
             if (!loadedIds.Contains(musicHeader.mid))
@@ -347,13 +382,13 @@ public class DataLoader : IDataLoader
         }
 
         loadedIds.Clear();
-        var charts = from x in files
-                     where x.EndsWith("cheader.bin")
+        var charts = from x in fs
+                     where x.Name.EndsWith("cheader.bin")
                      select x;
 
         foreach (var chart in charts)
         {
-            cHeader chartHeader = ProtobufHelper.LoadFromKiraFs<cHeader>(chart);
+            cHeader chartHeader = ProtobufHelper.Load<cHeader>(chart);
             if (loadedIds.Contains(chartHeader.sid))
                 continue;
             loadedIds.Add(chartHeader.sid);
@@ -380,14 +415,11 @@ public class DataLoader : IDataLoader
             {
                 var musicDir = $"music/{song.mid}";
 
-                var musicFiles = KiraFilesystem.Instance.ListFiles(name => name.Contains(musicDir));
+                var musicFiles = fs.Find(file => file.Name.Contains(musicDir));
                 musicFiles.All(item =>
                 {
-                    KiraFilesystem.Instance.RemoveFileFromIndex(item);
-                    return true;
+                    return item.Delete();
                 });
-
-                KiraFilesystem.Instance.SaveIndex();
 
                 Debug.Log($"Removing music {song} due to the refcount is zero");
             }
@@ -515,7 +547,7 @@ public class DataLoader : IDataLoader
 
     public int LoadKiraPack(FileInfo file)
     {
-        string path = Path.Combine(FSDir, Guid.NewGuid().ToString("N"));
+        string path = Path.Combine(FSDir, Guid.NewGuid().ToString("N") + ".kpak");
 
         if (!file.Exists)
             return -1;
@@ -525,8 +557,7 @@ public class DataLoader : IDataLoader
         try
         {
             File.Move(file.FullName, path);
-            KiraFilesystem.Instance.AddToIndex(path);
-            KiraFilesystem.Instance.SaveIndex();
+            fs.AddSearchPath(path);
 
             // Load charts
             ConvertBin(path);
