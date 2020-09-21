@@ -6,6 +6,7 @@ using UnityEngine;
 using AudioProvider;
 using SELib;
 using Zenject;
+using BanGround;
 
 [LuaCallCSharp]
 class ChartCamera
@@ -46,8 +47,9 @@ class ChartCamera
 class ScriptSoundEffect : IDisposable
 {
     ISoundEffect se;
-    [Inject]
-    private IAudioManager audioManager;
+
+    internal static Func<IFileSystem> GetFS;
+    internal static Func<IAudioManager> GetAM;
 
     public ScriptSoundEffect(string file)
     {
@@ -58,9 +60,9 @@ class ScriptSoundEffect : IDisposable
     {
         var path = ChartScript.GetChartResource(file);
 
-        if (KiraFilesystem.Instance.Exists(path))
+        if (GetFS().FileExists(path))
         {
-            se = await audioManager.PrecacheSE(KiraFilesystem.Instance.Read(path));
+            se = await GetAM().PrecacheSE(GetFS().GetFile(path).ReadToEnd());
         }
     }
 
@@ -78,13 +80,15 @@ class ScriptSoundEffect : IDisposable
 [LuaCallCSharp]
 class ScriptModel : IDisposable
 {
+    internal static Func<IFileSystem> GetFS;
+
     SEModel model;
 
     GameObject rootObj;
 
     public ScriptModel(string path)
     {
-        model = SEModel.Read(KiraFilesystem.Instance.ReadStream(ChartScript.GetChartResource(path)));
+        model = SEModel.Read(GetFS().GetFile(ChartScript.GetChartResource(path)).Open(FileMode.Open));
 
         rootObj = new GameObject(path);
 
@@ -195,12 +199,14 @@ class ScriptModel : IDisposable
 [LuaCallCSharp]
 class ScriptTexture
 {
+    internal static Func<IFileSystem> GetFS;
+
     public Texture2D tex;
 
     public ScriptTexture(string file)
     {
         var path = ChartScript.GetChartResource(file);
-        tex = KiraFilesystem.Instance.ReadTexture2D(path);
+        tex = GetFS().GetFile(path).ReadAsTexture();
     }
 }
 
@@ -253,15 +259,22 @@ class ChartScript : IDisposable
         return GetChartResource(difficulty.ToString("G").ToLower() + ".lua");
     }
 
-    public ChartScript(int chartSetId, Difficulty difficulty)
+    public ChartScript(int chartSetId, Difficulty difficulty, IFileSystem fs, IAudioManager am)
     {
+        ScriptTexture.GetFS =
+        ScriptSoundEffect.GetFS =
+        ScriptModel.GetFS = 
+        () => fs;
+
+        ScriptSoundEffect.GetAM = () => am;
+
         sid = chartSetId;
 
         var path = GetChartScriptPath(difficulty);
 
-        if (KiraFilesystem.Instance.Exists(path))
+        if (fs.FileExists(path))
         {
-            var script = KiraFilesystem.Instance.ReadString(path);
+            var script = fs.GetFile(path).ReadAsString();
 
             luaEnv = new LuaEnv();
 
@@ -269,9 +282,9 @@ class ChartScript : IDisposable
             {
                 var modulepath = GetChartResource(lib + ".lua");
 
-                if (KiraFilesystem.Instance.Exists(modulepath))
+                if (fs.FileExists(modulepath))
                 {
-                    return KiraFilesystem.Instance.Read(modulepath);
+                    return fs.GetFile(modulepath).ReadToEnd();
                 }
 
                 return null;

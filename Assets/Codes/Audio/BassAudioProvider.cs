@@ -18,6 +18,9 @@ namespace AudioProvider
         GCHandle pinnedObject;
         BassAudioProvider _provider;
 
+        bool _isDisposed = false;
+        public bool Disposed => _isDisposed;
+
         bool _isLooping, noFade;
         long _loopstart, _loopend, _loopendms;
 
@@ -144,12 +147,17 @@ namespace AudioProvider
 
         public void Dispose()
         {
+            if (Disposed)
+                return;
+
             Stop();
             Bass.BASS_StreamFree(_internalChannelID);
 
             _provider.OnUnload -= Dispose;
             _provider.OnUpdate -= Update;
             _provider.OnVolumeChanged -= VolumeChanged;
+
+            _isDisposed = true;
         }
 
         internal void Update()
@@ -191,6 +199,9 @@ namespace AudioProvider
         BassAudioProvider _provider;
         SEType _type;
 
+        bool _isDisposed = false;
+        public bool Disposed => _isDisposed;
+
         internal BassSoundEffect(int sound, byte[] audio, BassAudioProvider provider, SEType type)
         {
             _internalSound = sound;
@@ -201,9 +212,14 @@ namespace AudioProvider
 
         public void Dispose()
         {
+            if (Disposed)
+                return;
+
             Bass.BASS_SampleFree(_internalSound);
 
             _provider.OnUnload -= Dispose;
+
+            _isDisposed = true;
         }
 
         public void PlayOneShot()

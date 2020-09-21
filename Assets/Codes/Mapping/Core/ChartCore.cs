@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using BanGround;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -37,6 +38,8 @@ namespace BGEditor
         private IMessageBannerController messageBannerController;
         [Inject]
         private IMessageBox messageBox;
+        [Inject]
+        private IFileSystem fs;
 
         public EditorToolTip tooltip { get; private set; }
         public MultiNoteDetector multinote { get; private set; }
@@ -435,8 +438,8 @@ namespace BGEditor
                 notes.UnselectAll();
             }
 
-            if (KiraFilesystem.Instance.Exists(dataLoader.GetChartScriptPath(chartListManager.current.header.sid, (Difficulty)chartListManager.current.difficulty)))
-                scriptEditor.Code = KiraFilesystem.Instance.ReadString(dataLoader.GetChartScriptPath(chartListManager.current.header.sid, (Difficulty)chartListManager.current.difficulty));
+            if (fs.FileExists(dataLoader.GetChartScriptPath(chartListManager.current.header.sid, (Difficulty)chartListManager.current.difficulty)))
+                scriptEditor.Code = fs.GetFile(dataLoader.GetChartScriptPath(chartListManager.current.header.sid, (Difficulty)chartListManager.current.difficulty)).ReadAsString();
 
             onChartLoaded.Invoke();
             hotkey.onScroll.AddListener((delta) => MoveGrid(delta * 30));

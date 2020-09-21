@@ -93,6 +93,8 @@ class LatencyOffsetGuide : MonoBehaviour
 
     public void OnOK()
     {
+        GameObject.Find("Audio_Input").GetComponent<InputField>().text = avgOffset.text;
+
         OnClose();
     }
 
