@@ -14,6 +14,14 @@ namespace Web.Upload
         Image
     }
 
+    public static class Util
+    {
+        public static string Hash(byte[] content)
+        {
+            return Auth.Util.ToHex(SHA256.Create().ComputeHash(content));
+        }
+    }
+
     public class File
     {
         [JsonProperty("id")]
@@ -61,14 +69,6 @@ namespace Web.Upload
         [JsonProperty("size")]
         [JsonConverter(typeof(LongToStringConverter))]
         public long Size;
-    }
-
-    public static class Util
-    {
-        public static string Hash(byte[] content)
-        {
-            return Auth.Util.ToHex(SHA256.Create().ComputeHash(content));
-        }
     }
 
     public static class Extension
