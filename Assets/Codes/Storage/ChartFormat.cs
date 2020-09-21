@@ -243,6 +243,16 @@ public partial class cHeader : IExtensible
             difficultyLevel.Add(dataLoader.GetChartLevel(chart));
         }
     }
+
+    public void Sanitize(float length)
+    {
+        if (preview == null || preview.Length == 0)
+            preview = new float[] { 0, length };
+        else if (preview.Length == 1)
+            preview = new float[] { preview[0], preview[0] };
+        else
+            preview = preview.Take(2).ToArray();
+    }
 }
 
 [Preserve]
@@ -272,7 +282,22 @@ public partial class mHeader : IExtensible
 
     [ProtoMember(6)]
     public float length { get; set; }
+    
+    private float[] SanitizeArray(float[] arr, float[] defaultValue)
+    {
+        if (arr == null || arr.Length == 0)
+            return defaultValue;
+        else if (arr.Length == 1)
+            return new float[] { arr[0], arr[0] };
+        else
+            return arr.Take(2).ToArray();
+    }
 
+    public void Sanitize()
+    {
+        BPM = SanitizeArray(BPM, new float[] { 120, 120 });
+        preview = SanitizeArray(preview, new float[] { 0, length });
+    }
 }
 
 
