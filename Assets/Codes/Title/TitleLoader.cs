@@ -52,6 +52,12 @@ public class TitleLoader : MonoBehaviour
      * unity_editor
      * Password:
      * Nic3P4ssword
+     * 
+     * Test User for editor (dev server):
+     * Username:
+     * meigong
+     * Password:
+     * 114514
      */
 
     [Inject]

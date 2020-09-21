@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Web.Auth;
 using Web.Music;
+using Web.File;
 
 namespace Web.Chart
 {
@@ -25,6 +26,9 @@ namespace Web.Chart
 
         [JsonProperty("description")]
         public string Description;
+
+        [JsonProperty("tags")]
+        public List<string> Tags = new List<string>();
 
         [JsonProperty("status")]
         public string Status;
@@ -59,15 +63,9 @@ namespace Web.Chart
 
         [JsonProperty("description")]
         public string Description;
-    }
 
-    public class FilenameHash
-    {
-        [JsonProperty("name")]
-        public string Name;
-
-        [JsonProperty("hash")]
-        public string Hash;
+        [JsonProperty("tags")]
+        public List<string> Tags = new List<string>();
     }
 
     public class UpdateChartRequest
@@ -77,43 +75,6 @@ namespace Web.Chart
 
         [JsonProperty("resources")]
         public List<FilenameHash> Resources = new List<FilenameHash>();
-    }
-
-    public class FileInfo
-    {
-        [JsonProperty("id")]
-        public int Id;
-
-        [JsonProperty("uploader")]
-        public UserLite Uploader;
-
-        [JsonProperty("size")]
-        [JsonConverter(typeof(LongToStringConverter))]
-        public long Size;
-
-        [JsonProperty("type")]
-        public string Type;
-
-        [JsonProperty("hash")]
-        public string Hash;
-
-        [JsonProperty("url")]
-        public string Url;
-    }
-
-    public class FileDownloadInfo
-    {
-        [JsonProperty("name")]
-        public string Name;
-
-        [JsonProperty("file")]
-        public FileInfo File;
-    }
-
-    public class CreateSongRequest : EditSongRequest
-    {
-        [JsonProperty("hash")]
-        public string Hash;
     }
 
     public static class Extension
@@ -127,7 +88,7 @@ namespace Web.Chart
         /// Update one chart of certain difficulty of a chart set.
         /// </summary>
         /// <returns>A list of URLs to the new resources.</returns>
-        public static KiraWebRequest.Builder<List<string>> UpdateChart(this IKiraWebRequest web, UpdateChartRequest req, int id, Difficulty difficulty)
+        public static KiraWebRequest.Builder<List<string>> UpdateChart(this IKiraWebRequest web, int id, Difficulty difficulty, UpdateChartRequest req)
         {
             int diff = (int)difficulty;
             return web.New<List<string>>().UseTokens().SetReq(req).Post($"chart/{id}/{diff}/update");
@@ -138,12 +99,12 @@ namespace Web.Chart
             return web.New<ChartInfo>().UseTokens().Get($"chart/{id}/info");
         }
 
-        public static KiraWebRequest.Builder<int> CreatChartSet(this IKiraWebRequest web, CreateChartRequest req)
+        public static KiraWebRequest.Builder<int> CreateChartSet(this IKiraWebRequest web, CreateChartRequest req)
         {
             return web.New<int>().UseTokens().SetReq(req).Post("chart/create");
         }
 
-        public static KiraWebRequest.Builder<object> EditChartSet(this IKiraWebRequest web, CreateChartRequest req, int id)
+        public static KiraWebRequest.Builder<object> EditChartSet(this IKiraWebRequest web, int id, CreateChartRequest req)
         {
             return web.New().UseTokens().SetReq(req).Post($"chart/{id}/edit");
         }

@@ -655,4 +655,14 @@ public class DataLoader : IDataLoader
             Debug.Log($"Copy File {relativePath} {!webRequest.isNetworkError}");
         }
     }
+
+    public void MoveChart(int oldSid, int newSid)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void MoveMusic(int oldMid, int newMid)
+    {
+        throw new NotImplementedException();
+    }
 }
