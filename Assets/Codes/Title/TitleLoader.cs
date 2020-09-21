@@ -52,6 +52,12 @@ public class TitleLoader : MonoBehaviour
      * unity_editor
      * Password:
      * Nic3P4ssword
+     * 
+     * Test User for editor (dev server):
+     * Username:
+     * meigong
+     * Password:
+     * 114514
      */
 
     [Inject]
@@ -92,7 +98,7 @@ public class TitleLoader : MonoBehaviour
             {
                 if (e.isNetworkError)
                 {
-                    UserInfo.user = new User
+                    UserInfo.user = new UserLite
                     {
                         Avatar = "N/A",
                         Nickname = "Offline",
@@ -120,7 +126,7 @@ public class TitleLoader : MonoBehaviour
     public void HideLoginPanel()
     {
         loginPanel.SetActive(false);
-        UserInfo.user = new User
+        UserInfo.user = new UserLite
         {
             Avatar = "N/A",
             Nickname = "Offline",

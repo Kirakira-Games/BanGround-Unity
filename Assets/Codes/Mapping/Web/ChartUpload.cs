@@ -9,12 +9,17 @@ using System.Linq;
 using FileResponse = Web.Upload.File;
 using System;
 using BanGround;
+using Web.Music;
+using UnityEngine;
+using Web.Chart;
+using Web.File;
 
 namespace BGEditor
 {
     class FileInfo
     {
         public FileHashSize Info;
+        public bool IsDuplicate;
         public string Filename;
         public byte[] Content;
 
@@ -30,21 +35,37 @@ namespace BGEditor
     public class ChartUpload
     {
         [Inject]
-        IDataLoader dataLoader;
+        private IDataLoader dataLoader;
         [Inject]
-        IKiraWebRequest web;
+        private IKiraWebRequest web;
         [Inject]
-        IMessageBox messageBox;
+        private IMessageBox messageBox;
         [Inject]
-        IMessageBannerController messageBanner;
+        private IMessageBannerController messageBanner;
         [Inject]
-        ILoadingBlocker loadingBlocker;
+        private ILoadingBlocker loadingBlocker;
         [Inject]
-        IChartCore chartCore;
+        private IChartCore chartCore;
         [Inject]
-        IChartListManager chartList;
+        private IChartListManager chartList;
         [Inject]
         private IFileSystem fs;
+
+        // Chart related
+        private cHeader chartHeader;
+        private List<FileInfo> chartFiles;
+        private ChartSource chartSource;
+        private int chartId;
+
+        // Music related
+        private mHeader musicHeader;
+        private List<FileInfo> musicFiles;
+        private ChartSource musicSource;
+        private int musicId;
+
+        // All
+        private List<FileInfo> allFiles;
+        private List<bool> duplicates;
 
         public async UniTaskVoid UploadChart(int sid)
         {
@@ -79,121 +100,231 @@ namespace BGEditor
             loadingBlocker.Close();
         }
 
+        private async UniTask<int> FindExistingSong(FileInfo file)
+        {
+            try
+            {
+                return (await web.GetSongByIdOrHash(file.Info.Hash).Fetch()).Id;
+            }
+            catch (KiraWebException)
+            {
+                return -1;
+            }
+        }
+
+        private void Refresh()
+        {
+            chartHeader = chartList.current.header;
+            musicHeader = dataLoader.GetMusicHeader(chartHeader.mid);
+            musicHeader.Sanitize();
+            chartHeader.Sanitize(musicHeader.length);
+            chartSource = IDRouterUtil.GetSource(chartHeader.sid, out chartId);
+            musicSource = IDRouterUtil.GetSource(chartHeader.mid, out musicId);
+        }
+
+        private async UniTask<bool> PrepareMusic()
+        {
+            if (musicSource != ChartSource.Local && musicSource != ChartSource.BanGround)
+            {
+                messageBanner.ShowMsg(LogLevel.ERROR, "Unsupported source: " + musicSource.ToString());
+                return false;
+            }
+            musicFiles = await GenerateFileList(DataLoader.MusicDir + chartHeader.sid);
+            if (musicFiles.Count == 0)
+            {
+                messageBanner.ShowMsg(LogLevel.ERROR, "Corrupted music data.");
+                return false;
+            }
+            // Find the main music file
+            for (int i = 0; i < musicFiles.Count; i++)
+            {
+                var current = musicFiles[i];
+                if (current.Filename.StartsWith(musicId + "."))
+                {
+                    musicFiles.RemoveAt(i);
+                    musicFiles.Insert(0, current);
+                    break;
+                }
+            }
+            // Check source
+            if (musicSource == ChartSource.Local)
+            {
+                // Check if music already exists
+                loadingBlocker.SetText("Discussing with the server about this song...");
+                int mid = await FindExistingSong(musicFiles[0]);
+                if (mid >= 0)
+                {
+                    loadingBlocker.SetText("Updating local data...");
+                    mid = IDRouterUtil.ToFileId(ChartSource.BanGround, mid);
+                    dataLoader.MoveMusic(musicHeader.mid, mid);
+                    Refresh();
+                    return true;
+                }
+            }
+            else
+            {
+                // Already exists, no need to upload.
+                musicFiles = null;
+            }
+            return true;
+        }
+
+        private async UniTask<bool> PrepareChart()
+        {
+            if (chartSource != ChartSource.Local && chartSource != ChartSource.BanGround)
+            {
+                messageBanner.ShowMsg(LogLevel.ERROR, "Unsupported source.");
+                return false;
+            }
+            chartFiles = await GenerateFileList(dataLoader.GetChartResource(chartHeader.sid, ""));
+            return true;
+        }
+
+        private async UniTask<bool> CreateMusic()
+        {
+            if (musicSource != ChartSource.Local)
+            {
+                // Update song data
+                loadingBlocker.SetText("Updating song...");
+                try
+                {
+                    await web.EditSong(musicId, new EditSongRequest
+                    {
+                        Title = musicHeader.title,
+                        Artist = musicHeader.artist,
+                        Length = musicHeader.length,
+                        Bpm = new List<float>(musicHeader.BPM),
+                        Preview = musicHeader.preview.ToList()
+                    }).Send();
+                }
+                catch (KiraWebException) { }
+                return true;
+            }
+            // Upload song
+            loadingBlocker.SetText("Uploading song");
+            await BatchUpload(UploadType.Music, musicFiles);
+            // Create song
+            int mid = await web.CreateSong(new CreateSongRequest
+            {
+                Title = musicHeader.title,
+                Artist = musicHeader.artist,
+                Length = musicHeader.length,
+                Bpm = new List<float>(musicHeader.BPM),
+                Hash = musicFiles[0].Info.Hash,
+                Preview = musicHeader.preview.ToList()
+            }).Fetch();
+            loadingBlocker.SetText("Updating local data...");
+            mid = IDRouterUtil.ToFileId(ChartSource.BanGround, mid);
+            dataLoader.MoveMusic(musicHeader.mid, mid);
+            Refresh();
+            return true;
+        }
+
+        private async UniTask<bool> CreateChart()
+        {
+            // Upload files
+            loadingBlocker.SetText("Uploading files");
+            var uploads = await BatchUpload(UploadType.Chart, chartFiles);
+
+            // Find background file
+            var bgFile = chartFiles.Find(file => file.Filename == chartHeader.backgroundFile.pic || file.Filename == chartHeader.backgroundFile.vid);
+            if (bgFile == null)
+            {
+                // TODO: provide a default image
+                messageBanner.ShowMsg(LogLevel.ERROR, "Background image is required.");
+                return false;
+            }
+            var bgUrl = (await web.GetFileByIdOrHash(bgFile.Info.Hash).Fetch()).Url;
+            var request = new CreateChartRequest
+            {
+                MusicId = musicId,
+                Background = bgUrl,
+                Description = "The author is too lazy to write anything.",
+                Tags = chartHeader.tag
+            };
+            // Create chart data
+            if (chartSource != ChartSource.Local)
+            {
+                // Update chart data
+                loadingBlocker.SetText("Updating chart...");
+                await web.EditChartSet(chartId, request).Send();
+            }
+            else
+            {
+                // Create chart set
+                loadingBlocker.SetText("Creating chart...");
+                int sid = await web.CreateChartSet(request).Fetch();
+                loadingBlocker.SetText("Updating local data...");
+                sid = IDRouterUtil.ToFileId(ChartSource.BanGround, sid);
+                dataLoader.MoveChart(chartHeader.sid, sid);
+                Refresh();
+            }
+            // Update resources
+            loadingBlocker.SetText("Updating chart resources");
+            for (int i = 0; i < chartHeader.difficultyLevel.Count; i++)
+            {
+                loadingBlocker.SetProgress(i, chartHeader.difficultyLevel.Count);
+                int diff = chartHeader.difficultyLevel[i];
+                if (diff == -1)
+                    continue;
+                await web.UpdateChart(chartId, (Difficulty)i, new UpdateChartRequest
+                {
+                    Level = diff,
+                    Resources = chartFiles.Select(x => new FilenameHash {
+                        Name = x.Filename,
+                        Hash = x.Info.Hash
+                    }).ToList()
+                }).Send();
+            }
+            return true;
+        }
+
         private async UniTaskVoid StartUploadChart()
         {
-            var cHeader = chartList.current.header;
+            // Initialize class members
+            Refresh();
+            chartFiles = null;
+            allFiles = null;
+            musicFiles = null;
 
-            // Check music
-            var mSource = IDRouterUtil.GetSource(cHeader.mid, out int musicId);
-            if (mSource != ChartSource.Local && mSource != ChartSource.BanGround)
-            {
-                messageBanner.ShowMsg(LogLevel.ERROR, "Unsupported source.\nIf you are not using the latest version of BanGround, please update.");
+            // Prepare music
+            loadingBlocker.SetText("Preparing music files");
+            if (!await PrepareMusic())
                 return;
-            }
-            if (mSource == ChartSource.Local && !await messageBox.ShowMessage("Upload Chart", "This is a local song.\nWould you like to upload this song?"))
-            {
-                return;
-            }
+            await UniTask.DelayFrame(0);
 
-            // Check chart
-            var cSource = IDRouterUtil.GetSource(cHeader.sid, out int id);
-            if (cSource != ChartSource.Local && cSource != ChartSource.BanGround)
-            {
-                messageBanner.ShowMsg(LogLevel.ERROR, "Unsupported source.\nIf you are not using the latest version of BanGround, please update.");
+            // Prepare chart
+            loadingBlocker.SetText("Preparing chart files");
+            if (!await PrepareChart())
                 return;
-            }
-            string message = cSource == ChartSource.Local
-                ? "This is a local chart.\nWould you like to create this chart?"
-                : "This chart has already been uploaded.\nWould you like to modify this chart?\n(This may fail if you don't have access)";
-                   
-            if (!await messageBox.ShowMessage("Upload Chart", message))
-            {
-                return;
-            }
+            await UniTask.DelayFrame(0);
 
             // Calc cost
-            List<FileInfo> musicFiles = new List<FileInfo>();
-            if (mSource == ChartSource.Local)
-            {
-                loadingBlocker.SetText("Preparing music files");
-                musicFiles = await GenerateFileList(DataLoader.MusicDir + cHeader.sid);
-            }
-
-            loadingBlocker.SetText("Preparing chart files");
-            var chartFiles = await GenerateFileList(dataLoader.GetChartResource(cHeader.sid, ""));
-
-            var allFiles = musicFiles.Concat(chartFiles).ToList();
-
             loadingBlocker.SetText("Calculating cost...");
-            var duplicates = await CalcFish(allFiles);
-            if (duplicates == null)
-            {
+            allFiles = musicFiles == null ? chartFiles : musicFiles.Concat(chartFiles).ToList();
+            if (!await CalcFish(allFiles))
                 return;
-            }
+            await UniTask.DelayFrame(0);
 
             // Upload song
-            int mid = cHeader.mid;
-            if (mSource == ChartSource.Local)
-            {
-                // Upload song
-                loadingBlocker.SetText("Uploading song");
-                var responses = await BatchUpload(UploadType.Music, musicFiles);
-                FileResponse resp = null;
-                for (int i = 0; i < musicFiles.Count; i++)
-                {
-                    if (musicFiles[i].Filename == dataLoader.GetMusicPath(mid))
-                    {
-                        resp = responses[i];
-                        break;
-                    }
-                }
-                if (resp == null)
-                {
-                    // Should not happen
-                    throw new InvalidDataException("Music file not found.");
-                }
+            if (!await CreateMusic())
+                return;
+            await UniTask.DelayFrame(0);
 
-                // Create song
-                loadingBlocker.SetText("Creating song...");
-                var mHeader = dataLoader.GetMusicHeader(mid);
-                mid = await CreateSong(mHeader, resp);
-                if (mid == -1)
-                {
-                    return;
-                }
+            // Create chart
+            if (!await CreateChart())
+                return;
+            await UniTask.DelayFrame(0);
 
-                // TODO: update all mids, including references by other songs
-                loadingBlocker.SetText("Updating local data (Music ID)...");
-                await UniTask.DelayFrame(0);
-            }
-
-            // Upload chart
-            int sid = cHeader.sid;
-            if (cSource == ChartSource.Local)
-            {
-                loadingBlocker.SetText("Creating chart...");
-                sid = await CreateChart(cHeader);
-                if (sid == -1)
-                {
-                    return;
-                }
-                // TODO: update sid
-                loadingBlocker.SetText("Updating local data (Chart ID)...");
-                await UniTask.DelayFrame(0);
-            }
-
-            // Upload resources
-            loadingBlocker.SetText("Uploading chart");
-            var chartRes = await BatchUpload(UploadType.Chart, chartFiles);
-            
-            // TODO: Call API to assocaited these resources.
+            loadingBlocker.SetText("Wrapping it up...");
+            await UniTask.Delay(5000);
         }
 
         private async UniTask<List<FileInfo>> GenerateFileList(string prefix)
         {
             var files = fs.Find((file) =>
             {
-                return file.Name.StartsWith(prefix);
+                return file.Name.StartsWith(prefix) && !file.Name.EndsWith("header.bin");
             });
 
             var ret = new List<FileInfo>();
@@ -211,43 +342,37 @@ namespace BGEditor
             return ret;
         }
 
-        private async UniTask<List<bool>> CalcFish(List<FileInfo> files)
+        private async UniTask<bool> CalcFish(List<FileInfo> files)
         {
             var req = files.Select(file => file.Info).ToList();
-            var fishDelta = await web.DoCalcUploadCost(req);
+            var fishDelta = await web.CalcUploadCost(req).Fetch();
             if (fishDelta.Fish < 0)
             {
                 messageBanner.ShowMsg(LogLevel.INFO, $"Need {fishDelta.Required} fish, but you only have {fishDelta.Fish + fishDelta.Required}");
-                return null;
+                return false;
             }
             if (!await messageBox.ShowMessage("Fish Pay", $"Cost: {fishDelta.Required}. You have {fishDelta.Fish} fish after the payment.\nContinue?"))
             {
-                return null;
+                return false;
             }
-            return fishDelta.Duplicates;
-        }
-
-        private async UniTask<int> CreateSong(mHeader header, FileResponse file)
-        {
-            //TODO
-            return -1;
-        }
-
-        private async UniTask<int> CreateChart(cHeader header)
-        {
-            //TODO
-            return -1;
+            Debug.Assert(duplicates.Count == files.Count);
+            for (int i = 0; i < fishDelta.Duplicates.Count; i++)
+            {
+                files[i].IsDuplicate = fishDelta.Duplicates[i];
+            }
+            return true;
         }
 
         private async UniTask<List<FileResponse>> BatchUpload(UploadType type, List<FileInfo> files)
         {
+            var uploads = files.Where(file => !file.IsDuplicate).ToArray();
             var ret = new List<FileResponse>();
-            int count = files.Count;
+            int count = uploads.Length;
             int current = 0;
-            foreach (var file in files)
+            foreach (var file in uploads)
             {
                 loadingBlocker.SetProgress(current, count);
-                await web.DoUploadFile(type, file.Content);
+                ret.Add(await web.UploadFile(type, file.Content).Fetch());
                 current++;
             }
             return ret;
