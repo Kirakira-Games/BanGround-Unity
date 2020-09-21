@@ -214,7 +214,7 @@ namespace BGEditor
         private async UniTask<List<bool>> CalcFish(List<FileInfo> files)
         {
             var req = files.Select(file => file.Info).ToList();
-            var fishDelta = await web.DoCalcUploadCost(req);
+            var fishDelta = await web.CalcUploadCost(req).Fetch();
             if (fishDelta.Fish < 0)
             {
                 messageBanner.ShowMsg(LogLevel.INFO, $"Need {fishDelta.Required} fish, but you only have {fishDelta.Fish + fishDelta.Required}");
@@ -247,7 +247,7 @@ namespace BGEditor
             foreach (var file in files)
             {
                 loadingBlocker.SetProgress(current, count);
-                await web.DoUploadFile(type, file.Content);
+                ret.Add(await web.UploadFile(type, file.Content).Fetch());
                 current++;
             }
             return ret;

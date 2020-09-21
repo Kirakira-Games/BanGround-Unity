@@ -8,6 +8,7 @@
         string ServerAddr { get; }
         string UA { get; }
 
-        KiraWebRequest.Builder New();
+        KiraWebRequest.Builder<ResponseType> New<ResponseType>();
+        KiraWebRequest.Builder<object> New();
     }
 }

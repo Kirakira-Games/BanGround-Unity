@@ -8,7 +8,7 @@ using WebSocketSharp;
 
 public class UserInfo : MonoBehaviour
 {
-    public static User user;
+    public static UserLite user;
     public static bool isOffline;
     private Text username_Text;
     private Image userAvatar;
