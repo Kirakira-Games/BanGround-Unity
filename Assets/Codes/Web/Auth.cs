@@ -20,7 +20,7 @@ namespace Web.Auth
         public static string EncryptPassword(string raw) => ToHex(SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(raw + "@BanGround")));
     }
 
-    public class User
+    public class UserLite
     {
         [JsonProperty("id")]
         public int Id;
@@ -49,7 +49,7 @@ namespace Web.Auth
     public class UserAuth
     {
         [JsonProperty("user")]
-        public User User;
+        public UserLite User;
 
         [JsonProperty("refreshToken")]
         public string RefreshToken;
@@ -90,9 +90,9 @@ namespace Web.Auth
 
     public static class Extension
     {
-        public static KiraWebRequest.Builder RefreshAccessToken(this IKiraWebRequest web, string refreshToken)
+        public static KiraWebRequest.Builder<UserAuth> RefreshAccessToken(this IKiraWebRequest web, string refreshToken)
         {
-            return web.New().SetReq(new RefreshAccessTokenArgs { RefreshToken = refreshToken }).Post("auth/refresh-access-token");
+            return web.New<UserAuth>().SetReq(new RefreshAccessTokenArgs { RefreshToken = refreshToken }).Post("auth/refresh-access-token");
         }
 
         public static void UpdateUserInfo(this IKiraWebRequest web, UserAuth user)
@@ -104,20 +104,20 @@ namespace Web.Auth
 
         public static async UniTask<UserAuth> DoRefreshAccessToken(this IKiraWebRequest web)
         {
-            var user = await web.RefreshAccessToken(web.RefreshToken).Fetch<UserAuth>();
+            var user = await web.RefreshAccessToken(web.RefreshToken).Fetch();
             web.UpdateUserInfo(user);
             return user;
         }
 
-        public static KiraWebRequest.Builder Login(this IKiraWebRequest web, string account, string password)
+        public static KiraWebRequest.Builder<UserAuth> Login(this IKiraWebRequest web, string account, string password)
         {
             password = Util.EncryptPassword(password);
-            return web.New().SetReq(new LoginArgs { Account = account, Password = password }).Post("auth/login");
+            return web.New<UserAuth>().SetReq(new LoginArgs { Account = account, Password = password }).Post("auth/login");
         }
 
         public static async UniTask<UserAuth> DoLogin(this IKiraWebRequest web, string account, string password)
         {
-            var user = await web.Login(account, password).Fetch<UserAuth>();
+            var user = await web.Login(account, password).Fetch();
             web.UpdateUserInfo(user);
             return user;
         }

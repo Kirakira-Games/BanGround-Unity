@@ -28,7 +28,7 @@ namespace Web.Upload
         public int Id;
 
         [JsonProperty("uploader")]
-        public Auth.User Uploader;
+        public Auth.UserLite Uploader;
 
         [JsonProperty("size")]
         [JsonConverter(typeof(LongToStringConverter))]
@@ -73,37 +73,22 @@ namespace Web.Upload
 
     public static class Extension
     {
-        public static KiraWebRequest.Builder CalcUploadCost(this IKiraWebRequest web, List<FileHashSize> files)
+        public static KiraWebRequest.Builder<CalcResult> CalcUploadCost(this IKiraWebRequest web, List<FileHashSize> files)
         {
-            return web.New().SetReq(files).UseTokens().Post("upload/calc");
+            return web.New<CalcResult>().SetReq(files).UseTokens().Post("upload/calc");
         }
 
-        public static async UniTask<CalcResult> DoCalcUploadCost(this IKiraWebRequest web, List<FileHashSize> files)
+        public static KiraWebRequest.Builder<FishDelta> ClaimFiles(this IKiraWebRequest web, List<string> hashes)
         {
-            return await web.CalcUploadCost(files).Fetch<CalcResult>();
+            return web.New<FishDelta>().SetReq(hashes).UseTokens().Post("upload/claim");
         }
 
-        public static KiraWebRequest.Builder ClaimFiles(this IKiraWebRequest web, List<string> hashes)
-        {
-            return web.New().SetReq(hashes).UseTokens().Post("upload/claim");
-        }
-
-        public static async UniTask<FishDelta> DoClaimFiles(this IKiraWebRequest web, List<string> hashes)
-        {
-            return await web.ClaimFiles(hashes).Fetch<FishDelta>();
-        }
-
-        public static KiraWebRequest.Builder UploadFile(this IKiraWebRequest web, UploadType type, byte[] content)
+        public static KiraWebRequest.Builder<File> UploadFile(this IKiraWebRequest web, UploadType type, byte[] content)
         {
             string typeStr= type.ToString().ToLower();
             WWWForm form = new WWWForm();
             form.AddBinaryData("file", content);
-            return web.New().SetForm(form).UseTokens().Post("upload/" + typeStr);
-        }
-
-        public static async UniTask<File> DoUploadFile(this IKiraWebRequest web, UploadType type, byte[] content)
-        {
-            return await web.UploadFile(type, content).Fetch<File>();
+            return web.New<File>().SetForm(form).UseTokens().Post("upload/" + typeStr);
         }
     }
 }

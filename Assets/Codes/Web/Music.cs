@@ -1,16 +1,28 @@
-﻿using Boo.Lang;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using Web.Auth;
 
 namespace Web.Music
 {
+    public class MusicLite
+    {
+        [JsonProperty("id")]
+        public int Id;
+
+        [JsonProperty("title")]
+        public string Title;
+
+        [JsonProperty("artist")]
+        public string Artist;
+    }
+
     public class MusicInfo : JsonWithTimeStamps
     {
         [JsonProperty("id")]
         public int Id;
 
         [JsonProperty("uploader")]
-        public User Uploader;
+        public UserLite Uploader;
 
         [JsonProperty("title")]
         public string Title;
@@ -38,6 +50,12 @@ namespace Web.Music
 
         [JsonProperty("style")]
         public string Style = "";
+    }
+
+    public class SongListResponse
+    {
+        [JsonProperty("music")]
+        public List<MusicInfo> Songs = new List<MusicInfo>();
     }
 
     public class EditSongRequest
@@ -78,54 +96,49 @@ namespace Web.Music
 
     public static class Extension
     {
-        public static KiraWebRequest.Builder GetAllSongs(this IKiraWebRequest web, int offset = 0, int limit = 20)
+        public static KiraWebRequest.Builder<SongListResponse> GetAllSongs(this IKiraWebRequest web, int offset = 0, int limit = 20)
         {
-            return web.New().Get($"music/all?offset={offset}&limit={limit}");
+            return web.New<SongListResponse>().Get($"music/all?offset={offset}&limit={limit}");
         }
 
-        public static KiraWebRequest.Builder GetSongsByUploader(this IKiraWebRequest web, int uid, int offset = 0, int limit = 20)
+        public static KiraWebRequest.Builder<MusicInfo> GetSongByidOrHash(this IKiraWebRequest web, string idOrHash)
         {
-            return web.New().Get($"user/{uid}/music?offset={offset}&limit={limit}");
+            return web.New<MusicInfo>().Get($"music/{idOrHash}/info");
         }
 
-        public static KiraWebRequest.Builder GetSongByidOrHash(this IKiraWebRequest web, string idOrHash)
-        {
-            return web.New().Get($"music/{idOrHash}/info");
-        }
-
-        public static KiraWebRequest.Builder GetSongById(this IKiraWebRequest web, int id)
+        public static KiraWebRequest.Builder<MusicInfo> GetSongById(this IKiraWebRequest web, int id)
         {
             return web.GetSongByidOrHash(id.ToString());
         }
 
-        public static KiraWebRequest.Builder CheckSongExistsByidOrHash(this IKiraWebRequest web, string idOrHash)
+        public static KiraWebRequest.Builder<bool> CheckSongExistsByidOrHash(this IKiraWebRequest web, string idOrHash)
         {
-            return web.New().Get($"music/{idOrHash}/exists");
+            return web.New<bool>().Get($"music/{idOrHash}/exists");
         }
 
-        public static KiraWebRequest.Builder CheckSongExistsById(this IKiraWebRequest web, int id)
+        public static KiraWebRequest.Builder<bool> CheckSongExistsById(this IKiraWebRequest web, int id)
         {
             return web.CheckSongExistsByidOrHash(id.ToString());
         }
 
-        public static KiraWebRequest.Builder CreateSong(this IKiraWebRequest web, CreateSongRequest req)
+        public static KiraWebRequest.Builder<int> CreateSong(this IKiraWebRequest web, CreateSongRequest req)
         {
-            return web.New().UseTokens().SetReq(req).Post($"music/create");
+            return web.New<int>().UseTokens().SetReq(req).Post($"music/create");
         }
 
-        public static KiraWebRequest.Builder EditSong(this IKiraWebRequest web, string idOrHash, EditSongRequest req)
+        public static KiraWebRequest.Builder<object> EditSong(this IKiraWebRequest web, string idOrHash, EditSongRequest req)
         {
             return web.New().UseTokens().SetReq(req).Post($"music/{idOrHash}/create");
         }
 
-        public static KiraWebRequest.Builder EditSong(this IKiraWebRequest web, int id, EditSongRequest req)
+        public static KiraWebRequest.Builder<object> EditSong(this IKiraWebRequest web, int id, EditSongRequest req)
         {
             return web.EditSong(id.ToString(), req);
         }
 
-        public static KiraWebRequest.Builder SearchForSong(this IKiraWebRequest web, string keyword, int offset = 0, int limit = 20)
+        public static KiraWebRequest.Builder<SongListResponse> SearchForSong(this IKiraWebRequest web, string keyword, int offset = 0, int limit = 20)
         {
-            return web.New().Get($"music/search?offset={offset}&limit={limit}&keyword={keyword}");
+            return web.New<SongListResponse>().Get($"music/search?offset={offset}&limit={limit}&keyword={keyword}");
         }
     }
 }

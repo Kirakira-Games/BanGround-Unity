@@ -94,12 +94,17 @@ namespace Web
             set => cl_refreshtoken.Set(value);
         }
 
-        public Builder New()
+        public Builder<ResponseType> New<ResponseType>()
         {
-            return new Builder { context = this };
+            return new Builder<ResponseType> { context = this };
         }
 
-        public class Builder
+        public Builder<object> New()
+        {
+            return new Builder<object> { context = this };
+        }
+
+        public class Builder<ResponseType>
         {
             public IKiraWebRequest context;
 
@@ -157,7 +162,7 @@ namespace Web
                     webRequest.SetRequestHeader("Authorization", $"Bearer {context.AccessToken}");
             }
 
-            public Builder SetReq<Req>(Req req)
+            public Builder<ResponseType> SetReq<Req>(Req req)
             {
                 var text = JsonConvert.SerializeObject(req);
                 Debug.Log("[KWR] Request: " + text);
@@ -166,21 +171,21 @@ namespace Web
                 return this;
             }
 
-            public Builder SetForm(WWWForm form)
+            public Builder<ResponseType> SetForm(WWWForm form)
             {
                 request = form.data;
                 contentType = "multipart/form-data";
                 return this;
             }
 
-            public Builder UseTokens(bool autoRefresh = true)
+            public Builder<ResponseType> UseTokens(bool autoRefresh = true)
             {
                 useTokens = true;
                 this.autoRefresh = autoRefresh;
                 return this;
             }
 
-            public Builder Get(string url)
+            public Builder<ResponseType> Get(string url)
             {
                 this.url = url;
                 method = "GET";
@@ -188,11 +193,17 @@ namespace Web
                 return this;
             }
 
-            public Builder Post(string url)
+            public Builder<ResponseType> Post(string url)
             {
                 this.url = url;
                 method = "POST";
                 Create();
+                return this;
+            }
+
+            public Builder<ResponseType> AbortOn(UnityAction action)
+            {
+                action += () => Abort();
                 return this;
             }
 
@@ -207,20 +218,22 @@ namespace Web
                 return false;
             }
 
-            public Builder AbortOn(UnityAction action)
-            {
-                action += () => Abort();
-                return this;
-            }
-
-            public async UniTask<Resp> Fetch<Resp>()
+            public async UniTask<T> Fetch<T>()
             {
                 if (isAborted)
                     return default;
-                return await HandleResponse<Resp>(await webRequest.SendWebRequest());
+                return await HandleResponse<T>(await webRequest.SendWebRequest());
             }
 
-            public async UniTaskVoid Fetch()
+            public async UniTask<ResponseType> Fetch()
+            {
+                return await Fetch<ResponseType>();
+            }
+
+            /// <summary>
+            /// Send a request and ignore the response.
+            /// </summary>
+            public async UniTaskVoid Send()
             {
                 await Fetch<object>();
             }
