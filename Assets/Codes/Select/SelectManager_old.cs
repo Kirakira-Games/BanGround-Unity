@@ -10,6 +10,7 @@ using AudioProvider;
 using Random = UnityEngine.Random;
 using UniRx.Async;
 using Zenject;
+using BanGround;
 
 #pragma warning disable 0649
 public class SelectManager_old : MonoBehaviour
@@ -24,6 +25,8 @@ public class SelectManager_old : MonoBehaviour
     private IKVSystem kvSystem;
     [Inject]
     private IChartListManager chartListManager;
+    [Inject]
+    private IFileSystem fs;
     [Inject(Id = "cl_cursorter")]
     private KVar cl_cursorter;
 
@@ -278,7 +281,7 @@ public class SelectManager_old : MonoBehaviour
         }
         if (dataLoader.MusicExists(lastPreviewMid))
         {
-            previewSound = await audioManager.PlayLoopMusic(KiraFilesystem.Instance.Read(dataLoader.GetMusicPath(lastPreviewMid)), true,
+            previewSound = await audioManager.PlayLoopMusic(fs.GetFile(dataLoader.GetMusicPath(lastPreviewMid)).ReadToEnd(), true,
                 GetPreviewPos(),
                 false
             );

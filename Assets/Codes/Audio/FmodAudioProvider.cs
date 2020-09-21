@@ -39,6 +39,9 @@ namespace AudioProvider
 
         float volume = 1.0f;
 
+        bool _isDisposed = false;
+        public bool Disposed => _isDisposed;
+
         internal FmodSoundTrack(Sound sound, FMOD.System system, FmodAudioProvider provider)
         {
             _internalSound = sound;
@@ -56,12 +59,17 @@ namespace AudioProvider
 
         public void Dispose()
         {
+            if (Disposed)
+                return;
+
             _internalSound.release();
             _internalSound.release();
 
             parent.OnUnload -= Unload;
             parent.OnUpdate -= Update;
             parent.OnVolumeChanged -= VolumeChanged;
+
+            _isDisposed = true;
         }
 
         public uint GetLength()
@@ -277,6 +285,9 @@ namespace AudioProvider
         float volume;
         SEType _type;
 
+        bool _isDisposed = false;
+        public bool Disposed => _isDisposed;
+
         internal FmodSoundEffect(Sound sound, FMOD.System system, FmodAudioProvider provider, SEType type)
         {
             _internalSound = sound;
@@ -287,7 +298,12 @@ namespace AudioProvider
 
         public void Dispose()
         {
+            if (Disposed)
+                return;
+
             _internalSound.release();
+
+            _isDisposed = true;
         }
 
         public void PlayOneShot()

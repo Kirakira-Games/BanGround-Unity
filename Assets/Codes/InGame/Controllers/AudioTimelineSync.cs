@@ -148,6 +148,8 @@ public class AudioTimelineSync : MonoBehaviour, IAudioTimelineSync
         if (bgm == null)
             return;
         UpdateSync();
-        fpsCounter?.AppendExtraInfo($"S: {bgm.GetPlaybackTime()}/{timeInMs}");
+
+        if(!bgm.Disposed)
+            fpsCounter?.AppendExtraInfo($"S: {bgm.GetPlaybackTime()}/{timeInMs}");
     }
 }

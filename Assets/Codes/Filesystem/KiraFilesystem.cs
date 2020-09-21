@@ -1,383 +1,179 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading;
-using UnityEngine;
+using System.Threading.Tasks;
 
-namespace System.IO
+namespace BanGround
 {
-    class KiraFilesystem : IDisposable
+    class NormalFile : IFile
     {
-        public static KiraFilesystem Instance;
+        private FileInfo internalInfo;
+        private Stream openedStream;
 
-        // file, kirapack
-        Dictionary<string, string> index;
+        public string Name { get => internalInfo.FullName.Replace(RootPath, "").Replace('\\','/'); set => internalInfo.MoveTo(Path.Combine(RootPath, value)); }
 
-        Dictionary<string, ZipArchive> openedArchive = new Dictionary<string, ZipArchive>();
-        Dictionary<string, DateTime> lastAccessTime = new Dictionary<string, DateTime>();
+        public string RootPath { get; }
 
-        Thread thread;
-        bool disposed = false;
+        public bool Opened => openedStream != null;
 
-        string indexFile;
-        string root;
-        string tempPath;
+        public int Size => (int)internalInfo.Length;
 
-        public KiraFilesystem(string indexFile, string filesystemRoot)
+        public NormalFile(string searchPath, FileInfo info)
         {
-            if (Instance == null)
-                Instance = this;
-
-            this.indexFile = indexFile;
-            root = filesystemRoot;
-            tempPath = $"{root}temp/";
-
-            DirectoryInfo di = new DirectoryInfo(tempPath);
-            if (!di.Exists) di.Create();
-
-            if (File.Exists(indexFile))
-            {
-                using (FileStream fs = File.OpenRead(indexFile))
-                {
-                    var bf = new BinaryFormatter();
-                    index = bf.Deserialize(fs) as Dictionary<string, string>;
-                }
-            }
-            else
-            {
-                index = new Dictionary<string, string>();
-            }
-
-            if (Application.platform == RuntimePlatform.IPhonePlayer)
-            {
-                var count = index.Update(value => true, value => root + value.Substring(92));
-
-                if (count > 0)
-                    SaveIndex();
-            }
-
-            thread = new Thread(() =>
-            {
-                while(true)
-                {
-                    if (disposed)
-                        break;
-
-                    ReleaseUnusedKirapacks();
-
-                    Thread.Sleep(1000);
-                }
-            });
-
-            thread.Start();
+            RootPath = searchPath;
+            internalInfo = info;
         }
 
-        public void AddToIndex(string kiraPack)
+        public bool Delete()
         {
-            using (var s = File.OpenRead(kiraPack))
+            try
             {
-                using (var zip = new ZipArchive(s))
-                {
-                    foreach (var entry in zip.Entries)
-                    {
-                        if (!entry.FullName.EndsWith("/") && entry.Length != 0)
-                        {
-                            if (Exists(entry.FullName))
-                                RemoveFileFromIndex(entry.FullName);
-
-                            var path = Path.Combine(root, entry.FullName);
-                            if (File.Exists(path))
-                                File.Delete(path);
-
-                            index.Add(entry.FullName, kiraPack);
-                        }
-                    }
-                }
+                internalInfo.Delete();
             }
-
-            index.Add(kiraPack, kiraPack);
-        }
-
-        public void RemoveFromIndex(string kiraPack)
-        {
-            if (openedArchive.ContainsKey(kiraPack))
+            catch
             {
-                openedArchive[kiraPack].Dispose();
-
-                openedArchive.Remove(kiraPack);
-                lastAccessTime.Remove(kiraPack);
-            }
-
-            var entries = (from x in index where x.Value == kiraPack select x.Key).ToArray();
-
-            foreach (var entry in entries)
-                index.Remove(entry);
-
-            index.Remove(kiraPack);
-        }
-
-        public void RemoveFileFromIndex(string fileName)
-        {
-            var path = Path.Combine(root, fileName);
-            if (File.Exists(path))
-            {
-                File.Delete(path);
-            }
-
-            if (index.ContainsKey(fileName))
-            {
-                index.Remove(fileName);
-            }
-        }
-
-        public void CleanUnusedKirapack()
-        {
-            var query = from x in index
-                        where x.Key.Contains("data/filesystem/") && (from y in index where y.Value == x.Key select y).Count() == 1
-                        select x.Key;
-
-            query.Any(kirapack =>
-            {
-                index.Remove(kirapack);
-                if(openedArchive.ContainsKey(kirapack))
-                {
-                    openedArchive[kirapack].Dispose();
-                    openedArchive.Remove(kirapack);
-                    lastAccessTime.Remove(kirapack);
-                }
-
-                File.Delete(kirapack);
-
-                return true;
-            });
-        }
-
-        public void SaveIndex()
-        {
-            if (index.ContainsKey("chart/"))
-                index.Remove("chart/");
-            if (index.ContainsKey("music/"))
-                index.Remove("music/");
-
-            CleanUnusedKirapack();
-
-            if (File.Exists(indexFile))
-                File.Delete(indexFile);
-
-            using (FileStream fs = File.OpenWrite(indexFile))
-            {
-                var bf = new BinaryFormatter();
-                bf.Serialize(fs, index);
-            }
-        }
-
-        public string[] IndexedFiles
-        {
-            get
-            {
-                string[] files = new string[index.Count];
-                int i = 0;
-                foreach (var kv in index)
-                    files[i++] = kv.Key;
-
-                return files;
-            }
-        }
-
-        private void GetFiles(List<string> files, DirectoryInfo di, Func<string, bool> func)
-        {
-            var subfiles = from x in di.GetFiles()
-                           where func(x.FullName.Replace('\\', '/').Replace(root, ""))
-                           select x.FullName.Replace('\\','/').Replace(root, "");
-
-            var subdirs = di.GetDirectories();
-
-            files.AddRange(subfiles);
-
-            foreach (var sdi in subdirs)
-                GetFiles(files, sdi, func);
-        }
-
-        public string[] ListFiles(Func<string, bool> func = null)
-        {
-            if (func == null)
-                func = name => true;
-
-            var files = (from x in index where func(x.Key) select x.Key).ToList();
-            GetFiles(files, new DirectoryInfo(root), func);
-            return files.ToArray();
-        }
-
-        public bool Exists(string fileName)
-        {
-            if (File.Exists(Path.Combine(root, fileName)))
-                return true;
-
-            if (!index.ContainsKey(fileName))
                 return false;
-
-            var targetKirapack = index[fileName];
-
-            if (!File.Exists(targetKirapack))
-                return false;
-
-            ZipArchive zip = null;
-
-            if (openedArchive.ContainsKey(targetKirapack))
-            {
-                zip = openedArchive[targetKirapack];
-            }
-            else
-            {
-                zip = ZipFile.OpenRead(targetKirapack);
-                openedArchive.Add(targetKirapack, zip);
             }
 
-            lastAccessTime[targetKirapack] = DateTime.Now;
-
-            if (zip.GetEntry(fileName) != null)
-                return true;
-
-            return false;
+            return true;
         }
 
-        public byte[] Read(string fileName)
+        public Stream Open(FileMode mode)
         {
-            if (File.Exists(Path.Combine(root, fileName)))
+            return internalInfo.Open(mode);
+        }
+
+        public byte[] ReadToEnd()
+        {
+            return File.ReadAllBytes(internalInfo.FullName);
+        }
+
+        public bool WriteBytes(byte[] content)
+        {
+            try
             {
-                return File.ReadAllBytes(Path.Combine(root, fileName));
+                File.WriteAllBytes(internalInfo.FullName, content);
+            }
+            catch
+            {
+                return false;
             }
 
-            if (!index.ContainsKey(fileName))
-                throw new FileNotFoundException($"File {fileName} not found in filesystem.");
+            return true;
+        }
 
-            var targetKirapack = index[fileName];
+        public string Extract(bool force = false) => internalInfo.FullName;
+    }
 
-            ZipArchive zip = null;
+    class PakFile : IFile
+    {
+        string fileName;
 
-            if (openedArchive.ContainsKey(targetKirapack))
+        Action<IFile> onDelete;
+        Func<IFile, ZipArchiveEntry> getEntry;
+        private Stream openedStream;
+
+        public PakFile(string fileName, Func<IFile, ZipArchiveEntry> entry, string pakName, Action<IFile> onFileDelete)
+        {
+            this.fileName = fileName;
+            RootPath = pakName;
+            getEntry = entry;
+            onDelete = onFileDelete;
+        }
+
+        public string Name 
+        { 
+            get => fileName; 
+            set 
             {
-                zip = openedArchive[targetKirapack];
+                var archive = getEntry(this).Archive;
+                var newEntry = archive.CreateEntry(value);
+
+                if (openedStream == null)
+                    openedStream = getEntry(this).Open();
+
+                using (var newStream = newEntry.Open())
+                    openedStream.CopyTo(newStream);
+
+                getEntry(this).Delete();
+                fileName = value;
             }
-            else
+        }
+
+        public bool Opened => openedStream != null;
+
+        public int Size => (int)getEntry(this).Length;
+
+        public string RootPath { get; }
+
+        public bool Delete()
+        {
+            try
             {
-                zip = ZipFile.OpenRead(targetKirapack);
-                openedArchive.Add(targetKirapack, zip);
+                onDelete(this);
+                getEntry(this).Delete();
+            }
+            catch
+            {
+                return false;
             }
 
-            lastAccessTime[targetKirapack] = DateTime.Now;
+            return true;
+        }
 
+        public Stream Open(FileMode mode)
+        {
+            return getEntry(this).Open();
+        }
+
+        public byte[] ReadToEnd()
+        {
             byte[] buffer;
 
-            var entry = zip.GetEntry(fileName);
-
-            using (var sr = new BinaryReader(entry.Open()))
+            using (var br = new BinaryReader(getEntry(this).Open()))
             {
-                buffer = sr.ReadBytes((int)entry.Length);
+                buffer = br.ReadBytes((int)getEntry(this).Length);
             }
 
             return buffer;
         }
 
-        public MemoryStream ReadStream(string fileName)
+        public bool WriteBytes(byte[] content)
         {
-            var bytes = Read(fileName);
-            return new MemoryStream(bytes);
-        }
-
-        public string ReadString(string fileName, Encoding encoding = null)
-        {
-            if (encoding == null)
-                encoding = Encoding.UTF8;
-
-            var bytes = Read(fileName);
-
-            return encoding.GetString(bytes);
-        }
-
-        public Texture2D ReadTexture2D(string fileName)
-        {
-            Texture2D tex = new Texture2D(2, 2);
-            tex.LoadImage(Read(fileName));
-            tex.wrapMode = TextureWrapMode.Mirror;
-
-            return tex;
-        }
-
-        /// <summary>
-        /// Write file to fs root path, not any kirapack
-        /// </summary>
-        /// <param name="fileName"></param>
-        /// <param name="data"></param>
-        /// <returns>True if sucess</returns>
-        public bool Write(string fileName, byte[] data)
-        {
-            try
+            using (var bw = new BinaryWriter(getEntry(this).Open()))
             {
-                File.WriteAllBytes(Path.Combine(root, fileName), data);
-            }
-            catch
-            {
-                return false;
+                bw.Seek(0, SeekOrigin.Begin);
+                bw.Write(content);
             }
 
             return true;
         }
-
-        /// <summary>
-        /// Save a kirapack with files from filesystem
-        /// </summary>
-        /// <param name="kiraPack"></param>
-        /// <param name="fileList"></param>
-        /// <returns>True if sucess</returns>
-        public bool SaveKirapack(string kiraPack, string[] fileList)
+        
+        public string Extract(bool force = false)
         {
-            try
-            {
-                using (var zip = ZipFile.Open(kiraPack, ZipArchiveMode.Create))
-                {
-                    foreach (var file in fileList)
-                    {
-                        var entry = zip.CreateEntry(file, Compression.CompressionLevel.Fastest);
-                        using (var bw = new BinaryWriter(entry.Open()))
-                        {
-                            var bytes = Read(file);
-
-                            bw.Write(bytes);
-                        }
-                    }
-                }
-            }
-            catch
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        public string Extract(string fileName, bool force = false)
-        {
-            var bytes = Read(fileName);
+            var bytes = ReadToEnd();
 
             var md5Filename = "";
 
             using (var md5 = MD5.Create())
             {
-                var tmp = Encoding.UTF8.GetBytes(index[fileName] + fileName);
+                var tmp = Encoding.UTF8.GetBytes(Name);
                 var arr = md5.ComputeHash(tmp);
 
                 md5Filename = Convert.ToBase64String(arr);
-                md5Filename = md5Filename.Replace("/","_");
+                md5Filename = md5Filename.Replace("/", "_");
             }
-                
 
-            var path = Path.Combine(tempPath, md5Filename + Path.GetExtension(fileName));
+            if (!Directory.Exists(RootPath + "_extracted/"))
+                Directory.CreateDirectory(RootPath + "_extracted/");
+
+            var path = Path.Combine(RootPath + "_extracted/" , md5Filename + Path.GetExtension(fileName));
             var write = true;
 
             if (File.Exists(path))
@@ -391,76 +187,302 @@ namespace System.IO
 
             return path;
         }
+    }
 
-        //public void ReleaseUnusedKirapacks() => (from x in openedArchive where DateTime.Now - lastAccessTime[x.Key] > TimeSpan.FromMinutes(1) select x.Key).All((key) =>
-        //{
-        //    openedArchive[key].Dispose();
-        //    openedArchive.Remove(key);
+    class KiraFilesystem : IFileSystem
+    {
+        List<string> packPaths = new List<string>();
+        List<string> searchPaths = new List<string>();
 
-        //    lastAccessTime.Remove(key);
-        //    return true;
-        //});
+        Dictionary<string, IFile> pakFileIndexs = new Dictionary<string, IFile>();
+        Dictionary<string, (ZipArchive, DateTime)> packAccessCache = new Dictionary<string, (ZipArchive, DateTime)>();
 
-        public void ReleaseUnusedKirapacks()
+        public bool Init()
         {
-            List<string> removeKey = new List<string>();
-            foreach (var ar in openedArchive)
-            {
-                if (DateTime.Now - lastAccessTime[ar.Key] > TimeSpan.FromMinutes(1))
-                    removeKey.Add(ar.Key);
-            }
-            for (int i = 0; i < removeKey.Count; i++)
-            {
-                //Debug.Log($"Release pack:{removeKey[i]}");
-                openedArchive[removeKey[i]].Dispose();
-                openedArchive.Remove(removeKey[i]);
-                lastAccessTime.Remove(removeKey[i]);
-            }
+            return true;
         }
 
-        #region IDisposable Support
-        private bool disposedValue = false; // 要检测冗余调用
-
-        protected virtual void Dispose(bool disposing)
+        void OnPakFileDelete(IFile pakFile)
         {
-            if (!disposedValue)
+            pakFileIndexs.Remove(pakFile.Name);
+        }
+
+        ZipArchiveEntry GetEntryStub(IFile pakfile)
+        {
+            if (!packPaths.Contains(pakfile.RootPath))
+                throw new FileNotFoundException("Target kirapack already removed!");
+
+            if (packAccessCache.ContainsKey(pakfile.RootPath))
             {
-                if (disposing)
+                var t = packAccessCache[pakfile.RootPath];
+                t.Item2 = DateTime.Now;
+
+                packAccessCache[pakfile.RootPath] = t;
+
+                return packAccessCache[pakfile.RootPath].Item1.GetEntry(pakfile.Name);
+            }
+
+            var newZip = new ZipArchive(File.OpenRead(pakfile.RootPath));
+            packAccessCache.Add(pakfile.RootPath, (newZip, DateTime.Now));
+
+            return newZip.GetEntry(pakfile.Name);
+        }
+
+        public void AddSearchPath(string path)
+        {
+            if(Directory.Exists(path))
+            {
+                searchPaths.Add(path);
+
+                DirectoryInfo di = new DirectoryInfo(path);
+
+                foreach(var fi in di.GetFiles())    
                 {
-                    disposed = true;
-
-                    foreach (var kv in openedArchive)
-                    {
-                        kv.Value.Dispose();
-                    }
-
-                    openedArchive = null;
-                    lastAccessTime = null;
-
-                    SaveIndex();
-                    index = null;
+                    if (fi.Extension == ".kpak")
+                        AddSearchPath(fi.FullName);
                 }
 
-                disposedValue = true;
+                return;
+            }
+
+            if(File.Exists(path))
+            {
+                using(var br = new BinaryReader(File.OpenRead(path)))
+                {
+                    ushort pkMagic = br.ReadUInt16();
+                    byte version = br.ReadByte();
+
+                    if (!(pkMagic == 0x4b50 && version == 3))
+                        return;
+                }
+
+                packPaths.Add(path);
+
+                var zip = new ZipArchive(File.OpenRead(path));
+                packAccessCache.Add(path, (zip, DateTime.Now));
+
+                foreach (var entry in zip.Entries)
+                {
+                    if (entry.Length != 0)
+                    {
+                        if (pakFileIndexs.ContainsKey(entry.FullName))
+                            pakFileIndexs.Remove(entry.FullName);
+
+                        var file = new PakFile(entry.FullName, GetEntryStub, path, OnPakFileDelete);
+
+                        pakFileIndexs.Add(entry.FullName, file);
+                    }
+                }
             }
         }
 
-        // TODO: 仅当以上 Dispose(bool disposing) 拥有用于释放未托管资源的代码时才替代终结器。
-        // ~KiraFilesystem()
-        // {
-        //   // 请勿更改此代码。将清理代码放入以上 Dispose(bool disposing) 中。
-        //   Dispose(false);
-        // }
-
-        // 添加此代码以正确实现可处置模式。
-        public void Dispose()
+        public bool FileExists(string filename)
         {
-            // 请勿更改此代码。将清理代码放入以上 Dispose(bool disposing) 中。
-            Dispose(true);
-            // TODO: 如果在以上内容中替代了终结器，则取消注释以下行。
-            // GC.SuppressFinalize(this);
+            var result = pakFileIndexs.ContainsKey(filename);
+
+            if (result)
+                return result;
+
+            foreach(var searchPath in searchPaths)
+            {
+                var fullPath = Path.Combine(searchPath, filename);
+
+                result = File.Exists(fullPath);
+
+                if (result)
+                    return result;
+            }
+
+            return false;
         }
-        #endregion
+
+        public IFile GetFile(string path)
+        {
+            foreach(var searchPath in searchPaths)
+            {
+                var fi = new FileInfo(Path.Combine(searchPath, path));
+
+                if(fi.Exists)
+                {
+                    return new NormalFile(searchPath, fi);
+                }
+            }
+
+            if (pakFileIndexs.ContainsKey(path))
+                return pakFileIndexs[path];
+
+            throw new FileNotFoundException("Target file not found in any search path!");
+        }
+
+        public void RemoveSearchPath(string path)
+        {
+            if (searchPaths.Contains(path))
+                searchPaths.Remove(path);
+
+            if(packPaths.Contains(path))
+            {
+                packPaths.Remove(path);
+
+                var files = pakFileIndexs.Where(kvp => kvp.Value.RootPath == path).Select(kvp => kvp.Key);
+
+                foreach (var file in files)
+                    pakFileIndexs.Remove(file);
+
+                if (packAccessCache.ContainsKey(path))
+                {
+                    var (pack, time) = packAccessCache[path];
+
+                    packAccessCache.Remove(path);
+
+                    pack.Dispose();
+                }
+            }
+        }
+
+        private void GetFiles(string searchPath, List<IFile> files, DirectoryInfo di, Func<IFile, bool> func)
+        {
+            foreach(var fi in di.GetFiles())
+            {
+                var file = new NormalFile(searchPath, fi);
+
+                if (func(file))
+                    files.Add(file);
+            }
+
+            var subdirs = di.GetDirectories();
+
+            foreach (var sdi in subdirs)
+                GetFiles(searchPath, files, sdi, func);
+        }
+
+        public IEnumerable<IFile> Find(Func<IFile, bool> cmp)
+        {
+            var indexResult = pakFileIndexs.Values.Where(cmp).ToList();
+            var filesystemResult = new List<IFile>();
+
+            foreach(var searchPath in searchPaths)
+            {
+                GetFiles(searchPath, filesystemResult, new DirectoryInfo(searchPath), cmp);
+            }
+
+            if (false)
+            {
+                indexResult.AddRange(filesystemResult.Where((f) => indexResult.Find(f1 => f1.Name == f.Name) == null));
+                return indexResult;
+            }
+            else
+            {
+                filesystemResult.AddRange(indexResult.Where((f) => filesystemResult.Find(f1 => f1.Name == f.Name) == null));
+                return indexResult;
+            }
+        }
+
+        public void FlushPak(string pakName)
+        {
+            if(packAccessCache.ContainsKey(pakName))
+            {
+                packAccessCache[pakName].Item1.Dispose();
+                packAccessCache.Remove(pakName);
+            }
+        }
+
+        public IFile NewFile(string name, string searchPath = null)
+        {
+            if(searchPath != null && packPaths.Contains(searchPath))
+            {
+                ZipArchive archive = null;
+
+                if(!packAccessCache.ContainsKey(searchPath))
+                {
+                    archive = new ZipArchive(File.OpenRead(searchPath));
+                    packAccessCache.Add(searchPath, (archive, DateTime.Now));
+                }
+                else
+                {
+                    archive = packAccessCache[searchPath].Item1;
+                }
+
+                archive.CreateEntry(name);
+
+                return new PakFile(name, GetEntryStub, searchPath, OnPakFileDelete);
+            }
+            else if(searchPath != null && searchPaths.Contains(searchPath))
+            {
+                var fi = new FileInfo(Path.Combine(searchPath, name));
+                fi.Create().Close();
+
+                return new NormalFile(searchPath, fi);
+            }
+            else
+            {
+                searchPath = searchPaths[0];
+                var fi = new FileInfo(Path.Combine(searchPath, name));
+                fi.Create().Close();
+
+                return new NormalFile(searchPath, fi);
+            }
+        }
+
+        public int RemoveFolder(string path, string pakName = null)
+        {
+            IEnumerable<IFile> affectedFiles = null;
+            
+            if(pakName == null)
+            {
+                affectedFiles = Find(file => file.Name.StartsWith(path));
+            }
+            else
+            {
+                affectedFiles = Find(file => file.RootPath == pakName && file.Name.StartsWith(path));
+            }
+
+            foreach (var file in affectedFiles)
+                    file.Delete();
+
+            return affectedFiles.Count();
+        }
+
+        public int RenameFolder(string from, string to, string pakName)
+        {
+            IEnumerable<IFile> affectedFiles = null;
+
+            if (pakName == null)
+            {
+                affectedFiles = Find(file => file.Name.StartsWith(from));
+            }
+            else
+            {
+                affectedFiles = Find(file => file.RootPath == pakName && file.Name.StartsWith(from));
+            }
+
+            foreach (var file in affectedFiles)
+            {
+                file.Name = file.Name.Replace(from, to);
+            }
+
+            return affectedFiles.Count();
+        }
+
+        public bool Shutdown()
+        {
+            var openedPaks = packAccessCache.Values.Select(t => t.Item1);
+
+            foreach (var archive in openedPaks)
+                archive.Dispose();
+
+            packAccessCache.Clear();
+
+            return true;
+        }
+        public IEnumerator<IFile> GetEnumerator()
+        {
+            return Find(_ => true).GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return Find(_ => true).GetEnumerator();
+        }
 
     }
 }

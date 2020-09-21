@@ -8,6 +8,7 @@ using System.Linq;
 
 using FileResponse = Web.Upload.File;
 using System;
+using BanGround;
 
 namespace BGEditor
 {
@@ -42,6 +43,8 @@ namespace BGEditor
         IChartCore chartCore;
         [Inject]
         IChartListManager chartList;
+        [Inject]
+        private IFileSystem fs;
 
         public async UniTaskVoid UploadChart(int sid)
         {
@@ -188,19 +191,19 @@ namespace BGEditor
 
         private async UniTask<List<FileInfo>> GenerateFileList(string prefix)
         {
-            var files = KiraFilesystem.Instance.ListFiles((path) =>
+            var files = fs.Find((file) =>
             {
-                path = path.Replace("\\", "/");
-                return path.StartsWith(prefix);
+                return file.Name.StartsWith(prefix);
             });
+
             var ret = new List<FileInfo>();
-            int filesCount = files.Length;
+            int filesCount = files.Count();
             int currentCount = 0;
             foreach (var file in files)
             {
-                var path = file.Split('/');
+                var path = file.Name.Split('/');
                 var name = path[path.Length - 1];
-                ret.Add(new FileInfo(name, KiraFilesystem.Instance.Read(file)));
+                ret.Add(new FileInfo(name, file.ReadToEnd()));
                 loadingBlocker.SetProgress(currentCount, filesCount);
                 currentCount++;
                 await UniTask.DelayFrame(0);

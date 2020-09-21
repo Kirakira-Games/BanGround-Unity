@@ -1,6 +1,8 @@
 using AudioProvider;
+using BanGround;
 using System.IO;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 using Web;
 using Zenject;
@@ -14,6 +16,7 @@ public class GlobalInstaller : MonoInstaller
 
     private IKVSystem kvSystem;
     private IDataLoader dataLoader;
+    private IFileSystem fs;
 
     public override void Start()
     {
@@ -22,6 +25,13 @@ public class GlobalInstaller : MonoInstaller
 
     public override void InstallBindings()
     {
+        // Filesystem
+        Container.Bind<IFileSystem>().To<KiraFilesystem>().AsSingle().OnInstantiated((_, obj) =>
+        {
+            if (obj is ValidationMarker) return;
+            fs = obj as IFileSystem;
+        });
+
         // Data Loader
         Container.Bind<IDataLoader>().To<DataLoader>().AsSingle().OnInstantiated((context, obj) =>
         {
@@ -35,6 +45,7 @@ public class GlobalInstaller : MonoInstaller
         // KVar System
         Container.Bind<IKVSystem>().To<KVSystem>().AsSingle().OnInstantiated((_, obj) =>
         {
+            if (obj is ValidationMarker) return;
             kvSystem = obj as IKVSystem;
         }).NonLazy();
 
@@ -155,9 +166,9 @@ public class GlobalInstaller : MonoInstaller
                 if (!filename.EndsWith(".cfg"))
                     filename += ".cfg";
 
-                if (KiraFilesystem.Instance.Exists(filename))
+                if (fs.FileExists(filename))
                 {
-                    string[] cfg = KiraFilesystem.Instance.ReadString(filename).Replace("\r", "").Split('\n');
+                    string[] cfg = fs.GetFile(filename).ReadAsString().Replace("\r", "").Split('\n');
 
                     cfg.All(line => {
                         kvSystem.ExecuteLine(line, true);
