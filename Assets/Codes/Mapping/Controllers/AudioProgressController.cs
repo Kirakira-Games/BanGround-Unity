@@ -4,6 +4,7 @@ using AudioProvider;
 using System;
 using Zenject;
 using System.IO;
+using BanGround;
 
 namespace BGEditor
 {
@@ -117,9 +118,12 @@ namespace BGEditor
             Core.onUserChangeAudioProgress.Invoke();
         }
 
+        [Inject]
+        private IFileSystem fs;
+
         public async void Init()
         {
-            byte[] audio = KiraFilesystem.Instance.Read(dataLoader.GetMusicPath(chartListManager.current.header.mid));
+            byte[] audio =  fs.GetFile(dataLoader.GetMusicPath(chartListManager.current.header.mid)).ReadToEnd();
             // Load BGM
             audioManager.gameBGM = await audioManager.Provider.StreamTrack(audio);
             bgm.Play();

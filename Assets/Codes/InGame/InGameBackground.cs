@@ -6,6 +6,7 @@ using System.IO;
 using UnityEngine.SceneManagement;
 using UnityEngine.Networking;
 using Zenject;
+using BanGround;
 
 #pragma warning disable 0649
 public class InGameBackground : MonoBehaviour, IInGameBackground
@@ -21,6 +22,9 @@ public class InGameBackground : MonoBehaviour, IInGameBackground
 
     [Inject(Id = "r_brightness_bg")]
     KVar r_brightness_bg;
+
+    [Inject]
+    private IFileSystem fs;
 
     private void Awake()
     {
@@ -66,7 +70,7 @@ public class InGameBackground : MonoBehaviour, IInGameBackground
 
     public void SetBackground(string path, int type)
     {
-        if (path == null || (type == 0 && !KiraFilesystem.Instance.Exists(path)))
+        if (path == null || (type == 0 && !fs.FileExists(path)))
         {
             //RenderSettings.skybox = bgSkybox;
             mesh.sharedMaterial = bgSkybox;
@@ -79,7 +83,7 @@ public class InGameBackground : MonoBehaviour, IInGameBackground
             if (type == 0)
             {
                 vp.enabled = false;
-                var tex = KiraFilesystem.Instance.ReadTexture2D(path);
+                var tex = fs.GetFile(path).ReadAsTexture();
 
 
                 float ratio = tex.width / (float)tex.height;

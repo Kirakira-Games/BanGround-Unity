@@ -10,6 +10,7 @@ using UniRx.Async;
 using JudgeQueue = PriorityQueue<int, NoteBase>;
 using Zenject;
 using System.Threading;
+using BanGround;
 
 public class NoteController : MonoBehaviour, INoteController
 {
@@ -378,6 +379,9 @@ public class NoteController : MonoBehaviour, INoteController
     [Inject(Id = "r_brightness_long")]
     KVar r_brightness_long;
 
+    [Inject]
+    private IFileSystem fs;
+
     async void Start()
     {
         isFinished = false;
@@ -433,8 +437,10 @@ public class NoteController : MonoBehaviour, INoteController
             await audioManager.PrecacheInGameSE(resourceLoader.LoadSEResource<TextAsset>("flick.wav").bytes)
         };
 
+       
+
         // Game BGM
-        _ = audioManager.StreamGameBGMTrack(KiraFilesystem.Instance.Read(dataLoader.GetMusicPath(chartListManager.current.header.mid)))
+        _ = audioManager.StreamGameBGMTrack(fs.GetFile(dataLoader.GetMusicPath(chartListManager.current.header.mid)).ReadToEnd())
             .ContinueWith((bgm) => {
                 modManager.attachedMods.ForEach(mod => (mod as AudioMod)?.ApplyMod(bgm));
                 audioTimelineSync.time = -audioTimelineSync.RealTimeToBGMTime(WARM_UP_SECOND);
@@ -446,7 +452,7 @@ public class NoteController : MonoBehaviour, INoteController
         var (bg, bgtype) = dataLoader.GetBackgroundPath(chartListManager.current.header.sid, false);
         if (bgtype == 1)
         {
-            var videoPath = KiraFilesystem.Instance.Extract(bg);
+            var videoPath = fs.GetFile(bg).Extract();
             background.SetBackground(videoPath, bgtype);
         }
         else
@@ -472,7 +478,7 @@ public class NoteController : MonoBehaviour, INoteController
             GameObject.Find("settingsCanvas").GetComponent<Canvas>().enabled = false;
         }
 
-        chartScript = new ChartScript(chartListManager.current.header.sid, (Difficulty)chartListManager.current.difficulty);
+        chartScript = new ChartScript(chartListManager.current.header.sid, chartListManager.current.difficulty, fs, audioManager);
 
         //Set Play Mod Event
         //audioManager.restart = false;

@@ -7,6 +7,8 @@ using Zenject;
 using Web;
 using Web.Auth;
 using System;
+using BanGround;
+using System.Linq;
 
 public class TitleLoader : MonoBehaviour
 {
@@ -18,6 +20,8 @@ public class TitleLoader : MonoBehaviour
     private IKiraWebRequest web;
     [Inject]
     private ILoadingBlocker loadingBlocker;
+    [Inject]
+    private IFileSystem fs;
 
     [Inject(Id = "cl_language")]
     KVar cl_language;
@@ -57,11 +61,11 @@ public class TitleLoader : MonoBehaviour
         CheckUpdate();
         _ = dataLoader.Init();
 
-        var backgrounds = KiraFilesystem.Instance.ListFiles(filename => filename.StartsWith(BACKGROUND_PATH));
+        var backgrounds = fs.Find(file=> file.Name.StartsWith(BACKGROUND_PATH));
 
-        if (backgrounds.Length != 0)
+        if (backgrounds.Count() != 0)
         {
-            var tex = KiraFilesystem.Instance.ReadTexture2D(backgrounds[UnityEngine.Random.Range(0, backgrounds.Length)]);
+            var tex = backgrounds.ElementAt(UnityEngine.Random.Range(0, backgrounds.Count())).ReadAsTexture();
 
             var matCopy = Instantiate(backgroundMat);
 

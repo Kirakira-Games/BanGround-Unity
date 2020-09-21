@@ -10,6 +10,7 @@ using UnityEngine.Scripting;
 using ProtoBuf.Meta;
 using Zenject;
 using UnityEngine;
+using BanGround;
 
 [JsonConverter(typeof(StringEnumConverter))]
 [ProtoContract()]
@@ -377,9 +378,9 @@ public static class ProtobufHelper
         }
     }
 
-    public static T LoadFromKiraFs<T>(string path) where T : IExtensible
+    public static T Load<T>(IFile file) where T : IExtensible
     {
-        var stream = KiraFilesystem.Instance.ReadStream(path);
+        var stream = file.Open(FileMode.Open);
         return Serializer.Deserialize<T>(stream);
     }
 

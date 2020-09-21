@@ -112,16 +112,6 @@ public class AudioManager : MonoBehaviour, IAudioManager
     private void OnDestroy()
     {
         Provider.Unload();
-
-        try
-        {
-            // ? 随便这里好像可以
-            System.IO.KiraFilesystem.Instance.Dispose();
-        }
-        catch
-        {
-
-        }
     }
 
     public async UniTask<ISoundEffect> PrecacheSE(byte[] data) => await Provider.PrecacheSE(data, SEType.Common);

@@ -7,7 +7,6 @@ using System.Runtime.CompilerServices;
 //using UnityEditor.UIElements;
 using UnityEngine;
 using Zenject;
-using FS = System.IO.KiraFilesystem;
 
 [Flags]
 public enum KVarFlags
