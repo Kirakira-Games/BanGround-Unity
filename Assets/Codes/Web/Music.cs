@@ -37,10 +37,10 @@ namespace Web.Music
         public float Length;
 
         [JsonProperty("bpm")]
-        public List<int> Bpm = new List<int>();
+        public List<float> Bpm = new List<float>();
 
-        [JsonProperty("tags")]
-        public List<string> Tags = new List<string>();
+        [JsonProperty("preview")]
+        public List<float> Preview = new List<float>();
 
         [JsonProperty("source")]
         public string Source = "";
@@ -66,17 +66,14 @@ namespace Web.Music
         [JsonProperty("artist")]
         public string Artist;
 
-        [JsonProperty("background")]
-        public string Background;
-
         [JsonProperty("length")]
         public float Length;
 
         [JsonProperty("bpm")]
-        public List<int> Bpm = new List<int>();
+        public List<float> Bpm = new List<float>();
 
-        [JsonProperty("tags")]
-        public List<string> Tags = new List<string>();
+        [JsonProperty("preview")]
+        public List<float> Preview = new List<float>();
 
         [JsonProperty("source")]
         public string Source;
@@ -101,14 +98,14 @@ namespace Web.Music
             return web.New<SongListResponse>().Get($"music/all?offset={offset}&limit={limit}");
         }
 
-        public static KiraWebRequest.Builder<MusicInfo> GetSongByidOrHash(this IKiraWebRequest web, string idOrHash)
+        public static KiraWebRequest.Builder<MusicInfo> GetSongByIdOrHash(this IKiraWebRequest web, string idOrHash)
         {
             return web.New<MusicInfo>().Get($"music/{idOrHash}/info");
         }
 
         public static KiraWebRequest.Builder<MusicInfo> GetSongById(this IKiraWebRequest web, int id)
         {
-            return web.GetSongByidOrHash(id.ToString());
+            return web.GetSongByIdOrHash(id.ToString());
         }
 
         public static KiraWebRequest.Builder<bool> CheckSongExistsByidOrHash(this IKiraWebRequest web, string idOrHash)

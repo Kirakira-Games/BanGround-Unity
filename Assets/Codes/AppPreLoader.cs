@@ -41,7 +41,8 @@ public class AppPreLoader : MonoBehaviour
         // Init Json.Net
         JsonConvert.DefaultSettings = () => new JsonSerializerSettings
         {
-            MissingMemberHandling = MissingMemberHandling.Ignore
+            MissingMemberHandling = MissingMemberHandling.Ignore,
+            NullValueHandling = NullValueHandling.Ignore
         };
 
         SceneManager.LoadScene("Title");
