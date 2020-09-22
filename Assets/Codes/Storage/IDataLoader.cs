@@ -38,6 +38,6 @@ public interface IDataLoader
     void SaveHeader(cHeader header);
     void SaveHeader(mHeader header);
     void SaveHeader(mHeader header, byte[] oggFile);
-    void MoveChart(int oldSid, int newSid);
-    void MoveMusic(int oldMid, int newMid);
+    void MoveChart(int oldSid, int newSid, bool overwrite = true);
+    void MoveMusic(int oldMid, int newMid, bool overwrite = true);
 }

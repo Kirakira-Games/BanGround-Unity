@@ -437,7 +437,7 @@ namespace BanGround
             }
 
             foreach (var file in affectedFiles)
-                    file.Delete();
+                file.Delete();
 
             return affectedFiles.Count();
         }
