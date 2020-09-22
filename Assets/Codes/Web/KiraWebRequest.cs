@@ -77,7 +77,7 @@ namespace Web
             "DotNet"
 #endif
         + "); ApiRequest";
-#if true
+#if false
         // Use local server
         public string ServerAddr => "http://localhost:8080/api/";
 #elif UNITY_EDITOR
