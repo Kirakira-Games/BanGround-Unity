@@ -240,6 +240,7 @@ namespace BGEditor
                 MusicId = musicId,
                 Background = bgUrl,
                 Description = "The author is too lazy to write anything.",
+                Preview = chartHeader.preview.ToList(),
                 Tags = chartHeader.tag
             };
             // Create chart data
