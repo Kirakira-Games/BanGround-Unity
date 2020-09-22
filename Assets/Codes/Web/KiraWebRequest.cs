@@ -77,7 +77,10 @@ namespace Web
             "DotNet"
 #endif
         + "); ApiRequest";
-#if UNITY_EDITOR
+#if true
+        // Use local server
+        public string ServerAddr => "http://localhost:8080/api/";
+#elif UNITY_EDITOR
         public string ServerAddr => "https://beijing.aliyun.reikohaku.fun/api/";
 #else
         public string ServerAddr => "https://banground.live/api/";
@@ -108,6 +111,7 @@ namespace Web
         {
             public IKiraWebRequest context;
 
+            public WWWForm form { get; private set; }
             public UnityWebRequest webRequest { get; private set; }
             public byte[] request { get; private set; }
             public bool useTokens { get; private set; } = false;
@@ -116,6 +120,7 @@ namespace Web
             public string contentType { get; private set; }
             public string url { get; private set; }
             public string method { get; private set; }
+            public int timeout { get; private set; } = 60;
 
             private async UniTask<Resp> HandleResponse<Resp>(UnityWebRequest req)
             {
@@ -149,8 +154,11 @@ namespace Web
 
             private void Create()
             {
-                webRequest = new UnityWebRequest(context.ServerAddr + url, method);
-                webRequest.timeout = 15;
+                if (form == null)
+                    webRequest = new UnityWebRequest(context.ServerAddr + url, method);
+                else
+                    webRequest = UnityWebRequest.Post(context.ServerAddr + url, form);
+                webRequest.timeout = timeout;
                 webRequest.downloadHandler = new DownloadHandlerBuffer();
                 webRequest.SetRequestHeader("User-Agent", context.UA);
                 webRequest.SetRequestHeader("Accpet-Language", context.Language);
@@ -164,6 +172,8 @@ namespace Web
 
             public Builder<ResponseType> SetReq<Req>(Req req)
             {
+                if (form != null)
+                    throw new InvalidOperationException("Cannot set request on form data!");
                 var text = JsonConvert.SerializeObject(req);
                 Debug.Log("[KWR] Request: " + text);
                 request = new UTF8Encoding().GetBytes(text);
@@ -173,8 +183,9 @@ namespace Web
 
             public Builder<ResponseType> SetForm(WWWForm form)
             {
-                request = form.data;
-                contentType = "multipart/form-data";
+                if (request != null)
+                    throw new InvalidOperationException("Cannot set form after setting request!");
+                this.form = form;
                 return this;
             }
 
@@ -182,6 +193,12 @@ namespace Web
             {
                 useTokens = true;
                 this.autoRefresh = autoRefresh;
+                return this;
+            }
+
+            public Builder<ResponseType> SetTimeout(int timeout)
+            {
+                this.timeout = timeout;
                 return this;
             }
 
