@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using System;
 using System.Linq;
 using Zenject;
+using Web;
 
 namespace BGEditor
 {
@@ -30,58 +31,53 @@ namespace BGEditor
         public Text DifficultyText;
         public InputField Tags;
         public FloatInput[] ChartPreview;
+        public Text MidTxt;
+        public Text SidTxt;
 
         private mHeader mHeader;
         private cHeader cHeader;
-
-        private void Awake()
-        {
-            cHeader = chartListManager.current.header;
-            mHeader = dataLoader.GetMusicHeader(cHeader.mid);
-        }
 
         public void Show()
         {
             if (gameObject.activeSelf)
                 return;
+
+            cHeader = chartListManager.current.header;
+            mHeader = dataLoader.GetMusicHeader(cHeader.mid);
             // just fill in
             float duration = Progress.audioLength / 1000f;
+            mHeader.Sanitize();
+            cHeader.Sanitize(duration);
 
+            // Id & source
+            var musicSource = IDRouterUtil.GetSource(mHeader.mid, out int mid);
+            var chartSource = IDRouterUtil.GetSource(cHeader.sid, out int sid);
+            MidTxt.text = $"{musicSource}: {mid}";
+            SidTxt.text = $"{chartSource}: {sid}";
+
+            // Misc
             Blocker.gameObject.SetActive(true);
             gameObject.SetActive(true);
             Title.text = mHeader.title;
             Artist.text = mHeader.artist;
+
             BPM[0].SetValue(mHeader.BPM[0]);
-            BPM[1].SetValue(mHeader.BPM.Length > 1 ? mHeader.BPM[1] : mHeader.BPM[0]);
+            BPM[1].SetValue(mHeader.BPM[1]);
+
             MusicPreview[0].MaxVal = duration;
             MusicPreview[1].MaxVal = duration;
-            if (mHeader.preview != null)
-            {
-                MusicPreview[0].SetValue(mHeader.preview[0]);
-                MusicPreview[1].SetValue(mHeader.preview[1]);
-            }
-            else
-            {
-                MusicPreview[0].SetValue(0f);
-                MusicPreview[1].SetValue(duration);
-            }
+            MusicPreview[0].SetValue(mHeader.preview[0]);
+            MusicPreview[1].SetValue(mHeader.preview[1]);
 
             Designer.text = cHeader.authorNick;
             Difficulty.SetValue(cHeader.difficultyLevel[(int)chartListManager.current.difficulty]);
             DifficultyText.text = Enum.GetName(typeof(Difficulty), chartListManager.current.difficulty);
             Tags.text = string.Join(",", cHeader.tag);
+
             ChartPreview[0].MaxVal = duration;
             ChartPreview[1].MaxVal = duration;
-            if (cHeader.preview != null)
-            {
-                ChartPreview[0].SetValue(cHeader.preview[0]);
-                ChartPreview[1].SetValue(cHeader.preview[1]);
-            }
-            else
-            {
-                ChartPreview[0].SetValue(0f);
-                ChartPreview[1].SetValue(duration);
-            }
+            ChartPreview[0].SetValue(cHeader.preview[0]);
+            ChartPreview[1].SetValue(cHeader.preview[1]);
         }
 
         public void Save()
