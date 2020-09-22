@@ -64,6 +64,9 @@ namespace Web.Chart
         [JsonProperty("description")]
         public string Description;
 
+        [JsonProperty("preview")]
+        public List<float> Preview = new List<float>();
+
         [JsonProperty("tags")]
         public List<string> Tags = new List<string>();
     }

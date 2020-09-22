@@ -222,7 +222,7 @@ namespace BanGround
                 return packAccessCache[pakfile.RootPath].Item1.GetEntry(pakfile.Name);
             }
 
-            var newZip = new ZipArchive(File.OpenRead(pakfile.RootPath));
+            var newZip = new ZipArchive(File.Open(pakfile.RootPath, FileMode.Open, FileAccess.ReadWrite), ZipArchiveMode.Update);
             packAccessCache.Add(pakfile.RootPath, (newZip, DateTime.Now));
 
             return newZip.GetEntry(pakfile.Name);
@@ -245,9 +245,9 @@ namespace BanGround
                 return;
             }
 
-            if(File.Exists(path))
+            if (File.Exists(path))
             {
-                using(var br = new BinaryReader(File.OpenRead(path)))
+                using (var br = new BinaryReader(File.OpenRead(path)))
                 {
                     ushort pkMagic = br.ReadUInt16();
                     byte version = br.ReadByte();
@@ -258,7 +258,7 @@ namespace BanGround
 
                 packPaths.Add(path);
 
-                var zip = new ZipArchive(File.OpenRead(path));
+                var zip = new ZipArchive(File.Open(path, FileMode.Open, FileAccess.ReadWrite), ZipArchiveMode.Update);
                 packAccessCache.Add(path, (zip, DateTime.Now));
 
                 foreach (var entry in zip.Entries)
@@ -437,7 +437,7 @@ namespace BanGround
             }
 
             foreach (var file in affectedFiles)
-                    file.Delete();
+                file.Delete();
 
             return affectedFiles.Count();
         }
