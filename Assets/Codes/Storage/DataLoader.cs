@@ -421,7 +421,7 @@ public class DataLoader : IDataLoader
                     return item.Delete();
                 });
 
-                Debug.Log($"Removing music {song} due to the refcount is zero");
+                Debug.Log($"Removing music {song.mid} due to the refcount is zero");
             }
             else
             {
@@ -656,13 +656,61 @@ public class DataLoader : IDataLoader
         }
     }
 
-    public void MoveChart(int oldSid, int newSid)
+    private void MoveFiles(string oldPrefix, string newPrefix, bool overwrite)
     {
-        throw new NotImplementedException();
+        // Sanity check
+        var oldFiles = fs.Find(file => file.Name.StartsWith(oldPrefix));
+        var existingFilenames = new HashSet<string>(oldFiles.Select(i => Path.GetFileName(i.Name)));
+        var bus = fs.Find(file => file.Name.StartsWith(newPrefix) && existingFilenames.Contains(Path.GetFileName(file.Name))).ToArray();
+        if (bus.Length > 0 && !overwrite)
+            throw new InvalidOperationException($"Conflict: {bus[0].Name} will be overwritten.");
+        foreach (var file in bus)
+            file.Delete();
+        foreach (var file in oldFiles)
+            file.Name = Path.Combine(newPrefix, Path.GetFileName(file.Name));
     }
 
-    public void MoveMusic(int oldMid, int newMid)
+    public void MoveChart(int oldSid, int newSid, bool overwrite = true)
     {
-        throw new NotImplementedException();
+        MoveFiles(ChartDir + oldSid, ChartDir + newSid, overwrite);
+        // Handle rename
+        foreach (var chart in chartList)
+        {
+            if (chart.sid == oldSid)
+            {
+                chartDic.Remove(oldSid);
+                chart.sid = newSid;
+                SaveHeader(chart);
+                chartDic[newSid] = chart;
+                if (cl_lastsid == oldSid)
+                    cl_lastsid.Set(newSid);
+                break;
+            }
+        }
+    }
+
+    public void MoveMusic(int oldMid, int newMid, bool overwrite = true)
+    {
+        MoveFiles(MusicDir + oldMid, MusicDir + newMid, overwrite);
+        // Handle rename
+        foreach (var song in musicList)
+        {
+            if (song.mid == oldMid)
+            {
+                musicDic.Remove(oldMid);
+                song.mid = newMid;
+                SaveHeader(song);
+                musicDic[newMid] = song;
+                break;
+            }
+        }
+        foreach (var chart in chartList)
+        {
+            if (chart.mid == oldMid)
+            {
+                chart.mid = newMid;
+                SaveHeader(chart);
+            }
+        }
     }
 }

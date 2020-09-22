@@ -3,16 +3,16 @@ using Zenject;
 using Web;
 using UniRx.Async;
 using Web.Upload;
-using System.IO;
 using System.Linq;
 
-using FileResponse = Web.Upload.File;
 using System;
 using BanGround;
 using Web.Music;
 using UnityEngine;
 using Web.Chart;
 using Web.File;
+using UnityEngine.UI;
+using System.IO;
 
 namespace BGEditor
 {
@@ -27,12 +27,15 @@ namespace BGEditor
         {
             Filename = name;
             Content = content;
-            Info.Size = content.Length;
-            Info.Hash = Util.Hash(content);
+            Info = new FileHashSize
+            {
+                Size = content.Length,
+                Hash = Util.Hash(content)
+            };
         }
     }
 
-    public class ChartUpload
+    public class ChartUpload : MonoBehaviour
     {
         [Inject]
         private IDataLoader dataLoader;
@@ -65,9 +68,13 @@ namespace BGEditor
 
         // All
         private List<FileInfo> allFiles;
-        private List<bool> duplicates;
 
-        public async UniTaskVoid UploadChart(int sid)
+        private void Awake()
+        {
+            GetComponent<Button>().onClick.AddListener(() => UploadChart().Forget());
+        }
+
+        public async UniTaskVoid UploadChart()
         {
             if (UserInfo.isOffline)
             {
@@ -95,6 +102,7 @@ namespace BGEditor
             catch (Exception e)
             {
                 messageBanner.ShowMsg(LogLevel.ERROR, e.Message);
+                Debug.LogError(e.StackTrace);
             }
 
             loadingBlocker.Close();
@@ -104,6 +112,7 @@ namespace BGEditor
         {
             try
             {
+                Debug.Log("Hash = " + file.Info.Hash);
                 return (await web.GetSongByIdOrHash(file.Info.Hash).Fetch()).Id;
             }
             catch (KiraWebException)
@@ -129,7 +138,7 @@ namespace BGEditor
                 messageBanner.ShowMsg(LogLevel.ERROR, "Unsupported source: " + musicSource.ToString());
                 return false;
             }
-            musicFiles = await GenerateFileList(DataLoader.MusicDir + chartHeader.sid);
+            musicFiles = await GenerateFileList(DataLoader.MusicDir + chartHeader.mid);
             if (musicFiles.Count == 0)
             {
                 messageBanner.ShowMsg(LogLevel.ERROR, "Corrupted music data.");
@@ -234,12 +243,12 @@ namespace BGEditor
                 messageBanner.ShowMsg(LogLevel.ERROR, "Background image is required.");
                 return false;
             }
-            var bgUrl = (await web.GetFileByIdOrHash(bgFile.Info.Hash).Fetch()).Url;
             var request = new CreateChartRequest
             {
                 MusicId = musicId,
-                Background = bgUrl,
+                Background = bgFile.Info.Hash,
                 Description = "The author is too lazy to write anything.",
+                Preview = chartHeader.preview.ToList(),
                 Tags = chartHeader.tag
             };
             // Create chart data
@@ -279,7 +288,7 @@ namespace BGEditor
             return true;
         }
 
-        private async UniTaskVoid StartUploadChart()
+        private async UniTask StartUploadChart()
         {
             // Initialize class members
             Refresh();
@@ -332,8 +341,7 @@ namespace BGEditor
             int currentCount = 0;
             foreach (var file in files)
             {
-                var path = file.Name.Split('/');
-                var name = path[path.Length - 1];
+                var name = Path.GetFileName(file.Name);
                 ret.Add(new FileInfo(name, file.ReadToEnd()));
                 loadingBlocker.SetProgress(currentCount, filesCount);
                 currentCount++;
@@ -355,7 +363,7 @@ namespace BGEditor
             {
                 return false;
             }
-            Debug.Assert(duplicates.Count == files.Count);
+            Debug.Assert(fishDelta.Duplicates.Count == files.Count);
             for (int i = 0; i < fishDelta.Duplicates.Count; i++)
             {
                 files[i].IsDuplicate = fishDelta.Duplicates[i];
@@ -363,16 +371,16 @@ namespace BGEditor
             return true;
         }
 
-        private async UniTask<List<FileResponse>> BatchUpload(UploadType type, List<FileInfo> files)
+        private async UniTask<List<UploadResponse>> BatchUpload(UploadType type, List<FileInfo> files)
         {
             var uploads = files.Where(file => !file.IsDuplicate).ToArray();
-            var ret = new List<FileResponse>();
+            var ret = new List<UploadResponse>();
             int count = uploads.Length;
             int current = 0;
             foreach (var file in uploads)
             {
                 loadingBlocker.SetProgress(current, count);
-                ret.Add(await web.UploadFile(type, file.Content).Fetch());
+                ret.Add(await web.UploadFile(type, file.Filename, file.Content).Fetch());
                 current++;
             }
             return ret;

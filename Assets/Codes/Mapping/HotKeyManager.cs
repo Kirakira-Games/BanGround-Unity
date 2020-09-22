@@ -19,7 +19,7 @@ namespace BGEditor
     public class HotKeyManager : MonoBehaviour
     {
         [Inject]
-        private IChartCore Core;
+        private ILoadingBlocker loadingBlocker;
 
         public MouseScrollEvent onScroll = new MouseScrollEvent();
 
@@ -38,6 +38,10 @@ namespace BGEditor
         void Awake()
         {
             mHotKeys = new List<HotKeyCombo>(HotKeys);
+            // Add loading blocker
+            var allBlockers = blockers.ToList();
+            allBlockers.Add(loadingBlocker.gameObject);
+            blockers = allBlockers.ToArray();
         }
 
         private HotKeyCombo Find(string keys)
