@@ -14,7 +14,7 @@ namespace BanGround
         bool Opened { get; }
         int Size { get; }
 
-        Stream Open(FileMode mode);
+        Stream Open(FileAccess access);
         byte[] ReadToEnd();
         bool WriteBytes(byte[] content);
 
@@ -42,5 +42,7 @@ namespace BanGround
 
         int RenameFolder(string from, string to, string pakName = null);
         int RemoveFolder(string path, string pakName = null);
+
+        void OnUpdate();
     }
 }

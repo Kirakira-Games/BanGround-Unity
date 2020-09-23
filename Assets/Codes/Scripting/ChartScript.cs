@@ -88,7 +88,7 @@ class ScriptModel : IDisposable
 
     public ScriptModel(string path)
     {
-        model = SEModel.Read(GetFS().GetFile(ChartScript.GetChartResource(path)).Open(FileMode.Open));
+        model = SEModel.Read(GetFS().GetFile(ChartScript.GetChartResource(path)).Open(FileAccess.Read));
 
         rootObj = new GameObject(path);
 

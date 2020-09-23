@@ -8,6 +8,8 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace BanGround
 {
@@ -44,9 +46,9 @@ namespace BanGround
             return true;
         }
 
-        public Stream Open(FileMode mode)
+        public Stream Open(FileAccess access)
         {
-            return internalInfo.Open(mode);
+            return internalInfo.Open(FileMode.Open, access);
         }
 
         public byte[] ReadToEnd()
@@ -76,10 +78,10 @@ namespace BanGround
         string fileName;
 
         Action<IFile> onDelete;
-        Func<IFile, ZipArchiveEntry> getEntry;
+        Func<IFile, FileAccess, ZipArchiveEntry> getEntry;
         private Stream openedStream;
 
-        public PakFile(string fileName, Func<IFile, ZipArchiveEntry> entry, string pakName, Action<IFile> onFileDelete)
+        public PakFile(string fileName, Func<IFile, FileAccess, ZipArchiveEntry> entry, string pakName, Action<IFile> onFileDelete)
         {
             this.fileName = fileName;
             RootPath = pakName;
@@ -92,23 +94,23 @@ namespace BanGround
             get => fileName; 
             set 
             {
-                var archive = getEntry(this).Archive;
+                var archive = getEntry(this, FileAccess.ReadWrite).Archive;
                 var newEntry = archive.CreateEntry(value);
 
                 if (openedStream == null)
-                    openedStream = getEntry(this).Open();
+                    openedStream = getEntry(this, FileAccess.ReadWrite).Open();
 
                 using (var newStream = newEntry.Open())
                     openedStream.CopyTo(newStream);
 
-                getEntry(this).Delete();
+                getEntry(this, FileAccess.ReadWrite).Delete();
                 fileName = value;
             }
         }
 
         public bool Opened => openedStream != null;
 
-        public int Size => (int)getEntry(this).Length;
+        public int Size => (int)getEntry(this, FileAccess.Read).Length;
 
         public string RootPath { get; }
 
@@ -117,7 +119,7 @@ namespace BanGround
             try
             {
                 onDelete(this);
-                getEntry(this).Delete();
+                getEntry(this, FileAccess.ReadWrite).Delete();
             }
             catch
             {
@@ -127,18 +129,21 @@ namespace BanGround
             return true;
         }
 
-        public Stream Open(FileMode mode)
+        public Stream Open(FileAccess access)
         {
-            return getEntry(this).Open();
+            if (access == FileAccess.Write)
+                access = FileAccess.ReadWrite;
+
+            return getEntry(this, access).Open();
         }
 
         public byte[] ReadToEnd()
         {
             byte[] buffer;
 
-            using (var br = new BinaryReader(getEntry(this).Open()))
+            using (var br = new BinaryReader(getEntry(this, FileAccess.Read).Open()))
             {
-                buffer = br.ReadBytes((int)getEntry(this).Length);
+                buffer = br.ReadBytes((int)getEntry(this, FileAccess.Read).Length);
             }
 
             return buffer;
@@ -146,7 +151,7 @@ namespace BanGround
 
         public bool WriteBytes(byte[] content)
         {
-            using (var bw = new BinaryWriter(getEntry(this).Open()))
+            using (var bw = new BinaryWriter(getEntry(this, FileAccess.ReadWrite).Open()))
             {
                 bw.Seek(0, SeekOrigin.Begin);
                 bw.Write(content);
@@ -207,26 +212,45 @@ namespace BanGround
             pakFileIndexs.Remove(pakFile.Name);
         }
 
-        ZipArchiveEntry GetEntryStub(IFile pakfile)
+        ZipArchive GetArchive(string path, FileAccess access)
         {
-            if (!packPaths.Contains(pakfile.RootPath))
+            if (!packPaths.Contains(path))
                 throw new FileNotFoundException("Target kirapack already removed!");
 
-            if (packAccessCache.ContainsKey(pakfile.RootPath))
+            if (packAccessCache.ContainsKey(path))
             {
-                var t = packAccessCache[pakfile.RootPath];
-                t.Item2 = DateTime.Now;
+                var (archive, _) = packAccessCache[path];
+                if (access == FileAccess.Read && archive.Mode == ZipArchiveMode.Update)
+                {
+                    archive.Dispose();
+                    archive = ZipFile.OpenRead(path);
+                }
+                else if (access == FileAccess.ReadWrite && archive.Mode == ZipArchiveMode.Read)
+                {
+                    archive.Dispose();
+                    archive = ZipFile.Open(path, ZipArchiveMode.Update);
+                }
 
-                packAccessCache[pakfile.RootPath] = t;
-
-                return packAccessCache[pakfile.RootPath].Item1.GetEntry(pakfile.Name);
+                packAccessCache[path] = (archive, DateTime.Now);
+                return archive;
             }
 
-            var newZip = new ZipArchive(File.Open(pakfile.RootPath, FileMode.Open, FileAccess.ReadWrite), ZipArchiveMode.Update);
-            packAccessCache.Add(pakfile.RootPath, (newZip, DateTime.Now));
+            ZipArchive newArchive = null;
 
-            return newZip.GetEntry(pakfile.Name);
+            if (access == FileAccess.Read)
+            {
+                newArchive = ZipFile.OpenRead(path);
+            }
+            else if (access == FileAccess.ReadWrite)
+            {
+                newArchive = ZipFile.Open(path, ZipArchiveMode.Update);
+            }
+
+            packAccessCache.Add(path, (newArchive, DateTime.Now));
+            return newArchive;
         }
+
+        ZipArchiveEntry GetEntryStub(IFile pakfile, FileAccess access) => GetArchive(pakfile.RootPath, access).GetEntry(pakfile.Name);
 
         public void AddSearchPath(string path)
         {
@@ -258,8 +282,7 @@ namespace BanGround
 
                 packPaths.Add(path);
 
-                var zip = new ZipArchive(File.Open(path, FileMode.Open, FileAccess.ReadWrite), ZipArchiveMode.Update);
-                packAccessCache.Add(path, (zip, DateTime.Now));
+                var zip = GetArchive(path, FileAccess.Read);
 
                 foreach (var entry in zip.Entries)
                 {
@@ -323,7 +346,7 @@ namespace BanGround
             {
                 packPaths.Remove(path);
 
-                var files = pakFileIndexs.Where(kvp => kvp.Value.RootPath == path).Select(kvp => kvp.Key);
+                var files = pakFileIndexs.Where(kvp => kvp.Value.RootPath == path).Select(kvp => kvp.Key).ToArray();
 
                 foreach (var file in files)
                     pakFileIndexs.Remove(file);
@@ -381,7 +404,9 @@ namespace BanGround
         {
             if(packAccessCache.ContainsKey(pakName))
             {
-                packAccessCache[pakName].Item1.Dispose();
+                var archive = packAccessCache[pakName].Item1;
+
+                archive.Dispose();
                 packAccessCache.Remove(pakName);
             }
         }
@@ -390,17 +415,7 @@ namespace BanGround
         {
             if(searchPath != null && packPaths.Contains(searchPath))
             {
-                ZipArchive archive = null;
-
-                if(!packAccessCache.ContainsKey(searchPath))
-                {
-                    archive = new ZipArchive(File.OpenRead(searchPath));
-                    packAccessCache.Add(searchPath, (archive, DateTime.Now));
-                }
-                else
-                {
-                    archive = packAccessCache[searchPath].Item1;
-                }
+                ZipArchive archive = GetArchive(searchPath, FileAccess.ReadWrite);
 
                 archive.CreateEntry(name);
 
@@ -484,5 +499,28 @@ namespace BanGround
             return Find(_ => true).GetEnumerator();
         }
 
+        readonly TimeSpan onemin = TimeSpan.FromMinutes(1);
+
+        public void OnUpdate()
+        {
+            var paksToRelease = packAccessCache.Where((kvp) => 
+            {
+                var (_, (_, time)) = kvp;
+
+                if (DateTime.Now - time > onemin)
+                    return true;
+
+                return false;
+            }).ToArray();
+
+            foreach (var (path, (archive, time)) in paksToRelease)
+            {
+                if(DateTime.Now - time > onemin)
+                {
+                    archive.Dispose();
+                    packAccessCache.Remove(path);
+                }
+            }
+        }
     }
 }

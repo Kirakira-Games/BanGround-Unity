@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using UnityEngine.WSA;
 using Web;
 using Zenject;
 
@@ -156,6 +157,16 @@ public class GlobalInstaller : MonoInstaller
 
         Kommand.KommandInfo[] cmdInfos =
         {
+            Kommand.C("fs_test", "Test Filesystem", _ => {
+                const string testPath = "D:\\lol.zip";
+
+                fs.AddSearchPath(testPath);
+                var file = fs.NewFile("wtf.txt", testPath);
+                Debug.Log("Created file size:" + file.Size);
+
+                file.WriteBytes(Encoding.UTF8.GetBytes("What the fuck!!?"));
+                Debug.Log("File size after write:" + file.Size);
+            }),
             Kommand.C("savecfg", "Save configs", _ => kvSystem.SaveConfig()),
             Kommand.C("exec", "Execute a config file", (string[] args) =>
             {
@@ -275,5 +286,21 @@ public class GlobalInstaller : MonoInstaller
 
         foreach (var info in cmdInfos)
             Container.Bind<Kommand>().WithId(info.Name).AsCached().OnInstantiated(Kommand.OnInit(info)).NonLazy();
+    }
+
+    int fsUpdateFrameCounter = 0;
+
+    private void Update()
+    {
+        if(++fsUpdateFrameCounter > 3600)
+        {
+            fsUpdateFrameCounter = 0;
+            fs.OnUpdate();
+        }
+    }
+
+    private void OnDestroy()
+    {
+        fs.Shutdown();
     }
 }

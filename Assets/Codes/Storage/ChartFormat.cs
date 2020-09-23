@@ -405,7 +405,7 @@ public static class ProtobufHelper
 
     public static T Load<T>(IFile file) where T : IExtensible
     {
-        var stream = file.Open(FileMode.Open);
+        var stream = file.Open(FileAccess.Read);
         return Serializer.Deserialize<T>(stream);
     }
 
