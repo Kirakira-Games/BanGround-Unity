@@ -385,6 +385,14 @@ public partial class PlayRecords : IExtensible
 [Preserve]
 public static class ProtobufHelper
 {
+    public static void Write(object data, IFile target)
+    {
+        using(var stream = target.Open(FileAccess.Write))
+        {
+            Serializer.Serialize(stream, data);
+        }
+    }
+
     public static void Save(object data, string path)
     {
         if (File.Exists(path))

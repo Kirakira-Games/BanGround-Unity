@@ -234,11 +234,18 @@ public class DataLoader : IDataLoader
 
     public void SaveHeader(cHeader header)
     {
-        string path = Path.Combine(DataDir, ChartDir, header.sid.ToString(), "cheader.bin");
-        string dir = Path.GetDirectoryName(path);
-        if (!Directory.Exists(dir))
-            Directory.CreateDirectory(dir);
-        ProtobufHelper.Save(header, path);
+        var path = Path.Combine(DataDir, ChartDir, header.sid.ToString(), "cheader.bin");
+
+        if (fs.FileExists(path))
+        {
+            var file = fs.GetFile(path);
+            ProtobufHelper.Write(path, file);
+        }
+        else
+        {
+            var file = fs.NewFile(path);
+            ProtobufHelper.Write(path, file);
+        }
     }
 
     public void SaveHeader(mHeader header, byte[] oggFile)
