@@ -18,8 +18,6 @@ public class WebConsole : MonoBehaviour
 {
     [Inject]
     IKVSystem kvSystem;
-    [Inject]
-    IFileSystem fs;
 
     StringBuilder fullLog = new StringBuilder(0x10000);
 
@@ -340,6 +338,5 @@ public class WebConsole : MonoBehaviour
     private void OnApplicationQuit()
     {
         httpSv?.Stop();
-        fs.Shutdown();
     }
 }
