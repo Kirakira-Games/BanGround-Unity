@@ -102,6 +102,9 @@ namespace BanGround
 
                 using (var newStream = newEntry.Open())
                     openedStream.CopyTo(newStream);
+                    
+                openedStream.Close();
+                openedStream = null;
 
                 getEntry(this, FileAccess.ReadWrite).Delete();
                 fileName = value;
