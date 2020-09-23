@@ -78,15 +78,18 @@ namespace BanGround
         string fileName;
 
         Action<IFile> onDelete;
+        Action<string, IFile> onRename;
+
         Func<IFile, FileAccess, ZipArchiveEntry> getEntry;
         private Stream openedStream;
 
-        public PakFile(string fileName, Func<IFile, FileAccess, ZipArchiveEntry> entry, string pakName, Action<IFile> onFileDelete)
+        public PakFile(string fileName, Func<IFile, FileAccess, ZipArchiveEntry> entry, string pakName, Action<IFile> onFileDelete, Action<string, IFile> onFileRename)
         {
             this.fileName = fileName;
             RootPath = pakName;
             getEntry = entry;
             onDelete = onFileDelete;
+            onRename = onFileRename;
         }
 
         public string Name 
@@ -107,6 +110,8 @@ namespace BanGround
                 openedStream = null;
 
                 getEntry(this, FileAccess.ReadWrite).Delete();
+
+                onRename(fileName, this);
                 fileName = value;
             }
         }
@@ -210,6 +215,12 @@ namespace BanGround
             return true;
         }
 
+        void OnPakFileRename(string oldName, IFile pakFile)
+        {
+            pakFileIndexs.Remove(oldName);
+            pakFileIndexs.Add(pakFile.Name, pakFile);
+        }
+
         void OnPakFileDelete(IFile pakFile)
         {
             pakFileIndexs.Remove(pakFile.Name);
@@ -291,12 +302,14 @@ namespace BanGround
                 {
                     if (entry.Length != 0)
                     {
-                        if (pakFileIndexs.ContainsKey(entry.FullName))
-                            pakFileIndexs.Remove(entry.FullName);
+                        var fileName = entry.FullName;
 
-                        var file = new PakFile(entry.FullName, GetEntryStub, path, OnPakFileDelete);
+                        if (pakFileIndexs.ContainsKey(fileName))
+                            pakFileIndexs.Remove(fileName);
 
-                        pakFileIndexs.Add(entry.FullName, file);
+                        var file = new PakFile(fileName, GetEntryStub, path, OnPakFileDelete, OnPakFileRename);
+
+                        pakFileIndexs.Add(fileName, file);
                     }
                 }
             }
@@ -422,7 +435,7 @@ namespace BanGround
 
                 archive.CreateEntry(name);
 
-                return new PakFile(name, GetEntryStub, searchPath, OnPakFileDelete);
+                return new PakFile(name, GetEntryStub, searchPath, OnPakFileDelete, OnPakFileRename);
             }
             else if(searchPath != null && searchPaths.Contains(searchPath))
             {
@@ -435,6 +448,10 @@ namespace BanGround
             {
                 searchPath = searchPaths[0];
                 var fi = new FileInfo(Path.Combine(searchPath, name));
+
+                if (!fi.Directory.Exists)
+                    fi.Directory.Create();
+
                 fi.Create().Close();
 
                 return new NormalFile(searchPath, fi);

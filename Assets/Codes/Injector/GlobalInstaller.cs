@@ -157,7 +157,18 @@ public class GlobalInstaller : MonoInstaller
 
         Kommand.KommandInfo[] cmdInfos =
         {
-            Kommand.C("fs_test", "Test Filesystem", _ => {
+            Kommand.C("move_chart", "Move a chart", args => 
+            {
+                if(args.Length != 2)
+                    return;
+
+                int chartA = int.Parse(args[0]);
+                int targetChart = int.Parse(args[1]);
+
+                dataLoader.MoveChart(chartA, targetChart);
+            }),
+            Kommand.C("fs_test", "Test Filesystem", _ => 
+            {
                 const string testPath = "D:\\lol.zip";
 
                 fs.AddSearchPath(testPath);
@@ -166,6 +177,14 @@ public class GlobalInstaller : MonoInstaller
 
                 file.WriteBytes(Encoding.UTF8.GetBytes("What the fuck!!?"));
                 Debug.Log("File size after write:" + file.Size);
+
+                var origName = file.Name;
+                file.Name = "whatthefuck.txt";
+                Debug.Log(origName + " moved to " + file.Name);
+
+                Debug.Log(file.ReadAsString());
+
+                fs.RemoveSearchPath(testPath);
             }),
             Kommand.C("savecfg", "Save configs", _ => kvSystem.SaveConfig()),
             Kommand.C("exec", "Execute a config file", (string[] args) =>
