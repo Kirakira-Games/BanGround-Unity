@@ -73,8 +73,8 @@ namespace Web.Chart
 
     public class UpdateChartRequest
     {
-        [JsonProperty("level")]
-        public int Level;
+        [JsonProperty("difficulty")]
+        public List<int> Difficulty;
 
         [JsonProperty("resources")]
         public List<FilenameHash> Resources = new List<FilenameHash>();
@@ -91,10 +91,9 @@ namespace Web.Chart
         /// Update one chart of certain difficulty of a chart set.
         /// </summary>
         /// <returns>A list of URLs to the new resources.</returns>
-        public static KiraWebRequest.Builder<List<string>> UpdateChart(this IKiraWebRequest web, int id, Difficulty difficulty, UpdateChartRequest req)
+        public static KiraWebRequest.Builder<List<string>> UpdateChart(this IKiraWebRequest web, int id, UpdateChartRequest req)
         {
-            int diff = (int)difficulty;
-            return web.New<List<string>>().UseTokens().SetReq(req).Post($"chart/{id}/{diff}/update");
+            return web.New<List<string>>().UseTokens().SetReq(req).Post($"chart/{id}/update");
         }
 
         public static KiraWebRequest.Builder<ChartInfo> GetChartById(this IKiraWebRequest web, int id)
@@ -112,10 +111,9 @@ namespace Web.Chart
             return web.New().UseTokens().SetReq(req).Post($"chart/{id}/edit");
         }
 
-        public static KiraWebRequest.Builder<List<FileDownloadInfo>> GetChartResources(this IKiraWebRequest web, int id, Difficulty difficulty)
+        public static KiraWebRequest.Builder<List<FileDownloadInfo>> GetChartResources(this IKiraWebRequest web, int id)
         {
-            int diff = (int)difficulty;
-            return web.New<List<FileDownloadInfo>>().UseTokens().Get($"chart/{id}/{diff}/resources");
+            return web.New<List<FileDownloadInfo>>().UseTokens().Get($"chart/{id}/resources");
         }
     }
 }

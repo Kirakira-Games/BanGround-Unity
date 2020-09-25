@@ -698,7 +698,14 @@ public class DataLoader : IDataLoader
 
     public void MoveMusic(int oldMid, int newMid, bool overwrite = true)
     {
-        MoveFiles(MusicDir + oldMid, MusicDir + newMid, overwrite);
+        string newPrefix = MusicDir + newMid;
+        MoveFiles(MusicDir + oldMid, newPrefix, overwrite);
+        // Rename the song file
+        var files = fs.Find((file) => file.Name.StartsWith(newPrefix + "/" + oldMid + "."));
+        foreach (var file in files)
+        {
+            file.Name = file.Name.Replace(newPrefix + "/" + oldMid + ".", newPrefix + "/" + newMid + ".");
+        }
         // Handle rename
         foreach (var song in musicList)
         {

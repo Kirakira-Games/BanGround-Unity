@@ -78,7 +78,7 @@ namespace BGEditor
         {
             if (UserInfo.isOffline)
             {
-                messageBanner.ShowMsg(LogLevel.ERROR, "You're current offline.");
+                messageBanner.ShowMsg(LogLevel.ERROR, "You're currently offline.");
                 return;
             }
 
@@ -211,7 +211,7 @@ namespace BGEditor
             }
             // Upload song
             loadingBlocker.SetText("Uploading song");
-            await BatchUpload(UploadType.Music, musicFiles);
+            await BatchUpload(musicFiles);
             // Create song
             int mid = await web.CreateSong(new CreateSongRequest
             {
@@ -233,7 +233,7 @@ namespace BGEditor
         {
             // Upload files
             loadingBlocker.SetText("Uploading files");
-            var uploads = await BatchUpload(UploadType.Chart, chartFiles);
+            var uploads = await BatchUpload(chartFiles);
 
             // Find background file
             var bgFile = chartFiles.Find(file => file.Filename == chartHeader.backgroundFile.pic || file.Filename == chartHeader.backgroundFile.vid);
@@ -269,22 +269,15 @@ namespace BGEditor
                 Refresh();
             }
             // Update resources
-            loadingBlocker.SetText("Updating chart resources");
-            for (int i = 0; i < chartHeader.difficultyLevel.Count; i++)
+            loadingBlocker.SetText("Updating chart resources...");
+            await web.UpdateChart(chartId, new UpdateChartRequest
             {
-                loadingBlocker.SetProgress(i, chartHeader.difficultyLevel.Count);
-                int diff = chartHeader.difficultyLevel[i];
-                if (diff == -1)
-                    continue;
-                await web.UpdateChart(chartId, (Difficulty)i, new UpdateChartRequest
-                {
-                    Level = diff,
-                    Resources = chartFiles.Select(x => new FilenameHash {
-                        Name = x.Filename,
-                        Hash = x.Info.Hash
-                    }).ToList()
-                }).Send();
-            }
+                Difficulty = chartHeader.difficultyLevel,
+                Resources = chartFiles.Select(x => new FilenameHash {
+                    Name = x.Filename,
+                    Hash = x.Info.Hash
+                }).ToList()
+            }).Send();
             return true;
         }
 
@@ -371,7 +364,7 @@ namespace BGEditor
             return true;
         }
 
-        private async UniTask<List<UploadResponse>> BatchUpload(UploadType type, List<FileInfo> files)
+        private async UniTask<List<UploadResponse>> BatchUpload(List<FileInfo> files)
         {
             var uploads = files.Where(file => !file.IsDuplicate).ToArray();
             var ret = new List<UploadResponse>();
@@ -380,7 +373,7 @@ namespace BGEditor
             foreach (var file in uploads)
             {
                 loadingBlocker.SetProgress(current, count);
-                ret.Add(await web.UploadFile(type, file.Filename, file.Content).Fetch());
+                ret.Add(await web.UploadFile(file.Filename, file.Content).Fetch());
                 current++;
             }
             return ret;

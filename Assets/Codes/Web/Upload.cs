@@ -22,15 +22,17 @@ namespace Web.Upload
             return Auth.Util.ToHex(SHA256.Create().ComputeHash(content));
         }
 
-        public static string MimetypeOf(string filename)
+        public static (string, UploadType) GetType(string filename)
         {
             string ext = Path.GetExtension(filename).ToLower();
             switch (ext) {
-                case ".ogg": return "audio/ogg";
-                case ".png": return "image/png";
-                case ".jpg": return "image/jpg";
-                case ".jpeg": return "image/jpeg";
-                default: return "application/octet-stream";
+                case ".ogg": return ("audio/ogg", UploadType.Music);
+                case ".png": return ("image/png", UploadType.Image);
+                case ".jpg": return ("image/jpg", UploadType.Image);
+                case ".jpeg": return ("image/jpeg", UploadType.Image);
+                case ".bin": return ("application/octet-stream", UploadType.Chart);
+                case ".json": return ("application/json", UploadType.Chart);
+                default: return ("application/octet-stream", UploadType.Misc);
             }
         }
     }
@@ -119,14 +121,13 @@ namespace Web.Upload
                 ).UseTokens().Post("upload/claim");
         }
 
-        public static KiraWebRequest.Builder<UploadResponse> UploadFile(this IKiraWebRequest web, UploadType type, string filename, byte[] content)
+        public static KiraWebRequest.Builder<UploadResponse> UploadFile(this IKiraWebRequest web, string filename, byte[] content)
         {
-            string typeStr = type.ToString().ToLower();
-            string mimetype = Util.MimetypeOf(filename);
+            var (mimetype, uploadType) = Util.GetType(filename);
             WWWForm form = new WWWForm();
             form.AddBinaryData("file", content, filename, mimetype);
             Debug.Log($"[KWR] Upload: {filename} ({mimetype})");
-            return web.New<UploadResponse>().SetForm(form).UseTokens().SetTimeout(300).Post("upload/" + typeStr);
+            return web.New<UploadResponse>().SetForm(form).UseTokens().SetTimeout(300).Post("upload/" + uploadType.ToString().ToLower());
         }
     }
 }
