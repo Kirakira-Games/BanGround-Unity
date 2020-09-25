@@ -125,7 +125,7 @@ namespace Web.Music
 
         public static KiraWebRequest.Builder<object> EditSong(this IKiraWebRequest web, string idOrHash, EditSongRequest req)
         {
-            return web.New().UseTokens().SetReq(req).Post($"music/{idOrHash}/create");
+            return web.New().UseTokens().SetReq(req).Post($"music/{idOrHash}/edit");
         }
 
         public static KiraWebRequest.Builder<object> EditSong(this IKiraWebRequest web, int id, EditSongRequest req)

@@ -366,15 +366,22 @@ namespace BGEditor
 
         private async UniTask<List<UploadResponse>> BatchUpload(List<FileInfo> files)
         {
-            var uploads = files.Where(file => !file.IsDuplicate).ToArray();
+            var uploads = files.GroupBy(file => file.IsDuplicate).ToDictionary(g => g.Key, g => g.ToList());
             var ret = new List<UploadResponse>();
-            int count = uploads.Length;
-            int current = 0;
-            foreach (var file in uploads)
+            if (uploads.ContainsKey(false))
             {
-                loadingBlocker.SetProgress(current, count);
-                ret.Add(await web.UploadFile(file.Filename, file.Content).Fetch());
-                current++;
+                int count = uploads[false].Count;
+                int current = 0;
+                foreach (var file in uploads[false])
+                {
+                    loadingBlocker.SetProgress(current, count);
+                    ret.Add(await web.UploadFile(file.Filename, file.Content).Fetch());
+                    current++;
+                }
+            }
+            if (uploads.ContainsKey(true))
+            {
+                await web.ClaimFiles(uploads[true].Select(file => file.Info.Hash).ToList()).Send();
             }
             return ret;
         }

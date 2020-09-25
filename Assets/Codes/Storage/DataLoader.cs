@@ -258,20 +258,20 @@ public class DataLoader : IDataLoader
 
     public void SaveHeader(cHeader header)
     {
-        var path = KiraPath.Combine(DataDir, ChartDir, header.sid.ToString(), "cheader.bin");
+        string path = KiraPath.Combine(DataDir, ChartDir, header.sid.ToString(), "cheader.bin");
 
-        if (fs.FileExists(path))
-        {
-            var file = fs.GetFile(path);
-            ProtobufHelper.Write(path, file);
-            fs.FlushPak(file.RootPath);
-        }
-        else
-        {
-            var file = fs.NewFile(path);
-            ProtobufHelper.Write(path, file);
-            fs.FlushPak(file.RootPath);
-        }
+        var file = fs.GetOrNewFile(path);
+        ProtobufHelper.Write(header, file);
+        fs.FlushPak(file.RootPath);
+    }
+
+    public void SaveHeader(mHeader header)
+    {
+        string path = KiraPath.Combine(DataDir, MusicDir, header.mid.ToString(), "mheader.bin");
+
+        var file = fs.GetOrNewFile(path);
+        ProtobufHelper.Write(header, file);
+        fs.FlushPak(file.RootPath);
     }
 
     public void SaveHeader(mHeader header, byte[] oggFile)
@@ -279,27 +279,10 @@ public class DataLoader : IDataLoader
         SaveHeader(header);
 
         string path = KiraPath.Combine(MusicDir, header.mid.ToString(), $"{header.mid}.ogg");
-        if (fs.FileExists(path))
-        {
-            var file = fs.GetFile(path);
-            file.WriteBytes(oggFile);
-            fs.FlushPak(file.RootPath);
-        }
-        else
-        {
-            var file = fs.NewFile(path);
-            file.WriteBytes(oggFile);
-            fs.FlushPak(file.RootPath);
-        }
-    }
-
-    public void SaveHeader(mHeader header)
-    {
-        string path = KiraPath.Combine(DataDir, MusicDir, header.mid.ToString(), "mheader.bin");
-        string dir = KiraPath.GetDirectoryName(path);
-        if (!Directory.Exists(dir))
-            Directory.CreateDirectory(dir);
-        ProtobufHelper.Save(header, path);
+        
+        var file = fs.GetOrNewFile(path);
+        file.WriteBytes(oggFile);
+        fs.FlushPak(file.RootPath);
     }
 
     private void ExtractRelatedFiles(cHeader header, DirectoryInfo dir)
