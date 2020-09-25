@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using System.Collections;
 using System.IO;
 using System.IO.Compression;
 using Newtonsoft.Json;
@@ -14,6 +13,7 @@ using Zenject;
 using UnityEngine.Events;
 using BanGround;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Text.RegularExpressions;
 
 public class DataLoader : IDataLoader
 {
@@ -53,6 +53,27 @@ public class DataLoader : IDataLoader
     private Dictionary<int, cHeader> chartDic = new Dictionary<int, cHeader>();
     private Dictionary<int, mHeader> musicDic = new Dictionary<int, mHeader>();
 
+    private void SanityCheck()
+    {
+        // Music files with wrong filename
+        Regex musicFileName = new Regex("^" + MusicDir.Replace("/", @"\/") + @"([0-9]+)\/([0-9]+)\..*$");
+        foreach (var file in fs)
+        {
+            var filename = file.Name;
+            var matches = musicFileName.Matches(filename);
+            if (matches.Count == 0)
+                continue;
+            var groups = matches[0].Groups;
+            int id1 = int.Parse(groups[1].Value);
+            int id2 = int.Parse(groups[2].Value);
+            if (id1 != id2)
+            {
+                file.Name = filename.Substring(0, groups[2].Index) + id1 + filename.Substring(groups[2].Index + groups[2].Length);
+                Debug.Log("Fixed: " + file.Name);
+            }
+        }
+    }
+
     public async UniTaskVoid Init()
     {
         LastImportedSid = -1;
@@ -77,6 +98,9 @@ public class DataLoader : IDataLoader
             LoadKiraPack(new FileInfo(Application.persistentDataPath + "/Initial.kirapack"));
             PlayerPrefs.SetInt("InitialChartVersion", InitialChartVersion);
         }
+
+        // Sanity check to fix common fs issues
+        SanityCheck();
 
         // Register deep link
         Application.deepLinkActivated += (url) =>
@@ -240,11 +264,13 @@ public class DataLoader : IDataLoader
         {
             var file = fs.GetFile(path);
             ProtobufHelper.Write(path, file);
+            fs.FlushPak(file.RootPath);
         }
         else
         {
             var file = fs.NewFile(path);
             ProtobufHelper.Write(path, file);
+            fs.FlushPak(file.RootPath);
         }
     }
 
@@ -252,8 +278,19 @@ public class DataLoader : IDataLoader
     {
         SaveHeader(header);
 
-        string path = Path.Combine(DataDir, MusicDir, header.mid.ToString(), $"{header.mid}.ogg");
-        File.WriteAllBytes(path, oggFile);
+        string path = Path.Combine(MusicDir, header.mid.ToString(), $"{header.mid}.ogg");
+        if (fs.FileExists(path))
+        {
+            var file = fs.GetFile(path);
+            file.WriteBytes(oggFile);
+            fs.FlushPak(file.RootPath);
+        }
+        else
+        {
+            var file = fs.NewFile(path);
+            file.WriteBytes(oggFile);
+            fs.FlushPak(file.RootPath);
+        }
     }
 
     public void SaveHeader(mHeader header)
@@ -428,7 +465,7 @@ public class DataLoader : IDataLoader
                     return item.Delete();
                 });
 
-                Debug.Log($"Removing music {song.mid} due to the refcount is zero");
+                Debug.LogWarning($"Removing music {song.mid} due to zero refcount");
             }
             else
             {
@@ -673,8 +710,16 @@ public class DataLoader : IDataLoader
             throw new InvalidOperationException($"Conflict: {bus[0].Name} will be overwritten.");
         foreach (var file in bus)
             file.Delete();
+        var packs = new HashSet<string>();
         foreach (var file in oldFiles)
+        {
             file.Name = Path.Combine(newPrefix, Path.GetFileName(file.Name));
+            packs.Add(file.RootPath);
+        }
+        foreach (var pack in packs)
+        {
+            fs.FlushPak(pack);
+        }
     }
 
     public void MoveChart(int oldSid, int newSid, bool overwrite = true)

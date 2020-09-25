@@ -250,7 +250,7 @@ namespace Web
             /// <summary>
             /// Send a request and ignore the response.
             /// </summary>
-            public async UniTaskVoid Send()
+            public async UniTask Send()
             {
                 await Fetch<object>();
             }
