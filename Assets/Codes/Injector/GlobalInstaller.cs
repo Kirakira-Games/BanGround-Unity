@@ -258,7 +258,7 @@ public class GlobalInstaller : MonoInstaller
                         {
                             if (KiraFilesystem.Instance.Exists(path))
                             {
-                                path = Path.Combine(DataLoader.DataDir, path);
+                                path = KiraPath.Combine(DataLoader.DataDir, path);
                             }
                             else
                             {

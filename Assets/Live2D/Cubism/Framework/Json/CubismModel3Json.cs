@@ -18,6 +18,7 @@ using Live2D.Cubism.Framework.MotionFade;
 using Live2D.Cubism.Framework.Raycasting;
 using Live2D.Cubism.Rendering;
 using Live2D.Cubism.Rendering.Masking;
+using BanGround;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -583,7 +584,7 @@ namespace Live2D.Cubism.Framework.Json
         /// <returns>The asset on success; <see langword="null"/> otherwise.</returns>
         private T LoadReferencedAsset<T>(string referencedFile) where T : class
         {
-            var assetPath = Path.GetDirectoryName(AssetPath) + "/" + referencedFile;
+            var assetPath = KiraPath.GetDirectoryName(AssetPath) + "/" + referencedFile;
 
 
             return LoadAssetAtPath(typeof(T), assetPath) as T;

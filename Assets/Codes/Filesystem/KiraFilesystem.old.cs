@@ -91,7 +91,7 @@ namespace System.IO
                             if (Exists(entry.FullName))
                                 RemoveFileFromIndex(entry.FullName);
 
-                            var path = Path.Combine(root, entry.FullName);
+                            var path = KiraPath.Combine(root, entry.FullName);
                             if (File.Exists(path))
                                 File.Delete(path);
 
@@ -124,7 +124,7 @@ namespace System.IO
 
         public void RemoveFileFromIndex(string fileName)
         {
-            var path = Path.Combine(root, fileName);
+            var path = KiraPath.Combine(root, fileName);
             if (File.Exists(path))
             {
                 File.Delete(path);
@@ -216,7 +216,7 @@ namespace System.IO
 
         public bool Exists(string fileName)
         {
-            if (File.Exists(Path.Combine(root, fileName)))
+            if (File.Exists(KiraPath.Combine(root, fileName)))
                 return true;
 
             if (!index.ContainsKey(fileName))
@@ -249,9 +249,9 @@ namespace System.IO
 
         public byte[] Read(string fileName)
         {
-            if (File.Exists(Path.Combine(root, fileName)))
+            if (File.Exists(KiraPath.Combine(root, fileName)))
             {
-                return File.ReadAllBytes(Path.Combine(root, fileName));
+                return File.ReadAllBytes(KiraPath.Combine(root, fileName));
             }
 
             if (!index.ContainsKey(fileName))
@@ -320,7 +320,7 @@ namespace System.IO
         {
             try
             {
-                File.WriteAllBytes(Path.Combine(root, fileName), data);
+                File.WriteAllBytes(KiraPath.Combine(root, fileName), data);
             }
             catch
             {
@@ -378,7 +378,7 @@ namespace System.IO
             }
                 
 
-            var path = Path.Combine(tempPath, md5Filename + Path.GetExtension(fileName));
+            var path = KiraPath.Combine(tempPath, md5Filename + Path.GetExtension(fileName));
             var write = true;
 
             if (File.Exists(path))

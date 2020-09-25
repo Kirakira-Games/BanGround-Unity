@@ -15,7 +15,7 @@ namespace BanGround
         private FileInfo internalInfo;
         private Stream openedStream;
 
-        public string Name { get => internalInfo.FullName.Replace(RootPath, "").Replace('\\', '/'); set => internalInfo.MoveTo(Path.Combine(RootPath, value)); }
+        public string Name { get => internalInfo.FullName.Replace(RootPath, "").Replace('\\', '/'); set => internalInfo.MoveTo(KiraPath.Combine(RootPath, value)); }
 
         public string RootPath { get; }
 
@@ -189,7 +189,7 @@ namespace BanGround
             if (!Directory.Exists(RootPath + "_extracted/"))
                 Directory.CreateDirectory(RootPath + "_extracted/");
 
-            var path = Path.Combine(RootPath + "_extracted/", md5Filename + Path.GetExtension(Name));
+            var path = KiraPath.Combine(RootPath + "_extracted/", md5Filename + Path.GetExtension(Name));
             var write = true;
 
             if (File.Exists(path))
@@ -327,7 +327,7 @@ namespace BanGround
 
             foreach (var searchPath in searchPaths)
             {
-                var fullPath = Path.Combine(searchPath, filename);
+                var fullPath = KiraPath.Combine(searchPath, filename);
 
                 result = File.Exists(fullPath);
 
@@ -342,7 +342,7 @@ namespace BanGround
         {
             foreach (var searchPath in searchPaths)
             {
-                var fi = new FileInfo(Path.Combine(searchPath, path));
+                var fi = new FileInfo(KiraPath.Combine(searchPath, path));
 
                 if (fi.Exists)
                 {
@@ -442,7 +442,7 @@ namespace BanGround
             }
             else if (searchPath != null && searchPaths.Contains(searchPath))
             {
-                var fi = new FileInfo(Path.Combine(searchPath, name));
+                var fi = new FileInfo(KiraPath.Combine(searchPath, name));
                 fi.Create().Close();
 
                 return new NormalFile(searchPath, fi);
@@ -450,7 +450,7 @@ namespace BanGround
             else
             {
                 searchPath = searchPaths[0];
-                var fi = new FileInfo(Path.Combine(searchPath, name));
+                var fi = new FileInfo(KiraPath.Combine(searchPath, name));
 
                 if (!fi.Directory.Exists)
                     fi.Directory.Create();

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using BanGround;
 
 public class ReplayFrame
 {
@@ -81,5 +82,5 @@ public class DemoRecorder
         demoFile.Add(kirakiraTouchStates);
     }
 
-    public void Save() => demoFile.Save(Path.Combine(DataLoader.DataDir, demoName));
+    public void Save() => demoFile.Save(KiraPath.Combine(DataLoader.DataDir, demoName));
 } 

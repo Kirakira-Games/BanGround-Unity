@@ -185,7 +185,7 @@ public class WebConsole : MonoBehaviour
                     if (!Directory.Exists(DataLoader.InboxDir))
                         Directory.CreateDirectory(DataLoader.InboxDir);
 
-                    File.WriteAllBytes(Path.Combine(DataLoader.InboxDir, Guid.NewGuid().ToString("N") + ".kirapack"), bytes);
+                    File.WriteAllBytes(KiraPath.Combine(DataLoader.InboxDir, Guid.NewGuid().ToString("N") + ".kirapack"), bytes);
 
                     if (!actionQueue.Contains(flushKirapacksAction))
                         actionQueue.Enqueue(flushKirapacksAction);

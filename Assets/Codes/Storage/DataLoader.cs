@@ -118,13 +118,13 @@ public class DataLoader : IDataLoader
     public void InitFileSystem()
     {
         // Create directories
-        if (!Directory.Exists(Path.Combine(DataDir, ChartDir)))
+        if (!Directory.Exists(KiraPath.Combine(DataDir, ChartDir)))
         {
-            Directory.CreateDirectory(Path.Combine(DataDir, ChartDir));
+            Directory.CreateDirectory(KiraPath.Combine(DataDir, ChartDir));
         }
-        if (!Directory.Exists(Path.Combine(DataDir, MusicDir)))
+        if (!Directory.Exists(KiraPath.Combine(DataDir, MusicDir)))
         {
-            Directory.CreateDirectory(Path.Combine(DataDir, MusicDir));
+            Directory.CreateDirectory(KiraPath.Combine(DataDir, MusicDir));
         }
         if (!Directory.Exists(FSDir))
         {
@@ -240,8 +240,8 @@ public class DataLoader : IDataLoader
 
     public void SaveChart<T>(T chart, int sid, Difficulty difficulty) where T : IExtensible
     {
-        string path = Path.Combine(DataDir, GetChartPath(sid, difficulty));
-        string dir = Path.GetDirectoryName(path);
+        string path = KiraPath.Combine(DataDir, GetChartPath(sid, difficulty));
+        string dir = KiraPath.GetDirectoryName(path);
         if (!Directory.Exists(dir))
             Directory.CreateDirectory(dir);
         ProtobufHelper.Save(chart, path);
@@ -249,8 +249,8 @@ public class DataLoader : IDataLoader
 
     public void SaveChartScript(string script, int sid, Difficulty difficulty)
     {
-        string path = Path.Combine(DataDir, GetChartScriptPath(sid, difficulty));
-        string dir = Path.GetDirectoryName(path);
+        string path = KiraPath.Combine(DataDir, GetChartScriptPath(sid, difficulty));
+        string dir = KiraPath.GetDirectoryName(path);
         if (!Directory.Exists(dir))
             Directory.CreateDirectory(dir);
         File.WriteAllText(path, script);
@@ -258,7 +258,7 @@ public class DataLoader : IDataLoader
 
     public void SaveHeader(cHeader header)
     {
-        var path = Path.Combine(DataDir, ChartDir, header.sid.ToString(), "cheader.bin");
+        var path = KiraPath.Combine(DataDir, ChartDir, header.sid.ToString(), "cheader.bin");
 
         if (fs.FileExists(path))
         {
@@ -278,7 +278,7 @@ public class DataLoader : IDataLoader
     {
         SaveHeader(header);
 
-        string path = Path.Combine(MusicDir, header.mid.ToString(), $"{header.mid}.ogg");
+        string path = KiraPath.Combine(MusicDir, header.mid.ToString(), $"{header.mid}.ogg");
         if (fs.FileExists(path))
         {
             var file = fs.GetFile(path);
@@ -295,8 +295,8 @@ public class DataLoader : IDataLoader
 
     public void SaveHeader(mHeader header)
     {
-        string path = Path.Combine(DataDir, MusicDir, header.mid.ToString(), "mheader.bin");
-        string dir = Path.GetDirectoryName(path);
+        string path = KiraPath.Combine(DataDir, MusicDir, header.mid.ToString(), "mheader.bin");
+        string dir = KiraPath.GetDirectoryName(path);
         if (!Directory.Exists(dir))
             Directory.CreateDirectory(dir);
         ProtobufHelper.Save(header, path);
@@ -320,18 +320,18 @@ public class DataLoader : IDataLoader
 
         foreach (var file in files)
         {
-            var dirpath = Path.Combine(dir.FullName, Path.GetDirectoryName(file.Name));
+            var dirpath = KiraPath.Combine(dir.FullName, KiraPath.GetDirectoryName(file.Name));
             if (!Directory.Exists(dirpath))
                 Directory.CreateDirectory(dirpath);
-            File.WriteAllBytes(Path.Combine(dir.FullName, file.Name), file.ReadToEnd());
+            File.WriteAllBytes(KiraPath.Combine(dir.FullName, file.Name), file.ReadToEnd());
         }
     }
 
     public string BuildKiraPack(cHeader header)
     {
-        var dir = new DirectoryInfo(Path.Combine(KirapackDir, "temp/"));
+        var dir = new DirectoryInfo(KiraPath.Combine(KirapackDir, "temp/"));
         ExtractRelatedFiles(header, dir);
-        var zippath = Path.Combine(KirapackDir, header.sid + ".kirapack");
+        var zippath = KiraPath.Combine(KirapackDir, header.sid + ".kirapack");
         if (File.Exists(zippath))
             File.Delete(zippath);
         ZipFile.CreateFromDirectory(dir.FullName, zippath);
@@ -353,20 +353,20 @@ public class DataLoader : IDataLoader
 
     public void DuplicateKiraPack(cHeader header)
     {
-        var dir = new DirectoryInfo(Path.Combine(KirapackDir, "temp/"));
+        var dir = new DirectoryInfo(KiraPath.Combine(KirapackDir, "temp/"));
         ExtractRelatedFiles(header, dir);
 
         // Move directory
         int newsid = GenerateSid();
-        var newdir = Path.Combine(dir.FullName, "chart/", newsid + "/");
-        Directory.Move(Path.Combine(dir.FullName, "chart/", header.sid + "/"), newdir);
+        var newdir = KiraPath.Combine(dir.FullName, "chart/", newsid + "/");
+        Directory.Move(KiraPath.Combine(dir.FullName, "chart/", header.sid + "/"), newdir);
 
         // Save new header
         header.sid = newsid;
-        ProtobufHelper.Save(header, Path.Combine(newdir, "cheader.bin"));
+        ProtobufHelper.Save(header, KiraPath.Combine(newdir, "cheader.bin"));
 
         // Add to zip file
-        var zippath = Path.Combine(Application.persistentDataPath, newsid + ".kirapack");
+        var zippath = KiraPath.Combine(Application.persistentDataPath, newsid + ".kirapack");
         if (File.Exists(zippath))
             File.Delete(zippath);
         ZipFile.CreateFromDirectory(dir.FullName, zippath);
@@ -421,7 +421,7 @@ public class DataLoader : IDataLoader
             if (!referencedSongDirs.ContainsKey(musicHeader.mid))
             {
                 referencedSongs[musicHeader] = 0;
-                referencedSongDirs[musicHeader.mid] = Path.GetDirectoryName(music.Name);
+                referencedSongDirs[musicHeader.mid] = KiraPath.GetDirectoryName(music.Name);
             }
         }
 
@@ -447,7 +447,7 @@ public class DataLoader : IDataLoader
             catch
             {
                 Debug.LogWarning($"Chart {chartHeader.sid} does not have corresponding song {chartHeader.mid}. GC!");
-                DeleteFiles(Path.GetDirectoryName(chart.Name));
+                DeleteFiles(KiraPath.GetDirectoryName(chart.Name));
                 continue;
             }
 
@@ -573,11 +573,11 @@ public class DataLoader : IDataLoader
                         obj = JsonConvert.DeserializeObject(json, type);
                     }
 
-                    var dir = Path.Combine(DataDir, entry.FullName.Replace(entry.Name, ""));
+                    var dir = KiraPath.Combine(DataDir, entry.FullName.Replace(entry.Name, ""));
                     if (!Directory.Exists(dir))
                         Directory.CreateDirectory(dir);
 
-                    ProtobufHelper.Save(obj, Path.Combine(DataDir, entry.FullName.Replace(".json", ".bin")));
+                    ProtobufHelper.Save(obj, KiraPath.Combine(DataDir, entry.FullName.Replace(".json", ".bin")));
                 }
             }
         }
@@ -585,7 +585,7 @@ public class DataLoader : IDataLoader
 
     public int LoadKiraPack(FileInfo file)
     {
-        string path = Path.Combine(FSDir, Guid.NewGuid().ToString("N") + ".kpak");
+        string path = KiraPath.Combine(FSDir, Guid.NewGuid().ToString("N") + ".kpak");
 
         if (!file.Exists)
             return -1;
@@ -684,7 +684,7 @@ public class DataLoader : IDataLoader
         using (UnityWebRequest webRequest = UnityWebRequest.Get(streamingPath))
         {
             await webRequest.SendWebRequest();
-            string directory = Path.GetDirectoryName(Application.persistentDataPath + relativePath);
+            string directory = KiraPath.GetDirectoryName(Application.persistentDataPath + relativePath);
             if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
             using (var writer = File.Create(Application.persistentDataPath + relativePath))
             {
@@ -707,7 +707,7 @@ public class DataLoader : IDataLoader
         var packs = new HashSet<string>();
         foreach (var file in oldFiles)
         {
-            file.Name = Path.Combine(newPrefix, Path.GetFileName(file.Name));
+            file.Name = KiraPath.Combine(newPrefix, Path.GetFileName(file.Name));
             packs.Add(file.RootPath);
         }
         foreach (var pack in packs)

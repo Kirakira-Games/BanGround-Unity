@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using BanGround;
 using System.Runtime.CompilerServices;
 //using UnityEditor.UIElements;
 using UnityEngine;
@@ -413,7 +413,7 @@ public class KVSystem : IKVSystem
             }
         }
 
-        var path = Path.Combine(DataLoader.DataDir, "config.cfg");
+        var path = KiraPath.Combine(DataLoader.DataDir, "config.cfg");
 
         if (File.Exists(path))
             File.Delete(path);
