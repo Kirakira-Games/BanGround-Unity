@@ -248,15 +248,7 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             return;
         }
 
-        var chartDir = $"chart/{chartListManager.current.header.sid}";
-
-        var files = fs.Find(file => file.Name.Contains(chartDir));
-
-        files.All(item => 
-        {
-            item.Delete();
-            return true;
-        });
+        dataLoader.DeleteChart(chartListManager.current.header.sid);
 
         UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Select");
     }

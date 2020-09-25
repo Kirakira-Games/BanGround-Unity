@@ -31,6 +31,7 @@ namespace BanGround
 
         public bool Delete()
         {
+            Debug.Log($"delete {RootPath} {Name}");
             try
             {
                 internalInfo.Delete();
@@ -123,6 +124,7 @@ namespace BanGround
 
         public bool Delete()
         {
+            Debug.Log($"delete {RootPath} {Name}");
             try
             {
                 onDelete(this);
