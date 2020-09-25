@@ -258,7 +258,7 @@ public class DataLoader : IDataLoader
 
     public void SaveHeader(cHeader header)
     {
-        string path = KiraPath.Combine(DataDir, ChartDir, header.sid.ToString(), "cheader.bin");
+        string path = KiraPath.Combine(ChartDir, header.sid.ToString(), "cheader.bin");
 
         var file = fs.GetOrNewFile(path);
         ProtobufHelper.Write(header, file);
@@ -267,7 +267,7 @@ public class DataLoader : IDataLoader
 
     public void SaveHeader(mHeader header)
     {
-        string path = KiraPath.Combine(DataDir, MusicDir, header.mid.ToString(), "mheader.bin");
+        string path = KiraPath.Combine(MusicDir, header.mid.ToString(), "mheader.bin");
 
         var file = fs.GetOrNewFile(path);
         ProtobufHelper.Write(header, file);
