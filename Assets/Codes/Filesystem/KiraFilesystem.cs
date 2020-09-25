@@ -545,5 +545,12 @@ namespace BanGround
                 }
             }
         }
+
+        public IFile GetOrNewFile(string path)
+        {
+            if (FileExists(path))
+                return GetFile(path);
+            return NewFile(path);
+        }
     }
 }

@@ -31,7 +31,7 @@ namespace BanGround
         IFile NewFile(string name, string searchPath = null);
 
         IEnumerable<IFile> Find(Func<IFile, bool> cmp);
-
+        IFile GetOrNewFile(string path);
         IFile GetFile(string path);
 
         void AddSearchPath(string path);
