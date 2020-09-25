@@ -1,15 +1,12 @@
-﻿using System;
+﻿using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-using UnityEngine.UI;
 
 namespace BanGround
 {
@@ -18,7 +15,7 @@ namespace BanGround
         private FileInfo internalInfo;
         private Stream openedStream;
 
-        public string Name { get => internalInfo.FullName.Replace(RootPath, "").Replace('\\','/'); set => internalInfo.MoveTo(Path.Combine(RootPath, value)); }
+        public string Name { get => internalInfo.FullName.Replace(RootPath, "").Replace('\\', '/'); set => internalInfo.MoveTo(Path.Combine(RootPath, value)); }
 
         public string RootPath { get; }
 
@@ -38,8 +35,10 @@ namespace BanGround
             {
                 internalInfo.Delete();
             }
-            catch
+            catch (Exception e)
             {
+                Debug.LogError(e);
+                Debug.LogError(e.StackTrace);
                 return false;
             }
 
@@ -75,27 +74,27 @@ namespace BanGround
 
     class PakFile : IFile
     {
-        string fileName;
+        internal string __internal_filename;
 
         Action<IFile> onDelete;
         Action<string, IFile> onRename;
 
-        Func<IFile, FileAccess, ZipArchiveEntry> getEntry;
+        Func<PakFile, FileAccess, ZipArchiveEntry> getEntry;
         private Stream openedStream;
 
-        public PakFile(string fileName, Func<IFile, FileAccess, ZipArchiveEntry> entry, string pakName, Action<IFile> onFileDelete, Action<string, IFile> onFileRename)
+        public PakFile(string fileName, Func<PakFile, FileAccess, ZipArchiveEntry> entry, string pakName, Action<IFile> onFileDelete, Action<string, IFile> onFileRename)
         {
-            this.fileName = fileName;
+            __internal_filename = fileName;
             RootPath = pakName;
             getEntry = entry;
             onDelete = onFileDelete;
             onRename = onFileRename;
         }
 
-        public string Name 
-        { 
-            get => fileName; 
-            set 
+        public string Name
+        {
+            get => __internal_filename.Replace('\\', '/');
+            set
             {
                 var archive = getEntry(this, FileAccess.ReadWrite).Archive;
                 var newEntry = archive.CreateEntry(value);
@@ -105,14 +104,14 @@ namespace BanGround
 
                 using (var newStream = newEntry.Open())
                     openedStream.CopyTo(newStream);
-                    
+
                 openedStream.Close();
                 openedStream = null;
 
                 getEntry(this, FileAccess.ReadWrite).Delete();
 
-                onRename(fileName, this);
-                fileName = value;
+                onRename(Name, this);
+                __internal_filename = value;
             }
         }
 
@@ -129,8 +128,10 @@ namespace BanGround
                 onDelete(this);
                 getEntry(this, FileAccess.ReadWrite).Delete();
             }
-            catch
+            catch (Exception e)
             {
+                Debug.LogError(e);
+                Debug.LogError(e.StackTrace);
                 return false;
             }
 
@@ -167,7 +168,7 @@ namespace BanGround
 
             return true;
         }
-        
+
         public string Extract(bool force = false)
         {
             var bytes = ReadToEnd();
@@ -186,7 +187,7 @@ namespace BanGround
             if (!Directory.Exists(RootPath + "_extracted/"))
                 Directory.CreateDirectory(RootPath + "_extracted/");
 
-            var path = Path.Combine(RootPath + "_extracted/" , md5Filename + Path.GetExtension(fileName));
+            var path = Path.Combine(RootPath + "_extracted/", md5Filename + Path.GetExtension(Name));
             var write = true;
 
             if (File.Exists(path))
@@ -264,17 +265,17 @@ namespace BanGround
             return newArchive;
         }
 
-        ZipArchiveEntry GetEntryStub(IFile pakfile, FileAccess access) => GetArchive(pakfile.RootPath, access).GetEntry(pakfile.Name);
+        ZipArchiveEntry GetEntryStub(PakFile pakfile, FileAccess access) => GetArchive(pakfile.RootPath, access).GetEntry(pakfile.__internal_filename);
 
         public void AddSearchPath(string path)
         {
-            if(Directory.Exists(path))
+            if (Directory.Exists(path))
             {
                 searchPaths.Add(path);
 
                 DirectoryInfo di = new DirectoryInfo(path);
 
-                foreach(var fi in di.GetFiles())    
+                foreach (var fi in di.GetFiles())
                 {
                     if (fi.Extension == ".kpak")
                         AddSearchPath(fi.FullName);
@@ -309,7 +310,7 @@ namespace BanGround
 
                         var file = new PakFile(fileName, GetEntryStub, path, OnPakFileDelete, OnPakFileRename);
 
-                        pakFileIndexs.Add(fileName, file);
+                        pakFileIndexs.Add(fileName.Replace('\\', '/'), file);
                     }
                 }
             }
@@ -322,7 +323,7 @@ namespace BanGround
             if (result)
                 return result;
 
-            foreach(var searchPath in searchPaths)
+            foreach (var searchPath in searchPaths)
             {
                 var fullPath = Path.Combine(searchPath, filename);
 
@@ -337,11 +338,11 @@ namespace BanGround
 
         public IFile GetFile(string path)
         {
-            foreach(var searchPath in searchPaths)
+            foreach (var searchPath in searchPaths)
             {
                 var fi = new FileInfo(Path.Combine(searchPath, path));
 
-                if(fi.Exists)
+                if (fi.Exists)
                 {
                     return new NormalFile(searchPath, fi);
                 }
@@ -358,7 +359,7 @@ namespace BanGround
             if (searchPaths.Contains(path))
                 searchPaths.Remove(path);
 
-            if(packPaths.Contains(path))
+            if (packPaths.Contains(path))
             {
                 packPaths.Remove(path);
 
@@ -380,7 +381,7 @@ namespace BanGround
 
         private void GetFiles(string searchPath, List<IFile> files, DirectoryInfo di, Func<IFile, bool> func)
         {
-            foreach(var fi in di.GetFiles())
+            foreach (var fi in di.GetFiles())
             {
                 var file = new NormalFile(searchPath, fi);
 
@@ -399,7 +400,7 @@ namespace BanGround
             var indexResult = pakFileIndexs.Values.Where(cmp).ToList();
             var filesystemResult = new List<IFile>();
 
-            foreach(var searchPath in searchPaths)
+            foreach (var searchPath in searchPaths)
             {
                 GetFiles(searchPath, filesystemResult, new DirectoryInfo(searchPath), cmp);
             }
@@ -418,7 +419,7 @@ namespace BanGround
 
         public void FlushPak(string pakName)
         {
-            if(packAccessCache.ContainsKey(pakName))
+            if (packAccessCache.ContainsKey(pakName))
             {
                 var archive = packAccessCache[pakName].Item1;
 
@@ -429,7 +430,7 @@ namespace BanGround
 
         public IFile NewFile(string name, string searchPath = null)
         {
-            if(searchPath != null && packPaths.Contains(searchPath))
+            if (searchPath != null && packPaths.Contains(searchPath))
             {
                 ZipArchive archive = GetArchive(searchPath, FileAccess.ReadWrite);
 
@@ -437,7 +438,7 @@ namespace BanGround
 
                 return new PakFile(name, GetEntryStub, searchPath, OnPakFileDelete, OnPakFileRename);
             }
-            else if(searchPath != null && searchPaths.Contains(searchPath))
+            else if (searchPath != null && searchPaths.Contains(searchPath))
             {
                 var fi = new FileInfo(Path.Combine(searchPath, name));
                 fi.Create().Close();
@@ -461,8 +462,8 @@ namespace BanGround
         public int RemoveFolder(string path, string pakName = null)
         {
             IEnumerable<IFile> affectedFiles = null;
-            
-            if(pakName == null)
+
+            if (pakName == null)
             {
                 affectedFiles = Find(file => file.Name.StartsWith(path));
             }
@@ -523,7 +524,7 @@ namespace BanGround
 
         public void OnUpdate()
         {
-            var paksToRelease = packAccessCache.Where((kvp) => 
+            var paksToRelease = packAccessCache.Where((kvp) =>
             {
                 var (_, (_, time)) = kvp;
 
@@ -535,7 +536,7 @@ namespace BanGround
 
             foreach (var (path, (archive, time)) in paksToRelease)
             {
-                if(DateTime.Now - time > onemin)
+                if (DateTime.Now - time > onemin)
                 {
                     archive.Dispose();
                     packAccessCache.Remove(path);
