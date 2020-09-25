@@ -407,7 +407,7 @@ public class DataLoader : IDataLoader
         songList = new SongList();
 
         var referencedSongs = new Dictionary<mHeader, int>();
-        var loadedIds = new HashSet<int>();
+        var referencedSongDirs = new Dictionary<int, string>();
 
         var musics = from x in fs
                      where x.Name.EndsWith("mheader.bin")
@@ -418,18 +418,18 @@ public class DataLoader : IDataLoader
             mHeader musicHeader = ProtobufHelper.Load<mHeader>(music);
             if (musicHeader.BPM == null || musicHeader.BPM.Length == 0)
                 musicHeader.BPM = new float[] { 120, 120 };
-            if (!loadedIds.Contains(musicHeader.mid))
+            if (!referencedSongDirs.ContainsKey(musicHeader.mid))
             {
-                referencedSongs.Add(musicHeader, 0);
-                loadedIds.Add(musicHeader.mid);
+                referencedSongs[musicHeader] = 0;
+                referencedSongDirs[musicHeader.mid] = Path.GetDirectoryName(music.Name);
             }
         }
 
-        loadedIds.Clear();
         var charts = from x in fs
                      where x.Name.EndsWith("cheader.bin")
                      select x;
 
+        var loadedIds = new HashSet<int>();
         foreach (var chart in charts)
         {
             cHeader chartHeader = ProtobufHelper.Load<cHeader>(chart);
@@ -447,6 +447,7 @@ public class DataLoader : IDataLoader
             catch
             {
                 Debug.LogWarning($"Chart {chartHeader.sid} does not have corresponding song {chartHeader.mid}. GC!");
+                DeleteFiles(Path.GetDirectoryName(chart.Name));
                 continue;
             }
 
@@ -457,14 +458,7 @@ public class DataLoader : IDataLoader
         {
             if (refcount == 0)
             {
-                var musicDir = $"music/{song.mid}";
-
-                var musicFiles = fs.Find(file => file.Name.Contains(musicDir));
-                musicFiles.All(item =>
-                {
-                    return item.Delete();
-                });
-
+                DeleteFiles(referencedSongDirs[song.mid]);
                 Debug.LogWarning($"Removing music {song.mid} due to zero refcount");
             }
             else
@@ -771,5 +765,30 @@ public class DataLoader : IDataLoader
                 SaveHeader(chart);
             }
         }
+    }
+
+    private void DeleteFiles(string prefix)
+    {
+        var files = fs.Find(file => file.Name.StartsWith(prefix));
+        var packs = new HashSet<string>();
+        foreach (var file in files)
+        {
+            file.Delete();
+            packs.Add(file.RootPath);
+        }
+        foreach (var pack in packs)
+        {
+            fs.FlushPak(pack);
+        }
+    }
+
+    public void DeleteChart(int sid)
+    {
+        DeleteFiles(ChartDir + sid);
+    }
+
+    public void DeleteMusic(int mid)
+    {
+        DeleteFiles(MusicDir + mid);
     }
 }
