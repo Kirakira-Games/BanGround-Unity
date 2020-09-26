@@ -47,7 +47,7 @@ namespace BGEditor
             // just fill in
             float duration = Progress.audioLength / 1000f;
             mHeader.Sanitize();
-            cHeader.Sanitize(duration);
+            cHeader.Sanitize(mHeader);
 
             // Id & source
             var musicSource = IDRouterUtil.GetSource(mHeader.mid, out int mid);
