@@ -13,6 +13,7 @@ namespace BanGround
     class PreventDuplicateFileSet : IEnumerable<IFile>
     {
         private Dictionary<string, IFile> mFilesDic = new Dictionary<string, IFile>();
+        private List<IFile> mFileToDelete = new List<IFile>();
         public int Count => mFilesDic.Count;
 
         public PreventDuplicateFileSet() { }
@@ -20,6 +21,12 @@ namespace BanGround
         {
             foreach (var file in files)
                 Add(file);
+        }
+
+        public void DeleteDuplicateFile()
+        {
+            foreach (var file in mFileToDelete)
+                file.Delete();
         }
 
         public void Add(IFile file)
@@ -31,11 +38,11 @@ namespace BanGround
                 if (current.LastModified < file.LastModified)
                 {
                     mFilesDic[file.Name] = file;
-                    current.Delete();
+                    mFileToDelete.Add(current);
                 }
                 else
                 {
-                    file.Delete();
+                    mFileToDelete.Add(file);
                 }
             }
             else
@@ -140,13 +147,13 @@ namespace BanGround
     {
         internal string __internal_filename;
 
-        Action<IFile> onDelete;
-        Action<string, IFile> onRename;
+        Action<PakFile> onDelete;
+        Action<string, PakFile> onRename;
 
         Func<PakFile, FileAccess, ZipArchiveEntry> getEntry;
         private Stream openedStream;
 
-        public PakFile(string fileName, Func<PakFile, FileAccess, ZipArchiveEntry> entry, string pakName, Action<IFile> onFileDelete, Action<string, IFile> onFileRename)
+        public PakFile(string fileName, Func<PakFile, FileAccess, ZipArchiveEntry> entry, string pakName, Action<PakFile> onFileDelete, Action<string, PakFile> onFileRename)
         {
             __internal_filename = fileName;
             RootPath = pakName;
@@ -174,8 +181,10 @@ namespace BanGround
 
                 getEntry(this, FileAccess.ReadWrite).Delete();
 
-                onRename(Name, this);
+                var oldName = Name;
                 __internal_filename = value;
+
+                onRename(oldName, this);
             }
         }
 
@@ -185,7 +194,20 @@ namespace BanGround
 
         public string RootPath { get; }
 
-        public DateTimeOffset LastModified => getEntry(this, FileAccess.Read).LastWriteTime;
+        public DateTimeOffset LastModified {
+            get
+            {
+                //try
+                //{
+                    var entry = getEntry(this, FileAccess.Read);
+                    return entry.LastWriteTime;
+                //}
+                //catch(Exception ex)
+                //{
+                //    throw ex;
+                //}
+            }
+        }
 
         public bool Delete()
         {
@@ -283,15 +305,15 @@ namespace BanGround
             return true;
         }
 
-        void OnPakFileRename(string oldName, IFile pakFile)
+        void OnPakFileRename(string oldName, PakFile pakFile)
         {
             pakFileIndexs.Remove(oldName);
-            pakFileIndexs.Add(pakFile.Name, pakFile);
+            pakFileIndexs.Add(pakFile.__internal_filename.Replace('\\','/'), pakFile);
         }
 
-        void OnPakFileDelete(IFile pakFile)
+        void OnPakFileDelete(PakFile pakFile)
         {
-            pakFileIndexs.Remove(pakFile.Name);
+            pakFileIndexs.Remove(pakFile.__internal_filename.Replace('\\', '/'));
         }
 
         ZipArchive GetArchive(string path, FileAccess access)
@@ -451,23 +473,27 @@ namespace BanGround
 
         public IFile GetFile(string path)
         {
-            IFile ret = null;
+            var result = new PreventDuplicateFileSet();
             foreach (var searchPath in searchPaths)
             {
                 var fi = new FileInfo(KiraPath.Combine(searchPath, path));
 
                 if (fi.Exists)
                 {
-                    KeepLastModifiedFile(ref ret, new NormalFile(searchPath, fi));
+                    result.Add(new NormalFile(searchPath, fi));
                 }
             }
             
             if (pakFileIndexs.ContainsKey(path))
-                KeepLastModifiedFile(ref ret, pakFileIndexs[path]);
+                    result.Add(pakFileIndexs[path]);
 
-            if (ret == null)
+
+            if (result.Count == 0)
                 throw new FileNotFoundException("Target file not found in any search path!");
-            return ret;
+
+            result.DeleteDuplicateFile();
+
+            return result.ElementAt(0);
         }
 
         public void RemoveSearchPath(string path)
@@ -521,6 +547,7 @@ namespace BanGround
                 GetFiles(searchPath, result, new DirectoryInfo(searchPath), cmp);
             }
 
+            result.DeleteDuplicateFile();
             return result;
         }
 
