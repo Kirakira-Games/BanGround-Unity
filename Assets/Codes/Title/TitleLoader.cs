@@ -65,7 +65,7 @@ public class TitleLoader : MonoBehaviour
     {
         instance = this;
         CheckUpdate();
-        _ = dataLoader.Init();
+        dataLoader.Init().Forget();
 
         var backgrounds = fs.Find(file=> file.Name.StartsWith(BACKGROUND_PATH));
 
