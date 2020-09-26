@@ -387,9 +387,16 @@ public static class ProtobufHelper
 {
     public static void Write(object data, IFile target)
     {
-        using(var stream = target.Open(FileAccess.Write))
+        byte[] result;
+        using (var stream = new MemoryStream())
         {
             Serializer.Serialize(stream, data);
+            result = stream.ToArray();
+        }
+        using (var stream = target.Open(FileAccess.Write))
+        {
+            stream.SetLength(result.Length);
+            stream.Write(result, 0, result.Length);
         }
     }
 
@@ -413,8 +420,10 @@ public static class ProtobufHelper
 
     public static T Load<T>(IFile file) where T : IExtensible
     {
-        var stream = file.Open(FileAccess.Read);
-        return Serializer.Deserialize<T>(stream);
+        using (var stream = file.Open(FileAccess.Read))
+        {
+            return Serializer.Deserialize<T>(stream);
+        }
     }
 
     public static T Load<T>(string path) where T : IExtensible

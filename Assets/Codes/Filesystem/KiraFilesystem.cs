@@ -15,13 +15,25 @@ namespace BanGround
         private FileInfo internalInfo;
         private Stream openedStream;
 
-        public string Name { get => internalInfo.FullName.Replace(RootPath, "").Replace('\\', '/'); set => internalInfo.MoveTo(KiraPath.Combine(RootPath, value)); }
+        public string Name {
+            get => internalInfo.FullName.Replace('\\', '/').Replace(RootPath, "");
+            set
+            {
+                var path = KiraPath.Combine(RootPath, value);
+                var dir = KiraPath.GetDirectoryName(path);
+                if (!Directory.Exists(dir))
+                    Directory.CreateDirectory(dir);
+                internalInfo.MoveTo(path);
+            }
+        }
 
         public string RootPath { get; }
 
         public bool Opened => openedStream != null;
 
         public int Size => (int)internalInfo.Length;
+
+        public DateTimeOffset LastModified => internalInfo.LastWriteTimeUtc;
 
         public NormalFile(string searchPath, FileInfo info)
         {
@@ -31,7 +43,7 @@ namespace BanGround
 
         public bool Delete()
         {
-            Debug.Log($"delete {RootPath} {Name}");
+            Debug.Log($"Delete {RootPath} :: {Name}");
             try
             {
                 internalInfo.Delete();
@@ -48,7 +60,7 @@ namespace BanGround
 
         public Stream Open(FileAccess access)
         {
-            return internalInfo.Open(FileMode.Open, access);
+            return internalInfo.Open(access.HasFlag(FileAccess.Write) ? FileMode.Truncate : FileMode.Open, access);
         }
 
         public byte[] ReadToEnd()
@@ -122,9 +134,11 @@ namespace BanGround
 
         public string RootPath { get; }
 
+        public DateTimeOffset LastModified => getEntry(this, FileAccess.Read).LastWriteTime;
+
         public bool Delete()
         {
-            Debug.Log($"delete {RootPath} {Name}");
+            Debug.Log($"Delete {RootPath} {Name}");
             try
             {
                 onDelete(this);
@@ -294,12 +308,23 @@ namespace BanGround
                     byte version = br.ReadByte();
 
                     if (!(pkMagic == 0x4b50 && version == 3))
+                    {
+                        br.Close();
+                        File.Delete(path);
                         return;
+                    }
                 }
 
                 packPaths.Add(path);
-
                 var zip = GetArchive(path, FileAccess.Read);
+
+                if (zip.Entries.Count == 0)
+                {
+                    File.Delete(path);
+                    packPaths.Remove(path);
+                    zip.Dispose();
+                    return;
+                }
 
                 foreach (var entry in zip.Entries)
                 {
@@ -338,22 +363,42 @@ namespace BanGround
             return false;
         }
 
+        private void KeepLastModifiedFile(ref IFile current, IFile newfile)
+        {
+            if (current == null || newfile == null)
+            {
+                current = current ?? newfile;
+            }
+            else if (current.LastModified < newfile.LastModified)
+            {
+                current.Delete();
+                current = newfile;
+            }
+            else
+            {
+                newfile.Delete();
+            }
+        }
+
         public IFile GetFile(string path)
         {
+            IFile ret = null;
             foreach (var searchPath in searchPaths)
             {
                 var fi = new FileInfo(KiraPath.Combine(searchPath, path));
 
                 if (fi.Exists)
                 {
-                    return new NormalFile(searchPath, fi);
+                    KeepLastModifiedFile(ref ret, new NormalFile(searchPath, fi));
                 }
             }
-
+            
             if (pakFileIndexs.ContainsKey(path))
-                return pakFileIndexs[path];
+                KeepLastModifiedFile(ref ret, pakFileIndexs[path]);
 
-            throw new FileNotFoundException("Target file not found in any search path!");
+            if (ret == null)
+                throw new FileNotFoundException("Target file not found in any search path!");
+            return ret;
         }
 
         public void RemoveSearchPath(string path)
@@ -415,7 +460,7 @@ namespace BanGround
             else
             {
                 filesystemResult.AddRange(indexResult.Where((f) => filesystemResult.Find(f1 => f1.Name == f.Name) == null));
-                return indexResult;
+                return filesystemResult;
             }
         }
 

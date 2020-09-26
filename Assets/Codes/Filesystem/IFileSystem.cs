@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BanGround
 {
@@ -13,6 +10,7 @@ namespace BanGround
         string RootPath { get; }
         bool Opened { get; }
         int Size { get; }
+        DateTimeOffset LastModified { get; }
 
         Stream Open(FileAccess access);
         byte[] ReadToEnd();

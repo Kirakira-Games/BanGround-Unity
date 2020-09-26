@@ -14,6 +14,7 @@ using UnityEngine.Events;
 using BanGround;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.RegularExpressions;
+using LunarConsolePlugin;
 
 public class DataLoader : IDataLoader
 {
@@ -57,6 +58,7 @@ public class DataLoader : IDataLoader
     {
         // Music files with wrong filename
         Regex musicFileName = new Regex("^" + MusicDir.Replace("/", @"\/") + @"([0-9]+)\/([0-9]+)\..*$");
+        var toRemove = new HashSet<int>();
         foreach (var file in fs)
         {
             var filename = file.Name;
@@ -69,8 +71,81 @@ public class DataLoader : IDataLoader
             if (id1 != id2)
             {
                 file.Name = filename.Substring(0, groups[2].Index) + id1 + filename.Substring(groups[2].Index + groups[2].Length);
-                Debug.Log("Fixed: " + file.Name);
+                Debug.Log("Fixed ID: " + file.Name);
             }
+        }
+        // Fix music headers
+        Regex musicHeaderName = new Regex("^" + MusicDir.Replace("/", @"\/") + @"([0-9]+)\/mheader\.bin$");
+        foreach (var file in fs)
+        {
+            var filename = file.Name;
+            var matches = musicHeaderName.Matches(filename);
+            if (matches.Count == 0)
+                continue;
+            var groups = matches[0].Groups;
+            int id = int.Parse(groups[1].Value);
+            mHeader musicHeader = null;
+            try
+            {
+                musicHeader = ProtobufHelper.Load<mHeader>(file);
+            }
+            catch (Exception e) 
+            {
+                Debug.LogWarning(e + "\n" + e.StackTrace);
+            }
+            if (musicHeader == null || !fs.FileExists(GetMusicPath(id)))
+            {
+                Debug.Log($"Corrupted music header at {id}. GC!");
+                toRemove.Add(id);
+                continue;
+            }
+            if (musicHeader.mid != id)
+            {
+                Debug.Log($"Unmatched mid: {musicHeader.mid} in dir {id}. Update header!");
+                musicHeader.mid = id;
+                SaveHeader(musicHeader);
+            }
+        }
+        foreach (var id in toRemove)
+        {
+            DeleteMusic(id);
+        }
+        toRemove.Clear();
+        // Fix chart headers
+        Regex chartHeaderName = new Regex("^" + ChartDir.Replace("/", @"\/") + @"([0-9]+)\/cheader\.bin$");
+        foreach (var file in fs)
+        {
+            var filename = file.Name;
+            var matches = chartHeaderName.Matches(filename);
+            if (matches.Count == 0)
+                continue;
+            var groups = matches[0].Groups;
+            int id = int.Parse(groups[1].Value);
+            cHeader chartHeader = null;
+            try
+            {
+                chartHeader = ProtobufHelper.Load<cHeader>(file);
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning(e + "\n" + e.StackTrace);
+            }
+            if (chartHeader == null)
+            {
+                Debug.Log($"Corrupted chart header at {id}. GC!");
+                toRemove.Add(id);
+                continue;
+            }
+            if (chartHeader.sid != id)
+            {
+                Debug.Log($"Unmatched sid: {chartHeader.sid} in dir {id}. Update header!");
+                chartHeader.sid = id;
+                SaveHeader(chartHeader);
+            }
+        }
+        foreach (var id in toRemove)
+        {
+            DeleteChart(id);
         }
     }
 
@@ -98,9 +173,6 @@ public class DataLoader : IDataLoader
             LoadKiraPack(new FileInfo(Application.persistentDataPath + "/Initial.kirapack"));
             PlayerPrefs.SetInt("InitialChartVersion", InitialChartVersion);
         }
-
-        // Sanity check to fix common fs issues
-        SanityCheck();
 
         // Register deep link
         Application.deepLinkActivated += (url) =>
@@ -161,6 +233,9 @@ public class DataLoader : IDataLoader
 
         fs.AddSearchPath(DataDir);
         fs.AddSearchPath(FSDir);
+
+        // Sanity check to fix common fs issues
+        SanityCheck();
     }
 
     public string GetMusicPath(int mid)
@@ -392,9 +467,7 @@ public class DataLoader : IDataLoader
         var referencedSongs = new Dictionary<mHeader, int>();
         var referencedSongDirs = new Dictionary<int, string>();
 
-        var musics = from x in fs
-                     where x.Name.EndsWith("mheader.bin")
-                     select x;
+        var musics = fs.Find(file => file.Name.EndsWith("mheader.bin")).ToArray();
 
         foreach (var music in musics)
         {
@@ -406,11 +479,13 @@ public class DataLoader : IDataLoader
                 referencedSongs[musicHeader] = 0;
                 referencedSongDirs[musicHeader.mid] = KiraPath.GetDirectoryName(music.Name);
             }
+            else
+            {
+                Debug.LogWarning("Duplicate music header: " + musicHeader.mid);
+            }
         }
 
-        var charts = from x in fs
-                     where x.Name.EndsWith("cheader.bin")
-                     select x;
+        var charts = fs.Find(file => file.Name.EndsWith("cheader.bin")).ToArray();
 
         var loadedIds = new HashSet<int>();
         foreach (var chart in charts)
