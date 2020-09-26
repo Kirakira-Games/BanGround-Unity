@@ -126,7 +126,7 @@ namespace BGEditor
             chartHeader = chartList.current.header;
             musicHeader = dataLoader.GetMusicHeader(chartHeader.mid);
             musicHeader.Sanitize();
-            chartHeader.Sanitize(musicHeader.length);
+            chartHeader.Sanitize(musicHeader);
             chartSource = IDRouterUtil.GetSource(chartHeader.sid, out chartId);
             musicSource = IDRouterUtil.GetSource(chartHeader.mid, out musicId);
         }

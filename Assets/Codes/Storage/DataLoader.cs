@@ -14,7 +14,7 @@ using UnityEngine.Events;
 using BanGround;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.RegularExpressions;
-using LunarConsolePlugin;
+using System.Text;
 
 public class DataLoader : IDataLoader
 {
@@ -315,20 +315,20 @@ public class DataLoader : IDataLoader
 
     public void SaveChart<T>(T chart, int sid, Difficulty difficulty) where T : IExtensible
     {
-        string path = KiraPath.Combine(DataDir, GetChartPath(sid, difficulty));
-        string dir = KiraPath.GetDirectoryName(path);
-        if (!Directory.Exists(dir))
-            Directory.CreateDirectory(dir);
-        ProtobufHelper.Save(chart, path);
+        string path = GetChartPath(sid, difficulty);
+
+        var file = fs.GetOrNewFile(path);
+        ProtobufHelper.Write(chart, file);
+        fs.FlushPak(file.RootPath);
     }
 
     public void SaveChartScript(string script, int sid, Difficulty difficulty)
     {
-        string path = KiraPath.Combine(DataDir, GetChartScriptPath(sid, difficulty));
-        string dir = KiraPath.GetDirectoryName(path);
-        if (!Directory.Exists(dir))
-            Directory.CreateDirectory(dir);
-        File.WriteAllText(path, script);
+        string path = GetChartScriptPath(sid, difficulty);
+
+        var file = fs.GetOrNewFile(path);
+        file.WriteBytes(Encoding.Unicode.GetBytes(script));
+        fs.FlushPak(file.RootPath);
     }
 
     public void SaveHeader(cHeader header)
@@ -827,8 +827,8 @@ public class DataLoader : IDataLoader
 
     private void DeleteFiles(string prefix)
     {
-        var files = fs.Find(file => file.Name.StartsWith(prefix));
         var packs = new HashSet<string>();
+        var files = fs.Find(file => file.Name.StartsWith(prefix));
         foreach (var file in files)
         {
             file.Delete();

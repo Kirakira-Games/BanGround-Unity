@@ -10,6 +10,57 @@ using System.Text;
 
 namespace BanGround
 {
+    class PreventDuplicateFileSet : IEnumerable<IFile>
+    {
+        private Dictionary<string, IFile> mFilesDic = new Dictionary<string, IFile>();
+        public int Count => mFilesDic.Count;
+
+        public PreventDuplicateFileSet() { }
+        public PreventDuplicateFileSet(IEnumerable<IFile> files)
+        {
+            foreach (var file in files)
+                Add(file);
+        }
+
+        public void Add(IFile file)
+        {
+            if (file == null)
+                return;
+            if (mFilesDic.TryGetValue(file.Name, out var current))
+            {
+                if (current.LastModified < file.LastModified)
+                {
+                    mFilesDic[file.Name] = file;
+                    current.Delete();
+                }
+                else
+                {
+                    file.Delete();
+                }
+            }
+            else
+            {
+                mFilesDic.Add(file.Name, file);
+            }
+        }
+
+        public void Remove(IFile file)
+        {
+            if (mFilesDic.ContainsKey(file.Name))
+                mFilesDic.Remove(file.Name);
+        }
+
+        public IEnumerator<IFile> GetEnumerator()
+        {
+            return mFilesDic.Values.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+    }
+
     class NormalFile : IFile
     {
         private FileInfo internalInfo;
@@ -283,6 +334,20 @@ namespace BanGround
 
         ZipArchiveEntry GetEntryStub(PakFile pakfile, FileAccess access) => GetArchive(pakfile.RootPath, access).GetEntry(pakfile.__internal_filename);
 
+        private void RemoveEmptyDir(DirectoryInfo dir)
+        {
+            var subdirs = dir.GetDirectories();
+            if (dir.GetFiles().Length == 0 && subdirs.Length == 0)
+            {
+                dir.Delete();
+                return;
+            }
+            foreach (var d in subdirs)
+            {
+                RemoveEmptyDir(d);
+            }
+        }
+
         public void AddSearchPath(string path)
         {
             if (Directory.Exists(path))
@@ -295,6 +360,10 @@ namespace BanGround
                 {
                     if (fi.Extension == ".kpak")
                         AddSearchPath(fi.FullName);
+                }
+                foreach (var d in di.GetDirectories())
+                {
+                    RemoveEmptyDir(d);
                 }
 
                 return;
@@ -426,7 +495,7 @@ namespace BanGround
             }
         }
 
-        private void GetFiles(string searchPath, List<IFile> files, DirectoryInfo di, Func<IFile, bool> func)
+        private void GetFiles(string searchPath, PreventDuplicateFileSet files, DirectoryInfo di, Func<IFile, bool> func)
         {
             foreach (var fi in di.GetFiles())
             {
@@ -444,24 +513,15 @@ namespace BanGround
 
         public IEnumerable<IFile> Find(Func<IFile, bool> cmp)
         {
-            var indexResult = pakFileIndexs.Values.Where(cmp).ToList();
-            var filesystemResult = new List<IFile>();
+            var indexResult = pakFileIndexs.Values.Where(cmp);
+            var result = new PreventDuplicateFileSet(indexResult);
 
             foreach (var searchPath in searchPaths)
             {
-                GetFiles(searchPath, filesystemResult, new DirectoryInfo(searchPath), cmp);
+                GetFiles(searchPath, result, new DirectoryInfo(searchPath), cmp);
             }
 
-            if (false)
-            {
-                indexResult.AddRange(filesystemResult.Where((f) => indexResult.Find(f1 => f1.Name == f.Name) == null));
-                return indexResult;
-            }
-            else
-            {
-                filesystemResult.AddRange(indexResult.Where((f) => filesystemResult.Find(f1 => f1.Name == f.Name) == null));
-                return filesystemResult;
-            }
+            return result;
         }
 
         public void FlushPak(string pakName)

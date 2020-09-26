@@ -244,10 +244,10 @@ public partial class cHeader : IExtensible
         }
     }
 
-    public void Sanitize(float length)
+    public void Sanitize(mHeader musicHeader)
     {
         if (preview == null || preview.Length == 0)
-            preview = new float[] { 0, length };
+            preview = musicHeader.preview.ToArray();
         else if (preview.Length == 1)
             preview = new float[] { preview[0], preview[0] };
         else
