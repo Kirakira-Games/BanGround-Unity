@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using UniRx.Async;
+using Cysharp.Threading.Tasks;
 using UnityEngine.Events;
 
 public interface IChartListManager

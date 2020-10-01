@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine.Networking;
 using Newtonsoft.Json;
 using System.Text;
-using UniRx.Async;
+using Cysharp.Threading.Tasks;
 
 public class KirakiraWebRequest<Resp>
 {

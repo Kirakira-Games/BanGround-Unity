@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using Zenject;
 using AudioProvider;
-using UniRx.Async;
+using Cysharp.Threading.Tasks;
 
 public class AudioTimelineSync : MonoBehaviour, IAudioTimelineSync
 {

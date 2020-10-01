@@ -7,7 +7,7 @@ using System;
 using System.IO;
 using System.Linq;
 using AudioProvider;
-using UniRx.Async;
+using Cysharp.Threading.Tasks;
 using Zenject;
 
 public class ResultManager : MonoBehaviour

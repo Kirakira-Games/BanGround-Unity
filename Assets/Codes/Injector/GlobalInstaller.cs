@@ -1,5 +1,6 @@
 using AudioProvider;
 using BanGround;
+using BanGround.Community;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -90,6 +91,9 @@ public class GlobalInstaller : MonoInstaller
 
         // Loading blocker
         Container.Bind<ILoadingBlocker>().FromInstance(loadingBlocker);
+
+        // Community
+        Container.Bind<IStoreProvider>().WithId("BanGround").To<BanGroundStoreProvider>().AsSingle().NonLazy();
     }
 
     void RegisterKonCommands()

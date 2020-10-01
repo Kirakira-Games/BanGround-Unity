@@ -106,6 +106,11 @@ namespace Web.Chart
             return web.New<int>().UseTokens().SetReq(req).Post("chart/create");
         }
 
+        public static KiraWebRequest.Builder<ChartListResponse> GetChartsBySong(this IKiraWebRequest web, int mid, int offset = 0, int limit = 20)
+        {
+            return web.New<ChartListResponse>().UseTokens().Get($"music/{mid}/charts?offset={offset}&limit={limit}");
+        }
+
         public static KiraWebRequest.Builder<object> EditChartSet(this IKiraWebRequest web, int id, CreateChartRequest req)
         {
             return web.New().UseTokens().SetReq(req).Post($"chart/{id}/edit");

@@ -2,7 +2,7 @@
 using UnityEngine;
 using AudioProvider;
 using UnityEngine.UI;
-using UniRx.Async;
+using Cysharp.Threading.Tasks;
 using Zenject;
 using Web;
 using Web.Auth;
