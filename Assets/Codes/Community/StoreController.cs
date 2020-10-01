@@ -82,5 +82,10 @@ namespace Assets.Codes.Community
                 Search(Offset).Forget();
             }
         }
+
+        private void OnDestroy()
+        {
+            store.Cancel();
+        }
     }
 }
