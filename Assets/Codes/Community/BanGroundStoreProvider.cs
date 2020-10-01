@@ -18,6 +18,15 @@ namespace BanGround.Community
 
         private CancellationTokenSource mTokenSource = new CancellationTokenSource();
 
+        private string ToBackgroundUrl(string background)
+        {
+            if (string.IsNullOrEmpty(background))
+                return background;
+            if (background.StartsWith("/storage/"))
+                return background.Replace("/storage/", "https://beijing.aliyun.reikohaku.fun/storage/");
+            return background;
+        }
+
         private SongItem ToSongItem(MusicInfo info)
         {
             return new SongItem
@@ -26,7 +35,7 @@ namespace BanGround.Community
                 Id = info.Id,
                 Title = info.Title,
                 Artist = info.Artist,
-                BackgroundUrl = info.Background
+                BackgroundUrl = ToBackgroundUrl(info.Background)
             };
         }
 
@@ -46,7 +55,7 @@ namespace BanGround.Community
                 Source = ChartSource.BanGround,
                 Id = chart.Id,
                 Uploader = ToUserItem(chart.Uploader),
-                BackgroundUrl = chart.Background,
+                BackgroundUrl = ToBackgroundUrl(chart.Background),
                 Difficulty = chart.Difficulty
             };
         }
@@ -60,6 +69,7 @@ namespace BanGround.Community
         public void Cancel()
         {
             mTokenSource.Cancel();
+            mTokenSource = new CancellationTokenSource();
         }
 
         public async UniTask<List<ChartItem>> GetCharts(int mid, int offset, int limit)
