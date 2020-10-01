@@ -4,7 +4,7 @@ using UnityEngine;
 using System.Threading.Tasks;
 using UnityEngine.Networking;
 using Newtonsoft.Json;
-using UniRx.Async;
+using Cysharp.Threading.Tasks;
 
 public class VersionCheck
 {

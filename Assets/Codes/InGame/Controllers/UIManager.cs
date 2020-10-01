@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using AudioProvider;
 using System;
-using UniRx.Async;
+using Cysharp.Threading.Tasks;
 using Zenject;
 
 using State = GameStateMachine.State;

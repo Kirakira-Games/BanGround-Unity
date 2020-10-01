@@ -8,7 +8,7 @@ using System;
 using System.Linq;
 using ProtoBuf;
 using UnityEngine.SceneManagement;
-using UniRx.Async;
+using Cysharp.Threading.Tasks;
 using Zenject;
 using UnityEngine.Events;
 using BanGround;
@@ -727,7 +727,7 @@ public class DataLoader : IDataLoader
         return LoadSuccess;
     }
 
-    private async UniTaskVoid CopyFileFromStreamingAssetsToPersistentDataPath(string relativePath)
+    private async UniTask CopyFileFromStreamingAssetsToPersistentDataPath(string relativePath)
     {
         string streamingPath;
         if (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.Android)

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-using UniRx.Async;
+using Cysharp.Threading.Tasks;
 using System;
 using Newtonsoft.Json;
 using Zenject;

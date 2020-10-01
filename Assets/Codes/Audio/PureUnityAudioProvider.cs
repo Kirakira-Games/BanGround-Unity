@@ -8,7 +8,7 @@ using System;
 using UnityEngine.Timeline;
 using System.Linq;
 using WebSocketSharp;
-using UniRx.Async;
+using Cysharp.Threading.Tasks;
 using System.Threading.Tasks;
 
 namespace AudioProvider

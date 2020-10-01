@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Networking;
-using UniRx.Async;
+using Cysharp.Threading.Tasks;
 using Zenject;
 using Web.Auth;
 using WebSocketSharp;

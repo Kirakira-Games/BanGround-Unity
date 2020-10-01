@@ -2,7 +2,7 @@
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Linq;
-using UniRx.Async;
+using Cysharp.Threading.Tasks;
 using System.IO;
 using NVorbis;
 using System.Text;
@@ -192,11 +192,11 @@ public class ChartCreator : MonoBehaviour
 
             RequestAirdrop = true;
 
-            await UniTask.Delay(1500, default, default, token);
+            await UniTask.Delay(1500).WithCancellation(token);
 
             Application.OpenURL("http://127.0.0.1:8088/");
 
-            await UniTask.WaitUntil(() => AirdroppedFile != null, default, token);
+            await UniTask.WaitUntil(() => AirdroppedFile != null).WithCancellation(token);
 
             RequestAirdrop = false;
 

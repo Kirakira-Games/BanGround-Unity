@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.Events;
 using AudioProvider;
-using UniRx.Async;
+using Cysharp.Threading.Tasks;
 using JudgeQueue = PriorityQueue<int, NoteBase>;
 using Zenject;
 using System.Threading;

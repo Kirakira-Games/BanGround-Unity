@@ -1,7 +1,7 @@
 ﻿using ProtoBuf;
 using System.Collections.Generic;
 using System.IO;
-using UniRx.Async;
+using Cysharp.Threading.Tasks;
 using UnityEngine.Events;
 
 public interface IDataLoader

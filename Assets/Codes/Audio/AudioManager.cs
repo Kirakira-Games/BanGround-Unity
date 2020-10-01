@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using AudioProvider;
-using UniRx.Async;
+using Cysharp.Threading.Tasks;
 using Zenject;
 
 public class AudioManager : MonoBehaviour, IAudioManager

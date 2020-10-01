@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using FMOD;
-using UniRx.Async;
+using Cysharp.Threading.Tasks;
 using Zenject;
 
 #pragma warning disable CS1998 // 异步方法缺少 "await" 运算符，将以同步方式运行
@@ -30,7 +26,7 @@ namespace AudioProvider
         internal byte[] bytes;
 
         Sound _internalSound;
-        Channel _internalChannel;
+        FMOD.Channel _internalChannel;
         DSP _internalDSP;
         FMOD.System _internalSystem;
         FmodAudioProvider parent;
@@ -308,7 +304,7 @@ namespace AudioProvider
 
         public void PlayOneShot()
         {
-            _internalSystem.playSound(_internalSound, seGroup, true, out Channel channel);
+            _internalSystem.playSound(_internalSound, seGroup, true, out FMOD.Channel channel);
             channel.setVolume(volume);
             channel.setPaused(false);
         }

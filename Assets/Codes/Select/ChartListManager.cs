@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Zenject;
 using UnityEngine.PlayerLoop;
 using UnityEngine.Events;
-using UniRx.Async;
+using Cysharp.Threading.Tasks;
 using System;
 using Newtonsoft.Json;
 using System.Linq;

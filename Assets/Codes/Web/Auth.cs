@@ -3,7 +3,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
-using UniRx.Async;
+using Cysharp.Threading.Tasks;
 
 namespace Web.Auth
 {
