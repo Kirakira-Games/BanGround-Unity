@@ -91,9 +91,6 @@ public class GlobalInstaller : MonoInstaller
 
         // Loading blocker
         Container.Bind<ILoadingBlocker>().FromInstance(loadingBlocker);
-
-        // Community
-        Container.Bind<IStoreProvider>().WithId("BanGround").To<BanGroundStoreProvider>().AsSingle().NonLazy();
     }
 
     void RegisterKonCommands()

@@ -5,17 +5,18 @@ using Cysharp.Threading.Tasks;
 using Zenject;
 using Web.Auth;
 using WebSocketSharp;
+using TMPro;
 
 public class UserInfo : MonoBehaviour
 {
     public static UserLite user;
     public static bool isOffline;
-    private Text username_Text;
+    private TextMeshPro username_Text;
     private Image userAvatar;
 
     private void Start()
     {
-        username_Text = GameObject.Find("Username").GetComponent<Text>();
+        username_Text = GameObject.Find("Username").GetComponent<TextMeshPro>();
         userAvatar = GameObject.Find("Avatar").GetComponent<Image>();
     }
 
