@@ -96,7 +96,7 @@ public class SceneLoader : MonoBehaviour
         loadOP.allowSceneActivation = false;
         while (loadOP.progress < 0.9f)
         {
-            await UniTask.DelayFrame(0);
+            await UniTask.DelayFrame(1);
         }
         loadOP.allowSceneActivation = true;
 

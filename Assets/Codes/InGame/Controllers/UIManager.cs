@@ -169,7 +169,7 @@ public class UIManager : MonoBehaviour, IUIManager
             audioTimelineSync.time = currentTime;
             inGameBackground.seekVideo(currentTime);
             inGameBackground.playVideo();
-            await UniTask.DelayFrame(0);
+            await UniTask.DelayFrame(1);
             inGameBackground.pauseVideo();
             if (SM.Current != State.Rewinding)
             {

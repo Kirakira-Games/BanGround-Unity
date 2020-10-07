@@ -2,21 +2,19 @@
 using UnityEngine.UI;
 using UnityEngine.Networking;
 using Cysharp.Threading.Tasks;
-using Zenject;
 using Web.Auth;
-using WebSocketSharp;
 using TMPro;
 
 public class UserInfo : MonoBehaviour
 {
     public static UserLite user;
     public static bool isOffline;
-    private TextMeshPro username_Text;
+    private Text username_Text;
     private Image userAvatar;
 
     private void Start()
     {
-        username_Text = GameObject.Find("Username").GetComponent<TextMeshPro>();
+        username_Text = GameObject.Find("Username").GetComponent<Text>();
         userAvatar = GameObject.Find("Avatar").GetComponent<Image>();
     }
 

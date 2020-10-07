@@ -175,13 +175,13 @@ public class SelectManager_old : MonoBehaviour
         lg.enabled = false;
     }
 
-    IEnumerator SelectDefault()
+    private async UniTask SelectDefault()
     {
         var background = GameObject.Find("KirakiraBackground").GetComponent<FixBackground>();
         var path = dataLoader.GetBackgroundPath(chartListManager.current.header.sid).Item1;
         background.UpdateBackground(path);
 
-        yield return new WaitForEndOfFrame();
+        await UniTask.DelayFrame(1);
 
         try
         {
@@ -313,7 +313,7 @@ public class SelectManager_old : MonoBehaviour
                 return;
 
             previewSound.SetVolume(i);
-            await UniTask.DelayFrame(0);
+            await UniTask.DelayFrame(1);
         }
 
         faderWorking = false;
@@ -332,7 +332,7 @@ public class SelectManager_old : MonoBehaviour
                 return;
 
             previewSound.SetVolume(i);
-            await UniTask.DelayFrame(0);
+            await UniTask.DelayFrame(1);
         }
 
         faderWorking = false;
@@ -355,7 +355,7 @@ public class SelectManager_old : MonoBehaviour
         if (Application.platform == RuntimePlatform.Android)
         {
             Screen.orientation = ScreenOrientation.Portrait;
-            await UniTask.DelayFrame(0);
+            await UniTask.DelayFrame(1);
         }
         var zip = dataLoader.BuildKiraPack(chartListManager.current.header);
         var song = dataLoader.GetMusicHeader(chartListManager.current.header.mid);
@@ -371,7 +371,7 @@ public class SelectManager_old : MonoBehaviour
         }
         else if (Application.platform == RuntimePlatform.Android)
         {
-            await UniTask.DelayFrame(0);
+            await UniTask.DelayFrame(1);
             Screen.orientation = prevOrientation;
         }
     }
