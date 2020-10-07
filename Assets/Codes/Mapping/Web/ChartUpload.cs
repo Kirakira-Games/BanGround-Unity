@@ -293,30 +293,30 @@ namespace BGEditor
             loadingBlocker.SetText("Preparing music files");
             if (!await PrepareMusic())
                 return;
-            await UniTask.DelayFrame(0);
+            await UniTask.DelayFrame(1);
 
             // Prepare chart
             loadingBlocker.SetText("Preparing chart files");
             if (!await PrepareChart())
                 return;
-            await UniTask.DelayFrame(0);
+            await UniTask.DelayFrame(1);
 
             // Calc cost
             loadingBlocker.SetText("Calculating cost...");
             allFiles = musicFiles == null ? chartFiles : musicFiles.Concat(chartFiles).ToList();
             if (!await CalcFish(allFiles))
                 return;
-            await UniTask.DelayFrame(0);
+            await UniTask.DelayFrame(1);
 
             // Upload song
             if (!await CreateMusic())
                 return;
-            await UniTask.DelayFrame(0);
+            await UniTask.DelayFrame(1);
 
             // Create chart
             if (!await CreateChart())
                 return;
-            await UniTask.DelayFrame(0);
+            await UniTask.DelayFrame(1);
 
             loadingBlocker.SetText("Wrapping it up...");
             await UniTask.Delay(5000);
@@ -338,7 +338,7 @@ namespace BGEditor
                 ret.Add(new FileInfo(name, file.ReadToEnd()));
                 loadingBlocker.SetProgress(currentCount, filesCount);
                 currentCount++;
-                await UniTask.DelayFrame(0);
+                await UniTask.DelayFrame(1);
             }
             return ret;
         }
