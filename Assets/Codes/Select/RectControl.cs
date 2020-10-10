@@ -105,7 +105,7 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         startImg.SetActive(true);
         select = true;
         img.color = SelectedColor;
-        title.color = Color.white;
+        title.color = Color.grey;
         title.fontStyle = FontStyle.Bold;
         StartCoroutine(OnSelectAnimation1());
         StartCoroutine(OnSelectAnimation2());
