@@ -314,9 +314,10 @@ namespace AudioProvider
             OnUpdate?.Invoke();
         }
 
-        float[] GetFFTData()
+        public float[] GetFFTData()
         {
             // TODO: get data with Bass.BASS_ChannelGetData
+ 
             return null;
         }
     }
