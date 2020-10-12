@@ -450,12 +450,14 @@ namespace AudioProvider
             fftDSP.getParameterData((int)DSP_FFT.SPECTRUMDATA, out IntPtr fftDataUnsafe, out uint _);
             var fftData = Marshal.PtrToStructure<DSP_PARAMETER_FFT>(fftDataUnsafe);
 
+            var cacheFft = fftData.spectrum;
+
             var combinedData = new float[fftData.length];
             for(int iChannel = 0; iChannel < fftData.numchannels; iChannel++)
             {
                 for(int i = 0; i < fftData.length; i++)
                 {
-                    combinedData[i] += fftData.spectrum[iChannel][i] / fftData.numchannels;
+                    combinedData[i] += cacheFft[iChannel][i] / fftData.numchannels;
                 }
             }
 

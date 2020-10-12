@@ -14,4 +14,6 @@ public interface IAudioManager
     UniTask<ISoundTrack> PlayLoopMusic(byte[] audio, bool needLoop = true, uint[] times = null, bool noFade = true);
     void StopBGM();
     void StopAllCoroutines();
+
+    Texture2D GetFFTTexture();
 }

@@ -318,7 +318,7 @@ namespace AudioProvider
         {
             // TODO: get data with Bass.BASS_ChannelGetData
  
-            return null;
+            return new float[0];
         }
     }
 }
