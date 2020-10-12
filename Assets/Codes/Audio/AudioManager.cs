@@ -5,6 +5,7 @@ using UnityEngine;
 using AudioProvider;
 using Cysharp.Threading.Tasks;
 using Zenject;
+using System.Linq;
 
 public class AudioManager : MonoBehaviour, IAudioManager
 {
@@ -27,6 +28,7 @@ public class AudioManager : MonoBehaviour, IAudioManager
     [Inject(Id = "snd_buffer_fmod")]
     KVar snd_buffer_fmod;
 
+    Texture2D fftTex;
 
     private void Awake()
     {
@@ -83,30 +85,50 @@ public class AudioManager : MonoBehaviour, IAudioManager
         Provider.SetSoundTrackVolume(snd_bgm_volume);
     }
 
+    float _peakValue = 0.0f;
+
     private void Update()
     {
         Provider.Update();
-/*
-#if !UNITY_EDITOR && (UNITY_ANDROID || UNITY_STANDALONE)
-        if (Input.GetKeyUp(KeyCode.Escape) && !exiting)
-        {
-            waiting += 1.5f;
+        /*
+        #if !UNITY_EDITOR && (UNITY_ANDROID || UNITY_STANDALONE)
+                if (Input.GetKeyUp(KeyCode.Escape) && !exiting)
+                {
+                    waiting += 1.5f;
 
-            if (waiting > 1.5f)
-            {
-                exiting = true;
-                SceneManager.LoadSceneAsync("GameOver", LoadSceneMode.Additive);
-            }
-            else
-            {
-                messageBannerController.ShowMsg(LogLevel.INFO, "Tap Again to End The Game");
-            }
+                    if (waiting > 1.5f)
+                    {
+                        exiting = true;
+                        SceneManager.LoadSceneAsync("GameOver", LoadSceneMode.Additive);
+                    }
+                    else
+                    {
+                        messageBannerController.ShowMsg(LogLevel.INFO, "Tap Again to End The Game");
+                    }
+                }
+
+                waiting -= Time.deltaTime;
+                if (waiting < 0) waiting = 0;
+        #endif*/
+
+        var fftData = Provider.GetFFTData();
+
+        if (fftData.Length == 0)
+            return;
+
+        // Normalize
+        _peakValue = _peakValue * 0.99f + fftData.Max() * 0.01f;
+        fftData = fftData.Select(flt => flt / _peakValue).ToArray();
+
+        if (fftTex == null)
+            fftTex = new Texture2D(fftData.Length / 2, 1, TextureFormat.RFloat, false);
+
+        for(int i = 0; i < fftData.Length / 2; i++)
+        {
+            fftTex.SetPixel(i, 1, new Color(fftData[i], 0, 0));
         }
 
-        waiting -= Time.deltaTime;
-        if (waiting < 0) waiting = 0;
-#endif*/
-
+        fftTex.Apply();
     }
 
     private void OnDestroy()
@@ -146,5 +168,10 @@ public class AudioManager : MonoBehaviour, IAudioManager
 
         soundTrack.Play();
         return soundTrack;
+    }
+
+    public Texture2D GetFFTTexture()
+    {
+        return fftTex;
     }
 }
