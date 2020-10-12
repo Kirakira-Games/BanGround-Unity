@@ -35,7 +35,7 @@ public class OffsetSettingController : MonoBehaviour
         recentQueue = new Queue<int>();
         sum = 0;
         offsetText.text = "+0";
-        offsetText.color = Color.blue;
+        offsetText.color = Color.grey;
 
         //var noteSpeed = GameObject.Find("Speed_Input").GetComponent<InputField>();
         //noteSpeed.text = string.Format("{0:f1}", r_notespeed.Get<float>());
