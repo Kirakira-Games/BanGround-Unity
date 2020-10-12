@@ -83,8 +83,9 @@ public class SceneLoader : MonoBehaviour
             if (TaskVoid != null)
                 if (!await TaskVoid()) throw new Exception();
         }
-        catch (System.Exception)
+        catch (System.Exception e)
         {
+            Debug.LogError(e.Message);
             _ = SceneManager.UnloadSceneAsync("Loader");
             Loading = false;
             onTaskFinish.Invoke(false);
