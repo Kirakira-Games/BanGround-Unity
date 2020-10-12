@@ -437,5 +437,11 @@ namespace AudioProvider
             FMODUtil.ErrCheck(fmodSystem.update());
             OnUpdate?.Invoke();
         }
+        
+        float[] GetFFTData()
+        {
+            // TODO: create FMOD_DSP_TYPE_FFT dsp, then get FMOD_DSP_FFT_SPECTRUMDATA with GetParameterData
+            return null;
+        }
     }
 }
