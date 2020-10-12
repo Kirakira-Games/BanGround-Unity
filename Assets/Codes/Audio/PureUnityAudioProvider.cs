@@ -339,5 +339,11 @@ namespace AudioProvider
         {
             
         }
+        
+        float[] GetFFTData()
+        {
+            // TODO: remove? pure unity audio provider
+            return null;
+        }
     }
 }
