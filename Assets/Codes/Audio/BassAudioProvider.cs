@@ -313,5 +313,11 @@ namespace AudioProvider
         {
             OnUpdate?.Invoke();
         }
+
+        float[] GetFFTData()
+        {
+            // TODO: get data with Bass.BASS_ChannelGetData
+            return null;
+        }
     }
 }
