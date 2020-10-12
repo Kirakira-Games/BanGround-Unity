@@ -339,8 +339,8 @@ namespace AudioProvider
         {
             
         }
-        
-        float[] GetFFTData()
+
+        public float[] GetFFTData()
         {
             // TODO: remove? pure unity audio provider
             return null;

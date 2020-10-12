@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using FMOD;
 using Cysharp.Threading.Tasks;
 using Zenject;
+using System.Collections.Generic;
 
 #pragma warning disable CS1998 // 异步方法缺少 "await" 运算符，将以同步方式运行
 
@@ -323,6 +324,7 @@ namespace AudioProvider
     class FmodAudioProvider : IAudioProvider
     {
         FMOD.System fmodSystem;
+        DSP fftDSP;
 
         internal float trackVolume = 1.0f;
         internal float[] effectVolume = { 1.0f, 1.0f };
@@ -365,6 +367,9 @@ namespace AudioProvider
 
             fmodSystem.createChannelGroup("Tracks", out FmodSoundTrack.stGroup);
             fmodSystem.createChannelGroup("SoundEffects", out FmodSoundEffect.seGroup);
+
+            fmodSystem.createDSPByType(DSP_TYPE.FFT, out fftDSP);
+            FmodSoundTrack.stGroup.addDSP(0, fftDSP);
         }
         public async UniTask<ISoundEffect> PrecacheSE(byte[] audio, SEType type)
         {
@@ -437,11 +442,24 @@ namespace AudioProvider
             FMODUtil.ErrCheck(fmodSystem.update());
             OnUpdate?.Invoke();
         }
-        
-        float[] GetFFTData()
+
+        public float[] GetFFTData()
         {
             // TODO: create FMOD_DSP_TYPE_FFT dsp, then get FMOD_DSP_FFT_SPECTRUMDATA with GetParameterData
-            return null;
+            // Done?
+            fftDSP.getParameterData((int)DSP_FFT.SPECTRUMDATA, out IntPtr fftDataUnsafe, out uint _);
+            var fftData = Marshal.PtrToStructure<DSP_PARAMETER_FFT>(fftDataUnsafe);
+
+            var combinedData = new float[fftData.length];
+            for(int iChannel = 0; iChannel < fftData.numchannels; iChannel++)
+            {
+                for(int i = 0; i < fftData.length; i++)
+                {
+                    combinedData[i] += fftData.spectrum[iChannel][i] / fftData.numchannels;
+                }
+            }
+
+            return combinedData;
         }
     }
 }
