@@ -63,5 +63,7 @@ namespace AudioProvider
 
         UniTask<ISoundEffect> PrecacheSE(byte[] audio, SEType type);
         UniTask<ISoundTrack> StreamTrack(byte[] audio);
+        
+        float[] GetFFTData();
     }
 }
