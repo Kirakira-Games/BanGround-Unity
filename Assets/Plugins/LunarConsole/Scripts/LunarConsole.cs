@@ -255,7 +255,7 @@ namespace LunarConsolePlugin
                 if (IsPlatformSupported())
                 {
                     s_instance = this;
-                    DontDestroyOnLoad(gameObject);
+                    //DontDestroyOnLoad(gameObject);
                     Log.dev("Instance created...");
                 }
                 else

@@ -41,7 +41,7 @@ public class LocalizedStrings : MonoBehaviour
         ReloadLanguageFile(cl_language);
 
         Instanse = this;
-        DontDestroyOnLoad(Instanse.gameObject);
+        //DontDestroyOnLoad(Instanse.gameObject);
     }
 
     public string GetLocalizedString(string str)
