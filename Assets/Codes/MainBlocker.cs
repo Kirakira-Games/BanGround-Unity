@@ -12,7 +12,7 @@ public class MainBlocker : MonoBehaviour
     private void Awake()
     {
         Instance = this;
-        DontDestroyOnLoad(gameObject);
+        //DontDestroyOnLoad(gameObject);
     }
 
     private void Start()

@@ -42,8 +42,6 @@ public class AppPreLoader : MonoBehaviour
             MissingMemberHandling = MissingMemberHandling.Ignore,
             NullValueHandling = NullValueHandling.Ignore
         };
-
-        SceneManager.LoadScene("Title");
     }
 
     private void InitAudioInfo()
