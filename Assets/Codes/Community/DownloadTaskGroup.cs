@@ -61,10 +61,10 @@ namespace BanGround.Community
 
         public async UniTask Start()
         {
-            var task = currentTask;
-            if (task == null)
-                return;
-            await task.Start();
+            while (currentTask != null)
+            {
+                await currentTask.Start();
+            }
         }
     }
 }
