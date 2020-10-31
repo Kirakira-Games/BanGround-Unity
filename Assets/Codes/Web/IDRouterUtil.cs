@@ -1,7 +1,4 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
-
-namespace Web
+﻿namespace BanGround.Web
 {
     public enum ChartSource
     {
@@ -55,7 +52,7 @@ namespace Web
         {
             if (source == ChartSource.None || source == ChartSource.Local)
                 return id;
-            return ((int)source << ID_BIT) | id;
+            return (int)source << ID_BIT | id;
         }
     }
 }

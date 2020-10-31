@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using System;
 using System.Linq;
 using Zenject;
-using Web;
+using BanGround.Web;
 
 namespace BGEditor
 {

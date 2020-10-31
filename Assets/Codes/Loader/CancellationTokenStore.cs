@@ -8,7 +8,7 @@ public class CancellationTokenStore : ICancellationTokenStore
     public CancellationTokenSource sceneTokenSource { get; private set; } = new CancellationTokenSource();
     public CancellationToken sceneToken => sceneTokenSource.Token;
 
-    private void OnSceneUnloaded(Scene scene)
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         sceneTokenSource.Cancel();
         sceneTokenSource.Dispose();
@@ -17,6 +17,6 @@ public class CancellationTokenStore : ICancellationTokenStore
 
     public CancellationTokenStore()
     {
-        SceneManager.sceneUnloaded += OnSceneUnloaded;
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 }

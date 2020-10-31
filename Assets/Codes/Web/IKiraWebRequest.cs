@@ -1,4 +1,4 @@
-﻿namespace Web
+﻿namespace BanGround.Web
 {
     public interface IKiraWebRequest
     {

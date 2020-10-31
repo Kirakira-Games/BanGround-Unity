@@ -1,18 +1,18 @@
 ﻿using System.Collections.Generic;
 using Zenject;
-using Web;
 using Cysharp.Threading.Tasks;
-using Web.Upload;
 using System.Linq;
 
 using System;
 using BanGround;
-using Web.Music;
 using UnityEngine;
-using Web.Chart;
-using Web.File;
 using UnityEngine.UI;
 using System.IO;
+using BanGround.Web;
+using BanGround.Web.Chart;
+using BanGround.Web.File;
+using BanGround.Web.Music;
+using BanGround.Web.Upload;
 
 namespace BGEditor
 {

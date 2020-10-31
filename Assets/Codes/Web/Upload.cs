@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
+using BanGround.Web.Auth;
 
-namespace Web.Upload
+namespace BanGround.Web.Upload
 {
     public enum UploadType
     {
@@ -25,7 +25,8 @@ namespace Web.Upload
         public static (string, UploadType) GetType(string filename)
         {
             string ext = Path.GetExtension(filename).ToLower();
-            switch (ext) {
+            switch (ext)
+            {
                 case ".ogg": return ("audio/ogg", UploadType.Music);
                 case ".png": return ("image/png", UploadType.Image);
                 case ".jpg": return ("image/jpg", UploadType.Image);
@@ -43,7 +44,7 @@ namespace Web.Upload
         public int Id;
 
         [JsonProperty("uploader")]
-        public Auth.UserLite Uploader;
+        public UserLite Uploader;
 
         [JsonProperty("size")]
         [JsonConverter(typeof(LongToStringConverter))]

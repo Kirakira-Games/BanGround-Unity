@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using BanGround.Web.Auth;
+using Newtonsoft.Json;
 using System.Collections.Generic;
-using Web.Auth;
 
-namespace Web.Music
+namespace BanGround.Web.Music
 {
     public class MusicLite
     {

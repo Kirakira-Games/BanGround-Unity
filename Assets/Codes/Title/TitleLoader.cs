@@ -4,11 +4,11 @@ using AudioProvider;
 using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
 using Zenject;
-using Web;
-using Web.Auth;
 using System;
 using BanGround;
 using System.Linq;
+using BanGround.Web;
+using BanGround.Web.Auth;
 
 public class TitleLoader : MonoBehaviour
 {

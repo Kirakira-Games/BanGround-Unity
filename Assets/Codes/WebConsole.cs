@@ -1,4 +1,5 @@
 ﻿using BanGround;
+using BanGround.Web.Auth;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -253,7 +254,7 @@ public class WebConsole : MonoBehaviour
                 using (var sr = new StreamReader(ctx.Request.InputStream))
                     dataStr = sr.ReadToEnd();
 
-                var encoded = Web.Auth.Util.EncryptPassword(dataStr);
+                var encoded = Util.EncryptPassword(dataStr);
 
                 content = Encoding.UTF8.GetBytes(encoded);
             }

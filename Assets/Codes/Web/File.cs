@@ -1,10 +1,7 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using Web.Auth;
-using Web.Music;
+﻿using BanGround.Web.Auth;
+using Newtonsoft.Json;
 
-namespace Web.File
+namespace BanGround.Web.File
 {
     public class FilenameHash
     {
