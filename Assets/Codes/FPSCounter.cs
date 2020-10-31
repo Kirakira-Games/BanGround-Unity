@@ -6,11 +6,6 @@ using Zenject;
 
 public class FPSCounter : MonoBehaviour, IFPSCounter
 {
-    [Inject]
-    private IAudioManager audioManager;
-    [Inject(Optional = true)]
-    private IAudioTimelineSync audioTimelineSync;
-
     private string extraMsg;
 
     public void AppendExtraInfo(string info)
