@@ -7,7 +7,7 @@ using System.Text;
 using Zenject;
 using UnityEngine.Events;
 
-namespace Web
+namespace BanGround.Web
 {
     using Auth;
     using WebSocketSharp;

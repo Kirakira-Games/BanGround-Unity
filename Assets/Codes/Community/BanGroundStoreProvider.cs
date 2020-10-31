@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using System.Threading;
-using Web.Music;
 using Zenject;
-using Web;
 using System.Linq;
-using Web.Chart;
-using Web.Auth;
+using BanGround.Web.Chart;
+using BanGround.Web.Auth;
+using BanGround.Web;
+using BanGround.Web.Music;
 
 namespace BanGround.Community
 {

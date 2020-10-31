@@ -2,8 +2,8 @@
 using UnityEngine.UI;
 using UnityEngine.Networking;
 using Cysharp.Threading.Tasks;
-using Web.Auth;
 using TMPro;
+using BanGround.Web.Auth;
 
 public class UserInfo : MonoBehaviour
 {

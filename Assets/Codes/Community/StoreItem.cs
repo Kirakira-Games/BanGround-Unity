@@ -5,12 +5,21 @@ using System.Threading;
 using UnityEngine.Networking;
 using System;
 using Zenject;
+using System.Collections.Generic;
+using BanGround.Web;
 
 namespace BanGround.Community
 {
     public class StoreItem : MonoBehaviour
     {
-        public IStoreController Controller;
+        [Inject]
+        private IStoreController controller;
+        [Inject]
+        private IMessageBox messageBox;
+        [Inject]
+        private IMessageCenter messageCenter;
+        [Inject]
+        private IResourceDownloadCache<Texture2D> textureCache;
 
         public Text Title;
         public Image Background;
@@ -18,18 +27,38 @@ namespace BanGround.Community
 
         public SongItem SongItem { get; private set; }
         public ChartItem ChartItem { get; private set; }
-        private CancellationTokenSource mTokenSource = new CancellationTokenSource();
 
         public void OnClick()
         {
             if (SongItem == null)
             {
-                Debug.Log(ChartItem);
+                Download().Forget();
             }
             else
             {
-                Controller.LoadCharts(SongItem, 0).Forget();
+                controller.LoadCharts(SongItem, 0).Forget();
             }
+        }
+
+        private async UniTaskVoid Download()
+        {
+            if (ChartItem == null)
+            {
+                Debug.LogError("Unable to download chart: Chart item is not specified");
+                return;
+            }
+            var song = controller.ViewStack.Peek().Song;
+            if (song == null)
+            {
+                Debug.LogError("Unable to download chart: Song item is not specified");
+                return;
+            }
+            // User confirm
+            if (!await messageBox.ShowMessage("Download Chart", $"{song.ToDisplayString()}\n{ChartItem.ToDisplayString()}"))
+            {
+                return;
+            }
+            messageCenter.Show("Download", "Go");
         }
 
         private void Start()
@@ -45,14 +74,8 @@ namespace BanGround.Community
                 return;
             try
             {
-                using (UnityWebRequest webRequest = UnityWebRequestTexture.GetTexture(url))
-                {
-                    await webRequest.SendWebRequest().WithCancellation(mTokenSource.Token);
-                    if (webRequest.isHttpError || webRequest.isNetworkError)
-                        return;
-                    var tex = ((DownloadHandlerTexture)webRequest.downloadHandler).texture;
-                    Background.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0, 0));
-                }
+                var tex = await textureCache.Fetch(url);
+                Background.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0, 0));
             }
             catch (OperationCanceledException) { }
             catch (UnityWebRequestException) { }
@@ -72,17 +95,6 @@ namespace BanGround.Community
             ChartItem = item;
             GetImage().Forget();
             Title.text = "By " + item.Uploader.Nickname;
-        }
-
-        public void Cancel()
-        {
-            mTokenSource.Cancel();
-            mTokenSource = new CancellationTokenSource();
-        }
-
-        private void OnDestroy()
-        {
-            Cancel();
         }
     }
 }

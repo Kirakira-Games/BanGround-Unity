@@ -1,12 +1,11 @@
 using AudioProvider;
 using BanGround;
 using BanGround.Community;
+using BanGround.Web;
 using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using UnityEngine.WSA;
-using Web;
 using Zenject;
 
 public class GlobalInstaller : MonoInstaller
@@ -15,6 +14,7 @@ public class GlobalInstaller : MonoInstaller
     public MessageBox messageBox;
     public FPSCounter fpsCounter;
     public LoadingBlocker loadingBlocker;
+    public MessageCenter messageCenter;
 
     private IKVSystem kvSystem;
     private IDataLoader dataLoader;
@@ -91,6 +91,9 @@ public class GlobalInstaller : MonoInstaller
 
         // Loading blocker
         Container.Bind<ILoadingBlocker>().FromInstance(loadingBlocker);
+
+        // Message center
+        Container.Bind<IMessageCenter>().FromInstance(messageCenter);
     }
 
     void RegisterKonCommands()

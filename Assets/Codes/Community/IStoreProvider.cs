@@ -1,7 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
-using Web;
 using Newtonsoft.Json;
+using BanGround.Web;
 
 namespace BanGround.Community
 {
@@ -24,6 +24,11 @@ namespace BanGround.Community
         public string Artist;
         public string BackgroundUrl;
 
+        public string ToDisplayString()
+        {
+            return $"[{Id}] {Title} - {Artist}";
+        }
+
         public override string ToString()
         {
             return JsonConvert.SerializeObject(this);
@@ -37,6 +42,11 @@ namespace BanGround.Community
         public UserItem Uploader;
         public List<int> Difficulty;
         public string BackgroundUrl;
+
+        public string ToDisplayString()
+        {
+            return $"[{Id}] Difficulties: {string.Join(",", Difficulty)} - {Uploader.Nickname} ({Uploader.Username})";
+        }
 
         public override string ToString()
         {

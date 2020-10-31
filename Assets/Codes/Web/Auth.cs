@@ -1,11 +1,9 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using Cysharp.Threading.Tasks;
 
-namespace Web.Auth
+namespace BanGround.Web.Auth
 {
     public static class Util
     {

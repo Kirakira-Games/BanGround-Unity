@@ -1,11 +1,11 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using Web.Auth;
-using Web.Music;
-using Web.File;
+using BanGround.Web.Auth;
+using BanGround.Web.File;
+using BanGround.Web.Music;
 
-namespace Web.Chart
+namespace BanGround.Web.Chart
 {
     public class ChartInfo : JsonWithTimeStamps
     {

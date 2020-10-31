@@ -1,9 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using System.Threading.Tasks;
-using UnityEngine.Networking;
-using Newtonsoft.Json;
+﻿using UnityEngine;
 using Cysharp.Threading.Tasks;
 
 public class VersionCheck

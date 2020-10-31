@@ -14,7 +14,7 @@ namespace BanGround.Community
         Chart
     }
 
-    class StoreViewState
+    public class StoreViewState
     {
         public StoreViewType Type;
         public List<StoreItem> Items = new List<StoreItem>();
@@ -26,7 +26,7 @@ namespace BanGround.Community
         public SongItem Song;
     }
 
-    class StoreStack
+    public class StoreStack
     {
         private StoreController mController;
         private readonly Stack<StoreViewState> mStack = new Stack<StoreViewState>();
@@ -83,6 +83,8 @@ namespace BanGround.Community
     {
         [Inject(Id = "BanGround")]
         private IStoreProvider store;
+        [Inject]
+        private DiContainer container;
 
         public Button BackBtn;
         public Button SearchBtn;
@@ -93,21 +95,22 @@ namespace BanGround.Community
 
         public const int LIMIT = 9;
 
-        private StoreStack mViewStack;
         private GameObject mLoadingDisplay;
+
+        public StoreStack ViewStack { get; private set; }
         public GridLayoutGroup StoreView { get; private set; }
         public bool isLoading { get; private set; }
 
         private void OnBackButtonClicked()
         {
-            mViewStack.Pop();
-            if (mViewStack.Count == 0)
+            ViewStack.Pop();
+            if (ViewStack.Count == 0)
             {
                 SceneLoader.LoadScene("Community", "Title");
             }
             else
             {
-                mViewStack.RefreshState();
+                ViewStack.RefreshState();
             }
         }
 
@@ -115,7 +118,7 @@ namespace BanGround.Community
         {
             isLoading = true;
             store.Cancel();
-            var state = mViewStack.Create(StoreViewType.Chart);
+            var state = ViewStack.Create(StoreViewType.Chart);
             state.SearchText = SearchBar.text;
             state.Title = song.Title;
             state.Song = song;
@@ -136,8 +139,7 @@ namespace BanGround.Community
                 // Create song items
                 foreach (var chart in charts)
                 {
-                    var obj = Instantiate(SongPrefab, StoreView.transform).GetComponent<StoreItem>();
-                    obj.Controller = this;
+                    var obj = container.InstantiatePrefab(SongPrefab, StoreView.transform).GetComponent<StoreItem>();
                     obj.SetItem(chart);
                     state.Items.Add(obj);
                 }
@@ -146,7 +148,7 @@ namespace BanGround.Community
 
             // Finish
             mLoadingDisplay.SetActive(false);
-            mViewStack.RefreshState();
+            ViewStack.RefreshState();
             isLoading = false;
         }
 
@@ -156,15 +158,15 @@ namespace BanGround.Community
             store.Cancel();
             if (offset == 0)
             {
-                mViewStack.Clear();
-                var state = mViewStack.Create(StoreViewType.Song);
+                ViewStack.Clear();
+                var state = ViewStack.Create(StoreViewType.Song);
                 state.SearchText = text;
                 state.Title = text.IsNullOrEmpty() ? "Community" : $"Search: {text}";
-                mViewStack.RefreshState();
+                ViewStack.RefreshState();
             }
             try
             {
-                var state = mViewStack.Peek();
+                var state = ViewStack.Peek();
                 state.Offset = offset;
                 // Display loading
                 mLoadingDisplay.transform.SetAsLastSibling();
@@ -177,8 +179,7 @@ namespace BanGround.Community
                 // Create song items
                 foreach (var song in songs)
                 {
-                    var obj = Instantiate(SongPrefab, StoreView.transform).GetComponent<StoreItem>();
-                    obj.Controller = this;
+                    var obj = container.InstantiatePrefab(SongPrefab, StoreView.transform).GetComponent<StoreItem>();
                     obj.SetItem(song);
                     state.Items.Add(obj);
                 }
@@ -190,7 +191,7 @@ namespace BanGround.Community
 
         void Start()
         {
-            mViewStack = new StoreStack(this);
+            ViewStack = new StoreStack(this);
 
             // Get loading display
             StoreView = StoreRect.viewport.GetComponentInChildren<GridLayoutGroup>();
@@ -207,7 +208,7 @@ namespace BanGround.Community
 
         private void Update()
         {
-            var state = mViewStack.Peek();
+            var state = ViewStack.Peek();
             if (state == null)
             {
                 return;
