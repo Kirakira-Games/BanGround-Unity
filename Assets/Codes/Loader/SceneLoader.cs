@@ -81,7 +81,7 @@ public class SceneLoader : MonoBehaviour
         try
         {
             if (TaskVoid != null)
-                if (!await TaskVoid()) throw new Exception();
+                if (!await TaskVoid()) throw new Exception("Loader task failed.");
         }
         catch (System.Exception e)
         {
