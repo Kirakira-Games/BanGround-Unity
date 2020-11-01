@@ -43,7 +43,7 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     public Color SelectedColor = Color.white;
     public Color DisabledColor = Color.clear;
 
-    public static Color UnselectColor = new Color(0.74f, 0.74f, 0.74f, 0.74f);
+    public static Color UnselectColor = new Color(0.4f, 0.4f, 0.4f, 1f);
 
     bool select = false;
 
@@ -105,7 +105,7 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         startImg.SetActive(true);
         select = true;
         img.color = SelectedColor;
-        title.color = Color.grey;
+        title.color = Color.white;
         title.fontStyle = FontStyle.Bold;
         StartCoroutine(OnSelectAnimation1());
         StartCoroutine(OnSelectAnimation2());
