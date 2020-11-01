@@ -18,10 +18,10 @@ namespace BanGround.Web
         private ICancellationTokenStore cancellationTokenStore;
 
         /// <summary>
-        /// Fetch from cache or create a new <see cref="UnityWebRequest"/>
+        /// Fetch texture from cache or create a new <see cref="UnityWebRequest"/>
         /// </summary>
-        /// <param name="request">Instance of the UnityWebRequest.</param>
-        /// <returns></returns>
+        /// <param name="url">Url to download from.</param>
+        /// <returns>Texture2D</returns>
         public async UniTask<Texture2D> Fetch(string url)
         {
             UnityWebRequest request = null;
