@@ -19,6 +19,6 @@ class AudioVisualization : MonoBehaviour
         image = GetComponent<Image>();
 
         var tex = am.GetFFTTexture();
-        image.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, 1), new Vector2(0.5f, 0.5f));
+        image.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, 1), new Vector2(1f, 1f));
     }
 }
