@@ -3,10 +3,11 @@ using System.Collections;
 using UnityEngine.Events;
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
+using System;
 
 namespace BanGround.Community
 {
-    public class DownloadTaskGroup : IDownloadTask
+    public class DownloadTaskGroup : DownloadTaskBase, IDownloadTask
     {
         public List<IDownloadTask> Tasks { get; private set; } = new List<IDownloadTask>();
         /// <summary>
@@ -15,17 +16,9 @@ namespace BanGround.Community
         public int TIndex { get; private set; } = 0;
         public IDownloadTask currentTask => TIndex >= Tasks.Count ? null : Tasks[TIndex];
 
-        public string Key { get; private set; }
-
-        public float Progress => (float)(TIndex + (currentTask?.Progress ?? 1f)) / Tasks.Count;
-
-        public string Description => currentTask?.Description ?? "Done.";
-
-        public DownloadState State => currentTask?.State ?? DownloadState.Finished;
-
-        public UnityEvent OnCancel { get; private set; } = new UnityEvent();
-
-        public UnityEvent OnFinish { get; private set; } = new UnityEvent();
+        public override float Progress => (float)(TIndex + (currentTask?.Progress ?? 1f)) / Tasks.Count;
+        public override string Description => currentTask?.Description ?? "Done.";
+        public override DownloadState State => currentTask?.State ?? DownloadState.Finished;
 
         public DownloadTaskGroup(string key)
         {
@@ -45,21 +38,18 @@ namespace BanGround.Community
             task.OnFinish.AddListener(() =>
             {
                 TIndex++;
-                var curTask = currentTask;
-                if (curTask == null)
+                if (currentTask == null)
                     OnFinish.Invoke();
-                else
-                    curTask.Start();
             });
             Tasks.Add(task);
         }
 
-        public void Cancel()
+        public override void Cancel()
         {
             currentTask?.Cancel();
         }
 
-        public async UniTask Start()
+        public override async UniTask Start()
         {
             while (currentTask != null)
             {

@@ -8,11 +8,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Unity.Networking;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace BanGround.Community
 {
-    class BackgroundDownloadTask : IDownloadTask
+    class BackgroundDownloadTask : DownloadTaskBase, IDownloadTask
     {
         const string DOWNLOAD_CACHE_FOLDER = "download_cache/";
 
@@ -24,9 +23,8 @@ namespace BanGround.Community
         private string _dlPath = null;
         private string _targetPath = null;
 
-        public string Key { get; private set; }
-
-        public float Progress { 
+        public override float Progress
+        { 
             get
             {
                 if (_bgDL == null)
@@ -36,7 +34,7 @@ namespace BanGround.Community
             }
         }
 
-        public string Description
+        public override string Description
         {
             get
             {
@@ -56,7 +54,7 @@ namespace BanGround.Community
             }
         }
 
-        public DownloadState State
+        public override DownloadState State
         {
             get
             {
@@ -75,9 +73,6 @@ namespace BanGround.Community
             }
         }
 
-        public UnityEvent OnCancel { get; private set; } = new UnityEvent();
-
-        public UnityEvent OnFinish { get; private set; } = new UnityEvent();
         /// <summary>
         /// Create a background download task
         /// </summary>
@@ -94,7 +89,7 @@ namespace BanGround.Community
             Key = address;
         }
 
-        public void Cancel()
+        public override void Cancel()
         {
             if (_bgDL == null)
                 throw new Exception("Download not started!");
@@ -102,7 +97,7 @@ namespace BanGround.Community
             _cancellationToken.Cancel();
         }
 
-        public async UniTask Start()
+        public override async UniTask Start()
         {
             if (_bgDL != null)
                 throw new Exception("Download already started!");

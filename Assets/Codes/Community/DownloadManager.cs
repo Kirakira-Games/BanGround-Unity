@@ -6,6 +6,7 @@ using UnityEngine.Events;
 
 namespace BanGround.Community
 {
+    public class DownloadTaskEvent : UnityEvent<IDownloadTask> { }
     public enum DownloadState
     {
         Stopped,
@@ -16,9 +17,21 @@ namespace BanGround.Community
     public interface IDownloadTask
     {
         /// <summary>
+        /// Image of the task. Nullable.
+        /// </summary>
+        Texture2D Image { get; }
+        IDownloadTask SetImage(Texture2D texture);
+
+        /// <summary>
         /// Unique key for each download task to avoid duplicates
         /// </summary>
         string Key { get; }
+
+        /// <summary>
+        /// User readable name of the download task.
+        /// </summary>
+        string Name { get; }
+        IDownloadTask SetName(string name);
 
         /// <summary>
         /// Progress (between 0 and 1)
@@ -37,9 +50,10 @@ namespace BanGround.Community
         UnityEvent OnCancel { get; }
         UnityEvent OnFinish { get; }
     }
-    public class DownloadManager
+    public class DownloadManager : IDownloadManager
     {
         public List<IDownloadTask> Tasks { get; private set; } = new List<IDownloadTask>();
+        public DownloadTaskEvent onAddTask { get; private set; } = new DownloadTaskEvent();
 
         public bool AddTask(IDownloadTask task)
         {
@@ -48,6 +62,7 @@ namespace BanGround.Community
             Tasks.Add(task);
             task.OnFinish.AddListener(() => Tasks.Remove(task));
             task.OnCancel.AddListener(() => Tasks.Remove(task));
+            onAddTask.Invoke(task);
             task.Start();
             return true;
         }
