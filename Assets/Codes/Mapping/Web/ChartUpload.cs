@@ -278,6 +278,10 @@ namespace BGEditor
                     Hash = x.Info.Hash
                 }).ToList()
             }).Send();
+            // Update chart version
+            loadingBlocker.SetText("Updating chart version...");
+            chartHeader.version = (await web.GetChartById(chartId).Fetch()).Version;
+            dataLoader.SaveHeader(chartHeader);
             return true;
         }
 

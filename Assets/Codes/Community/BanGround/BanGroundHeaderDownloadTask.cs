@@ -88,7 +88,7 @@ namespace BanGround.Community
             }
             var cHeader = new cHeader
             {
-                version = 1, // TODO: version should be uploaded together with the chart
+                version = chart.Version,
                 sid = id,
                 mid = IDRouterUtil.ToFileId(ChartSource.BanGround, chart.Music.Id),
                 author = chart.Uploader.Username,
