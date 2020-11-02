@@ -23,7 +23,7 @@ namespace BanGround.Community
 
         private void AddTask(IDownloadTask task)
         {
-            var item = Instantiate(DownloadListItemPrefab, Content.transform).GetComponentInChildren<DownloadListItem>();
+            var item = Instantiate(DownloadListItemPrefab, Content.transform).GetComponent<DownloadListItem>();
             item.SetDownloadTask(task);
             mChildren.Add(item);
         }
@@ -43,7 +43,7 @@ namespace BanGround.Community
 
         private void Update()
         {
-            mChildren = mChildren.Where(child => child.gameObject != null).ToList();
+            mChildren = mChildren.Where(child => child != null).ToList();
             NumberOfTaskText.text = mChildren.Where(child =>
                 child.DownloadTask.State == DownloadState.Downloading ||
                 child.DownloadTask.State == DownloadState.Preparing

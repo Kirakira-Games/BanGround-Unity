@@ -5,6 +5,7 @@ using BanGround.Web.Music;
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using System.Threading;
+using UnityEngine;
 using UnityEngine.Networking;
 
 namespace BanGround.Community
@@ -15,7 +16,7 @@ namespace BanGround.Community
         private IDataLoader dataLoader;
         private CancellationTokenSource cancellationToken = new CancellationTokenSource();
         private UnityWebRequest req;
-        public List<FileDownloadInfo> resources { get; set; } = new List<FileDownloadInfo>();
+        public string BackGround;
 
         public int Id { get; private set; }
         /// <summary>
@@ -77,15 +78,6 @@ namespace BanGround.Community
             req = builder.webRequest;
             var chart = await task;
             var id = IDRouterUtil.ToFileId(ChartSource.BanGround, Id);
-            string backgroundFile = null;
-            if (!string.IsNullOrEmpty(chart.Background))
-            {
-                var file = resources.Find(f => f.File.Hash.ToUpper() == chart.Background);
-                if (file != null)
-                {
-                    backgroundFile = file.Name;
-                }
-            }
             var cHeader = new cHeader
             {
                 version = chart.Version,
@@ -95,7 +87,7 @@ namespace BanGround.Community
                 authorNick = chart.Uploader.Nickname,
                 backgroundFile = new BackgroundFile
                 {
-                    pic = backgroundFile
+                    pic = BackGround
                 },
                 preview = chart.Preview.ToArray(),
                 tag = chart.Tags

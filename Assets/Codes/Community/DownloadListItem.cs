@@ -1,10 +1,8 @@
-﻿using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 namespace BanGround.Community
 {
-    [RequireComponent(typeof(ProgressBar))]
     public class DownloadListItem : MonoBehaviour
     {
         private static readonly Color SUCCESS_COLOR = new Color(0, 1, 0, .5f);
@@ -14,17 +12,13 @@ namespace BanGround.Community
         public Text Progress;
         public Image DownloadImage;
         public Button RemoveButton;
-        private ProgressBar Bar;
+        public ProgressBar Bar;
+        private bool hasCreatedImage = false;
 
         public void SetDownloadTask(IDownloadTask task)
         {
+            RemoveButton.interactable = false;
             DownloadTask = task;
-            SongName.text = DownloadTask.Name;
-            if (task.Image != null)
-            {
-                var tex = task.Image;
-                DownloadImage.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0, 0));
-            }
             task.OnFinish.AddListener(() =>
             {
                 Progress.text = "Done";
@@ -43,12 +37,6 @@ namespace BanGround.Community
             });
         }
 
-        private void Start()
-        {
-            Bar = GetComponent<ProgressBar>();
-            RemoveButton.interactable = false;
-        }
-
         private void OnRemove()
         {
             Destroy(gameObject);
@@ -58,6 +46,13 @@ namespace BanGround.Community
         {
             if (DownloadTask == null || DownloadTask.State != DownloadState.Downloading)
                 return;
+            SongName.text = DownloadTask.Name;
+            if (DownloadTask.Image != null && !hasCreatedImage)
+            {
+                var tex = DownloadTask.Image;
+                DownloadImage.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0, 0));
+                hasCreatedImage = true;
+            }
             Progress.text = DownloadTask.Progress.ToString("P2");
             Bar.Progress = DownloadTask.Progress;
         }

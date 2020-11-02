@@ -97,15 +97,32 @@ namespace BanGround.Community
             }
 
             // Download chart
+            int sid = IDRouterUtil.ToFileId(ChartSource.BanGround, chart.Id);
             var resources = await web.GetChartResources(chart.Id).Fetch();
             ResourceSanityCheck(resources);
+
+            // Download background
+            string backgroundUrl = string.IsNullOrEmpty(chart.BackgroundUrl) ? song.BackgroundUrl : chart.BackgroundUrl;
+            string backgroundFileName = null;
+            if (backgroundUrl != null) {
+                backgroundFileName = "bg.jpg";
+                var alreadyInList = resources.Find(file => file.File.Url == backgroundUrl);
+                if (alreadyInList == null)
+                {
+                    task.AddTask(new WebClientDownloadTask(backgroundUrl, dataLoader.GetChartResource(sid, backgroundFileName), fs));
+                }
+                else
+                {
+                    backgroundFileName = alreadyInList.Name;
+                }
+            }
+
             // Download chart header
             task.AddTask(new BanGroundHeaderDownloadTask(web, dataLoader, chart.Id, true)
             {
-                resources = resources
+                BackGround = backgroundFileName
             });
             // Download chart resources
-            int sid = IDRouterUtil.ToFileId(ChartSource.BanGround, chart.Id);
             foreach (var file in resources)
             {
                 string url = file.File.Url;

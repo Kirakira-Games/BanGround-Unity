@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 7579663975510408287}
   - component: {fileID: 2215994749241761903}
   - component: {fileID: 981841226681166545}
-  - component: {fileID: 985113861124616678}
   m_Layer: 5
   m_Name: DownloadScrollbar
   m_TagString: Untagged
@@ -91,22 +90,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ProgressImage: {fileID: 5068920605453878302}
---- !u!114 &985113861124616678
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1528071425987655325}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5821ab6907003d24b9f5e1cff40c2d06, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SongName: {fileID: 4232364704047705508}
-  Progress: {fileID: 863681912732555350}
-  DownloadImage: {fileID: 5693544488610992261}
-  RemoveButton: {fileID: 5238881590598195825}
 --- !u!1 &4431979233743636870
 GameObject:
   m_ObjectHideFlags: 0
@@ -118,6 +101,7 @@ GameObject:
   - component: {fileID: 2383155935861824349}
   - component: {fileID: 5203132379702027117}
   - component: {fileID: 5693544488610992261}
+  - component: {fileID: 5035900879900222455}
   m_Layer: 5
   m_Name: DownloadListItem
   m_TagString: Untagged
@@ -185,6 +169,23 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &5035900879900222455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4431979233743636870}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5821ab6907003d24b9f5e1cff40c2d06, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SongName: {fileID: 4232364704047705508}
+  Progress: {fileID: 863681912732555350}
+  DownloadImage: {fileID: 5693544488610992261}
+  RemoveButton: {fileID: 5238881590598195825}
+  Bar: {fileID: 981841226681166545}
 --- !u!1 &5776631033139144652
 GameObject:
   m_ObjectHideFlags: 0
