@@ -82,7 +82,7 @@ namespace BanGround.Community
     public class StoreController : MonoBehaviour, IStoreController
     {
         [Inject(Id = "BanGround")]
-        private IStoreProvider store;
+        private IStoreProvider bgStore;
         [Inject]
         private DiContainer container;
 
@@ -101,6 +101,8 @@ namespace BanGround.Community
         public GridLayoutGroup StoreView { get; private set; }
         public bool isLoading { get; private set; }
 
+        public IStoreProvider StoreProvider => bgStore;
+
         private void OnBackButtonClicked()
         {
             ViewStack.Pop();
@@ -117,7 +119,7 @@ namespace BanGround.Community
         public async UniTaskVoid LoadCharts(SongItem song, int offset)
         {
             isLoading = true;
-            store.Cancel();
+            StoreProvider.Cancel();
             var state = ViewStack.Create(StoreViewType.Chart);
             state.SearchText = SearchBar.text;
             state.Title = song.Title;
@@ -129,7 +131,7 @@ namespace BanGround.Community
 
             try
             {
-                var charts = await store.GetCharts(song.Id, offset, LIMIT);
+                var charts = await StoreProvider.GetCharts(song.Id, offset, LIMIT);
 
                 // Handle infinite scroll
                 if (charts.Count < LIMIT)
@@ -155,7 +157,7 @@ namespace BanGround.Community
         public async UniTaskVoid Search(string text, int offset = 0)
         {
             isLoading = true;
-            store.Cancel();
+            StoreProvider.Cancel();
             if (offset == 0)
             {
                 ViewStack.Clear();
@@ -171,7 +173,7 @@ namespace BanGround.Community
                 // Display loading
                 mLoadingDisplay.transform.SetAsLastSibling();
                 mLoadingDisplay.SetActive(true);
-                var songs = await store.Search(text, offset, LIMIT);
+                var songs = await StoreProvider.Search(text, offset, LIMIT);
                 // Handle infinite scroll
                 if (songs.Count < LIMIT)
                     state.HasMorePages = false;
@@ -226,7 +228,7 @@ namespace BanGround.Community
 
         private void OnDestroy()
         {
-            store.Cancel();
+            StoreProvider.Cancel();
         }
     }
 }

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading;
+using UnityEngine;
 
 namespace BanGround.Community
 {
@@ -23,7 +24,7 @@ namespace BanGround.Community
         public override DownloadState State { get; protected set; } = DownloadState.Preparing;
 
         /// <summary>
-        /// Create a background download task
+        /// Create a web client download task
         /// </summary>
         /// <param name="address">Download address (url)</param>
         /// <param name="target">File path after downloaded (in fs)</param>

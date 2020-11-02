@@ -14,7 +14,7 @@ public class ChartVersion : IChartVersion
     [Inject]
     private IMessageBox messageBox;
 
-    const int VERSION = 2;
+    public const int VERSION = 2;
 
     public bool CanRead(int version)
     {

@@ -10,7 +10,7 @@ namespace BanGround.Community
     {
         public Texture2D Image { get; protected set; }
         public string Key { get; protected set; }
-        public string Name { get; protected set; }
+        public string Name { get; protected set; } = "Task";
         public virtual float Progress
         {
             get => throw new NotImplementedException();
