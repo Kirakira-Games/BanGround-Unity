@@ -125,7 +125,7 @@ namespace BGEditor
         {
             lane = -1;
             beat = new int[3];
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, pos, Core.cam, out var point);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, pos, null, out var point);
 
             // Compute beat
             float actualY = point.y + Editor.scrollPos - VPadding;
