@@ -12,6 +12,9 @@ namespace BanGround.Web.Chart
         [JsonProperty("id")]
         public int Id;
 
+        [JsonProperty("version")]
+        public int Version;
+
         [JsonProperty("uploader")]
         public UserLite Uploader;
 
