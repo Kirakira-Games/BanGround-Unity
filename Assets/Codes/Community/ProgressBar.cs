@@ -12,7 +12,7 @@ namespace BanGround.Community
             set
             {
                 mProgress = value;
-                ProgressImage.transform.localScale.Set(value, 1, 1);
+                ProgressImage.transform.localScale = new Vector3(value, 1, 1);
             }
         }
 

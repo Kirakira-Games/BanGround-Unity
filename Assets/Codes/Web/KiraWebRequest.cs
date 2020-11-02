@@ -80,7 +80,7 @@ namespace BanGround.Web
 #if false
         // Use local server
         public string ServerAddr => "http://localhost:8080/api/";
-#elif UNITY_EDITOR
+#elif UNITY_EDITOR || true
         public string ServerAddr => "https://beijing.aliyun.reikohaku.fun/api/";
 #else
         public string ServerAddr => "https://banground.live/api/";
