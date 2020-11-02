@@ -54,6 +54,7 @@ namespace BanGround.Community
 
             State = DownloadState.Downloading;
             Description = "Downloading";
+            Debug.Log("Download: " + _dlAddr);
 
             var bytes = await webClient.DownloadDataTaskAsync(new Uri(_dlAddr)).AsUniTask().WithCancellation(_cancellationToken.Token);
 

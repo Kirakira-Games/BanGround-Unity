@@ -9,6 +9,7 @@ using BanGround.Web.Auth;
 using BanGround.Web;
 using BanGround.Web.Music;
 using System;
+using BanGround.Web.File;
 
 namespace BanGround.Community
 {
@@ -67,6 +68,17 @@ namespace BanGround.Community
             };
         }
 
+        private void ResourceSanityCheck(List<FileDownloadInfo> resources)
+        {
+            foreach (var file in resources)
+            {
+                if (file.File.Url.StartsWith("/"))
+                {
+                    file.File.Url = web.ServerAddr.Replace("/api/", "") + file.File.Url;
+                }
+            }
+        }
+
         public async UniTask<IDownloadTask> AddToDownloadList(SongItem song, ChartItem chart)
         {
             Debug.Assert(chart.Source == ChartSource.BanGround);
@@ -76,6 +88,7 @@ namespace BanGround.Community
             task.AddTask(new BanGroundHeaderDownloadTask(web, dataLoader, song.Id, false));
             // Download music resources
             var songResources = await web.GetMusicResources(song.Id).Fetch();
+            ResourceSanityCheck(songResources);
             int mid = IDRouterUtil.ToFileId(ChartSource.BanGround, song.Id);
             Debug.Assert(songResources.Count == 1);
             foreach (var file in songResources)
@@ -85,6 +98,7 @@ namespace BanGround.Community
 
             // Download chart
             var resources = await web.GetChartResources(chart.Id).Fetch();
+            ResourceSanityCheck(resources);
             // Download chart header
             task.AddTask(new BanGroundHeaderDownloadTask(web, dataLoader, chart.Id, true)
             {
@@ -94,7 +108,12 @@ namespace BanGround.Community
             int sid = IDRouterUtil.ToFileId(ChartSource.BanGround, chart.Id);
             foreach (var file in resources)
             {
-                task.AddTask(new WebClientDownloadTask(file.File.Url, dataLoader.GetChartResource(sid, file.Name), fs));
+                string url = file.File.Url;
+                if (url.StartsWith("/"))
+                {
+                    url = web.ServerAddr + url.Substring(1);
+                }
+                task.AddTask(new WebClientDownloadTask(url, dataLoader.GetChartResource(sid, file.Name), fs));
             }
             
             // Finalize

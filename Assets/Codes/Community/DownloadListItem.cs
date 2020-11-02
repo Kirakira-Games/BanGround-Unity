@@ -25,18 +25,20 @@ namespace BanGround.Community
                 var tex = task.Image;
                 DownloadImage.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0, 0));
             }
-            task.OnCancel.AddListener(() =>
+            task.OnFinish.AddListener(() =>
             {
                 Progress.text = "Done";
                 Bar.Progress = 1;
                 Bar.SetColor(SUCCESS_COLOR);
+                RemoveButton.interactable = true;
                 RemoveButton.onClick.AddListener(OnRemove);
             });
-            task.OnFinish.AddListener(() =>
+            task.OnCancel.AddListener(() =>
             {
                 Progress.text = "Failed";
-                Bar.Progress = 0;
+                Bar.Progress = 1;
                 Bar.SetColor(FAILURE_COLOR);
+                RemoveButton.interactable = true;
                 RemoveButton.onClick.AddListener(OnRemove);
             });
         }
