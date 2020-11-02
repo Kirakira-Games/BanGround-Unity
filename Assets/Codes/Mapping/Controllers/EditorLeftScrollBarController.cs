@@ -33,8 +33,9 @@ namespace BGEditor
 
         private void Seek(Vector2 pos)
         {
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, pos, Core.cam, out var point);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, pos, null, out var point);
             float x = Mathf.InverseLerp(PaddingBottom, rectTransform.rect.height - PaddingTop, point.y);
+            //Debug.Log($"pos = {pos}, point = {point}, x = {x}, [{PaddingBottom},{rectTransform.rect.height - PaddingTop}], maxheight = {Editor.maxHeight}");
             Core.SeekGrid(Mathf.Lerp(0, Editor.maxHeight, x));
         }
 
