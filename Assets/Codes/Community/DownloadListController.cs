@@ -6,10 +6,11 @@ using Zenject;
 
 namespace BanGround.Community
 {
+    [RequireComponent(typeof(Button))]
     public class DownloadListController : MonoBehaviour
     {
+        public GameObject DownloadList;
         public Text NumberOfTaskText;
-        public Button DownloadViewButton;
         public Button BackButton;
         public VerticalLayoutGroup Content;
         public GameObject DownloadListItemPrefab;
@@ -29,21 +30,24 @@ namespace BanGround.Community
 
         private void Start()
         {
-            DownloadViewButton.onClick.AddListener(() =>
+            GetComponent<Button>().onClick.AddListener(() =>
             {
-                gameObject.SetActive(true);
+                DownloadList.SetActive(true);
             });
             BackButton.onClick.AddListener(() =>
             {
-                gameObject.SetActive(false);
+                DownloadList.SetActive(false);
             });
             downloadManager.onAddTask.AddListener(AddTask);
-            gameObject.SetActive(false);
         }
 
         private void Update()
         {
             mChildren = mChildren.Where(child => child.gameObject != null).ToList();
+            NumberOfTaskText.text = mChildren.Where(child =>
+                child.DownloadTask.State == DownloadState.Downloading ||
+                child.DownloadTask.State == DownloadState.Preparing
+            ).Count().ToString();
             OverallDownloadProgressBar.Progress = 0;
             foreach (var child in mChildren)
             {

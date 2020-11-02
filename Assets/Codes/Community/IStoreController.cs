@@ -5,6 +5,7 @@ namespace BanGround.Community
     public interface IStoreController
     {
         StoreStack ViewStack { get; }
+        IStoreProvider StoreProvider { get; }
         UniTaskVoid LoadCharts(SongItem song, int offset);
         UniTaskVoid Search(string text, int offset = 0);
     }

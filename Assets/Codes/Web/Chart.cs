@@ -24,6 +24,9 @@ namespace BanGround.Web.Chart
         [JsonProperty("difficulty")]
         public List<int> Difficulty = new List<int>();
 
+        [JsonProperty("preview")]
+        public List<float> Preview = new List<float>();
+
         [JsonProperty("description")]
         public string Description;
 

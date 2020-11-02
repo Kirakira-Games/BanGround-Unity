@@ -58,7 +58,7 @@ namespace BanGround.Community
     {
         UniTask<List<SongItem>> Search(string keyword, int offset, int limit);
         UniTask<List<ChartItem>> GetCharts(int mid, int offset, int limit);
-        UniTask<bool> AddToDownloadList(ChartItem item);
+        UniTask<IDownloadTask> AddToDownloadList(SongItem song, ChartItem chart);
         void Cancel();
     }
 }

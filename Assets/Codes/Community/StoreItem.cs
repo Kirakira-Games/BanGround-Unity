@@ -15,11 +15,15 @@ namespace BanGround.Community
         [Inject]
         private IStoreController controller;
         [Inject]
+        private IMessageBannerController messageBanner;
+        [Inject]
         private IMessageBox messageBox;
         [Inject]
         private IMessageCenter messageCenter;
         [Inject]
         private IResourceDownloadCache<Texture2D> textureCache;
+        [Inject]
+        private ILoadingBlocker loadingBlocker;
 
         public Text Title;
         public Image Background;
@@ -58,7 +62,21 @@ namespace BanGround.Community
             {
                 return;
             }
-            messageCenter.Show("Download", "Go");
+            // Start download
+            loadingBlocker.Show("Creating download task...");
+            try
+            {
+                var task = await controller.StoreProvider.AddToDownloadList(song, ChartItem);
+                task.SetImage(Background.sprite.texture)
+                    .SetName($"{song.Title} ({ChartItem.Uploader.Nickname})");
+                messageCenter.Show("Download", "Go");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e.Message + "\n" + e.StackTrace);
+                messageBanner.ShowMsg(LogLevel.ERROR, e.Message);
+            }
+            loadingBlocker.Close();
         }
 
         private void Start()

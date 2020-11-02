@@ -1,4 +1,5 @@
 ﻿using BanGround.Web.Auth;
+using BanGround.Web.File;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
@@ -136,6 +137,11 @@ namespace BanGround.Web.Music
         public static KiraWebRequest.Builder<SongListResponse> SearchForSong(this IKiraWebRequest web, string keyword, int offset = 0, int limit = 20)
         {
             return web.New<SongListResponse>().Get($"music/search?offset={offset}&limit={limit}&keyword={keyword}");
+        }
+
+        public static KiraWebRequest.Builder<List<FileDownloadInfo>> GetMusicResources(this IKiraWebRequest web, int id)
+        {
+            return web.New<List<FileDownloadInfo>>().Get($"music/{id}/resources");
         }
     }
 }

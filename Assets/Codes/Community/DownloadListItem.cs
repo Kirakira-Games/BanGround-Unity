@@ -20,8 +20,11 @@ namespace BanGround.Community
         {
             DownloadTask = task;
             SongName.text = DownloadTask.Name;
-            var tex = task.Image;
-            DownloadImage.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0, 0));
+            if (task.Image != null)
+            {
+                var tex = task.Image;
+                DownloadImage.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0, 0));
+            }
             task.OnCancel.AddListener(() =>
             {
                 Progress.text = "Done";
