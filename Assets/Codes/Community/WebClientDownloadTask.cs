@@ -1,19 +1,13 @@
 ﻿using Cysharp.Threading.Tasks;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using Unity.Networking;
-using UnityEngine;
-using UnityEngine.Events;
 
 namespace BanGround.Community
 {
-    class WebClientDownloadTask : IDownloadTask
+    class WebClientDownloadTask : DownloadTaskBase, IDownloadTask
     {
         private IFileSystem fs;
         private string _dlAddr;
@@ -22,17 +16,11 @@ namespace BanGround.Community
         private WebClient webClient;
         private CancellationTokenSource _cancellationToken = new CancellationTokenSource();
 
-        public string Key { get; private set; }
+        public override float Progress { get; protected set; } = 0.0f;
 
-        public float Progress { get; private set; } = 0.0f;
+        public override string Description { get; protected set; } = "Preparing";
 
-        public string Description { get; private set; } = "Preparing";
-
-        public DownloadState State { get; private set; } = DownloadState.Preparing;
-
-        public UnityEvent OnCancel { get; private set; } = new UnityEvent();
-
-        public UnityEvent OnFinish { get; private set; } = new UnityEvent();
+        public override DownloadState State { get; protected set; } = DownloadState.Preparing;
 
         /// <summary>
         /// Create a background download task
@@ -50,7 +38,7 @@ namespace BanGround.Community
         }
 
 
-        public void Cancel()
+        public override void Cancel()
         {
             if (webClient == null)
                 throw new Exception("Download not started!");
@@ -58,7 +46,7 @@ namespace BanGround.Community
             _cancellationToken.Cancel();
         }
 
-        public async UniTask Start()
+        public override async UniTask Start()
         {
             webClient = new WebClient();
             webClient.DownloadProgressChanged += WebClient_DownloadProgressChanged;

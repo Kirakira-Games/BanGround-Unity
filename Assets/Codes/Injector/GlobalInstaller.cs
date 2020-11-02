@@ -94,6 +94,9 @@ public class GlobalInstaller : MonoInstaller
 
         // Message center
         Container.Bind<IMessageCenter>().FromInstance(messageCenter);
+
+        // Download manager
+        Container.Bind<IDownloadManager>().To<DownloadManager>().AsSingle().NonLazy();
     }
 
     void RegisterKonCommands()
