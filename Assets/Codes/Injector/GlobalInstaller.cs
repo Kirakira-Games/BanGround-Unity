@@ -40,6 +40,7 @@ public class GlobalInstaller : MonoInstaller
             if (obj is ValidationMarker) return;
             dataLoader = obj as IDataLoader;
             dataLoader.InitFileSystem();
+            dataLoader.Init().Forget();
             DataLoader.Instance = dataLoader; // TODO: Remove
             new GameObject("AppPreloader").AddComponent<AppPreLoader>();
         }).NonLazy();

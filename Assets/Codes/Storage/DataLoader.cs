@@ -170,7 +170,7 @@ public class DataLoader : IDataLoader
         {
             Debug.Log("Load initial charts...");
             await CopyFileFromStreamingAssetsToPersistentDataPath("/Initial.kirapack");
-            LoadKiraPack(new FileInfo(Application.persistentDataPath + "/Initial.kirapack"));
+            //LoadKiraPack(new FileInfo(Application.persistentDataPath + "/Initial.kirapack"));
             PlayerPrefs.SetInt("InitialChartVersion", InitialChartVersion);
         }
 
@@ -231,8 +231,8 @@ public class DataLoader : IDataLoader
 
         fs.Init();
 
-        fs.AddSearchPath(DataDir);
-        fs.AddSearchPath(FSDir);
+        fs.AddSearchPath(DataDir, false);
+        fs.AddSearchPath(FSDir, false);
 
         // Sanity check to fix common fs issues
         SanityCheck();
