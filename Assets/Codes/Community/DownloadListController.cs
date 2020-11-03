@@ -38,7 +38,15 @@ namespace BanGround.Community
             {
                 DownloadList.SetActive(false);
             });
+            // Initialize existing tasks
+            downloadManager.Tasks.ForEach(AddTask);
+
             downloadManager.onAddTask.AddListener(AddTask);
+        }
+
+        private void OnDestroy()
+        {
+            downloadManager.onAddTask.RemoveListener(AddTask);
         }
 
         private void Update()
