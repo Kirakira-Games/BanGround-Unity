@@ -27,7 +27,6 @@ public class DataLoader : IDataLoader
     private static readonly string FSDir = DataDir + "filesystem/";
     private static readonly string FSIndex = DataDir + "filesystem/fsindex.bin";
     public static readonly string InboxDir = Application.persistentDataPath + "/Inbox/";
-    private static readonly string SongListPath = DataDir + "songlist.bin";
     public static readonly string ScoresPath = Application.persistentDataPath + "/Scores.bin";
     public int LastImportedSid { get; set; } = -1;
 
@@ -166,7 +165,8 @@ public class DataLoader : IDataLoader
         }
 
         // Check first launch after updating initial charts
-        if (!File.Exists(SongListPath) || PlayerPrefs.GetInt("InitialChartVersion") != InitialChartVersion)
+        RefreshSongList();
+        if (chartList.Count == 0 || PlayerPrefs.GetInt("InitialChartVersion") != InitialChartVersion)
         {
             Debug.Log("Load initial charts...");
             await CopyFileFromStreamingAssetsToPersistentDataPath("/Initial.kirapack");
