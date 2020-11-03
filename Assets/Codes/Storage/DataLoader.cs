@@ -674,8 +674,8 @@ public class DataLoader : IDataLoader
         }
         catch (Exception e)
         {
-            messageBannerController.ShowMsg(LogLevel.ERROR,
-                string.Format("Cannot Load {0}: {1}", file.Name, e.Message));
+            messageBannerController.ShowMsg(LogLevel.ERROR, $"Cannot Load {file.Name}: {e.Message}");
+            Debug.LogException(e);
             return -1;
         }
     }
