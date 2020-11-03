@@ -370,7 +370,7 @@ namespace BanGround
             }
         }
 
-        public void AddSearchPath(string path)
+        public void AddSearchPath(string path, bool removeEmptyDir = true)
         {
             if (Directory.Exists(path))
             {
@@ -383,9 +383,12 @@ namespace BanGround
                     if (fi.Extension == ".kpak")
                         AddSearchPath(fi.FullName);
                 }
-                foreach (var d in di.GetDirectories())
+                if (removeEmptyDir)
                 {
-                    RemoveEmptyDir(d);
+                    foreach (var d in di.GetDirectories())
+                    {
+                        RemoveEmptyDir(d);
+                    }
                 }
 
                 return;

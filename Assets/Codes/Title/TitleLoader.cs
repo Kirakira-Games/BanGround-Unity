@@ -65,7 +65,6 @@ public class TitleLoader : MonoBehaviour
     {
         instance = this;
         CheckUpdate();
-        dataLoader.Init().Forget();
 
         var backgrounds = fs.Find(file=> file.Name.StartsWith(BACKGROUND_PATH));
 
@@ -86,7 +85,7 @@ public class TitleLoader : MonoBehaviour
     {
         PlayTitle();
 
-        if (!string.IsNullOrEmpty(web.AccessToken) && !string.IsNullOrEmpty(web.RefreshToken))
+        if (UserInfo.user == null && !string.IsNullOrEmpty(web.AccessToken) && !string.IsNullOrEmpty(web.RefreshToken))
         {
             loadingBlocker.Show("Logging in...");
             try

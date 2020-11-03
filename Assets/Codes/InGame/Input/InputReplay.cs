@@ -43,10 +43,11 @@ public class DemoFile
 
     public void Save(string fileName)
     {
+        /* TODO: Use protobuf
         using (var sw = new StreamWriter(new DeflateStream(File.OpenWrite(fileName), System.IO.Compression.CompressionLevel.Optimal)))
         {
             sw.Write(JsonConvert.SerializeObject(this));
-        }
+        }*/
     }
 
     public static DemoFile LoadFrom(string fileName)
