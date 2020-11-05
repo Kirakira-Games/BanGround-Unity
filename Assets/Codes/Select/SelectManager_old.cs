@@ -35,7 +35,7 @@ public class SelectManager_old : MonoBehaviour
     private RectTransform rt;
     private ScrollRect rt_s;
     private VerticalLayoutGroup lg;
-    public DragHandler dh;
+    [HideInInspector] public DragHandler dh;
 
     //sort
     private Text sort_Text;
@@ -102,6 +102,11 @@ public class SelectManager_old : MonoBehaviour
         rt_s = GameObject.Find("Song Scroll View").GetComponent<ScrollRect>();
         dh = GameObject.Find("Song Scroll View").GetComponent<DragHandler>();
         lg = GameObject.Find("SongContent").GetComponent<VerticalLayoutGroup>();
+    }
+
+    public void Return2Title()
+    {
+        SceneLoader.LoadScene("Select", "Title");
     }
 
     #region Controller
