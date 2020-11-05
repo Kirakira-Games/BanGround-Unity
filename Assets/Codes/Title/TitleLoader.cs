@@ -202,6 +202,11 @@ public class TitleLoader : MonoBehaviour
         }
     }
 
+    public void ShowCredits()
+    {
+        SceneLoader.LoadScene("Title", "Credits");
+    }
+
     private void OnDestroy()
     {
         music?.Dispose();
