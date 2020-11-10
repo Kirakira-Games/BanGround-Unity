@@ -140,11 +140,11 @@ public class AudioManager : MonoBehaviour, IAudioManager
     public async UniTask<ISoundEffect> PrecacheInGameSE(byte[] data) => await Provider.PrecacheSE(data, SEType.InGame);
     public async UniTask<ISoundTrack> StreamGameBGMTrack(byte[] data)
     {
-        if (Provider is PureUnityAudioProvider)
+        /*if (Provider is PureUnityAudioProvider)
         {
             gameBGM = await ((PureUnityAudioProvider)Provider).PrecacheTrack(data);
         }
-        else
+        else*/
         {
             gameBGM = await Provider.StreamTrack(data);
         }
