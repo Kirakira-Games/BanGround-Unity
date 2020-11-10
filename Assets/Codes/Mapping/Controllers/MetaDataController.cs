@@ -183,7 +183,7 @@ namespace BGEditor
                     coverPath = path;
                 });
 
-                await UniTask.WaitUntil(() => cancel || coverPath != null).WithCancellation(token);
+                await UniTask.WaitUntil(() => cancel || coverPath != null);
 
                 if (!cancel && coverPath != null)
                 {
