@@ -136,7 +136,7 @@ public class KVar : KonCommandBase
 #endif
 
         if (IsFlagSet(KVarFlags.Cheat) && !_kvSystem.CanCheat)
-            throw new AccessViolationException("KVar is inwriteable while cheat not enabled only!");
+            throw new AccessViolationException("KVar is inwriteable while cheat not enabled!");
 
         if (IsFlagSet(KVarFlags.StringOnly))
         {
@@ -249,8 +249,6 @@ public class KVar : KonCommandBase
 
 public class KVSystem : IKVSystem
 {
-    public static KVSystem Instance;
-
     private bool isReloadingConfig = false;
 
     // All commands
@@ -271,11 +269,6 @@ public class KVSystem : IKVSystem
 
             return cheat;
         }
-    }
-
-    KVSystem()
-    {
-        Instance = this;  // TODO: Remove
     }
 
     public unsafe static string[] CommandLineToArgs(string str)
