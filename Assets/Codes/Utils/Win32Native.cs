@@ -5,9 +5,9 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
 namespace BanGround.Utils
 {
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
     public class SelectFileDialog
     {
         OPENFILENAMEW ofnw;
@@ -118,5 +118,6 @@ namespace BanGround.Utils
         [DllImport("Comdlg32.dll", EntryPoint = "GetOpenFileNameW", SetLastError = true, ThrowOnUnmappableChar = true, CharSet = CharSet.Unicode)]
         public static extern bool OpenFileDialog(ref OPENFILENAMEW lpofnw);
     }
-}
 #endif
+}
+
