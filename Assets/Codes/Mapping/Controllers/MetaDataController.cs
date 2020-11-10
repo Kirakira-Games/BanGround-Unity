@@ -108,8 +108,8 @@ namespace BGEditor
             cHeader.difficultyLevel[(int)chartListManager.current.difficulty] = Difficulty.value;
             Core.chart.level = Difficulty.value;
             cHeader.tag = (from tag in Tags.text.Split(',')
-                          where tag.Trim().Length > 0
-                          select tag.Trim())
+                           where tag.Trim().Length > 0
+                           select tag.Trim())
                           .ToList();
             swap = ChartPreview[0].value > ChartPreview[1].value ? 1 : 0;
             cHeader.preview = new float[]
@@ -118,7 +118,7 @@ namespace BGEditor
                 ChartPreview[1 ^ swap].value
             };
 
-            if(cover != null)
+            if (cover != null)
                 cHeader.backgroundFile.pic = "bg" + coverExt;
 
             dataLoader.SaveHeader(mHeader);
@@ -141,36 +141,33 @@ namespace BGEditor
         public async void SelectCover()
         {
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-            await UniTask.Run(() =>
+            var sfd = await new SelectFileDialog()
+           .SetFilter("File contains cover\0*.jpg;*.png;*.flac;*.mp3;*.aac\0")
+           .SetTitle("Select Cover file")
+           .SetDefaultExt("jpg")
+           .ShowAsync();
+
+            if (sfd.IsSucessful)
             {
-                var sfd = new SelectFileDialog()
-               .SetFilter("File contains cover\0*.jpg;*.png;*.flac;*.mp3;*.aac\0")
-               .SetTitle("Select Cover file")
-               .SetDefaultExt("jpg")
-               .Show();
+                var coverfi = new System.IO.FileInfo(sfd.File);
 
-                if (sfd.IsSucessful)
+                if (coverfi.Extension == ".jpg" || coverfi.Extension == ".png")
                 {
-                    var coverfi = new System.IO.FileInfo(sfd.File);
+                    cover = System.IO.File.ReadAllBytes(coverfi.FullName);
+                }
+                else
+                {
+                    var coverFile = TagLib.File.Create(coverfi.FullName);
 
-                    if (coverfi.Extension == ".jpg" || coverfi.Extension == ".png")
+                    if (coverFile.Tag.Pictures.Length > 0)
                     {
-                        cover = System.IO.File.ReadAllBytes(coverfi.FullName);
-                    }
-                    else
-                    {
-                        var coverFile = TagLib.File.Create(coverfi.FullName);
+                        var pic = coverFile.Tag.Pictures[0];
 
-                        if (coverFile.Tag.Pictures.Length > 0)
-                        {
-                            var pic = coverFile.Tag.Pictures[0];
-
-                            cover = pic.Data.ToArray();
-                            coverExt = pic.MimeType.Replace("image/", ".");
-                        }
+                        cover = pic.Data.ToArray();
+                        coverExt = pic.MimeType.Replace("image/", ".");
                     }
                 }
-            });
+            }
 #elif (UNITY_IOS || UNITY_ANDROID) && !UNITY_EDITOR
                 bool cancel = false;
                 string coverPath = null;
