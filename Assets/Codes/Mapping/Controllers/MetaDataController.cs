@@ -135,6 +135,7 @@ namespace BGEditor
 
         public async void SelectCover()
         {
+#if (UNITY_IOS || UNITY_ANDROID) && !UNITY_EDITOR
             bool cancel = false;
             string coverPath = null;
 
@@ -155,6 +156,10 @@ namespace BGEditor
 
                 Destroy(texture);
             }
+#else
+            // TODO
+            await UniTask.DelayFrame(1);
+#endif
         }
     }
 }
