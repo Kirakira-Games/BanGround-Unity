@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using Zenject;
 using BanGround.Web;
+using Cysharp.Threading.Tasks;
 
 namespace BGEditor
 {
@@ -36,6 +37,7 @@ namespace BGEditor
 
         private mHeader mHeader;
         private cHeader cHeader;
+        private byte[] cover;
 
         public void Show()
         {
@@ -78,6 +80,8 @@ namespace BGEditor
             ChartPreview[1].MaxVal = duration;
             ChartPreview[0].SetValue(cHeader.preview[0]);
             ChartPreview[1].SetValue(cHeader.preview[1]);
+
+            cover = null;
         }
 
         public void Save()
@@ -113,7 +117,7 @@ namespace BGEditor
             };
 
             dataLoader.SaveHeader(mHeader);
-            dataLoader.SaveHeader(cHeader);
+            dataLoader.SaveHeader(cHeader, ".jpg", cover);
             Core.Save();
         }
 
@@ -127,6 +131,30 @@ namespace BGEditor
             }
             Blocker.gameObject.SetActive(false);
             gameObject.SetActive(false);
+        }
+
+        public async void SelectCover()
+        {
+            bool cancel = false;
+            string coverPath = null;
+
+            NativeGallery.GetImageFromGallery(path =>
+            {
+                if (path == null)
+                    cancel = true;
+
+                coverPath = path;
+            });
+
+            await UniTask.WaitUntil(() => cancel || coverPath != null);
+
+            if (!cancel && coverPath != null)
+            {
+                var texture = NativeGallery.LoadImageAtPath(coverPath, -1, false, false, true);
+                cover = texture.EncodeToJPG(75);
+
+                Destroy(texture);
+            }
         }
     }
 }
