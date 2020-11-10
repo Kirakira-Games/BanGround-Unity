@@ -63,27 +63,28 @@ public class ChartCreator : MonoBehaviour
 
         return header;
     }
-    private cHeader CreateHeader(int mid = -1)
+    private cHeader CreateHeader(int mid = -1, string cover = "")
     {
-        var header = new cHeader();
-        header.version = ChartVersion;
-        header.sid = dataLoader.GenerateSid();
-        header.mid = mid == -1 ? cHeader.mid : mid;
-        bool copyInfo = header.mid == cHeader.mid;
-        if (UserInfo.isOffline)
-        {
-            header.author = "Guest";
-            header.authorNick = "Guest";
-        }
-        else
-        {
-            header.author = UserInfo.user.Username;
-            header.authorNick = UserInfo.user.Nickname;
-        }
-        header.backgroundFile = cHeader.backgroundFile;
-        header.preview = (!copyInfo || cHeader.preview == null) ? new float[] { 0.0f, 0.0f } : cHeader.preview.ToArray();
-        header.tag = (!copyInfo || cHeader.tag == null) ? new List<string>() : cHeader.tag.ToList();
-        return header;
+        bool copyInfo = mid == -1;
+
+        return new cHeader 
+        { 
+            version = ChartVersion,
+
+            sid = dataLoader.GenerateSid(),
+            mid = copyInfo ? cHeader.mid : mid,
+
+            author = UserInfo.isOffline ? "Guest" : UserInfo.user.Username,
+            authorNick = UserInfo.isOffline ? "Guest" : UserInfo.user.Nickname,
+
+            backgroundFile = new BackgroundFile
+            {
+                pic = cover
+            },
+
+            preview = (!copyInfo || cHeader.preview == null) ? new float[] { 0.0f, 0.0f } : cHeader.preview.ToArray(),
+            tag = (!copyInfo || cHeader.tag == null) ? new List<string>() : cHeader.tag.ToList()
+        };
     }
 
     private V2.Chart CreateChart(Difficulty difficulty, int level)
@@ -128,8 +129,8 @@ public class ChartCreator : MonoBehaviour
         // Create chart
         int clamped = Mathf.Clamp(difficulty, 0, 3);
         int level = Random.Range(clamped * 5 + 5, clamped * 8 + 6);
-        var chart = CreateChart((Difficulty) difficulty, level);
-        dataLoader.SaveChart(chart, header.sid, (Difficulty) difficulty);
+        var chart = CreateChart((Difficulty)difficulty, level);
+        dataLoader.SaveChart(chart, header.sid, (Difficulty)difficulty);
 
         // Reload scene
         cl_lastdiff.Set(difficulty);
@@ -153,12 +154,12 @@ public class ChartCreator : MonoBehaviour
         // Create chart
         int clamped = Mathf.Clamp(difficulty, 0, 3);
         int level = Random.Range(clamped * 5 + 5, clamped * 8 + 6);
-        var chart = CreateChart((Difficulty) difficulty, level);
-        dataLoader.SaveChart(chart, cHeader.sid, (Difficulty) difficulty);
+        var chart = CreateChart((Difficulty)difficulty, level);
+        dataLoader.SaveChart(chart, cHeader.sid, (Difficulty)difficulty);
 
         // Reload scene
         cl_lastdiff.Set(difficulty);
-        chartListManager.current.difficulty = (Difficulty) difficulty;
+        chartListManager.current.difficulty = (Difficulty)difficulty;
         SceneManager.LoadScene("Select");
     }
 
@@ -176,6 +177,7 @@ public class ChartCreator : MonoBehaviour
 
         CancellationTokenSource tokenSource = new CancellationTokenSource();
 
+
         var task = WaitForAirdrop(tokenSource.Token);
 
         loadingBlocker.Show("Waiting for airdrop (You must drop a ogg music!!!)...", tokenSource.Cancel);
@@ -184,12 +186,16 @@ public class ChartCreator : MonoBehaviour
 
         loadingBlocker.Close();
     }
+
     public async UniTask WaitForAirdrop(CancellationToken token = default)
     {
         try
         {
             int difficulty = SelectedDifficulty();
 
+            byte[] file = null;
+
+#if !UNITY_ANDROID
             RequestAirdrop = true;
 
             await UniTask.Delay(1500).WithCancellation(token);
@@ -200,11 +206,33 @@ public class ChartCreator : MonoBehaviour
 
             RequestAirdrop = false;
 
+            file = AirdroppedFile;
+#else
+            bool cancel = false;
+            string audioPath = null;
+
+            NativeGallery.GetAudioFromGallery(path =>
+            {
+                if (path == null)
+                    cancel = true;
+
+                audioPath = path;
+            });
+
+            await UniTask.WaitUntil(() => cancel || audioPath != null).WithCancellation(token);
+
+            if (cancel)
+            {
+                return;
+            }
+
+            file = File.ReadAllBytes(audioPath);
+#endif
             var title = "New Song";
             var artist = "Unknown Artist";
             var len = -1.0f;
 
-            using (var stream = new MemoryStream(AirdroppedFile))
+            using (var stream = new MemoryStream(file))
             {
                 // check airdropped file
                 using (var br = new BinaryReader(stream, Encoding.UTF8, true))
@@ -226,13 +254,40 @@ public class ChartCreator : MonoBehaviour
                 }
             }
 
+            byte[] cover = null;
+            string coverExt = null;
+
+#if (UNITY_IOS || UNITY_ANDROID) && !UNITY_EDITOR
+            cancel = false;
+            string coverPath = null;
+
+            NativeGallery.GetImageFromGallery(path =>
+            {
+                if (path == null)
+                    cancel = true;
+
+                coverPath = path;
+            });
+
+            await UniTask.WaitUntil(() => cancel || coverPath != null).WithCancellation(token);
+
+            if (!cancel && coverPath != null)
+            {
+                var texture = NativeGallery.LoadImageAtPath(coverPath, -1, false, false, true);
+                cover = texture.EncodeToJPG(75);
+
+                coverExt = ".jpg";
+
+                Destroy(texture);
+            }
+#endif
             // Create mheader
             var mheader = CreateMHeader(title, artist, len);
-            dataLoader.SaveHeader(mheader, AirdroppedFile);
+            dataLoader.SaveHeader(mheader, file);
 
             // Create header
-            var header = CreateHeader(mheader.mid);
-            dataLoader.SaveHeader(header);
+            var header = CreateHeader(mheader.mid, cover == null ? default : "bg" + coverExt);
+            dataLoader.SaveHeader(header, coverExt, cover);
 
             // Create chart
             int clamped = Mathf.Clamp(difficulty, 0, 3);
@@ -246,7 +301,9 @@ public class ChartCreator : MonoBehaviour
             cl_lastsid.Set(header.sid);
             SceneManager.LoadScene("Select");
 
+#if UNITY_STANDALONE || UNITY_IOS || UNITY_EDITOR
             AirdroppedFile = null;
+#endif
         }
         catch (System.OperationCanceledException)
         {
