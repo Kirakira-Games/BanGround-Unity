@@ -5,6 +5,7 @@ using System.Linq;
 using Zenject;
 using BanGround.Web;
 using Cysharp.Threading.Tasks;
+using BanGround.Utils;
 
 namespace BGEditor
 {
@@ -38,6 +39,7 @@ namespace BGEditor
         private mHeader mHeader;
         private cHeader cHeader;
         private byte[] cover;
+        private string coverExt;
 
         public void Show()
         {
@@ -116,8 +118,11 @@ namespace BGEditor
                 ChartPreview[1 ^ swap].value
             };
 
+            if(cover != null)
+                cHeader.backgroundFile.pic = "bg" + coverExt;
+
             dataLoader.SaveHeader(mHeader);
-            dataLoader.SaveHeader(cHeader, ".jpg", cover);
+            dataLoader.SaveHeader(cHeader, coverExt, cover);
             Core.Save();
         }
 
@@ -135,30 +140,60 @@ namespace BGEditor
 
         public async void SelectCover()
         {
-#if (UNITY_IOS || UNITY_ANDROID) && !UNITY_EDITOR
-            bool cancel = false;
-            string coverPath = null;
-
-            NativeGallery.GetImageFromGallery(path =>
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+            await UniTask.Run(() =>
             {
-                if (path == null)
-                    cancel = true;
+                var sfd = new SelectFileDialog()
+               .SetFilter("File contains cover\0*.jpg;*.png;*.flac;*.mp3;*.aac\0")
+               .SetTitle("Select Cover file")
+               .SetDefaultExt("jpg")
+               .Show();
 
-                coverPath = path;
+                if (sfd.IsSucessful)
+                {
+                    var coverfi = new System.IO.FileInfo(sfd.File);
+
+                    if (coverfi.Extension == ".jpg" || coverfi.Extension == ".png")
+                    {
+                        cover = System.IO.File.ReadAllBytes(coverfi.FullName);
+                    }
+                    else
+                    {
+                        var coverFile = TagLib.File.Create(coverfi.FullName);
+
+                        if (coverFile.Tag.Pictures.Length > 0)
+                        {
+                            var pic = coverFile.Tag.Pictures[0];
+
+                            cover = pic.Data.ToArray();
+                            coverExt = pic.MimeType.Replace("image/", ".");
+                        }
+                    }
+                }
             });
+#elif (UNITY_IOS || UNITY_ANDROID) && !UNITY_EDITOR
+                bool cancel = false;
+                string coverPath = null;
 
-            await UniTask.WaitUntil(() => cancel || coverPath != null);
+                NativeGallery.GetImageFromGallery(path =>
+                {
+                    if (path == null)
+                        cancel = true;
 
-            if (!cancel && coverPath != null)
-            {
-                var texture = NativeGallery.LoadImageAtPath(coverPath, -1, false, false, true);
-                cover = texture.EncodeToJPG(75);
+                    coverPath = path;
+                });
 
-                Destroy(texture);
-            }
-#else
-            // TODO
-            await UniTask.DelayFrame(1);
+                await UniTask.WaitUntil(() => cancel || coverPath != null).WithCancellation(token);
+
+                if (!cancel && coverPath != null)
+                {
+                    var texture = NativeGallery.LoadImageAtPath(coverPath, -1, false, false, true);
+                    cover = texture.EncodeToJPG(75);
+
+                    coverExt = ".jpg";
+
+                    Destroy(texture);
+                }
 #endif
         }
     }

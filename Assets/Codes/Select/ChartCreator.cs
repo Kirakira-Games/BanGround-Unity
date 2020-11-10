@@ -4,11 +4,14 @@ using UnityEngine.SceneManagement;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using System.IO;
-using NVorbis;
-using System.Text;
 using System.Collections.Generic;
 using System.Threading;
 using Zenject;
+using BanGround.Audio;
+using TagLib;
+using ModestTree;
+using BanGround.Utils;
+using System.Runtime.InteropServices;
 
 public class ChartCreator : MonoBehaviour
 {
@@ -67,8 +70,8 @@ public class ChartCreator : MonoBehaviour
     {
         bool copyInfo = mid == -1;
 
-        return new cHeader 
-        { 
+        return new cHeader
+        {
             version = ChartVersion,
 
             sid = dataLoader.GenerateSid(),
@@ -195,19 +198,22 @@ public class ChartCreator : MonoBehaviour
 
             byte[] file = null;
 
-#if !UNITY_ANDROID
-            RequestAirdrop = true;
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+            var sfd = new SelectFileDialog()
+                .SetFilter("OGG Audio\0*.ogg\0")
+                .SetTitle("Select Audio file")
+                .SetDefaultExt("ogg")
+                .Show();
 
-            await UniTask.Delay(1500).WithCancellation(token);
-
-            Application.OpenURL("http://127.0.0.1:8088/");
-
-            await UniTask.WaitUntil(() => AirdroppedFile != null).WithCancellation(token);
-
-            RequestAirdrop = false;
-
-            file = AirdroppedFile;
-#else
+            if(sfd.IsSucessful)
+            {
+                file = System.IO.File.ReadAllBytes(sfd.File);
+            }
+            else
+            {
+                throw new System.OperationCanceledException();
+            }
+#elif UNITY_ANDROID && !UNITY_EDITOR
             bool cancel = false;
             string audioPath = null;
 
@@ -223,64 +229,112 @@ public class ChartCreator : MonoBehaviour
 
             if (cancel)
             {
-                return;
+                throw new System.OperationCanceledException();
             }
 
             file = File.ReadAllBytes(audioPath);
+
+#else
+            RequestAirdrop = true;
+
+            await UniTask.Delay(1500).WithCancellation(token);
+
+            Application.OpenURL("http://127.0.0.1:8088/");
+
+            await UniTask.WaitUntil(() => AirdroppedFile != null).WithCancellation(token);
+
+            RequestAirdrop = false;
+
+            file = AirdroppedFile;
 #endif
+
             var title = "New Song";
             var artist = "Unknown Artist";
             var len = -1.0f;
 
-            using (var stream = new MemoryStream(file))
+            TagLib.File tagFile = null;
+
+            try
             {
-                // check airdropped file
-                using (var br = new BinaryReader(stream, Encoding.UTF8, true))
-                {
-                    if (new string(br.ReadChars(4)) != "OggS")
-                    {
-                        messageBannerController.ShowMsg(LogLevel.ERROR, "YOU MUST DROP A PROPPER OGG FILE TO CONTINUE!!!");
-
-                        throw new InvalidDataException("YOU MUST DROP A PROPPER OGG FILE TO CONTINUE!!!");
-                    }
-                }
-
-                // get infomation from file
-                using (var reader = new VorbisReader(stream))
-                {
-                    title = reader.Tags.Title == string.Empty ? "New Song" : reader.Tags.Title;
-                    artist = reader.Tags.Artist == string.Empty ? "Unknown Artist" : reader.Tags.Artist;
-                    len = (float)reader.TotalTime.TotalSeconds;
-                }
+                tagFile = TagLib.File.Create(new AudioFileAbstraction(file));
             }
+            catch (UnsupportedFormatException)
+            {
+                messageBannerController.ShowMsg(LogLevel.ERROR, "Unsupported file format!");
+                throw new InvalidDataException("Unsupported file format!");
+            }
+
+            title = tagFile.Tag.Title ?? "New Song";
+            artist = tagFile.Tag.Performers == null ? "Unknown Artist" : tagFile.Tag.Performers.Join(", ");
+            len = (float)tagFile.Properties.Duration.TotalSeconds;
 
             byte[] cover = null;
             string coverExt = null;
 
-#if (UNITY_IOS || UNITY_ANDROID) && !UNITY_EDITOR
-            cancel = false;
-            string coverPath = null;
-
-            NativeGallery.GetImageFromGallery(path =>
+            if (tagFile.Tag.Pictures.Length > 0)
             {
-                if (path == null)
-                    cancel = true;
+                var pic = tagFile.Tag.Pictures[0];
 
-                coverPath = path;
-            });
-
-            await UniTask.WaitUntil(() => cancel || coverPath != null).WithCancellation(token);
-
-            if (!cancel && coverPath != null)
-            {
-                var texture = NativeGallery.LoadImageAtPath(coverPath, -1, false, false, true);
-                cover = texture.EncodeToJPG(75);
-
-                coverExt = ".jpg";
-
-                Destroy(texture);
+                cover = pic.Data.ToArray();
+                coverExt = pic.MimeType.Replace("image/", ".");
             }
+
+
+            if (cover == null)
+            {
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+                sfd.SetFilter("File contains cover\0*.jpg;*.png;*.flac;*.mp3;*.aac\0")
+                .SetTitle("Select Cover file")
+                .SetDefaultExt("jpg")
+                .Show();
+
+                if (sfd.IsSucessful)
+                {
+                    var coverfi = new FileInfo(sfd.File);
+
+                    if(coverfi.Extension == ".jpg" || coverfi.Extension == ".png")
+                    {
+                        cover = System.IO.File.ReadAllBytes(coverfi.FullName);
+                    }
+                    else
+                    {
+                        var coverFile = TagLib.File.Create(coverfi.FullName);
+
+                        if (coverFile.Tag.Pictures.Length > 0)
+                        {
+                            var pic = coverFile.Tag.Pictures[0];
+
+                            cover = pic.Data.ToArray();
+                            coverExt = pic.MimeType.Replace("image/", ".");
+                        }
+                    }
+                }
+#elif (UNITY_IOS || UNITY_ANDROID) && !UNITY_EDITOR
+                cancel = false;
+                string coverPath = null;
+
+                NativeGallery.GetImageFromGallery(path =>
+                {
+                    if (path == null)
+                        cancel = true;
+
+                    coverPath = path;
+                });
+
+                await UniTask.WaitUntil(() => cancel || coverPath != null).WithCancellation(token);
+
+                if (!cancel && coverPath != null)
+                {
+                    var texture = NativeGallery.LoadImageAtPath(coverPath, -1, false, false, true);
+                    cover = texture.EncodeToJPG(75);
+
+                    coverExt = ".jpg";
+
+                    Destroy(texture);
+                }
 #endif
+            }
+
             // Create mheader
             var mheader = CreateMHeader(title, artist, len);
             dataLoader.SaveHeader(mheader, file);
@@ -297,7 +351,7 @@ public class ChartCreator : MonoBehaviour
 
             // Reload scene
             cl_lastdiff.Set(difficulty);
-            chartListManager.current.difficulty = (Difficulty) difficulty;
+            chartListManager.current.difficulty = (Difficulty)difficulty;
             cl_lastsid.Set(header.sid);
             SceneManager.LoadScene("Select");
 
@@ -312,13 +366,7 @@ public class ChartCreator : MonoBehaviour
             RequestAirdrop = false;
             AirdroppedFile = null;
         }
-        catch (System.Exception ex)
-        {
-            RequestAirdrop = false;
-            AirdroppedFile = null;
 
-            throw ex;
-        }
     }
 
     public void 还没做好()
