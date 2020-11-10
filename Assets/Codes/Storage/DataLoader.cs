@@ -331,12 +331,22 @@ public class DataLoader : IDataLoader
         fs.FlushPak(file.RootPath);
     }
 
-    public void SaveHeader(cHeader header)
+    public void SaveHeader(cHeader header, string coverExt = null, byte[] cover = null)
     {
         string path = KiraPath.Combine(ChartDir, header.sid.ToString(), "cheader.bin");
 
         var file = fs.GetOrNewFile(path);
         ProtobufHelper.Write(header, file);
+
+        if(cover != null)
+        {
+            string bgPath = KiraPath.Combine(ChartDir, header.sid.ToString(), "bg" + coverExt);
+            var bgFile = fs.GetOrNewFile(bgPath);
+            bgFile.WriteBytes(cover);
+
+            fs.FlushPak(bgFile.RootPath);
+        }
+
         fs.FlushPak(file.RootPath);
     }
 

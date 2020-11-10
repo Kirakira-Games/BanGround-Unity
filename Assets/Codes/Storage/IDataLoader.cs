@@ -35,7 +35,7 @@ public interface IDataLoader
     void RefreshSongList();
     void SaveChart<T>(T chart, int sid, Difficulty difficulty) where T : IExtensible;
     void SaveChartScript(string script, int sid, Difficulty difficulty);
-    void SaveHeader(cHeader header);
+    void SaveHeader(cHeader header, string coverExt = null, byte[] cover = null);
     void SaveHeader(mHeader header);
     void SaveHeader(mHeader header, byte[] oggFile);
     void MoveChart(int oldSid, int newSid, bool overwrite = true);
