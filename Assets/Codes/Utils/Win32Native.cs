@@ -52,6 +52,12 @@ namespace BanGround.Utils
             IsSucessful = Win32.OpenFileDialog(ref ofnw);
             return this;
         }
+
+        public async Task<SelectFileDialog> ShowAsync()
+        {
+            await Task.Run(() => IsSucessful = Win32.OpenFileDialog(ref ofnw));
+            return this;
+        }
     }
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]

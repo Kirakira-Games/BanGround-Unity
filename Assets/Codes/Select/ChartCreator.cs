@@ -199,11 +199,11 @@ public class ChartCreator : MonoBehaviour
             byte[] file = null;
 
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-            var sfd = new SelectFileDialog()
+            var sfd = await new SelectFileDialog()
                 .SetFilter("OGG Audio\0*.ogg\0")
                 .SetTitle("Select Audio file")
                 .SetDefaultExt("ogg")
-                .Show();
+                .ShowAsync();
 
             if(sfd.IsSucessful)
             {
@@ -283,10 +283,10 @@ public class ChartCreator : MonoBehaviour
             if (cover == null)
             {
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-                sfd.SetFilter("File contains cover\0*.jpg;*.png;*.flac;*.mp3;*.aac\0")
+                await sfd.SetFilter("File contains cover\0*.jpg;*.png;*.flac;*.mp3;*.aac\0")
                 .SetTitle("Select Cover file")
                 .SetDefaultExt("jpg")
-                .Show();
+                .ShowAsync();
 
                 if (sfd.IsSucessful)
                 {
