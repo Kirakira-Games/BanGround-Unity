@@ -261,7 +261,8 @@ public class ChartCreator : MonoBehaviour
             catch (UnsupportedFormatException)
             {
                 messageBannerController.ShowMsg(LogLevel.ERROR, "Unsupported file format!");
-                throw new InvalidDataException("Unsupported file format!");
+                //throw new InvalidDataException("Unsupported file format!");
+                return;
             }
 
             title = tagFile.Tag.Title ?? "New Song";
@@ -310,7 +311,7 @@ public class ChartCreator : MonoBehaviour
                     }
                 }
 #elif (UNITY_IOS || UNITY_ANDROID) && !UNITY_EDITOR
-                cancel = false;
+                bool cancel = false;
                 string coverPath = null;
 
                 NativeGallery.GetImageFromGallery(path =>
