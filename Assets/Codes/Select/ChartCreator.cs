@@ -232,7 +232,7 @@ public class ChartCreator : MonoBehaviour
                 throw new System.OperationCanceledException();
             }
 
-            file = File.ReadAllBytes(audioPath);
+            file = System.IO.File.ReadAllBytes(audioPath);
 
 #else
             RequestAirdrop = true;
