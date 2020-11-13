@@ -311,7 +311,10 @@ public class ChartCreator : MonoBehaviour
                     }
                 }
 #elif (UNITY_IOS || UNITY_ANDROID) && !UNITY_EDITOR
-                bool cancel = false;
+#if UNITY_IOS
+                bool 
+#endif
+                cancel = false;
                 string coverPath = null;
 
                 NativeGallery.GetImageFromGallery(path =>
