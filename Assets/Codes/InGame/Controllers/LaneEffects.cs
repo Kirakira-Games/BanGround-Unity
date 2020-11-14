@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using V2;
 using Zenject;
-
+/*
 public class LaneEffects : MonoBehaviour
 {
     [Inject]
@@ -98,3 +98,4 @@ public class LaneEffects : MonoBehaviour
         }
     }
 }
+*/

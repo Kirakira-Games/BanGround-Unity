@@ -62,7 +62,7 @@ public class NoteController : MonoBehaviour, INoteController
     private Animator cameraAnimation;
 
     private FixBackground background;
-    private LaneEffects laneEffects;
+    //private LaneEffects laneEffects;
 
     private UnityAction<JudgeResult> onJudge;
 
@@ -463,11 +463,11 @@ public class NoteController : MonoBehaviour, INoteController
 
         //background = GameObject.Find("dokidokiBackground").GetComponent<FixBackground>();
         //background.UpdateBackground(dataLoader.GetBackgroundPath(sid));
-
+        /*
         // Lane Effects
         laneEffects = GameObject.Find("Effects").GetComponent<LaneEffects>();
         laneEffects.Init(chart.groups[0]);
-
+        */
         // Check if adjusting offset
         if (chartListManager.offsetAdjustMode)
         {
@@ -567,7 +567,7 @@ public class NoteController : MonoBehaviour, INoteController
             isFinished = false;
 
         // Update lane effects
-        laneEffects.UpdateLaneEffects();
+        //laneEffects.UpdateLaneEffects();
 
         // Destroy objects
         slidesToDestroy.ForEach(slide => slides.Remove(slide));
