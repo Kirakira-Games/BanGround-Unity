@@ -78,7 +78,7 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         rt = GetComponent<RectTransform>();
         //bt.onClick.AddListener(OnPressed);
 
-        rt.sizeDelta = new Vector2(980, 116);
+        rt.sizeDelta = new Vector2(820, 116);
         img.color = DisabledColor;
         title.color = UnselectColor;
         title.fontStyle = FontStyle.Normal;
@@ -136,12 +136,12 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     }
     IEnumerator OnSelectAnimation3()
     {
-        while (rt.sizeDelta.x < 1050)
+        while (rt.sizeDelta.x < 960)
         {
-            rt.sizeDelta += new Vector2((1050 - rt.sizeDelta.x) * 0.3f, 0f);
+            rt.sizeDelta += new Vector2((960 - rt.sizeDelta.x) * 0.3f, 0f);
             yield return new WaitForEndOfFrame();
         }
-        rt.sizeDelta = new Vector2(1050, rt.sizeDelta.y);
+        rt.sizeDelta = new Vector2(960, rt.sizeDelta.y);
     }
 
     
@@ -150,7 +150,7 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         if (!select) return;
         StopAllCoroutines();
-        rt.sizeDelta = new Vector2(980, 116);
+        rt.sizeDelta = new Vector2(820, 116);
         img.color = DisabledColor;
         title.color = UnselectColor;
         title.fontStyle = FontStyle.Normal;
