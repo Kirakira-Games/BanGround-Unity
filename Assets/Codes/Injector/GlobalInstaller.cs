@@ -21,11 +21,6 @@ public class GlobalInstaller : MonoInstaller
     private IFileSystem fs;
     private IAudioProvider ap;
 
-    public override void Start()
-    {
-        kvSystem.ReloadConfig();
-    }
-
     public override void InstallBindings()
     {
         // Filesystem
@@ -51,6 +46,8 @@ public class GlobalInstaller : MonoInstaller
         {
             if (obj is ValidationMarker) return;
             kvSystem = obj as IKVSystem;
+
+            kvSystem.ReloadConfig();
         }).NonLazy();
 
         RegisterKonCommands();
@@ -63,12 +60,12 @@ public class GlobalInstaller : MonoInstaller
         }).NonLazy();
 
         // Audio Manager
-        Container.Bind<IAudioProvider>().FromFactory<AudioProviderFactory>().AsSingle().OnInstantiated((_, obj) =>
+        Container.Bind<IAudioProvider>().FromFactory<AudioProviderFactory>().AsSingle().NonLazy();
+        Container.Bind<IAudioManager>().To<AudioManager>().FromNewComponentOnNewGameObject().AsSingle().OnInstantiated((_, obj) =>
         {
             if (obj is ValidationMarker) return;
-            ap = obj as IAudioProvider;
+            ap = (obj as IAudioManager).Provider;
         }).NonLazy();
-        Container.Bind<IAudioManager>().To<AudioManager>().FromNewComponentOnNewGameObject().AsSingle().NonLazy();
 
         // Sorter Factory
         Container.Bind<ISorterFactory>().To<SorterFactory>().AsSingle().NonLazy();
@@ -148,9 +145,18 @@ public class GlobalInstaller : MonoInstaller
             KVar.C("cl_accesstoken", "", KVarFlags.Archive | KVarFlags.StringOnly, "Saved access token", (_, kvSystem) => kvSystem.SaveConfig()),
             KVar.C("cl_refreshtoken", "", KVarFlags.Archive | KVarFlags.StringOnly, "Saved refresh token", (_, kvSystem) => kvSystem.SaveConfig()),
 
-            KVar.C("snd_bgm_volume", "0.7", KVarFlags.Archive, "BGM volume", _ => ap.SetSoundTrackVolume(kvSystem.Find("snd_bgm_volume"))),
-            KVar.C("snd_se_volume", "0.7", KVarFlags.Archive, "Sound effect volume",_ => ap.SetSoundEffectVolume(kvSystem.Find("snd_se_volume"), SEType.Common)),
-            KVar.C("snd_igse_volume", "0.7", KVarFlags.Archive, "In-game sound effect volume",_ => ap.SetSoundEffectVolume(kvSystem.Find("snd_igse_volume"), SEType.InGame)),
+            KVar.C("snd_bgm_volume", "0.7", KVarFlags.Archive, "BGM volume", _ => 
+            {
+                ap?.SetSoundTrackVolume(kvSystem.Find("snd_bgm_volume"));
+            }),
+            KVar.C("snd_se_volume", "0.7", KVarFlags.Archive, "Sound effect volume",_ => 
+            {
+                ap?.SetSoundEffectVolume(kvSystem.Find("snd_se_volume"), SEType.Common);
+            }),
+            KVar.C("snd_igse_volume", "0.7", KVarFlags.Archive, "In-game sound effect volume",_ =>
+            {
+                ap?.SetSoundEffectVolume(kvSystem.Find("snd_igse_volume"), SEType.InGame);
+            }),
 
             KVar.C("snd_engine", "Fmod", KVarFlags.Archive | KVarFlags.StringOnly, "Sound engine type"),
             KVar.C("snd_buffer_bass", "-1", KVarFlags.Archive, "Buffer type of Bass Sound Engine"),
@@ -209,15 +215,7 @@ public class GlobalInstaller : MonoInstaller
                 if (!filename.EndsWith(".cfg"))
                     filename += ".cfg";
 
-                if (fs.FileExists(filename))
-                {
-                    string[] cfg = fs.GetFile(filename).ReadAsString().Replace("\r", "").Split('\n');
-
-                    cfg.All(line => {
-                        kvSystem.ExecuteLine(line, true);
-                        return true;
-                    });
-                }
+                kvSystem.ExecuteFile(filename);
             }),
             Kommand.C("echo", "Repeater", (string[] args) =>
             {

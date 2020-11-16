@@ -231,7 +231,6 @@ public class DataLoader : IDataLoader
 
         fs.Init();
 
-        fs.AddSearchPath(DataDir, false);
         fs.AddSearchPath(FSDir, false);
 
         // Sanity check to fix common fs issues
