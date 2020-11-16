@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Un4seen.Bass;
 using Un4seen.Bass.AddOn.Enc;
-using Un4seen.Bass.AddOn.EncOpus;
+using Un4seen.Bass.AddOn.EncOgg;
 using Zenject;
 
 using Debug = UnityEngine.Debug;
@@ -44,7 +44,7 @@ namespace BanGround.Audio
             var pinnedObjectPtr = pinnedObject.AddrOfPinnedObject();
 
             var id = Bass.BASS_StreamCreateFile(pinnedObjectPtr, 0, Source.Length, BASSFlag.BASS_STREAM_DECODE | BASSFlag.BASS_STREAM_PRESCAN);
-            var encoder = BassEnc_Opus.BASS_Encode_OPUS_Start(id, $"--bitrate {Bitrate}", BASSEncode.BASS_ENCODE_DEFAULT, EncodeCallback, IntPtr.Zero);
+            var encoder = BassEnc_Ogg.BASS_Encode_OGG_Start(id, $"-b {Bitrate}", BASSEncode.BASS_ENCODE_DEFAULT, EncodeCallback, IntPtr.Zero);
 
             var size = Bass.BASS_ChannelGetLength(id);
             float fullSize = size;
