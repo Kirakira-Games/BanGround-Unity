@@ -295,7 +295,10 @@ namespace BanGround
     class KiraFilesystem : IFileSystem
     {
         List<string> packPaths = new List<string>();
-        List<string> searchPaths = new List<string>();
+        List<string> searchPaths = new List<string>
+        {
+            KiraPath.Combine(Application.persistentDataPath, "data")
+        };
 
         Dictionary<string, IFile> pakFileIndexs = new Dictionary<string, IFile>();
         Dictionary<string, (ZipArchive, DateTime)> packAccessCache = new Dictionary<string, (ZipArchive, DateTime)>();
