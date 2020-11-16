@@ -35,9 +35,9 @@ namespace BanGround.Audio
                 if (header == "OggS")
                     ext = ".ogg";
 
-#if MORE_FORMATS
-                if (header == "fLaC")
-                    ext = ".flac";
+                // Not supported by BASS by default whoops
+                // if (header == "fLaC")
+                //     ext = ".flac";
 
                 if (header == "ID3\x3")
                     ext = ".mp3";
@@ -45,8 +45,7 @@ namespace BanGround.Audio
                 string mp4header = new string(br.ReadChars(8));
 
                 if (mp4header == "ftypmp41" || mp4header == "ftypmp42" || mp4header == "ftypM4A ")
-                    ext = ".aac";'
-#endif
+                    ext = ".aac";
             }
 
             if (ext == null)

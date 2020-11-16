@@ -34,7 +34,6 @@ public class SettingAndMod : MonoBehaviour
     private Toggle shake_Tog;
     private Toggle milisec_Tog;
     private Toggle Video_Tog;
-    private Toggle Effect_Tog;
     private Toggle Resolution_Tog;
     private NoteStyleToggleGroup noteToggles;
     private SESelector seSelector;
@@ -120,8 +119,6 @@ public class SettingAndMod : MonoBehaviour
     KVar r_brightness_lane;
     [Inject(Id = "r_brightness_long")]
     KVar r_brightness_long;
-    [Inject(Id = "r_showeffect")]
-    KVar r_showeffect;
     [Inject(Id = "r_lowresolution")]
     KVar r_lowresolution;
 
@@ -166,7 +163,6 @@ public class SettingAndMod : MonoBehaviour
         noteToggles = GameObject.Find("Note_Group").GetComponent<NoteStyleToggleGroup>();
         seSelector = GameObject.Find("SEGroup").GetComponent<SESelector>();
         Video_Tog = GameObject.Find("Video_Toggle").GetComponent<Toggle>();
-        Effect_Tog = GameObject.Find("Effect_Tog").GetComponent<Toggle>();
         Resolution_Tog = GameObject.Find("Resolution_Tog").GetComponent<Toggle>();
 
         speed_Input = GameObject.Find("Speed_Input").GetComponent<InputField>();
@@ -279,7 +275,6 @@ public class SettingAndMod : MonoBehaviour
         shake_Tog.isOn = r_shake_flick;
         milisec_Tog.isOn = cl_showms;
         Video_Tog.isOn = r_usevideo;
-        Effect_Tog.isOn = r_showeffect;
         Resolution_Tog.isOn = r_lowresolution;
 
         judgeOffsetTransform.value = cl_offset_transform;
@@ -338,7 +333,6 @@ public class SettingAndMod : MonoBehaviour
             r_shake_flick.Set(shake_Tog.isOn);
             cl_showms.Set(milisec_Tog.isOn);
             r_usevideo.Set(Video_Tog.isOn);
-            r_showeffect.Set(Effect_Tog.isOn);
             r_lowresolution.Set(Resolution_Tog.isOn);
 #if (UNITY_STANDALONE || UNITY_WSA)
             if (FS_Tog.isOn)

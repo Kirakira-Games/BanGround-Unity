@@ -200,12 +200,12 @@ public class ChartCreator : MonoBehaviour
 
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
             var sfd = await new SelectFileDialog()
-                .SetFilter("OGG Audio\0*.ogg\0")
+                .SetFilter("Audio File\0*.ogg;*.mp3;*.aac\0")
                 .SetTitle("Select Audio file")
                 .SetDefaultExt("ogg")
                 .ShowAsync();
 
-            if(sfd.IsSucessful)
+            if (sfd.IsSucessful)
             {
                 file = System.IO.File.ReadAllBytes(sfd.File);
             }
@@ -293,7 +293,7 @@ public class ChartCreator : MonoBehaviour
                 {
                     var coverfi = new FileInfo(sfd.File);
 
-                    if(coverfi.Extension == ".jpg" || coverfi.Extension == ".png")
+                    if (coverfi.Extension == ".jpg" || coverfi.Extension == ".png")
                     {
                         cover = System.IO.File.ReadAllBytes(coverfi.FullName);
                     }
@@ -339,9 +339,16 @@ public class ChartCreator : MonoBehaviour
 #endif
             }
 
+            byte[] transcoded = null;
+
+            using (ITranscoder transcoder = new BassTranscoder { Source = file })
+            {
+                transcoded = await transcoder.DoAsync();
+            }
+
             // Create mheader
             var mheader = CreateMHeader(title, artist, len);
-            dataLoader.SaveHeader(mheader, file);
+            dataLoader.SaveHeader(mheader, transcoded);
 
             // Create header
             var header = CreateHeader(mheader.mid, cover == null ? default : "bg" + coverExt);

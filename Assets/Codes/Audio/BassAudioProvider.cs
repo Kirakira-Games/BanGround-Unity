@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Un4seen.Bass;
 using Un4seen.Bass.AddOn.Fx;
 using Cysharp.Threading.Tasks;
+using Un4seen.Bass.AddOn.Opus;
 
 #pragma warning disable CS1998 // 异步方法缺少 "await" 运算符，将以同步方式运行
 
@@ -245,6 +246,7 @@ namespace AudioProvider
         public void Init(int sampleRate, uint bufferLength)
         {
             Bass.BASS_Init(-1, sampleRate, BASSInit.BASS_DEVICE_DEFAULT, IntPtr.Zero);
+            BassOpus.LoadMe();
 
             if (bufferLength != 0)
             {
@@ -307,6 +309,10 @@ namespace AudioProvider
         public void Unload()
         {
             OnUnload?.Invoke();
+
+            BassOpus.FreeMe();
+
+            Bass.BASS_Free();
         }
 
         public void Update()

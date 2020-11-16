@@ -7,6 +7,7 @@ namespace BanGround.Audio
     {
         byte[] Source { get; set; }
         int Bitrate { get; set; }
+        float Progress { get; }
 
         byte[] Do();
         UniTask<byte[]> DoAsync();
