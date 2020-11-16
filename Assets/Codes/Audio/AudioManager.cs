@@ -30,7 +30,7 @@ public class AudioManager : MonoBehaviour, IAudioManager
 
     Texture2D fftTex;
 
-    private void Awake()
+    private void Start()
     {
         int bufferIndex;
 

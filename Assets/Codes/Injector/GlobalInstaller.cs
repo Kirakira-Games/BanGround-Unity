@@ -247,7 +247,7 @@ public class GlobalInstaller : MonoInstaller
                     }
     
                     if (show)
-                        table += $"<tr><td>{name}</td><td>{type}</td><td>{cmd.Description}</td></tr>";
+                        table += $"<tr><td>{cmd.Name}</td><td>{type}</td><td>{cmd.Description}</td></tr>";
                 }
     
                 table += "</table>";
