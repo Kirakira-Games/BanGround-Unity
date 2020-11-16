@@ -125,7 +125,6 @@ public class GlobalInstaller : MonoInstaller
             KVar.C("r_brightness_lane", "0.84", KVarFlags.Archive, "Lane brightness"),
             KVar.C("r_brightness_long", "0.8", KVarFlags.Archive, "Brightness of Longs or Slides"),
 
-            KVar.C("r_showeffect", "1", KVarFlags.Archive, "Show LaneParticleEffect"),
             KVar.C("r_lowresolution", "0", KVarFlags.Archive, "Low Resolution(0.7x)"),
 
             KVar.C("cl_showms", "0", KVarFlags.Archive),
