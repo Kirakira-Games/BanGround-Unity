@@ -253,9 +253,6 @@ public class SettingAndMod : MonoBehaviour
         setting_Close_Btn.gameObject.SetActive(false);
         kvSystem.SaveConfig();
         SelectManager_old.instance.previewSound?.Play();
-        audioManager.Provider.SetSoundEffectVolume(snd_se_volume, SEType.Common);
-        audioManager.Provider.SetSoundEffectVolume(snd_igse_volume, SEType.InGame);
-        audioManager.Provider.SetSoundTrackVolume(snd_bgm_volume);
     }
     void OpenMod()
     {
