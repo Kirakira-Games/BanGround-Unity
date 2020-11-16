@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 //using UnityEditor.UIElements;
 using UnityEngine;
 using Zenject;
+using System.Linq;
 
 [Flags]
 public enum KVarFlags
@@ -249,6 +250,9 @@ public class KVar : KonCommandBase
 
 public class KVSystem : IKVSystem
 {
+    [Inject]
+    IFileSystem fs;
+
     private bool isReloadingConfig = false;
 
     // All commands
@@ -384,7 +388,7 @@ public class KVSystem : IKVSystem
     public void ReloadConfig() 
     {
         isReloadingConfig = true;
-        ExecuteLine("exec config.cfg");
+        ExecuteFile("config.cfg");
         isReloadingConfig = false;
     }
 
@@ -451,5 +455,18 @@ public class KVSystem : IKVSystem
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
+    }
+
+    public void ExecuteFile(string file)
+    {
+        if (fs.FileExists(file))
+        {
+            string[] cfg = fs.GetFile(file).ReadAsString().Replace("\r", "").Split('\n');
+
+            cfg.All(line => {
+                ExecuteLine(line, true);
+                return true;
+            });
+        }
     }
 }
