@@ -43,13 +43,15 @@ namespace BanGround.Audio
             var pinnedObject = GCHandle.Alloc(Source, GCHandleType.Pinned);
             var pinnedObjectPtr = pinnedObject.AddrOfPinnedObject();
 
+            var startTime = DateTime.Now;
+
             var id = Bass.BASS_StreamCreateFile(pinnedObjectPtr, 0, Source.Length, BASSFlag.BASS_STREAM_DECODE | BASSFlag.BASS_STREAM_PRESCAN);
             var encoder = BassEnc_Ogg.BASS_Encode_OGG_Start(id, $"-b {Bitrate}", BASSEncode.BASS_ENCODE_DEFAULT, EncodeCallback, IntPtr.Zero);
 
             var size = Bass.BASS_ChannelGetLength(id);
             float fullSize = size;
 
-            var buffer = new byte[65536];
+            var buffer = new byte[0x1000];
 
             while (true)
             {
@@ -71,6 +73,9 @@ namespace BanGround.Audio
 
             BassEnc.BASS_Encode_Stop(encoder);
             Bass.BASS_StreamFree(id);
+
+            var dur = DateTime.Now - startTime;
+            Debug.Log($"Encode toke {dur.TotalMilliseconds}ms");
 
             return _result.ToArray();
         }
