@@ -8,6 +8,7 @@ using Un4seen.Bass;
 using Un4seen.Bass.AddOn.Fx;
 using Cysharp.Threading.Tasks;
 using Un4seen.Bass.AddOn.Opus;
+using System.Diagnostics;
 
 #pragma warning disable CS1998 // 异步方法缺少 "await" 运算符，将以同步方式运行
 
@@ -243,10 +244,50 @@ namespace AudioProvider
         internal event BassEventHandler OnVolumeChanged;
         internal event BassEventHandler OnUnload;
 
+        private static string GetPluginAbsPath(string pluginName)
+        {
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+            foreach (ProcessModule module in Process.GetCurrentProcess().Modules)
+            {
+                if(module.ModuleName.ToLower() == "bass.dll")
+                {
+                    return module.FileName.Substring(0, module.FileName.Length - 8) + pluginName + ".dll";
+                }
+            }
+
+            return pluginName;
+#else
+            return pluginName;
+#endif
+
+        }
+
+        private static readonly string[] PluginNames =
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_IOS
+            {GetPluginAbsPath("BASSOPUS")};
+#elif UNITY_ANDROID
+            {"libbassopus"};
+#endif
+
+        private List<int> LoadedPlugins = new List<int>();
+
         public void Init(int sampleRate, uint bufferLength)
         {
             Bass.BASS_Init(-1, sampleRate, BASSInit.BASS_DEVICE_DEFAULT, IntPtr.Zero);
-            BassOpus.LoadMe();
+
+            foreach (var plugin in PluginNames)
+            {
+                var handle = Bass.BASS_PluginLoad(plugin);
+
+                if(handle == 0)
+                {
+                    var error = Bass.BASS_ErrorGetCode();
+
+                    throw new Exception($"Failed to load plugin {plugin}, error: {error:g}");
+                }
+
+                LoadedPlugins.Add(handle);
+            }
 
             if (bufferLength != 0)
             {

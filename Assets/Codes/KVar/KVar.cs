@@ -464,7 +464,7 @@ public class KVSystem : IKVSystem
             string[] cfg = fs.GetFile(file).ReadAsString().Replace("\r", "").Split('\n');
 
             cfg.All(line => {
-                ExecuteLine(line, true);
+                ExecuteLine(line);
                 return true;
             });
         }
