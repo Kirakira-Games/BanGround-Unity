@@ -79,10 +79,6 @@ public class AudioManager : MonoBehaviour, IAudioManager
             }
             Provider.Init(AppPreLoader.sampleRate, (uint)(AppPreLoader.bufferSize / HandelValue_Buffer.FmodBufferScale[bufferIndex]));
         }
-
-        Provider.SetSoundEffectVolume(snd_se_volume, SEType.Common);
-        Provider.SetSoundEffectVolume(snd_igse_volume, SEType.InGame);
-        Provider.SetSoundTrackVolume(snd_bgm_volume);
     }
 
     float _peakValue = 0.0f;

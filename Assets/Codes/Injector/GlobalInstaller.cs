@@ -19,6 +19,7 @@ public class GlobalInstaller : MonoInstaller
     private IKVSystem kvSystem;
     private IDataLoader dataLoader;
     private IFileSystem fs;
+    private IAudioProvider ap;
 
     public override void Start()
     {
@@ -62,7 +63,11 @@ public class GlobalInstaller : MonoInstaller
         }).NonLazy();
 
         // Audio Manager
-        Container.Bind<IAudioProvider>().FromFactory<AudioProviderFactory>().AsSingle().NonLazy();
+        Container.Bind<IAudioProvider>().FromFactory<AudioProviderFactory>().AsSingle().OnInstantiated((_, obj) =>
+        {
+            if (obj is ValidationMarker) return;
+            ap = obj as IAudioProvider;
+        }).NonLazy();
         Container.Bind<IAudioManager>().To<AudioManager>().FromNewComponentOnNewGameObject().AsSingle().NonLazy();
 
         // Sorter Factory
@@ -143,9 +148,9 @@ public class GlobalInstaller : MonoInstaller
             KVar.C("cl_accesstoken", "", KVarFlags.Archive | KVarFlags.StringOnly, "Saved access token", (_, kvSystem) => kvSystem.SaveConfig()),
             KVar.C("cl_refreshtoken", "", KVarFlags.Archive | KVarFlags.StringOnly, "Saved refresh token", (_, kvSystem) => kvSystem.SaveConfig()),
 
-            KVar.C("snd_bgm_volume", "0.7", KVarFlags.Archive, "BGM volume"),
-            KVar.C("snd_se_volume", "0.7", KVarFlags.Archive, "Sound effect volume"),
-            KVar.C("snd_igse_volume", "0.7", KVarFlags.Archive, "In-game sound effect volume"),
+            KVar.C("snd_bgm_volume", "0.7", KVarFlags.Archive, "BGM volume", _ => ap.SetSoundTrackVolume(kvSystem.Find("snd_bgm_volume"))),
+            KVar.C("snd_se_volume", "0.7", KVarFlags.Archive, "Sound effect volume",_ => ap.SetSoundEffectVolume(kvSystem.Find("snd_se_volume"), SEType.Common)),
+            KVar.C("snd_igse_volume", "0.7", KVarFlags.Archive, "In-game sound effect volume",_ => ap.SetSoundEffectVolume(kvSystem.Find("snd_igse_volume"), SEType.InGame)),
 
             KVar.C("snd_engine", "Fmod", KVarFlags.Archive | KVarFlags.StringOnly, "Sound engine type"),
             KVar.C("snd_buffer_bass", "-1", KVarFlags.Archive, "Buffer type of Bass Sound Engine"),
@@ -165,7 +170,7 @@ public class GlobalInstaller : MonoInstaller
 
         Kommand.KommandInfo[] cmdInfos =
         {
-            Kommand.C("move_chart", "Move a chart", args => 
+            Kommand.C("move_chart", "Move a chart", args =>
             {
                 if(args.Length != 2)
                     return;
@@ -175,7 +180,7 @@ public class GlobalInstaller : MonoInstaller
 
                 dataLoader.MoveChart(chartA, targetChart);
             }),
-            Kommand.C("fs_test", "Test Filesystem", _ => 
+            Kommand.C("fs_test", "Test Filesystem", _ =>
             {
                 const string testPath = "D:\\lol.zip";
 
@@ -229,12 +234,12 @@ public class GlobalInstaller : MonoInstaller
             {
                 var table = "<table cellspacing=\"5\"><tr><td>Name</td><td>Type</td><td>Description</td></tr>\n" +
                             "<tr><td height=\"1\" colspan=\"3\" style=\"background-color:#0c0;\"></td></tr>";
-    
+
                 foreach (var cmd in kvSystem)
                 {
                     bool show = true;
                     string type = "Kommand";
-    
+
                     if(cmd is KVar kVar)
                     {
                         if (kVar.IsFlagSet(KVarFlags.Hidden)
@@ -242,14 +247,14 @@ public class GlobalInstaller : MonoInstaller
                             || kVar.IsFlagSet(KVarFlags.DevelopmentOnly)
 #endif
                         ) show = false;
-    
+
                         type = "KVar";
                     }
-    
+
                     if (show)
                         table += $"<tr><td>{cmd.Name}</td><td>{type}</td><td>{cmd.Description}</td></tr>";
                 }
-    
+
                 table += "</table>";
                 Debug.Log(table);
             }),
@@ -319,7 +324,7 @@ public class GlobalInstaller : MonoInstaller
 
     private void Update()
     {
-        if(++fsUpdateFrameCounter > 3600)
+        if (++fsUpdateFrameCounter > 3600)
         {
             fsUpdateFrameCounter = 0;
             fs.OnUpdate();
