@@ -27,7 +27,7 @@ public class SwitchToggle : MonoBehaviour
         Vector2 viewportLocalPosition = settingRect.viewport.localPosition;
         Vector2 childLocalPosition = target.localPosition;
         result = new Vector2(
-            0 - (viewportLocalPosition.x + childLocalPosition.x),
+            0,
             0 - (viewportLocalPosition.y + childLocalPosition.y)
         );
         return content.localPosition.y >= result.y &&
