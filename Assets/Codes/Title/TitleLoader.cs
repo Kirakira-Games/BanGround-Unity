@@ -45,7 +45,7 @@ public class TitleLoader : MonoBehaviour
     private ISoundEffect banGround;
     private bool isAuthing;
 
-    const string BACKGROUND_PATH = "backgrounds";
+    //const string BACKGROUND_PATH = "backgrounds";
     /*
      * Test User for editor:
      * Username:
@@ -66,7 +66,7 @@ public class TitleLoader : MonoBehaviour
         instance = this;
         CheckUpdate();
 
-        var backgrounds = fs.Find(file=> file.Name.StartsWith(BACKGROUND_PATH));
+        var backgrounds = fs.Find(file => file.Name.EndsWith(".jpg") || file.Name.EndsWith(".png") || file.Name.EndsWith(".jpeg"));
 
         if (backgrounds.Count() != 0)
         {
@@ -75,7 +75,7 @@ public class TitleLoader : MonoBehaviour
             var matCopy = Instantiate(backgroundMat);
 
             matCopy.SetTexture("_MainTex", tex);
-            matCopy.SetFloat("_TexRatio", tex.width / tex.height);
+            matCopy.SetFloat("_TexRatio", tex.width / (float)tex.height);
 
             background.sharedMaterial = matCopy;
         }
