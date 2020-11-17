@@ -51,7 +51,7 @@ public class NoteMesh : MonoBehaviour
 
     public MeshFilter meshFilter { get; private set; }
     public MeshRenderer meshRenderer { get; private set; }
-    public float width = 1.1f;
+    public float width = 1.2f;
     private Vector3[] meshVertices;
 
     private static float GetLength(float z)
