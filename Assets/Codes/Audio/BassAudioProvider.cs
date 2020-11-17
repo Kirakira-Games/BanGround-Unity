@@ -262,12 +262,7 @@ namespace AudioProvider
 
         }
 
-        private static readonly string[] PluginNames =
-#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_IOS
-            {GetPluginAbsPath("BASSOPUS")};
-#elif UNITY_ANDROID
-            {"libbassopus"};
-#endif
+        private static readonly string[] PluginNames = { };
 
         private List<int> LoadedPlugins = new List<int>();
 
@@ -283,7 +278,8 @@ namespace AudioProvider
                 {
                     var error = Bass.BASS_ErrorGetCode();
 
-                    throw new Exception($"Failed to load plugin {plugin}, error: {error:g}");
+                    if(error != BASSError.BASS_ERROR_ALREADY)
+                        throw new Exception($"Failed to load plugin {plugin}, error: {error:g}");
                 }
 
                 LoadedPlugins.Add(handle);
