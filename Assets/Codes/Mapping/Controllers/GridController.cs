@@ -25,6 +25,8 @@ namespace BGEditor
         public float VPadding;
         public float LineBoundingHeight;
         public int BPMFontSize;
+        public Font fontFamily;
+
         public int StartBar { get; private set; }
         public int EndBar { get; private set; }
 
@@ -97,7 +99,7 @@ namespace BGEditor
             var txt = rect.GetComponent<Text>();
             txt.raycastTarget = false;
             txt.text = text;
-            txt.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            txt.font = fontFamily;
             txt.alignment = TextAnchor.MiddleRight;
             txt.fontSize = 48;
             objectsInUse.AddLast(ret);
