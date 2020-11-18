@@ -92,6 +92,11 @@ namespace BanGround.Scripting.Lunar
 
             OverrideTexture(texId);
         }
+        
+        public void SetColor(float r, float g, float b, float a)
+        {
+            spriteRenderer.color = new Color(r, g, b, a);
+        }
 
         public void SetPosition(float x, float y, float z)
         {
