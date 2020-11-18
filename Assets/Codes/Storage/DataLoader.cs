@@ -326,7 +326,7 @@ public class DataLoader : IDataLoader
         string path = GetChartScriptPath(sid, difficulty);
 
         var file = fs.GetOrNewFile(path);
-        file.WriteBytes(Encoding.Unicode.GetBytes(script));
+        file.WriteBytes(Encoding.UTF8.GetBytes(script));
         fs.FlushPak(file.RootPath);
     }
 

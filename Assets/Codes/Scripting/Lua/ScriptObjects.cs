@@ -85,14 +85,12 @@ namespace BanGround.Scripting.Lunar
         {
             this.texLookup = texLookup;
 
-            spr = Sprite.Create(texLookup(texId), new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f));
-
             obj = new GameObject("ScriptSprite");
             obj.transform.parent = GameObject.Find("ScriptObjects").transform;
 
             spriteRenderer = obj.AddComponent<SpriteRenderer>();
 
-            spriteRenderer.sprite = spr;
+            OverrideTexture(texId);
         }
 
         public void SetPosition(float x, float y, float z)
@@ -107,8 +105,11 @@ namespace BanGround.Scripting.Lunar
 
         public void OverrideTexture(int texId)
         {
-            UnityEngine.Object.Destroy(spr);
-            spr = Sprite.Create(texLookup(texId), new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f));
+            if(spr != null)
+                UnityEngine.Object.Destroy(spr);
+
+            var tex = texLookup(texId);
+            spr = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
 
             spriteRenderer.sprite = spr;
         }

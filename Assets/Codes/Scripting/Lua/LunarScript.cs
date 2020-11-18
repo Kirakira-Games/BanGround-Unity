@@ -94,22 +94,24 @@ namespace BanGround.Scripting.Lunar
             return spr;
         }
 
+        public float GetHealth() => LifeController.instance.lifePoint;
+
         float startTime = 0;
         float startBeat = 0;
 
-        public void AddKeyframeByTime(float time, LuaFunction callback)
+        public void AtTime(float time, LuaFunction callback)
         {
             ls.AddKeyframeByTime(startTime, time, callback);
             startTime = time;
         }
 
-        public void AddKeyframeByBeat(float beat, LuaFunction callback)
+        public void AtBeat(float beat, LuaFunction callback)
         {
             ls.AddKeyframeByBeat(startBeat, beat, callback);
             startBeat = beat;
         }
 
-        public void PrintToConsole(string str)
+        public void Msg(string str)
         {
             Debug.Log(str);
         }
@@ -195,6 +197,7 @@ namespace BanGround.Scripting.Lunar
         public void AddKeyframeByTime(float startTime, float time, LuaFunction callback)
         {
             keyframes.Add((startTime, time - startTime, callback));
+            keyframes.Sort((a, b) => a.Item1.CompareTo(b.Item1));
         }
 
         public void AddKeyframeByBeat(float startBeat, float beat, LuaFunction callback)
