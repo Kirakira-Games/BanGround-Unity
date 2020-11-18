@@ -435,7 +435,7 @@ static class ResultsGetter
     }
     public static double GetAcc()
     {
-        double acc = ComboManager.acc / (double)(ComboManager.noteCount * 10);
+        double acc = (double)ComboManager.acc / ComboManager.maxAcc;
         return acc;
     }
 }

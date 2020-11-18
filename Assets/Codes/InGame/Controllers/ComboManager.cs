@@ -142,5 +142,5 @@ public class ComboManager : MonoBehaviour
     }
 
     [Flags]
-    enum ClearFlag { None,FC,AP}
+    enum ClearFlag { None, FC, AP }
 }
