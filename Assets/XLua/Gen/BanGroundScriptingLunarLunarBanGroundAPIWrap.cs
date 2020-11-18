@@ -21,7 +21,7 @@ namespace XLua.CSObjectWrap
         {
 			ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
 			System.Type type = typeof(BanGround.Scripting.Lunar.LunarBanGroundAPI);
-			Utils.BeginObjectRegister(type, L, translator, 0, 11, 0, 0);
+			Utils.BeginObjectRegister(type, L, translator, 0, 12, 0, 0);
 			
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "GetCamera", _m_GetCamera);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "LoadTexture", _m_LoadTexture);
@@ -30,6 +30,7 @@ namespace XLua.CSObjectWrap
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "SetJudgeLineColor", _m_SetJudgeLineColor);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "PrecacheSound", _m_PrecacheSound);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "CreateSprite", _m_CreateSprite);
+			Utils.RegisterFunc(L, Utils.METHOD_IDX, "GetHealth", _m_GetHealth);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "AddKeyframeByTime", _m_AddKeyframeByTime);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "AddKeyframeByBeat", _m_AddKeyframeByBeat);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "PrintToConsole", _m_PrintToConsole);
@@ -271,6 +272,34 @@ namespace XLua.CSObjectWrap
                     
                         BanGround.Scripting.Lunar.ScriptSprite gen_ret = gen_to_be_invoked.CreateSprite( _textureId );
                         translator.Push(L, gen_ret);
+                    
+                    
+                    
+                    return 1;
+                }
+                
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _m_GetHealth(RealStatePtr L)
+        {
+		    try {
+            
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+            
+            
+                BanGround.Scripting.Lunar.LunarBanGroundAPI gen_to_be_invoked = (BanGround.Scripting.Lunar.LunarBanGroundAPI)translator.FastGetCSObj(L, 1);
+            
+            
+                
+                {
+                    
+                        float gen_ret = gen_to_be_invoked.GetHealth(  );
+                        LuaAPI.lua_pushnumber(L, gen_ret);
                     
                     
                     
