@@ -576,8 +576,7 @@ public class NoteController : MonoBehaviour, INoteController
         slidesToDestroy.ForEach(slide => slides.Remove(slide));
         notesToDestroy.ForEach(note => notebases.Remove(note));
 
-        if(chartScript.HasOnUpdate)
-            chartScript?.OnUpdate(audioTime);
+        chartScript?.OnUpdate(audioTime);
 
         if (chartScript.HasOnBeat)
             chartScript?.OnBeat(chartListManager.chart.TimeToBeat(audioTime));
