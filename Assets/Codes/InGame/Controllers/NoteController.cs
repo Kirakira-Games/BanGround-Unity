@@ -11,6 +11,7 @@ using JudgeQueue = PriorityQueue<int, NoteBase>;
 using Zenject;
 using System.Threading;
 using BanGround;
+using BanGround.Scripting;
 
 public class NoteController : MonoBehaviour, INoteController
 {
@@ -30,6 +31,8 @@ public class NoteController : MonoBehaviour, INoteController
     private IGameStateMachine SM;
     [Inject]
     private IUIManager UI;
+    [Inject]
+    private IScript chartScript;
 
     [Inject(Id = "o_judge")]
     private KVar o_judge;
@@ -65,8 +68,6 @@ public class NoteController : MonoBehaviour, INoteController
     //private LaneEffects laneEffects;
 
     private UnityAction<JudgeResult> onJudge;
-
-    private ChartScript chartScript;
 
     // Saved instances
     private HashSet<NoteBase> notebases = new HashSet<NoteBase>();
@@ -141,6 +142,9 @@ public class NoteController : MonoBehaviour, INoteController
 
         // Update EL
         JudgeResultController.instance.DisplayJudgeOffset(notebase, (int)result);
+
+        if(chartScript.HasOnJudge)
+            chartScript.OnJudge(result);
     }
 
     private void UpdateLane(JudgeQueue Q)
@@ -400,7 +404,6 @@ public class NoteController : MonoBehaviour, INoteController
 
         // Create tables for fast lookup
         syncTable = new Dictionary<int, NoteSyncLine>();
-        Application.targetFrameRate = 120;
 
         // Create queue for each lane
         laneQueue = new JudgeQueue[NoteUtility.LANE_COUNT];
@@ -478,7 +481,7 @@ public class NoteController : MonoBehaviour, INoteController
             GameObject.Find("settingsCanvas").GetComponent<Canvas>().enabled = false;
         }
 
-        chartScript = new ChartScript(chartListManager.current.header.sid, chartListManager.current.difficulty, fs, audioManager);
+        chartScript.Init(chartListManager.current.header.sid, chartListManager.current.difficulty);
 
         //Set Play Mod Event
         //audioManager.restart = false;
@@ -573,7 +576,11 @@ public class NoteController : MonoBehaviour, INoteController
         slidesToDestroy.ForEach(slide => slides.Remove(slide));
         notesToDestroy.ForEach(note => notebases.Remove(note));
 
-        chartScript?.OnUpdate(audioTime);
+        if(chartScript.HasOnUpdate)
+            chartScript?.OnUpdate(audioTime);
+
+        if (chartScript.HasOnBeat)
+            chartScript?.OnBeat(chartListManager.chart.TimeToBeat(audioTime));
     }
 
     private void OnDestroy()

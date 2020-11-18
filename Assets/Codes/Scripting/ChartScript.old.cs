@@ -1,4 +1,4 @@
-﻿using System;
+﻿/*using System;
 using System.Collections.Generic;
 using XLua;
 using System.IO;
@@ -306,4 +306,4 @@ class ChartScript : IDisposable
         onUpdate = null;
         luaEnv.Dispose();
     }
-}
+}*/

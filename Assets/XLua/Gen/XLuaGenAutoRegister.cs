@@ -19,12 +19,28 @@ namespace XLua.CSObjectWrap
 	{
         
         
+        static void wrapInit0(LuaEnv luaenv, ObjectTranslator translator)
+        {
+        
+            translator.DelayWrapLoader(typeof(BanGround.Scripting.Lunar.LunarBanGroundAPI), BanGroundScriptingLunarLunarBanGroundAPIWrap.__Register);
+        
+        
+            translator.DelayWrapLoader(typeof(BanGround.Scripting.Lunar.ScriptCamera), BanGroundScriptingLunarScriptCameraWrap.__Register);
+        
+        
+            translator.DelayWrapLoader(typeof(BanGround.Scripting.Lunar.ScriptSoundEffect), BanGroundScriptingLunarScriptSoundEffectWrap.__Register);
+        
+        
+            translator.DelayWrapLoader(typeof(BanGround.Scripting.Lunar.ScriptSprite), BanGroundScriptingLunarScriptSpriteWrap.__Register);
         
         
         
+        }
         
         static void Init(LuaEnv luaenv, ObjectTranslator translator)
         {
+            
+            wrapInit0(luaenv, translator);
             
             
         }
