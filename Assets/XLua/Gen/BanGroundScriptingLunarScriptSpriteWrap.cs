@@ -21,8 +21,9 @@ namespace XLua.CSObjectWrap
         {
 			ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
 			System.Type type = typeof(BanGround.Scripting.Lunar.ScriptSprite);
-			Utils.BeginObjectRegister(type, L, translator, 0, 4, 0, 0);
+			Utils.BeginObjectRegister(type, L, translator, 0, 5, 0, 0);
 			
+			Utils.RegisterFunc(L, Utils.METHOD_IDX, "SetColor", _m_SetColor);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "SetPosition", _m_SetPosition);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "SetRotation", _m_SetRotation);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "OverrideTexture", _m_OverrideTexture);
@@ -76,6 +77,37 @@ namespace XLua.CSObjectWrap
         
         
         
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _m_SetColor(RealStatePtr L)
+        {
+		    try {
+            
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+            
+            
+                BanGround.Scripting.Lunar.ScriptSprite gen_to_be_invoked = (BanGround.Scripting.Lunar.ScriptSprite)translator.FastGetCSObj(L, 1);
+            
+            
+                
+                {
+                    float _r = (float)LuaAPI.lua_tonumber(L, 2);
+                    float _g = (float)LuaAPI.lua_tonumber(L, 3);
+                    float _b = (float)LuaAPI.lua_tonumber(L, 4);
+                    float _a = (float)LuaAPI.lua_tonumber(L, 5);
+                    
+                    gen_to_be_invoked.SetColor( _r, _g, _b, _a );
+                    
+                    
+                    
+                    return 0;
+                }
+                
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            
+        }
         
         [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
         static int _m_SetPosition(RealStatePtr L)
