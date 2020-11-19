@@ -25,11 +25,10 @@ public class TabToggleGroup : MonoBehaviour
     /// </summary>
     private Vector2 GetTopPosition(RectTransform panel)
     {
-        Vector2 viewportLocalPosition = Scroll.viewport.localPosition;
         Vector2 childLocalPosition = panel.localPosition;
         return new Vector2(
             0,
-            0 - (viewportLocalPosition.y + childLocalPosition.y)
+            0 - childLocalPosition.y
         );
     }
 
@@ -55,6 +54,7 @@ public class TabToggleGroup : MonoBehaviour
             if (index != ActiveTabIndex)
             {
                 ActiveTabIndex = index;
+                Canvas.ForceUpdateCanvases();
                 Content.localPosition = GetTopPosition(ActiveTab.Target);
             }
         }
