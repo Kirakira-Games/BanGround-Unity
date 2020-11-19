@@ -6,18 +6,17 @@ using AudioProvider;
 public class AudioProviderFactory : IFactory<IAudioProvider>
 {
     private DiContainer container;
+    private string snd_engine;
 
-    [Inject(Id = "snd_engine")]
-    private KVar snd_engine;
-
-    public AudioProviderFactory(DiContainer container)
+    public AudioProviderFactory(DiContainer container, [Inject(Id = "snd_engine")] KVar snd_engine)
     {
         this.container = container;
+        this.snd_engine = snd_engine;
     }
 
     public IAudioProvider Create()
     {
-        switch ((string)snd_engine)
+        switch (snd_engine)
         {
             case "Bass":
                 return container.Instantiate<BassAudioProvider>();
