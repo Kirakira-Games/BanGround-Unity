@@ -347,8 +347,6 @@ namespace AudioProvider
         {
             OnUnload?.Invoke();
 
-            BassOpus.FreeMe();
-
             Bass.BASS_Free();
         }
 
