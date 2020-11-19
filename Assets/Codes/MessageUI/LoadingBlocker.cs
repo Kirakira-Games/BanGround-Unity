@@ -8,9 +8,12 @@ public class LoadingBlocker : MonoBehaviour, ILoadingBlocker
 {
     public Text text;
     public Button cancelButton;
+    public Slider progressBar;
+    public GameObject loadingIcon;
+    public float progress { get; private set; }
+    public bool showProgress { get; private set; }
 
     private Action action = null;
-    private string progress;
     private string message;
 
     private void Start()
@@ -23,6 +26,7 @@ public class LoadingBlocker : MonoBehaviour, ILoadingBlocker
     // TODO: Add progress bar display
     public void Show(string message, Action cancelAction = null, bool showProgress = false)
     {
+        progress = 0;
         SetText(message, showProgress);
 
         gameObject.SetActive(true);
@@ -33,14 +37,23 @@ public class LoadingBlocker : MonoBehaviour, ILoadingBlocker
 
     public void SetText(string message, bool showProgress = false)
     {
-        progress = "";
         this.message = message;
-        UpdateText();
+        this.showProgress = showProgress;
+        UpdateDisplay();
     }
 
-    private void UpdateText()
+    private void UpdateDisplay()
     {
-        text.text = message + " " + progress;
+        text.text = message;
+        if (showProgress == loadingIcon.activeSelf)
+        {
+            loadingIcon.SetActive(!showProgress);
+            progressBar.gameObject.SetActive(showProgress);
+        }
+        if (showProgress)
+        {
+            progressBar.value = progress;
+        }
     }
 
     public void Close()
@@ -48,9 +61,11 @@ public class LoadingBlocker : MonoBehaviour, ILoadingBlocker
         gameObject.SetActive(false);
     }
 
-    public void SetProgress(int current, int max)
+    public void SetProgress(int current, int max) => SetProgress((float)current / Mathf.Max(1, max));
+
+    public void SetProgress(float progress)
     {
-        progress = $"({current}/{max})";
-        UpdateText();
+        this.progress = progress;
+        UpdateDisplay();
     }
 }

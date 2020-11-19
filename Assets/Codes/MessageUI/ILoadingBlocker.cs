@@ -8,5 +8,6 @@ public interface ILoadingBlocker
     void OnCancel();
     void SetText(string message, bool showProgress = false);
     void SetProgress(int current, int max);
+    void SetProgress(float progress);
     void Show(string message, Action cancelAction = null, bool showProgress = false);
 }

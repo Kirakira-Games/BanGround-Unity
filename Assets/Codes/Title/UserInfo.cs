@@ -2,13 +2,12 @@
 using UnityEngine.UI;
 using UnityEngine.Networking;
 using Cysharp.Threading.Tasks;
-using TMPro;
 using BanGround.Web.Auth;
 
 public class UserInfo : MonoBehaviour
 {
     public static UserLite user;
-    public static bool isOffline;
+    public static bool isOffline = true;
     private Text username_Text;
     private Image userAvatar;
 

@@ -74,7 +74,7 @@ namespace BanGround
         private Stream openedStream;
 
         public string Name {
-            get => internalInfo.FullName.Replace('\\', '/').Replace(RootPath, "");
+            get => internalInfo.FullName.Replace('\\', '/').Replace(RootPath, "").TrimStart('/');
             set
             {
                 var path = KiraPath.Combine(RootPath, value);
