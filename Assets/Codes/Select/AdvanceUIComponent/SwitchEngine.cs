@@ -26,14 +26,22 @@ public class SwitchEngine : MonoBehaviour
         {
             if (on) snd_engine.Set("Fmod");
         });
-/*
+        /*
         engineTgs[2].onValueChanged.AddListener(on =>
         {
             if (on) snd_engine.Set("Unity");
         });*/
-
-        engineTgs[0].isOn = snd_engine == "Bass";
-        engineTgs[1].isOn = snd_engine == "Fmod";
-       /* engineTgs[2].isOn = snd_engine == "Unity";*/
+        switch ((string) snd_engine)
+        {
+            case "Bass":
+                engineTgs[0].isOn = true;
+                break;
+            case "Fmod":
+                engineTgs[1].isOn = true;
+                break;
+            default:
+                Debug.LogError("Unrecognized sound engine: " + snd_engine);
+                break;
+        }
     }
 }
