@@ -12,6 +12,7 @@ using TagLib;
 using ModestTree;
 using BanGround.Utils;
 using System.Runtime.InteropServices;
+using AudioProvider;
 
 public class ChartCreator : MonoBehaviour
 {
@@ -23,6 +24,8 @@ public class ChartCreator : MonoBehaviour
     private IMessageBannerController messageBannerController;
     [Inject]
     private ILoadingBlocker loadingBlocker;
+    [Inject]
+    private IAudioProvider audioProvider;
 
     [Inject(Id = "cl_lastdiff")]
     private KVar cl_lastdiff;
@@ -183,7 +186,7 @@ public class ChartCreator : MonoBehaviour
 
         var task = WaitForAirdrop(tokenSource.Token);
 
-        loadingBlocker.Show("Waiting for airdrop (You must drop a ogg music!!!)...", tokenSource.Cancel);
+        loadingBlocker.Show("Waiting for airdrop (ogg/mp3)...", tokenSource.Cancel);
 
         await task;
 
@@ -281,7 +284,7 @@ public class ChartCreator : MonoBehaviour
             }
 
 
-            if (cover == null)
+            if (cover == null && false) // Maybe remove this feature?
             {
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
                 await sfd.SetFilter("File contains cover\0*.jpg;*.png;*.flac;*.mp3;*.aac\0")
@@ -341,9 +344,16 @@ public class ChartCreator : MonoBehaviour
 
             byte[] transcoded = null;
 
-            using (ITranscoder transcoder = new BassTranscoder { Source = file })
+            using (ITranscoder transcoder = new BassTranscoder(audioProvider) { Source = file })
             {
-                transcoded = await transcoder.DoAsync();
+                loadingBlocker.SetText("Converting audio file...", true);
+                var task = transcoder.DoAsync();
+                while (!task.Status.IsCompleted())
+                {
+                    loadingBlocker.SetProgress(transcoder.Progress);
+                    await UniTask.DelayFrame(1);
+                }
+                transcoded = await task;
             }
 
             // Create mheader

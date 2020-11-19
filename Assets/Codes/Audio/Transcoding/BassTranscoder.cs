@@ -18,16 +18,16 @@ namespace BanGround.Audio
 {
     class BassTranscoder : ITranscoder
     {
-        [Inject]
-        IAudioProvider provider;
-
         public byte[] Source { get; set; } = null;
         public int Bitrate { get; set; } = 96;
         public float Progress { get; private set; } = .0f;
 
-        public BassTranscoder()
+        private bool initBass;
+
+        public BassTranscoder(IAudioProvider provider)
         {
-            if(!(provider is BassAudioProvider))
+            initBass = !(provider is BassAudioProvider);
+            if (initBass)
                 Bass.BASS_Init(0, 48000, BASSInit.BASS_DEVICE_DEFAULT, IntPtr.Zero);
         }
 
@@ -63,7 +63,7 @@ namespace BanGround.Audio
 
                 Progress = 1.0f - (size / fullSize);
 
-                Debug.Log($"Encode progress {Progress}");
+                //Debug.Log($"Encode progress {Progress}");
 
                 if (transferred < 1)
                     break;
@@ -90,12 +90,12 @@ namespace BanGround.Audio
 
         public UniTask<byte[]> DoAsync()
         {
-            return UniTask.Run(Do);
+            return UniTask.RunOnThreadPool(Do);
         }
 
         public void Dispose()
         {
-            if (!(provider is BassAudioProvider))
+            if (initBass)
                 Bass.BASS_Free();
         }
     }

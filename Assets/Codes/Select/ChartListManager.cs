@@ -57,7 +57,6 @@ public class ChartListManager : IChartListManager
         dataLoader.onSongListRefreshed.AddListener(() =>
         {
             SortChart();
-            SelectChartBySid(cl_lastsid);
             SelectDifficulty((Difficulty)cl_lastdiff);
         });
     }
@@ -83,7 +82,7 @@ public class ChartListManager : IChartListManager
     public void SelectChartByIndex(int index)
     {
         index = Mathf.Clamp(index, 0, chartList.Count - 1);
-        if (cl_lastsid == chartList[index].sid
+        if (selectedChart.header?.sid == chartList[index].sid
             && selectedChart.header != null
             && selectedChart.index == index)
             return;
