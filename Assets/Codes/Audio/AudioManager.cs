@@ -148,7 +148,7 @@ public class AudioManager : MonoBehaviour, IAudioManager
         }
         return gameBGM;
     }
-    public void StopBGM() => gameBGM.Stop();
+    public void StopBGM() => gameBGM?.Stop();
     public async UniTask<ISoundTrack> PlayLoopMusic(byte[] audio,bool needLoop = true, uint[] times = null, bool noFade = true)
     {
         ISoundTrack soundTrack = await Provider.StreamTrack(audio);

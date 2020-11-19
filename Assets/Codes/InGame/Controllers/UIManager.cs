@@ -326,6 +326,8 @@ public class UIManager : MonoBehaviour, IUIManager
 
     private void OnDestroy()
     {
+        audioManager.gameBGM?.Pause();
+        audioManager.StopAllCoroutines();
         resultVoice?.Dispose();
 
         /*#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
