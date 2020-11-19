@@ -16,8 +16,12 @@ namespace AudioProvider
         internal static void ErrCheck(RESULT result)
         {
             if (result != RESULT.OK)
-                //throw new Exception($"FMOD Error! Result code: {Enum.GetName(typeof(RESULT), result)}");
-                messageBannerController.ShowMsg(LogLevel.ERROR, Enum.GetName(typeof(RESULT), result), false);
+            {
+                if (messageBannerController == null)
+                    UnityEngine.Debug.LogError($"FMOD Error! Result code: {result}");
+                else
+                    messageBannerController.ShowMsg(LogLevel.ERROR, result.ToString(), false);
+            }
         }
     }
 
