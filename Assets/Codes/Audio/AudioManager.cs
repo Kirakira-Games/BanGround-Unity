@@ -107,6 +107,7 @@ public class AudioManager : MonoBehaviour, IAudioManager
                 if (waiting < 0) waiting = 0;
         #endif*/
 
+        /*
         var fftData = Provider.GetFFTData();
 
         if (fftData.Length == 0)
@@ -125,6 +126,7 @@ public class AudioManager : MonoBehaviour, IAudioManager
         }
 
         fftTex.Apply();
+        */
     }
 
     private void OnDestroy()

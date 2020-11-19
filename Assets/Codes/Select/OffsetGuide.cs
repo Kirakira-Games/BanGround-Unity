@@ -24,13 +24,6 @@ public class OffsetGuide : MonoBehaviour
         chartListManager.ForceOffsetChart();
         modManager.SuppressAllMods(true);
 
-        //if (!await liveSetting.LoadChart(true))
-        //{
-        //    liveSetting.offsetAdjustMode = false;
-
-        //    return;
-        //}
-
         SettingAndMod.instance.SetLiveSetting();
         kvSystem.SaveConfig();
         SceneLoader.LoadScene("Select", "InGame", async () =>
