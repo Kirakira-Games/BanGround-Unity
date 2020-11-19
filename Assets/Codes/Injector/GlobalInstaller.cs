@@ -19,7 +19,7 @@ public class GlobalInstaller : MonoInstaller
     private IKVSystem kvSystem;
     private IDataLoader dataLoader;
     private IFileSystem fs;
-    private IAudioProvider ap;
+    private IAudioProvider audioProvider;
 
     public override void InstallBindings()
     {
@@ -64,7 +64,7 @@ public class GlobalInstaller : MonoInstaller
         Container.Bind<IAudioManager>().To<AudioManager>().FromNewComponentOnNewGameObject().AsSingle().OnInstantiated((_, obj) =>
         {
             if (obj is ValidationMarker) return;
-            ap = (obj as IAudioManager).Provider;
+            audioProvider = (obj as IAudioManager).Provider;
         }).NonLazy();
 
         // Sorter Factory
@@ -146,15 +146,15 @@ public class GlobalInstaller : MonoInstaller
 
             KVar.C("snd_bgm_volume", "0.7", KVarFlags.Archive, "BGM volume", _ => 
             {
-                ap?.SetSoundTrackVolume(kvSystem.Find("snd_bgm_volume"));
+                audioProvider?.SetSoundTrackVolume(kvSystem.Find("snd_bgm_volume"));
             }),
             KVar.C("snd_se_volume", "0.7", KVarFlags.Archive, "Sound effect volume",_ => 
             {
-                ap?.SetSoundEffectVolume(kvSystem.Find("snd_se_volume"), SEType.Common);
+                audioProvider?.SetSoundEffectVolume(kvSystem.Find("snd_se_volume"), SEType.Common);
             }),
             KVar.C("snd_igse_volume", "0.7", KVarFlags.Archive, "In-game sound effect volume",_ =>
             {
-                ap?.SetSoundEffectVolume(kvSystem.Find("snd_igse_volume"), SEType.InGame);
+                audioProvider?.SetSoundEffectVolume(kvSystem.Find("snd_igse_volume"), SEType.InGame);
             }),
 
             KVar.C("snd_engine", "Fmod", KVarFlags.Archive | KVarFlags.StringOnly, "Sound engine type"),
