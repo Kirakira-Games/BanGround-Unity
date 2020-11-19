@@ -64,7 +64,7 @@ namespace BanGround.Web
         [Inject(Id = "cl_refreshtoken")]
         private KVar cl_refreshtoken;
 
-        public string UA => "BanGround-Unity/Alpha (" +
+        public string UA => $"BanGround-Unity/{Application.version} (" +
 #if UNITY_EDITOR
             "Editor"
 #elif UNITY_ANDROID
@@ -80,7 +80,7 @@ namespace BanGround.Web
 #if false
         // Use local server
         public string ServerAddr => "http://localhost:8080/api/";
-#elif UNITY_EDITOR || true
+#elif UNITY_EDITOR
         public string ServerAddr => "https://beijing.aliyun.reikohaku.fun/api/";
 #else
         public string ServerAddr => "https://banground.live/api/";
