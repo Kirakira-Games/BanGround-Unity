@@ -1,4 +1,5 @@
-﻿using AudioProvider;
+﻿using AOT;
+using AudioProvider;
 using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
@@ -31,6 +32,34 @@ namespace BanGround.Audio
                 Bass.BASS_Init(0, 48000, BASSInit.BASS_DEVICE_DEFAULT, IntPtr.Zero);
         }
 
+        class BassEncodeHolder
+        {
+            static List<byte> _result;
+
+            public static void StartEncode()
+            {
+                _result = new List<byte>();
+            }
+
+            [MonoPInvokeCallback(typeof(ENCODEPROC))]
+            public static unsafe void EncodeCallback(int handle, int channel, IntPtr buffer, int length, IntPtr user)
+            {
+                byte* pBuffer = (byte*)buffer.ToPointer();
+
+                while (length-- > 0)
+                    _result.Add(*pBuffer++);
+            }
+
+            public static byte[] GetResult()
+            {
+                var arr = _result.ToArray();
+
+                _result = null;
+
+                return arr;
+            }
+        }
+
         List<byte> _result = new List<byte>();
 
         public byte[] Do()
@@ -45,8 +74,10 @@ namespace BanGround.Audio
 
             var startTime = DateTime.Now;
 
+            BassEncodeHolder.StartEncode();
+
             var id = Bass.BASS_StreamCreateFile(pinnedObjectPtr, 0, Source.Length, BASSFlag.BASS_STREAM_DECODE | BASSFlag.BASS_STREAM_PRESCAN);
-            var encoder = BassEnc_Ogg.BASS_Encode_OGG_Start(id, $"-b {Bitrate}", BASSEncode.BASS_ENCODE_DEFAULT, EncodeCallback, IntPtr.Zero);
+            var encoder = BassEnc_Ogg.BASS_Encode_OGG_Start(id, $"-b {Bitrate}", BASSEncode.BASS_ENCODE_DEFAULT, BassEncodeHolder.EncodeCallback, IntPtr.Zero);
 
             var size = Bass.BASS_ChannelGetLength(id);
             float fullSize = size;
@@ -77,15 +108,7 @@ namespace BanGround.Audio
             var dur = DateTime.Now - startTime;
             Debug.Log($"Encode toke {dur.TotalMilliseconds}ms");
 
-            return _result.ToArray();
-        }
-
-        public unsafe void EncodeCallback(int handle, int channel, IntPtr buffer, int length, IntPtr user)
-        {
-            byte* pBuffer = (byte*)buffer.ToPointer();
-
-            while (length-- > 0)
-                _result.Add(*(pBuffer++));
+            return BassEncodeHolder.GetResult();
         }
 
         public UniTask<byte[]> DoAsync()
