@@ -98,6 +98,8 @@ namespace BanGround.Web.Auth
             UserInfo.user = user.User;
             web.AccessToken = user.AccessToken;
             web.RefreshToken = user.RefreshToken;
+
+            UserInfo.isOffline = false;
         }
 
         public static async UniTask<UserAuth> DoRefreshAccessToken(this IKiraWebRequest web)
