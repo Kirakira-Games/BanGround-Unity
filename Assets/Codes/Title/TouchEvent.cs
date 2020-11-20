@@ -46,6 +46,9 @@ public class TouchEvent : MonoBehaviour
 
     public async void OnCommunityButtonClick()
     {
+        if (authing)
+            return;
+
         //必须要在线状态才能进社区
         if (UserInfo.user == null || UserInfo.isOffline) 
         {
@@ -101,9 +104,14 @@ public class TouchEvent : MonoBehaviour
         {
             UserInfo.user = null;
         }
-        await UniTask.WaitUntil(() => UserInfo.user != null);
-        userCanvas.GetUserInfo().Forget();
-        loginPanel.SetActive(false);
+
+        await UniTask.WaitUntil(() => UserInfo.user != null || !loginPanel.activeSelf);
+
+        if(loginPanel.activeSelf)
+        {
+            userCanvas.GetUserInfo().Forget();
+            loginPanel.SetActive(false);
+        }
 
         authing = false;
     }
