@@ -64,8 +64,9 @@ public class ChartListManager : IChartListManager
     private void UpdateActualDifficulty()
     {
         var header = selectedChart.header;
-        int difficulty = cl_lastdiff;
+        header.LoadDifficultyLevels(dataLoader);
 
+        int difficulty = cl_lastdiff;
         int circleshit = 0;
 
         while (header.difficultyLevel[difficulty] == -1 && ++circleshit < 6)
@@ -82,10 +83,10 @@ public class ChartListManager : IChartListManager
     public void SelectChartByIndex(int index)
     {
         index = Mathf.Clamp(index, 0, chartList.Count - 1);
-        if (selectedChart.header?.sid == chartList[index].sid
-            && selectedChart.header != null
-            && selectedChart.index == index)
+        if (ReferenceEquals(selectedChart.header, chartList[index]) && selectedChart.index == index)
+        {
             return;
+        }
         selectedChart.index = index;
         selectedChart.header = chartList[index];
         selectedChart.header.LoadDifficultyLevels(dataLoader);
