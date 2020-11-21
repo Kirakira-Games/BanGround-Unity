@@ -115,8 +115,20 @@ namespace BGEditor
         {
             try
             {
-                Debug.Log("Hash = " + file.Info.Hash);
+                Debug.Log("Music hash = " + file.Info.Hash);
                 return (await web.GetSongByIdOrHash(file.Info.Hash).Fetch()).Id;
+            }
+            catch (KiraWebException)
+            {
+                return -1;
+            }
+        }
+
+        private async UniTask<int> FindExistingChart(int id)
+        {
+            try
+            {
+                return (await web.GetChartById(id).Fetch()).Id;
             }
             catch (KiraWebException)
             {
@@ -158,25 +170,21 @@ namespace BGEditor
                     break;
                 }
             }
-            // Check source
-            if (musicSource == ChartSource.Local)
+            // Check if music already exists
+            loadingBlocker.SetText("Discussing with the server about this song...");
+            int mid = await FindExistingSong(musicFiles[0]);
+            loadingBlocker.SetText("Updating local data...");
+            if (mid >= 0)
             {
-                // Check if music already exists
-                loadingBlocker.SetText("Discussing with the server about this song...");
-                int mid = await FindExistingSong(musicFiles[0]);
-                if (mid >= 0)
-                {
-                    loadingBlocker.SetText("Updating local data...");
-                    mid = IDRouterUtil.ToFileId(ChartSource.BanGround, mid);
-                    dataLoader.MoveMusic(musicHeader.mid, mid);
-                    Refresh();
-                    return true;
-                }
+                mid = IDRouterUtil.ToFileId(ChartSource.BanGround, mid);
+                dataLoader.MoveMusic(musicHeader.mid, mid);
+                Refresh();
             }
-            else
+            else if (musicSource != ChartSource.Local)
             {
-                // Already exists, no need to upload.
-                musicFiles = null;
+                mid = dataLoader.GenerateMid();
+                dataLoader.MoveMusic(musicHeader.mid, mid);
+                Refresh();
             }
             return true;
         }
@@ -187,6 +195,22 @@ namespace BGEditor
             {
                 messageBanner.ShowMsg(LogLevel.ERROR, "Unsupported source.");
                 return false;
+            }
+            if (chartSource == ChartSource.BanGround)
+            {
+                loadingBlocker.SetText("Discussing with the server about this chart...");
+                int sid = await FindExistingChart(chartId);
+                loadingBlocker.SetText("Updating local data...");
+                if (sid < 0)
+                {
+                    sid = dataLoader.GenerateSid();
+                }
+                else
+                {
+                    sid = IDRouterUtil.ToFileId(ChartSource.BanGround, sid);
+                }
+                dataLoader.MoveChart(chartHeader.sid, sid);
+                Refresh();
             }
             chartFiles = await GenerateFileList(dataLoader.GetChartResource(chartHeader.sid, ""));
             return true;
@@ -235,7 +259,7 @@ namespace BGEditor
         private async UniTask<bool> CreateChart()
         {
             // Upload files
-            loadingBlocker.SetText("Uploading files");
+            loadingBlocker.SetText("Uploading files", true);
             var uploads = await BatchUpload(chartFiles);
 
             // Find background file

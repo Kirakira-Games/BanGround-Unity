@@ -56,6 +56,13 @@ namespace BGEditor
         public void Refresh()
         {
             audioLength = bgm.GetLength();
+            float expectedLength = audioLength / 1000f;
+            var mHeader = dataLoader.GetMusicHeader(chartListManager.current.header.mid);
+            if (!Mathf.Approximately(mHeader.length, expectedLength))
+            {
+                mHeader.length = expectedLength;
+                dataLoader.SaveHeader(mHeader);
+            }
         }
 
         public void UpdateDisplay(bool isUser)
