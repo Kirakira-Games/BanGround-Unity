@@ -2,29 +2,23 @@
 using UnityEngine.UI;
 using UnityEngine.Networking;
 using Cysharp.Threading.Tasks;
-using BanGround.Web.Auth;
+using Zenject;
+using BanGround.Identity;
 
 public class UserInfo : MonoBehaviour
 {
-    public static UserLite user;
-    public static bool isOffline = true;
-    private Text username_Text;
-    private Image userAvatar;
+    [Inject]
+    private IAccountManager accountManager;
 
-    private void Start()
-    {
-        username_Text = GameObject.Find("Username").GetComponent<Text>();
-        userAvatar = GameObject.Find("Avatar").GetComponent<Image>();
-    }
+    public Text UsernameText;
+    public Image UserAvatar;
 
     public async UniTaskVoid GetUserInfo()
     {
-        if (user == null)
-            return;
+        var user = accountManager.ActiveUser;
+        UsernameText.text = user.Nickname;
 
-        username_Text.text = user.Nickname;
-
-        if (user.Avatar == "N/A" || string.IsNullOrEmpty(user.Avatar))
+        if (string.IsNullOrEmpty(user.Avatar))
             return;
 
         using (UnityWebRequest ub = UnityWebRequestTexture.GetTexture(user.Avatar))
@@ -33,7 +27,7 @@ public class UserInfo : MonoBehaviour
             if (this == null)
                 return;
             var tex = DownloadHandlerTexture.GetContent(ub);
-            userAvatar.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+            UserAvatar.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
         }
     }
 }

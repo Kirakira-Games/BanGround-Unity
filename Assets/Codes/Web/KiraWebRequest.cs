@@ -85,6 +85,7 @@ namespace BanGround.Web
 #else
         public string ServerAddr => "https://banground.live/api/";
 #endif
+        public string ServerSite => ServerAddr.Substring(0, ServerAddr.Length - 5);
         public string Language => "zh-CN";
         public string AccessToken
         {
@@ -122,29 +123,29 @@ namespace BanGround.Web
             public string method { get; private set; }
             public int timeout { get; private set; } = 60;
 
-            private async UniTask<Resp> HandleResponse<Resp>(UnityWebRequest req)
+            private async UniTask<Resp> HandleResponse<Resp>()
             {
                 if (isAborted)
                     throw new KiraUserAbortedException();
-                if (req.isNetworkError || req.responseCode >= 500)
+                if (webRequest.isNetworkError || webRequest.responseCode >= 500)
                     throw new KiraNetworkErrorException();
-                if (req.isHttpError)
+                if (webRequest.isHttpError)
                 {
-                    if (req.responseCode == 401 && autoRefresh && context.RefreshToken != null)
+                    if (webRequest.responseCode == 401 && autoRefresh && context.RefreshToken != null)
                     {
                         await context.DoRefreshAccessToken();
                         webRequest.Dispose();
                         Create();
                         return await Fetch<Resp>();
                     }
-                    var err = JsonConvert.DeserializeObject<KiraErrorMessage>(req.downloadHandler.text);
-                    throw new KiraWebException(req.responseCode, err);
+                    var err = JsonConvert.DeserializeObject<KiraErrorMessage>(webRequest.downloadHandler.text);
+                    throw new KiraWebException(webRequest.responseCode, err ?? new KiraErrorMessage(webRequest.responseCode.ToString()));
                 }
-                if (!req.downloadHandler.text.IsNullOrEmpty())
+                if (!webRequest.downloadHandler.text.IsNullOrEmpty())
                 {
-                    var result = JsonConvert.DeserializeObject<Result<Resp>>(req.downloadHandler.text);
+                    var result = JsonConvert.DeserializeObject<Result<Resp>>(webRequest.downloadHandler.text);
                     if (result.status == false)
-                        throw new KiraWebException(req.responseCode, new KiraErrorMessage(result.error));
+                        throw new KiraWebException(webRequest.responseCode, new KiraErrorMessage(result.error));
                     Debug.Log("[KWR] Response: " + JsonConvert.SerializeObject(result.data));
                     return result.data;
                 }
@@ -239,7 +240,12 @@ namespace BanGround.Web
             {
                 if (isAborted)
                     return default;
-                return await HandleResponse<T>(await webRequest.SendWebRequest());
+                try
+                {
+                    await webRequest.SendWebRequest();
+                }
+                catch { }
+                return await HandleResponse<T>();
             }
 
             public async UniTask<ResponseType> Fetch()

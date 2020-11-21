@@ -13,7 +13,7 @@ public class EditorToolTip : MonoBehaviour
 
     public static EditorToolTip Create(Transform parent)
     {
-        var obj = Instantiate(Resources.Load("prefab/Mapping/Tooltip")) as GameObject;
+        var obj = Instantiate(Resources.Load("Prefab/Mapping/Tooltip")) as GameObject;
         obj.SetActive(false);
         obj.transform.SetParent(parent, false);
         return obj.GetComponent<EditorToolTip>();

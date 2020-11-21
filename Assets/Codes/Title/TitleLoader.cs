@@ -4,11 +4,10 @@ using AudioProvider;
 using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
 using Zenject;
-using System;
 using BanGround;
 using System.Linq;
-using BanGround.Web;
-using BanGround.Web.Auth;
+using BanGround.Identity;
+using System;
 
 public class TitleLoader : MonoBehaviour
 {
@@ -17,11 +16,9 @@ public class TitleLoader : MonoBehaviour
     [Inject]
     private IMessageBannerController messageBannerController;
     [Inject]
-    private IKiraWebRequest web;
-    [Inject]
-    private ILoadingBlocker loadingBlocker;
-    [Inject]
     private IFileSystem fs;
+    [Inject]
+    private IAccountManager accountManager;
 
     [Inject(Id = "cl_language")]
     KVar cl_language;
@@ -37,13 +34,10 @@ public class TitleLoader : MonoBehaviour
     public InputField usernameField;
     public InputField passwordField;
 
-    public GameObject loginPanel;
-
     public static TitleLoader instance;
 
     public ISoundTrack music;
     private ISoundEffect banGround;
-    private bool isAuthing;
 
     //const string BACKGROUND_PATH = "backgrounds";
     /*
@@ -83,36 +77,14 @@ public class TitleLoader : MonoBehaviour
 
     private async void Start()
     {
-        PlayTitle();
+        userCanvas.GetUserInfo().Forget();
+        await PlayTitle();
 
-        if (UserInfo.user == null && !string.IsNullOrEmpty(web.AccessToken) && !string.IsNullOrEmpty(web.RefreshToken))
-        {
-            loadingBlocker.Show("Logging in...");
-            try
-            {
-                await web.DoRefreshAccessToken();
-                userCanvas.GetUserInfo().Forget();
-            }
-            catch (KiraWebException e)
-            {
-                if (e.isNetworkError)
-                {
-                    UserInfo.user = new UserLite
-                    {
-                        Avatar = "N/A",
-                        Nickname = "Offline",
-                        Username = "Offline"
-                    };
-                    UserInfo.isOffline = true;
-                }
-                userCanvas.GetUserInfo().Forget();
-            }
-            catch { }
-            loadingBlocker.Close();
-        }
+        await accountManager.TryLogin();
+        userCanvas.GetUserInfo().Forget();
     }
 
-    async void PlayTitle()
+    async UniTask PlayTitle()
     {
         music = await audioManager.PlayLoopMusic(titleMusic.bytes);
         music.SetVolume(0.7f);
@@ -120,41 +92,6 @@ public class TitleLoader : MonoBehaviour
 
         banGround = await audioManager.PrecacheSE(voice[UnityEngine.Random.Range(0,voice.Length)].bytes);
         banGround.PlayOneShot();
-    }
-
-    public void HideLoginPanel()
-    {
-        loginPanel.SetActive(false);
-    }
-
-    public async void SubmitLogin()
-    {
-        if (isAuthing)
-            return;
-
-        isAuthing = true;
-        try
-        {
-            await web.DoLogin(usernameField.text, passwordField.text);
-            loginPanel.SetActive(false);
-        }
-        catch (KiraWebException e)
-        {
-            if (e.isNetworkError)
-                messageBannerController.ShowMsg(LogLevel.ERROR, "Unable to connect to the server! Check your network");
-            else
-                messageBannerController.ShowMsg(LogLevel.ERROR, "Username or Password is wrong!");
-        }
-        catch (Exception e)
-        {
-            messageBannerController.ShowMsg(LogLevel.ERROR, e.Message);
-        }
-        isAuthing = false;
-    }
-
-    public void OnRegisterClicked()
-    {
-        Application.OpenURL("https://banground.live/user/reg");
     }
 
     async void CheckUpdate()

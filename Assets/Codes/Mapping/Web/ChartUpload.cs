@@ -13,6 +13,7 @@ using BanGround.Web.Chart;
 using BanGround.Web.File;
 using BanGround.Web.Music;
 using BanGround.Web.Upload;
+using BanGround.Identity;
 
 namespace BGEditor
 {
@@ -53,6 +54,8 @@ namespace BGEditor
         private IChartListManager chartList;
         [Inject]
         private IFileSystem fs;
+        [Inject]
+        private IAccountManager accountManager;
 
         // Chart related
         private cHeader chartHeader;
@@ -76,7 +79,7 @@ namespace BGEditor
 
         public async UniTaskVoid UploadChart()
         {
-            if (UserInfo.isOffline)
+            if (accountManager.isOfflineMode)
             {
                 messageBanner.ShowMsg(LogLevel.ERROR, "You're currently offline.");
                 return;

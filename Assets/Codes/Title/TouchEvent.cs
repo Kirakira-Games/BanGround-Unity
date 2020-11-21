@@ -1,12 +1,19 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using BanGround.Identity;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Zenject;
 
 public class TouchEvent : MonoBehaviour
 {
+    [Inject]
+    private IAccountManager accountManager;
+    [Inject]
+    private IMessageBannerController messageBanner;
+
     public bool waitingUpdate = true;
     public bool authing = false;
 
@@ -22,20 +29,23 @@ public class TouchEvent : MonoBehaviour
         userCanvas = GameObject.Find("UserInfo").GetComponent<UserInfo>();
     }
 
+    public async void OnLoginButtonClick()
+    {
+        if (await accountManager.DoLogin())
+        {
+            userCanvas.GetUserInfo().Forget();
+        }
+    }
+
     public async void OnStartButtonClick()
     {
-        if (authing)
-            return;
-
-        //开始游戏前必定触发一次登陆动作
-        if (UserInfo.user == null) 
-        {
-            await GetAuthenticationResult();
-            return;
-        }
-
         if (waitingUpdate)
             return;
+
+        if (accountManager.isOfflineMode && !accountManager.isTokenSaved && !await accountManager.DoLogin())
+        {
+            return;
+        }
 
         if (!touched)
         {
@@ -50,17 +60,11 @@ public class TouchEvent : MonoBehaviour
             return;
 
         //必须要在线状态才能进社区
-        if (UserInfo.user == null || UserInfo.isOffline) 
+        if (accountManager.isOfflineMode && !await accountManager.DoLogin()) 
         {
-            await GetAuthenticationResult();
             return;
         }
         SceneLoader.LoadScene("Title", "Community");
-    }
-
-    public async void OnLoginButtonClick()
-    {
-        await GetAuthenticationResult();
     }
 
     void StartSwitch()
@@ -93,27 +97,6 @@ public class TouchEvent : MonoBehaviour
         }
 
         operation.allowSceneActivation = true;
-    }
-
-    private async UniTask GetAuthenticationResult()
-    {
-        authing = true;
-
-        loginPanel.SetActive(true);
-        if (UserInfo.isOffline)
-        {
-            UserInfo.user = null;
-        }
-
-        await UniTask.WaitUntil(() => UserInfo.user != null || !loginPanel.activeSelf);
-
-        if(loginPanel.activeSelf)
-        {
-            userCanvas.GetUserInfo().Forget();
-            loginPanel.SetActive(false);
-        }
-
-        authing = false;
     }
 }
 
