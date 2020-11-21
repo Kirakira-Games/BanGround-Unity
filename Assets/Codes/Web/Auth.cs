@@ -93,19 +93,16 @@ namespace BanGround.Web.Auth
             return web.New<UserAuth>().SetReq(new RefreshAccessTokenArgs { RefreshToken = refreshToken }).Post("auth/refresh-access-token");
         }
 
-        public static void UpdateUserInfo(this IKiraWebRequest web, UserAuth user)
+        public static void UpdateTokens(this IKiraWebRequest web, UserAuth user)
         {
-            UserInfo.user = user.User;
             web.AccessToken = user.AccessToken;
             web.RefreshToken = user.RefreshToken;
-
-            UserInfo.isOffline = false;
         }
 
         public static async UniTask<UserAuth> DoRefreshAccessToken(this IKiraWebRequest web)
         {
             var user = await web.RefreshAccessToken(web.RefreshToken).Fetch();
-            web.UpdateUserInfo(user);
+            web.UpdateTokens(user);
             return user;
         }
 
@@ -118,7 +115,7 @@ namespace BanGround.Web.Auth
         public static async UniTask<UserAuth> DoLogin(this IKiraWebRequest web, string account, string password)
         {
             var user = await web.Login(account, password).Fetch();
-            web.UpdateUserInfo(user);
+            web.UpdateTokens(user);
             return user;
         }
     }

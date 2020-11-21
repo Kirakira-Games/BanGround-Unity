@@ -1,6 +1,7 @@
 using AudioProvider;
 using BanGround;
 using BanGround.Community;
+using BanGround.Identity;
 using BanGround.Web;
 using System.IO;
 using System.Linq;
@@ -15,6 +16,7 @@ public class GlobalInstaller : MonoInstaller
     public FPSCounter fpsCounter;
     public LoadingBlocker loadingBlocker;
     public MessageCenter messageCenter;
+    public AccountManager accountManager;
 
     private IKVSystem kvSystem;
     private IDataLoader dataLoader;
@@ -100,6 +102,9 @@ public class GlobalInstaller : MonoInstaller
 
         // Download manager
         Container.Bind<IDownloadManager>().To<DownloadManager>().AsSingle().NonLazy();
+
+        // Account manager
+        Container.Bind<IAccountManager>().FromInstance(accountManager);
     }
 
     void RegisterKonCommands()

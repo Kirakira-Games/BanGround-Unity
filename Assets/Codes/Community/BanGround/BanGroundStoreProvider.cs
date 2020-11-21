@@ -74,7 +74,7 @@ namespace BanGround.Community
             {
                 if (file.File.Url.StartsWith("/"))
                 {
-                    file.File.Url = web.ServerAddr.Replace("/api/", "") + file.File.Url;
+                    file.File.Url = web.ServerSite + file.File.Url;
                 }
             }
         }

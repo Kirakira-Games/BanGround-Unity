@@ -13,6 +13,7 @@ using ModestTree;
 using BanGround.Utils;
 using System.Runtime.InteropServices;
 using AudioProvider;
+using BanGround.Identity;
 
 public class ChartCreator : MonoBehaviour
 {
@@ -26,6 +27,8 @@ public class ChartCreator : MonoBehaviour
     private ILoadingBlocker loadingBlocker;
     [Inject]
     private IAudioProvider audioProvider;
+    [Inject]
+    private IAccountManager accountManager;
 
     [Inject(Id = "cl_lastdiff")]
     private KVar cl_lastdiff;
@@ -80,8 +83,8 @@ public class ChartCreator : MonoBehaviour
             sid = dataLoader.GenerateSid(),
             mid = copyInfo ? cHeader.mid : mid,
 
-            author = UserInfo.isOffline ? "Guest" : UserInfo.user.Username,
-            authorNick = UserInfo.isOffline ? "Guest" : UserInfo.user.Nickname,
+            author = accountManager.ActiveUser.Username,
+            authorNick = accountManager.ActiveUser.Nickname,
 
             backgroundFile = new BackgroundFile
             {
