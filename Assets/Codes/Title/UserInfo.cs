@@ -15,6 +15,8 @@ public class UserInfo : MonoBehaviour
 
     public async UniTaskVoid GetUserInfo()
     {
+        if (this == null)
+            return;
         var user = accountManager.ActiveUser;
         UsernameText.text = user.Nickname;
 
