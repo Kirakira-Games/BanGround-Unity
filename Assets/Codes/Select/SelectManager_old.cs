@@ -29,6 +29,8 @@ public class SelectManager_old : MonoBehaviour
     private IFileSystem fs;
     [Inject(Id = "cl_cursorter")]
     private KVar cl_cursorter;
+    [Inject]
+    private ICancellationTokenStore cancellationToken;
 
     public const float scroll_Min_Speed = 50f;
 
@@ -267,12 +269,12 @@ public class SelectManager_old : MonoBehaviour
 
     async void PlayPreview()
     {
-        await UniTask.WaitUntil(() => !faderWorking);
+        await UniTask.WaitUntil(() => !faderWorking).WithCancellation(cancellationToken.sceneToken);
 
         if (chartListManager.current.header.mid == lastPreviewMid)
             return;
 
-        await PreviewFadeOut(0.02f);
+        await PreviewFadeOut(0.02f).WithCancellation(cancellationToken.sceneToken);
 
         lastPreviewMid = chartListManager.current.header.mid;
 
@@ -291,12 +293,12 @@ public class SelectManager_old : MonoBehaviour
             if (isFirstPlay)
             {
                 previewSound?.Pause();
-                await UniTask.Delay(2200);  //给语音留个地方
+                await UniTask.Delay(2200).WithCancellation(cancellationToken.sceneToken);  //给语音留个地方
                 previewSound?.Play();
                 isFirstPlay = false;
             }
 
-            await PreviewFadeIn();
+            await PreviewFadeIn().WithCancellation(cancellationToken.sceneToken);
         }
     }
 
@@ -315,7 +317,7 @@ public class SelectManager_old : MonoBehaviour
                 return;
 
             previewSound.SetVolume(i);
-            await UniTask.DelayFrame(1);
+            await UniTask.DelayFrame(1).WithCancellation(cancellationToken.sceneToken);
         }
 
         faderWorking = false;
@@ -334,7 +336,7 @@ public class SelectManager_old : MonoBehaviour
                 return;
 
             previewSound.SetVolume(i);
-            await UniTask.DelayFrame(1);
+            await UniTask.DelayFrame(1).WithCancellation(cancellationToken.sceneToken);
         }
 
         faderWorking = false;

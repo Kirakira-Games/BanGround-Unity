@@ -6,7 +6,7 @@ using UnityEngine.UI;
  
 public class ChangeFontWindow : EditorWindow
 {
-    [MenuItem("Tools/更换字体")]
+    [MenuItem("BanGround/更换字体")]
     public static void Open()
     {
         EditorWindow.GetWindow(typeof(ChangeFontWindow));
