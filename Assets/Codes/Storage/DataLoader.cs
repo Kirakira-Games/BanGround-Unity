@@ -544,11 +544,6 @@ public class DataLoader : IDataLoader
         foreach (var chart in songList.cHeaders)
             chartDic[chart.sid] = chart;
 
-        if (cl_lastsid >= songList.cHeaders.Count)
-        {
-            cl_lastsid.Set(Mathf.Max(0, songList.cHeaders.Count - 1));
-        }
-
         onSongListRefreshed.Invoke();
     }
 
