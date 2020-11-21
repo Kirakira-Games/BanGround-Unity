@@ -442,7 +442,7 @@ namespace BGEditor
                 scriptEditor.Code = fs.GetFile(dataLoader.GetChartScriptPath(chartListManager.current.header.sid, (Difficulty)chartListManager.current.difficulty)).ReadAsString();
 
             onChartLoaded.Invoke();
-            hotkey.onScroll.AddListener((delta) => MoveGrid(delta * 30));
+            hotkey.onScroll.AddListener((delta) => MoveGrid(delta * 100));
         }
         #endregion
     }
