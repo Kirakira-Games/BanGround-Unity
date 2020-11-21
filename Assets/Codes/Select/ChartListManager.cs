@@ -104,7 +104,7 @@ public class ChartListManager : IChartListManager
         }
         else
         {
-            SelectChartByIndex(UnityEngine.Random.Range(0, chartList.Count));
+            SelectChartByIndex(chartList.Count - 1);
         }
     }
 
