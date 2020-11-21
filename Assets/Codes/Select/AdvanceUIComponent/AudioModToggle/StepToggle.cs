@@ -8,22 +8,14 @@ public class StepToggle : MonoBehaviour,IPointerClickHandler
 {
     public StepInfo[] Steps;
     public StepToggle ConflictTog;
-
-    private Text txt;
-    private Image img;
+    public Text Txt;
+    public Image Img;
     protected int index = 0;
 
     [HideInInspector] public AudioMod currentMod;
 
-    private void Awake()
-    {
-        txt = GetComponentInChildren<Text>();
-        img = GetComponentInChildren<Image>();
-    }
-
     public void OnPointerClick(PointerEventData eventData)
     {
-        Debug.Log("Click");
         index++;
         index %= Steps.Length;
         OnIndexChanged();
@@ -36,8 +28,8 @@ public class StepToggle : MonoBehaviour,IPointerClickHandler
 
     protected void OnIndexChanged()
     {
-        txt.text = Steps[index].StepText;
-        img.sprite = Steps[index].StepImg;
+        Txt.text = Steps[index].StepText;
+        Img.sprite = Steps[index].StepImg;
     }
 }
 
