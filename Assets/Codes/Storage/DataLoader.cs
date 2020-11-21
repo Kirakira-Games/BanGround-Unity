@@ -785,6 +785,8 @@ public class DataLoader : IDataLoader
 
     public void MoveChart(int oldSid, int newSid, bool overwrite = true)
     {
+        if (oldSid == newSid)
+            return;
         MoveFiles(ChartDir + oldSid, ChartDir + newSid, overwrite);
         // Handle rename
         foreach (var chart in chartList)
@@ -804,6 +806,8 @@ public class DataLoader : IDataLoader
 
     public void MoveMusic(int oldMid, int newMid, bool overwrite = true)
     {
+        if (oldMid == newMid)
+            return;
         string newPrefix = MusicDir + newMid;
         MoveFiles(MusicDir + oldMid, newPrefix, overwrite);
         // Rename the song file
