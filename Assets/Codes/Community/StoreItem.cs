@@ -66,7 +66,7 @@ namespace BanGround.Community
             try
             {
                 var task = await controller.StoreProvider.AddToDownloadList(song, ChartItem);
-                IDRouterUtil.GetSource(ChartItem.Id, out int id);
+                var id = IDRouterUtil.ToFileId(ChartItem.Source, ChartItem.Id);
                 task.SetImage(Background.sprite.texture)
                     .SetName($"{song.Title} ({ChartItem.Uploader.Nickname})")
                     .OnFinish.AddListener(() =>
