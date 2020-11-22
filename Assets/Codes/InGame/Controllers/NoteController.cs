@@ -581,7 +581,7 @@ public class NoteController : MonoBehaviour, INoteController
             chartScript.OnUpdate(audioTime);
 
             if (chartScript.HasOnBeat)
-                chartScript.OnBeat(chartListManager.chart.TimeToBeat(audioTime));
+                chartScript.OnBeat(chartListManager.chart.TimeToBeat(audioTimef));
         }
     }
 
