@@ -351,6 +351,8 @@ namespace BGEditor
 
             loadingBlocker.SetText("Wrapping it up...");
             await UniTask.Delay(5000);
+
+            messageBanner.ShowMsg(LogLevel.INFO, "Upload succeeds.");
         }
 
         private async UniTask<List<FileInfo>> GenerateFileList(string prefix)
