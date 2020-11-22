@@ -1,17 +1,16 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
-using System.Threading;
-using UnityEngine.Networking;
 using System;
 using Zenject;
-using System.Collections.Generic;
 using BanGround.Web;
 
 namespace BanGround.Community
 {
     public class StoreItem : MonoBehaviour
     {
+        [Inject(Id = "cl_lastsid")]
+        private KVar cl_lastsid;
         [Inject]
         private IStoreController controller;
         [Inject]
@@ -67,8 +66,13 @@ namespace BanGround.Community
             try
             {
                 var task = await controller.StoreProvider.AddToDownloadList(song, ChartItem);
+                IDRouterUtil.GetSource(ChartItem.Id, out int id);
                 task.SetImage(Background.sprite.texture)
-                    .SetName($"{song.Title} ({ChartItem.Uploader.Nickname})");
+                    .SetName($"{song.Title} ({ChartItem.Uploader.Nickname})")
+                    .OnFinish.AddListener(() =>
+                    {
+                        cl_lastsid.Set(id);
+                    });
                 messageCenter.Show("Download", "Go");
             }
             catch (Exception e)
