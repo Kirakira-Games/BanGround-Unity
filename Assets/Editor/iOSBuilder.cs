@@ -57,6 +57,11 @@ public static class iOSBuilder
 
         PBXProject pbxProject = new PBXProject();
         pbxProject.ReadFromFile(projectPath);
+
+        // TODO: Remove
+        Debug.Log("Applying iOS 14.2 workaround. Remove me once Unity has patched this.");
+        pbxProject.AddFrameworkToProject(pbxProject.GetUnityMainTargetGuid(), "UnityFramework.framework", false);
+
         string[] targetGuids = new string[2] { pbxProject.GetUnityMainTargetGuid(), pbxProject.GetUnityFrameworkTargetGuid() };
 
         pbxProject.SetBuildProperty(targetGuids, "ENABLE_BITCODE", "NO");
