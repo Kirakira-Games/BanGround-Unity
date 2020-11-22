@@ -264,7 +264,9 @@ public class SelectManager_old : MonoBehaviour
             preview = mheader.preview;
         }
         ret[0] = (uint)(preview[0] * 1000);
-        ret[1] = preview.Length > 1 ? (uint)(preview[1] * 1000) : ret[0];
+        ret[1] = preview.Length > 1 ? (uint)(preview[1] * 1000) : ret[0] + 10000;
+        if (ret[0] > ret[1])
+            (ret[0], ret[1]) = (ret[1], ret[0]);
         return ret;
     }
 
