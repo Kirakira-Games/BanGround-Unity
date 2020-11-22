@@ -131,7 +131,7 @@ public class SelectManager_old : MonoBehaviour
 
         PlayVoicesAtSceneOut();
         SceneLoader.LoadScene("Select", "InGame", () => chartListManager.LoadChart(true));
-        await PreviewFadeOut().WithCancellation(cancellationToken.sceneToken).IgnoreCancellation();
+        await PreviewFadeOut().WithCancellation(cancellationToken.sceneToken).SuppressCancellationThrow();
     }
 
     public async void RefreshSongList()
@@ -243,7 +243,7 @@ public class SelectManager_old : MonoBehaviour
 
         chartListManager.SelectChartByIndex(index);
 
-        PlayPreview().WithCancellation(cancellationToken.sceneToken).IgnoreCancellation().Forget();
+        PlayPreview().WithCancellation(cancellationToken.sceneToken).SuppressCancellationThrow().Forget();
     }
 
     public void UnselectSong()

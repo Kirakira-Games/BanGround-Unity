@@ -147,7 +147,7 @@ public class UIManager : MonoBehaviour, IUIManager
         #endif*/
         if (SM.Current == State.Playing)
         {
-            BiteTheDust().WithCancellation(Cancel.sceneToken).IgnoreCancellation().Forget();
+            BiteTheDust().WithCancellation(Cancel.sceneToken).SuppressCancellationThrow().Forget();
         }
         else if (SM.Current == State.Loading)
         {
