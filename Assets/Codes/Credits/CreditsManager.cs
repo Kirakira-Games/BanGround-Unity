@@ -1,10 +1,8 @@
 ﻿using AudioProvider;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using Cysharp.Threading.Tasks;
 using Zenject;
 
+[RequireComponent(typeof(Canvas))]
 public class CreditsManager : MonoBehaviour
 {
     [Inject]
@@ -17,6 +15,7 @@ public class CreditsManager : MonoBehaviour
     async void Start()
     {
         bgmST = await audioManager.PlayLoopMusic(bgmVoice.bytes);
+        // Adjust canvas: TODO(GEEKiDoS)
     }
 
     public void ExitCreditScene()

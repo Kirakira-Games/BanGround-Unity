@@ -149,11 +149,13 @@ public class ChartListManager : IChartListManager
     }
 
     [Inject(Id = "r_mirror")]
-    KVar r_mirror;
+    private KVar r_mirror;
+    [Inject]
+    private IChartVersion chartVersion;
 
     public async UniTask<bool> LoadChart(bool convertToGameChart)
     {
-        chart = await ChartVersion.Instance.Process(current.header, current.difficulty);
+        chart = await chartVersion.Process(current.header, current.difficulty);
         if (chart == null)
         {
             messageBannerController.ShowMsg(LogLevel.ERROR, "This chart is unsupported.");

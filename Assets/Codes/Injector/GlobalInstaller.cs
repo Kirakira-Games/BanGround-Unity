@@ -39,7 +39,6 @@ public class GlobalInstaller : MonoInstaller
             dataLoader = obj as IDataLoader;
             dataLoader.InitFileSystem();
             dataLoader.Init().Forget();
-            DataLoader.Instance = dataLoader; // TODO: Remove
             new GameObject("AppPreloader").AddComponent<AppPreLoader>();
         }).NonLazy();
 
@@ -58,7 +57,6 @@ public class GlobalInstaller : MonoInstaller
         Container.Bind<IChartVersion>().To<ChartVersion>().AsSingle().OnInstantiated((contxet, obj) =>
         {
             if (obj is ValidationMarker) return;
-            ChartVersion.Instance = obj as IChartVersion; // TODO: Remove
         }).NonLazy();
 
         // Audio Manager
