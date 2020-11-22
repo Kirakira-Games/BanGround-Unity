@@ -411,6 +411,7 @@ public class SelectManager_old : MonoBehaviour
 
     private void OnDestroy()
     {
+        previewSound?.Stop();
         previewSound?.Dispose();
         SlideMesh.cacheMat = null;
         chartListManager.onChartListUpdated.RemoveListener(RefreshSongList);
