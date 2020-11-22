@@ -93,7 +93,8 @@ namespace BanGround.Community
             try
             {
                 var tex = await textureCache.Fetch(url);
-                Background.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0, 0));
+                if (this != null && tex != null)
+                    Background.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0, 0));
             }
             catch (OperationCanceledException) { }
             catch (UnityWebRequestException) { }
