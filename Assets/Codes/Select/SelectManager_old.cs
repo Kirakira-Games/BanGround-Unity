@@ -11,6 +11,7 @@ using Random = UnityEngine.Random;
 using Cysharp.Threading.Tasks;
 using Zenject;
 using BanGround;
+using BanGround.Utils;
 
 #pragma warning disable 0649
 public class SelectManager_old : MonoBehaviour
@@ -130,7 +131,7 @@ public class SelectManager_old : MonoBehaviour
 
         PlayVoicesAtSceneOut();
         SceneLoader.LoadScene("Select", "InGame", () => chartListManager.LoadChart(true));
-        await PreviewFadeOut();
+        await PreviewFadeOut().WithCancellation(cancellationToken.sceneToken).IgnoreCancellation();
     }
 
     public async void RefreshSongList()
@@ -242,7 +243,7 @@ public class SelectManager_old : MonoBehaviour
 
         chartListManager.SelectChartByIndex(index);
 
-        PlayPreview();
+        PlayPreview().WithCancellation(cancellationToken.sceneToken).IgnoreCancellation().Forget();
     }
 
     public void UnselectSong()
@@ -267,14 +268,14 @@ public class SelectManager_old : MonoBehaviour
         return ret;
     }
 
-    async void PlayPreview()
+    async UniTask PlayPreview()
     {
-        await UniTask.WaitUntil(() => !faderWorking).WithCancellation(cancellationToken.sceneToken);
+        await UniTask.WaitUntil(() => !faderWorking);
 
         if (chartListManager.current.header.mid == lastPreviewMid)
             return;
 
-        await PreviewFadeOut(0.02f).WithCancellation(cancellationToken.sceneToken);
+        await PreviewFadeOut(0.02f);
 
         lastPreviewMid = chartListManager.current.header.mid;
 
@@ -293,12 +294,12 @@ public class SelectManager_old : MonoBehaviour
             if (isFirstPlay)
             {
                 previewSound?.Pause();
-                await UniTask.Delay(2200).WithCancellation(cancellationToken.sceneToken);  //给语音留个地方
+                await UniTask.Delay(2200);  //给语音留个地方
                 previewSound?.Play();
                 isFirstPlay = false;
             }
 
-            await PreviewFadeIn().WithCancellation(cancellationToken.sceneToken);
+            await PreviewFadeIn();
         }
     }
 
@@ -317,7 +318,7 @@ public class SelectManager_old : MonoBehaviour
                 return;
 
             previewSound.SetVolume(i);
-            await UniTask.DelayFrame(1).WithCancellation(cancellationToken.sceneToken);
+            await UniTask.DelayFrame(1);
         }
 
         faderWorking = false;
@@ -336,7 +337,7 @@ public class SelectManager_old : MonoBehaviour
                 return;
 
             previewSound.SetVolume(i);
-            await UniTask.DelayFrame(1).WithCancellation(cancellationToken.sceneToken);
+            await UniTask.DelayFrame(1);
         }
 
         faderWorking = false;

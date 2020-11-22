@@ -10,6 +10,7 @@ using Zenject;
 
 using State = GameStateMachine.State;
 using System.Threading;
+using BanGround.Utils;
 
 public class UIManager : MonoBehaviour, IUIManager
 {
@@ -146,7 +147,7 @@ public class UIManager : MonoBehaviour, IUIManager
         #endif*/
         if (SM.Current == State.Playing)
         {
-            _ = BiteTheDust();
+            BiteTheDust().WithCancellation(Cancel.sceneToken).IgnoreCancellation().Forget();
         }
         else if (SM.Current == State.Loading)
         {
@@ -173,21 +174,21 @@ public class UIManager : MonoBehaviour, IUIManager
             inGameBackground.pauseVideo();
             if (SM.Current != State.Rewinding)
             {
-                await UniTask.WaitUntil(() => SM.Current == State.Rewinding, cancellationToken: Cancel.sceneToken);
+                await UniTask.WaitUntil(() => SM.Current == State.Rewinding);
             }
         }
 
         // play
         uint pauseTime = bgm.GetPlaybackTime();
         bgm.Play();
-        await UniTask.WaitUntil(() => bgm.GetPlaybackTime() != pauseTime, cancellationToken: Cancel.sceneToken);
+        await UniTask.WaitUntil(() => bgm.GetPlaybackTime() != pauseTime);
         audioTimelineSync.timeInMs = (int)bgm.GetPlaybackTime();
         audioTimelineSync.Play();
         inGameBackground.seekVideo(bgm.GetPlaybackTime() / 1000f);
         inGameBackground.playVideo();
 
         if (SM.Current != State.Rewinding)
-            await UniTask.WaitUntil(() => SM.Current == State.Rewinding, cancellationToken: Cancel.sceneToken);
+            await UniTask.WaitUntil(() => SM.Current == State.Rewinding);
         SM.PopState(State.Rewinding);
     }
 
