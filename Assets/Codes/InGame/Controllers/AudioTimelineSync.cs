@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Zenject;
 using AudioProvider;
 using Cysharp.Threading.Tasks;
+using System;
 
 public class AudioTimelineSync : MonoBehaviour, IAudioTimelineSync
 {
@@ -93,9 +94,12 @@ public class AudioTimelineSync : MonoBehaviour, IAudioTimelineSync
         inGameBackground.playVideo();
         gameBGM.Play();
         SM.Transit(GameStateMachine.State.Loading, GameStateMachine.State.Playing);
-
-        await UniTask.WaitUntil(() => gameBGM.GetPlaybackTime() > 0, cancellationToken: Cancel.sceneToken);
-        timeInMs = (int)gameBGM.GetPlaybackTime();
+        try
+        {
+            await UniTask.WaitUntil(() => gameBGM.GetPlaybackTime() > 0).WithCancellation(Cancel.sceneToken);
+            timeInMs = (int)gameBGM.GetPlaybackTime();
+        }
+        catch (OperationCanceledException) { }
     }
 
     private void UpdateSync()
@@ -107,7 +111,7 @@ public class AudioTimelineSync : MonoBehaviour, IAudioTimelineSync
         {
             if (currentTime >= -0.02 && SM.Current == GameStateMachine.State.Loading)
             {
-                _ = StartPlaying(bgm);
+                StartPlaying(bgm).Forget();
             }
             return;
         }
