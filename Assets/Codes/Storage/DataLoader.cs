@@ -18,7 +18,6 @@ using System.Text;
 
 public class DataLoader : IDataLoader
 {
-    public static IDataLoader Instance; // Temporary singleton for refactoring. TODO: Remove.
     public static readonly string DataDir = Application.persistentDataPath + "/data/";
     public static readonly string ChartDir = "chart/";
     public static readonly string MusicDir = "music/";

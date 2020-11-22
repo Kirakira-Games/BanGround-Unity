@@ -8,7 +8,6 @@ using BGEditor;
 
 public class ChartVersion : IChartVersion
 {
-    public static IChartVersion Instance; // Temporary singleton for refactoring. TODO: Remove.
     [Inject]
     private IDataLoader dataLoader;
     [Inject]
