@@ -157,8 +157,12 @@ public class AudioManager : MonoBehaviour, IAudioManager
         uint end = soundTrack.GetLength();
         if (times != null)
         {
-            start = times[0] < 0 ? 0 :times[0];
-            end = times[1] <= 0 ? soundTrack.GetLength() : times[1];
+            times[0] = Math.Max(start, times[0]);
+            times[1] = Math.Min(end, times[1]);
+            if (times[1] >= times[0] + 1000)
+            {
+                (start, end) = (times[0], times[1]);
+            }
         }
 
         if (needLoop)
