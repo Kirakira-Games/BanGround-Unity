@@ -216,7 +216,7 @@ namespace BanGround.Community
                 return;
             }
             state.NormalizedY = StoreRect.normalizedPosition.y;
-            if (state.HasMorePages && !isLoading && state.NormalizedY < 0)
+            if (state.HasMorePages && !isLoading && state.NormalizedY <= 0.01f)
             {
                 // Infinite scroll
                 if (state.Type == StoreViewType.Song)
