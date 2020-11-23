@@ -89,11 +89,12 @@ namespace BGEditor
                 throw new NotImplementedException($"NoteType {Enum.GetName(typeof(NoteType), note.type)} is unsupported.");
             }
             // Add notes to dict
+            int beat = note.beat[0];
             displayNotes.Add(note, notebase);
-            if (!notesByBeat.ContainsKey(note.beat[0]))
-                notesByBeat.Add(note.beat[0], new HashSet<EditorNoteBase> { notebase });
+            if (!notesByBeat.ContainsKey(beat))
+                notesByBeat.Add(beat, new HashSet<EditorNoteBase> { notebase });
             else
-                notesByBeat[note.beat[0]].Add(notebase);
+                notesByBeat[beat].Add(notebase);
             notebase.Init(note);
             notebase.Refresh();
             (notebase as EditorSlideNote)?.UpdateBodyMesh();
@@ -104,6 +105,14 @@ namespace BGEditor
             if (note.type == NoteType.BPM)
                 return;
             var notebase = Find(note);
+            // Remove connections
+            if (notebase is EditorSlideNote slideNote)
+            {
+                if (slideNote.next != null)
+                    ConnectNote(note, null);
+                if (slideNote.prev != null)
+                    ConnectNote(slideNote.prev.note, null);
+            }
             Core.tooltip.Hide(notebase);
             Pool.Destroy(notebase.gameObject);
             displayNotes.Remove(note);
