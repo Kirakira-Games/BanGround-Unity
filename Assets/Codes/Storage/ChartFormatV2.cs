@@ -163,7 +163,7 @@ namespace V2
         {
             return new TimingPoint
             {
-                beat = beat,
+                beat = beat.ToArray(),
                 time = time,
                 speed = speed.Copy(),
                 tap = tap.Copy(),

@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-using UnityEngine.Networking.NetworkSystem;
-using System;
 using V2;
 using Zenject;
 
