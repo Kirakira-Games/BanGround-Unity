@@ -35,6 +35,7 @@ namespace BGEditor
             }
         }
 
+        [HideInInspector]
         public bool isActiveThisFrame;
 
         protected float maxHeight;
