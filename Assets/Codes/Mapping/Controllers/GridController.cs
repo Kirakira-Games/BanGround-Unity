@@ -238,7 +238,7 @@ namespace BGEditor
         private void OnPointerClickNoteView(PointerEventData eventData)
         {
             // Handle click on slide body
-            var ray = Core.cam.ScreenPointToRay(eventData.pressPosition);
+            var ray = new Ray(new Vector3(eventData.pressPosition.x, eventData.pressPosition.y, -1), Vector3.forward * 10);
             var hits = Physics2D.GetRayIntersectionAll(ray);
             foreach (var hit in hits)
             {
@@ -256,13 +256,13 @@ namespace BGEditor
             // Other clicks
             if (GetLaneBeat(eventData.pressPosition, out var lane, out var beat))
             {
-                if (Editor.tool == EditorTool.Select)
-                    return;
                 if (eventData.button == PointerEventData.InputButton.Right || Editor.tool == EditorTool.Delete)
                 {
                     Notes.UnselectAll();
                     return;
                 }
+                if (Editor.tool == EditorTool.Select)
+                    return;
                 var note = new V2.Note
                 {
                     lane = Editor.yDivision == 0 ? lane : -1,
