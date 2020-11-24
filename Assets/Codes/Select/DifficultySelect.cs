@@ -20,7 +20,7 @@ public class DifficultySelect : MonoBehaviour
     [Inject(Id = "cl_lastdiff")]
     private KVar cl_lastdiff;
 
-    public static readonly string[] DIFFICULTY_ABBR = { "EZ", "NM", "HD", "EX", "SP" };
+    public static readonly string[] DIFFICULTY_ABBR = { "", "", "", "", "" };
     public GameObject[] cards = new GameObject[5];
     public GameObject[] labels = new GameObject[5];
     private Text[] labelText = new Text[5];
