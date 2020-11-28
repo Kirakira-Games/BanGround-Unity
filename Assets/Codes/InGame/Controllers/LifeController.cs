@@ -13,7 +13,7 @@ public class LifeController : MonoBehaviour
 
     public static LifeController instance;
     public static List<float> lifePerSecond;
-    public float lifePoint { get; private set; }
+    public int lifePoint { get; private set; }
 
     public Gradient colors;
 
@@ -26,7 +26,7 @@ public class LifeController : MonoBehaviour
     {
         instance = this;
         lifePerSecond = new List<float>();
-        lifePoint = 100f;
+        lifePoint = 100;
         lifeSlider = GetComponentInChildren<Slider>();
         lifeTxt = GetComponentInChildren<Text>();
         fill = GameObject.Find("LifeFill").GetComponent<Image>();
@@ -35,31 +35,34 @@ public class LifeController : MonoBehaviour
         StartCoroutine(LifeRecorder());
     }
 
-    public void CaculateLife(JudgeResult jr, GameNoteType type)
+    public void CaculateLife(JudgeResult result, GameNoteType type)
     {
-        if (type == GameNoteType.SlideTick && jr == JudgeResult.Miss)
-            jr = JudgeResult.Good;
-        //print(level);
-        switch (jr)
+        if (type==GameNoteType.SlideTick)
         {
-            case JudgeResult.Perfect:
-                lifePoint += 20f / (level + 1);
-                break;
-            case JudgeResult.Great:
-                lifePoint += 4f / (level + 1);
-                break;
-            case JudgeResult.Good:
-                lifePoint -= lifePoint * 0.1f;
-                break;
-            case JudgeResult.Bad:
-                lifePoint -= lifePoint * 0.2f;
-                break;
-            case JudgeResult.Miss:
-                lifePoint -= lifePoint * 0.4f;
-                break;
+            if (result == JudgeResult.Miss) lifePoint -= 5;
         }
-        if (lifePoint < 0.5f) lifePoint = 0;
-        if (lifePoint > 100f) lifePoint = 100f;
+        else
+        {
+            switch (result)
+            {
+                case JudgeResult.Perfect:
+                    lifePoint += 1;
+                    break;
+                case JudgeResult.Great:
+                    break;
+                case JudgeResult.Good:
+                    lifePoint -= 10;
+                    break;
+                case JudgeResult.Bad:
+                    lifePoint -= 20;
+                    break;
+                case JudgeResult.Miss:
+                    lifePoint -= 40;
+                    break;
+            }
+        }
+        if (lifePoint < 0) lifePoint = 0;
+        if (lifePoint > 100) lifePoint = 100;
         UpdateDisplay();
     }
 
