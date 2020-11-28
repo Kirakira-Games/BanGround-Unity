@@ -20,6 +20,7 @@ public class DataLoader : IDataLoader
 {
     public static readonly string DataDir = Application.persistentDataPath + "/data/";
     public static readonly string ChartDir = "chart/";
+    public static readonly string ReplayDir = "replay/";
     public static readonly string MusicDir = "music/";
     private static readonly string SkinDir = "skin/";
     private static readonly string KirapackDir = Application.persistentDataPath + "/kirapack/";
@@ -200,6 +201,10 @@ public class DataLoader : IDataLoader
         if (!Directory.Exists(FSDir))
         {
             Directory.CreateDirectory(FSDir);
+        }
+        if(!Directory.Exists(KiraPath.Combine(DataDir, ReplayDir)))
+        {
+            Directory.CreateDirectory(KiraPath.Combine(DataDir, ReplayDir));
         }
 
         if(File.Exists(FSIndex))

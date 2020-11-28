@@ -8,6 +8,7 @@ using System.IO.Compression;
 using Newtonsoft.Json;
 using System.Linq;
 using Zenject;
+using BanGround;
 
 public interface KirakiraTouchProvider
 {
@@ -225,6 +226,10 @@ public class TouchManager : MonoBehaviour
     private INoteController noteController;
     [Inject]
     private IGameStateMachine SM;
+    [Inject]
+    private IFileSystem fs;
+    [Inject]
+    private IDataLoader dataLoader;
 
     private Dictionary<int, KirakiraTouch> touchTable;
     private Dictionary<(KirakiraTracer, int), JudgeResult> traceCache;
@@ -398,7 +403,11 @@ public class TouchManager : MonoBehaviour
     {
         if (recorder != null)
         {
-            recorder.Save();
+            var file = fs.GetOrNewFile($"{DataLoader.ReplayDir}/{recorder.demoName}");
+
+            var fileList = fs.GetFile(dataLoader.GetChartPath(chartListManager.current.header.sid, chartListManager.current.difficulty));
+
+            recorder.Save(file, new IFile[] { fileList });
         }
     }
 
