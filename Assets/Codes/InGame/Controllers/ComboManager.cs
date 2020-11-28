@@ -49,11 +49,8 @@ public class ComboManager : MonoBehaviour
         comboSprite = Resources.LoadAll<Sprite>("UI/comboCount");
     }
 
-    public void UpdateCombo(JudgeResult result)
+    public void UpdateComboCountAndScore(JudgeResult result)
     {
-        //if (flag == ClearFlag.AP && result > JudgeResult.Perfect) { flag = ClearFlag.FC; UpdateComboMat(); }
-        //if (flag == ClearFlag.FC && result > JudgeResult.Great) { flag = ClearFlag.None; UpdateComboMat(); }
-
         int intResult = (int)result;
         judgeCount[intResult]++;
         acc += accRate[intResult];
@@ -83,11 +80,10 @@ public class ComboManager : MonoBehaviour
         }
         scoreDisplay.SetScore(score / maxScore, (double)acc / maxAcc);
 
-        //comboText.text =  combo[1] <= 0 ? "":combo[1].ToString() ;
-        UpdateComboImg();
+        UpdateComboCountImg();
     }
 
-    private void UpdateComboImg()
+    private void UpdateComboCountImg()
     {
         int i = comboImg.Length - 1;
         int comboTemp = combo[1];
@@ -103,14 +99,6 @@ public class ComboManager : MonoBehaviour
             comboImg[i].gameObject.SetActive(false);
         }
     }
-
-    //private void UpdateComboMat()
-    //{
-    //    for (int i = 0; i < comboImg.Length; i++)
-    //    {
-    //        comboImg[i].material = comboMat[(int)flag];
-    //    }
-    //}
 
     private static double Accumulate(int segSize, double segDelta, int num)
     {
