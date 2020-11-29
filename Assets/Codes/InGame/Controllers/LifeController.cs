@@ -14,6 +14,32 @@ public class LifeController : MonoBehaviour
     public static LifeController instance;
     public static List<float> lifePerSecond;
     public int lifePoint { get; private set; }
+    public int multiplier
+    {
+        get
+        {
+            if (lifePoint>=90)
+            {
+                return 10;
+            }
+            else if (lifePoint>=80)
+            {
+                return 9;
+            }
+            else if (lifePoint>=60)
+            {
+                return 8;
+            }
+            else if (lifePoint>=30)
+            {
+                return 6;
+            }
+            else
+            {
+                return 3;
+            }
+        }
+    }
 
     public Gradient colors;
 
