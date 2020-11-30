@@ -131,14 +131,14 @@ public class NoteController : MonoBehaviour, INoteController
             soundEffects[se].PlayOneShot();
         }
 
-        // Update score
+        // Display judge result
         JudgeResultController.instance.DisplayJudgeResult(result);
 
         // Update life
         LifeController.instance.CaculateLife(result, notebase.type);
 
         // Update combo
-        ComboManager.manager.UpdateCombo(result);
+        ComboManager.manager.UpdateComboCountAndScore(result);
 
         // Update EL
         JudgeResultController.instance.DisplayJudgeOffset(notebase, (int)result);
