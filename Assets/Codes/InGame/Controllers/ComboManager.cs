@@ -13,6 +13,7 @@ public class ComboManager : MonoBehaviour
     public static int[] judgeCount;
     public static double score;
     public static double maxScore;
+    public static double normalizeFactor;
     public static int acc;
     public static int maxAcc;
     public static int noteCount;
@@ -34,7 +35,7 @@ public class ComboManager : MonoBehaviour
         combo = new int[2];
         manager = this;
         score = 0;
-        maxScore = 0;
+        maxScore = 1e7;
         acc = 0;
         maxAcc = 0;
         judgeCount = new int[(int)JudgeResult.Miss + 1];
@@ -49,11 +50,8 @@ public class ComboManager : MonoBehaviour
         comboSprite = Resources.LoadAll<Sprite>("UI/comboCount");
     }
 
-    public void UpdateCombo(JudgeResult result)
+    public void UpdateComboCountAndScore(JudgeResult result)
     {
-        //if (flag == ClearFlag.AP && result > JudgeResult.Perfect) { flag = ClearFlag.FC; UpdateComboMat(); }
-        //if (flag == ClearFlag.FC && result > JudgeResult.Great) { flag = ClearFlag.None; UpdateComboMat(); }
-
         int intResult = (int)result;
         judgeCount[intResult]++;
         acc += accRate[intResult];
@@ -71,23 +69,14 @@ public class ComboManager : MonoBehaviour
                 combo[i] = 0;
             }
         }
-        double rate = combo[0] / 50 * 0.005 + combo[1] / 100 * 0.005;
-        if (rate > 0.1)
-        {
-            rate = 0.1;
-        }
-        score += (double)accRate[intResult] / accRate[0] + rate;
-        if (score > maxScore)
-        {
-            score = maxScore;
-        }
+
+        score += normalizeFactor * accRate[intResult] * LifeController.instance.multiplier;
         scoreDisplay.SetScore(score / maxScore, (double)acc / maxAcc);
 
-        //comboText.text =  combo[1] <= 0 ? "":combo[1].ToString() ;
-        UpdateComboImg();
+        UpdateComboCountImg();
     }
 
-    private void UpdateComboImg()
+    private void UpdateComboCountImg()
     {
         int i = comboImg.Length - 1;
         int comboTemp = combo[1];
@@ -104,23 +93,6 @@ public class ComboManager : MonoBehaviour
         }
     }
 
-    //private void UpdateComboMat()
-    //{
-    //    for (int i = 0; i < comboImg.Length; i++)
-    //    {
-    //        comboImg[i].material = comboMat[(int)flag];
-    //    }
-    //}
-
-    private static double Accumulate(int segSize, double segDelta, int num)
-    {
-        int segNum = num / segSize;
-        int rest = num % segSize;
-        double ans = ((segNum - 1) * segDelta) * segNum * segSize / 2;
-        ans += segNum * segDelta * rest;
-        return ans;
-    }
-
     public void Init(int numNotes)
     {
         if (numNotes <= 0)
@@ -131,14 +103,8 @@ public class ComboManager : MonoBehaviour
         }
         noteCount = numNotes;
 
-        if (numNotes > 700)
-        {
-            maxScore = numNotes + Accumulate(50, 0.005, 700) + Accumulate(100, 0.005, 700) + 0.1 * (numNotes - 700);
-        }
-        else
-        {
-            maxScore = numNotes + Accumulate(50, 0.005, numNotes) + Accumulate(100, 0.005, numNotes);
-        }
+        maxScore = 1e7;
+        normalizeFactor = maxScore / noteCount / 10 / 10;
     }
 
     [Flags]
