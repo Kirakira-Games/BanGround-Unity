@@ -266,10 +266,9 @@ public class ResultManager : MonoBehaviour
 
     public void ShowScore()
     {
-        
-        score_Text.text = string.Format("{0:0000000}",playResult.Score);
+        score_Text.text = string.Format(ComboManager.FORMAT_DISPLAY_SCORE, playResult.Score);
         double delta = playResult.Score - lastScore;
-        score_delta_Text.text = string.Format(delta < 0 ? "{0:0000000}": "+{0:0000000}", playResult.Score - lastScore) ;
+        score_delta_Text.text = (delta >= 0 ? "+" : "") + string.Format(ComboManager.FORMAT_DISPLAY_SCORE, playResult.Score - lastScore) ;
         perfect_Text.text = ComboManager.judgeCount[(int)JudgeResult.Perfect].ToString();
         great_Text.text = ComboManager.judgeCount[(int)JudgeResult.Great].ToString();
         good_Text.text = ComboManager.judgeCount[(int)JudgeResult.Good].ToString();
@@ -319,12 +318,12 @@ public class ResultManager : MonoBehaviour
         foreach (var mod in modManager.attachedMods)
             modScoreMultiplier *= mod.ScoreMultiplier;
 
-        playResult.Score = (ComboManager.score / ComboManager.maxScore) * 1000000 * modScoreMultiplier;
+        playResult.Score = (ComboManager.score / ComboManager.maxScore) * ComboManager.MAX_DISPLAY_SCORE * modScoreMultiplier;
         playResult.ranks = ResultsGetter.GetRanks();
         playResult.clearMark = ResultsGetter.GetClearMark();
         playResult.Acc = ResultsGetter.GetAcc();
         playResult.ChartId = cheader.sid;
-        playResult.Difficulty = (Difficulty)chartListManager.current.difficulty;
+        playResult.Difficulty = chartListManager.current.difficulty;
         PlayRecords pr = PlayRecords.OpenRecord();
 
         var resultList = pr.resultsList.Where((x) => x.ChartId == cheader.sid && x.Difficulty == (Difficulty)chartListManager.current.difficulty);

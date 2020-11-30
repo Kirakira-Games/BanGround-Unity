@@ -18,19 +18,19 @@ public class LifeController : MonoBehaviour
     {
         get
         {
-            if (lifePoint>=90)
+            if (lifePoint > 90)
             {
                 return 10;
             }
-            else if (lifePoint>=80)
+            else if (lifePoint > 80)
             {
                 return 9;
             }
-            else if (lifePoint>=60)
+            else if (lifePoint > 60)
             {
                 return 8;
             }
-            else if (lifePoint>=30)
+            else if (lifePoint > 30)
             {
                 return 6;
             }
