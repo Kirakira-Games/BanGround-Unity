@@ -8,12 +8,15 @@ using UnityEngine.UI;
 
 public class ComboManager : MonoBehaviour
 {
+    public const string FORMAT_DISPLAY_SCORE = "{0:00000000}";
+    public const int MAX_DISPLAY_SCORE = (int)1e7;
+    public static string GetDisplayScore(double score) => string.Format(FORMAT_DISPLAY_SCORE, Math.Round(score * MAX_DISPLAY_SCORE));
+
     public static readonly int[] accRate = { 10, 8, 5, 2, 0 };
     public static int[] maxCombo;
     public static int[] judgeCount;
-    public static double score;
-    public static double maxScore;
-    public static double normalizeFactor;
+    public static int score;
+    public static int maxScore;
     public static int acc;
     public static int maxAcc;
     public static int noteCount;
@@ -35,9 +38,9 @@ public class ComboManager : MonoBehaviour
         combo = new int[2];
         manager = this;
         score = 0;
-        maxScore = 1e7;
+        maxScore = 1;
         acc = 0;
-        maxAcc = 0;
+        maxAcc = 1;
         judgeCount = new int[(int)JudgeResult.Miss + 1];
         JudgeOffsetResult = new List<int>();
     }
@@ -70,8 +73,8 @@ public class ComboManager : MonoBehaviour
             }
         }
 
-        score += normalizeFactor * accRate[intResult] * LifeController.instance.multiplier;
-        scoreDisplay.SetScore(score / maxScore, (double)acc / maxAcc);
+        score += accRate[intResult] * LifeController.instance.multiplier;
+        scoreDisplay.SetScore((double)score / maxScore, (double)acc / maxAcc);
 
         UpdateComboCountImg();
     }
@@ -103,8 +106,7 @@ public class ComboManager : MonoBehaviour
         }
         noteCount = numNotes;
 
-        maxScore = 1e7;
-        normalizeFactor = maxScore / noteCount / 10 / 10;
+        maxScore = noteCount * 10 * 10;
     }
 
     [Flags]

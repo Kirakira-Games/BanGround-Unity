@@ -46,7 +46,7 @@ public class GradeColorChange : MonoBehaviour
     {
         if (displayScore < score)
             displayScore += (score - displayScore) * 0.5;
-        scoreTxt.text = string.Format("{0:0000000}", displayScore * 1000000);
+        scoreTxt.text = ComboManager.GetDisplayScore(displayScore);
         fill.color = startColor * (float)(1 - displayScore) + endColor * (float)displayScore;
     }
 
