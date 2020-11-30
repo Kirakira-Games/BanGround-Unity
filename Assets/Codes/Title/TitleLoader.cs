@@ -78,7 +78,9 @@ public class TitleLoader : MonoBehaviour
     private async void Start()
     {
         userCanvas.GetUserInfo().Forget();
-        await PlayTitle();
+        PlayTitle().Forget();
+
+        await UniTask.Delay(500);
 
         await accountManager.TryLogin();
         userCanvas.GetUserInfo().Forget();
@@ -88,7 +90,7 @@ public class TitleLoader : MonoBehaviour
     {
         music = await audioManager.PlayLoopMusic(titleMusic.bytes);
         music.SetVolume(0.7f);
-        await UniTask.Delay(3000); //yield return new WaitForSeconds(3f);
+        await UniTask.Delay(2000); //yield return new WaitForSeconds(3f);
 
         banGround = await audioManager.PrecacheSE(voice[UnityEngine.Random.Range(0,voice.Length)].bytes);
         banGround.PlayOneShot();
