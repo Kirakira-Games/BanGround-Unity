@@ -274,7 +274,7 @@ namespace BGEditor
             {
                 MusicId = musicId,
                 Background = bgFile.Info.Hash,
-                Description = "",
+                Description = musicHeader.artist + " - " + musicHeader.title,
                 Preview = chartHeader.preview.ToList(),
                 Tags = chartHeader.tag
             };
