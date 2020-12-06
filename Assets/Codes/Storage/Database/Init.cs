@@ -10,15 +10,14 @@ namespace BanGround.Database
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void SetupMessagePackResolver()
         {
-            /*
             StaticCompositeResolver.Instance.Register(new[]{
                 MasterMemoryResolver.Instance, // set MasterMemory generated resolver
-                Generated.Instance,    // set MessagePack generated resolver
+                GeneratedResolver.Instance,    // set MessagePack generated resolver
                 StandardResolver.Instance      // set default MessagePack resolver
             });
 
             var options = MessagePackSerializerOptions.Standard.WithResolver(StaticCompositeResolver.Instance);
-            MessagePackSerializer.DefaultOptions = options;*/
+            MessagePackSerializer.DefaultOptions = options;
         }
     }
 }
