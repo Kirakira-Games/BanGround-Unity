@@ -28,6 +28,8 @@ public class ResultManager : MonoBehaviour
     [Inject]
     private IDatabaseAPI db;
 
+    [Inject(Id = "g_demoRecord")]
+    private KVar g_demoRecord;
     [Inject(Id = "fs_iconpath")]
     private KVar fs_iconpath;
 
@@ -319,9 +321,13 @@ public class ResultManager : MonoBehaviour
     private void ReadScores()
     {
         float modScoreMultiplier = 1.0f;
+        ushort mods = 0;
 
         foreach (var mod in modManager.attachedMods)
+        {
+            mods |= mod.Flag;
             modScoreMultiplier *= mod.ScoreMultiplier;
+        }
 
         playResult.Score = (int)Math.Round((double)ComboManager.score / ComboManager.maxScore * ComboManager.MAX_DISPLAY_SCORE * modScoreMultiplier);
         playResult.Rank = ResultsGetter.GetRanks();
@@ -333,9 +339,11 @@ public class ResultManager : MonoBehaviour
         playResult.CreatedAt = DateTime.Now;
         playResult.Combo = ResultsGetter.GetCombo();
         playResult.Judge = ResultsGetter.GetJudgeCount();
-        //playResult.ChartHash = TODO;
-        //playResult.Mods = TODO;
-        //playResult.ReplayFile = TODO;
+       // playResult.ChartHash = TODO;
+        playResult.Mods = mods;
+
+        if(g_demoRecord)
+            playResult.ReplayFile = "replay/" + ComboManager.recoder.demoName;
 
         var oldRanks = db.GetRankItems(cheader.sid, chartListManager.current.difficulty);
         RankItem result = playResult;
@@ -355,6 +363,10 @@ public class ResultManager : MonoBehaviour
                 result.Judge = playResult.Judge;
                 result.MusicId = playResult.MusicId;
                 result.CreatedAt = playResult.CreatedAt;
+
+                result.Mods = playResult.Mods;
+                // result.ChartHash = playResult.ChartHash; TODO
+                result.ReplayFile = playResult.ReplayFile;
             }
             result.Rank = (Ranks)Mathf.Min((int)result.Rank, (int)playResult.Rank);
             result.ClearMark = (ClearMarks)Mathf.Min((int)result.ClearMark, (int)playResult.ClearMark);

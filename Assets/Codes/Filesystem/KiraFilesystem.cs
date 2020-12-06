@@ -540,7 +540,13 @@ namespace BanGround
             var subdirs = di.GetDirectories();
 
             foreach (var sdi in subdirs)
+            {
+                // exclude replay folder
+                if (sdi.Name == "replay")
+                    continue;
+
                 GetFiles(searchPath, files, sdi, func);
+            }
         }
 
         public IEnumerable<IFile> Find(Func<IFile, bool> cmp)
