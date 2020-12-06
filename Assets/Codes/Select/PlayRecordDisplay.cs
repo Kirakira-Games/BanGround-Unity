@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using BanGround.Database;
+using BanGround.Database.Models;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,11 +14,14 @@ public class PlayRecordDisplay : MonoBehaviour
     [Inject]
     private IResourceLoader resourceLoader;
 
-    RawImage Rank;
-    RawImage clearMark;
-    Text score;
-    Text acc;
-    public static PlayRecords playRecords;
+    [Inject]
+    private IDatabaseAPI db;
+
+    private RawImage Rank;
+    private RawImage clearMark;
+    private Text score;
+    private Text acc;
+
     private void Awake()
     {
         //Marks
@@ -24,24 +29,14 @@ public class PlayRecordDisplay : MonoBehaviour
         clearMark = GameObject.Find("ClearMark").GetComponent<RawImage>();
         score = GameObject.Find("ScoreHistory").GetComponent<Text>();
         acc = GameObject.Find("AccText").GetComponent<Text>();
-        playRecords = PlayRecords.OpenRecord();
     }
     public void DisplayRecord()
     {
         int count = 0;
-        PlayResult a = new PlayResult();
-        for (int i = 0; i < playRecords.resultsList.Count; i++)
-        {
-            if (playRecords.resultsList[i].ChartId == chartListManager.current.header.sid &&
-                playRecords.resultsList[i].Difficulty == chartListManager.current.difficulty)
-            {
-                count++;
-                a = playRecords.resultsList[i];
-
-            }
-        }
-        score.text = string.Format("{0:0000000}", a.Score);
-        acc.text = string.Format("{0:P2}", Mathf.FloorToInt((float)a.Acc * 10000) / 10000f);
+        var records = db.GetRankItems(chartListManager.current.header.sid, chartListManager.current.difficulty);
+        RankItem rank = records.Length == 0 ? new RankItem() : records[records.Length - 1];
+        score.text = string.Format(ComboManager.FORMAT_DISPLAY_SCORE, rank.Score);
+        acc.text = string.Format("{0:P2}", Mathf.FloorToInt(rank.Acc * 10000 + NoteUtility.EPS) / 10000f);
         //Set Rank
         if (count == 0)
         {
@@ -55,11 +50,11 @@ public class PlayRecordDisplay : MonoBehaviour
             clearMark.enabled = true;
         }
 
-        Rank.texture = resourceLoader.LoadIconResource<Texture2D>(a.ranks.ToString());
+        Rank.texture = resourceLoader.LoadIconResource<Texture2D>(rank.Rank.ToString());
 
         //Set Mark
         var mark = new Texture2D(0, 0);
-        switch (a.clearMark)
+        switch (rank.ClearMark)
         {
             case ClearMarks.AP:
                 mark = resourceLoader.LoadIconResource<Texture2D>("AP") as Texture2D;

@@ -3,7 +3,7 @@ using System.Collections;
 using System;
 using AudioProvider;
 
-public class ModBase
+public abstract class ModBase
 {
     public virtual float ScoreMultiplier => 1.0f;
     public virtual Type[] IncompatibleMods => Array.Empty<Type>();

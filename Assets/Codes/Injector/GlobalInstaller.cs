@@ -1,6 +1,7 @@
 using AudioProvider;
 using BanGround;
 using BanGround.Community;
+using BanGround.Database;
 using BanGround.Identity;
 using BanGround.Web;
 using System.IO;
@@ -25,6 +26,9 @@ public class GlobalInstaller : MonoInstaller
 
     public override void InstallBindings()
     {
+        // MasterMemory
+        Initializer.SetupMessagePackResolver();
+
         // Filesystem
         Container.Bind<IFileSystem>().To<KiraFilesystem>().AsSingle().OnInstantiated((_, obj) =>
         {
@@ -41,6 +45,9 @@ public class GlobalInstaller : MonoInstaller
             dataLoader.Init().Forget();
             new GameObject("AppPreloader").AddComponent<AppPreLoader>();
         }).NonLazy();
+
+        // Client-side database
+        Container.Bind<IDatabaseAPI>().To<DatabaseAPI>().AsSingle().NonLazy();
 
         // KVar System
         Container.Bind<IKVSystem>().To<KVSystem>().AsSingle().OnInstantiated((_, obj) =>

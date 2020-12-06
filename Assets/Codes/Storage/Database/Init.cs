@@ -1,13 +1,12 @@
 ﻿using MessagePack;
 using MessagePack.Resolvers;
 using UnityEngine;
-using BanGround.Database.Models;
+using BanGround.Database.Generated;
 
 namespace BanGround.Database
 {
     public static class Initializer
     {
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         public static void SetupMessagePackResolver()
         {
             StaticCompositeResolver.Instance.Register(new[]{

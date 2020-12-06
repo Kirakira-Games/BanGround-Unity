@@ -9,6 +9,9 @@ using System.Linq;
 using AudioProvider;
 using Cysharp.Threading.Tasks;
 using Zenject;
+using BanGround.Database.Models;
+using UnityEngine.Rendering;
+using BanGround.Database;
 
 public class ResultManager : MonoBehaviour
 {
@@ -22,6 +25,8 @@ public class ResultManager : MonoBehaviour
     private IChartListManager chartListManager;
     [Inject]
     private IResourceLoader resourceLoader;
+    [Inject]
+    private IDatabaseAPI db;
 
     [Inject(Id = "fs_iconpath")]
     private KVar fs_iconpath;
@@ -55,8 +60,8 @@ public class ResultManager : MonoBehaviour
     private RawImage markIcon;
     private Image difficultCard;
 
-    PlayResult playResult = new PlayResult();
-    double lastScore = 0;
+    private RankItem playResult = new RankItem();
+    private double lastScore = 0;
 
     public TextAsset[] voices = new TextAsset[9];
     public TextAsset bgmVoice;
@@ -280,11 +285,11 @@ public class ResultManager : MonoBehaviour
     private void ShowRank()
     {
         //Set Rank
-        rankIcon.texture = resourceLoader.LoadIconResource<Texture2D>(playResult.ranks.ToString());
+        rankIcon.texture = resourceLoader.LoadIconResource<Texture2D>(playResult.Rank.ToString());
 
         //Set Mark
         
-        switch (playResult.clearMark)
+        switch (playResult.ClearMark)
         {
             case ClearMarks.AP:
                 markIcon.texture = resourceLoader.LoadIconResource<Texture2D>("AP") as Texture2D;
@@ -307,7 +312,7 @@ public class ResultManager : MonoBehaviour
         level_Text.text = Enum.GetName(typeof(Difficulty), chartListManager.current.difficulty).ToUpper() + " " +
             cheader.difficultyLevel[(int)chartListManager.current.difficulty];
         songName_Text.text = mheader.title;
-        acc_Text.text = modManager.isAutoplay ? "AUTOPLAY" : string.Format("{0:P2}", Mathf.FloorToInt((float)playResult.Acc * 10000) / 10000f);
+        acc_Text.text = modManager.isAutoplay ? "AUTOPLAY" : string.Format("{0:P2}", Mathf.FloorToInt(playResult.Acc * 10000 + NoteUtility.EPS) / 10000f);
         difficultCard.sprite = Resources.Load<Sprite>("UI/DifficultyCards/" + Enum.GetName(typeof(Difficulty), chartListManager.current.difficulty));
     }
 
@@ -318,57 +323,54 @@ public class ResultManager : MonoBehaviour
         foreach (var mod in modManager.attachedMods)
             modScoreMultiplier *= mod.ScoreMultiplier;
 
-        playResult.Score = (ComboManager.score / ComboManager.maxScore) * ComboManager.MAX_DISPLAY_SCORE * modScoreMultiplier;
-        playResult.ranks = ResultsGetter.GetRanks();
-        playResult.clearMark = ResultsGetter.GetClearMark();
-        playResult.Acc = ResultsGetter.GetAcc();
+        playResult.Score = (int)Math.Round((double)ComboManager.score / ComboManager.maxScore * ComboManager.MAX_DISPLAY_SCORE * modScoreMultiplier);
+        playResult.Rank = ResultsGetter.GetRanks();
+        playResult.ClearMark = ResultsGetter.GetClearMark();
+        playResult.Acc = (float)ResultsGetter.GetAcc();
         playResult.ChartId = cheader.sid;
+        playResult.MusicId = cheader.mid;
         playResult.Difficulty = chartListManager.current.difficulty;
-        PlayRecords pr = PlayRecords.OpenRecord();
+        playResult.CreatedAt = DateTime.Now;
+        playResult.Combo = ResultsGetter.GetCombo();
+        playResult.Judge = ResultsGetter.GetJudgeCount();
+        //playResult.ChartHash = TODO;
+        //playResult.Mods = TODO;
+        //playResult.ReplayFile = TODO;
 
-        var resultList = pr.resultsList.Where((x) => x.ChartId == cheader.sid && x.Difficulty == (Difficulty)chartListManager.current.difficulty);
-        if (resultList.Count() == 1) 
-        {
-            var result = resultList.First();
-            lastScore = result.Score;
-            result.Score = Math.Max(result.Score, playResult.Score);
-            result.ranks = (Ranks)Mathf.Min((int)result.ranks, (int)playResult.ranks);
-            result.clearMark = (ClearMarks)Mathf.Min((int)result.clearMark, (int)playResult.clearMark);
-            result.Acc = Math.Max(result.Acc, playResult.Acc);
+        var oldRanks = db.GetRankItems(cheader.sid, chartListManager.current.difficulty);
+        RankItem result = playResult;
 
-            //pr.resultsList.Remove(result);
-            //pr.resultsList.Add(playResult);
-        }
-        else
+        if (oldRanks.Length == 0)
         {
             lastScore = 0;
-            pr.resultsList.Add(playResult);
+            db.SaveRankItem(playResult);
+        }
+        else
+        {
+            result = oldRanks[oldRanks.Length - 1];
+            lastScore = result.Score;
+            if (playResult.Score > result.Score)
+            {
+                result.Score = playResult.Score;
+                result.Judge = playResult.Judge;
+                result.MusicId = playResult.MusicId;
+                result.CreatedAt = playResult.CreatedAt;
+            }
+            result.Rank = (Ranks)Mathf.Min((int)result.Rank, (int)playResult.Rank);
+            result.ClearMark = (ClearMarks)Mathf.Min((int)result.ClearMark, (int)playResult.ClearMark);
+            result.Acc = Mathf.Max(result.Acc, playResult.Acc);
+            result.Combo = Math.Max(result.Combo, playResult.Combo);
         }
 
-        //int count = 0;
-        //for(int i =0;i<pr.resultsList.Count;i++)
-        //{
-        //    if (pr.resultsList[i].FolderName == liveSetting.selectedFolder && pr.resultsList[i].ChartName == liveSetting.selectedChart)
-        //    {
-        //        count++;
-        //        lastScore = pr.resultsList[i].Score;
-        //        if (lastScore < playResult.Score)
-        //        {
-        //            pr.resultsList.RemoveAt(i);
-        //            pr.resultsList.Add(playResult);
-        //        }
-        //        break;
-        //    }
-        //}
-        //if (count == 0)
-        //{
-        //    lastScore = 0;
-        //    pr.resultsList.Add(playResult);
-        //}
         if (!modManager.isAutoplay)
-            print("Record Saved" + pr.Save());
+        {
+            db.SaveRankItem(result);
+            print("Record saved");
+        }
         else
+        {
             print("Autoplay score not saved");
+        }
     }
 
     private void RemoveListener()
@@ -392,6 +394,16 @@ public class ResultManager : MonoBehaviour
 
 static class ResultsGetter
 {
+    public static int GetCombo()
+    {
+        return ComboManager.maxCombo[(int)JudgeResult.Great];
+    }
+
+    public static int[] GetJudgeCount()
+    {
+        return ComboManager.judgeCount.ToArray();
+    }
+
     public static ClearMarks GetClearMark()
     {
         double acc = GetAcc();
@@ -399,7 +411,7 @@ static class ResultsGetter
         {
             return ClearMarks.AP;
         }
-        else if (ComboManager.maxCombo[(int)JudgeResult.Great] == ComboManager.noteCount)
+        else if (GetCombo() == ComboManager.noteCount)
         {
             return ClearMarks.FC;
         }
