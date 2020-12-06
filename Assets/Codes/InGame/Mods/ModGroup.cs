@@ -5,6 +5,7 @@ using AudioProvider;
 
 public abstract class ModBase
 {
+    public virtual ushort Flag => 0;
     public virtual float ScoreMultiplier => 1.0f;
     public virtual Type[] IncompatibleMods => Array.Empty<Type>();
 }

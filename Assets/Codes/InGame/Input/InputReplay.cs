@@ -28,8 +28,12 @@ public class FileChecksum
 
 public class DemoFile
 {
+    const ushort KIRAREPLAY_VERSION = 2;
+
+    public uint uid;
     public int sid;
     public Difficulty difficulty;
+    public ushort mods;
     public List<FileChecksum> checksums = new List<FileChecksum>();
     public List<ReplayFrame> frames = new List<ReplayFrame>();
 
@@ -55,8 +59,6 @@ public class DemoFile
         frames.Add(frame);
     }
 
-    const ushort KIRAREPLAY_VERSION = 1;
-
     public void Save(IFile demofile, IFile[] fileList)
     {
         var dic = new Dictionary<string, long>();
@@ -67,6 +69,11 @@ public class DemoFile
             {
                 // ushort version;
                 br.Write(KIRAREPLAY_VERSION);
+
+                br.Write(uid);
+                br.Write(sid);
+                br.Write((ushort)difficulty);
+                br.Write(mods);
 
                 // uint fileCount;
                 br.Write(fileList.Length);
@@ -201,6 +208,11 @@ public class DemoFile
                 if (version != KIRAREPLAY_VERSION)
                     throw new InvalidDataException("Kira replay version mismatch");
 
+                result.uid = br.ReadUInt32();
+                result.sid = br.ReadInt32();
+                result.difficulty = (Difficulty)br.ReadUInt16();
+                result.mods = br.ReadUInt16();
+
                 // uint fileCount;
                 var fileCount = br.ReadUInt32();
 
@@ -294,14 +306,15 @@ public class DemoFile
 public class DemoRecorder
 {
     public string demoName;
-    DemoFile demoFile;
+    public DemoFile demoFile;
 
-    public DemoRecorder(int chartId, Difficulty diff)
+    public DemoRecorder(int chartId, Difficulty diff, ushort mods)
     {
         demoFile = new DemoFile
         {
             sid = chartId,
-            difficulty = diff
+            difficulty = diff,
+            mods = mods
         };
 
         demoName = $"{chartId}_{diff:g}_{DateTime.Now.ToLongDateString()}_{DateTime.Now.ToLongTimeString()}.kirareplay".Replace(":", "-").Replace("/", "-").Replace("\\", "-");

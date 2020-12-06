@@ -22,6 +22,7 @@ public class ComboManager : MonoBehaviour
     public static int noteCount;
     public static ComboManager manager;
     public static List<int> JudgeOffsetResult;
+    public static DemoRecorder recoder;
 
     private int[] combo;
 

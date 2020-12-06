@@ -332,7 +332,7 @@ public class TouchManager : MonoBehaviour
         KirakiraTouch.flickDistPixels = Mathf.Min(Screen.height / 20, NoteUtility.FLICK_JUDGE_DIST / 2.54f * KirakiraTouch.dpi);
 
         // Touch provider
-        if(cl_currentDemo != "")
+        if (cl_currentDemo != "")
         {
             provider = new DemoReplayTouchPrivider(DemoFile.LoadFrom(fs.GetFile(cl_currentDemo)));
         }
@@ -357,7 +357,7 @@ public class TouchManager : MonoBehaviour
 
         if (!(provider is DemoReplayTouchPrivider) && g_demoRecord)
         {
-            recorder = new DemoRecorder(chartListManager.current.header.sid, chartListManager.current.difficulty);
+            recorder = new DemoRecorder(chartListManager.current.header.sid, chartListManager.current.difficulty, 0 /* TODO: mod flag, it's not exists now */);
         }
     }
 
@@ -405,9 +405,41 @@ public class TouchManager : MonoBehaviour
         {
             var file = fs.GetOrNewFile($"{DataLoader.ReplayDir}/{recorder.demoName}");
 
-            var fileList = fs.GetFile(dataLoader.GetChartPath(chartListManager.current.header.sid, chartListManager.current.difficulty));
+            var fileList = fs.Find(f =>
+            {
+                if (f.Name.StartsWith(dataLoader.GetChartResource(chartListManager.current.header.sid, "")))
+                {
+                    if (f.Name.EndsWith(".json"))
+                        return false;
 
-            recorder.Save(file, new IFile[] { fileList });
+                    var name = f.Name.Replace(dataLoader.GetChartResource(chartListManager.current.header.sid, ""), "").ToLower();
+
+                    if (name == "cheader.bin")
+                        return false;
+
+                    if (name.EndsWith(".bin") && name != $"{chartListManager.current.difficulty:g}.bin".ToLower())
+                        return false;
+
+                    if (name != $"{chartListManager.current.difficulty:g}.lua".ToLower() && (
+                        name == $"{Difficulty.Easy:g}.lua".ToLower() || name == $"{Difficulty.Normal:g}.lua".ToLower() ||
+                        name == $"{Difficulty.Hard:g}.lua".ToLower() || name == $"{Difficulty.Expert:g}.lua".ToLower() ||
+                        name == $"{Difficulty.Special:g}.lua".ToLower()
+                    ))
+                        return false;
+
+                    return true;
+                }
+                else if (f.Name.ToLower() == dataLoader.GetMusicPath(chartListManager.current.header.mid))
+                {
+                    return true;
+                }
+
+                return false;
+            });
+
+            recorder.Save(file, fileList.ToArray());
+
+            ComboManager.recoder = recorder;
         }
     }
 
