@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using BanGround.Database;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Zenject;
@@ -88,14 +89,21 @@ public class ChartAuthorSort : IComparer<cHeader>
 
 public class ChartScoreSort : IComparer<cHeader>
 {
+    private IDatabaseAPI db;
+    private Difficulty difficulty;
+    public ChartScoreSort(IDatabaseAPI db, Difficulty difficulty)
+    {
+        this.db = db;
+        this.difficulty = difficulty;
+    }
     public int Compare(cHeader x, cHeader y)
     {
-        IEnumerable<PlayResult> ListX = PlayRecordDisplay.playRecords.resultsList.Where(o => o.ChartId == x.sid);
-        IEnumerable<PlayResult> ListY = PlayRecordDisplay.playRecords.resultsList.Where(o => o.ChartId == y.sid);
-        double resultX = 0, resultY = 0;
-        if (ListX.Count() > 0) resultX = ListX.Max(o => o.Score);
-        if (ListY.Count() > 0) resultY = ListY.Max(o => o.Score);
-        int dif = (int)(resultX - resultY);
+        var listX = db.GetRankItems(x.sid, difficulty);
+        var listY = db.GetRankItems(y.sid, difficulty);
+        int resultX = 0, resultY = 0;
+        if (listX.Length > 0) resultX = listX.Max(o => o.Score);
+        if (listY.Length > 0) resultY = listY.Max(o => o.Score);
+        int dif = resultY - resultX;
         return dif == 0 ? x.mid - y.mid : dif;
         //DAMN:The selector could select a different song if score was changed
     }
@@ -110,6 +118,8 @@ public class SorterFactory : ISorterFactory
 {
     [Inject]
     private IDataLoader dataLoader;
+    [Inject]
+    private IDatabaseAPI db;
     [Inject(Id = "cl_cursorter")]
     private KVar cl_cursorter;
     [Inject(Id = "cl_lastdiff")]
@@ -128,7 +138,7 @@ public class SorterFactory : ISorterFactory
             case Sorter.ChartAuthor:
                 return new ChartAuthorSort();
             case Sorter.ChartScore:
-                return new ChartScoreSort();
+                return new ChartScoreSort(db, (Difficulty)cl_lastdiff);
             default:
                 return new SongNameSort(dataLoader);
         }

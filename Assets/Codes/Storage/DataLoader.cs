@@ -27,7 +27,6 @@ public class DataLoader : IDataLoader
     private static readonly string FSDir = DataDir + "filesystem/";
     private static readonly string FSIndex = DataDir + "filesystem/fsindex.bin";
     public static readonly string InboxDir = Application.persistentDataPath + "/Inbox/";
-    public static readonly string ScoresPath = Application.persistentDataPath + "/Scores.bin";
     public int LastImportedSid { get; set; } = -1;
 
     [Inject]

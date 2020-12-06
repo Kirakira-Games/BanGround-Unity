@@ -51,7 +51,7 @@ namespace MessagePack.Resolvers
         {
             lookup = new global::System.Collections.Generic.Dictionary<Type, int>(1)
             {
-                { typeof(global::BanGround.Database.RawModels.RankItem), 0 },
+                { typeof(global::BanGround.Database.Models.RankItem), 0 },
             };
         }
 
@@ -65,7 +65,7 @@ namespace MessagePack.Resolvers
 
             switch (key)
             {
-                case 0: return new MessagePack.Formatters.BanGround.Database.RawModels.RankItemFormatter();
+                case 0: return new MessagePack.Formatters.BanGround.Database.Models.RankItemFormatter();
                 default: return null;
             }
         }
