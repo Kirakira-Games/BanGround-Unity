@@ -11,6 +11,7 @@ using Zenject;
 using State = GameStateMachine.State;
 using System.Threading;
 using BanGround.Utils;
+using BanGround.Database.Models;
 
 public class UIManager : MonoBehaviour, IUIManager
 {

@@ -4,6 +4,7 @@ using System.IO;
 using UnityEngine;
 using System.Linq;
 using MessagePack;
+using System;
 
 namespace BanGround.Database
 {
@@ -54,6 +55,31 @@ namespace BanGround.Database
         {
             var items = DB.RankItemTable.FindByChartIdAndDifficulty((sid, difficulty));
             return items.ToArray();
+        }
+
+        public RankItem GetBestRank(int sid, Difficulty difficulty)
+        {
+            var items = GetRankItems(sid, difficulty);
+            if (items.Length == 0)
+                return null;
+            var best = new RankItem();
+            foreach (var item in items)
+            {
+                if (item.Score >= best.Score)
+                {
+                    best.Score = item.Score;
+                    best.Judge = item.Judge;
+                    best.MusicId = item.MusicId;
+                    best.CreatedAt = item.CreatedAt;
+
+                    best.Mods = item.Mods;
+                    best.ChartHash = item.ChartHash;
+                    best.ReplayFile = item.ReplayFile;
+                }
+                best.Acc = Math.Max(item.Acc, best.Acc);
+                best.Combo = Math.Max(item.Combo, best.Combo);
+            }
+            return best;
         }
 
         public void SaveRankItem(RankItem item)

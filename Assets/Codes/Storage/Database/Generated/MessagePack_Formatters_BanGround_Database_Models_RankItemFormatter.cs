@@ -29,14 +29,10 @@ namespace MessagePack.Formatters.BanGround.Database.Models
         private static global::System.ReadOnlySpan<byte> GetSpan_ChartId() => new byte[1 + 7] { 167, 67, 104, 97, 114, 116, 73, 100 };
         // Difficulty
         private static global::System.ReadOnlySpan<byte> GetSpan_Difficulty() => new byte[1 + 10] { 170, 68, 105, 102, 102, 105, 99, 117, 108, 116, 121 };
-        // ClearMark
-        private static global::System.ReadOnlySpan<byte> GetSpan_ClearMark() => new byte[1 + 9] { 169, 67, 108, 101, 97, 114, 77, 97, 114, 107 };
-        // Rank
-        private static global::System.ReadOnlySpan<byte> GetSpan_Rank() => new byte[1 + 4] { 164, 82, 97, 110, 107 };
-        // Judge
-        private static global::System.ReadOnlySpan<byte> GetSpan_Judge() => new byte[1 + 5] { 165, 74, 117, 100, 103, 101 };
         // MusicId
         private static global::System.ReadOnlySpan<byte> GetSpan_MusicId() => new byte[1 + 7] { 167, 77, 117, 115, 105, 99, 73, 100 };
+        // Judge
+        private static global::System.ReadOnlySpan<byte> GetSpan_Judge() => new byte[1 + 5] { 165, 74, 117, 100, 103, 101 };
         // Acc
         private static global::System.ReadOnlySpan<byte> GetSpan_Acc() => new byte[1 + 3] { 163, 65, 99, 99 };
         // Combo
@@ -61,21 +57,17 @@ namespace MessagePack.Formatters.BanGround.Database.Models
             }
 
             IFormatterResolver formatterResolver = options.Resolver;
-            writer.WriteMapHeader(14);
+            writer.WriteMapHeader(12);
             writer.WriteRaw(GetSpan_Id());
             writer.Write(value.Id);
             writer.WriteRaw(GetSpan_ChartId());
             writer.Write(value.ChartId);
             writer.WriteRaw(GetSpan_Difficulty());
             formatterResolver.GetFormatterWithVerify<Difficulty>().Serialize(ref writer, value.Difficulty, options);
-            writer.WriteRaw(GetSpan_ClearMark());
-            formatterResolver.GetFormatterWithVerify<ClearMarks>().Serialize(ref writer, value.ClearMark, options);
-            writer.WriteRaw(GetSpan_Rank());
-            formatterResolver.GetFormatterWithVerify<Ranks>().Serialize(ref writer, value.Rank, options);
-            writer.WriteRaw(GetSpan_Judge());
-            formatterResolver.GetFormatterWithVerify<int[]>().Serialize(ref writer, value.Judge, options);
             writer.WriteRaw(GetSpan_MusicId());
             writer.Write(value.MusicId);
+            writer.WriteRaw(GetSpan_Judge());
+            formatterResolver.GetFormatterWithVerify<int[]>().Serialize(ref writer, value.Judge, options);
             writer.WriteRaw(GetSpan_Acc());
             writer.Write(value.Acc);
             writer.WriteRaw(GetSpan_Combo());
@@ -105,11 +97,9 @@ namespace MessagePack.Formatters.BanGround.Database.Models
             var __Id__ = default(int);
             var __ChartId__ = default(int);
             var __Difficulty__ = default(Difficulty);
-            var __ClearMark__ = default(ClearMarks);
-            var __Rank__ = default(Ranks);
-            var __Judge__ = default(int[]);
             var __MusicId__ = default(int);
-            var __Acc__ = default(float);
+            var __Judge__ = default(int[]);
+            var __Acc__ = default(double);
             var __Combo__ = default(int);
             var __Score__ = default(int);
             var __Mods__ = default(int);
@@ -159,40 +149,6 @@ namespace MessagePack.Formatters.BanGround.Database.Models
                                 continue;
 
                         }
-                    case 9:
-                        switch (global::MessagePack.Internal.AutomataKeyGen.GetKey(ref stringKey))
-                        {
-                            default: goto FAIL;
-                            case 8241953946720365635UL:
-                                if (stringKey[0] != 107) { goto FAIL; }
-
-                                __ClearMark__ = formatterResolver.GetFormatterWithVerify<ClearMarks>().Deserialize(ref reader, options);
-                                continue;
-
-                            case 8314006052075038787UL:
-                                if (stringKey[0] != 104) { goto FAIL; }
-
-                                __ChartHash__ = formatterResolver.GetFormatterWithVerify<string>().Deserialize(ref reader, options);
-                                continue;
-
-                            case 4712002660661031491UL:
-                                if (stringKey[0] != 116) { goto FAIL; }
-
-                                __CreatedAt__ = formatterResolver.GetFormatterWithVerify<global::System.DateTime>().Deserialize(ref reader, options);
-                                continue;
-
-                        }
-                    case 4:
-                        switch (global::MessagePack.Internal.AutomataKeyGen.GetKey(ref stringKey))
-                        {
-                            default: goto FAIL;
-                            case 1802395986UL:
-                                __Rank__ = formatterResolver.GetFormatterWithVerify<Ranks>().Deserialize(ref reader, options);
-                                continue;
-                            case 1935961933UL:
-                                __Mods__ = reader.ReadInt32();
-                                continue;
-                        }
                     case 5:
                         switch (global::MessagePack.Internal.AutomataKeyGen.GetKey(ref stringKey))
                         {
@@ -210,8 +166,30 @@ namespace MessagePack.Formatters.BanGround.Database.Models
                     case 3:
                         if (global::MessagePack.Internal.AutomataKeyGen.GetKey(ref stringKey) != 6513473UL) { goto FAIL; }
 
-                        __Acc__ = reader.ReadSingle();
+                        __Acc__ = reader.ReadDouble();
                         continue;
+                    case 4:
+                        if (global::MessagePack.Internal.AutomataKeyGen.GetKey(ref stringKey) != 1935961933UL) { goto FAIL; }
+
+                        __Mods__ = reader.ReadInt32();
+                        continue;
+                    case 9:
+                        switch (global::MessagePack.Internal.AutomataKeyGen.GetKey(ref stringKey))
+                        {
+                            default: goto FAIL;
+                            case 8314006052075038787UL:
+                                if (stringKey[0] != 104) { goto FAIL; }
+
+                                __ChartHash__ = formatterResolver.GetFormatterWithVerify<string>().Deserialize(ref reader, options);
+                                continue;
+
+                            case 4712002660661031491UL:
+                                if (stringKey[0] != 116) { goto FAIL; }
+
+                                __CreatedAt__ = formatterResolver.GetFormatterWithVerify<global::System.DateTime>().Deserialize(ref reader, options);
+                                continue;
+
+                        }
 
                 }
             }
@@ -221,10 +199,8 @@ namespace MessagePack.Formatters.BanGround.Database.Models
                 Id = __Id__,
                 ChartId = __ChartId__,
                 Difficulty = __Difficulty__,
-                ClearMark = __ClearMark__,
-                Rank = __Rank__,
-                Judge = __Judge__,
                 MusicId = __MusicId__,
+                Judge = __Judge__,
                 Acc = __Acc__,
                 Combo = __Combo__,
                 Score = __Score__,
