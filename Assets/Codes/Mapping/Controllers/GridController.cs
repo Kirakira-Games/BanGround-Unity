@@ -222,9 +222,17 @@ namespace BGEditor
             foreach (var point in Core.group.points)
             {
                 float beat = ChartUtility.BeatToFloat(point.beat);
-                beat = Mathf.Max(0, beat);
-                if (beat < StartBar || beat > EndBar)
-                    continue;
+                beat = Mathf.Max(-50.0f / Editor.barHeight, beat);
+                if (beat >= 0)
+                {
+                    if (beat < StartBar || beat > EndBar)
+                        continue;
+                }
+                else
+                {
+                    if (StartBar != 0)
+                        continue;
+                }
 
                 float y = beat * Editor.barHeight - start;
                 var info = CreateGridInfo(new Vector2(0, y), point.ToEditorString(), false);
