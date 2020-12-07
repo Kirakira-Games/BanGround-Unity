@@ -54,11 +54,12 @@ public class GameChartData
 public enum JudgeResult
 {
     None = -1,
-    Perfect,
-    Great,
-    Good,
-    Bad,
-    Miss
+    Perfect = 0,
+    Great = 1,
+    Good = 2,
+    Bad = 3,
+    Miss = 4,
+    Max = 4
 }
 
 public enum TapEffectType

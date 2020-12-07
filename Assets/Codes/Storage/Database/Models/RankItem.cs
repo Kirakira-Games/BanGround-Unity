@@ -15,16 +15,12 @@ namespace BanGround.Database.Models
         [SecondaryKey(0, keyOrder: 1), NonUnique]
         public Difficulty Difficulty { get; set; }
 
-        public ClearMarks ClearMark { get; set; }
-
-        public Ranks Rank { get; set; }
-
-        public int[] Judge { get; set; }
-
         [SecondaryKey(1), NonUnique]
         public int MusicId { get; set; }
 
-        public float Acc { get; set; }
+        public int[] Judge { get; set; }
+
+        public double Acc { get; set; }
 
         public int Combo { get; set; }
 
@@ -39,5 +35,60 @@ namespace BanGround.Database.Models
 
         [SecondaryKey(3), NonUnique]
         public DateTime CreatedAt { get; set; }
+
+        public static ClearMarks GetClearMark(int[] Judge, int Combo, double Acc)
+        {
+            int noteCount = 0;
+            for (int i = 0; i <= (int)JudgeResult.Max; i++)
+            {
+                noteCount += Judge[i];
+            }
+            if (noteCount == 0)
+            {
+                return ClearMarks.F;
+            }
+            if (Judge[(int)JudgeResult.Perfect] == noteCount)
+            {
+                return ClearMarks.AP;
+            }
+            else if (Combo == ComboManager.noteCount)
+            {
+                return ClearMarks.FC;
+            }
+            else if (Acc >= 0.6)
+            {
+                return ClearMarks.CL;
+            }
+            else
+            {
+                return ClearMarks.F;
+            }
+            }
+
+        [IgnoreMember]
+        public ClearMarks ClearMark => GetClearMark(Judge, Combo, Acc);
+
+        public static Ranks GetRank(double Acc)
+        {
+            if (Acc >= 0.998)
+                return Ranks.SSS;
+            else if (Acc >= 0.99)
+                return Ranks.SS;
+            else if (Acc >= 0.97)
+                return Ranks.S;
+            else if (Acc >= 0.94)
+                return Ranks.A;
+            else if (Acc >= 0.90)
+                return Ranks.B;
+            else if (Acc >= 0.85)
+                return Ranks.C;
+            else if (Acc >= 0.60)
+                return Ranks.D;
+            else
+                return Ranks.F;
+        }
+
+        [IgnoreMember]
+        public Ranks Rank => GetRank(Acc);
     }
 }

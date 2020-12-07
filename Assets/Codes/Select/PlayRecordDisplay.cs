@@ -33,10 +33,9 @@ public class PlayRecordDisplay : MonoBehaviour
     public void DisplayRecord()
     {
         int count = 0;
-        var records = db.GetRankItems(chartListManager.current.header.sid, chartListManager.current.difficulty);
-        RankItem rank = records.Length == 0 ? new RankItem() : records[records.Length - 1];
+        var rank = db.GetBestRank(chartListManager.current.header.sid, chartListManager.current.difficulty) ?? new RankItem();
         score.text = string.Format(ComboManager.FORMAT_DISPLAY_SCORE, rank.Score);
-        acc.text = string.Format("{0:P2}", Mathf.FloorToInt(rank.Acc * 10000 + NoteUtility.EPS) / 10000f);
+        acc.text = string.Format("{0:P2}", rank.Acc);
         //Set Rank
         if (count == 0)
         {

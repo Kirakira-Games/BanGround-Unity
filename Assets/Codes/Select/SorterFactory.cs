@@ -98,11 +98,9 @@ public class ChartScoreSort : IComparer<cHeader>
     }
     public int Compare(cHeader x, cHeader y)
     {
-        var listX = db.GetRankItems(x.sid, difficulty);
-        var listY = db.GetRankItems(y.sid, difficulty);
-        int resultX = 0, resultY = 0;
-        if (listX.Length > 0) resultX = listX.Max(o => o.Score);
-        if (listY.Length > 0) resultY = listY.Max(o => o.Score);
+        var rankX = db.GetBestRank(x.sid, difficulty);
+        var rankY = db.GetBestRank(y.sid, difficulty);
+        int resultX = rankX?.Score ?? 0, resultY = rankY?.Score ?? 0;
         int dif = resultY - resultX;
         return dif == 0 ? x.mid - y.mid : dif;
         //DAMN:The selector could select a different song if score was changed
