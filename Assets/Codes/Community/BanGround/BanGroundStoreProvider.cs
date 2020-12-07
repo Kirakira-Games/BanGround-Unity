@@ -43,7 +43,8 @@ namespace BanGround.Community
                 Id = info.Id,
                 Title = info.Title,
                 Artist = info.Artist,
-                BackgroundUrl = ToBackgroundUrl(info.Background)
+                BackgroundUrl = ToBackgroundUrl(info.Background),
+                DiffRange = info.DiffRange.ToArray()
             };
         }
 

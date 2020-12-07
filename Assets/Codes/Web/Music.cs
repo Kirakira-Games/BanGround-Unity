@@ -43,6 +43,9 @@ namespace BanGround.Web.Music
         [JsonProperty("preview")]
         public List<float> Preview = new List<float>();
 
+        [JsonProperty("diffrange")]
+        public List<int> DiffRange = new List<int>();
+
         [JsonProperty("source")]
         public string Source = "";
 
