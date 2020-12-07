@@ -23,6 +23,7 @@ namespace BanGround.Community
         public string Title;
         public string Artist;
         public string BackgroundUrl;
+        public int[] DiffRange;
 
         public string ToDisplayString()
         {
