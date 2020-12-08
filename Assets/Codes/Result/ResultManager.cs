@@ -32,9 +32,12 @@ public class ResultManager : MonoBehaviour
     private KVar g_demoRecord;
     [Inject(Id = "fs_iconpath")]
     private KVar fs_iconpath;
+    [Inject(Id = "cl_currentdemo")]
+    private KVar cl_currentDemo;
 
     private Button button_back;
     private Button button_retry;
+    private Button button_replay;
 
     private Text score_Text;
     private Text score_delta_Text;
@@ -211,6 +214,7 @@ public class ResultManager : MonoBehaviour
     {
         button_back = GameObject.Find("Button_back").GetComponent<Button>();
         button_retry = GameObject.Find("Button_retry").GetComponent<Button>();
+        button_replay = GameObject.Find("Button_watchreplay").GetComponent<Button>();
         Animator anim = GameObject.Find("AnimationManager").GetComponent<Animator>();
 
         button_back.onClick.AddListener(() =>
@@ -231,6 +235,13 @@ public class ResultManager : MonoBehaviour
             SceneLoader.LoadScene("Result", "InGame");
         });
 
+        button_replay.onClick.AddListener(() =>
+        {
+            cl_currentDemo.Set("replay/" + ComboManager.recoder.demoName);
+            StartCoroutine(BgmFadeOut());
+            RemoveListener();
+            SceneLoader.LoadScene("Result", "InGame");
+        });
     }
 
     IEnumerator BgmFadeOut()
@@ -376,7 +387,6 @@ public class ResultManager : MonoBehaviour
         else bgmST?.Pause();
     }
 }
-
 
 static class ResultsGetter
 {
