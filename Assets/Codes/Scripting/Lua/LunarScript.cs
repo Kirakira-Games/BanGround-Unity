@@ -99,13 +99,13 @@ namespace BanGround.Scripting.Lunar
         float startTime = 0;
         float startBeat = 0;
 
-        public void AtTime(float time, LuaFunction callback)
+        public void UntilTime(float time, LuaFunction callback)
         {
             ls.AddKeyframeByTime(startTime, time, callback);
             startTime = time;
         }
 
-        public void AtBeat(float beat, LuaFunction callback)
+        public void UntilBeat(float beat, LuaFunction callback)
         {
             ls.AddKeyframeByBeat(startBeat, beat, callback);
             startBeat = beat;

@@ -21,11 +21,13 @@ namespace XLua.CSObjectWrap
         {
 			ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
 			System.Type type = typeof(BanGround.Scripting.Lunar.ScriptSprite);
-			Utils.BeginObjectRegister(type, L, translator, 0, 5, 0, 0);
+			Utils.BeginObjectRegister(type, L, translator, 0, 7, 0, 0);
 			
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "SetColor", _m_SetColor);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "SetPosition", _m_SetPosition);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "SetRotation", _m_SetRotation);
+			Utils.RegisterFunc(L, Utils.METHOD_IDX, "SetScale", _m_SetScale);
+			Utils.RegisterFunc(L, Utils.METHOD_IDX, "SetLayer", _m_SetLayer);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "OverrideTexture", _m_OverrideTexture);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "Dispose", _m_Dispose);
 			
@@ -157,6 +159,64 @@ namespace XLua.CSObjectWrap
                     float _roll = (float)LuaAPI.lua_tonumber(L, 4);
                     
                     gen_to_be_invoked.SetRotation( _pitch, _yaw, _roll );
+                    
+                    
+                    
+                    return 0;
+                }
+                
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _m_SetScale(RealStatePtr L)
+        {
+		    try {
+            
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+            
+            
+                BanGround.Scripting.Lunar.ScriptSprite gen_to_be_invoked = (BanGround.Scripting.Lunar.ScriptSprite)translator.FastGetCSObj(L, 1);
+            
+            
+                
+                {
+                    float _x = (float)LuaAPI.lua_tonumber(L, 2);
+                    float _y = (float)LuaAPI.lua_tonumber(L, 3);
+                    float _z = (float)LuaAPI.lua_tonumber(L, 4);
+                    
+                    gen_to_be_invoked.SetScale( _x, _y, _z );
+                    
+                    
+                    
+                    return 0;
+                }
+                
+            } catch(System.Exception gen_e) {
+                return LuaAPI.luaL_error(L, "c# exception:" + gen_e);
+            }
+            
+        }
+        
+        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        static int _m_SetLayer(RealStatePtr L)
+        {
+		    try {
+            
+                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+            
+            
+                BanGround.Scripting.Lunar.ScriptSprite gen_to_be_invoked = (BanGround.Scripting.Lunar.ScriptSprite)translator.FastGetCSObj(L, 1);
+            
+            
+                
+                {
+                    int _layer = LuaAPI.xlua_tointeger(L, 2);
+                    
+                    gen_to_be_invoked.SetLayer( _layer );
                     
                     
                     
