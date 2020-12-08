@@ -280,7 +280,7 @@ public class DemoFile
                             phase = phase,
                             time = audioTime + deltaTime,
                             touchId = touchId,
-                            screenPos = new Vector2
+                            pos = new Vector2
                             {
                                 x = x,
                                 y = y

@@ -425,9 +425,9 @@ public class NoteController : MonoBehaviour, INoteController
         timingGroups = chart.groups.Select(g => new TimingGroupController(g, r_brightness_long)).ToArray();
 
         // Check AutoPlay
-        if (modManager.isAutoplay)
+        if (TouchManager.provider is AutoPlayTouchProvider provider)
         {
-            (TouchManager.provider as AutoPlayTouchProvider).Init(notes);
+            provider.Init(notes);
         }
 
         // Sound effects
