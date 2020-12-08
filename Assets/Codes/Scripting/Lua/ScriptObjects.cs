@@ -108,6 +108,16 @@ namespace BanGround.Scripting.Lunar
             obj.transform.rotation = Quaternion.Euler(pitch, yaw, roll);
         }
 
+        public void SetScale(float x, float y, float z)
+        {
+            obj.transform.localScale = new Vector3(x, y, z);
+        }
+
+        public void SetLayer(int layer)
+        {
+            obj.layer = layer;
+        }
+
         public void OverrideTexture(int texId)
         {
             if(spr != null)

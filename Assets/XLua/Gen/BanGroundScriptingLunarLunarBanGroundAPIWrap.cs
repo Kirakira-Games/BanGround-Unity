@@ -31,8 +31,8 @@ namespace XLua.CSObjectWrap
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "PrecacheSound", _m_PrecacheSound);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "CreateSprite", _m_CreateSprite);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "GetHealth", _m_GetHealth);
-			Utils.RegisterFunc(L, Utils.METHOD_IDX, "AtTime", _m_AtTime);
-			Utils.RegisterFunc(L, Utils.METHOD_IDX, "AtBeat", _m_AtBeat);
+			Utils.RegisterFunc(L, Utils.METHOD_IDX, "UntilTime", _m_UntilTime);
+			Utils.RegisterFunc(L, Utils.METHOD_IDX, "UntilBeat", _m_UntilBeat);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "Msg", _m_Msg);
 			Utils.RegisterFunc(L, Utils.METHOD_IDX, "Dispose", _m_Dispose);
 			
@@ -313,7 +313,7 @@ namespace XLua.CSObjectWrap
         }
         
         [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-        static int _m_AtTime(RealStatePtr L)
+        static int _m_UntilTime(RealStatePtr L)
         {
 		    try {
             
@@ -328,7 +328,7 @@ namespace XLua.CSObjectWrap
                     float _time = (float)LuaAPI.lua_tonumber(L, 2);
                     XLua.LuaFunction _callback = (XLua.LuaFunction)translator.GetObject(L, 3, typeof(XLua.LuaFunction));
                     
-                    gen_to_be_invoked.AtTime( _time, _callback );
+                    gen_to_be_invoked.UntilTime( _time, _callback );
                     
                     
                     
@@ -342,7 +342,7 @@ namespace XLua.CSObjectWrap
         }
         
         [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-        static int _m_AtBeat(RealStatePtr L)
+        static int _m_UntilBeat(RealStatePtr L)
         {
 		    try {
             
@@ -357,7 +357,7 @@ namespace XLua.CSObjectWrap
                     float _beat = (float)LuaAPI.lua_tonumber(L, 2);
                     XLua.LuaFunction _callback = (XLua.LuaFunction)translator.GetObject(L, 3, typeof(XLua.LuaFunction));
                     
-                    gen_to_be_invoked.AtBeat( _beat, _callback );
+                    gen_to_be_invoked.UntilBeat( _beat, _callback );
                     
                     
                     
