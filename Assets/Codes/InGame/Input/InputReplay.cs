@@ -28,12 +28,12 @@ public class FileChecksum
 
 public class DemoFile
 {
-    const ushort KIRAREPLAY_VERSION = 2;
+    const ushort KIRAREPLAY_VERSION = 3;
 
     public uint uid;
     public int sid;
     public Difficulty difficulty;
-    public ushort mods;
+    public ulong mods;
     public List<FileChecksum> checksums = new List<FileChecksum>();
     public List<ReplayFrame> frames = new List<ReplayFrame>();
 
@@ -59,7 +59,7 @@ public class DemoFile
         frames.Add(frame);
     }
 
-    public void Save(IFile demofile, IFile[] fileList)
+    public void Save(IFile demofile, Dictionary<string, byte[]> chartHash)
     {
         var dic = new Dictionary<string, long>();
 
@@ -76,24 +76,18 @@ public class DemoFile
                 br.Write(mods);
 
                 // uint fileCount;
-                br.Write(fileList.Length);
+                br.Write(chartHash.Count);
                 // FileChecksum checksums[];
-                foreach (var file in fileList)
+                foreach (var file in chartHash)
                 {
                     // char *fileName;
                     // write a placeholder and write the position of it later
-                    dic.Add(file.Name, br.BaseStream.Position);
+                    dic.Add(file.Key, br.BaseStream.Position);
                     br.Write(0);
 
                     // char checksum[32];
                     // sha256 checksum
-                    using (var sha256 = SHA256.Create())
-                    {
-                        using (var fs = file.Open(FileAccess.Read))
-                        {
-                            br.Write(sha256.ComputeHash(fs));
-                        }
-                    }
+                    br.Write(file.Value);
                 }
 
                 // uint frameCount;
@@ -211,7 +205,7 @@ public class DemoFile
                 result.uid = br.ReadUInt32();
                 result.sid = br.ReadInt32();
                 result.difficulty = (Difficulty)br.ReadUInt16();
-                result.mods = br.ReadUInt16();
+                result.mods = br.ReadUInt64();
 
                 // uint fileCount;
                 var fileCount = br.ReadUInt32();
@@ -308,7 +302,7 @@ public class DemoRecorder
     public string demoName;
     public DemoFile demoFile;
 
-    public DemoRecorder(int chartId, Difficulty diff, ushort mods)
+    public DemoRecorder(int chartId, Difficulty diff, ulong mods)
     {
         demoFile = new DemoFile
         {
@@ -325,5 +319,5 @@ public class DemoRecorder
         demoFile.Add(kirakiraTouchStates);
     }
 
-    public void Save(IFile demofile, IFile[] fileList) => demoFile.Save(demofile, fileList);
+    public void Save(IFile demofile, Dictionary<string, byte[]> chartHash) => demoFile.Save(demofile, chartHash);
 }

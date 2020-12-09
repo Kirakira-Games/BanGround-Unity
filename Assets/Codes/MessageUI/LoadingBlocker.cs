@@ -23,7 +23,7 @@ public class LoadingBlocker : MonoBehaviour, ILoadingBlocker
 
     public void OnCancel() => action();
 
-    // TODO: Add progress bar display
+
     public void Show(string message, Action cancelAction = null, bool showProgress = false)
     {
         progress = 0;

@@ -5,33 +5,37 @@ using AudioProvider;
 
 public abstract class ModBase
 {
-    public virtual ushort Flag => 0;
+    public abstract ulong Flag { get; }
     public virtual float ScoreMultiplier => 1.0f;
     public virtual Type[] IncompatibleMods => Array.Empty<Type>();
 }
 
-public class AudioMod : ModBase
+public abstract class AudioMod : ModBase
 {
     public virtual float SpeedCompensation => 1.0f;
     public virtual void ApplyMod(ISoundTrack soundTrack){}
 }
 
-public class PlayMod : ModBase { }
+public abstract class PlayMod : ModBase { }
 public class AutoPlayMod : PlayMod
 {
+    public override ulong Flag => 1ul << 63;
     public static AutoPlayMod Instance = new AutoPlayMod();
 }
-public class SuddenDeathMod : PlayMod 
+public class SuddenDeathMod : PlayMod
 {
+    public override ulong Flag => 1ul << 0;
     public static SuddenDeathMod Instance = new SuddenDeathMod();
 }
-public class PerfectMod : PlayMod 
+public class PerfectMod : PlayMod
 {
+    public override ulong Flag => 1ul << 1;
     public static PerfectMod Instance = new PerfectMod();
 }
 
 public class DoubleMod : AudioMod
 {
+    public override ulong Flag => 1ul << 2;
     public static DoubleMod Instanse = new DoubleMod();
 
     public override Type[] IncompatibleMods => new Type[] { typeof(HalfMod) };
@@ -47,6 +51,7 @@ public class DoubleMod : AudioMod
 
 public class NightCoreMod : AudioMod
 {
+    public override ulong Flag => 1ul << 3;
     public static NightCoreMod Instanse = new NightCoreMod();
 
     public override Type[] IncompatibleMods => new Type[] { typeof(HalfMod), typeof(DoubleMod), typeof(DayCoreMod) };
@@ -61,6 +66,7 @@ public class NightCoreMod : AudioMod
 
 public class HalfMod : AudioMod
 {
+    public override ulong Flag => 1ul << 4;
     public static HalfMod Instanse = new HalfMod();
 
     public override Type[] IncompatibleMods => new Type[] { typeof(DoubleMod) };
@@ -76,6 +82,7 @@ public class HalfMod : AudioMod
 
 public class DayCoreMod: AudioMod
 {
+    public override ulong Flag => 1ul << 5;
     public static DayCoreMod Instanse = new DayCoreMod();
     public override Type[] IncompatibleMods => new Type[] { typeof(DoubleMod), typeof(HalfMod), typeof(NightCoreMod) };
 

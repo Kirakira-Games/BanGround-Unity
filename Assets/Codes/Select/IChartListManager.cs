@@ -22,5 +22,6 @@ public interface IChartListManager
     void SelectChartBySid(int sid);
     void SelectDifficulty(Difficulty difficulty);
     void SortChart();
+    Dictionary<string, byte[]> ComputeCurrentChartHash();
     UniTask<bool> LoadChart(bool convertToGameChart);
 }

@@ -31,15 +31,9 @@ public class GradeColorChange : MonoBehaviour
 
     public void SetScore(double _score, double _acc)
     {
-        float modScoreMultiplier = 1.0f;
-
-        foreach (var mod in modManager.attachedMods)
-            modScoreMultiplier *= mod.ScoreMultiplier;
-
-        score = _score * modScoreMultiplier;
+        score = _score * modManager.ScoreMultiplier;
         sld.value = (float)_score;
         txt.text = modManager.isAutoplay ? "AUTO": string.Format("{0:P2}", Mathf.FloorToInt((float)_acc * 10000) / 10000f);
-        
     }
 
     void ScoreAddAnimation()

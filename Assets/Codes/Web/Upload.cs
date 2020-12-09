@@ -19,7 +19,12 @@ namespace BanGround.Web.Upload
     {
         public static string Hash(byte[] content)
         {
-            return Auth.Util.ToHex(SHA256.Create().ComputeHash(content));
+            return Auth.Util.ToHex(HashToByte(content));
+        }
+
+        public static byte[] HashToByte(byte[] content)
+        {
+            return SHA256.Create().ComputeHash(content);
         }
 
         public static (string, UploadType) GetType(string filename)

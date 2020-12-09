@@ -7,6 +7,9 @@ using Cysharp.Threading.Tasks;
 using System;
 using Newtonsoft.Json;
 using System.Linq;
+using BanGround;
+using System.Security.Cryptography;
+using System.IO;
 
 public class ChartIndexInfo
 {
@@ -30,6 +33,10 @@ public class ChartListManager : IChartListManager
     private KVar cl_lastdiff;
     [Inject]
     private IMessageBannerController messageBannerController;
+    [Inject]
+    private IModManager modManager;
+    [Inject]
+    private IFileSystem fs;
 
     public List<cHeader> chartList => dataLoader.chartList;
 
@@ -148,6 +155,44 @@ public class ChartListManager : IChartListManager
         onChartListUpdated.Invoke();
     }
 
+    public Dictionary<string, byte[]> ComputeCurrentChartHash()
+    {
+        var fileList = fs.Find(f =>
+        {
+            if (f.Name.StartsWith(dataLoader.GetChartResource(current.header.sid, "")))
+            {
+                var name = f.Name.Replace(dataLoader.GetChartResource(current.header.sid, ""), "").ToLower();
+
+                if (name == "cheader.bin")
+                    return false;
+
+                if (name.EndsWith(".bin") && name != $"{current.difficulty:g}.bin".ToLower())
+                    return false;
+
+                return true;
+            }
+            else if (f.Name.ToLower() == dataLoader.GetMusicPath(current.header.mid))
+            {
+                return true;
+            }
+
+            return false;
+        }).ToArray();
+
+        var ret = new Dictionary<string, byte[]>();
+        foreach (var file in fileList)
+        {
+            using (var sha256 = SHA256.Create())
+            {
+                using (var fs = file.Open(FileAccess.Read))
+                {
+                    ret.Add(file.Name, sha256.ComputeHash(fs));
+                }
+            }
+        }
+        return ret;
+    }
+
     [Inject(Id = "r_mirror")]
     private KVar r_mirror;
     [Inject]
@@ -183,8 +228,8 @@ public class ChartListManager : IChartListManager
     private GameChartData LoadChartInternal(V2.Chart chart)
     {
         ChartLoader.numNotes = 0;
-        var timing = new ChartTiming(chart.bpm, chart.offset, ModManager.Instance.NoteScreenTime, r_mirror);
-        List<GameNoteData> gameNotes = new List<GameNoteData>();
+        var timing = new ChartTiming(chart.bpm, chart.offset, modManager.NoteScreenTime, r_mirror);
+        var gameNotes = new List<GameNoteData>();
         for (int i = 0; i < chart.groups.Count; i++)
         {
             ChartLoader.LoadTimingGroup(timing, i, chart.groups[i]).ForEach(note => gameNotes.Add(note));
