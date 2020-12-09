@@ -26,7 +26,7 @@ public class OffsetGuide : MonoBehaviour
 
         SettingAndMod.instance.SetLiveSetting();
         kvSystem.SaveConfig();
-        SceneLoader.LoadScene("Select", "InGame", async () =>
+        SceneLoader.LoadScene("InGame", async () =>
         {
             if (!await chartListManager.LoadChart(true))
             {
@@ -35,6 +35,6 @@ public class OffsetGuide : MonoBehaviour
                 return false;
             }
             return true;
-        });
+        }, true);
     }
 }

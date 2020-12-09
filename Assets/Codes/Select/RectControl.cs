@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using Zenject;
 using BanGround;
+using UnityEngine.SceneManagement;
 
 #pragma warning disable 0649
 #pragma warning disable 0414
@@ -266,7 +267,7 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
             dataLoader.DeleteChart(header.sid);
         }
 
-        UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Select");
+        SceneLoader.LoadSceneAsync("Select");
     }
 
     // Update is called once per frame

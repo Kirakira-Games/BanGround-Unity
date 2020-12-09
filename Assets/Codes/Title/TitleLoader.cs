@@ -136,7 +136,7 @@ public class TitleLoader : MonoBehaviour
 
     public void ShowCredits()
     {
-        SceneLoader.LoadScene("Title", "Credits");
+        SceneLoader.LoadScene("Credits", pushStack: true);
     }
 
     private void OnDestroy()

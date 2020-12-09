@@ -30,7 +30,6 @@ public class OffsetSettingController : MonoBehaviour
 
     void Start()
     {
-        Debug.Log("Start");
         offsetText = GetComponent<Text>();
         recentQueue = new Queue<int>();
         sum = 0;

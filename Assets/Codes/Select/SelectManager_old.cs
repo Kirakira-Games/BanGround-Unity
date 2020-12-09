@@ -112,7 +112,7 @@ public class SelectManager_old : MonoBehaviour
 
     public void Return2Title()
     {
-        SceneLoader.LoadScene("Select", "Title");
+        SceneLoader.Back("Title");
     }
 
     #region Controller
@@ -130,7 +130,7 @@ public class SelectManager_old : MonoBehaviour
         kvSystem.SaveConfig();
 
         PlayVoicesAtSceneOut();
-        SceneLoader.LoadScene("Select", "InGame", () => chartListManager.LoadChart(true));
+        SceneLoader.LoadScene("InGame", () => chartListManager.LoadChart(true), true);
         await PreviewFadeOut().WithCancellation(cancellationToken.sceneToken).SuppressCancellationThrow();
     }
 
@@ -353,7 +353,7 @@ public class SelectManager_old : MonoBehaviour
         //{
         //    return;
         //}
-        SceneLoader.LoadScene("Select", "Mapping", () => chartListManager.LoadChart(false));
+        SceneLoader.LoadScene("Mapping", () => chartListManager.LoadChart(false), true);
     }
 
     public async void ExportKiraPack()

@@ -198,20 +198,16 @@ public class UIManager : MonoBehaviour, IUIManager
         //SceneManager.LoadScene("InGame");
         //await liveSetting.LoadChart(true);
         Time.timeScale = 1;
-        SceneLoader.LoadScene("InGame", "InGame", () =>
+        SceneLoader.LoadScene("InGame", async () =>
         {
-            async UniTask<bool> Retry()
+            if (await chartListManager.LoadChart(true))
             {
-                if (await chartListManager.LoadChart(true))
-                {
-                    OnStopPlaying();
-                    return true;
-                }
-                Time.timeScale = 0;
-                return false;
+                OnStopPlaying();
+                return true;
             }
-            return Retry();
-        });
+            Time.timeScale = 0;
+            return false;
+        }, false);
     }
 
     public void GameRetire()
@@ -220,7 +216,7 @@ public class UIManager : MonoBehaviour, IUIManager
 
         OnStopPlaying();
         //SceneManager.LoadScene("Select");
-        SceneLoader.LoadScene("InGame", "Select");
+        SceneLoader.Back(null);
     }
 
     private void OnApplicationPause(bool pause)
@@ -254,7 +250,7 @@ public class UIManager : MonoBehaviour, IUIManager
 
         if (restart)
         {
-            await SceneManager.LoadSceneAsync("InGame");
+            await SceneLoader.LoadSceneAsync("InGame");
         }
         else
         {
@@ -287,7 +283,7 @@ public class UIManager : MonoBehaviour, IUIManager
 
             await UniTask.Delay(3000);
 
-            _ = SceneManager.LoadSceneAsync("Result");
+            _ = SceneLoader.LoadSceneAsync("Result");
         }
     }
 
