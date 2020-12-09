@@ -856,6 +856,30 @@ public class DataLoader : IDataLoader
         DeleteFiles(ChartDir + sid);
     }
 
+    public void DeleteDifficulty(int sid, Difficulty difficulty)
+    {
+        var packs = new HashSet<string>();
+        string luafile = difficulty.ToString().ToLower() + ".lua";
+        string binfile = difficulty.ToString().ToLower() + ".bin";
+        var files = fs.Find(file =>
+        {
+            if (!file.Name.StartsWith(ChartDir + sid))
+                return false;
+            if (file.Name.ToLower().EndsWith(luafile) || file.Name.ToLower().EndsWith(binfile))
+                return true;
+            return false;
+        });
+        foreach (var file in files)
+        {
+            file.Delete();
+            packs.Add(file.RootPath);
+        }
+        foreach (var pack in packs)
+        {
+            fs.FlushPak(pack);
+        }
+    }
+
     public void DeleteMusic(int mid)
     {
         DeleteFiles(MusicDir + mid);

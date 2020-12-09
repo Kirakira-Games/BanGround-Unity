@@ -237,18 +237,34 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 
     private void OnDelete()
     {
-        /*var file = dataLoader.GetChartPath(chartListManager.current.header.sid, (Difficulty)chartListManager.current.difficulty);
-        var path = new System.IO.FileInfo(file).Directory.FullName;
-        //Debug.Log(path);
-        System.IO.Directory.Delete(path, true);*/
-        if (chartListManager.current.header.sid == chartListManager.offsetAdjustSid)
+        var header = chartListManager.current.header;
+        Difficulty difficulty = chartListManager.current.difficulty;
+        if (header.sid == chartListManager.offsetAdjustSid)
         {
             int index = UnityEngine.Random.Range(0, delFailMsg.Length);
             messageBannerController.ShowMsg(LogLevel.INFO, delFailMsg[index]);
             return;
         }
 
-        dataLoader.DeleteChart(chartListManager.current.header.sid);
+        bool hasOtherDifficulty = false;
+        for (int i = 0; i < header.difficultyLevel.Count; i++)
+        {
+            if (i == (int)difficulty)
+                continue;
+            if (header.difficultyLevel[i] != -1)
+            {
+                hasOtherDifficulty = true;
+                break;
+            }
+        }
+        if (hasOtherDifficulty)
+        {
+            dataLoader.DeleteDifficulty(header.sid, difficulty);
+        }
+        else
+        {
+            dataLoader.DeleteChart(header.sid);
+        }
 
         UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("Select");
     }
