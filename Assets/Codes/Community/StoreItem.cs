@@ -127,7 +127,6 @@ namespace BanGround.Community
 
             // Title and artist
             Title.text = item.Title;
-            Artist.gameObject.SetActive(true);
             Artist.text = item.Artist;
 
             // Difficulty
@@ -150,8 +149,8 @@ namespace BanGround.Community
             GetImage().Forget();
 
             // Title and artist
-            Artist.gameObject.SetActive(false);
             Title.text = "By " + item.Uploader.Nickname;
+            Artist.text = item.Uploader.Username;
 
             // Difficulty
             Difficulty.SetActive(true);
