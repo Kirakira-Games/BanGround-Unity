@@ -50,6 +50,5 @@ namespace BGEditor
         void SwitchTool(EditorTool tool);
         void Undo();
         void AssignTimingGroups(V2.Chart chart);
-        void 还没做好();
     }
 }

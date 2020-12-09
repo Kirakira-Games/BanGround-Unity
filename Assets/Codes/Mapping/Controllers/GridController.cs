@@ -53,6 +53,7 @@ namespace BGEditor
             objectsInUse = new LinkedList<GameObject>();
             parentRect = GetComponent<RectTransform>();
 
+            Core.onChartLoaded.AddListener(Refresh);
             Core.onGridModifed.AddListener(Refresh);
             Core.onGridMoved.AddListener(Refresh);
             Core.onTimingPointModified.AddListener(Refresh);
@@ -113,7 +114,7 @@ namespace BGEditor
             else
                 info.ResetRight(anchoredPosition, text);
             var color = info.img.color;
-            color.a = Editor.speedView ? 1f : 0.5f;
+            color.a = Editor.isSpeedView ? 1f : 0.5f;
             info.img.color = color;
             objectsInUse.AddLast(ret);
             return info;
@@ -222,17 +223,9 @@ namespace BGEditor
             foreach (var point in Core.group.points)
             {
                 float beat = ChartUtility.BeatToFloat(point.beat);
-                beat = Mathf.Max(-50.0f / Editor.barHeight, beat);
-                if (beat >= 0)
-                {
-                    if (beat < StartBar || beat > EndBar)
-                        continue;
-                }
-                else
-                {
-                    if (StartBar != 0)
-                        continue;
-                }
+                beat = Mathf.Max(0, beat);
+                if (beat < StartBar || beat > EndBar)
+                    continue;
 
                 float y = beat * Editor.barHeight - start;
                 var info = CreateGridInfo(new Vector2(0, y), point.ToEditorString(), false);
@@ -377,7 +370,7 @@ namespace BGEditor
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (Editor.speedView)
+            if (Editor.isSpeedView)
             {
                 OnPointerClickSpeedView(eventData);
             }
@@ -391,7 +384,7 @@ namespace BGEditor
         #region Handlers
         public void OnSwitchGridView(bool isOn)
         {
-            Editor.speedView = isOn;
+            Editor.isSpeedView = isOn;
             Core.onSpeedViewSwitched.Invoke();
             Refresh();
         }

@@ -1403,7 +1403,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 500, y: 217.9545}
+  m_SizeDelta: {x: 500, y: 180}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!1 &89049773
 GameObject:
@@ -1563,7 +1563,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 810050434}
-        m_MethodName: "\u8FD8\u6CA1\u505A\u597D"
+        m_MethodName: Play
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3250,7 +3250,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Ys: 0100000002000000030000000400000005000000060000000700000008000000090000000a0000000b0000000c000000
-  DefaultIndex: 0
   YPosSlider: {fileID: 552695521}
   YPosText: {fileID: 339978631}
   YFilter: {fileID: 1947915224}
@@ -5905,8 +5904,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -267.3, y: -140}
-  m_SizeDelta: {x: 300, y: 70}
+  m_AnchoredPosition: {x: -267.3, y: -170}
+  m_SizeDelta: {x: 300, y: 60}
   m_Pivot: {x: 0.49999985, y: 0.49999997}
 --- !u!114 &339978631
 MonoBehaviour:
@@ -5922,7 +5921,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -11260,6 +11259,7 @@ GameObject:
   - component: {fileID: 810050435}
   - component: {fileID: 810050434}
   - component: {fileID: 810050436}
+  - component: {fileID: 810050437}
   m_Layer: 0
   m_Name: ChartCore
   m_TagString: Untagged
@@ -11787,6 +11787,20 @@ MonoBehaviour:
   - {fileID: 1394433293}
   - {fileID: 31939947}
   - {fileID: 1509019626}
+--- !u!114 &810050437
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 810050433}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39bf1ffce32eed44d9e80f57d77ad48e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SpeedViewToggle: {fileID: 883168212}
+  SEToggle: {fileID: 22864833}
 --- !u!1 &820030678
 GameObject:
   m_ObjectHideFlags: 0
@@ -15998,7 +16012,6 @@ MonoBehaviour:
   AudioProgressSlider: {fileID: 2052041219}
   PlaybackRateSlider: {fileID: 2108860136}
   PlayButton: {fileID: 570277895}
-  SEToggle: {fileID: 22864833}
   PlayImg: {fileID: 21300000, guid: 7085e6cb7207f244d90ec1a4d9fc8541, type: 3}
   PauseImg: {fileID: 21300000, guid: 3ae26a0437a3f453092fd324e23bfab3, type: 3}
 --- !u!1 &1121611250
@@ -28391,7 +28404,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Beats: 0100000002000000030000000400000006000000080000000c0000001000000018000000
-  DefaultIndex: 3
 --- !u!95 &2134667599
 Animator:
   serializedVersion: 3

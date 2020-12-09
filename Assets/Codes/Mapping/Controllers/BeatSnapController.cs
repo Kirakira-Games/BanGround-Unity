@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 using Zenject;
+using System.Linq;
 
 namespace BGEditor
 {
@@ -9,9 +10,10 @@ namespace BGEditor
     {
         [Inject]
         IChartCore Core;
+        [Inject]
+        IEditorInfo Editor;
 
         public int[] Beats;
-        public int DefaultIndex;
 
         private Dropdown dropdown;
 
@@ -29,7 +31,10 @@ namespace BGEditor
                 dropdown.options.Add(new Dropdown.OptionData("1 / " + i));
             }
             dropdown.onValueChanged.AddListener(HandleValueChange);
-            dropdown.value = DefaultIndex;
+            Core.onChartLoaded.AddListener(() =>
+            {
+                dropdown.value = Beats.ToList().IndexOf(Editor.gridDivision);
+            });
         }
     }
 }
