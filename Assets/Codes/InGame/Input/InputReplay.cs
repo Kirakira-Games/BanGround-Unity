@@ -108,8 +108,8 @@ public class DemoFile
                         br.Write((short)(e.time - frame.audioTime));
                         // char phase
                         br.Write((byte)e.phase);
-                        // char touchId;
-                        br.Write((byte)(e.touchId % 256));
+                        // int touchId;
+                        br.Write(e.touchId);
 
                         // vec2 pos
                         br.Write((short)(e.pos.x * 64));
@@ -262,8 +262,8 @@ public class DemoFile
                         short deltaTime = br.ReadInt16();
                         // char phase
                         KirakiraTouchPhase phase = (KirakiraTouchPhase)br.ReadByte();
-                        // char touchId
-                        int touchId = br.ReadByte();
+                        // int touchId
+                        int touchId = br.ReadInt32();
 
                         // vec2 pos
                         var x = br.ReadInt16() / 64.0f;
