@@ -62,8 +62,8 @@ namespace BanGround.Community
             Tasks.Add(task);
             task.OnFinish.AddListener(() => Tasks.Remove(task));
             task.OnCancel.AddListener(() => Tasks.Remove(task));
-            onAddTask.Invoke(task);
             task.Start();
+            onAddTask.Invoke(task);
             return true;
         }
 
