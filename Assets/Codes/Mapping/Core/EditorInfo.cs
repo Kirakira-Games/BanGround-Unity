@@ -1,4 +1,6 @@
 ﻿using System;
+using UnityEngine;
+using Zenject;
 
 namespace BGEditor
 {
@@ -7,8 +9,36 @@ namespace BGEditor
         Select, Single, Flick, Slide, Delete
     }
 
+    public class EditorInfoFactory : IFactory<IEditorInfo>
+    {
+        private EditorInfo mSavedInstance;
+
+        public IEditorInfo Create()
+        {
+            var ret = mSavedInstance;
+            if (ret == null)
+                return new EditorInfo(this);
+
+            mSavedInstance = null;
+            return ret;
+        }
+
+        public void Save(EditorInfo info)
+        {
+            Debug.Assert(mSavedInstance == null, "[EditorInfo] Overwriting saved instance!");
+            mSavedInstance = info;
+        }
+    }
+
     public class EditorInfo : IEditorInfo
     {
+        public readonly EditorInfoFactory factory;
+
+        public EditorInfo(EditorInfoFactory factory)
+        {
+            this.factory = factory;
+        }
+
         public const int MAX_BAR_HEIGHT = 600;
         public const int MIN_BAR_HEIGHT = 60;
 
@@ -26,5 +56,10 @@ namespace BGEditor
         public EditorTool tool { get; set; } = EditorTool.Select;
 
         public int maxHeight => barHeight * numBeats;
+
+        public void Save()
+        {
+            factory.Save(this);
+        }
     }
 }

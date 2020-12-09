@@ -13,5 +13,6 @@
         int yDivision { get; set; }
         bool yFilter { get; set; }
         float yPos { get; set; }
+        void Save();
     }
 }

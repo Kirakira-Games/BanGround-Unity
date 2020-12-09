@@ -11,6 +11,9 @@ public class MappingInstaller : MonoInstaller
     public Button blocker;
     public GridController gridController;
 
+    [Inject]
+    private IFactory<IEditorInfo> editorInfoFactory;
+
     public override void InstallBindings()
     {
         Container.Bind<IChartCore>().FromInstance(chartCore);
@@ -18,7 +21,7 @@ public class MappingInstaller : MonoInstaller
         Container.Bind<IAudioProgressController>().FromInstance(audioProgress);
         Container.Bind<IGridController>().FromInstance(gridController);
         Container.Bind<Button>().WithId("Blocker").FromInstance(blocker);
-        Container.Bind<IEditorInfo>().To<EditorInfo>().AsSingle().NonLazy();
+        Container.Bind<IEditorInfo>().FromInstance(editorInfoFactory.Create());
         Container.Bind<IObjectPool>().To<ObjectPool>().AsSingle().NonLazy();
     }
 }

@@ -4,6 +4,7 @@ using BanGround.Community;
 using BanGround.Database;
 using BanGround.Identity;
 using BanGround.Web;
+using BGEditor;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -110,6 +111,9 @@ public class GlobalInstaller : MonoInstaller
 
         // Account manager
         Container.Bind<IAccountManager>().FromInstance(accountManager);
+
+        // Editor info
+        Container.Bind<IFactory<IEditorInfo>>().To<EditorInfoFactory>().AsSingle().NonLazy();
     }
 
     void RegisterKonCommands()
