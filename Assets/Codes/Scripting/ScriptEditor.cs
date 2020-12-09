@@ -56,36 +56,6 @@ class LuaHighlighter : LuaBaseVisitor<bool>
     public LuaHighlighter(string str)
     {
         code = str;
-
-        var stream = new AntlrInputStream(code);
-        var lexer = new LuaLexer(stream);
-        var tokenStream = new CommonTokenStream(lexer);
-        var parser = new LuaParser(tokenStream);
-
-        tokenStream.Fill();
-        var tokens = tokenStream.GetTokens();
-
-        foreach (var token in tokens)
-        {
-            var style = lexer.Vocabulary.GetDisplayName(token.Type);
-
-            if (_KeyWords.Contains(style))
-                style = "KEYWORDS";
-            else if (_Operators.Contains(style))
-                style = "OPERATORS";
-
-            if (HighLightColors.ContainsKey(style))
-            {
-                colors.Add(new StringColor
-                {
-                    color = HighLightColors[style],
-                    startPos = token.StartIndex,
-                    endPos = token.StopIndex
-                });
-            }
-        }
-
-        AST = parser.chunk();
     }
 
     public override bool VisitParlist([NotNull] LuaParser.ParlistContext context)
@@ -143,7 +113,40 @@ class LuaHighlighter : LuaBaseVisitor<bool>
 
     public string GetHighlightedCode()
     {
+
+        var stream = new AntlrInputStream(code);
+        var lexer = new LuaLexer(stream);
+        var tokenStream = new CommonTokenStream(lexer);
+        var parser = new LuaParser(tokenStream);
+
+        tokenStream.Fill();
+        var tokens = tokenStream.GetTokens();
+
+        AST = parser.chunk();
         Visit(AST);
+
+        foreach (var token in tokens)
+        {
+            var style = lexer.Vocabulary.GetDisplayName(token.Type);
+
+            if (_KeyWords.Contains(style))
+                style = "KEYWORDS";
+            else if (_Operators.Contains(style))
+                style = "OPERATORS";
+
+            if (HighLightColors.ContainsKey(style))
+            {
+                if (colors.Find(color => color.startPos == token.StartIndex || color.endPos == token.StopIndex) == null)
+                {
+                    colors.Add(new StringColor
+                    {
+                        color = HighLightColors[style],
+                        startPos = token.StartIndex,
+                        endPos = token.StopIndex
+                    });
+                }
+            }
+        }
 
         colors.Sort((a, b) =>
         {
