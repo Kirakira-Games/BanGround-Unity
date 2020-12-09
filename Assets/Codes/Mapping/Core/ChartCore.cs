@@ -331,7 +331,7 @@ namespace BGEditor
             progress.Pause();
             if (await messageBox.ShowMessage("Exit", "Save before exit?"))
                 Save();
-            SceneLoader.LoadScene("Mapping", "Select");
+            SceneLoader.Back(null);
         }
 
         public void AssignTimingGroups(V2.Chart chart)

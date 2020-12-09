@@ -64,7 +64,7 @@ public class TouchEvent : MonoBehaviour
         {
             return;
         }
-        SceneLoader.LoadScene("Title", "Community");
+        SceneLoader.LoadScene("Community", pushStack: true);
     }
 
     void StartSwitch()
@@ -87,7 +87,7 @@ public class TouchEvent : MonoBehaviour
 
     IEnumerator delayAndSwitch()
     {
-        operation = SceneManager.LoadSceneAsync("Select");
+        operation = SceneLoader.LoadSceneAsync("Select", true);
         operation.allowSceneActivation = false;
 
         yield return new WaitForSeconds(1.2f);

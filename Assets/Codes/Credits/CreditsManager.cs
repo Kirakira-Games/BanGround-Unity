@@ -19,7 +19,7 @@ public class CreditsManager : MonoBehaviour
 
     public void ExitCreditScene()
     {
-        SceneLoader.LoadScene("Credits", "Title");
+        SceneLoader.Back(null);
     }
 
     private void OnDestroy()

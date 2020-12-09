@@ -108,7 +108,7 @@ namespace BanGround.Community
             ViewStack.Pop();
             if (ViewStack.Count == 0)
             {
-                SceneLoader.LoadScene("Community", "Title");
+                SceneLoader.Back(null);
             }
             else
             {

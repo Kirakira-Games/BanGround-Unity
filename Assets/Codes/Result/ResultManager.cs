@@ -224,7 +224,7 @@ public class ResultManager : MonoBehaviour
             //StartCoroutine("DelayLoadScene", "Select");
             StartCoroutine(BgmFadeOut());
             RemoveListener();
-            SceneLoader.LoadScene("Result", "Select");
+            SceneLoader.Back(null);
         });
 
         button_retry.onClick.AddListener(() =>
@@ -233,7 +233,7 @@ public class ResultManager : MonoBehaviour
             //StartCoroutine("DelayLoadScene","InGame" ); 
             StartCoroutine(BgmFadeOut());
             RemoveListener();
-            SceneLoader.LoadScene("Result", "InGame");
+            SceneLoader.LoadScene("InGame", pushStack: false);
         });
 
         button_replay.onClick.AddListener(() =>
@@ -241,7 +241,7 @@ public class ResultManager : MonoBehaviour
             cl_currentDemo.Set("replay/" + ComboManager.recoder.demoName);
             StartCoroutine(BgmFadeOut());
             RemoveListener();
-            SceneLoader.LoadScene("Result", "InGame");
+            SceneLoader.LoadScene("InGame", pushStack: false);
         });
     }
 
