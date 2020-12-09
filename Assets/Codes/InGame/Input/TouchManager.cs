@@ -359,7 +359,10 @@ public class TouchManager : MonoBehaviour
 
         if (!(provider is DemoReplayTouchPrivider) && g_demoRecord)
         {
-            recorder = new DemoRecorder(chartListManager.current.header.sid, chartListManager.current.difficulty, 0 /* TODO: mod flag, it's not exists now */);
+            recorder = new DemoRecorder(
+                chartListManager.current.header.sid,
+                chartListManager.current.difficulty,
+                modManager.Flag);
         }
     }
 
@@ -407,39 +410,7 @@ public class TouchManager : MonoBehaviour
         {
             var file = fs.GetOrNewFile($"{DataLoader.ReplayDir}/{recorder.demoName}");
 
-            var fileList = fs.Find(f =>
-            {
-                if (f.Name.StartsWith(dataLoader.GetChartResource(chartListManager.current.header.sid, "")))
-                {
-                    if (f.Name.EndsWith(".json"))
-                        return false;
-
-                    var name = f.Name.Replace(dataLoader.GetChartResource(chartListManager.current.header.sid, ""), "").ToLower();
-
-                    if (name == "cheader.bin")
-                        return false;
-
-                    if (name.EndsWith(".bin") && name != $"{chartListManager.current.difficulty:g}.bin".ToLower())
-                        return false;
-
-                    if (name != $"{chartListManager.current.difficulty:g}.lua".ToLower() && (
-                        name == $"{Difficulty.Easy:g}.lua".ToLower() || name == $"{Difficulty.Normal:g}.lua".ToLower() ||
-                        name == $"{Difficulty.Hard:g}.lua".ToLower() || name == $"{Difficulty.Expert:g}.lua".ToLower() ||
-                        name == $"{Difficulty.Special:g}.lua".ToLower()
-                    ))
-                        return false;
-
-                    return true;
-                }
-                else if (f.Name.ToLower() == dataLoader.GetMusicPath(chartListManager.current.header.mid))
-                {
-                    return true;
-                }
-
-                return false;
-            });
-
-            recorder.Save(file, fileList.ToArray());
+            recorder.Save(file, chartListManager.ComputeCurrentChartHash());
 
             ComboManager.recoder = recorder;
         }

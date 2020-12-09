@@ -26,7 +26,7 @@ namespace BanGround.Database.Models
 
         public int Score { get; set; }
 
-        public int Mods { get; set; }
+        public ulong Mods { get; set; }
 
         [SecondaryKey(2), NonUnique]
         public string ChartHash { get; set; }

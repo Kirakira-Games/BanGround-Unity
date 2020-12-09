@@ -21,6 +21,32 @@ public class ModManager : IModManager
     public float SpeedCompensationSum => isSuppressingMods ? 1.0f : mSpeedCompensationSum;
     public int NoteScreenTime => (int)((-540f * r_notespeed + 6500) * SpeedCompensationSum);
 
+    public ulong Flag
+    {
+        get
+        {
+            ulong mods = 0;
+            foreach (var mod in attachedMods)
+            {
+                mods |= mod.Flag;
+            }
+            return mods;
+        }
+    }
+
+    public float ScoreMultiplier
+    {
+        get
+        {
+            float ret = 1;
+            foreach (var mod in attachedMods)
+            {
+                ret *= mod.ScoreMultiplier;
+            }
+            return ret;
+        }
+    }
+
     // TODO: Remove
     public ModManager()
     {

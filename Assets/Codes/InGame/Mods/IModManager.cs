@@ -7,6 +7,8 @@ public interface IModManager
     bool isAutoplay { get; }
     float SpeedCompensationSum { get; }
     int NoteScreenTime { get; }
+    ulong Flag { get; }
+    float ScoreMultiplier { get; }
 
     bool AddMod(ModBase mod);
     void RemoveAllMods();

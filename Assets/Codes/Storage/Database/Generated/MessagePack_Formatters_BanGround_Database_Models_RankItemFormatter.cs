@@ -102,7 +102,7 @@ namespace MessagePack.Formatters.BanGround.Database.Models
             var __Acc__ = default(double);
             var __Combo__ = default(int);
             var __Score__ = default(int);
-            var __Mods__ = default(int);
+            var __Mods__ = default(ulong);
             var __ChartHash__ = default(string);
             var __ReplayFile__ = default(string);
             var __CreatedAt__ = default(global::System.DateTime);
@@ -171,7 +171,7 @@ namespace MessagePack.Formatters.BanGround.Database.Models
                     case 4:
                         if (global::MessagePack.Internal.AutomataKeyGen.GetKey(ref stringKey) != 1935961933UL) { goto FAIL; }
 
-                        __Mods__ = reader.ReadInt32();
+                        __Mods__ = reader.ReadUInt64();
                         continue;
                     case 9:
                         switch (global::MessagePack.Internal.AutomataKeyGen.GetKey(ref stringKey))

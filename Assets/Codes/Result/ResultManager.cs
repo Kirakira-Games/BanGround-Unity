@@ -12,6 +12,7 @@ using Zenject;
 using BanGround.Database.Models;
 using UnityEngine.Rendering;
 using BanGround.Database;
+using Newtonsoft.Json;
 
 public class ResultManager : MonoBehaviour
 {
@@ -331,16 +332,7 @@ public class ResultManager : MonoBehaviour
 
     private void ReadScores()
     {
-        float modScoreMultiplier = 1.0f;
-        ushort mods = 0;
-
-        foreach (var mod in modManager.attachedMods)
-        {
-            mods |= mod.Flag;
-            modScoreMultiplier *= mod.ScoreMultiplier;
-        }
-
-        playResult.Score = (int)Math.Round((double)ComboManager.score / ComboManager.maxScore * ComboManager.MAX_DISPLAY_SCORE * modScoreMultiplier);
+        playResult.Score = (int)Math.Round((double)ComboManager.score / ComboManager.maxScore * ComboManager.MAX_DISPLAY_SCORE * modManager.ScoreMultiplier);
         playResult.Acc = ResultsGetter.GetAcc();
         playResult.ChartId = cheader.sid;
         playResult.MusicId = cheader.mid;
@@ -348,8 +340,8 @@ public class ResultManager : MonoBehaviour
         playResult.CreatedAt = DateTime.Now;
         playResult.Combo = ResultsGetter.GetCombo();
         playResult.Judge = ResultsGetter.GetJudgeCount();
-        //playResult.ChartHash = TODO(GEEKiDoS);
-        playResult.Mods = mods;
+        playResult.ChartHash = JsonConvert.SerializeObject(chartListManager.ComputeCurrentChartHash());
+        playResult.Mods = modManager.Flag;
 
         if (g_demoRecord)
         {

@@ -15,8 +15,6 @@ public class CreditsManager : MonoBehaviour
     async void Start()
     {
         bgmST = await audioManager.PlayLoopMusic(bgmVoice.bytes);
-        // Adjust canvas: TODO(GEEKiDoS)
-        // 不用 DO 了
     }
 
     public void ExitCreditScene()
