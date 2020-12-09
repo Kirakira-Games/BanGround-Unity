@@ -27,7 +27,6 @@ namespace BGEditor
         public Slider AudioProgressSlider;
         public Slider PlaybackRateSlider;
         public Button PlayButton;
-        public Toggle SEToggle;
         public Sprite PlayImg;
         public Sprite PauseImg;
 
@@ -180,7 +179,7 @@ namespace BGEditor
                 }
                 float beat = Core.chart.TimeToBeat(time);
                 Core.SeekGrid(beat * Editor.barHeight, true);
-                if (SEToggle.isOn && !float.IsNaN(lastBeat))
+                if (Editor.isSEOn && !float.IsNaN(lastBeat))
                 {
                     Core.group.notes.ForEach(note =>
                     {

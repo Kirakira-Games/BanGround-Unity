@@ -319,9 +319,16 @@ namespace BGEditor
             messageBannerController.ShowMsg(LogLevel.OK, "Chart saved.");
         }
 
-        public void 还没做好()
+        public async void Play()
         {
-            messageBannerController.ShowMsg(LogLevel.INFO, "Coming soon!");
+            if (Blocker.gameObject.activeSelf || messageBox.isActive)
+                return;
+            progress.Pause();
+            if (!await messageBox.ShowMessage("Play", "You have to save your chart before test play.\nContinue?"))
+                return;
+            Save();
+            editor.Save();
+            SceneLoader.LoadScene("InGame", () => chartListManager.LoadChart(true), pushStack: true);
         }
 
         public async void Exit()

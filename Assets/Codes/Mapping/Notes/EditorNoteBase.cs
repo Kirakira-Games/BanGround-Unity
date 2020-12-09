@@ -25,7 +25,7 @@ namespace BGEditor
         {
             get
             {
-                if (note.group != Editor.currentTimingGroup || Editor.speedView)
+                if (note.group != Editor.currentTimingGroup || Editor.isSpeedView)
                     return false;
                 if (!Editor.yFilter)
                     return true;

@@ -10,11 +10,14 @@ namespace BGEditor
     {
         [Inject]
         IChartCore Core;
+        [Inject]
+        IEditorInfo Editor;
 
         public Toggle[] Toggles;
 
-        protected void Awake()
+        protected void Start()
         {
+            Toggles[(int)Editor.tool].isOn = true;
             for (int i = 0; i < Toggles.Length; i++)
             {
                 EditorTool tool = (EditorTool)i;

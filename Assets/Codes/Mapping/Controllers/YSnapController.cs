@@ -2,13 +2,13 @@
 using System.Collections;
 using UnityEngine.UI;
 using Zenject;
+using System.Linq;
 
 namespace BGEditor
 {
     public class YSnapController : MonoBehaviour
     {
         public int[] Ys;
-        public int DefaultIndex;
         public Slider YPosSlider;
         public Text YPosText;
         public Toggle YFilter;
@@ -120,13 +120,16 @@ namespace BGEditor
                 dropdown.options.Add(new Dropdown.OptionData("1 / " + i));
             }
             dropdown.onValueChanged.AddListener(HandleSnapChange);
-            dropdown.value = DefaultIndex;
 
             // Slider
             YPosSlider.onValueChanged.AddListener(HandleYChange);
             YFilter.onValueChanged.AddListener(HandleToggle);
             Core.onYSnapModified.AddListener(RefreshSnap);
             Core.onYPosModified.AddListener(RefreshText);
+            
+            // Init
+            YFilter.SetIsOnWithoutNotify(Editor.yFilter);
+            RefreshSnap(Editor.yDivision, Editor.yDivision);
         }
     }
 }
