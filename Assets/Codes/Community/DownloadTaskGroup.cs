@@ -16,7 +16,7 @@ namespace BanGround.Community
         public int TIndex { get; private set; } = 0;
         public IDownloadTask currentTask => TIndex >= Tasks.Count ? null : Tasks[TIndex];
 
-        public override float Progress => (float)(TIndex + (currentTask?.Progress ?? 1f)) / Tasks.Count;
+        public override float Progress => Mathf.Min(1, (float)(TIndex + (currentTask?.Progress ?? 1f)) / Tasks.Count);
         public override string Description => currentTask?.Description ?? "Done.";
         public override DownloadState State => currentTask?.State ?? DownloadState.Finished;
 

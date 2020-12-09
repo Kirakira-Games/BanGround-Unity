@@ -56,7 +56,10 @@ namespace BanGround.Community
         private void Update()
         {
             if (DownloadTask == null || DownloadTask.State != DownloadState.Downloading)
-                return;
+            {
+                if (hasCreatedImage)
+                    return;
+            }
             SongName.text = DownloadTask.Name;
             if (DownloadTask.Image != null && !hasCreatedImage)
             {
@@ -64,7 +67,8 @@ namespace BanGround.Community
                 DownloadImage.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0, 0));
                 hasCreatedImage = true;
             }
-            Progress.text = DownloadTask.Progress.ToString("P2");
+            if (DownloadTask.State == DownloadState.Downloading)
+                Progress.text = DownloadTask.Progress.ToString("P2");
             Bar.Progress = DownloadTask.Progress;
         }
     }
