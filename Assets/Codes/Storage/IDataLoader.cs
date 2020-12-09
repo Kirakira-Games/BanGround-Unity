@@ -41,5 +41,6 @@ public interface IDataLoader
     void MoveChart(int oldSid, int newSid, bool overwrite = true);
     void MoveMusic(int oldMid, int newMid, bool overwrite = true);
     void DeleteChart(int sid);
+    void DeleteDifficulty(int sid, Difficulty difficulty);
     void DeleteMusic(int mid);
 }
