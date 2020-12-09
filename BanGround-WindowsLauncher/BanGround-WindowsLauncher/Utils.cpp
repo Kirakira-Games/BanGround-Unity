@@ -93,7 +93,7 @@ void InstallFileType()
 		}
 		else
 		{
-			char* endPtr = strstr(workdir, "BanGround-Unity.exe");
+			char* endPtr = strstr(workdir, "BanGround.exe");
 			if (endPtr != nullptr)
 			{
 				*endPtr = 0;
