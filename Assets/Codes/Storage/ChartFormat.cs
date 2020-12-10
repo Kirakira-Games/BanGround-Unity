@@ -11,6 +11,7 @@ using ProtoBuf.Meta;
 using Zenject;
 using UnityEngine;
 using BanGround;
+using MessagePack;
 
 [JsonConverter(typeof(StringEnumConverter))]
 [ProtoContract()]
