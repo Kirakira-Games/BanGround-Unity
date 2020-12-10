@@ -27,8 +27,8 @@ namespace MessagePack.Formatters.BanGround.Database.Models
         private static global::System.ReadOnlySpan<byte> GetSpan_Id() => new byte[1 + 2] { 162, 73, 100 };
         // ChartId
         private static global::System.ReadOnlySpan<byte> GetSpan_ChartId() => new byte[1 + 7] { 167, 67, 104, 97, 114, 116, 73, 100 };
-        // Difficulty
-        private static global::System.ReadOnlySpan<byte> GetSpan_Difficulty() => new byte[1 + 10] { 170, 68, 105, 102, 102, 105, 99, 117, 108, 116, 121 };
+        // _Difficulty
+        private static global::System.ReadOnlySpan<byte> GetSpan__Difficulty() => new byte[1 + 11] { 171, 95, 68, 105, 102, 102, 105, 99, 117, 108, 116, 121 };
         // MusicId
         private static global::System.ReadOnlySpan<byte> GetSpan_MusicId() => new byte[1 + 7] { 167, 77, 117, 115, 105, 99, 73, 100 };
         // Judge
@@ -62,8 +62,8 @@ namespace MessagePack.Formatters.BanGround.Database.Models
             writer.Write(value.Id);
             writer.WriteRaw(GetSpan_ChartId());
             writer.Write(value.ChartId);
-            writer.WriteRaw(GetSpan_Difficulty());
-            formatterResolver.GetFormatterWithVerify<Difficulty>().Serialize(ref writer, value.Difficulty, options);
+            writer.WriteRaw(GetSpan__Difficulty());
+            writer.Write(value._Difficulty);
             writer.WriteRaw(GetSpan_MusicId());
             writer.Write(value.MusicId);
             writer.WriteRaw(GetSpan_Judge());
@@ -96,7 +96,7 @@ namespace MessagePack.Formatters.BanGround.Database.Models
             var length = reader.ReadMapHeader();
             var __Id__ = default(int);
             var __ChartId__ = default(int);
-            var __Difficulty__ = default(Difficulty);
+            var ___Difficulty__ = default(int);
             var __MusicId__ = default(int);
             var __Judge__ = default(int[]);
             var __Acc__ = default(double);
@@ -132,23 +132,11 @@ namespace MessagePack.Formatters.BanGround.Database.Models
                                 __MusicId__ = reader.ReadInt32();
                                 continue;
                         }
-                    case 10:
-                        switch (global::MessagePack.Internal.AutomataKeyGen.GetKey(ref stringKey))
-                        {
-                            default: goto FAIL;
-                            case 7815262032712067396UL:
-                                if (global::MessagePack.Internal.AutomataKeyGen.GetKey(ref stringKey) != 31092UL) { goto FAIL; }
+                    case 11:
+                        if (!global::System.MemoryExtensions.SequenceEqual(stringKey, GetSpan__Difficulty().Slice(1))) { goto FAIL; }
 
-                                __Difficulty__ = formatterResolver.GetFormatterWithVerify<Difficulty>().Deserialize(ref reader, options);
-                                continue;
-
-                            case 7585884081690273106UL:
-                                if (global::MessagePack.Internal.AutomataKeyGen.GetKey(ref stringKey) != 25964UL) { goto FAIL; }
-
-                                __ReplayFile__ = formatterResolver.GetFormatterWithVerify<string>().Deserialize(ref reader, options);
-                                continue;
-
-                        }
+                        ___Difficulty__ = reader.ReadInt32();
+                        continue;
                     case 5:
                         switch (global::MessagePack.Internal.AutomataKeyGen.GetKey(ref stringKey))
                         {
@@ -190,6 +178,11 @@ namespace MessagePack.Formatters.BanGround.Database.Models
                                 continue;
 
                         }
+                    case 10:
+                        if (!global::System.MemoryExtensions.SequenceEqual(stringKey, GetSpan_ReplayFile().Slice(1))) { goto FAIL; }
+
+                        __ReplayFile__ = formatterResolver.GetFormatterWithVerify<string>().Deserialize(ref reader, options);
+                        continue;
 
                 }
             }
@@ -198,7 +191,7 @@ namespace MessagePack.Formatters.BanGround.Database.Models
             {
                 Id = __Id__,
                 ChartId = __ChartId__,
-                Difficulty = __Difficulty__,
+                _Difficulty = ___Difficulty__,
                 MusicId = __MusicId__,
                 Judge = __Judge__,
                 Acc = __Acc__,

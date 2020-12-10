@@ -53,7 +53,7 @@ namespace BanGround.Database
 
         public RankItem[] GetRankItems(int sid, Difficulty difficulty)
         {
-            var items = DB.RankItemTable.FindByChartIdAndDifficulty((sid, difficulty));
+            var items = DB.RankItemTable.FindByChartIdAnd_Difficulty((sid, (int)difficulty));
             return items.ToArray();
         }
 
