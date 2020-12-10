@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class InputManagerTouchProvider : KirakiraTouchProvider
+public class InputManagerTouchProvider : IKirakiraTouchProvider
 {
     public static KirakiraTouchPhase Kirakira(TouchPhase phase)
     {
