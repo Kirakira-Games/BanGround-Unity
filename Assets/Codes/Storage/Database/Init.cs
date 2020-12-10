@@ -2,6 +2,8 @@
 using MessagePack.Resolvers;
 using UnityEngine;
 using BanGround.Database.Generated;
+using BanGround.Database.Models;
+using MessagePack.Formatters.BanGround.Database.Models;
 
 namespace BanGround.Database
 {
@@ -12,7 +14,7 @@ namespace BanGround.Database
             StaticCompositeResolver.Instance.Register(new[]{
                 MasterMemoryResolver.Instance, // set MasterMemory generated resolver
                 GeneratedResolver.Instance,    // set MessagePack generated resolver
-                StandardResolver.Instance      // set default MessagePack resolver
+                StandardResolver.Instance,      // set default MessagePack resolver
             });
 
             var options = MessagePackSerializerOptions.Standard.WithResolver(StaticCompositeResolver.Instance);

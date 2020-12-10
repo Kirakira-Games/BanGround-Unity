@@ -15,7 +15,7 @@ namespace BanGround.Database.Generated.Tables
         readonly Func<RankItem, int> primaryIndexSelector;
 
         readonly RankItem[] secondaryIndex0;
-        readonly Func<RankItem, (int ChartId, Difficulty Difficulty)> secondaryIndex0Selector;
+        readonly Func<RankItem, (int ChartId, int _Difficulty)> secondaryIndex0Selector;
         readonly RankItem[] secondaryIndex1;
         readonly Func<RankItem, int> secondaryIndex1Selector;
         readonly RankItem[] secondaryIndex2;
@@ -27,8 +27,8 @@ namespace BanGround.Database.Generated.Tables
             : base(sortedData)
         {
             this.primaryIndexSelector = x => x.Id;
-            this.secondaryIndex0Selector = x => (x.ChartId, x.Difficulty);
-            this.secondaryIndex0 = CloneAndSortBy(this.secondaryIndex0Selector, System.Collections.Generic.Comparer<(int ChartId, Difficulty Difficulty)>.Default);
+            this.secondaryIndex0Selector = x => (x.ChartId, x._Difficulty);
+            this.secondaryIndex0 = CloneAndSortBy(this.secondaryIndex0Selector, System.Collections.Generic.Comparer<(int ChartId, int _Difficulty)>.Default);
             this.secondaryIndex1Selector = x => x.MusicId;
             this.secondaryIndex1 = CloneAndSortBy(this.secondaryIndex1Selector, System.Collections.Generic.Comparer<int>.Default);
             this.secondaryIndex2Selector = x => x.ChartHash;
@@ -40,7 +40,7 @@ namespace BanGround.Database.Generated.Tables
 
         partial void OnAfterConstruct();
 
-        public RangeView<RankItem> SortByChartIdAndDifficulty => new RangeView<RankItem>(secondaryIndex0, 0, secondaryIndex0.Length - 1, true);
+        public RangeView<RankItem> SortByChartIdAnd_Difficulty => new RangeView<RankItem>(secondaryIndex0, 0, secondaryIndex0.Length - 1, true);
         public RangeView<RankItem> SortByMusicId => new RangeView<RankItem>(secondaryIndex1, 0, secondaryIndex1.Length - 1, true);
         public RangeView<RankItem> SortByChartHash => new RangeView<RankItem>(secondaryIndex2, 0, secondaryIndex2.Length - 1, true);
         public RangeView<RankItem> SortByCreatedAt => new RangeView<RankItem>(secondaryIndex3, 0, secondaryIndex3.Length - 1, true);
@@ -90,19 +90,19 @@ namespace BanGround.Database.Generated.Tables
             return FindUniqueRangeCore(data, primaryIndexSelector, System.Collections.Generic.Comparer<int>.Default, min, max, ascendant);
         }
 
-        public RangeView<RankItem> FindByChartIdAndDifficulty((int ChartId, Difficulty Difficulty) key)
+        public RangeView<RankItem> FindByChartIdAnd_Difficulty((int ChartId, int _Difficulty) key)
         {
-            return FindManyCore(secondaryIndex0, secondaryIndex0Selector, System.Collections.Generic.Comparer<(int ChartId, Difficulty Difficulty)>.Default, key);
+            return FindManyCore(secondaryIndex0, secondaryIndex0Selector, System.Collections.Generic.Comparer<(int ChartId, int _Difficulty)>.Default, key);
         }
 
-        public RangeView<RankItem> FindClosestByChartIdAndDifficulty((int ChartId, Difficulty Difficulty) key, bool selectLower = true)
+        public RangeView<RankItem> FindClosestByChartIdAnd_Difficulty((int ChartId, int _Difficulty) key, bool selectLower = true)
         {
-            return FindManyClosestCore(secondaryIndex0, secondaryIndex0Selector, System.Collections.Generic.Comparer<(int ChartId, Difficulty Difficulty)>.Default, key, selectLower);
+            return FindManyClosestCore(secondaryIndex0, secondaryIndex0Selector, System.Collections.Generic.Comparer<(int ChartId, int _Difficulty)>.Default, key, selectLower);
         }
 
-        public RangeView<RankItem> FindRangeByChartIdAndDifficulty((int ChartId, Difficulty Difficulty) min, (int ChartId, Difficulty Difficulty) max, bool ascendant = true)
+        public RangeView<RankItem> FindRangeByChartIdAnd_Difficulty((int ChartId, int _Difficulty) min, (int ChartId, int _Difficulty) max, bool ascendant = true)
         {
-            return FindManyRangeCore(secondaryIndex0, secondaryIndex0Selector, System.Collections.Generic.Comparer<(int ChartId, Difficulty Difficulty)>.Default, min, max, ascendant);
+            return FindManyRangeCore(secondaryIndex0, secondaryIndex0Selector, System.Collections.Generic.Comparer<(int ChartId, int _Difficulty)>.Default, min, max, ascendant);
         }
 
         public RangeView<RankItem> FindByMusicId(int key)
@@ -163,7 +163,7 @@ namespace BanGround.Database.Generated.Tables
                 {
                     new MasterMemory.Meta.MetaProperty(typeof(RankItem).GetProperty("Id")),
                     new MasterMemory.Meta.MetaProperty(typeof(RankItem).GetProperty("ChartId")),
-                    new MasterMemory.Meta.MetaProperty(typeof(RankItem).GetProperty("Difficulty")),
+                    new MasterMemory.Meta.MetaProperty(typeof(RankItem).GetProperty("_Difficulty")),
                     new MasterMemory.Meta.MetaProperty(typeof(RankItem).GetProperty("MusicId")),
                     new MasterMemory.Meta.MetaProperty(typeof(RankItem).GetProperty("Judge")),
                     new MasterMemory.Meta.MetaProperty(typeof(RankItem).GetProperty("Acc")),
@@ -180,8 +180,8 @@ namespace BanGround.Database.Generated.Tables
                     }, true, true, System.Collections.Generic.Comparer<int>.Default),
                     new MasterMemory.Meta.MetaIndex(new System.Reflection.PropertyInfo[] {
                         typeof(RankItem).GetProperty("ChartId"),
-                        typeof(RankItem).GetProperty("Difficulty"),
-                    }, false, false, System.Collections.Generic.Comparer<(int ChartId, Difficulty Difficulty)>.Default),
+                        typeof(RankItem).GetProperty("_Difficulty"),
+                    }, false, false, System.Collections.Generic.Comparer<(int ChartId, int _Difficulty)>.Default),
                     new MasterMemory.Meta.MetaIndex(new System.Reflection.PropertyInfo[] {
                         typeof(RankItem).GetProperty("MusicId"),
                     }, false, false, System.Collections.Generic.Comparer<int>.Default),

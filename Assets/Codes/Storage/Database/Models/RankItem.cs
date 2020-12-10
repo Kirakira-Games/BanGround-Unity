@@ -12,8 +12,12 @@ namespace BanGround.Database.Models
 
         [SecondaryKey(0, keyOrder: 1), NonUnique]
         public int ChartId { get; set; }
+
+        [IgnoreMember]
+        public Difficulty Difficulty { get => (Difficulty)_Difficulty; set => _Difficulty = (int)value; }
+
         [SecondaryKey(0, keyOrder: 1), NonUnique]
-        public Difficulty Difficulty { get; set; }
+        public int _Difficulty { get; set; }
 
         [SecondaryKey(1), NonUnique]
         public int MusicId { get; set; }
