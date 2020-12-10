@@ -133,7 +133,7 @@ public class GlobalInstaller : MonoInstaller
 
             KVar.C("r_shake_flick", "1", KVarFlags.Archive, "Shake the screen while flicker note judged"),
             KVar.C("r_usevideo", "1", KVarFlags.Archive, "Use video for background (If present)"),
-            KVar.C("r_farclip", "196.0", KVarFlags.Archive, "Far clip of note camera (means length of lane)"),
+            KVar.C("r_farclip", "162.0", KVarFlags.Archive, "Far clip of note camera (means length of lane)"),
 
             KVar.C("r_brightness_bg", "0.7", KVarFlags.Archive, "Background brightness"),
             KVar.C("r_brightness_lane", "0.84", KVarFlags.Archive, "Lane brightness"),
