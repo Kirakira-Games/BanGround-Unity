@@ -10,7 +10,7 @@ using System.Linq;
 using Zenject;
 using BanGround;
 
-public interface KirakiraTouchProvider
+public interface IKirakiraTouchProvider
 {
     KirakiraTouchState[][] GetTouches();
 }
@@ -210,12 +210,9 @@ public class KirakiraTouch
 public class TouchManager : MonoBehaviour
 {
     public static TouchManager instance;
-    public static KirakiraTouchProvider provider;
 
     [Inject(Id = "g_demoRecord")]
     private KVar g_demoRecord;
-    [Inject(Id = "cl_currentdemo")]
-    private KVar cl_currentDemo;
     [Inject]
     private IChartListManager chartListManager;
     [Inject]
@@ -229,7 +226,7 @@ public class TouchManager : MonoBehaviour
     [Inject]
     private IFileSystem fs;
     [Inject]
-    private IDataLoader dataLoader;
+    private IKirakiraTouchProvider touchProvider;
 
     private Dictionary<int, KirakiraTouch> touchTable;
     private Dictionary<(KirakiraTracer, int), JudgeResult> traceCache;
@@ -331,32 +328,7 @@ public class TouchManager : MonoBehaviour
         KirakiraTouch.dpi = GetDPI();
         KirakiraTouch.flickDistPixels = Mathf.Min(Screen.height / 20, NoteUtility.FLICK_JUDGE_DIST / 2.54f * KirakiraTouch.dpi);
 
-        // Touch provider
-        if (cl_currentDemo != "")
-        {
-            provider = new DemoReplayTouchPrivider(DemoFile.LoadFrom(fs.GetFile(cl_currentDemo)));
-            g_demoRecord.Set(false);
-        }
-        else if (modManager.isAutoplay)
-        {
-            GameObject.Find("MouseCanvas").SetActive(false);
-            provider = new AutoPlayTouchProvider(SM);
-        }
-        else
-        {
-            /*#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
-                        provider = new MultiMouseTouchProvider();
-            #else*/
-#if UNITY_EDITOR
-            GameObject.Find("MouseCanvas").SetActive(false);
-            provider = new MouseTouchProvider();
-#else
-            GameObject.Find("MouseCanvas").SetActive(false);
-            provider = new InputManagerTouchProvider();
-#endif
-        }
-
-        if (!(provider is DemoReplayTouchPrivider) && g_demoRecord)
+        if (!(touchProvider is DemoReplayTouchPrivider) && g_demoRecord)
         {
             recorder = new DemoRecorder(
                 chartListManager.current.header.sid,
@@ -413,7 +385,7 @@ public class TouchManager : MonoBehaviour
 
             ComboManager.recoder = recorder;
         }
-        else if(provider is DemoReplayTouchPrivider)
+        else if(touchProvider is DemoReplayTouchPrivider)
         {
             g_demoRecord.Set(true);
         }
@@ -423,7 +395,7 @@ public class TouchManager : MonoBehaviour
     {
         if (SM.HasState(GameStateMachine.State.Finished)) return;
 
-        var touchFrames = provider.GetTouches();
+        var touchFrames = touchProvider.GetTouches();
 
         foreach (var touches in touchFrames)
         {

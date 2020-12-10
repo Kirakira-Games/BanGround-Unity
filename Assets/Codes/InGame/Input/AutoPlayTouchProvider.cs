@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class AutoPlayTouchProvider : KirakiraTouchProvider
+public class AutoPlayTouchProvider : IKirakiraTouchProvider
 {
     private List<KirakiraTouchState> events = new List<KirakiraTouchState>();
     private LinkedList<KirakiraTouchState> delayedQueue = new LinkedList<KirakiraTouchState>();

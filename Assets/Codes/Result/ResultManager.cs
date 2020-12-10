@@ -34,7 +34,7 @@ public class ResultManager : MonoBehaviour
     [Inject(Id = "fs_iconpath")]
     private KVar fs_iconpath;
     [Inject(Id = "cl_currentdemo")]
-    private KVar cl_currentDemo;
+    private KVar cl_currentdemo;
 
     private Button button_back;
     private Button button_retry;
@@ -238,7 +238,7 @@ public class ResultManager : MonoBehaviour
 
         button_replay.onClick.AddListener(() =>
         {
-            cl_currentDemo.Set("replay/" + ComboManager.recoder.demoName);
+            cl_currentdemo.Set("replay/" + ComboManager.recoder.demoName);
             StartCoroutine(BgmFadeOut());
             RemoveListener();
             SceneLoader.LoadScene("InGame", pushStack: false);
@@ -351,7 +351,7 @@ public class ResultManager : MonoBehaviour
         var oldBest = db.GetBestRank(cheader.sid, chartListManager.current.difficulty);
         lastScore = oldBest?.Score ?? 0;
 
-        if (!modManager.isAutoplay && cl_currentDemo == "")
+        if (!modManager.isAutoplay && cl_currentdemo == "")
         {
             db.SaveRankItem(playResult);
             print("Record saved");
@@ -359,7 +359,7 @@ public class ResultManager : MonoBehaviour
         else
         {
             print("Autoplay score not saved");
-            cl_currentDemo.Set("");
+            cl_currentdemo.Set("");
         }
     }
 

@@ -33,6 +33,8 @@ public class NoteController : MonoBehaviour, INoteController
     private IUIManager UI;
     [Inject]
     private IScript chartScript;
+    [Inject]
+    private IKirakiraTouchProvider touchProvider;
 
     [Inject(Id = "o_judge")]
     private KVar o_judge;
@@ -425,7 +427,7 @@ public class NoteController : MonoBehaviour, INoteController
         timingGroups = chart.groups.Select(g => new TimingGroupController(g, r_brightness_long)).ToArray();
 
         // Check AutoPlay
-        if (TouchManager.provider is AutoPlayTouchProvider provider)
+        if (touchProvider is AutoPlayTouchProvider provider)
         {
             provider.Init(notes);
         }

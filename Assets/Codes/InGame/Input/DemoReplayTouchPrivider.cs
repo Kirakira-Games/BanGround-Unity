@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Assets.Codes.InGame.Input
 {
-    class DemoReplayTouchPrivider : KirakiraTouchProvider
+    class DemoReplayTouchPrivider : IKirakiraTouchProvider
     {
         private DemoFile demoFile;
 
