@@ -105,6 +105,9 @@ namespace BanGround.Community
 
         private void OnBackButtonClicked()
         {
+            if (isLoading)
+                return;
+
             ViewStack.Pop();
             if (ViewStack.Count == 0)
             {
@@ -118,6 +121,8 @@ namespace BanGround.Community
 
         public async UniTaskVoid LoadCharts(SongItem song, int offset)
         {
+            if (isLoading)
+                return;
             isLoading = true;
             StoreProvider.Cancel();
             var state = ViewStack.Create(StoreViewType.Chart);
@@ -147,11 +152,13 @@ namespace BanGround.Community
                 }
             }
             catch (OperationCanceledException) { }
-
-            // Finish
-            mLoadingDisplay.SetActive(false);
-            ViewStack.RefreshState();
-            isLoading = false;
+            finally
+            {
+                // Finish
+                mLoadingDisplay.SetActive(false);
+                ViewStack.RefreshState();
+                isLoading = false;
+            }
         }
 
         public async UniTaskVoid Search(string text, int offset = 0)
