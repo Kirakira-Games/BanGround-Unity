@@ -351,7 +351,7 @@ public class ResultManager : MonoBehaviour
         var oldBest = db.GetBestRank(cheader.sid, chartListManager.current.difficulty);
         lastScore = oldBest?.Score ?? 0;
 
-        if (!modManager.isAutoplay)
+        if (!modManager.isAutoplay && cl_currentDemo == "")
         {
             db.SaveRankItem(playResult);
             print("Record saved");
@@ -359,6 +359,7 @@ public class ResultManager : MonoBehaviour
         else
         {
             print("Autoplay score not saved");
+            cl_currentDemo.Set("");
         }
     }
 
