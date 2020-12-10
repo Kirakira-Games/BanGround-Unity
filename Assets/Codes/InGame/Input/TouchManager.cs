@@ -335,7 +335,6 @@ public class TouchManager : MonoBehaviour
         if (cl_currentDemo != "")
         {
             provider = new DemoReplayTouchPrivider(DemoFile.LoadFrom(fs.GetFile(cl_currentDemo)));
-            cl_currentDemo.Set("");
             g_demoRecord.Set(false);
         }
         else if (modManager.isAutoplay)
