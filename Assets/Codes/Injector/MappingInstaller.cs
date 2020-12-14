@@ -17,7 +17,7 @@ public class MappingInstaller : MonoInstaller
         MappingParams parameters = SceneLoader.Parameters;
         if (parameters == null)
         {
-            Debug.LogError("Missing MappingParams. Falling back to default params.");
+            Debug.LogWarning("Missing MappingParams. Falling back to default params.");
             parameters = new MappingParams();
         }
 

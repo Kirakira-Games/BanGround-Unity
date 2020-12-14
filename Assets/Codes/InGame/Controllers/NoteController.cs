@@ -395,7 +395,7 @@ public class NoteController : MonoBehaviour, INoteController
         InGameParams parameters = SceneLoader.Parameters;
         if (parameters == null)
         {
-            Debug.LogError("Missing InGameParams. Falling back to default params.");
+            Debug.LogWarning("Missing InGameParams. Falling back to default params.");
             parameters = new InGameParams();
         }
 

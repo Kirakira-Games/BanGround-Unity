@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using Zenject;
+using BanGround.Scene.Params;
 
 namespace BGEditor
 {
@@ -40,6 +41,8 @@ namespace BGEditor
         private IMessageBox messageBox;
         [Inject]
         private IFileSystem fs;
+        [Inject]
+        private IModManager modManager;
 
         public EditorToolTip tooltip { get; private set; }
         public MultiNoteDetector multinote { get; private set; }
@@ -324,10 +327,21 @@ namespace BGEditor
             if (Blocker.gameObject.activeSelf || messageBox.isActive)
                 return;
             progress.Pause();
-            if (!await messageBox.ShowMessage("Play", "You have to save your chart before test play.\nContinue?"))
+            int ret = await messageBox.ShowMessage("Play", "Your chart will be saved before test play.\nContinue?", new string[] {
+                "Cancel",
+                "Play from start",
+                "Play from here"
+            });
+            if (ret == 0)
                 return;
             Save();
-            SceneLoader.LoadScene("InGame", () => chartListManager.LoadChart(true), pushStack: true);
+            float seekTime = ret == 1 ? 0 : audioManager.gameBGM.GetPlaybackTime() / 1000f;
+            var param = new InGameParams
+            {
+                mods = modManager.Flag,
+                seekPosition = seekTime
+            };
+            SceneLoader.LoadScene("InGame", () => chartListManager.LoadChart(true), pushStack: true, parameters: param);
         }
 
         public async void Exit()
