@@ -327,7 +327,6 @@ namespace BGEditor
             if (!await messageBox.ShowMessage("Play", "You have to save your chart before test play.\nContinue?"))
                 return;
             Save();
-            editor.Save();
             SceneLoader.LoadScene("InGame", () => chartListManager.LoadChart(true), pushStack: true);
         }
 

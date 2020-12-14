@@ -218,6 +218,7 @@ public class SceneLoader : MonoBehaviour
             onTaskFinish.Invoke(false);
             return;
         }
+        // Must invoke before loading next scene
         onTaskFinish.Invoke(true);
         await SceneManager.UnloadSceneAsync(currentScene.name);
         loadOP = SceneManager.LoadSceneAsync(nextSceneName, LoadSceneMode.Additive);

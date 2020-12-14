@@ -114,9 +114,6 @@ public class GlobalInstaller : MonoInstaller
 
         // Account manager
         Container.Bind<IAccountManager>().FromInstance(accountManager);
-
-        // Editor info
-        Container.Bind<IFactory<IEditorInfo>>().To<EditorInfoFactory>().AsSingle().NonLazy();
     }
 
     void RegisterKonCommands()

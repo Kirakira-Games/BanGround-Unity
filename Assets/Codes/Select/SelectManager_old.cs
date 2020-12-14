@@ -12,6 +12,8 @@ using Cysharp.Threading.Tasks;
 using Zenject;
 using BanGround;
 using BanGround.Utils;
+using BanGround.Scene.Params;
+using BGEditor;
 
 #pragma warning disable 0649
 public class SelectManager_old : MonoBehaviour
@@ -349,11 +351,10 @@ public class SelectManager_old : MonoBehaviour
     #region ChartEditor
     public void OpenMappingScene()
     {
-        //if (!await liveSetting.LoadChart(false))
-        //{
-        //    return;
-        //}
-        SceneLoader.LoadScene("Mapping", () => chartListManager.LoadChart(false), true);
+        SceneLoader.LoadScene("Mapping", () => chartListManager.LoadChart(false), true, new MappingParams
+        {
+            editor = new EditorInfo()
+        });
     }
 
     public async void ExportKiraPack()

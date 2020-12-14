@@ -20,7 +20,5 @@
         #region SE
         bool isSEOn { get; set; }
         #endregion
-
-        void Save();
     }
 }
