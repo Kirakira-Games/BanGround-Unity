@@ -4,10 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
-class NoteBaseXComparer : IComparer<NoteBase>
+class NoteBaseComparer : IComparer<NoteBase>
 {
     public int Compare(NoteBase lhs, NoteBase rhs)
     {
+        if (Mathf.Approximately(lhs.transform.position.x, rhs.transform.position.x))
+            return (int)Mathf.Sign(lhs.transform.position.y - lhs.transform.position.y);
         return (int)Mathf.Sign(lhs.transform.position.x - lhs.transform.position.x);
     }
 }
@@ -21,7 +23,7 @@ public class NoteSyncLine : MonoBehaviour
     private int totNotes;
     private bool[] soundEffects = new bool[5];
 
-    private static NoteBaseXComparer comparer = new NoteBaseXComparer();
+    private static NoteBaseComparer comparer = new NoteBaseComparer();
     private static readonly Vector3 PARTIAL_POS = new Vector3(0, -0.05f, 0);
     private const float lineWidth = 0.06f;
 
