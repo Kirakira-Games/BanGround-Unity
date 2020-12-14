@@ -163,7 +163,7 @@ public class UIManager : MonoBehaviour, IUIManager
         ISoundTrack bgm = audioManager.gameBGM;
         SM.AddState(State.Rewinding);
         float currentTime = audioTimelineSync.Time;
-        float targetTime = Mathf.Max(0, currentTime - BiteTime);
+        float targetTime = Mathf.Max(audioTimelineSync.AudioSeekPos, currentTime - BiteTime);
 
         // rewind
         bgm.SetPlaybackTime((uint)Mathf.RoundToInt(targetTime * 1000));
