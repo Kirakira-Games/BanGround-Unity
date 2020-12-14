@@ -8,6 +8,7 @@
     public class InGameParams
     {
         public string replayPath;
-        public ulong mods;
+        public ulong mods = 0;
+        public float seekPosition = 0f;
     }
 }

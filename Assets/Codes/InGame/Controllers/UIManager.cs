@@ -162,7 +162,7 @@ public class UIManager : MonoBehaviour, IUIManager
     {
         ISoundTrack bgm = audioManager.gameBGM;
         SM.AddState(State.Rewinding);
-        float currentTime = audioTimelineSync.time;
+        float currentTime = audioTimelineSync.Time;
         float targetTime = Mathf.Max(0, currentTime - BiteTime);
 
         // rewind
@@ -170,7 +170,7 @@ public class UIManager : MonoBehaviour, IUIManager
         while (currentTime > targetTime)
         {
             currentTime -= Time.deltaTime;
-            audioTimelineSync.time = currentTime;
+            audioTimelineSync.Time = currentTime;
             inGameBackground.seekVideo(currentTime);
             inGameBackground.playVideo();
             await UniTask.DelayFrame(1);
@@ -185,7 +185,7 @@ public class UIManager : MonoBehaviour, IUIManager
         uint pauseTime = bgm.GetPlaybackTime();
         bgm.Play();
         await UniTask.WaitUntil(() => bgm.GetPlaybackTime() != pauseTime);
-        audioTimelineSync.timeInMs = (int)bgm.GetPlaybackTime();
+        audioTimelineSync.TimeInMs = (int)bgm.GetPlaybackTime();
         audioTimelineSync.Play();
         inGameBackground.seekVideo(bgm.GetPlaybackTime() / 1000f);
         inGameBackground.playVideo();
@@ -309,7 +309,7 @@ public class UIManager : MonoBehaviour, IUIManager
     private void Update()
     {
         if (SM.inSimpleState && SM.Current != State.Finished && audioManager.gameBGM != null &&
-            audioTimelineSync.timeInMs > audioManager.gameBGM.GetLength() + 1000 &&
+            audioTimelineSync.TimeInMs > audioManager.gameBGM.GetLength() + 1000 &&
             noteController.isFinished)
         {
             SM.Transit(SM.Current, State.Finished);

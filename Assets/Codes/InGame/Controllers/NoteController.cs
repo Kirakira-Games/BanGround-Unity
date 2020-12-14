@@ -12,6 +12,7 @@ using Zenject;
 using System.Threading;
 using BanGround;
 using BanGround.Scripting;
+using BanGround.Scene.Params;
 
 public class NoteController : MonoBehaviour, INoteController
 {
@@ -77,7 +78,7 @@ public class NoteController : MonoBehaviour, INoteController
     private List<NoteBase> notesToDestroy = new List<NoteBase>();
     private List<Slide> slidesToDestroy = new List<Slide>();
 
-    private const int WARM_UP_SECOND = 4;
+    private const float WARM_UP_SECOND = 4f;
 
     #region Judge
     private TapEffectType EmitEffect(Vector3 position, JudgeResult result, GameNoteType type)
@@ -391,6 +392,12 @@ public class NoteController : MonoBehaviour, INoteController
     async void Start()
     {
         isFinished = false;
+        InGameParams parameters = SceneLoader.Parameters;
+        if (parameters == null)
+        {
+            Debug.LogError("Missing InGameParams. Falling back to default params.");
+            parameters = new InGameParams();
+        }
 
         // Main camera
         mainCamera = GameObject.Find("GameMainCamera").GetComponent<Camera>();
@@ -448,7 +455,8 @@ public class NoteController : MonoBehaviour, INoteController
         _ = audioManager.StreamGameBGMTrack(fs.GetFile(dataLoader.GetMusicPath(chartListManager.current.header.mid)).ReadToEnd())
             .ContinueWith((bgm) => {
                 modManager.attachedMods.ForEach(mod => (mod as AudioMod)?.ApplyMod(bgm));
-                audioTimelineSync.time = -audioTimelineSync.RealTimeToBGMTime(WARM_UP_SECOND);
+                audioTimelineSync.AudioSeekPos = parameters.seekPosition;
+                audioTimelineSync.Time = parameters.seekPosition - audioTimelineSync.RealTimeToBGMTime(WARM_UP_SECOND);
                 audioTimelineSync.Play();
             });
 
@@ -518,7 +526,7 @@ public class NoteController : MonoBehaviour, INoteController
     {
         if (SceneLoader.Loading || SM.Base == GameStateMachine.State.Finished || Time.timeScale == 0) return;
 
-        audioTime = audioTimelineSync.timeInMs + audioTimelineSync.RealTimeToBGMTime(o_audio);
+        audioTime = audioTimelineSync.TimeInMs + audioTimelineSync.RealTimeToBGMTime(o_audio);
         judgeTime = audioTime - o_judge;
         audioTimef = audioTime / 1000f;
         judgeTimef = judgeTime / 1000f;
