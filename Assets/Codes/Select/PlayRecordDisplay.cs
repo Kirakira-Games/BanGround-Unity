@@ -17,60 +17,46 @@ public class PlayRecordDisplay : MonoBehaviour
     [Inject]
     private IDatabaseAPI db;
 
-    private RawImage Rank;
-    private RawImage clearMark;
-    private Text score;
-    private Text acc;
+    public RawImage Rank;
+    public RawImage ClearMark;
+    public Text Score;
+    public Text Acc;
 
-    private void Awake()
-    {
-        //Marks
-        Rank = GameObject.Find("Rank").GetComponent<RawImage>();
-        clearMark = GameObject.Find("ClearMark").GetComponent<RawImage>();
-        score = GameObject.Find("ScoreHistory").GetComponent<Text>();
-        acc = GameObject.Find("AccText").GetComponent<Text>();
-    }
     public void DisplayRecord()
     {
-        int count = 0;
-        var rank = db.GetBestRank(chartListManager.current.header.sid, chartListManager.current.difficulty) ?? new RankItem();
-        score.text = string.Format(ComboManager.FORMAT_DISPLAY_SCORE, rank.Score);
-        acc.text = string.Format("{0:P2}", rank.Acc);
-        //Set Rank
-        if (count == 0)
-        {
-            Rank.enabled = false;
-            clearMark.enabled = false;
-            return;
-        }
-        else
-        {
-            Rank.enabled = true;
-            clearMark.enabled = true;
-        }
+        var rank = db.GetBestRank(chartListManager.current.header.sid, chartListManager.current.difficulty);
+
+        // Set rank and clearmark display
+        Rank.enabled = ClearMark.enabled = rank != null;
+        if (rank == null)
+            rank = new RankItem();
+
+        // Set score and acc
+        Score.text = string.Format(ComboManager.FORMAT_DISPLAY_SCORE, rank.Score);
+        Acc.text = string.Format("{0:P2}", rank.Acc);
 
         Rank.texture = resourceLoader.LoadIconResource<Texture2D>(rank.Rank.ToString());
 
-        //Set Mark
+        // Set Mark
         var mark = new Texture2D(0, 0);
         switch (rank.ClearMark)
         {
             case ClearMarks.AP:
-                mark = resourceLoader.LoadIconResource<Texture2D>("AP") as Texture2D;
+                mark = resourceLoader.LoadIconResource<Texture2D>("AP");
                 break;
             case ClearMarks.FC:
-                mark = resourceLoader.LoadIconResource<Texture2D>("FC") as Texture2D;
+                mark = resourceLoader.LoadIconResource<Texture2D>("FC");
                 break;
             case ClearMarks.CL:
-                mark = resourceLoader.LoadIconResource<Texture2D>("CL") as Texture2D;
+                mark = resourceLoader.LoadIconResource<Texture2D>("CL");
                 break;
             case ClearMarks.F:
-                clearMark.enabled = false;
+                ClearMark.enabled = false;
                 break;
             default:
-                clearMark.enabled = false;
+                ClearMark.enabled = false;
                 break;
         }
-        clearMark.texture = mark;
+        ClearMark.texture = mark;
     }
 }
