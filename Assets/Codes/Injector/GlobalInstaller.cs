@@ -30,6 +30,9 @@ public class GlobalInstaller : MonoInstaller
         // MasterMemory
         Initializer.SetupMessagePackResolver();
 
+        // SceneLoader
+        SceneLoader.Init();
+
         // Filesystem
         Container.Bind<IFileSystem>().To<KiraFilesystem>().AsSingle().OnInstantiated((_, obj) =>
         {

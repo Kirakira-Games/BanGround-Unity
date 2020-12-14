@@ -2,12 +2,38 @@
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
 #pragma warning disable 0649
 public class SceneTaskDoneEvent : UnityEvent<bool> { }
+
+public class SceneState
+{
+    public dynamic parameters;
+    public string name;
+
+    public SceneState() { }
+
+    public SceneState(string name, dynamic parameters)
+    {
+        this.name = name;
+        this.parameters = parameters;
+    }
+
+    public SceneState(SceneState rhs)
+    {
+        name = rhs.name;
+        parameters = rhs.parameters;
+    }
+
+    public override string ToString()
+    {
+        return $"{name}, Params = {JsonConvert.SerializeObject(parameters)}";
+    }
+}
 
 public class SceneLoader : MonoBehaviour
 {
@@ -18,13 +44,27 @@ public class SceneLoader : MonoBehaviour
     private Camera loaderCamera;
     private AsyncOperation loadOP;
 
-    private static readonly LinkedList<string> sceneStack = new LinkedList<string>();
+    private static readonly LinkedList<SceneState> sceneStack = new LinkedList<SceneState>();
     private static Func<UniTask<bool>> TaskVoid;
-    public static Scene currentScene;
+    public static SceneState CurrentScene => sceneStack.Last.Value;
     public static SceneTaskDoneEvent onTaskFinish = new SceneTaskDoneEvent();
     private static string nextSceneName;
 
     public static bool Loading = false;
+
+    public static void Init()
+    {
+        // Add listener to update current scene
+        SceneManager.sceneLoaded += (scene, mode) =>
+        {
+            if (scene.name == "Loader" || scene.name == CurrentScene.name)
+                return;
+            PushScene(scene.name, null);
+        };
+        
+        // Initialize first scene
+        PushScene(SceneManager.GetActiveScene().name, null);
+    }
 
     void Start()
     {
@@ -40,7 +80,7 @@ public class SceneLoader : MonoBehaviour
         animator = GameObject.Find("GateCanvas2").GetComponent<Animator>();
         animator.Play("Closing");
         loaderCamera = GameObject.Find("LoaderCamera").GetComponent<Camera>();
-        Load();
+        LoadAsync();
     }
 
 
@@ -60,49 +100,46 @@ public class SceneLoader : MonoBehaviour
         return true;
     }
 
-    private static void PushCurrentScene()
+    private static void PushScene(string name, dynamic paramters)
     {
-        Debug.Log("Push scene: " + currentScene.name);
-        sceneStack.AddLast(currentScene.name);
+        var state = new SceneState(name, paramters);
+        Debug.Log("Push scene: " + state.name);
+        sceneStack.AddLast(state);
         if (sceneStack.Count > 10)
         {
             Debug.LogWarning("Too many scenes in stack! Did you forget to use SceneLoader.Back()?\nScene Stack:\n"
-                + string.Join("\n", sceneStack.Select(name => "- " + name)));
+                + string.Join("\n", sceneStack.Select(scene => "- " + scene.name)));
         }
     }
 
     private static void PopScene()
     {
-        Debug.Log("Pop scene: " + sceneStack.Last.Value);
+        Debug.Log("Pop scene: " + sceneStack.Last.Value.name);
         sceneStack.RemoveLast();
     }
 
-    public static void LoadScene(string nextSceneName, Func<UniTask<bool>> task = null, bool pushStack = false)
+    public static void LoadScene(string nextSceneName, Func<UniTask<bool>> task = null, bool pushStack = false, dynamic parameters = null)
     {
-        currentScene = SceneManager.GetActiveScene();
         if (!LoadSceneHelper(nextSceneName, task))
-        {
             return;
-        }
-        if (pushStack)
+        
+        onTaskFinish.AddListener(success =>
         {
-            onTaskFinish.AddListener(success =>
-            {
-                if (success)
-                {
-                    PushCurrentScene();
-                }
-            });
-        }
+            if (!success)
+                return;
+            if (!pushStack)
+                PopScene();
+            PushScene(nextSceneName, parameters);
+        });
     }
 
-    public static AsyncOperation LoadSceneAsync(string nextSceneName, bool pushStack = false)
+    public static AsyncOperation LoadSceneAsync(string nextSceneName, bool pushStack = false, dynamic parameters = null)
     {
-        currentScene = SceneManager.GetActiveScene();
-        if (pushStack)
-        {
-            PushCurrentScene();
-        }
+        if (!pushStack)
+            PopScene();
+
+        PushScene(nextSceneName, parameters);
+        
         return SceneManager.LoadSceneAsync(nextSceneName);
     }
 
@@ -112,17 +149,16 @@ public class SceneLoader : MonoBehaviour
     /// </summary>
     public static void Back(string to, string fallback = null)
     {
-        currentScene = SceneManager.GetActiveScene();
         if (to == null)
         {
-            nextSceneName = sceneStack.Last?.Value ?? fallback;
+            nextSceneName = sceneStack.Last.Previous?.Value.name ?? fallback;
             if (string.IsNullOrEmpty(nextSceneName))
             {
                 Debug.LogError($"No valid scene provided: to={to}, fallback={fallback}.");
                 return;
             }
         }
-        else if (sceneStack.Find(to) == null)
+        else if (sceneStack.All(scene => scene.name != to))
         {
             Debug.LogError($"Scene {to} is not in the stack.");
             return;
@@ -132,9 +168,8 @@ public class SceneLoader : MonoBehaviour
             nextSceneName = to;
         }
         if (!LoadSceneHelper(nextSceneName))
-        {
             return;
-        }
+
         onTaskFinish.AddListener(success =>
         {
             if (success)
@@ -142,24 +177,17 @@ public class SceneLoader : MonoBehaviour
                 if (to == null)
                 {
                     if (sceneStack.Count > 0)
+                    {
                         PopScene();
+                    }
                 }
                 else
                 {
-                    while (sceneStack.Last.Value != to)
+                    while (sceneStack.Last.Value.name != to)
                         PopScene();
-
-                    PopScene();
                 }
             }
         });
-    }
-
-    public void Load()
-    {
-        //AudioManagerOld.Instanse.PauseBGM();
-
-        LoadAsync();
     }
 
     private async void LoadAsync()
@@ -176,6 +204,7 @@ public class SceneLoader : MonoBehaviour
 
     private async void CountDown(float seconds)
     {
+        var currentScene = CurrentScene;
         try
         {
             if (TaskVoid != null)
@@ -190,7 +219,7 @@ public class SceneLoader : MonoBehaviour
             return;
         }
         onTaskFinish.Invoke(true);
-        await SceneManager.UnloadSceneAsync(currentScene);
+        await SceneManager.UnloadSceneAsync(currentScene.name);
         loadOP = SceneManager.LoadSceneAsync(nextSceneName, LoadSceneMode.Additive);
         loadOP.allowSceneActivation = false;
         while (loadOP.progress < 0.9f)
