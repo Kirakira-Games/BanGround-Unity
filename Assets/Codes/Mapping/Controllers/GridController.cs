@@ -302,7 +302,7 @@ namespace BGEditor
                     Core.Commit(new CreateNoteCmd(note));
                 return;
             }
-            else if (Editor.tool != EditorTool.Select)
+            else if (Editor.tool != EditorTool.Select || eventData.button == PointerEventData.InputButton.Right)
             {
                 Notes.UnselectAll();
             }

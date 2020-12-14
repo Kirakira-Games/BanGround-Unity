@@ -9,8 +9,8 @@ public class SlideTick : SlideNoteBase
     {
         if (!isJudging)
         {
-            if (touch.current.phase != KirakiraTouchPhase.Began)
-                return JudgeResult.None;
+            //if (touch.current.phase != KirakiraTouchPhase.Began)
+            //    return JudgeResult.None;
             if (touch.current.time >= time - NoteUtility.SLIDE_TICK_JUDGE_RANGE &&
                 touch.current.time <= time + NoteUtility.SLIDE_TICK_JUDGE_RANGE)
                 return JudgeResult.Perfect;
