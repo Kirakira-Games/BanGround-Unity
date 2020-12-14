@@ -1,21 +1,13 @@
-﻿using System.Collections;
-using UnityEngine;
-
-namespace BanGround.Scene
+﻿namespace BanGround.Scene.Params
 {
-    public class SceneParams : MonoBehaviour
+    public class MappingParams
     {
+        public BGEditor.IEditorInfo editor = new BGEditor.EditorInfo();
+    }
 
-        // Use this for initialization
-        void Start()
-        {
-
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-
-        }
+    public class InGameParams
+    {
+        public string replayPath;
+        public ulong mods;
     }
 }
