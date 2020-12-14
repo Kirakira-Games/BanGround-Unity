@@ -22,7 +22,7 @@ namespace BanGround.Database.Models
         [SecondaryKey(1), NonUnique]
         public int MusicId { get; set; }
 
-        public int[] Judge { get; set; }
+        public int[] Judge { get; set; } = new int[(int)JudgeResult.Max + 1];
 
         public double Acc { get; set; }
 
