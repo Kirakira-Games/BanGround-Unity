@@ -47,6 +47,7 @@ public class SceneLoader : MonoBehaviour
     private static readonly LinkedList<SceneState> sceneStack = new LinkedList<SceneState>();
     private static Func<UniTask<bool>> TaskVoid;
     public static SceneState CurrentScene => sceneStack.Last.Value;
+    public static dynamic Parameters => CurrentScene.parameters;
     public static SceneTaskDoneEvent onTaskFinish = new SceneTaskDoneEvent();
     private static string nextSceneName;
 

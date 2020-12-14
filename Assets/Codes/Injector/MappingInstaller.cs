@@ -14,7 +14,7 @@ public class MappingInstaller : MonoInstaller
 
     public override void InstallBindings()
     {
-        MappingParams parameters = SceneLoader.CurrentScene.parameters;
+        MappingParams parameters = SceneLoader.Parameters;
         if (parameters == null)
         {
             Debug.LogError("Missing MappingParams. Falling back to default params.");

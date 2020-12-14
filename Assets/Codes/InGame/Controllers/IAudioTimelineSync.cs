@@ -1,8 +1,9 @@
 ﻿public interface IAudioTimelineSync
 {
-    float smoothAudioDiff { get; }
-    float time { get; set; }
-    int timeInMs { get; set; }
+    float SmoothAudioDiff { get; }
+    float Time { get; set; }
+    int TimeInMs { get; set; }
+    float AudioSeekPos { get; set; }
 
     float BGMTimeToRealtime(float t);
     int BGMTimeToRealtime(int t);
