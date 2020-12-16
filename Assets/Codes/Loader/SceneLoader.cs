@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BanGround.Scene.Params;
 using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -48,6 +49,16 @@ public class SceneLoader : MonoBehaviour
     private static Func<UniTask<bool>> TaskVoid;
     public static SceneState CurrentScene => sceneStack.Last.Value;
     public static dynamic Parameters => CurrentScene.parameters;
+    public static T GetParamsOrDefault<T>() where T: new()
+    {
+        if (Parameters == null)
+        {
+            Debug.LogWarning($"Missing {nameof(T)}. Falling back to default params.");
+            CurrentScene.parameters = new T();
+        }
+        return Parameters;
+    }
+
     public static SceneTaskDoneEvent onTaskFinish = new SceneTaskDoneEvent();
     private static string nextSceneName;
 

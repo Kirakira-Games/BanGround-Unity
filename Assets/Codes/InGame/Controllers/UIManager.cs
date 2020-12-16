@@ -2,16 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using AudioProvider;
-using System;
 using Cysharp.Threading.Tasks;
 using Zenject;
 
 using State = GameStateMachine.State;
-using System.Threading;
-using BanGround.Utils;
-using BanGround.Database.Models;
+using BanGround.Scene.Params;
+using BanGround.Game.Mods;
 
 public class UIManager : MonoBehaviour, IUIManager
 {
@@ -29,6 +26,8 @@ public class UIManager : MonoBehaviour, IUIManager
     private IGameStateMachine SM;
     [Inject]
     private ICancellationTokenStore Cancel;
+    [Inject]
+    private IModManager modManager;
 
     [Inject(Id = "r_brightness_lane")]
     private KVar r_brightness_lane;
@@ -200,16 +199,17 @@ public class UIManager : MonoBehaviour, IUIManager
         //SceneManager.LoadScene("InGame");
         //await liveSetting.LoadChart(true);
         Time.timeScale = 1;
+        var parameters = SceneLoader.GetParamsOrDefault<InGameParams>();
         SceneLoader.LoadScene("InGame", async () =>
         {
-            if (await chartListManager.LoadChart(true))
+            if (await chartListManager.LoadChart(true, parameters.mods))
             {
                 OnStopPlaying();
                 return true;
             }
             Time.timeScale = 0;
             return false;
-        }, false);
+        }, false, parameters: parameters);
     }
 
     public void GameRetire()
@@ -251,9 +251,10 @@ public class UIManager : MonoBehaviour, IUIManager
         if (chartListManager.offsetAdjustMode)
             restart = true;
 
+        var parameters = SceneLoader.GetParamsOrDefault<InGameParams>();
         if (restart)
         {
-            await SceneLoader.LoadSceneAsync("InGame");
+            await SceneLoader.LoadSceneAsync("InGame", parameters: parameters);
         }
         else
         {
@@ -286,7 +287,10 @@ public class UIManager : MonoBehaviour, IUIManager
 
             await UniTask.Delay(3000);
 
-            _ = SceneLoader.LoadSceneAsync("Result");
+            _ = SceneLoader.LoadSceneAsync("Result", parameters: new ResultParams(parameters)
+            {
+                scoreMultiplier = modManager.ScoreMultiplier
+            });
         }
     }
 

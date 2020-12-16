@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using BanGround.Game.Mods;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -19,12 +20,12 @@ public class StepToggle : MonoBehaviour,IPointerClickHandler
         index++;
         index %= Steps.Length;
         OnIndexChanged();
-        if (index != 0) ConflictTog.SetStep(null);
+        if (index != 0) ConflictTog.SetStep(ModFlag.None);
     }
 
-    public virtual AudioMod GetStep() { return null; }
+    public virtual ModFlag GetStep() { return ModFlag.None; }
 
-    public virtual void SetStep(List<ModBase> mods) { }
+    public virtual void SetStep(ModFlag mods) { }
 
     protected void OnIndexChanged()
     {

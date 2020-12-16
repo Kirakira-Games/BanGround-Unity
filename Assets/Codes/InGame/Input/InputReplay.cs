@@ -11,6 +11,7 @@ using LZMAEncoder = SevenZip.Compression.LZMA.Encoder;
 using LZMADecoder = SevenZip.Compression.LZMA.Decoder;
 using System.Text;
 using UnityEngine;
+using BanGround.Game.Mods;
 
 public class ReplayFrame
 {
@@ -302,13 +303,13 @@ public class DemoRecorder
     public string demoName;
     public DemoFile demoFile;
 
-    public DemoRecorder(int chartId, Difficulty diff, ulong mods)
+    public DemoRecorder(int chartId, Difficulty diff, ModFlag mods)
     {
         demoFile = new DemoFile
         {
             sid = chartId,
             difficulty = diff,
-            mods = mods
+            mods = (ulong)mods
         };
 
         demoName = $"{chartId}_{diff:g}_{DateTime.Now.ToLongDateString()}_{DateTime.Now.ToLongTimeString()}.kirareplay".Replace(":", "-").Replace("/", "-").Replace("\\", "-");

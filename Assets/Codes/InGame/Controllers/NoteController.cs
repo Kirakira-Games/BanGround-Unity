@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Profiling;
@@ -9,10 +8,10 @@ using AudioProvider;
 using Cysharp.Threading.Tasks;
 using JudgeQueue = PriorityQueue<int, NoteBase>;
 using Zenject;
-using System.Threading;
 using BanGround;
 using BanGround.Scripting;
 using BanGround.Scene.Params;
+using BanGround.Game.Mods;
 
 public class NoteController : MonoBehaviour, INoteController
 {
@@ -392,12 +391,7 @@ public class NoteController : MonoBehaviour, INoteController
     async void Start()
     {
         isFinished = false;
-        InGameParams parameters = SceneLoader.Parameters;
-        if (parameters == null)
-        {
-            Debug.LogWarning("Missing InGameParams. Falling back to default params.");
-            parameters = new InGameParams();
-        }
+        var parameters = SceneLoader.GetParamsOrDefault<InGameParams>();
 
         // Main camera
         mainCamera = GameObject.Find("GameMainCamera").GetComponent<Camera>();
@@ -454,7 +448,7 @@ public class NoteController : MonoBehaviour, INoteController
         // Game BGM
         _ = audioManager.StreamGameBGMTrack(fs.GetFile(dataLoader.GetMusicPath(chartListManager.current.header.mid)).ReadToEnd())
             .ContinueWith((bgm) => {
-                modManager.attachedMods.ForEach(mod => (mod as AudioMod)?.ApplyMod(bgm));
+                modManager.AttachedMods.ForEach(mod => (mod as AudioMod)?.ApplyMod(bgm));
                 audioTimelineSync.AudioSeekPos = parameters.seekPosition;
                 audioTimelineSync.Time = parameters.seekPosition - audioTimelineSync.RealTimeToBGMTime(WARM_UP_SECOND);
                 audioTimelineSync.Play();
@@ -496,7 +490,7 @@ public class NoteController : MonoBehaviour, INoteController
         //Set Play Mod Event
         //audioManager.restart = false;
         onJudge = null;
-        foreach (var mod in modManager.attachedMods)
+        foreach (var mod in modManager.AttachedMods)
         {
             if (mod is SuddenDeathMod)
                 onJudge += ((JudgeResult result) =>

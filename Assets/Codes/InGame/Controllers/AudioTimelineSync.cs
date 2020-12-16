@@ -5,6 +5,7 @@ using Zenject;
 using AudioProvider;
 using Cysharp.Threading.Tasks;
 using System;
+using BanGround.Game.Mods;
 
 public class AudioTimelineSync : MonoBehaviour, IAudioTimelineSync
 {

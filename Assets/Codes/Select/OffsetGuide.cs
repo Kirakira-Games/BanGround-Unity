@@ -1,4 +1,6 @@
-﻿using FMOD.Studio;
+﻿using BanGround.Game.Mods;
+using BanGround.Scene.Params;
+using FMOD.Studio;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,8 +13,6 @@ public class OffsetGuide : MonoBehaviour
     private IKVSystem kvSystem;
     [Inject]
     private IChartListManager chartListManager;
-    [Inject]
-    private IModManager modManager;
 
     void Start()
     {
@@ -22,19 +22,22 @@ public class OffsetGuide : MonoBehaviour
     void StartOffsetGuide()
     {
         chartListManager.ForceOffsetChart();
-        modManager.SuppressAllMods(true);
 
         SettingAndMod.instance.SetLiveSetting();
         kvSystem.SaveConfig();
         SceneLoader.LoadScene("InGame", async () =>
         {
-            if (!await chartListManager.LoadChart(true))
+            if (!await chartListManager.LoadChart(true, ModFlag.None))
             {
-                modManager.SuppressAllMods(false);
                 chartListManager.ClearForcedChart();
                 return false;
             }
             return true;
-        }, true);
+        }, true, parameters: new InGameParams
+        {
+            mods = ModFlag.None,
+            saveRecord = false,
+            saveReplay = false,
+        });
     }
 }

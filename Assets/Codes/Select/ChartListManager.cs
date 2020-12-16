@@ -10,6 +10,7 @@ using System.Linq;
 using BanGround;
 using System.Security.Cryptography;
 using System.IO;
+using BanGround.Game.Mods;
 
 public class ChartIndexInfo
 {
@@ -31,12 +32,17 @@ public class ChartListManager : IChartListManager
     private KVar cl_lastsid;
     [Inject(Id = "cl_lastdiff")]
     private KVar cl_lastdiff;
+    [Inject(Id = "r_mirror")]
+    private KVar r_mirror;
+    [Inject(Id = "r_notespeed")]
+    private KVar r_notespeed;
+
     [Inject]
     private IMessageBannerController messageBannerController;
     [Inject]
-    private IModManager modManager;
-    [Inject]
     private IFileSystem fs;
+    [Inject]
+    private IChartVersion chartVersion;
 
     public List<cHeader> chartList => dataLoader.chartList;
 
@@ -193,12 +199,7 @@ public class ChartListManager : IChartListManager
         return ret;
     }
 
-    [Inject(Id = "r_mirror")]
-    private KVar r_mirror;
-    [Inject]
-    private IChartVersion chartVersion;
-
-    public async UniTask<bool> LoadChart(bool convertToGameChart)
+    public async UniTask<bool> LoadChart(bool convertToGameChart, ModFlag mods = ModFlag.None)
     {
         chart = await chartVersion.Process(current.header, current.difficulty);
         if (chart == null)
@@ -213,7 +214,7 @@ public class ChartListManager : IChartListManager
                 gameChart = LoadChartInternal(
                         JsonConvert.DeserializeObject<V2.Chart>(
                         JsonConvert.SerializeObject(chart)
-                    ));
+                    ), mods);
             }
             return true;
         }
@@ -225,8 +226,12 @@ public class ChartListManager : IChartListManager
         }
     }
 
-    private GameChartData LoadChartInternal(V2.Chart chart)
+    private GameChartData LoadChartInternal(V2.Chart chart, ModFlag mods)
     {
+        // Compute note screen time
+        var modManager = new ModManager(r_notespeed, mods);
+
+        // Load chart
         ChartLoader.numNotes = 0;
         var timing = new ChartTiming(chart.bpm, chart.offset, modManager.NoteScreenTime, r_mirror);
         var gameNotes = new List<GameNoteData>();

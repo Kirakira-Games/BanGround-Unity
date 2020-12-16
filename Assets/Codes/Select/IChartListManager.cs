@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using BanGround.Game.Mods;
 using Cysharp.Threading.Tasks;
 using UnityEngine.Events;
 
@@ -23,5 +24,5 @@ public interface IChartListManager
     void SelectDifficulty(Difficulty difficulty);
     void SortChart();
     Dictionary<string, byte[]> ComputeCurrentChartHash();
-    UniTask<bool> LoadChart(bool convertToGameChart);
+    UniTask<bool> LoadChart(bool convertToGameChart, ModFlag mods = ModFlag.None);
 }
