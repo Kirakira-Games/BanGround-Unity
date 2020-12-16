@@ -15,8 +15,8 @@ public class InGameInstaller : MonoInstaller
     public UIManager uiManager;
     public LunarScript chartScript;
 
-    [Inject(Id = "cl_notespeed")]
-    private KVar cl_notespeed;
+    [Inject(Id = "r_notespeed")]
+    private KVar r_notespeed;
     [Inject]
     private IFileSystem fs;
 
@@ -26,7 +26,7 @@ public class InGameInstaller : MonoInstaller
         var parameters = SceneLoader.GetParamsOrDefault<InGameParams>();
 
         // Initiate mod manager
-        var modManager = new ModManager(cl_notespeed, parameters.mods);
+        var modManager = new ModManager(r_notespeed, parameters.mods);
         Container.Bind<IModManager>().FromInstance(modManager);
 
         // Bind all components
@@ -42,7 +42,7 @@ public class InGameInstaller : MonoInstaller
 
         // Touch provider
         IKirakiraTouchProvider touchProvider;
-        if (parameters.replayPath != "")
+        if (!string.IsNullOrEmpty(parameters.replayPath))
         {
             touchProvider = new DemoReplayTouchPrivider(DemoFile.LoadFrom(fs.GetFile(parameters.replayPath)));
         }

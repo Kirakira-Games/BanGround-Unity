@@ -65,7 +65,7 @@ namespace BanGround.Game.Mods
 
         public float ScoreMultiplier
         {
-            get => AttachedMods.Aggregate(0f, (acc, x) => acc + x.ScoreMultiplier);
+            get => AttachedMods.Aggregate(1f, (acc, x) => acc * x.ScoreMultiplier);
         }
 
         public ModFlag Flag { get; private set; } = 0;
