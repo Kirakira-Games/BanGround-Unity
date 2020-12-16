@@ -115,7 +115,7 @@ public class SceneLoader : MonoBehaviour
     private static void PushScene(string name, dynamic paramters)
     {
         var state = new SceneState(name, paramters);
-        Debug.Log("Push scene: " + state.name);
+        Debug.Log($"Push scene: {state.name}\nParameters: {JsonConvert.SerializeObject(paramters)}");
         sceneStack.AddLast(state);
         if (sceneStack.Count > 10)
         {

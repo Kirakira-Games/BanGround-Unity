@@ -31,8 +31,6 @@ public class UIManager : MonoBehaviour, IUIManager
 
     [Inject(Id = "r_brightness_lane")]
     private KVar r_brightness_lane;
-    [Inject(Id = "cl_currentdemo")]
-    private KVar cl_currentdemo;
 
     private const float BiteTime = 2;
 
@@ -218,7 +216,6 @@ public class UIManager : MonoBehaviour, IUIManager
 
         OnStopPlaying();
         //SceneManager.LoadScene("Select");
-        cl_currentdemo.Set("");
         SceneLoader.Back(null);
     }
 
