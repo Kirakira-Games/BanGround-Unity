@@ -172,13 +172,11 @@ public class GlobalInstaller : MonoInstaller
             KVar.C("snd_buffer_bass", "-1", KVarFlags.Archive, "Buffer type of Bass Sound Engine"),
             KVar.C("snd_buffer_fmod", "-1", KVarFlags.Archive, "Buffer size of Fmod/Unity Sound Engine"),
 
-            KVar.C("g_demoRecord", "1", KVarFlags.Archive, "Enables demo recording."),
+            KVar.C("g_saveReplay", "1", KVarFlags.Archive, "Enables replay recording."),
 
             KVar.C("snd_output", ((int)FMOD.OUTPUTTYPE.AUTODETECT).ToString(), KVarFlags.Archive),
 
             KVar.C("cl_language", "-1", KVarFlags.Archive),
-
-            KVar.C("cl_currentdemo", "", KVarFlags.StringOnly, "Current demo file"),
 
             KVar.C("cl_modflag", "0", KVarFlags.StringOnly, "A binary string storing ModFlag. At most 64 bits."),
         };

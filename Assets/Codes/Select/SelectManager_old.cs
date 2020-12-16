@@ -35,6 +35,8 @@ public class SelectManager_old : MonoBehaviour
     private KVar cl_cursorter;
     [Inject(Id = "cl_modflag")]
     private KVar cl_modflag;
+    [Inject(Id = "g_saveReplay")]
+    private KVar g_saveReplay;
     [Inject]
     private ICancellationTokenStore cancellationToken;
 
@@ -142,7 +144,7 @@ public class SelectManager_old : MonoBehaviour
             {
                 mods = modflag,
                 saveRecord = true,
-                saveReplay = true,
+                saveReplay = g_saveReplay,
             });
         await PreviewFadeOut().WithCancellation(cancellationToken.sceneToken).SuppressCancellationThrow();
     }

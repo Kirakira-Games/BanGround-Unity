@@ -30,5 +30,17 @@ namespace BanGround.Scene.Params
             mods = game.mods;
             seekPosition = game.seekPosition;
         }
+
+        public InGameParams ToInGameParams()
+        {
+            return new InGameParams
+            {
+                replayPath = replayPath,
+                saveRecord = saveRecord,
+                saveReplay = saveReplay,
+                mods = mods,
+                seekPosition = seekPosition
+            };
+        }
     }
 }

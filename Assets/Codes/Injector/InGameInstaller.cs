@@ -15,10 +15,6 @@ public class InGameInstaller : MonoInstaller
     public UIManager uiManager;
     public LunarScript chartScript;
 
-    [Inject(Id = "g_demoRecord")]
-    private KVar g_demoRecord;
-    [Inject(Id = "cl_currentdemo")]
-    private KVar cl_currentdemo;
     [Inject(Id = "cl_notespeed")]
     private KVar cl_notespeed;
     [Inject]
@@ -46,10 +42,9 @@ public class InGameInstaller : MonoInstaller
 
         // Touch provider
         IKirakiraTouchProvider touchProvider;
-        if (cl_currentdemo != "")
+        if (parameters.replayPath != "")
         {
-            touchProvider = new DemoReplayTouchPrivider(DemoFile.LoadFrom(fs.GetFile(cl_currentdemo)));
-            g_demoRecord.Set(false);
+            touchProvider = new DemoReplayTouchPrivider(DemoFile.LoadFrom(fs.GetFile(parameters.replayPath)));
         }
         else if (parameters.mods.HasFlag(ModFlag.AutoPlay))
         {

@@ -212,8 +212,6 @@ public class TouchManager : MonoBehaviour
 {
     public static TouchManager instance;
 
-    [Inject(Id = "g_demoRecord")]
-    private KVar g_demoRecord;
     [Inject]
     private IChartListManager chartListManager;
     [Inject]
@@ -327,7 +325,8 @@ public class TouchManager : MonoBehaviour
         KirakiraTouch.dpi = GetDPI();
         KirakiraTouch.flickDistPixels = Mathf.Min(Screen.height / 20, NoteUtility.FLICK_JUDGE_DIST / 2.54f * KirakiraTouch.dpi);
 
-        if (!(touchProvider is DemoReplayTouchPrivider) && g_demoRecord)
+        var parameters = SceneLoader.GetParamsOrDefault<InGameParams>();
+        if (parameters.saveRecord)
         {
             recorder = new DemoRecorder(
                 chartListManager.current.header.sid,
@@ -383,10 +382,6 @@ public class TouchManager : MonoBehaviour
             recorder.Save(file, chartListManager.ComputeCurrentChartHash());
 
             ComboManager.recoder = recorder;
-        }
-        else if(touchProvider is DemoReplayTouchPrivider)
-        {
-            g_demoRecord.Set(true);
         }
     }
 

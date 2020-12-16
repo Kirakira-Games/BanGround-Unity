@@ -29,12 +29,8 @@ public class ResultManager : MonoBehaviour
     [Inject]
     private IDatabaseAPI db;
 
-    [Inject(Id = "g_demoRecord")]
-    private KVar g_demoRecord;
     [Inject(Id = "fs_iconpath")]
     private KVar fs_iconpath;
-    [Inject(Id = "cl_currentdemo")]
-    private KVar cl_currentdemo;
 
     private Button button_back;
     private Button button_retry;
@@ -216,6 +212,7 @@ public class ResultManager : MonoBehaviour
 
     private void SetBtnObject()
     {
+        var parameters = SceneLoader.GetParamsOrDefault<ResultParams>();
         button_back = GameObject.Find("Button_back").GetComponent<Button>();
         button_retry = GameObject.Find("Button_retry").GetComponent<Button>();
         button_replay = GameObject.Find("Button_watchreplay").GetComponent<Button>();
@@ -236,15 +233,17 @@ public class ResultManager : MonoBehaviour
             //StartCoroutine("DelayLoadScene","InGame" ); 
             StartCoroutine(BgmFadeOut());
             RemoveListener();
-            SceneLoader.LoadScene("InGame", pushStack: false); // TODO: Add params
+            SceneLoader.LoadScene("InGame", pushStack: false, parameters: parameters.ToInGameParams());
         });
 
         button_replay.onClick.AddListener(() =>
         {
-            cl_currentdemo.Set("replay/" + ComboManager.recoder.demoName);
+            var replayPath = "replay/" + ComboManager.recoder.demoName;
+            var inGameParams = parameters.ToInGameParams();
+            inGameParams.replayPath = replayPath;
             StartCoroutine(BgmFadeOut());
             RemoveListener();
-            SceneLoader.LoadScene("InGame", pushStack: false); // TODO: Add params
+            SceneLoader.LoadScene("InGame", pushStack: false, parameters: inGameParams);
         });
     }
 
@@ -346,7 +345,7 @@ public class ResultManager : MonoBehaviour
         playResult.ChartHash = JsonConvert.SerializeObject(chartListManager.ComputeCurrentChartHash());
         playResult.Mods = (ulong)parameters.mods;
 
-        if (g_demoRecord)
+        if (parameters.saveRecord)
         {
             playResult.ReplayFile = "replay/" + ComboManager.recoder.demoName;
         }
@@ -362,7 +361,6 @@ public class ResultManager : MonoBehaviour
         else
         {
             print("Autoplay score not saved");
-            cl_currentdemo.Set("");
         }
     }
 
