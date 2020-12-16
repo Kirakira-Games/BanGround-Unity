@@ -212,7 +212,10 @@ public class ResultManager : MonoBehaviour
 
     private void SetBtnObject()
     {
-        var parameters = SceneLoader.GetParamsOrDefault<ResultParams>();
+        var gameParams = SceneLoader.GetParamsOrDefault<ResultParams>().ToInGameParams();
+        gameParams.saveReplay = false;
+        gameParams.saveRecord = false;
+
         button_back = GameObject.Find("Button_back").GetComponent<Button>();
         button_retry = GameObject.Find("Button_retry").GetComponent<Button>();
         button_replay = GameObject.Find("Button_watchreplay").GetComponent<Button>();
@@ -233,17 +236,19 @@ public class ResultManager : MonoBehaviour
             //StartCoroutine("DelayLoadScene","InGame" ); 
             StartCoroutine(BgmFadeOut());
             RemoveListener();
-            SceneLoader.LoadScene("InGame", pushStack: false, parameters: parameters.ToInGameParams());
+            SceneLoader.LoadScene("InGame", pushStack: false, parameters: gameParams);
         });
 
         button_replay.onClick.AddListener(() =>
         {
-            var replayPath = "replay/" + ComboManager.recoder.demoName;
-            var inGameParams = parameters.ToInGameParams();
-            inGameParams.replayPath = replayPath;
+            if (parameters.saveReplay)
+                gameParams.replayPath = "replay/" + ComboManager.recoder.demoName;
+            if (string.IsNullOrEmpty(gameParams.replayPath))
+                return;
+
             StartCoroutine(BgmFadeOut());
             RemoveListener();
-            SceneLoader.LoadScene("InGame", pushStack: false, parameters: inGameParams);
+            SceneLoader.LoadScene("InGame", pushStack: false, parameters: gameParams);
         });
     }
 
@@ -345,7 +350,7 @@ public class ResultManager : MonoBehaviour
         playResult.ChartHash = JsonConvert.SerializeObject(chartListManager.ComputeCurrentChartHash());
         playResult.Mods = (ulong)parameters.mods;
 
-        if (parameters.saveRecord)
+        if (parameters.saveReplay)
         {
             playResult.ReplayFile = "replay/" + ComboManager.recoder.demoName;
         }
@@ -353,7 +358,7 @@ public class ResultManager : MonoBehaviour
         var oldBest = db.GetBestRank(cheader.sid, chartListManager.current.difficulty);
         lastScore = oldBest?.Score ?? 0;
 
-        if (parameters.saveRecord)
+        if (!parameters.mods.HasFlag(ModFlag.AutoPlay) && parameters.saveRecord)
         {
             db.SaveRankItem(playResult);
             print("Record saved");
