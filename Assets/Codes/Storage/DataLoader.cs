@@ -180,7 +180,7 @@ public class DataLoader : IDataLoader
             {
                 if (SceneManager.GetActiveScene().name == "Select")
                 {
-                    SceneManager.LoadScene("Select");
+                    SceneLoader.LoadScene("Select");
                 }
             }
         };

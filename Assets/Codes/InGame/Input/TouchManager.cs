@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using System.Linq;
 using Zenject;
 using BanGround;
+using BanGround.Scene.Params;
 
 public interface IKirakiraTouchProvider
 {
@@ -216,8 +217,6 @@ public class TouchManager : MonoBehaviour
     [Inject]
     private IChartListManager chartListManager;
     [Inject]
-    private IModManager modManager;
-    [Inject]
     private IAudioTimelineSync audioTimelineSync;
     [Inject]
     private INoteController noteController;
@@ -333,7 +332,7 @@ public class TouchManager : MonoBehaviour
             recorder = new DemoRecorder(
                 chartListManager.current.header.sid,
                 chartListManager.current.difficulty,
-                modManager.Flag);
+                SceneLoader.GetParamsOrDefault<InGameParams>().mods);
         }
     }
 

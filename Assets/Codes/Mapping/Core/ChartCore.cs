@@ -10,6 +10,7 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using Zenject;
 using BanGround.Scene.Params;
+using BanGround.Game.Mods;
 
 namespace BGEditor
 {
@@ -41,8 +42,6 @@ namespace BGEditor
         private IMessageBox messageBox;
         [Inject]
         private IFileSystem fs;
-        [Inject]
-        private IModManager modManager;
 
         public EditorToolTip tooltip { get; private set; }
         public MultiNoteDetector multinote { get; private set; }
@@ -338,10 +337,12 @@ namespace BGEditor
             float seekTime = ret == 1 ? 0 : audioManager.gameBGM.GetPlaybackTime() / 1000f;
             var param = new InGameParams
             {
-                mods = modManager.Flag,
-                seekPosition = seekTime
+                mods = ModFlag.None,
+                seekPosition = seekTime,
+                saveRecord = false,
+                saveReplay = false,
             };
-            SceneLoader.LoadScene("InGame", () => chartListManager.LoadChart(true), pushStack: true, parameters: param);
+            SceneLoader.LoadScene("InGame", () => chartListManager.LoadChart(true, ModFlag.None), pushStack: true, parameters: param);
         }
 
         public async void Exit()

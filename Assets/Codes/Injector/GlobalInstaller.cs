@@ -84,9 +84,6 @@ public class GlobalInstaller : MonoInstaller
         // Chart List Manager
         Container.Bind<IChartListManager>().To<ChartListManager>().AsSingle().NonLazy();
 
-        // Mod Manager
-        Container.Bind<IModManager>().To<ModManager>().AsSingle().NonLazy();
-
         // Resource Loader
         Container.Bind<IResourceLoader>().To<ResourceLoader>().AsSingle().NonLazy();
 
@@ -182,6 +179,8 @@ public class GlobalInstaller : MonoInstaller
             KVar.C("cl_language", "-1", KVarFlags.Archive),
 
             KVar.C("cl_currentdemo", "", KVarFlags.StringOnly, "Current demo file"),
+
+            KVar.C("cl_modflag", "0", KVarFlags.StringOnly, "A binary string storing ModFlag. At most 64 bits."),
         };
 
         foreach (var info in varInfos)

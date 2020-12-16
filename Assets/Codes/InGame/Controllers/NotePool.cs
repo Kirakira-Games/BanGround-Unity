@@ -5,6 +5,7 @@ using UnityEngine.Rendering;
 using Object = UnityEngine.Object;
 using System.Collections;
 using Zenject;
+using BanGround.Game.Mods;
 
 class NoteEvent : IComparable<NoteEvent>
 {

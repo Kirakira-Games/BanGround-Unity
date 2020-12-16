@@ -5,6 +5,7 @@ using AudioProvider;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
+using BanGround.Game.Mods;
 
 public class SettingAndMod : MonoBehaviour
 {
@@ -14,8 +15,8 @@ public class SettingAndMod : MonoBehaviour
     private IAudioManager audioManager;
     [Inject]
     private IKVSystem kvSystem;
-    [Inject]
-    private IModManager modManager;
+    [Inject(Id = "cl_modflag")]
+    private KVar cl_modflag;
 
     private Button setting_Open_Btn;
     private Button setting_Close_Btn;
@@ -298,12 +299,13 @@ public class SettingAndMod : MonoBehaviour
     }
     void GetModStatus()
     {
-        auto_Tog.isOn = modManager.isAutoplay;
+        var flag = ModFlagUtil.From(cl_modflag);
+        auto_Tog.isOn = flag.HasFlag(ModFlag.AutoPlay);
 
-        speedDown_Tog.SetStep(modManager.attachedMods);
-        speedUp_Tog.SetStep(modManager.attachedMods);
-        suddenDeath_Tog.isOn = modManager.attachedMods.Contains(SuddenDeathMod.Instance);
-        perfect_Tog.isOn = modManager.attachedMods.Contains(PerfectMod.Instance);
+        speedDown_Tog.SetStep(flag);
+        speedUp_Tog.SetStep(flag);
+        suddenDeath_Tog.isOn = flag.HasFlag(ModFlag.SuddenDeath);
+        perfect_Tog.isOn = flag.HasFlag(ModFlag.Perfect);
     }
 
     public void OnLanuageChanged(int value)
@@ -366,15 +368,20 @@ public class SettingAndMod : MonoBehaviour
             cl_notestyle.Set((int)noteToggles.GetStyle());
             cl_sestyle.Set((int)seSelector.GetSE());
 
-            modManager.RemoveAllMods();
-            modManager.AddMod(speedUp_Tog.GetStep());
-            modManager.AddMod(speedDown_Tog.GetStep());
+            ModFlag flag = ModFlag.None;
+            flag |= speedUp_Tog.GetStep();
+            flag |= speedDown_Tog.GetStep();
 
-            if (suddenDeath_Tog.isOn) modManager.AddMod(SuddenDeathMod.Instance);
+            if (suddenDeath_Tog.isOn)
+                flag |= ModFlag.SuddenDeath;
 
-            if (perfect_Tog.isOn) modManager.AddMod(PerfectMod.Instance);
+            if (perfect_Tog.isOn)
+                flag |= ModFlag.Perfect;
 
-            if (auto_Tog.isOn) modManager.AddMod(AutoPlayMod.Instance);
+            if (auto_Tog.isOn)
+                flag |= ModFlag.AutoPlay;
+
+            cl_modflag.SetMod(flag);
         }
         catch (System.Exception e)
         {

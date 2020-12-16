@@ -14,12 +14,7 @@ public class MappingInstaller : MonoInstaller
 
     public override void InstallBindings()
     {
-        MappingParams parameters = SceneLoader.Parameters;
-        if (parameters == null)
-        {
-            Debug.LogWarning("Missing MappingParams. Falling back to default params.");
-            parameters = new MappingParams();
-        }
+        var parameters = SceneLoader.GetParamsOrDefault<MappingParams>();
 
         Container.Bind<IChartCore>().FromInstance(chartCore);
         Container.Bind<IEditNoteController>().FromInstance(editNoteController);

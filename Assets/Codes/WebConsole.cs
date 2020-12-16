@@ -51,7 +51,7 @@ public class WebConsole : MonoBehaviour
             {
                 if (SceneManager.GetActiveScene().name == "Select")
                 {
-                    SceneManager.LoadScene("Select");
+                    SceneLoader.LoadScene("Select");
                 }
             }
         };

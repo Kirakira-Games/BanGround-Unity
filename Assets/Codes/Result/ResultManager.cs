@@ -13,6 +13,8 @@ using BanGround.Database.Models;
 using UnityEngine.Rendering;
 using BanGround.Database;
 using Newtonsoft.Json;
+using BanGround.Scene.Params;
+using BanGround.Game.Mods;
 
 public class ResultManager : MonoBehaviour
 {
@@ -20,8 +22,6 @@ public class ResultManager : MonoBehaviour
     private IAudioManager audioManager;
     [Inject]
     private IDataLoader dataLoader;
-    [Inject]
-    private IModManager modManager;
     [Inject]
     private IChartListManager chartListManager;
     [Inject]
@@ -75,8 +75,11 @@ public class ResultManager : MonoBehaviour
     private FixBackground background;
     private ISoundTrack bgmST;
 
+    private ResultParams parameters;
+
     async void Start()
     {
+        parameters = SceneLoader.GetParamsOrDefault<ResultParams>();
         cheader = chartListManager.current.header;
         mheader = dataLoader.GetMusicHeader(cheader.mid);
 
@@ -233,7 +236,7 @@ public class ResultManager : MonoBehaviour
             //StartCoroutine("DelayLoadScene","InGame" ); 
             StartCoroutine(BgmFadeOut());
             RemoveListener();
-            SceneLoader.LoadScene("InGame", pushStack: false);
+            SceneLoader.LoadScene("InGame", pushStack: false); // TODO: Add params
         });
 
         button_replay.onClick.AddListener(() =>
@@ -241,7 +244,7 @@ public class ResultManager : MonoBehaviour
             cl_currentdemo.Set("replay/" + ComboManager.recoder.demoName);
             StartCoroutine(BgmFadeOut());
             RemoveListener();
-            SceneLoader.LoadScene("InGame", pushStack: false);
+            SceneLoader.LoadScene("InGame", pushStack: false); // TODO: Add params
         });
     }
 
@@ -326,13 +329,13 @@ public class ResultManager : MonoBehaviour
         level_Text.text = Enum.GetName(typeof(Difficulty), chartListManager.current.difficulty).ToUpper() + " " +
             cheader.difficultyLevel[(int)chartListManager.current.difficulty];
         songName_Text.text = mheader.title;
-        acc_Text.text = modManager.isAutoplay ? "AUTOPLAY" : string.Format("{0:P2}", playResult.Acc);
+        acc_Text.text = parameters.mods.HasFlag(ModFlag.AutoPlay) ? "AUTOPLAY" : string.Format("{0:P2}", playResult.Acc);
         difficultCard.sprite = Resources.Load<Sprite>("UI/DifficultyCards/" + Enum.GetName(typeof(Difficulty), chartListManager.current.difficulty));
     }
 
     private void ReadScores()
     {
-        playResult.Score = (int)Math.Round((double)ComboManager.score / ComboManager.maxScore * ComboManager.MAX_DISPLAY_SCORE * modManager.ScoreMultiplier);
+        playResult.Score = (int)Math.Round((double)ComboManager.score / ComboManager.maxScore * ComboManager.MAX_DISPLAY_SCORE * parameters.scoreMultiplier);
         playResult.Acc = ResultsGetter.GetAcc();
         playResult.ChartId = cheader.sid;
         playResult.MusicId = cheader.mid;
@@ -341,7 +344,7 @@ public class ResultManager : MonoBehaviour
         playResult.Combo = ResultsGetter.GetCombo();
         playResult.Judge = ResultsGetter.GetJudgeCount();
         playResult.ChartHash = JsonConvert.SerializeObject(chartListManager.ComputeCurrentChartHash());
-        playResult.Mods = modManager.Flag;
+        playResult.Mods = (ulong)parameters.mods;
 
         if (g_demoRecord)
         {
@@ -351,7 +354,7 @@ public class ResultManager : MonoBehaviour
         var oldBest = db.GetBestRank(cheader.sid, chartListManager.current.difficulty);
         lastScore = oldBest?.Score ?? 0;
 
-        if (!modManager.isAutoplay && cl_currentdemo == "")
+        if (parameters.saveRecord)
         {
             db.SaveRankItem(playResult);
             print("Record saved");
