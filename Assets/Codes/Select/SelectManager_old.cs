@@ -30,6 +30,8 @@ public class SelectManager_old : MonoBehaviour
     [Inject]
     private IChartListManager chartListManager;
     [Inject]
+    private IChartLoader chartLoader;
+    [Inject]
     private IFileSystem fs;
     [Inject(Id = "cl_cursorter")]
     private KVar cl_cursorter;
@@ -139,9 +141,15 @@ public class SelectManager_old : MonoBehaviour
         PlayVoicesAtSceneOut();
 
         var modflag = ModFlagUtil.From(cl_modflag);
-        SceneLoader.LoadScene("InGame", () => chartListManager.LoadChart(true, modflag), true,
+        SceneLoader.LoadScene("InGame", () => chartLoader.LoadChart(
+            chartListManager.current.header.sid,
+            chartListManager.current.difficulty,
+            true), true,
             parameters: new InGameParams
             {
+                sid = chartListManager.current.header.sid,
+                difficulty = chartListManager.current.difficulty,
+                isOffsetGuide = false,
                 mods = modflag,
                 saveRecord = true,
                 saveReplay = g_saveReplay,
@@ -364,10 +372,15 @@ public class SelectManager_old : MonoBehaviour
     #region ChartEditor
     public void OpenMappingScene()
     {
-        SceneLoader.LoadScene("Mapping", () => chartListManager.LoadChart(false), true, new MappingParams
-        {
-            editor = new EditorInfo()
-        });
+        int sid = chartListManager.current.header.sid;
+        var difficulty = chartListManager.current.difficulty;
+        SceneLoader.LoadScene("Mapping", () => chartLoader.LoadChart(sid, difficulty, false), true,
+            new MappingParams
+            {
+                sid = sid,
+                difficulty = difficulty,
+                editor = new EditorInfo()
+            });
     }
 
     public async void ExportKiraPack()

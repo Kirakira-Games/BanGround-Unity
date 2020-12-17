@@ -16,7 +16,7 @@ namespace BGEditor
         [Inject]
         private IDataLoader dataLoader;
         [Inject]
-        private IChartListManager chartListManager;
+        private IChartLoader chartLoader;
         [Inject]
         private IAudioProgressController Progress;
         [Inject]
@@ -46,7 +46,7 @@ namespace BGEditor
             if (gameObject.activeSelf)
                 return;
 
-            cHeader = chartListManager.current.header;
+            cHeader = chartLoader.header;
             mHeader = dataLoader.GetMusicHeader(cHeader.mid);
             // just fill in
             float duration = Progress.audioLength / 1000f;
@@ -74,8 +74,8 @@ namespace BGEditor
             MusicPreview[1].SetValue(mHeader.preview[1]);
 
             Designer.text = cHeader.authorNick;
-            Difficulty.SetValue(cHeader.difficultyLevel[(int)chartListManager.current.difficulty]);
-            DifficultyText.text = Enum.GetName(typeof(Difficulty), chartListManager.current.difficulty);
+            Difficulty.SetValue(chartLoader.chart.level);
+            DifficultyText.text = chartLoader.chart.difficulty.ToString();
             Tags.text = string.Join(",", cHeader.tag);
 
             ChartPreview[0].MaxVal = duration;
@@ -105,7 +105,7 @@ namespace BGEditor
             };
 
             cHeader.authorNick = Designer.text;
-            cHeader.difficultyLevel[(int)chartListManager.current.difficulty] = Difficulty.value;
+            cHeader.difficultyLevel[(int)chartLoader.chart.difficulty] = Difficulty.value;
             Core.chart.level = Difficulty.value;
             cHeader.tag = (from tag in Tags.text.Split(',')
                            where tag.Trim().Length > 0

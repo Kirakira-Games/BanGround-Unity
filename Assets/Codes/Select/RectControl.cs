@@ -240,7 +240,7 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         var header = chartListManager.current.header;
         Difficulty difficulty = chartListManager.current.difficulty;
-        if (header.sid == chartListManager.offsetAdjustSid)
+        if (header.sid == OffsetGuide.OFFSET_GUIDE_SID)
         {
             int index = UnityEngine.Random.Range(0, delFailMsg.Length);
             messageBannerController.ShowMsg(LogLevel.INFO, delFailMsg[index]);

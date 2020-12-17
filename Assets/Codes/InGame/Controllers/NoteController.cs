@@ -20,7 +20,7 @@ public class NoteController : MonoBehaviour, INoteController
     [Inject]
     private IDataLoader dataLoader;
     [Inject]
-    private IChartListManager chartListManager;
+    private IChartLoader chartLoader;
     [Inject]
     private IModManager modManager;
     [Inject]
@@ -417,7 +417,7 @@ public class NoteController : MonoBehaviour, INoteController
         noteQueue = new JudgeQueue();
 
         // Load chart
-        chart = chartListManager.gameChart;
+        chart = chartLoader.gameChart;
         NotePool.Instance.Init(modManager, notes);
         noteHead = 0;
 
@@ -446,7 +446,7 @@ public class NoteController : MonoBehaviour, INoteController
        
 
         // Game BGM
-        _ = audioManager.StreamGameBGMTrack(fs.GetFile(dataLoader.GetMusicPath(chartListManager.current.header.mid)).ReadToEnd())
+        _ = audioManager.StreamGameBGMTrack(fs.GetFile(dataLoader.GetMusicPath(chartLoader.header.mid)).ReadToEnd())
             .ContinueWith((bgm) => {
                 modManager.AttachedMods.ForEach(mod => (mod as AudioMod)?.ApplyMod(bgm));
                 audioTimelineSync.AudioSeekPos = parameters.seekPosition;
@@ -456,7 +456,7 @@ public class NoteController : MonoBehaviour, INoteController
 
         // Background
         var background = GameObject.Find("InGameBackground").GetComponent<InGameBackground>();
-        var (bg, bgtype) = dataLoader.GetBackgroundPath(chartListManager.current.header.sid, false);
+        var (bg, bgtype) = dataLoader.GetBackgroundPath(parameters.sid, false);
         if (bgtype == 1)
         {
             var videoPath = fs.GetFile(bg).Extract();
@@ -476,7 +476,7 @@ public class NoteController : MonoBehaviour, INoteController
         laneEffects.Init(chart.groups[0]);
         */
         // Check if adjusting offset
-        if (chartListManager.offsetAdjustMode)
+        if (parameters.isOffsetGuide)
         {
             GameObject.Find("infoCanvas").GetComponent<Canvas>().enabled = false;
         }
@@ -485,7 +485,7 @@ public class NoteController : MonoBehaviour, INoteController
             GameObject.Find("settingsCanvas").GetComponent<Canvas>().enabled = false;
         }
 
-        chartScript.Init(chartListManager.current.header.sid, chartListManager.current.difficulty);
+        chartScript.Init(chartLoader.header.sid, chartLoader.chart.difficulty);
 
         //Set Play Mod Event
         //audioManager.restart = false;
@@ -585,7 +585,7 @@ public class NoteController : MonoBehaviour, INoteController
             chartScript.OnUpdate(audioTime);
 
             if (chartScript.HasOnBeat)
-                chartScript.OnBeat(chartListManager.chart.TimeToBeat(audioTimef));
+                chartScript.OnBeat(chartLoader.chart.TimeToBeat(audioTimef));
         }
     }
 

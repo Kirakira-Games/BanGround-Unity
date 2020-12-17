@@ -16,7 +16,8 @@ namespace BanGround.Game.Mods
         Double = 1ul << 2,
         NightCore = 1ul << 3,
         Half = 1ul << 4,
-        DayCore = 1ul << 5
+        DayCore = 1ul << 5,
+        Mirror = 1ul << 6
     }
 
     public static class ModFlagUtil
@@ -49,6 +50,8 @@ namespace BanGround.Game.Mods
                 ret.Add(new HalfMod());
             if (flag.HasFlag(ModFlag.DayCore))
                 ret.Add(new DayCoreMod());
+            if (flag.HasFlag(ModFlag.Mirror))
+                ret.Add(new MirrorMod());
             return ret;
         }
     }

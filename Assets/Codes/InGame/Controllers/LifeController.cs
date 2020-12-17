@@ -7,8 +7,6 @@ using Zenject;
 public class LifeController : MonoBehaviour
 {
     [Inject]
-    private IChartListManager chartListManager;
-    [Inject]
     private IGameStateMachine SM;
 
     public static LifeController instance;
@@ -44,7 +42,6 @@ public class LifeController : MonoBehaviour
     public Gradient colors;
 
     private Image fill;
-    private int level;
     private Slider lifeSlider;
     private Text lifeTxt;
 
@@ -57,15 +54,14 @@ public class LifeController : MonoBehaviour
         lifeTxt = GetComponentInChildren<Text>();
         fill = GameObject.Find("LifeFill").GetComponent<Image>();
         UpdateDisplay();
-        level = chartListManager.current.header.difficultyLevel[(int)chartListManager.current.difficulty];
         StartCoroutine(LifeRecorder());
     }
 
     public void CaculateLife(JudgeResult result, GameNoteType type)
     {
-        if (type==GameNoteType.SlideTick)
+        if (type == GameNoteType.SlideTick && result == JudgeResult.Miss)
         {
-            if (result == JudgeResult.Miss) lifePoint -= 5;
+            lifePoint -= 5;
         }
         else
         {
@@ -87,8 +83,7 @@ public class LifeController : MonoBehaviour
                     break;
             }
         }
-        if (lifePoint < 0) lifePoint = 0;
-        if (lifePoint > 100) lifePoint = 100;
+        lifePoint = Mathf.Clamp(lifePoint, 0, 100);
         UpdateDisplay();
     }
 

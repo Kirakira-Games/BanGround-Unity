@@ -6,10 +6,13 @@ using Zenject;
 
 public class OffsetGuide : MonoBehaviour
 {
+    public const int OFFSET_GUIDE_SID = 99901;
+    public const Difficulty OFFSET_GUIDE_DIFF = Difficulty.Easy;
+
     [Inject]
     private IKVSystem kvSystem;
     [Inject]
-    private IChartListManager chartListManager;
+    private IChartLoader chartLoader;
 
     void Start()
     {
@@ -18,23 +21,17 @@ public class OffsetGuide : MonoBehaviour
 
     void StartOffsetGuide()
     {
-        chartListManager.ForceOffsetChart();
-
         SettingAndMod.instance.SetLiveSetting();
         kvSystem.SaveConfig();
-        SceneLoader.LoadScene("InGame", async () =>
-        {
-            if (!await chartListManager.LoadChart(true, ModFlag.None))
+        SceneLoader.LoadScene("InGame", () => chartLoader.LoadChart(OFFSET_GUIDE_SID, OFFSET_GUIDE_DIFF, true),
+            true, parameters: new InGameParams
             {
-                chartListManager.ClearForcedChart();
-                return false;
-            }
-            return true;
-        }, true, parameters: new InGameParams
-        {
-            mods = ModFlag.None,
-            saveRecord = false,
-            saveReplay = false,
-        });
+                sid = OFFSET_GUIDE_SID,
+                difficulty = OFFSET_GUIDE_DIFF,
+                mods = ModFlag.None,
+                isOffsetGuide = true,
+                saveRecord = false,
+                saveReplay = false,
+            });
     }
 }

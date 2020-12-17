@@ -12,14 +12,14 @@ namespace BGEditor
         [Inject]
         private IDataLoader dataLoader;
         [Inject]
-        private IChartListManager chartListManager;
-        [Inject]
         private IFileSystem fs;
+        [Inject]
+        private IChartLoader chartLoader;
 
         private void Start()
         {
             var image = GetComponent<Image>();
-            var (path, _) = dataLoader.GetBackgroundPath(chartListManager.current.header.sid);
+            var (path, _) = dataLoader.GetBackgroundPath(chartLoader.header.sid);
             if (string.IsNullOrEmpty(path))
                 return;
             var tex = fs.GetFile(path)?.ReadAsTexture();

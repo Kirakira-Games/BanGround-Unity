@@ -47,7 +47,8 @@ public class SceneLoader : MonoBehaviour
 
     private static readonly LinkedList<SceneState> sceneStack = new LinkedList<SceneState>();
     private static Func<UniTask<bool>> TaskVoid;
-    public static SceneState CurrentScene => sceneStack.Last.Value;
+    private static SceneState loadingScene = null;
+    public static SceneState CurrentScene => loadingScene ?? sceneStack.Last.Value;
     public static dynamic Parameters => CurrentScene.parameters;
     public static T GetParamsOrDefault<T>() where T: new()
     {
@@ -71,11 +72,11 @@ public class SceneLoader : MonoBehaviour
         {
             if (scene.name == "Loader" || scene.name == CurrentScene.name)
                 return;
-            PushScene(scene.name, null);
+            PushScene(new SceneState(scene.name, null));
         };
         
         // Initialize first scene
-        PushScene(SceneManager.GetActiveScene().name, null);
+        PushScene(new SceneState(SceneManager.GetActiveScene().name, null));
     }
 
     void Start()
@@ -112,10 +113,9 @@ public class SceneLoader : MonoBehaviour
         return true;
     }
 
-    private static void PushScene(string name, dynamic paramters)
+    private static void PushScene(SceneState state)
     {
-        var state = new SceneState(name, paramters);
-        Debug.Log($"Push scene: {state.name}\nParameters: {JsonConvert.SerializeObject(paramters)}");
+        Debug.Log($"Push scene: {state.name}\nParameters: {JsonConvert.SerializeObject(state.parameters)}");
         sceneStack.AddLast(state);
         if (sceneStack.Count > 10)
         {
@@ -134,14 +134,16 @@ public class SceneLoader : MonoBehaviour
     {
         if (!LoadSceneHelper(nextSceneName, task))
             return;
-        
+
+        loadingScene = new SceneState(nextSceneName, parameters);
         onTaskFinish.AddListener(success =>
         {
             if (!success)
                 return;
             if (!pushStack)
                 PopScene();
-            PushScene(nextSceneName, parameters);
+            PushScene(loadingScene);
+            loadingScene = null;
         });
     }
 
@@ -150,7 +152,7 @@ public class SceneLoader : MonoBehaviour
         if (!pushStack)
             PopScene();
 
-        PushScene(nextSceneName, parameters);
+        PushScene(new SceneState(nextSceneName, parameters));
         
         return SceneManager.LoadSceneAsync(nextSceneName);
     }
@@ -216,7 +218,7 @@ public class SceneLoader : MonoBehaviour
 
     private async void CountDown(float seconds)
     {
-        var currentScene = CurrentScene;
+        var currentScene = sceneStack.Last.Value;
         try
         {
             if (TaskVoid != null)

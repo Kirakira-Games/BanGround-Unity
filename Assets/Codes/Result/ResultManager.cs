@@ -23,7 +23,7 @@ public class ResultManager : MonoBehaviour
     [Inject]
     private IDataLoader dataLoader;
     [Inject]
-    private IChartListManager chartListManager;
+    private IChartLoader chartLoader;
     [Inject]
     private IResourceLoader resourceLoader;
     [Inject]
@@ -76,7 +76,7 @@ public class ResultManager : MonoBehaviour
     async void Start()
     {
         parameters = SceneLoader.GetParamsOrDefault<ResultParams>();
-        cheader = chartListManager.current.header;
+        cheader = chartLoader.header;
         mheader = dataLoader.GetMusicHeader(cheader.mid);
 
         SetBtnObject();
@@ -116,7 +116,7 @@ public class ResultManager : MonoBehaviour
     private void ShowBackground()
     {
         background = GameObject.Find("Background").GetComponent<FixBackground>();
-        string path = dataLoader.GetBackgroundPath(chartListManager.current.header.sid).Item1;
+        string path = dataLoader.GetBackgroundPath(parameters.sid).Item1;
         background.UpdateBackground(path);
     }
 
@@ -330,11 +330,11 @@ public class ResultManager : MonoBehaviour
 
     private void ShowSongInfo()
     {
-        level_Text.text = Enum.GetName(typeof(Difficulty), chartListManager.current.difficulty).ToUpper() + " " +
-            cheader.difficultyLevel[(int)chartListManager.current.difficulty];
+        level_Text.text = Enum.GetName(typeof(Difficulty), parameters.difficulty).ToUpper() + " " +
+            cheader.difficultyLevel[(int)parameters.difficulty];
         songName_Text.text = mheader.title;
         acc_Text.text = parameters.mods.HasFlag(ModFlag.AutoPlay) ? "AUTOPLAY" : string.Format("{0:P2}", playResult.Acc);
-        difficultCard.sprite = Resources.Load<Sprite>("UI/DifficultyCards/" + Enum.GetName(typeof(Difficulty), chartListManager.current.difficulty));
+        difficultCard.sprite = Resources.Load<Sprite>("UI/DifficultyCards/" + parameters.difficulty.ToString());
     }
 
     private void ReadScores()
@@ -343,11 +343,11 @@ public class ResultManager : MonoBehaviour
         playResult.Acc = ResultsGetter.GetAcc();
         playResult.ChartId = cheader.sid;
         playResult.MusicId = cheader.mid;
-        playResult.Difficulty = chartListManager.current.difficulty;
+        playResult.Difficulty = parameters.difficulty;
         playResult.CreatedAt = DateTime.Now;
         playResult.Combo = ResultsGetter.GetCombo();
         playResult.Judge = ResultsGetter.GetJudgeCount();
-        playResult.ChartHash = JsonConvert.SerializeObject(chartListManager.ComputeCurrentChartHash());
+        playResult.ChartHash = JsonConvert.SerializeObject(chartLoader.GetChartHash(cheader.mid, cheader.sid, parameters.difficulty));
         playResult.Mods = (ulong)parameters.mods;
 
         if (parameters.saveReplay)
@@ -355,7 +355,7 @@ public class ResultManager : MonoBehaviour
             playResult.ReplayFile = "replay/" + ComboManager.recoder.demoName;
         }
 
-        var oldBest = db.GetBestRank(cheader.sid, chartListManager.current.difficulty);
+        var oldBest = db.GetBestRank(cheader.sid, parameters.difficulty);
         lastScore = oldBest?.Score ?? 0;
 
         if (!parameters.mods.HasFlag(ModFlag.AutoPlay) && parameters.saveRecord)

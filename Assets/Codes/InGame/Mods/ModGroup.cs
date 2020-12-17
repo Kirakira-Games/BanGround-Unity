@@ -17,24 +17,17 @@ namespace BanGround.Game.Mods
         public virtual void ApplyMod(ISoundTrack soundTrack) { }
     }
 
+    public abstract class ChartMod : ModBase { }
+    public class MirrorMod : ChartMod { }
+
     public abstract class PlayMod : ModBase { }
-    public class AutoPlayMod : PlayMod
-    {
-        public static AutoPlayMod Instance = new AutoPlayMod();
-    }
-    public class SuddenDeathMod : PlayMod
-    {
-        public static SuddenDeathMod Instance = new SuddenDeathMod();
-    }
-    public class PerfectMod : PlayMod
-    {
-        public static PerfectMod Instance = new PerfectMod();
-    }
+    public class AutoPlayMod : PlayMod { }
+    public class SuddenDeathMod : PlayMod { }
+    public class PerfectMod : PlayMod { }
+
 
     public class DoubleMod : AudioMod
     {
-        public static DoubleMod Instanse = new DoubleMod();
-
         public override Type[] IncompatibleMods => new Type[] { typeof(HalfMod) };
 
         public override float SpeedCompensation => 1.5f;
@@ -48,8 +41,6 @@ namespace BanGround.Game.Mods
 
     public class NightCoreMod : AudioMod
     {
-        public static NightCoreMod Instanse = new NightCoreMod();
-
         public override Type[] IncompatibleMods => new Type[] { typeof(HalfMod), typeof(DoubleMod), typeof(DayCoreMod) };
         public override float SpeedCompensation => 1.5f;
         public override float ScoreMultiplier => 1.1f;
@@ -62,8 +53,6 @@ namespace BanGround.Game.Mods
 
     public class HalfMod : AudioMod
     {
-        public static HalfMod Instanse = new HalfMod();
-
         public override Type[] IncompatibleMods => new Type[] { typeof(DoubleMod) };
 
         public override float SpeedCompensation => 0.75f;
@@ -77,7 +66,6 @@ namespace BanGround.Game.Mods
 
     public class DayCoreMod : AudioMod
     {
-        public static DayCoreMod Instanse = new DayCoreMod();
         public override Type[] IncompatibleMods => new Type[] { typeof(DoubleMod), typeof(HalfMod), typeof(NightCoreMod) };
 
         public override float SpeedCompensation => 0.75f;
