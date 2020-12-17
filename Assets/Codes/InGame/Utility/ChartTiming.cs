@@ -25,14 +25,16 @@ public class ChartTiming
     private delegate void Lerp(NoteAnim S, NoteAnim T, NoteAnim i);
     public const float Z_MAX = 1.2f;
 
+    public readonly bool isMirror;
+
     public static float BeatToFloat(int[] beat)
     {
         return beat[0] + (float)beat[1] / beat[2];
     }
 
-    public ChartTiming(List<ValuePoint> bpms, int offset, int noteScreenTime, KVar r_mirror)
+    public ChartTiming(List<ValuePoint> bpms, int offset, int noteScreenTime, bool isMirror)
     {
-        this.r_mirror = r_mirror;
+        this.isMirror = isMirror;
 
         totTime = noteScreenTime / 1000f;
         this.bpms = bpms;
@@ -212,8 +214,6 @@ public class ChartTiming
         }
     }
 
-    KVar r_mirror;
-
     public void AddAnimation(V2.Note data)
     {
         Debug.Assert(data.beat != null);
@@ -268,7 +268,7 @@ public class ChartTiming
         data.anims = GenerateAnimation(tmpList, data);
 
         // Check mirror
-        if (r_mirror)
+        if (isMirror)
         {
             if (data.lane != -1)
                 data.lane = NoteUtility.LANE_COUNT - 1 - data.lane;

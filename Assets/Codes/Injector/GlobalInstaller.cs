@@ -65,10 +65,10 @@ public class GlobalInstaller : MonoInstaller
         RegisterKonCommands();
 
         // Chart version
-        Container.Bind<IChartVersion>().To<ChartVersion>().AsSingle().OnInstantiated((contxet, obj) =>
-        {
-            if (obj is ValidationMarker) return;
-        }).NonLazy();
+        Container.Bind<IChartVersion>().To<ChartVersion>().AsSingle().NonLazy();
+
+        // Chart Loader
+        Container.Bind<IChartLoader>().To<ChartLoader>().AsSingle().NonLazy();
 
         // Audio Manager
         Container.Bind<IAudioProvider>().FromFactory<AudioProviderFactory>().AsSingle().NonLazy();

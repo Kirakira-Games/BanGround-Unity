@@ -213,7 +213,7 @@ public class TouchManager : MonoBehaviour
     public static TouchManager instance;
 
     [Inject]
-    private IChartListManager chartListManager;
+    private IChartLoader chartLoader;
     [Inject]
     private IAudioTimelineSync audioTimelineSync;
     [Inject]
@@ -229,6 +229,7 @@ public class TouchManager : MonoBehaviour
     private Dictionary<(KirakiraTracer, int), JudgeResult> traceCache;
     private HashSet<KirakiraTouch> exchanged;
     private DemoRecorder recorder = null;
+    private InGameParams parameters;
 
     public static int EvalResult(JudgeResult result)
     {
@@ -325,12 +326,12 @@ public class TouchManager : MonoBehaviour
         KirakiraTouch.dpi = GetDPI();
         KirakiraTouch.flickDistPixels = Mathf.Min(Screen.height / 20, NoteUtility.FLICK_JUDGE_DIST / 2.54f * KirakiraTouch.dpi);
 
-        var parameters = SceneLoader.GetParamsOrDefault<InGameParams>();
+        parameters = SceneLoader.GetParamsOrDefault<InGameParams>();
         if (parameters.saveRecord)
         {
             recorder = new DemoRecorder(
-                chartListManager.current.header.sid,
-                chartListManager.current.difficulty,
+                parameters.sid,
+                parameters.difficulty,
                 SceneLoader.GetParamsOrDefault<InGameParams>().mods);
         }
     }
@@ -379,7 +380,7 @@ public class TouchManager : MonoBehaviour
         {
             var file = fs.GetOrNewFile($"{DataLoader.ReplayDir}/{recorder.demoName}");
 
-            recorder.Save(file, chartListManager.ComputeCurrentChartHash());
+            recorder.Save(file, chartLoader.GetChartHash(chartLoader.header.mid, parameters.sid, parameters.difficulty));
 
             ComboManager.recoder = recorder;
         }

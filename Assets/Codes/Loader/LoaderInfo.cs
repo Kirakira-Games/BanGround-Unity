@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using System.Linq;
 using Zenject;
 using BanGround;
+using BanGround.Scene.Params;
 
 #pragma warning disable 0649
 public class LoaderInfo : MonoBehaviour
@@ -14,12 +15,13 @@ public class LoaderInfo : MonoBehaviour
     [Inject]
     private IDataLoader dataLoader;
     [Inject]
-    private IChartListManager chartListManager;
+    private IChartLoader chartLoader;
     [Inject]
     private IFileSystem fs;
 
     private mHeader musicHeader;
     private cHeader chartHeader;
+    private InGameParams parameters;
 
     [SerializeField] private Image songImg;
     [SerializeField] private Text songName;
@@ -40,20 +42,22 @@ public class LoaderInfo : MonoBehaviour
 
     private void GetInfo()
     {
-        chartHeader = chartListManager.current.header;
-        musicHeader = dataLoader.GetMusicHeader(chartListManager.current.header.mid);
+        parameters = SceneLoader.GetParamsOrDefault<InGameParams>();
+        chartHeader = dataLoader.GetChartHeader(parameters.sid);
+        chartHeader.LoadDifficultyLevels(dataLoader);
+        musicHeader = dataLoader.GetMusicHeader(chartHeader.mid);
     }
 
     private void AppendChartInfo(bool success)
     {
         if (!success) return;
-        songBPM.text = GetBPM() + " NOTE " + chartListManager.gameChart.numNotes;
+        songBPM.text = GetBPM() + " NOTE " + chartLoader.gameChart.numNotes;
     }
 
     private void ShowInfo()
     {
         // Song img
-        var path = dataLoader.GetBackgroundPath(chartListManager.current.header.sid).Item1;
+        var path = dataLoader.GetBackgroundPath(chartHeader.sid).Item1;
         if (path != null && fs.FileExists(path))
         {
             var tex = fs.GetFile(path).ReadAsTexture();
@@ -67,7 +71,7 @@ public class LoaderInfo : MonoBehaviour
         songBPM.text = "Loading...";
         
         // Difficulty and charter
-        Difficulty difficulty = (Difficulty)chartListManager.current.difficulty;
+        Difficulty difficulty = parameters.difficulty;
         int level = chartHeader.difficultyLevel[(int)difficulty];
         songLevelAndCharter.text = string.Format(LevelAndCharterFormat, difficulty.ToString().ToUpper(), level, chartHeader.authorNick);
         
@@ -77,8 +81,8 @@ public class LoaderInfo : MonoBehaviour
 
     private string GetBPM()
     {
-        var min = chartListManager.gameChart.bpm.Min(o => o.value);
-        var max = chartListManager.gameChart.bpm.Max(o => o.value);
+        var min = chartLoader.gameChart.bpm.Min(o => o.value);
+        var max = chartLoader.gameChart.bpm.Max(o => o.value);
         return min == max ? $"BPM {min}" : $"BPM {min}-{max}";
     }
 }

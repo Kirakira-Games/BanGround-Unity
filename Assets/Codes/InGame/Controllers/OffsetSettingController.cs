@@ -6,8 +6,6 @@ using Zenject;
 public class OffsetSettingController : MonoBehaviour
 {
     [Inject]
-    private IChartListManager chartListManager;
-    [Inject]
     private IUIManager UI;
 
     private Text offsetText;
@@ -66,7 +64,6 @@ public class OffsetSettingController : MonoBehaviour
 
     public void SaveAndExit()
     {
-        chartListManager.ClearForcedChart();
         UI.GameRetire();
     }
 }

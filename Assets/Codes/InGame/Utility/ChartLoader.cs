@@ -6,6 +6,12 @@ using System;
 using System.IO;
 using Newtonsoft.Json;
 using Random = UnityEngine.Random;
+using Cysharp.Threading.Tasks;
+using Zenject;
+using BanGround.Scene.Params;
+using BanGround.Game.Mods;
+using BanGround;
+using System.Security.Cryptography;
 
 class GameNoteComparer : Comparer<GameNoteData>
 {
@@ -15,9 +21,10 @@ class GameNoteComparer : Comparer<GameNoteData>
     }
 }
 
-public static class ChartLoader
+public class ChartLoader : IChartLoader
 {
-    public static int numNotes;
+    #region static
+
     public static string BeatToString(int[] beat)
     {
         return "[" + (beat[1] + beat[2] * beat[0]) + "/" + beat[2] + "]";
@@ -142,7 +149,8 @@ public static class ChartLoader
         }
     }
 
-    internal static List<GameNoteData> LoadTimingGroup(ChartTiming timing, int groupId, V2.TimingGroup group)
+    /// <returns>A list of notes and the number of notes in total.</returns>
+    internal static (List<GameNoteData>, int) LoadTimingGroup(ChartTiming timing, int groupId, V2.TimingGroup group)
     {
         // AnalyzeNotes
         var notes = group.notes;
@@ -154,6 +162,7 @@ public static class ChartLoader
         float prevBeat = -1e9f;
         var tickStackTable = new Dictionary<int, GameNoteData>();
         var ret = new List<GameNoteData>();
+        int numNotes = 0;
         foreach (var note in notes)
         {
             if (prevBeat - note.beatf > NoteUtility.EPS)
@@ -228,14 +237,137 @@ public static class ChartLoader
             }
             Debug.LogError("Some slides do not contain a tail. Ignored.");
         }
-        return ret;
+        return (ret, numNotes);
     }
-    
+
     public static GameTimingGroup ToGameTimingGroup(V2.TimingGroup group)
     {
         return new GameTimingGroup
         {
             points = group.points
         };
+    }
+    #endregion
+
+    [Inject]
+    private IChartVersion chartVersion;
+    [Inject]
+    private IDataLoader dataLoader;
+    [Inject]
+    private IMessageBannerController messageBanner;
+    [Inject]
+    private IFileSystem fs;
+
+    [Inject(Id = "r_notespeed")]
+    private KVar r_notespeed;
+
+    public cHeader header { get; private set; }
+    public V2.Chart chart { get; private set; }
+    public GameChartData gameChart { get; private set; }
+
+    private int numNotes;
+
+    public async UniTask<bool> LoadChart(int sid, Difficulty difficulty, bool convertToGameChart)
+    {
+        header = dataLoader.GetChartHeader(sid);
+        if (header == null)
+        {
+            messageBanner.ShowMsg(LogLevel.ERROR, "Chart does not exist.");
+            return false;
+        }
+
+        header.LoadDifficultyLevels(dataLoader);
+        chart = await chartVersion.Process(header, difficulty);
+        if (chart == null)
+        {
+            messageBanner.ShowMsg(LogLevel.ERROR, "Chart data is corrupted or unsupported.");
+            return false;
+        }
+        try
+        {
+            if (convertToGameChart)
+            {
+                gameChart = LoadChartInternal(
+                    JsonConvert.DeserializeObject<V2.Chart>(
+                    JsonConvert.SerializeObject(chart)
+                ));
+            }
+            return true;
+        }
+        catch (Exception e)
+        {
+            messageBanner.ShowMsg(LogLevel.ERROR, e.Message);
+            Debug.LogError(e.StackTrace);
+            return false;
+        }
+    }
+
+    private GameChartData LoadChartInternal(V2.Chart chart)
+    {
+        // Compute note screen time
+        var mods = SceneLoader.GetParamsOrDefault<InGameParams>().mods;
+        var modManager = new ModManager(r_notespeed, mods);
+
+        // Load chart
+        numNotes = 0;
+        bool isMirror = mods.HasFlag(ModFlag.Mirror);
+        var timing = new ChartTiming(chart.bpm, chart.offset, modManager.NoteScreenTime, isMirror);
+        var gameNotes = new List<GameNoteData>();
+        for (int i = 0; i < chart.groups.Count; i++)
+        {
+            var result = LoadTimingGroup(timing, i, chart.groups[i]);
+            result.Item1.ForEach(note => gameNotes.Add(note));
+            numNotes += result.Item2;
+        }
+
+        // Sort notes by animation order
+        gameNotes.Sort(new GameNoteComparer());
+
+        return new GameChartData
+        {
+            isFuwafuwa = IsChartFuwafuwa(gameNotes),
+            numNotes = numNotes,
+            notes = gameNotes.ToArray(),
+            groups = chart.groups.Select(x => ToGameTimingGroup(x)).ToArray(),
+            bpm = chart.bpm.ToArray()
+        };
+    }
+
+    public Dictionary<string, byte[]> GetChartHash(int mid, int sid, Difficulty difficulty)
+    {
+        var fileList = fs.Find(f =>
+        {
+            if (f.Name.StartsWith(dataLoader.GetChartResource(sid, "")))
+            {
+                var name = f.Name.Replace(dataLoader.GetChartResource(sid, ""), "").ToLower();
+
+                if (name == "cheader.bin")
+                    return false;
+
+                if (name.EndsWith(".bin") && name != $"{difficulty:g}.bin".ToLower())
+                    return false;
+
+                return true;
+            }
+            else if (f.Name.ToLower() == dataLoader.GetMusicPath(mid))
+            {
+                return true;
+            }
+
+            return false;
+        }).ToArray();
+
+        var ret = new Dictionary<string, byte[]>();
+        foreach (var file in fileList)
+        {
+            using (var sha256 = SHA256.Create())
+            {
+                using (var fs = file.Open(FileAccess.Read))
+                {
+                    ret.Add(file.Name, sha256.ComputeHash(fs));
+                }
+            }
+        }
+        return ret;
     }
 }

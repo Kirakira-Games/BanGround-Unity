@@ -30,5 +30,6 @@ public class ModIconDisplay : MonoBehaviour
             icons[5].gameObject.SetActive(true);
         if (flag.HasFlag(ModFlag.DayCore))
             icons[6].gameObject.SetActive(true);
+        // TODO: Add mirror
     }
 }

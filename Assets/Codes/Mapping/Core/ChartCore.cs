@@ -25,7 +25,7 @@ namespace BGEditor
         [Inject]
         private IDataLoader dataLoader;
         [Inject]
-        private IChartListManager chartListManager;
+        private IChartLoader chartLoader;
         [Inject]
         private IEditorInfo editor;
         [Inject]
@@ -64,6 +64,9 @@ namespace BGEditor
         [HideInInspector]
         public V2.TimingGroup group => chart.groups[editor.currentTimingGroup];
 
+        [HideInInspector]
+        public MappingParams parameters;
+
         public UnityEvent onTimingModified { get; } = new UnityEvent();
         public UnityEvent onGridMoved { get; } = new UnityEvent();
         public UnityEvent onGridModifed { get; } = new UnityEvent();
@@ -95,6 +98,9 @@ namespace BGEditor
         {
             chart = new V2.Chart();
             tooltip = EditorToolTip.Create(transform);
+
+            // Get parameters
+            parameters = SceneLoader.GetParamsOrDefault<MappingParams>();
 
             // Init object pool
             pool.Init(SingleNote, FlickNote, SlideNote, GridInfoText);
@@ -313,10 +319,10 @@ namespace BGEditor
 
         public void Save()
         {
-            dataLoader.SaveChart(GetFinalizedChart(), chartListManager.current.header.sid, (Difficulty)chartListManager.current.difficulty);
+            dataLoader.SaveChart(GetFinalizedChart(), chartLoader.header.sid, parameters.difficulty);
 
             if (!string.IsNullOrEmpty(scriptEditor.Code))
-                dataLoader.SaveChartScript(scriptEditor.Code, chartListManager.current.header.sid, (Difficulty)chartListManager.current.difficulty);
+                dataLoader.SaveChartScript(scriptEditor.Code, chartLoader.header.sid, parameters.difficulty);
 
             messageBannerController.ShowMsg(LogLevel.OK, "Chart saved.");
         }
@@ -337,12 +343,17 @@ namespace BGEditor
             float seekTime = ret == 1 ? 0 : audioManager.gameBGM.GetPlaybackTime() / 1000f;
             var param = new InGameParams
             {
+                sid = parameters.sid,
+                difficulty = parameters.difficulty,
                 mods = ModFlag.None,
                 seekPosition = seekTime,
                 saveRecord = false,
                 saveReplay = false,
             };
-            SceneLoader.LoadScene("InGame", () => chartListManager.LoadChart(true, ModFlag.None), pushStack: true, parameters: param);
+            SceneLoader.LoadScene("InGame",
+                () => chartLoader.LoadChart(parameters.sid, parameters.difficulty, true),
+                pushStack: true,
+                parameters: param);
         }
 
         public async void Exit()
@@ -365,7 +376,7 @@ namespace BGEditor
 
         public void LoadChart()
         {
-            V2.Chart raw = chartListManager.chart;
+            V2.Chart raw = chartLoader.chart;
             AssignTimingGroups(raw);
             chart = new V2.Chart
             {
@@ -459,8 +470,8 @@ namespace BGEditor
                 notes.UnselectAll();
             }
 
-            if (fs.FileExists(dataLoader.GetChartScriptPath(chartListManager.current.header.sid, (Difficulty)chartListManager.current.difficulty)))
-                scriptEditor.Code = fs.GetFile(dataLoader.GetChartScriptPath(chartListManager.current.header.sid, (Difficulty)chartListManager.current.difficulty)).ReadAsString();
+            if (fs.FileExists(dataLoader.GetChartScriptPath(parameters.sid, parameters.difficulty)))
+                scriptEditor.Code = fs.GetFile(dataLoader.GetChartScriptPath(parameters.sid, parameters.difficulty)).ReadAsString();
 
             onChartLoaded.Invoke();
             hotkey.onScroll.AddListener((delta) => MoveGrid(delta * 100));

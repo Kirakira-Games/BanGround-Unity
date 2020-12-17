@@ -51,7 +51,7 @@ namespace BGEditor
         [Inject]
         private IChartCore chartCore;
         [Inject]
-        private IChartListManager chartList;
+        private IChartLoader chartLoader;
         [Inject]
         private IFileSystem fs;
         [Inject]
@@ -138,7 +138,7 @@ namespace BGEditor
 
         private void Refresh()
         {
-            chartHeader = chartList.current.header;
+            chartHeader = chartLoader.header;
             musicHeader = dataLoader.GetMusicHeader(chartHeader.mid);
             musicHeader.Sanitize();
             chartHeader.Sanitize(musicHeader);
