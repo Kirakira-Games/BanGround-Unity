@@ -1,19 +1,23 @@
 ﻿using System.Collections.Generic;
+using System.Text;
+using BanGround;
 using Newtonsoft.Json;
 using UnityEngine;
 using Zenject;
 
 public class LocalizedStrings : MonoBehaviour
 {
+    [Inject]
+    IFileSystem fs;
+
     public TextAsset[] languageFiles = new TextAsset[24];
     private Dictionary<string, string> dictionary = null;
-
-    public static LocalizedStrings Instanse = null;
 
     [Inject(Id = "cl_language")]
     KVar cl_language;
 
-    private void Awake()
+    [Inject]
+    public void Inject()
     {
         if(cl_language == -1)
         {
@@ -39,15 +43,17 @@ public class LocalizedStrings : MonoBehaviour
         }
 
         ReloadLanguageFile(cl_language);
-
-        Instanse = this;
-        //DontDestroyOnLoad(Instanse.gameObject);
     }
 
     public string GetLocalizedString(string str)
     {
         if (dictionary.ContainsKey(str))
             return dictionary[str];
+
+        Debug.LogWarning($"Missing localized entry: {str}");
+
+        var file = fs.GetOrNewFile("missing_localized_entrys.csv");
+        file.WriteBytes(Encoding.UTF8.GetBytes(file.ReadAsString() + "\n" + str));
 
         return str;
     }

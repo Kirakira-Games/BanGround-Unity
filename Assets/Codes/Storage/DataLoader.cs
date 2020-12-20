@@ -30,6 +30,8 @@ public class DataLoader : IDataLoader
     public int LastImportedSid { get; set; } = -1;
 
     [Inject]
+    LocalizedStrings localizedStrings;
+    [Inject]
     private IChartVersion chartVersion;
     [Inject]
     private IMessageBannerController messageBannerController;
@@ -720,7 +722,7 @@ public class DataLoader : IDataLoader
                 {
                     cl_lastsid.Set(tmp);
                     LoadSuccess = true;
-                    messageBannerController.ShowMsg(LogLevel.OK, "Loaded kirapack: ".GetLocalized() + file.Name);
+                    messageBannerController.ShowMsg(LogLevel.OK, localizedStrings.GetLocalizedString("Loaded kirapack: ") + file.Name);
                 }
                 //File.Delete(file.FullName);
                 //}

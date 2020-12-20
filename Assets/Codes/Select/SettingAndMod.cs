@@ -12,6 +12,8 @@ public class SettingAndMod : MonoBehaviour
     public static SettingAndMod instance;
 
     [Inject]
+    LocalizedStrings localizedStrings;
+    [Inject]
     private IAudioManager audioManager;
     [Inject]
     private IKVSystem kvSystem;
@@ -304,7 +306,7 @@ public class SettingAndMod : MonoBehaviour
     public void OnLanuageChanged(int value)
     {
         cl_language.Set(value);
-        LocalizedStrings.Instanse.ReloadLanguageFile(cl_language);
+        localizedStrings.ReloadLanguageFile(cl_language);
         LocalizedText.ReloadAll();
     }
 

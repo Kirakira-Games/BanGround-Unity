@@ -19,6 +19,7 @@ public class GlobalInstaller : MonoInstaller
     public LoadingBlocker loadingBlocker;
     public MessageCenter messageCenter;
     public AccountManager accountManager;
+    public LocalizedStrings localizedStrings;
 
     private IKVSystem kvSystem;
     private IDataLoader dataLoader;
@@ -63,6 +64,8 @@ public class GlobalInstaller : MonoInstaller
         }).NonLazy();
 
         RegisterKonCommands();
+
+        Container.Bind<LocalizedStrings>().FromInstance(localizedStrings).NonLazy();
 
         // Chart version
         Container.Bind<IChartVersion>().To<ChartVersion>().AsSingle().NonLazy();
