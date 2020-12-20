@@ -19,6 +19,8 @@ public class TitleLoader : MonoBehaviour
     private IFileSystem fs;
     [Inject]
     private IAccountManager accountManager;
+    [Inject]
+    LocalizedStrings localizedStrings;
 
     [Inject(Id = "cl_language")]
     KVar cl_language;
@@ -130,7 +132,7 @@ public class TitleLoader : MonoBehaviour
     {
         music?.Dispose();
         banGround?.Dispose();
-        LocalizedStrings.Instanse.ReloadLanguageFile(cl_language);
+        localizedStrings.ReloadLanguageFile(cl_language);
         LocalizedText.ReloadAll();
     }
 

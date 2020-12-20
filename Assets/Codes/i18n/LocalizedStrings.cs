@@ -8,12 +8,11 @@ public class LocalizedStrings : MonoBehaviour
     public TextAsset[] languageFiles = new TextAsset[24];
     private Dictionary<string, string> dictionary = null;
 
-    public static LocalizedStrings Instanse = null;
-
     [Inject(Id = "cl_language")]
     KVar cl_language;
 
-    private void Awake()
+    [Inject]
+    public void Inject()
     {
         if(cl_language == -1)
         {
@@ -39,9 +38,6 @@ public class LocalizedStrings : MonoBehaviour
         }
 
         ReloadLanguageFile(cl_language);
-
-        Instanse = this;
-        //DontDestroyOnLoad(Instanse.gameObject);
     }
 
     public string GetLocalizedString(string str)
