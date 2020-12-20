@@ -332,7 +332,7 @@ public class TouchManager : MonoBehaviour
             recorder = new DemoRecorder(
                 parameters.sid,
                 parameters.difficulty,
-                SceneLoader.GetParamsOrDefault<InGameParams>().mods);
+                parameters.mods);
         }
     }
 
@@ -501,7 +501,7 @@ public class TouchManager : MonoBehaviour
                 noteController.UpdateTouch(GetTouchById(touch.touchId));
             }
 
-            // Remove ended touches
+            // Remove finished touches
             foreach (var touch1 in touches)
             {
                 var tracer = GetTouchById(touch1.touchId);
