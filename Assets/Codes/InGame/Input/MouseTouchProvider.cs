@@ -15,7 +15,6 @@ public class MouseTouchProvider : IKirakiraTouchProvider
             screenPos = Input.mousePosition,
             pos = pos,
             time = NoteController.judgeTime,
-            realtime = Time.realtimeSinceStartup,
             phase = phase
         };
         return new KirakiraTouchState[] { touch };

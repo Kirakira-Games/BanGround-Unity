@@ -52,11 +52,6 @@ public class KirakiraTouchState
     public int time;
 
     /// <summary>
-    /// Time that syncs with RealtimeSinceStartup
-    /// </summary>
-    public float realtime;
-
-    /// <summary>
     /// Unique ID of this touch.
     /// </summary>
     public int touchId;
@@ -175,11 +170,11 @@ public class KirakiraTouch
             start = state;
             touchId = state.touchId;
         }
-        timeline.Push(state.realtime, state);
+        timeline.Push(state.time, state);
 
         // Remove unnecessary states
         while (timeline.FirstV != null &&
-            RealtimeToBGMMs(timeline.FirstV.Value.realtime, current.realtime) > NoteUtility.SLIDE_TICK_JUDGE_RANGE)
+            current.time - timeline.FirstV.Value.time > NoteUtility.SLIDE_TICK_JUDGE_RANGE + 100)
         {
             timeline.RemoveFirst();
         }
@@ -190,7 +185,7 @@ public class KirakiraTouch
         {
             if (TraveledFlickDistance(i.Value.screenPos, current.screenPos))
             {
-                timeSinceFlick = RealtimeToBGMMs(i.Value.realtime, state.realtime);
+                timeSinceFlick = state.time - i.Value.time;
                 break;
             }
         }
@@ -394,12 +389,9 @@ public class TouchManager : MonoBehaviour
 
         foreach (var touches in touchFrames)
         {
-            if (recorder != null)
+            if (recorder != null && touches.Length > 0)
             {
-                if (touches.Length > 0)
-                {
-                    recorder.Add(touches);
-                }
+                recorder.Add(touches);
             }
 
             // Update touches that just starts

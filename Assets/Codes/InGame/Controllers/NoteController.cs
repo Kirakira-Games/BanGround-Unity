@@ -46,6 +46,7 @@ public class NoteController : MonoBehaviour, INoteController
 
     public static int audioTime { get; private set; }
     public static int judgeTime { get; private set; }
+    public static int looseJudgeTime { get; private set; }
     public static float audioTimef { get; private set; }
     public static float judgeTimef { get; private set; }
 
@@ -522,6 +523,7 @@ public class NoteController : MonoBehaviour, INoteController
 
         audioTime = audioTimelineSync.TimeInMs + audioTimelineSync.RealTimeToBGMTime(o_audio);
         judgeTime = audioTime - o_judge;
+        looseJudgeTime = judgeTime - 100;
         audioTimef = audioTime / 1000f;
         judgeTimef = judgeTime / 1000f;
         slidesToDestroy.Clear();

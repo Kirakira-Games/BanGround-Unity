@@ -10,13 +10,13 @@ using UnityEngine;
 
 namespace Assets.Codes.InGame.Input
 {
-    class DemoReplayTouchPrivider : IKirakiraTouchProvider
+    class DemoReplayTouchProvider : IKirakiraTouchProvider
     {
         private DemoFile demoFile;
 
         int currentIndex;
 
-        public DemoReplayTouchPrivider(DemoFile demoFile)
+        public DemoReplayTouchProvider(DemoFile demoFile)
         {
             this.demoFile = demoFile;
 
@@ -26,12 +26,15 @@ namespace Assets.Codes.InGame.Input
         public KirakiraTouchState[][] GetTouches()
         {
             var frames = new List<KirakiraTouchState[]>();
-            while (currentIndex < demoFile.frames.Count && demoFile.frames[currentIndex].audioTime <= NoteController.audioTime)
+            while (currentIndex < demoFile.frames.Count && demoFile.frames[currentIndex].judgeTime <= NoteController.judgeTime)
             {
                 for(int i = 0; i < demoFile.frames[currentIndex].events.Length; i ++)
                 {
-                    demoFile.frames[currentIndex].events[i].screenPos = NoteController.mainCamera.WorldToScreenPoint(demoFile.frames[currentIndex].events[i].pos);
-                    demoFile.frames[currentIndex].events[i].realtime = Time.realtimeSinceStartup;
+                    var touchEvent = demoFile.frames[currentIndex].events[i];
+                    var ray = new Ray(touchEvent.pos, Vector3.forward);
+                    var worldPoint = NoteUtility.JudgePlane.Raycast(ray, out float dist) ? ray.GetPoint(dist) : KirakiraTouch.INVALID_POSITION;
+
+                    touchEvent.screenPos = NoteController.mainCamera.WorldToScreenPoint(worldPoint);
                 }
 
                 frames.Add(demoFile.frames[currentIndex].events);

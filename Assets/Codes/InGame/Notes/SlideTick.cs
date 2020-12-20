@@ -25,6 +25,7 @@ public class SlideTick : SlideNoteBase
     public override void ResetNote(GameNoteData data)
     {
         base.ResetNote(data);
+        judgeWindowEnd = time + NoteUtility.SLIDE_TICK_JUDGE_RANGE;
         noteMesh.width = 1.2f;
         noteMesh.meshRenderer.sharedMaterial.SetTexture("_MainTex", resourceLoader.LoadSkinResource<Texture2D>("note_tick_default_tint"));
         //GetComponent<SpriteRenderer>().sprite = resourceLoader.LoadSkinResource<Sprite>("note_tick_default");
@@ -33,13 +34,5 @@ public class SlideTick : SlideNoteBase
     public override void Judge(KirakiraTouch touch, JudgeResult result)
     {
         RealJudge(touch, result);
-    }
-
-    protected override void OnNoteUpdateJudge()
-    {
-        if (NoteController.judgeTime > time + NoteUtility.SLIDE_TICK_JUDGE_RANGE)
-        {
-            Judge(null, JudgeResult.Miss);
-        }
     }
 }

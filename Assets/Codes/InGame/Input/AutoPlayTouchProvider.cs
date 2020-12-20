@@ -246,7 +246,6 @@ public class AutoPlayTouchProvider : IKirakiraTouchProvider
         foreach (var e in ret)
         {
             e.time = NoteController.audioTime;
-            e.realtime = Time.realtimeSinceStartup;
         }
 
         return new KirakiraTouchState[][] { ret.ToArray() };
