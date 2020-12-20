@@ -7,6 +7,8 @@ public class SlideTick : SlideNoteBase
 {
     protected override JudgeResult TrySlideJudge(KirakiraTouch touch)
     {
+        if (touch.current.phase == KirakiraTouchPhase.Ended)
+            return JudgeResult.None;
         if (!isJudging)
         {
             //if (touch.current.phase != KirakiraTouchPhase.Began)
