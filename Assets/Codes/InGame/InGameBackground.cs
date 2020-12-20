@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Video;
-using System.IO;
-using UnityEngine.SceneManagement;
-using UnityEngine.Networking;
 using Zenject;
 using BanGround;
+using BanGround.Game.Mods;
 
 #pragma warning disable 0649
 public class InGameBackground : MonoBehaviour, IInGameBackground
@@ -106,11 +104,7 @@ public class InGameBackground : MonoBehaviour, IInGameBackground
                 pauseVideo();
                 mesh.enabled = false;
                 vp.targetCameraAlpha = r_brightness_bg;
-                foreach (ModBase m in modManager.attachedMods)
-                {
-                    if (m is AudioMod)
-                        vp.playbackSpeed = (m as AudioMod).SpeedCompensation;
-                }
+                vp.playbackSpeed = modManager.SpeedCompensationSum;
             }
         }
     }

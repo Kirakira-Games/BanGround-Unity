@@ -120,7 +120,7 @@ public class ChartCreator : MonoBehaviour
     public void Duplicate()
     {
         dataLoader.DuplicateKiraPack(cHeader);
-        SceneManager.LoadScene("Select");
+        SceneLoader.LoadScene("Select");
     }
 
     public void NewChartSet()
@@ -144,7 +144,7 @@ public class ChartCreator : MonoBehaviour
         // Reload scene
         cl_lastdiff.Set(difficulty);
         cl_lastsid.Set(header.sid);
-        SceneManager.LoadScene("Select");
+        SceneLoader.LoadScene("Select");
     }
 
     public void NewDifficulty()
@@ -169,7 +169,7 @@ public class ChartCreator : MonoBehaviour
         // Reload scene
         cl_lastdiff.Set(difficulty);
         chartListManager.current.difficulty = (Difficulty)difficulty;
-        SceneManager.LoadScene("Select");
+        SceneLoader.LoadScene("Select");
     }
 
     public static bool RequestAirdrop = false;
@@ -377,7 +377,7 @@ public class ChartCreator : MonoBehaviour
             cl_lastdiff.Set(difficulty);
             chartListManager.current.difficulty = (Difficulty)difficulty;
             cl_lastsid.Set(header.sid);
-            SceneManager.LoadScene("Select");
+            SceneLoader.LoadScene("Select");
 
 #if UNITY_STANDALONE || UNITY_IOS || UNITY_EDITOR
             AirdroppedFile = null;

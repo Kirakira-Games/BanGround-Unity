@@ -1,38 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BanGround.Game.Mods;
 
 public class SpeedDownStep : StepToggle
 {
-    public override AudioMod GetStep()
+    public override ModFlag GetStep()
     {
-        if (index == 1) return HalfMod.Instanse;
-        else if (index == 2) return DayCoreMod.Instanse;
-        else return null;
+        if (index == 1) return ModFlag.Half;
+        else if (index == 2) return ModFlag.DayCore;
+        else return ModFlag.None;
     }
 
-    public override void SetStep(List<ModBase> mods)
+    public override void SetStep(ModFlag mods)
     {
-        if (mods == null || mods.Count == 0)
+        if (mods.HasFlag(ModFlag.Half))
         {
-            index = 0;
+            index = 1;
+        }
+        else if (mods.HasFlag(ModFlag.DayCore))
+        {
+            index = 2;
         }
         else
         {
-            foreach (var mod in mods)
-            {
-                if (mod is AudioMod)
-                {
-                    if (mod is HalfMod) index = 1;
-                    else if (mod is DayCoreMod) index = 2;
-                    else index = 0;
-                    break;
-                }
-            }
+            index = 0;
         }
         OnIndexChanged();
     }
-
 }

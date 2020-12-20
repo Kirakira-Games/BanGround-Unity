@@ -1,18 +1,18 @@
-﻿using FMOD.Studio;
-using System.Collections;
-using System.Collections.Generic;
+﻿using BanGround.Game.Mods;
+using BanGround.Scene.Params;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
 public class OffsetGuide : MonoBehaviour
 {
+    public const int OFFSET_GUIDE_SID = 99901;
+    public const Difficulty OFFSET_GUIDE_DIFF = Difficulty.Easy;
+
     [Inject]
     private IKVSystem kvSystem;
     [Inject]
-    private IChartListManager chartListManager;
-    [Inject]
-    private IModManager modManager;
+    private IChartLoader chartLoader;
 
     void Start()
     {
@@ -21,20 +21,17 @@ public class OffsetGuide : MonoBehaviour
 
     void StartOffsetGuide()
     {
-        chartListManager.ForceOffsetChart();
-        modManager.SuppressAllMods(true);
-
         SettingAndMod.instance.SetLiveSetting();
         kvSystem.SaveConfig();
-        SceneLoader.LoadScene("InGame", async () =>
-        {
-            if (!await chartListManager.LoadChart(true))
+        SceneLoader.LoadScene("InGame", () => chartLoader.LoadChart(OFFSET_GUIDE_SID, OFFSET_GUIDE_DIFF, true),
+            true, parameters: new InGameParams
             {
-                modManager.SuppressAllMods(false);
-                chartListManager.ClearForcedChart();
-                return false;
-            }
-            return true;
-        }, true);
+                sid = OFFSET_GUIDE_SID,
+                difficulty = OFFSET_GUIDE_DIFF,
+                mods = ModFlag.None,
+                isOffsetGuide = true,
+                saveRecord = false,
+                saveReplay = false,
+            });
     }
 }

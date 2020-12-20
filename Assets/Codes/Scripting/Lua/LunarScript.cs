@@ -136,7 +136,7 @@ namespace BanGround.Scripting.Lunar
         [Inject]
         IAudioManager am;
         [Inject]
-        private IChartListManager chartListManager;
+        private IChartLoader chartLoader;
 
         LuaEnv luaEnv = null;
         LuaFunction onUpdate = null;
@@ -202,8 +202,8 @@ namespace BanGround.Scripting.Lunar
 
         public void AddKeyframeByBeat(float startBeat, float beat, LuaFunction callback)
         {
-            float sb = chartListManager.chart.BeatToTime(startBeat),
-                b = chartListManager.chart.BeatToTime(beat);
+            float sb = chartLoader.chart.BeatToTime(startBeat),
+                b = chartLoader.chart.BeatToTime(beat);
 
             AddKeyframeByTime(sb, b, callback);
         }

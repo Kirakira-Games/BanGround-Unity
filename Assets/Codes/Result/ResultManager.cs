@@ -13,6 +13,8 @@ using BanGround.Database.Models;
 using UnityEngine.Rendering;
 using BanGround.Database;
 using Newtonsoft.Json;
+using BanGround.Scene.Params;
+using BanGround.Game.Mods;
 
 public class ResultManager : MonoBehaviour
 {
@@ -21,20 +23,14 @@ public class ResultManager : MonoBehaviour
     [Inject]
     private IDataLoader dataLoader;
     [Inject]
-    private IModManager modManager;
-    [Inject]
-    private IChartListManager chartListManager;
+    private IChartLoader chartLoader;
     [Inject]
     private IResourceLoader resourceLoader;
     [Inject]
     private IDatabaseAPI db;
 
-    [Inject(Id = "g_demoRecord")]
-    private KVar g_demoRecord;
     [Inject(Id = "fs_iconpath")]
     private KVar fs_iconpath;
-    [Inject(Id = "cl_currentdemo")]
-    private KVar cl_currentDemo;
 
     private Button button_back;
     private Button button_retry;
@@ -75,9 +71,12 @@ public class ResultManager : MonoBehaviour
     private FixBackground background;
     private ISoundTrack bgmST;
 
+    private ResultParams parameters;
+
     async void Start()
     {
-        cheader = chartListManager.current.header;
+        parameters = SceneLoader.GetParamsOrDefault<ResultParams>();
+        cheader = chartLoader.header;
         mheader = dataLoader.GetMusicHeader(cheader.mid);
 
         SetBtnObject();
@@ -117,7 +116,7 @@ public class ResultManager : MonoBehaviour
     private void ShowBackground()
     {
         background = GameObject.Find("Background").GetComponent<FixBackground>();
-        string path = dataLoader.GetBackgroundPath(chartListManager.current.header.sid).Item1;
+        string path = dataLoader.GetBackgroundPath(parameters.sid).Item1;
         background.UpdateBackground(path);
     }
 
@@ -213,6 +212,10 @@ public class ResultManager : MonoBehaviour
 
     private void SetBtnObject()
     {
+        var gameParams = SceneLoader.GetParamsOrDefault<ResultParams>().ToInGameParams();
+        gameParams.saveReplay = false;
+        gameParams.saveRecord = false;
+
         button_back = GameObject.Find("Button_back").GetComponent<Button>();
         button_retry = GameObject.Find("Button_retry").GetComponent<Button>();
         button_replay = GameObject.Find("Button_watchreplay").GetComponent<Button>();
@@ -233,15 +236,19 @@ public class ResultManager : MonoBehaviour
             //StartCoroutine("DelayLoadScene","InGame" ); 
             StartCoroutine(BgmFadeOut());
             RemoveListener();
-            SceneLoader.LoadScene("InGame", pushStack: false);
+            SceneLoader.LoadScene("InGame", pushStack: false, parameters: gameParams);
         });
 
         button_replay.onClick.AddListener(() =>
         {
-            cl_currentDemo.Set("replay/" + ComboManager.recoder.demoName);
+            if (parameters.saveReplay)
+                gameParams.replayPath = "replay/" + ComboManager.recoder.demoName;
+            if (string.IsNullOrEmpty(gameParams.replayPath))
+                return;
+
             StartCoroutine(BgmFadeOut());
             RemoveListener();
-            SceneLoader.LoadScene("InGame", pushStack: false);
+            SceneLoader.LoadScene("InGame", pushStack: false, parameters: gameParams);
         });
     }
 
@@ -323,35 +330,35 @@ public class ResultManager : MonoBehaviour
 
     private void ShowSongInfo()
     {
-        level_Text.text = Enum.GetName(typeof(Difficulty), chartListManager.current.difficulty).ToUpper() + " " +
-            cheader.difficultyLevel[(int)chartListManager.current.difficulty];
+        level_Text.text = Enum.GetName(typeof(Difficulty), parameters.difficulty).ToUpper() + " " +
+            cheader.difficultyLevel[(int)parameters.difficulty];
         songName_Text.text = mheader.title;
-        acc_Text.text = modManager.isAutoplay ? "AUTOPLAY" : string.Format("{0:P2}", playResult.Acc);
-        difficultCard.sprite = Resources.Load<Sprite>("UI/DifficultyCards/" + Enum.GetName(typeof(Difficulty), chartListManager.current.difficulty));
+        acc_Text.text = parameters.mods.HasFlag(ModFlag.AutoPlay) ? "AUTOPLAY" : string.Format("{0:P2}", playResult.Acc);
+        difficultCard.sprite = Resources.Load<Sprite>("UI/DifficultyCards/" + parameters.difficulty.ToString());
     }
 
     private void ReadScores()
     {
-        playResult.Score = (int)Math.Round((double)ComboManager.score / ComboManager.maxScore * ComboManager.MAX_DISPLAY_SCORE * modManager.ScoreMultiplier);
+        playResult.Score = (int)Math.Round((double)ComboManager.score / ComboManager.maxScore * ComboManager.MAX_DISPLAY_SCORE * parameters.scoreMultiplier);
         playResult.Acc = ResultsGetter.GetAcc();
         playResult.ChartId = cheader.sid;
         playResult.MusicId = cheader.mid;
-        playResult.Difficulty = chartListManager.current.difficulty;
+        playResult.Difficulty = parameters.difficulty;
         playResult.CreatedAt = DateTime.Now;
         playResult.Combo = ResultsGetter.GetCombo();
         playResult.Judge = ResultsGetter.GetJudgeCount();
-        playResult.ChartHash = JsonConvert.SerializeObject(chartListManager.ComputeCurrentChartHash());
-        playResult.Mods = modManager.Flag;
+        playResult.ChartHash = JsonConvert.SerializeObject(chartLoader.GetChartHash(cheader.mid, cheader.sid, parameters.difficulty));
+        playResult.Mods = (ulong)parameters.mods;
 
-        if (g_demoRecord)
+        if (parameters.saveReplay)
         {
             playResult.ReplayFile = "replay/" + ComboManager.recoder.demoName;
         }
 
-        var oldBest = db.GetBestRank(cheader.sid, chartListManager.current.difficulty);
+        var oldBest = db.GetBestRank(cheader.sid, parameters.difficulty);
         lastScore = oldBest?.Score ?? 0;
 
-        if (!modManager.isAutoplay && cl_currentDemo == "")
+        if (!parameters.mods.HasFlag(ModFlag.AutoPlay) && parameters.saveRecord)
         {
             db.SaveRankItem(playResult);
             print("Record saved");
@@ -359,7 +366,6 @@ public class ResultManager : MonoBehaviour
         else
         {
             print("Autoplay score not saved");
-            cl_currentDemo.Set("");
         }
     }
 

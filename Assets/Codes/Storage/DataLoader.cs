@@ -46,7 +46,7 @@ public class DataLoader : IDataLoader
     public List<cHeader> chartList => songList.cHeaders;
     public bool loaded => songList != null;
 
-    private const int InitialChartVersion = 6;
+    private const int InitialChartVersion = 7;
     private const int GameVersion = 4;
 
     private Dictionary<int, cHeader> chartDic = new Dictionary<int, cHeader>();
@@ -180,7 +180,7 @@ public class DataLoader : IDataLoader
             {
                 if (SceneManager.GetActiveScene().name == "Select")
                 {
-                    SceneManager.LoadScene("Select");
+                    SceneLoader.LoadScene("Select");
                 }
             }
         };

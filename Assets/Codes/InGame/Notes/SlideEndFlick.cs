@@ -32,6 +32,9 @@ public class SlideEndFlick : SlideNoteBase
 
         noteMesh.meshRenderer.sharedMaterial.SetTexture("_MainTex", resourceLoader.LoadSkinResource<Texture2D>("note_flick_tint"));
         flickArrow.Reset(timingGroup);
+        judgeWindowEnd = time + (isTilt ?
+            NoteUtility.SLIDE_END_FLICK_JUDGE_RANGE :
+            NoteUtility.SLIDE_END_JUDGE_RANGE[(int)JudgeResult.Bad]);
         //GetComponent<SpriteRenderer>().sprite = resourceLoader.LoadSkinResource<Sprite>("note_flick_default");
     }
 
@@ -43,6 +46,8 @@ public class SlideEndFlick : SlideNoteBase
     public override JudgeResult TryTrace(KirakiraTouch touch)
     {
         if (!isTracingOrJudged) return JudgeResult.None;
+        if (touch.current.time > judgeWindowEnd)
+            return JudgeResult.Miss;
 
         int judgeRange = isTilt ?
             NoteUtility.SLIDE_END_FLICK_JUDGE_RANGE :
@@ -58,17 +63,5 @@ public class SlideEndFlick : SlideNoteBase
             return JudgeResult.Miss;
         }
         return JudgeResult.None;
-    }
-
-    protected override void OnNoteUpdateJudge()
-    {
-        int judgeEndTime = time + (isTilt ?
-            NoteUtility.SLIDE_END_FLICK_JUDGE_RANGE :
-            NoteUtility.SLIDE_END_JUDGE_RANGE[(int)JudgeResult.Bad]);
-
-        if (NoteController.judgeTime > judgeEndTime)
-        {
-            RealJudge(null, JudgeResult.Miss);
-        }
     }
 }

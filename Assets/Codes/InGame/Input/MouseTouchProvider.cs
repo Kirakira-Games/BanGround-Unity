@@ -3,7 +3,7 @@ using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 using TouchPhase = UnityEngine.InputSystem.TouchPhase;
 
 // For debugging purpose only, simulate touch event from mouse event
-public class MouseTouchProvider : KirakiraTouchProvider
+public class MouseTouchProvider : IKirakiraTouchProvider
 {
     public static KirakiraTouchState[] SimulateMouseTouch(KirakiraTouchPhase phase)
     {
@@ -15,7 +15,6 @@ public class MouseTouchProvider : KirakiraTouchProvider
             screenPos = Input.mousePosition,
             pos = pos,
             time = NoteController.judgeTime,
-            realtime = Time.realtimeSinceStartup,
             phase = phase
         };
         return new KirakiraTouchState[] { touch };

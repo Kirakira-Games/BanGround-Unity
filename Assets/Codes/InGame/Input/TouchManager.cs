@@ -9,8 +9,9 @@ using Newtonsoft.Json;
 using System.Linq;
 using Zenject;
 using BanGround;
+using BanGround.Scene.Params;
 
-public interface KirakiraTouchProvider
+public interface IKirakiraTouchProvider
 {
     KirakiraTouchState[][] GetTouches();
 }
@@ -49,11 +50,6 @@ public class KirakiraTouchState
     /// Time of receiving this touch. (Judge time)
     /// </summary>
     public int time;
-
-    /// <summary>
-    /// Time that syncs with RealtimeSinceStartup
-    /// </summary>
-    public float realtime;
 
     /// <summary>
     /// Unique ID of this touch.
@@ -174,11 +170,11 @@ public class KirakiraTouch
             start = state;
             touchId = state.touchId;
         }
-        timeline.Push(state.realtime, state);
+        timeline.Push(state.time, state);
 
         // Remove unnecessary states
         while (timeline.FirstV != null &&
-            RealtimeToBGMMs(timeline.FirstV.Value.realtime, current.realtime) > NoteUtility.SLIDE_TICK_JUDGE_RANGE)
+            current.time - timeline.FirstV.Value.time > NoteUtility.SLIDE_TICK_JUDGE_RANGE + 100)
         {
             timeline.RemoveFirst();
         }
@@ -189,7 +185,7 @@ public class KirakiraTouch
         {
             if (TraveledFlickDistance(i.Value.screenPos, current.screenPos))
             {
-                timeSinceFlick = RealtimeToBGMMs(i.Value.realtime, state.realtime);
+                timeSinceFlick = state.time - i.Value.time;
                 break;
             }
         }
@@ -210,16 +206,9 @@ public class KirakiraTouch
 public class TouchManager : MonoBehaviour
 {
     public static TouchManager instance;
-    public static KirakiraTouchProvider provider;
 
-    [Inject(Id = "g_demoRecord")]
-    private KVar g_demoRecord;
-    [Inject(Id = "cl_currentdemo")]
-    private KVar cl_currentDemo;
     [Inject]
-    private IChartListManager chartListManager;
-    [Inject]
-    private IModManager modManager;
+    private IChartLoader chartLoader;
     [Inject]
     private IAudioTimelineSync audioTimelineSync;
     [Inject]
@@ -229,12 +218,13 @@ public class TouchManager : MonoBehaviour
     [Inject]
     private IFileSystem fs;
     [Inject]
-    private IDataLoader dataLoader;
+    private IKirakiraTouchProvider touchProvider;
 
     private Dictionary<int, KirakiraTouch> touchTable;
     private Dictionary<(KirakiraTracer, int), JudgeResult> traceCache;
     private HashSet<KirakiraTouch> exchanged;
     private DemoRecorder recorder = null;
+    private InGameParams parameters;
 
     public static int EvalResult(JudgeResult result)
     {
@@ -331,37 +321,13 @@ public class TouchManager : MonoBehaviour
         KirakiraTouch.dpi = GetDPI();
         KirakiraTouch.flickDistPixels = Mathf.Min(Screen.height / 20, NoteUtility.FLICK_JUDGE_DIST / 2.54f * KirakiraTouch.dpi);
 
-        // Touch provider
-        if (cl_currentDemo != "")
-        {
-            provider = new DemoReplayTouchPrivider(DemoFile.LoadFrom(fs.GetFile(cl_currentDemo)));
-            g_demoRecord.Set(false);
-        }
-        else if (modManager.isAutoplay)
-        {
-            GameObject.Find("MouseCanvas").SetActive(false);
-            provider = new AutoPlayTouchProvider(SM);
-        }
-        else
-        {
-            /*#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
-                        provider = new MultiMouseTouchProvider();
-            #else*/
-#if UNITY_EDITOR
-            GameObject.Find("MouseCanvas").SetActive(false);
-            provider = new MouseTouchProvider();
-#else
-            GameObject.Find("MouseCanvas").SetActive(false);
-            provider = new InputManagerTouchProvider();
-#endif
-        }
-
-        if (!(provider is DemoReplayTouchPrivider) && g_demoRecord)
+        parameters = SceneLoader.GetParamsOrDefault<InGameParams>();
+        if (parameters.saveRecord)
         {
             recorder = new DemoRecorder(
-                chartListManager.current.header.sid,
-                chartListManager.current.difficulty,
-                modManager.Flag);
+                parameters.sid,
+                parameters.difficulty,
+                parameters.mods);
         }
     }
 
@@ -409,13 +375,9 @@ public class TouchManager : MonoBehaviour
         {
             var file = fs.GetOrNewFile($"{DataLoader.ReplayDir}/{recorder.demoName}");
 
-            recorder.Save(file, chartListManager.ComputeCurrentChartHash());
+            recorder.Save(file, chartLoader.GetChartHash(chartLoader.header.mid, parameters.sid, parameters.difficulty));
 
             ComboManager.recoder = recorder;
-        }
-        else if(provider is DemoReplayTouchPrivider)
-        {
-            g_demoRecord.Set(true);
         }
     }
 
@@ -423,16 +385,13 @@ public class TouchManager : MonoBehaviour
     {
         if (SM.HasState(GameStateMachine.State.Finished)) return;
 
-        var touchFrames = provider.GetTouches();
+        var touchFrames = touchProvider.GetTouches();
 
         foreach (var touches in touchFrames)
         {
-            if (recorder != null)
+            if (recorder != null && touches.Length > 0)
             {
-                if (touches.Length > 0)
-                {
-                    recorder.Add(touches);
-                }
+                recorder.Add(touches);
             }
 
             // Update touches that just starts
@@ -534,7 +493,7 @@ public class TouchManager : MonoBehaviour
                 noteController.UpdateTouch(GetTouchById(touch.touchId));
             }
 
-            // Remove ended touches
+            // Remove finished touches
             foreach (var touch1 in touches)
             {
                 var tracer = GetTouchById(touch1.touchId);

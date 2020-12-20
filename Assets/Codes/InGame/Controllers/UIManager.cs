@@ -1,24 +1,19 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using AudioProvider;
+using BanGround.Game.Mods;
+using BanGround.Scene.Params;
+using Cysharp.Threading.Tasks;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
-using AudioProvider;
-using System;
-using Cysharp.Threading.Tasks;
 using Zenject;
-
 using State = GameStateMachine.State;
-using System.Threading;
-using BanGround.Utils;
-using BanGround.Database.Models;
 
 public class UIManager : MonoBehaviour, IUIManager
 {
     [Inject]
     private IAudioManager audioManager;
     [Inject]
-    private IChartListManager chartListManager;
+    private IChartLoader chartLoader;
     [Inject]
     private IAudioTimelineSync audioTimelineSync;
     [Inject]
@@ -29,33 +24,38 @@ public class UIManager : MonoBehaviour, IUIManager
     private IGameStateMachine SM;
     [Inject]
     private ICancellationTokenStore Cancel;
+    [Inject]
+    private IModManager modManager;
 
     [Inject(Id = "r_brightness_lane")]
     private KVar r_brightness_lane;
 
     private const float BiteTime = 2;
 
-    MeshRenderer lan_MR;
+    private MeshRenderer lan_MR;
 
-    GameObject pause_Canvas;
+    private GameObject pause_Canvas;
 
-    Button pause_Btn;
-    Button resume_Btn;
-    Button retry_Btn;
-    Button retire_Btn;
+    private Button pause_Btn;
+    private Button resume_Btn;
+    private Button retry_Btn;
+    private Button retire_Btn;
 
     public TextAsset APvoice;
     public TextAsset FCvoice;
     public TextAsset CLvoice;
     public TextAsset Fvoice;
-    GameObject gateCanvas;
+    private GameObject gateCanvas;
 
     private ISoundEffect resultVoice;
+
+    private InGameParams parameters;
 
     [Inject]
     void Inject([Inject(Id = "r_lowresolution")] KVar lowResolution)
     {
         QualitySettings.SetQualityLevel(lowResolution ? 0 : 1);
+        parameters = SceneLoader.GetParamsOrDefault<InGameParams>();
     }
 
 /*
@@ -119,7 +119,7 @@ public class UIManager : MonoBehaviour, IUIManager
 
     private void GamePause()
     {
-        if (SM.Current == State.Paused || SM.Current == State.Finished || chartListManager.offsetAdjustMode)
+        if (SM.Current == State.Paused || SM.Current == State.Finished || parameters.isOffsetGuide)
         {
             return;
         }
@@ -160,15 +160,15 @@ public class UIManager : MonoBehaviour, IUIManager
     {
         ISoundTrack bgm = audioManager.gameBGM;
         SM.AddState(State.Rewinding);
-        float currentTime = audioTimelineSync.time;
-        float targetTime = Mathf.Max(0, currentTime - BiteTime);
+        float currentTime = audioTimelineSync.Time;
+        float targetTime = Mathf.Max(audioTimelineSync.AudioSeekPos, currentTime - BiteTime);
 
         // rewind
         bgm.SetPlaybackTime((uint)Mathf.RoundToInt(targetTime * 1000));
         while (currentTime > targetTime)
         {
             currentTime -= Time.deltaTime;
-            audioTimelineSync.time = currentTime;
+            audioTimelineSync.Time = currentTime;
             inGameBackground.seekVideo(currentTime);
             inGameBackground.playVideo();
             await UniTask.DelayFrame(1);
@@ -183,7 +183,7 @@ public class UIManager : MonoBehaviour, IUIManager
         uint pauseTime = bgm.GetPlaybackTime();
         bgm.Play();
         await UniTask.WaitUntil(() => bgm.GetPlaybackTime() != pauseTime);
-        audioTimelineSync.timeInMs = (int)bgm.GetPlaybackTime();
+        audioTimelineSync.TimeInMs = (int)bgm.GetPlaybackTime();
         audioTimelineSync.Play();
         inGameBackground.seekVideo(bgm.GetPlaybackTime() / 1000f);
         inGameBackground.playVideo();
@@ -200,14 +200,14 @@ public class UIManager : MonoBehaviour, IUIManager
         Time.timeScale = 1;
         SceneLoader.LoadScene("InGame", async () =>
         {
-            if (await chartListManager.LoadChart(true))
+            if (await chartLoader.LoadChart(parameters.sid, parameters.difficulty, true))
             {
                 OnStopPlaying();
                 return true;
             }
             Time.timeScale = 0;
             return false;
-        }, false);
+        }, false, parameters: parameters);
     }
 
     public void GameRetire()
@@ -228,7 +228,7 @@ public class UIManager : MonoBehaviour, IUIManager
     public void OnAudioFinish(bool restart)
     {
         if (SceneLoader.Loading || SM.Base == State.Loading) return;
-        if (chartListManager.offsetAdjustMode)
+        if (parameters.isOffsetGuide)
             restart = true;
 
         inGameBackground.stopVideo();
@@ -245,12 +245,12 @@ public class UIManager : MonoBehaviour, IUIManager
 
     private async void ShowResult(bool restart)
     {
-        if (chartListManager.offsetAdjustMode)
+        if (parameters.isOffsetGuide)
             restart = true;
 
         if (restart)
         {
-            await SceneLoader.LoadSceneAsync("InGame");
+            await SceneLoader.LoadSceneAsync("InGame", parameters: parameters);
         }
         else
         {
@@ -283,7 +283,10 @@ public class UIManager : MonoBehaviour, IUIManager
 
             await UniTask.Delay(3000);
 
-            _ = SceneLoader.LoadSceneAsync("Result");
+            _ = SceneLoader.LoadSceneAsync("Result", parameters: new ResultParams(parameters)
+            {
+                scoreMultiplier = modManager.ScoreMultiplier
+            });
         }
     }
 
@@ -306,7 +309,7 @@ public class UIManager : MonoBehaviour, IUIManager
     private void Update()
     {
         if (SM.inSimpleState && SM.Current != State.Finished && audioManager.gameBGM != null &&
-            audioTimelineSync.timeInMs > audioManager.gameBGM.GetLength() + 1000 &&
+            audioTimelineSync.TimeInMs > audioManager.gameBGM.GetLength() + 1000 &&
             noteController.isFinished)
         {
             SM.Transit(SM.Current, State.Finished);

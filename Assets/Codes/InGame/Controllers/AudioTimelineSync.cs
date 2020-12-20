@@ -5,9 +5,15 @@ using Zenject;
 using AudioProvider;
 using Cysharp.Threading.Tasks;
 using System;
+using BanGround.Game.Mods;
 
 public class AudioTimelineSync : MonoBehaviour, IAudioTimelineSync
 {
+    private const int QUEUE_SIZE = 10;
+    private const float DIFF_TOLERANCE = 0.1f;
+    private const float UNSYNC_LIMIT = 10f;
+    private const float SYNC_LEAD = 0.02f;
+
     [Inject]
     private IAudioManager audioManager;
     [Inject]
@@ -26,11 +32,8 @@ public class AudioTimelineSync : MonoBehaviour, IAudioTimelineSync
     private float deltaTime;
 
     // Sync display
-    public float smoothAudioDiff => syncQueue.Count == 0 ? float.NaN : totDiff / syncQueue.Count;
+    public float SmoothAudioDiff => syncQueue.Count == 0 ? float.NaN : totDiff / syncQueue.Count;
     private Queue<float> syncQueue = new Queue<float>();
-    private const int QUEUE_SIZE = 10;
-    private const float DIFF_TOLERANCE = 0.1f;
-    private const float UNSYNC_LIMIT = 10f;
     private float totDiff;
     private uint prevAudioTime;
     private float adjustLimit;
@@ -64,7 +67,7 @@ public class AudioTimelineSync : MonoBehaviour, IAudioTimelineSync
     {
         ClearSync();
         deltaTime = -1e3f;
-        adjustLimit = Time.smoothDeltaTime * 0.2f;
+        adjustLimit = UnityEngine.Time.smoothDeltaTime * 0.2f;
     }
 
     public void Play()
@@ -78,26 +81,30 @@ public class AudioTimelineSync : MonoBehaviour, IAudioTimelineSync
         watch.Stop();
     }
 
-    public float time
+    public float Time
     {
         get => (float)((watch.Elapsed.TotalSeconds + deltaTime) * modManager.SpeedCompensationSum);
         set { deltaTime = (float)(value / modManager.SpeedCompensationSum - watch.Elapsed.TotalSeconds); }
     }
-    public int timeInMs
+    public int TimeInMs
     {
-        get => Mathf.RoundToInt(time * 1000);
-        set { time = value / 1000f; }
+        get => Mathf.RoundToInt(Time * 1000);
+        set { Time = value / 1000f; }
     }
+    public float AudioSeekPos { get; set; }
 
     private async UniTaskVoid StartPlaying(ISoundTrack gameBGM)
     {
+        inGameBackground.seekVideo(AudioSeekPos);
+        gameBGM.SetPlaybackTime((uint)(AudioSeekPos * 1000));
+
         inGameBackground.playVideo();
         gameBGM.Play();
         SM.Transit(GameStateMachine.State.Loading, GameStateMachine.State.Playing);
         try
         {
-            await UniTask.WaitUntil(() => gameBGM.GetPlaybackTime() > 0).WithCancellation(Cancel.sceneToken);
-            timeInMs = (int)gameBGM.GetPlaybackTime();
+            await UniTask.WaitUntil(() => gameBGM.GetPlaybackTime() > AudioSeekPos).WithCancellation(Cancel.sceneToken);
+            TimeInMs = (int)gameBGM.GetPlaybackTime();
         }
         catch (OperationCanceledException) { }
     }
@@ -106,10 +113,10 @@ public class AudioTimelineSync : MonoBehaviour, IAudioTimelineSync
     {
         if (SM.Base == GameStateMachine.State.Finished)
             return;
-        float currentTime = time;
+        float currentTime = Time;
         if (bgm.GetStatus() != PlaybackStatus.Playing)
         {
-            if (currentTime >= -0.02 && SM.Current == GameStateMachine.State.Loading)
+            if (currentTime >= AudioSeekPos - SYNC_LEAD && SM.Current == GameStateMachine.State.Loading)
             {
                 StartPlaying(bgm).Forget();
             }
@@ -154,6 +161,6 @@ public class AudioTimelineSync : MonoBehaviour, IAudioTimelineSync
         UpdateSync();
 
         if(!bgm.Disposed)
-            fpsCounter?.AppendExtraInfo($"S: {bgm.GetPlaybackTime()}/{timeInMs}");
+            fpsCounter?.AppendExtraInfo($"S: {bgm.GetPlaybackTime()}/{TimeInMs}");
     }
 }

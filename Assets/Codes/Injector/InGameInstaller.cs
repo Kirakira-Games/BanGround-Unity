@@ -1,4 +1,8 @@
-﻿using BanGround.Scripting;
+﻿using Assets.Codes.InGame.Input;
+using BanGround;
+using BanGround.Game.Mods;
+using BanGround.Scene.Params;
+using BanGround.Scripting;
 using BanGround.Scripting.Lunar;
 using UnityEngine;
 using Zenject;
@@ -11,14 +15,56 @@ public class InGameInstaller : MonoInstaller
     public UIManager uiManager;
     public LunarScript chartScript;
 
+    [Inject(Id = "r_notespeed")]
+    private KVar r_notespeed;
+    [Inject]
+    private IFileSystem fs;
+
     public override void InstallBindings()
     {
+        // Load parameters
+        var parameters = SceneLoader.GetParamsOrDefault<InGameParams>();
+
+        // Initiate mod manager
+        var modManager = new ModManager(r_notespeed, parameters.mods);
+        Container.Bind<IModManager>().FromInstance(modManager);
+
+        // Bind all components
         Container.Unbind<IAudioTimelineSync>();
         Container.Bind<IAudioTimelineSync>().FromInstance(audioTimelineSync);
         Container.Bind<INoteController>().FromInstance(noteController);
         Container.Bind<IInGameBackground>().FromInstance(inGameBackground);
         Container.Bind<IUIManager>().FromInstance(uiManager);
         Container.Bind<IScript>().FromInstance(chartScript);
-        Container.Bind<IGameStateMachine>().To<GameStateMachine>().AsSingle().NonLazy();
+
+        var SM = new GameStateMachine();
+        Container.Bind<IGameStateMachine>().FromInstance(SM);
+
+        // Touch provider
+        IKirakiraTouchProvider touchProvider;
+        if (!string.IsNullOrEmpty(parameters.replayPath))
+        {
+            touchProvider = new DemoReplayTouchProvider(DemoFile.LoadFrom(fs.GetFile(parameters.replayPath)));
+        }
+        else if (parameters.mods.HasFlag(ModFlag.AutoPlay))
+        {
+            GameObject.Find("MouseCanvas").SetActive(false);
+            touchProvider = new AutoPlayTouchProvider(SM);
+        }
+        else
+        {
+            /*#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+                        provider = new MultiMouseTouchProvider();
+            #else*/
+#if UNITY_EDITOR
+            GameObject.Find("MouseCanvas").SetActive(false);
+            touchProvider = new MouseTouchProvider();
+#else
+            GameObject.Find("MouseCanvas").SetActive(false);
+            touchProvider = new InputManagerTouchProvider();
+#endif
+        }
+
+        Container.Bind<IKirakiraTouchProvider>().FromInstance(touchProvider);
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Profiling;
@@ -9,9 +8,10 @@ using AudioProvider;
 using Cysharp.Threading.Tasks;
 using JudgeQueue = PriorityQueue<int, NoteBase>;
 using Zenject;
-using System.Threading;
 using BanGround;
 using BanGround.Scripting;
+using BanGround.Scene.Params;
+using BanGround.Game.Mods;
 
 public class NoteController : MonoBehaviour, INoteController
 {
@@ -20,7 +20,7 @@ public class NoteController : MonoBehaviour, INoteController
     [Inject]
     private IDataLoader dataLoader;
     [Inject]
-    private IChartListManager chartListManager;
+    private IChartLoader chartLoader;
     [Inject]
     private IModManager modManager;
     [Inject]
@@ -33,6 +33,8 @@ public class NoteController : MonoBehaviour, INoteController
     private IUIManager UI;
     [Inject]
     private IScript chartScript;
+    [Inject]
+    private IKirakiraTouchProvider touchProvider;
 
     [Inject(Id = "o_judge")]
     private KVar o_judge;
@@ -44,6 +46,7 @@ public class NoteController : MonoBehaviour, INoteController
 
     public static int audioTime { get; private set; }
     public static int judgeTime { get; private set; }
+    public static int looseJudgeTime { get; private set; }
     public static float audioTimef { get; private set; }
     public static float judgeTimef { get; private set; }
 
@@ -75,7 +78,7 @@ public class NoteController : MonoBehaviour, INoteController
     private List<NoteBase> notesToDestroy = new List<NoteBase>();
     private List<Slide> slidesToDestroy = new List<Slide>();
 
-    private const int WARM_UP_SECOND = 4;
+    private const float WARM_UP_SECOND = 4f;
 
     #region Judge
     private TapEffectType EmitEffect(Vector3 position, JudgeResult result, GameNoteType type)
@@ -389,6 +392,7 @@ public class NoteController : MonoBehaviour, INoteController
     async void Start()
     {
         isFinished = false;
+        var parameters = SceneLoader.GetParamsOrDefault<InGameParams>();
 
         // Main camera
         mainCamera = GameObject.Find("GameMainCamera").GetComponent<Camera>();
@@ -414,7 +418,7 @@ public class NoteController : MonoBehaviour, INoteController
         noteQueue = new JudgeQueue();
 
         // Load chart
-        chart = chartListManager.gameChart;
+        chart = chartLoader.gameChart;
         NotePool.Instance.Init(modManager, notes);
         noteHead = 0;
 
@@ -425,7 +429,7 @@ public class NoteController : MonoBehaviour, INoteController
         timingGroups = chart.groups.Select(g => new TimingGroupController(g, r_brightness_long)).ToArray();
 
         // Check AutoPlay
-        if (TouchManager.provider is AutoPlayTouchProvider provider)
+        if (touchProvider is AutoPlayTouchProvider provider)
         {
             provider.Init(notes);
         }
@@ -443,16 +447,17 @@ public class NoteController : MonoBehaviour, INoteController
        
 
         // Game BGM
-        _ = audioManager.StreamGameBGMTrack(fs.GetFile(dataLoader.GetMusicPath(chartListManager.current.header.mid)).ReadToEnd())
+        _ = audioManager.StreamGameBGMTrack(fs.GetFile(dataLoader.GetMusicPath(chartLoader.header.mid)).ReadToEnd())
             .ContinueWith((bgm) => {
-                modManager.attachedMods.ForEach(mod => (mod as AudioMod)?.ApplyMod(bgm));
-                audioTimelineSync.time = -audioTimelineSync.RealTimeToBGMTime(WARM_UP_SECOND);
+                modManager.AttachedMods.ForEach(mod => (mod as AudioMod)?.ApplyMod(bgm));
+                audioTimelineSync.AudioSeekPos = parameters.seekPosition;
+                audioTimelineSync.Time = parameters.seekPosition - audioTimelineSync.RealTimeToBGMTime(WARM_UP_SECOND);
                 audioTimelineSync.Play();
             });
 
         // Background
         var background = GameObject.Find("InGameBackground").GetComponent<InGameBackground>();
-        var (bg, bgtype) = dataLoader.GetBackgroundPath(chartListManager.current.header.sid, false);
+        var (bg, bgtype) = dataLoader.GetBackgroundPath(parameters.sid, false);
         if (bgtype == 1)
         {
             var videoPath = fs.GetFile(bg).Extract();
@@ -472,7 +477,7 @@ public class NoteController : MonoBehaviour, INoteController
         laneEffects.Init(chart.groups[0]);
         */
         // Check if adjusting offset
-        if (chartListManager.offsetAdjustMode)
+        if (parameters.isOffsetGuide)
         {
             GameObject.Find("infoCanvas").GetComponent<Canvas>().enabled = false;
         }
@@ -481,12 +486,12 @@ public class NoteController : MonoBehaviour, INoteController
             GameObject.Find("settingsCanvas").GetComponent<Canvas>().enabled = false;
         }
 
-        chartScript.Init(chartListManager.current.header.sid, chartListManager.current.difficulty);
+        chartScript.Init(chartLoader.header.sid, chartLoader.chart.difficulty);
 
         //Set Play Mod Event
         //audioManager.restart = false;
         onJudge = null;
-        foreach (var mod in modManager.attachedMods)
+        foreach (var mod in modManager.AttachedMods)
         {
             if (mod is SuddenDeathMod)
                 onJudge += ((JudgeResult result) =>
@@ -516,8 +521,9 @@ public class NoteController : MonoBehaviour, INoteController
     {
         if (SceneLoader.Loading || SM.Base == GameStateMachine.State.Finished || Time.timeScale == 0) return;
 
-        audioTime = audioTimelineSync.timeInMs + audioTimelineSync.RealTimeToBGMTime(o_audio);
+        audioTime = audioTimelineSync.TimeInMs + audioTimelineSync.RealTimeToBGMTime(o_audio);
         judgeTime = audioTime - o_judge;
+        looseJudgeTime = judgeTime - 100;
         audioTimef = audioTime / 1000f;
         judgeTimef = judgeTime / 1000f;
         slidesToDestroy.Clear();
@@ -581,7 +587,7 @@ public class NoteController : MonoBehaviour, INoteController
             chartScript.OnUpdate(audioTime);
 
             if (chartScript.HasOnBeat)
-                chartScript.OnBeat(chartListManager.chart.TimeToBeat(audioTimef));
+                chartScript.OnBeat(chartLoader.chart.TimeToBeat(audioTimef));
         }
     }
 

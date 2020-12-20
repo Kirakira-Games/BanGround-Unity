@@ -5,6 +5,7 @@ using AudioProvider;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
+using BanGround.Game.Mods;
 
 public class SettingAndMod : MonoBehaviour
 {
@@ -14,8 +15,8 @@ public class SettingAndMod : MonoBehaviour
     private IAudioManager audioManager;
     [Inject]
     private IKVSystem kvSystem;
-    [Inject]
-    private IModManager modManager;
+    [Inject(Id = "cl_modflag")]
+    private KVar cl_modflag;
 
     private Button setting_Open_Btn;
     private Button setting_Close_Btn;
@@ -26,7 +27,6 @@ public class SettingAndMod : MonoBehaviour
     private Toggle syncLine_Tog;
     private Toggle offBeat_Tog;
     private Toggle persp_Tog;
-    private Toggle mirrow_Tog;
     private Slider ELP_Slider;
     private Toggle FS_Tog;
     private Toggle VSync_Tog;
@@ -42,16 +42,19 @@ public class SettingAndMod : MonoBehaviour
 
     /* Mods     */
 
+    [Header("Mod toggles")]
     // Auto
-    private Toggle auto_Tog;
+    public Toggle autoToggle;
     // Double
-    private StepToggle speedUp_Tog;
+    public StepToggle speedUpToggle;
     // Half
-    private StepToggle speedDown_Tog;
-    //Sudden Death
-    private Toggle suddenDeath_Tog;
-    //Perfect
-    private Toggle perfect_Tog;
+    public StepToggle speedDownToggle;
+    // Sudden Death
+    public Toggle suddenDeathToggle;
+    // Perfect
+    public Toggle perfectToggle;
+    // Mirror
+    public Toggle mirrorToggle;
 
     /* Mods End */
 
@@ -101,8 +104,6 @@ public class SettingAndMod : MonoBehaviour
     KVar r_lanefx;
     [Inject(Id = "r_graynote")]
     KVar r_graynote;
-    [Inject(Id = "r_mirror")]
-    KVar r_mirror;
     [Inject(Id = "r_bang_perspect")]
     KVar r_bang_perspect;
     [Inject(Id = "r_shake_flick")]
@@ -157,7 +158,6 @@ public class SettingAndMod : MonoBehaviour
 
         syncLine_Tog = GameObject.Find("Sync_Toggle").GetComponent<Toggle>();
         offBeat_Tog = GameObject.Find("Offbeat_Toggle").GetComponent<Toggle>();
-        mirrow_Tog = GameObject.Find("Mirrow_Toggle").GetComponent<Toggle>();
         persp_Tog = GameObject.Find("Perspective_Toggle").GetComponent<Toggle>();
 
         noteToggles = GameObject.Find("Note_Group").GetComponent<NoteStyleToggleGroup>();
@@ -179,12 +179,6 @@ public class SettingAndMod : MonoBehaviour
         igseVolume_Input = GameObject.Find("IGSEVolume_Input").GetComponent<Slider>();
         bgmVolume_Input = GameObject.Find("BGMVolume_Input").GetComponent<Slider>();
         ELP_Slider = GameObject.Find("ELP_Slider").GetComponent<Slider>();
-
-        auto_Tog = GameObject.Find("Autoplay_Toggle").GetComponent<Toggle>();
-        speedDown_Tog = GameObject.Find("Half_Toggle").GetComponent<StepToggle>();
-        speedUp_Tog = GameObject.Find("Double_Toggle").GetComponent<StepToggle>();
-        suddenDeath_Tog = GameObject.Find("SuddenDeath_Toggle").GetComponent<Toggle>();
-        perfect_Tog = GameObject.Find("Perfect_Toggle").GetComponent<Toggle>();
 
         milisec_Tog = GameObject.Find("Milisec_Toggle").GetComponent<Toggle>();
         laneLight_Tog = GameObject.Find("LaneLight_Toggle").GetComponent<Toggle>();
@@ -267,7 +261,6 @@ public class SettingAndMod : MonoBehaviour
         size_Input.text = r_notesize;
         syncLine_Tog.isOn = r_syncline;
         offBeat_Tog.isOn = r_graynote;
-        mirrow_Tog.isOn = r_mirror;
         persp_Tog.isOn = r_bang_perspect;
         ELP_Slider.value = cl_elp;
 
@@ -298,12 +291,14 @@ public class SettingAndMod : MonoBehaviour
     }
     void GetModStatus()
     {
-        auto_Tog.isOn = modManager.isAutoplay;
+        var flag = ModFlagUtil.From(cl_modflag);
 
-        speedDown_Tog.SetStep(modManager.attachedMods);
-        speedUp_Tog.SetStep(modManager.attachedMods);
-        suddenDeath_Tog.isOn = modManager.attachedMods.Contains(SuddenDeathMod.Instance);
-        perfect_Tog.isOn = modManager.attachedMods.Contains(PerfectMod.Instance);
+        autoToggle.isOn = flag.HasFlag(ModFlag.AutoPlay);
+        speedDownToggle.SetStep(flag);
+        speedUpToggle.SetStep(flag);
+        suddenDeathToggle.isOn = flag.HasFlag(ModFlag.SuddenDeath);
+        perfectToggle.isOn = flag.HasFlag(ModFlag.Perfect);
+        mirrorToggle.isOn = flag.HasFlag(ModFlag.Mirror);
     }
 
     public void OnLanuageChanged(int value)
@@ -326,7 +321,6 @@ public class SettingAndMod : MonoBehaviour
             snd_bgm_volume.Set(bgmVolume_Input.value);
             r_syncline.Set(syncLine_Tog.isOn);
             r_graynote.Set(offBeat_Tog.isOn);
-            r_mirror.Set(mirrow_Tog.isOn);
             r_bang_perspect.Set(persp_Tog.isOn);
             cl_elp.Set(ELP_Slider.value);
             r_lanefx.Set(laneLight_Tog.isOn);
@@ -366,15 +360,23 @@ public class SettingAndMod : MonoBehaviour
             cl_notestyle.Set((int)noteToggles.GetStyle());
             cl_sestyle.Set((int)seSelector.GetSE());
 
-            modManager.RemoveAllMods();
-            modManager.AddMod(speedUp_Tog.GetStep());
-            modManager.AddMod(speedDown_Tog.GetStep());
+            ModFlag flag = ModFlag.None;
+            flag |= speedUpToggle.GetStep();
+            flag |= speedDownToggle.GetStep();
 
-            if (suddenDeath_Tog.isOn) modManager.AddMod(SuddenDeathMod.Instance);
+            if (suddenDeathToggle.isOn)
+                flag |= ModFlag.SuddenDeath;
 
-            if (perfect_Tog.isOn) modManager.AddMod(PerfectMod.Instance);
+            if (perfectToggle.isOn)
+                flag |= ModFlag.Perfect;
 
-            if (auto_Tog.isOn) modManager.AddMod(AutoPlayMod.Instance);
+            if (autoToggle.isOn)
+                flag |= ModFlag.AutoPlay;
+
+            if (mirrorToggle.isOn)
+                flag |= ModFlag.Mirror;
+
+            cl_modflag.SetMod(flag);
         }
         catch (System.Exception e)
         {

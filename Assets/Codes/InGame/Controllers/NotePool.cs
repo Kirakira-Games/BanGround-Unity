@@ -5,6 +5,7 @@ using UnityEngine.Rendering;
 using Object = UnityEngine.Object;
 using System.Collections;
 using Zenject;
+using BanGround.Game.Mods;
 
 class NoteEvent : IComparable<NoteEvent>
 {
@@ -188,7 +189,7 @@ public class NotePool : MonoBehaviour
                 {
                     type = i.type,
                     time = range == -1 ?
-                        note.time + NoteUtility.SLIDE_TICK_JUDGE_RANGE + Mathf.Max(0, o_judge) :
+                        note.time + NoteUtility.SLIDE_TICK_JUDGE_RANGE + 100 + Mathf.Max(0, o_judge) :
                         note.time + range,
                     delta = -1
                 });

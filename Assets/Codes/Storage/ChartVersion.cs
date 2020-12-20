@@ -35,6 +35,9 @@ public class ChartVersion : IChartVersion
 
     public async UniTask<V2.Chart> Process(cHeader header, Difficulty difficulty)
     {
+        if (header == null)
+            return null;
+
         V2.Chart chart = new V2.Chart();
         try
         {

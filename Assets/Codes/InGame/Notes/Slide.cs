@@ -68,6 +68,7 @@ public class Slide : MonoBehaviour, KirakiraTracer
         }
     }
 
+    #region display
     private void UpdateHead()
     {
         while (judgeHead < notes.Count && (notes[judgeHead].isDestroyed ||
@@ -140,6 +141,7 @@ public class Slide : MonoBehaviour, KirakiraTracer
         noteHead.gameObject.SetActive(isJudging);
         //noteHead.tapEffect.OnUpdate();
     }
+    #endregion display
 
     public void OnSlideUpdate()
     {
