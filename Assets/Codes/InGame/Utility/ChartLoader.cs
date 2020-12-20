@@ -311,7 +311,7 @@ public class ChartLoader : IChartLoader
         // Load chart
         numNotes = 0;
         bool isMirror = mods.HasFlag(ModFlag.Mirror);
-        var timing = new ChartTiming(chart.bpm, chart.offset, modManager.NoteScreenTime, isMirror);
+        var timing = new ChartTiming(chart, modManager.NoteScreenTime, isMirror);
         var gameNotes = new List<GameNoteData>();
         for (int i = 0; i < chart.groups.Count; i++)
         {
