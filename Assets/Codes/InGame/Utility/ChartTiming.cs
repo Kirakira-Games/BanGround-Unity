@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Linq;
 using UnityEngine.Rendering;
 using Zenject;
+using BGEditor;
 
 class IWithTimingComparer : IComparer<IWithTiming>
 {
@@ -17,6 +18,7 @@ class IWithTimingComparer : IComparer<IWithTiming>
 
 public class ChartTiming
 {
+    public readonly V2.Chart chart;
     public List<ValuePoint> bpms { get; private set; }
     public TimingGroup timings { get; private set; }
     private float totTime;
@@ -27,29 +29,19 @@ public class ChartTiming
 
     public readonly bool isMirror;
 
-    public static float BeatToFloat(int[] beat)
-    {
-        return beat[0] + (float)beat[1] / beat[2];
-    }
-
-    public ChartTiming(List<ValuePoint> bpms, int offset, int noteScreenTime, bool isMirror)
+    public ChartTiming(V2.Chart chart, int noteScreenTime, bool isMirror)
     {
         this.isMirror = isMirror;
+        this.chart = chart;
 
         totTime = noteScreenTime / 1000f;
-        this.bpms = bpms;
-        bpms.ForEach(bpm => bpm.beatf = BeatToFloat(bpm.beat));
+        bpms = chart.bpm;
+        bpms.ForEach(bpm => bpm.beatf = ChartUtility.BeatToFloat(bpm.beat));
         bpms.Sort(new IWithTimingComparer());
         // Compute time for BPM
-        float currentBpm = 120;
-        float startDash = 0;
-        float startTime = offset / 1000f;
         foreach (var bpm in bpms)
         {
-            startTime += (bpm.beatf - startDash) * 60 / currentBpm;
-            startDash = bpm.beatf;
-            currentBpm = bpm.value;
-            bpm.time = startTime;
+            bpm.time = chart.BeatToTime(bpm.beat);
         }
     }
 
@@ -58,8 +50,8 @@ public class ChartTiming
         if (timing == null)
             return;
         if (timing.beat != null)
-            timing.beatf = BeatToFloat(timing.beat);
-        timing.time = GetTimeByBeat(timing.beatf);
+            timing.beatf = ChartUtility.BeatToFloat(timing.beat);
+        timing.time = chart.BeatToTime(timing.beatf);
     }
 
     public void LoadTimingGroup(TimingGroup group)
@@ -91,17 +83,6 @@ public class ChartTiming
     public float GetAppearTime(V2.Note note)
     {
         return note.anims[0].time;
-    }
-
-    public float GetTimeByBeat(float beat)
-    {
-        var bpm = bpms[GetPrevIndex(bpms, beat)];
-        return bpm.time + (beat - bpm.beatf) * 60 / bpm.value;
-    }
-
-    public float GetTimeByBeat(int[] beat)
-    {
-        return GetTimeByBeat(BeatToFloat(beat));
     }
 
     public List<V2.NoteAnim> GenerateAnimation(List<V2.NoteAnim> raw, V2.Note note)
@@ -246,7 +227,7 @@ public class ChartTiming
 
         // The last animation after judge
         float beatEnd = data.beatf;
-        while (GetTimeByBeat(beatEnd) - GetTimeByBeat(data.beatf) <= NoteUtility.SLIDE_TICK_JUDGE_RANGE / 1000f)
+        while (chart.BeatToTime(beatEnd) - chart.BeatToTime(data.beatf) <= NoteUtility.SLIDE_TICK_JUDGE_RANGE / 1000f)
         {
             beatEnd += 1f;
         }

@@ -53,7 +53,7 @@ namespace BGEditor
     {
         public static float BeatToFloat(int[] beat)
         {
-            return ChartTiming.BeatToFloat(beat);
+            return beat[0] + (float)beat[1] / beat[2];
         }
 
         public static void NormalizeBeat(int[] beat)
