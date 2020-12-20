@@ -15,7 +15,7 @@ namespace BGEditor
         [Inject]
         private IAudioManager audioManager;
         [Inject]
-        private IChartListManager chartListManager;
+        private IChartLoader chartLoader;
         [Inject]
         private IResourceLoader resourceLoader;
         [Inject]
@@ -56,7 +56,7 @@ namespace BGEditor
         {
             audioLength = bgm.GetLength();
             float expectedLength = audioLength / 1000f;
-            var mHeader = dataLoader.GetMusicHeader(chartListManager.current.header.mid);
+            var mHeader = dataLoader.GetMusicHeader(chartLoader.header.mid);
             if (!Mathf.Approximately(mHeader.length, expectedLength))
             {
                 mHeader.length = expectedLength;
@@ -129,7 +129,7 @@ namespace BGEditor
 
         public async void Init()
         {
-            byte[] audio =  fs.GetFile(dataLoader.GetMusicPath(chartListManager.current.header.mid)).ReadToEnd();
+            byte[] audio =  fs.GetFile(dataLoader.GetMusicPath(chartLoader.header.mid)).ReadToEnd();
             // Load BGM
             audioManager.gameBGM = await audioManager.Provider.StreamTrack(audio);
             bgm.Play();

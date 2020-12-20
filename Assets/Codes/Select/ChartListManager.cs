@@ -10,6 +10,8 @@ using System.Linq;
 using BanGround;
 using System.Security.Cryptography;
 using System.IO;
+using BanGround.Game.Mods;
+using BanGround.Scene.Params;
 
 public class ChartIndexInfo
 {
@@ -23,20 +25,10 @@ public class ChartListManager : IChartListManager
     private IDataLoader dataLoader;
     private ISorterFactory sorterFactory;
 
-    public int offsetAdjustSid { get; private set; } = 99901;
-    public Difficulty offsetAdjustDiff { get; private set; } = Difficulty.Easy;
-    public bool offsetAdjustMode { get; private set; } = false;
-
     [Inject(Id = "cl_lastsid")]
     private KVar cl_lastsid;
     [Inject(Id = "cl_lastdiff")]
     private KVar cl_lastdiff;
-    [Inject]
-    private IMessageBannerController messageBannerController;
-    [Inject]
-    private IModManager modManager;
-    [Inject]
-    private IFileSystem fs;
 
     public List<cHeader> chartList => dataLoader.chartList;
 
@@ -45,17 +37,13 @@ public class ChartListManager : IChartListManager
     public UnityEvent onSelectedChartUpdated { get; } = new UnityEvent();
 
     /// <summary>
-    /// Current chart, either <see cref="selectedChart"/> or <see cref="forceChart"/>
+    /// Current chart.
     /// </summary>
-    public ChartIndexInfo current => forceChart.header == null ? selectedChart : forceChart;
+    public ChartIndexInfo current => selectedChart;
 
-    public V2.Chart chart { get; private set; }
-    public GameChartData gameChart { get; private set; }
 
     // Currently selected chart.
     private ChartIndexInfo selectedChart = new ChartIndexInfo();
-    // Force to play this chart. Used in offset adjust mode.
-    private ChartIndexInfo forceChart = new ChartIndexInfo();
 
     public ChartListManager(IDataLoader dataLoader, ISorterFactory sorterFactory)
     {
@@ -121,130 +109,10 @@ public class ChartListManager : IChartListManager
         UpdateActualDifficulty();
     }
 
-    public void ClearForcedChart()
-    {
-        forceChart.header = null;
-        offsetAdjustMode = false;
-    }
-
-    public void ForceChart(int sid, Difficulty difficulty)
-    {
-        ClearForcedChart();
-
-        int index = chartList.FindIndex((header) => header.sid == sid);
-
-        if (index != -1)
-        {
-            forceChart.index = index;
-            forceChart.header = chartList[index];
-            forceChart.header.LoadDifficultyLevels(dataLoader);
-            forceChart.difficulty = difficulty;
-        }
-    }
-
-    public void ForceOffsetChart()
-    {
-        ForceChart(offsetAdjustSid, offsetAdjustDiff);
-        offsetAdjustMode = true;
-    }
-
     public void SortChart()
     {
         chartList.Sort(sorterFactory.Create());
         SelectChartBySid(cl_lastsid);
         onChartListUpdated.Invoke();
-    }
-
-    public Dictionary<string, byte[]> ComputeCurrentChartHash()
-    {
-        var fileList = fs.Find(f =>
-        {
-            if (f.Name.StartsWith(dataLoader.GetChartResource(current.header.sid, "")))
-            {
-                var name = f.Name.Replace(dataLoader.GetChartResource(current.header.sid, ""), "").ToLower();
-
-                if (name == "cheader.bin")
-                    return false;
-
-                if (name.EndsWith(".bin") && name != $"{current.difficulty:g}.bin".ToLower())
-                    return false;
-
-                return true;
-            }
-            else if (f.Name.ToLower() == dataLoader.GetMusicPath(current.header.mid))
-            {
-                return true;
-            }
-
-            return false;
-        }).ToArray();
-
-        var ret = new Dictionary<string, byte[]>();
-        foreach (var file in fileList)
-        {
-            using (var sha256 = SHA256.Create())
-            {
-                using (var fs = file.Open(FileAccess.Read))
-                {
-                    ret.Add(file.Name, sha256.ComputeHash(fs));
-                }
-            }
-        }
-        return ret;
-    }
-
-    [Inject(Id = "r_mirror")]
-    private KVar r_mirror;
-    [Inject]
-    private IChartVersion chartVersion;
-
-    public async UniTask<bool> LoadChart(bool convertToGameChart)
-    {
-        chart = await chartVersion.Process(current.header, current.difficulty);
-        if (chart == null)
-        {
-            messageBannerController.ShowMsg(LogLevel.ERROR, "This chart is unsupported.");
-            return false;
-        }
-        try
-        {
-            if (convertToGameChart)
-            {
-                gameChart = LoadChartInternal(
-                        JsonConvert.DeserializeObject<V2.Chart>(
-                        JsonConvert.SerializeObject(chart)
-                    ));
-            }
-            return true;
-        }
-        catch (Exception e)
-        {
-            messageBannerController.ShowMsg(LogLevel.ERROR, e.Message);
-            Debug.LogError(e.StackTrace);
-            return false;
-        }
-    }
-
-    private GameChartData LoadChartInternal(V2.Chart chart)
-    {
-        ChartLoader.numNotes = 0;
-        var timing = new ChartTiming(chart.bpm, chart.offset, modManager.NoteScreenTime, r_mirror);
-        var gameNotes = new List<GameNoteData>();
-        for (int i = 0; i < chart.groups.Count; i++)
-        {
-            ChartLoader.LoadTimingGroup(timing, i, chart.groups[i]).ForEach(note => gameNotes.Add(note));
-        }
-
-        // Sort notes by animation order
-        gameNotes.Sort(new GameNoteComparer());
-
-        return new GameChartData
-        {
-            isFuwafuwa = ChartLoader.IsChartFuwafuwa(gameNotes),
-            numNotes = ChartLoader.numNotes,
-            notes = gameNotes.ToArray(),
-            groups = chart.groups.Select(x => ChartLoader.ToGameTimingGroup(x)).ToArray(),
-            bpm = chart.bpm.ToArray()
-        };
     }
 }

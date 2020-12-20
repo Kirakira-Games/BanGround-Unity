@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class InputManagerTouchProvider : KirakiraTouchProvider
+public class InputManagerTouchProvider : IKirakiraTouchProvider
 {
     public static KirakiraTouchPhase Kirakira(TouchPhase phase)
     {
@@ -33,7 +33,6 @@ public class InputManagerTouchProvider : KirakiraTouchProvider
             {
                 touchId = touch.fingerId,
                 time = NoteController.judgeTime,
-                realtime = Time.realtimeSinceStartup,
                 screenPos = touch.position,
                 pos = pos,
                 phase = Kirakira(touch.phase)

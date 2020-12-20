@@ -9,6 +9,7 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
     private KVar r_bang_perspect;
 
     public int time;
+    public int judgeWindowEnd;
     public int lane;
     public int judgeTime;
     public int touchId;
@@ -57,6 +58,7 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
         isDestroyed = false;
         
         time = data.time;
+        judgeWindowEnd = time + NoteUtility.TAP_JUDGE_RANGE[(int)JudgeResult.Bad];
         lane = data.lane;
         type = data.type;
         displayFuwafuwa = data.isFuwafuwa;
@@ -123,7 +125,8 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
 
     protected virtual void OnNoteUpdateJudge()
     {
-        if (NoteController.judgeTime > time + NoteUtility.TAP_JUDGE_RANGE[(int)JudgeResult.Bad])
+        // Loose time window
+        if (NoteController.looseJudgeTime > judgeWindowEnd)
         {
             RealJudge(null, JudgeResult.Miss);
         }
@@ -156,9 +159,11 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
     public virtual JudgeResult TryJudge(KirakiraTouch touch)
     {
         if (isTracingOrJudged || touch.current.phase != KirakiraTouchPhase.Began)
-        {
             return JudgeResult.None;
-        }
+        
+        if (touch.current.time > judgeWindowEnd)
+            return JudgeResult.Miss;
+
         return TranslateTimeToJudge(NoteUtility.TAP_JUDGE_RANGE, touch.current.time);
     }
 

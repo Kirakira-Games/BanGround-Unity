@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BanGround.Game.Mods;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,31 +7,26 @@ using System.Threading.Tasks;
 
 public class SpeedUpStep : StepToggle
 {
-    public override AudioMod GetStep()
+    public override ModFlag GetStep()
     {
-        if (index == 1) return DoubleMod.Instanse;
-        else if (index == 2) return NightCoreMod.Instanse;
-        else return null;
+        if (index == 1) return ModFlag.Double;
+        else if (index == 2) return ModFlag.NightCore;
+        else return ModFlag.None;
     }
 
-    public override void SetStep(List<ModBase> mods)
+    public override void SetStep(ModFlag mods)
     {
-        if (mods == null || mods.Count == 0)
+        if (mods.HasFlag(ModFlag.Double))
         {
-            index = 0;
+            index = 1;
+        }
+        else if (mods.HasFlag(ModFlag.NightCore))
+        {
+            index = 2;
         }
         else
         {
-            foreach (var mod in mods)
-            {
-                if (mod is AudioMod)
-                {
-                    if (mod is DoubleMod) index = 1;
-                    else if (mod is NightCoreMod) index = 2;
-                    else index = 0;
-                    break;
-                }
-            }
+            index = 0;
         }
         OnIndexChanged();
     }

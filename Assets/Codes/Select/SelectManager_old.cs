@@ -12,6 +12,9 @@ using Cysharp.Threading.Tasks;
 using Zenject;
 using BanGround;
 using BanGround.Utils;
+using BanGround.Scene.Params;
+using BGEditor;
+using BanGround.Game.Mods;
 
 #pragma warning disable 0649
 public class SelectManager_old : MonoBehaviour
@@ -27,9 +30,15 @@ public class SelectManager_old : MonoBehaviour
     [Inject]
     private IChartListManager chartListManager;
     [Inject]
+    private IChartLoader chartLoader;
+    [Inject]
     private IFileSystem fs;
     [Inject(Id = "cl_cursorter")]
     private KVar cl_cursorter;
+    [Inject(Id = "cl_modflag")]
+    private KVar cl_modflag;
+    [Inject(Id = "g_saveReplay")]
+    private KVar g_saveReplay;
     [Inject]
     private ICancellationTokenStore cancellationToken;
 
@@ -130,7 +139,21 @@ public class SelectManager_old : MonoBehaviour
         kvSystem.SaveConfig();
 
         PlayVoicesAtSceneOut();
-        SceneLoader.LoadScene("InGame", () => chartListManager.LoadChart(true), true);
+
+        var modflag = ModFlagUtil.From(cl_modflag);
+        SceneLoader.LoadScene("InGame", () => chartLoader.LoadChart(
+            chartListManager.current.header.sid,
+            chartListManager.current.difficulty,
+            true), true,
+            parameters: new InGameParams
+            {
+                sid = chartListManager.current.header.sid,
+                difficulty = chartListManager.current.difficulty,
+                isOffsetGuide = false,
+                mods = modflag,
+                saveRecord = true,
+                saveReplay = g_saveReplay,
+            });
         await PreviewFadeOut().WithCancellation(cancellationToken.sceneToken).SuppressCancellationThrow();
     }
 
@@ -349,11 +372,15 @@ public class SelectManager_old : MonoBehaviour
     #region ChartEditor
     public void OpenMappingScene()
     {
-        //if (!await liveSetting.LoadChart(false))
-        //{
-        //    return;
-        //}
-        SceneLoader.LoadScene("Mapping", () => chartListManager.LoadChart(false), true);
+        int sid = chartListManager.current.header.sid;
+        var difficulty = chartListManager.current.difficulty;
+        SceneLoader.LoadScene("Mapping", () => chartLoader.LoadChart(sid, difficulty, false), true,
+            new MappingParams
+            {
+                sid = sid,
+                difficulty = difficulty,
+                editor = new EditorInfo()
+            });
     }
 
     public async void ExportKiraPack()
@@ -386,7 +413,7 @@ public class SelectManager_old : MonoBehaviour
     public void DuplicateKiraPack()
     {
         dataLoader.DuplicateKiraPack(chartListManager.current.header);
-        SceneManager.LoadScene("Select");
+        SceneLoader.LoadScene("Select");
     }
     #endregion
 
@@ -404,7 +431,7 @@ public class SelectManager_old : MonoBehaviour
         if (focus)
         {
             bool success = dataLoader.LoadAllKiraPackFromInbox();
-            if (success) SceneManager.LoadScene("Select");
+            if (success) SceneLoader.LoadScene("Select");
         }
     }
 #endif

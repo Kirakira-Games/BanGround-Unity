@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class AutoPlayTouchProvider : KirakiraTouchProvider
+public class AutoPlayTouchProvider : IKirakiraTouchProvider
 {
     private List<KirakiraTouchState> events = new List<KirakiraTouchState>();
     private LinkedList<KirakiraTouchState> delayedQueue = new LinkedList<KirakiraTouchState>();
@@ -246,7 +246,6 @@ public class AutoPlayTouchProvider : KirakiraTouchProvider
         foreach (var e in ret)
         {
             e.time = NoteController.audioTime;
-            e.realtime = Time.realtimeSinceStartup;
         }
 
         return new KirakiraTouchState[][] { ret.ToArray() };

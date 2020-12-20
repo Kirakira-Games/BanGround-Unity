@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using BanGround.Game.Mods;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,12 +13,12 @@ public class GradeColorChange : MonoBehaviour
     [Inject]
     private IModManager modManager;
 
-    Slider sld;
-    Image fill;
-    Text txt;
-    Text scoreTxt;
-    double score;
-    double displayScore;
+    private Slider sld;
+    private Image fill;
+    private Text txt;
+    private Text scoreTxt;
+    private double score;
+    private double displayScore;
 
     private void Start()
     {
@@ -33,7 +34,7 @@ public class GradeColorChange : MonoBehaviour
     {
         score = _score * modManager.ScoreMultiplier;
         sld.value = (float)_score;
-        txt.text = modManager.isAutoplay ? "AUTO": string.Format("{0:P2}", Mathf.FloorToInt((float)_acc * 10000) / 10000f);
+        txt.text = modManager.Flag.HasFlag(ModFlag.AutoPlay) ? "AUTO": string.Format("{0:P2}", Mathf.FloorToInt((float)_acc * 10000) / 10000f);
     }
 
     void ScoreAddAnimation()

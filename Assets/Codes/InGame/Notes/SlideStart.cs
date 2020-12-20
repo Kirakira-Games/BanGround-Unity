@@ -33,17 +33,10 @@ public class SlideStart : SlideNoteBase
     public override void ResetNote(GameNoteData data)
     {
         base.ResetNote(data);
+        judgeWindowEnd = time + (isTilt ?
+            NoteUtility.SLIDE_END_JUDGE_RANGE :
+            NoteUtility.TAP_JUDGE_RANGE)[(int)JudgeResult.Bad];
         noteMesh.meshRenderer.sharedMaterial.SetTexture("_MainTex", resourceLoader.LoadSkinResource<Texture2D>("note_single_tint"));
         //GetComponent<SpriteRenderer>().sprite = resourceLoader.LoadSkinResource<Sprite>("note_long_default");
-    }
-
-    protected override void OnNoteUpdateJudge()
-    {
-        if (NoteController.judgeTime > time + (isTilt ?
-            NoteUtility.SLIDE_END_JUDGE_RANGE:
-            NoteUtility.TAP_JUDGE_RANGE)[(int)JudgeResult.Bad])
-        {
-            RealJudge(null, JudgeResult.Miss);
-        }
     }
 }

@@ -30,6 +30,9 @@ public class GlobalInstaller : MonoInstaller
         // MasterMemory
         Initializer.SetupMessagePackResolver();
 
+        // SceneLoader
+        SceneLoader.Init();
+
         // Filesystem
         Container.Bind<IFileSystem>().To<KiraFilesystem>().AsSingle().OnInstantiated((_, obj) =>
         {
@@ -62,10 +65,10 @@ public class GlobalInstaller : MonoInstaller
         RegisterKonCommands();
 
         // Chart version
-        Container.Bind<IChartVersion>().To<ChartVersion>().AsSingle().OnInstantiated((contxet, obj) =>
-        {
-            if (obj is ValidationMarker) return;
-        }).NonLazy();
+        Container.Bind<IChartVersion>().To<ChartVersion>().AsSingle().NonLazy();
+
+        // Chart Loader
+        Container.Bind<IChartLoader>().To<ChartLoader>().AsSingle().NonLazy();
 
         // Audio Manager
         Container.Bind<IAudioProvider>().FromFactory<AudioProviderFactory>().AsSingle().NonLazy();
@@ -80,9 +83,6 @@ public class GlobalInstaller : MonoInstaller
 
         // Chart List Manager
         Container.Bind<IChartListManager>().To<ChartListManager>().AsSingle().NonLazy();
-
-        // Mod Manager
-        Container.Bind<IModManager>().To<ModManager>().AsSingle().NonLazy();
 
         // Resource Loader
         Container.Bind<IResourceLoader>().To<ResourceLoader>().AsSingle().NonLazy();
@@ -111,9 +111,6 @@ public class GlobalInstaller : MonoInstaller
 
         // Account manager
         Container.Bind<IAccountManager>().FromInstance(accountManager);
-
-        // Editor info
-        Container.Bind<IFactory<IEditorInfo>>().To<EditorInfoFactory>().AsSingle().NonLazy();
     }
 
     void RegisterKonCommands()
@@ -128,7 +125,6 @@ public class GlobalInstaller : MonoInstaller
             KVar.C("r_syncline", "1", KVarFlags.Archive, "Show syncline"),
             KVar.C("r_lanefx", "1", KVarFlags.Archive, "Show lane effects while clicking on lanes"),
             KVar.C("r_graynote", "1", KVarFlags.Archive, "Enables the \"Off-beat coloring\" aka grey notes"),
-            KVar.C("r_mirror", "0", KVarFlags.Archive, "Mirror the chart"),
             KVar.C("r_bang_perspect", "1", KVarFlags.Archive, "Use BanG Dream style perspect instead of real 3d perspect"),
 
             KVar.C("r_shake_flick", "1", KVarFlags.Archive, "Shake the screen while flicker note judged"),
@@ -175,13 +171,13 @@ public class GlobalInstaller : MonoInstaller
             KVar.C("snd_buffer_bass", "-1", KVarFlags.Archive, "Buffer type of Bass Sound Engine"),
             KVar.C("snd_buffer_fmod", "-1", KVarFlags.Archive, "Buffer size of Fmod/Unity Sound Engine"),
 
-            KVar.C("g_demoRecord", "1", KVarFlags.Archive, "Enables demo recording."),
+            KVar.C("g_saveReplay", "1", KVarFlags.Archive, "Enables replay recording."),
 
             KVar.C("snd_output", ((int)FMOD.OUTPUTTYPE.AUTODETECT).ToString(), KVarFlags.Archive),
 
             KVar.C("cl_language", "-1", KVarFlags.Archive),
 
-            KVar.C("cl_currentdemo", "", KVarFlags.StringOnly, "Current demo file"),
+            KVar.C("cl_modflag", "0", KVarFlags.StringOnly, "A binary string storing ModFlag. At most 64 bits."),
         };
 
         foreach (var info in varInfos)

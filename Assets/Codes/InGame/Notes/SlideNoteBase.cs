@@ -30,6 +30,10 @@ public abstract class SlideNoteBase : NoteBase
         {
             return JudgeResult.None;
         }
+        if (touch.current.time > judgeWindowEnd)
+        {
+            return JudgeResult.Miss;
+        }
         return TrySlideJudge(touch);
     }
 
