@@ -1,10 +1,15 @@
 ﻿using System.Collections.Generic;
+using System.Text;
+using BanGround;
 using Newtonsoft.Json;
 using UnityEngine;
 using Zenject;
 
 public class LocalizedStrings : MonoBehaviour
 {
+    [Inject]
+    IFileSystem fs;
+
     public TextAsset[] languageFiles = new TextAsset[24];
     private Dictionary<string, string> dictionary = null;
 
@@ -44,6 +49,11 @@ public class LocalizedStrings : MonoBehaviour
     {
         if (dictionary.ContainsKey(str))
             return dictionary[str];
+
+        Debug.LogWarning($"Missing localized entry: {str}");
+
+        var file = fs.GetOrNewFile("missing_localized_entrys.csv");
+        file.WriteBytes(Encoding.UTF8.GetBytes(file.ReadAsString() + "\n" + str));
 
         return str;
     }
