@@ -15,7 +15,6 @@ using BanGround.Game.Mods;
 
 public class ReplayFrame
 {
-    public int audioTime;
     public int judgeTime;
 
     public KirakiraTouchState[] events;
@@ -29,7 +28,7 @@ public class FileChecksum
 
 public class DemoFile
 {
-    const ushort KIRAREPLAY_VERSION = 3;
+    const ushort KIRAREPLAY_VERSION = 4;
 
     public uint uid;
     public int sid;
@@ -42,7 +41,7 @@ public class DemoFile
     {
         var frame = new ReplayFrame
         {
-            audioTime = NoteController.audioTime,
+            judgeTime = NoteController.judgeTime,
             events = new KirakiraTouchState[kirakiraTouchStates.Length]
         };
 
@@ -97,8 +96,8 @@ public class DemoFile
                 // ReplayFrame frames[];
                 foreach (var frame in frames)
                 {
-                    // int audioTime;
-                    br.Write(frame.audioTime);
+                    // int judgeTime;
+                    br.Write(frame.judgeTime);
                     // char eventCount;
                     br.Write((byte)frame.events.Length);
 
@@ -106,15 +105,15 @@ public class DemoFile
                     foreach (var e in frame.events)
                     {
                         // short deltaTime;
-                        br.Write((short)(e.time - frame.audioTime));
+                        br.Write((short)(e.time - frame.judgeTime));
                         // char phase
                         br.Write((byte)e.phase);
                         // int touchId;
                         br.Write(e.touchId);
 
                         // vec2 pos
-                        br.Write((short)(e.pos.x * 64));
-                        br.Write((short)(e.pos.y * 64));
+                        br.Write((short)(e.pos.x * 256));
+                        br.Write((short)(e.pos.y * 256));
                     }
                 }
 
@@ -247,12 +246,12 @@ public class DemoFile
                 // ReplayFrame frames[];
                 for (int i = 0; i < frameCount; ++i)
                 {
-                    // int audioTime;
-                    var audioTime = br.ReadInt32();
+                    // int judgeTime;
+                    var judgeTime = br.ReadInt32();
                     // char eventCount;
                     var eventCount = br.ReadByte();
 
-                    Console.WriteLine($"Frame {i} at {audioTime}ms, contains {eventCount} events");
+                    Console.WriteLine($"Frame {i} at {judgeTime}ms, contains {eventCount} events");
 
                     var eventList = new List<KirakiraTouchState>();
 
@@ -267,13 +266,13 @@ public class DemoFile
                         int touchId = br.ReadInt32();
 
                         // vec2 pos
-                        var x = br.ReadInt16() / 64.0f;
-                        var y = br.ReadInt16() / 64.0f;
+                        var x = br.ReadInt16() / 256.0f;
+                        var y = br.ReadInt16() / 256.0f;
 
                         eventList.Add(new KirakiraTouchState
                         {
                             phase = phase,
-                            time = audioTime + deltaTime,
+                            time = judgeTime + deltaTime,
                             touchId = touchId,
                             pos = new Vector2
                             {
@@ -285,7 +284,7 @@ public class DemoFile
 
                     var frame = new ReplayFrame
                     {
-                        audioTime = audioTime,
+                        judgeTime = judgeTime,
                         events = eventList.ToArray()
                     };
 

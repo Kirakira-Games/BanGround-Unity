@@ -191,7 +191,6 @@ class MultiMouseTouchProvider : InputManagerTouchProvider
                     screenPos = current.position,
                     pos = pos,
                     time = NoteController.judgeTime,
-                    realtime = Time.realtimeSinceStartup,
                     phase = phase
                 };
                 //Debug.Log(touch.ToString());
@@ -210,7 +209,6 @@ class MultiMouseTouchProvider : InputManagerTouchProvider
                         screenPos = current.position,
                         pos = pos,
                         time = NoteController.judgeTime,
-                        realtime = Time.realtimeSinceStartup,
                         phase = KirakiraTouchPhase.Ended
                     });
                 }

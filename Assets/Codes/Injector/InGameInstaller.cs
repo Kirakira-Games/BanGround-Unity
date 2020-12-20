@@ -44,7 +44,7 @@ public class InGameInstaller : MonoInstaller
         IKirakiraTouchProvider touchProvider;
         if (!string.IsNullOrEmpty(parameters.replayPath))
         {
-            touchProvider = new DemoReplayTouchPrivider(DemoFile.LoadFrom(fs.GetFile(parameters.replayPath)));
+            touchProvider = new DemoReplayTouchProvider(DemoFile.LoadFrom(fs.GetFile(parameters.replayPath)));
         }
         else if (parameters.mods.HasFlag(ModFlag.AutoPlay))
         {

@@ -16,6 +16,8 @@ public class FlickNote : NoteBase
     public override void ResetNote(GameNoteData data)
     {
         base.ResetNote(data);
+
+        judgeWindowEnd = time + NoteUtility.TAP_JUDGE_RANGE[(int)JudgeResult.Bad];
         noteMesh.meshRenderer.sharedMaterial.SetTexture("_MainTex", resourceLoader.LoadSkinResource<Texture2D>("note_flick_tint"));
         flickArrow.Reset(timingGroup);
         //GetComponent<SpriteRenderer>().sprite = resourceLoader.LoadSkinResource<Sprite>("note_flick_default");
@@ -34,16 +36,16 @@ public class FlickNote : NoteBase
 
     protected override void OnNoteUpdateJudge()
     {
+        // Loose time window
         if (!isTracingOrJudged)
         {
-            if (NoteController.judgeTime > time + NoteUtility.TAP_JUDGE_RANGE[(int)JudgeResult.Bad])
+            if (NoteController.looseJudgeTime > judgeWindowEnd)
             {
                 RealJudge(null, JudgeResult.Miss);
             }
         }
-        else if (NoteController.judgeTime >
-            Mathf.Max(time + NoteUtility.TAP_JUDGE_RANGE[(int)JudgeResult.Bad],
-                      judgeTime + NoteUtility.SLIDE_END_FLICK_JUDGE_RANGE))
+        else if (NoteController.looseJudgeTime >
+            Mathf.Max(judgeWindowEnd, judgeTime + NoteUtility.SLIDE_END_FLICK_JUDGE_RANGE))
         {
             RealJudge(null, JudgeResult.Miss);
         }

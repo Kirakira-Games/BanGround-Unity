@@ -33,7 +33,6 @@ public class InputManagerTouchProvider : IKirakiraTouchProvider
             {
                 touchId = touch.fingerId,
                 time = NoteController.judgeTime,
-                realtime = Time.realtimeSinceStartup,
                 screenPos = touch.position,
                 pos = pos,
                 phase = Kirakira(touch.phase)
