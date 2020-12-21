@@ -1,14 +1,12 @@
 ﻿using BanGround.Game.Mods;
 using Newtonsoft.Json;
+using System;
 
 namespace BanGround.Scene.Params
 {
     public abstract class SceneParams
     {
-        public override string ToString()
-        {
-            return JsonConvert.SerializeObject(this);
-        }
+        public override abstract string ToString();
     }
 
     public class MappingParams : SceneParams
@@ -16,6 +14,11 @@ namespace BanGround.Scene.Params
         public int sid;
         public Difficulty difficulty;
         public BGEditor.IEditorInfo editor = new BGEditor.EditorInfo();
+
+        public override string ToString()
+        {
+            return $"sid = {sid}\ndifficulty = {difficulty}\n";
+        }
     }
 
     public class InGameParams : SceneParams
@@ -28,6 +31,18 @@ namespace BanGround.Scene.Params
         public bool isOffsetGuide = false;
         public ModFlag mods = ModFlag.None;
         public float seekPosition = 0f;
+
+        public override string ToString()
+        {
+            return $"sid = {sid}\n" +
+                $"difficulty = {difficulty}\n" +
+                $"replayPath = {replayPath}\n" +
+                $"saveReplay = {saveReplay}\n" +
+                $"saveRecord = {saveRecord}\n" +
+                $"isOffsetGuide = {isOffsetGuide}\n" +
+                $"mods = {Convert.ToString((long)mods, 2)}\n" +
+                $"seekPosition = {seekPosition}\n";
+        }
     }
 
     public class ResultParams : InGameParams
@@ -61,6 +76,11 @@ namespace BanGround.Scene.Params
                 mods = mods,
                 seekPosition = seekPosition
             };
+        }
+
+        public override string ToString()
+        {
+            return base.ToString() + $"scoreMultiplier = {scoreMultiplier}\n";
         }
     }
 }

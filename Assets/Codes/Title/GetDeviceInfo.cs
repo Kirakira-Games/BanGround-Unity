@@ -63,12 +63,12 @@ public class GetDeviceInfo : MonoBehaviour
         if (snd_engine == "Bass")
         {
             bufferIndex = snd_buffer_bass;
-            return (AppPreLoader.bufferSize * HandelValue_Buffer.BassBufferScale[bufferIndex]).ToString();
+            return (AppPreLoader.bufferSize * HandleValue_Buffer.BassBufferScale[bufferIndex]).ToString();
         }
         else
         {
             bufferIndex = snd_buffer_fmod;
-            return (AppPreLoader.bufferSize / HandelValue_Buffer.FmodBufferScale[bufferIndex]).ToString();
+            return (AppPreLoader.bufferSize / HandleValue_Buffer.FmodBufferScale[bufferIndex]).ToString();
         }
 
     }
