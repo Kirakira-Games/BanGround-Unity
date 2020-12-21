@@ -65,6 +65,7 @@ public class GlobalInstaller : MonoInstaller
 
         RegisterKonCommands();
 
+        // Localized strings
         Container.Bind<LocalizedStrings>().FromInstance(localizedStrings).NonLazy();
 
         // Chart version

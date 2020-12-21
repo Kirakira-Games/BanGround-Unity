@@ -13,12 +13,12 @@ public class SceneTaskDoneEvent : UnityEvent<bool> { }
 
 public class SceneState
 {
-    public dynamic parameters;
+    public SceneParams parameters;
     public string name;
 
     public SceneState() { }
 
-    public SceneState(string name, dynamic parameters)
+    public SceneState(string name, SceneParams parameters)
     {
         this.name = name;
         this.parameters = parameters;
@@ -32,7 +32,7 @@ public class SceneState
 
     public override string ToString()
     {
-        return $"{name}, Params = {JsonConvert.SerializeObject(parameters)}";
+        return $"{name}, Params = {parameters}";
     }
 }
 
@@ -49,15 +49,15 @@ public class SceneLoader : MonoBehaviour
     private static Func<UniTask<bool>> TaskVoid;
     private static SceneState loadingScene = null;
     public static SceneState CurrentScene => loadingScene ?? sceneStack.Last?.Value;
-    public static dynamic Parameters => CurrentScene.parameters;
-    public static T GetParamsOrDefault<T>() where T: new()
+    public static SceneParams Parameters => CurrentScene.parameters;
+    public static T GetParamsOrDefault<T>() where T: SceneParams, new()
     {
         if (Parameters == null)
         {
             Debug.LogWarning($"Missing {nameof(T)}. Falling back to default params.");
             CurrentScene.parameters = new T();
         }
-        return Parameters;
+        return (T)Parameters;
     }
 
     public static SceneTaskDoneEvent onTaskFinish = new SceneTaskDoneEvent();
@@ -70,13 +70,17 @@ public class SceneLoader : MonoBehaviour
         // Add listener to update current scene
         SceneManager.sceneLoaded += (scene, mode) =>
         {
-            if (scene.name == "Loader" || CurrentScene != null && scene.name == CurrentScene.name)
+            if (scene.name == "Loader" || scene.name == CurrentScene?.name)
                 return;
             PushScene(new SceneState(scene.name, null));
         };
-        
+
         // Initialize first scene
-        PushScene(new SceneState(SceneManager.GetActiveScene().name, null));
+        var initScene = SceneManager.GetActiveScene();
+        if (initScene != null)
+        {
+            PushScene(new SceneState(initScene.name, null));
+        }
     }
 
     void Start()
@@ -115,7 +119,7 @@ public class SceneLoader : MonoBehaviour
 
     private static void PushScene(SceneState state)
     {
-        Debug.Log($"Push scene: {state.name}\nParameters: {JsonConvert.SerializeObject(state.parameters)}");
+        Debug.Log($"Push scene: {state}");
         sceneStack.AddLast(state);
         if (sceneStack.Count > 10)
         {
@@ -130,7 +134,7 @@ public class SceneLoader : MonoBehaviour
         sceneStack.RemoveLast();
     }
 
-    public static void LoadScene(string nextSceneName, Func<UniTask<bool>> task = null, bool pushStack = false, dynamic parameters = null)
+    public static void LoadScene(string nextSceneName, Func<UniTask<bool>> task = null, bool pushStack = false, SceneParams parameters = null)
     {
         if (!LoadSceneHelper(nextSceneName, task))
             return;
@@ -147,7 +151,7 @@ public class SceneLoader : MonoBehaviour
         });
     }
 
-    public static AsyncOperation LoadSceneAsync(string nextSceneName, bool pushStack = false, dynamic parameters = null)
+    public static AsyncOperation LoadSceneAsync(string nextSceneName, bool pushStack = false, SceneParams parameters = null)
     {
         if (!pushStack)
             PopScene();

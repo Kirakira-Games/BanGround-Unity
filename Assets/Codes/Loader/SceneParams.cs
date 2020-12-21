@@ -1,15 +1,24 @@
 ﻿using BanGround.Game.Mods;
+using Newtonsoft.Json;
 
 namespace BanGround.Scene.Params
 {
-    public class MappingParams
+    public abstract class SceneParams
+    {
+        public override string ToString()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
+    }
+
+    public class MappingParams : SceneParams
     {
         public int sid;
         public Difficulty difficulty;
         public BGEditor.IEditorInfo editor = new BGEditor.EditorInfo();
     }
 
-    public class InGameParams
+    public class InGameParams : SceneParams
     {
         public int sid;
         public Difficulty difficulty;

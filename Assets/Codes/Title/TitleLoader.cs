@@ -44,7 +44,7 @@ public class TitleLoader : MonoBehaviour
     //const string BACKGROUND_PATH = "backgrounds";
 
     [Inject]
-    private void Inject(IDataLoader dataLoader)
+    private void Inject()
     {
         instance = this;
         CheckUpdate();
