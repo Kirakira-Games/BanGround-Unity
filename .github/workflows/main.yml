@@ -1,0 +1,32 @@
+name: Bump iOS Build Number
+
+on:
+  workflow_dispatch:
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Bump iOS build number
+        uses: KCFindstr/Action-Unity-Bump-iOS-Build-Number@v0.1
+        id: bump
+        with:
+          ProjectSettingsPath: './ProjectSettings/ProjectSettings.asset'
+          
+      - name: Get the output build number
+        run: echo "The new iOS build number is ${{ steps.bump.outputs.newBuildNumber }}"
+
+      - name: Commit files
+        run: |
+          git config --local user.email "792491320@qq.com"
+          git config --local user.name "GitHub Action"
+          git commit -m "Bump iOS build number to ${{ steps.bump.outputs.newBuildNumber }}" -a
+          
+      - name: Push cahnges to github
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
