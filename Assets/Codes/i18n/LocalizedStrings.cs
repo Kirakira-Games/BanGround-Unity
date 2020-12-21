@@ -47,6 +47,11 @@ public class LocalizedStrings : MonoBehaviour
 
     public string GetLocalizedString(string str)
     {
+        if (dictionary == null)
+        {
+            Debug.LogError("[LocalizedStrings] Dictionary not initialized yet!");
+            return str;
+        }
         if (dictionary.ContainsKey(str))
             return dictionary[str];
 
