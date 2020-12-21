@@ -1,8 +1,8 @@
 name: Bump iOS Build Number
 
 on:
-  push:
-    branches: 
+  pull_request:
+    branches:
       - release
   workflow_dispatch:
 
