@@ -48,7 +48,7 @@ public class SceneLoader : MonoBehaviour
     private static readonly LinkedList<SceneState> sceneStack = new LinkedList<SceneState>();
     private static Func<UniTask<bool>> TaskVoid;
     private static SceneState loadingScene = null;
-    public static SceneState CurrentScene => loadingScene ?? sceneStack.Last.Value;
+    public static SceneState CurrentScene => loadingScene ?? sceneStack.Last?.Value;
     public static dynamic Parameters => CurrentScene.parameters;
     public static T GetParamsOrDefault<T>() where T: new()
     {
@@ -70,7 +70,7 @@ public class SceneLoader : MonoBehaviour
         // Add listener to update current scene
         SceneManager.sceneLoaded += (scene, mode) =>
         {
-            if (scene.name == "Loader" || scene.name == CurrentScene.name)
+            if (scene.name == "Loader" || CurrentScene != null && scene.name == CurrentScene.name)
                 return;
             PushScene(new SceneState(scene.name, null));
         };
