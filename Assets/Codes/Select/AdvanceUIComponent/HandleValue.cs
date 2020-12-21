@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
-public class HandelValue : MonoBehaviour
+public class HandleValue : MonoBehaviour
 {
     [Inject]
     LocalizedStrings localizedStrings;
