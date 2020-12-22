@@ -105,9 +105,7 @@ namespace BanGround.Community
 
         private void OnBackButtonClicked()
         {
-            if (isLoading)
-                return;
-
+            StoreProvider.Cancel();
             ViewStack.Pop();
             if (ViewStack.Count == 0)
             {
@@ -121,10 +119,8 @@ namespace BanGround.Community
 
         public async UniTaskVoid LoadCharts(SongItem song, int offset)
         {
-            if (isLoading)
-                return;
-            isLoading = true;
             StoreProvider.Cancel();
+            isLoading = true;
             var state = ViewStack.Create(StoreViewType.Chart);
             state.SearchText = SearchBar.text;
             state.Title = song.Title;
@@ -163,8 +159,8 @@ namespace BanGround.Community
 
         public async UniTaskVoid Search(string text, int offset = 0)
         {
-            isLoading = true;
             StoreProvider.Cancel();
+            isLoading = true;
             if (offset == 0)
             {
                 ViewStack.Clear();
@@ -194,8 +190,11 @@ namespace BanGround.Community
                 }
             }
             catch (OperationCanceledException) { }
-            mLoadingDisplay.SetActive(false);
-            isLoading = false;
+            finally
+            {
+                mLoadingDisplay.SetActive(false);
+                isLoading = false;
+            }
         }
 
         void Start()

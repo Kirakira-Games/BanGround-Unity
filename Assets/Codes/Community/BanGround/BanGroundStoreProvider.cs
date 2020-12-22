@@ -31,7 +31,7 @@ namespace BanGround.Community
             if (string.IsNullOrEmpty(background))
                 return background;
             if (background.StartsWith("/storage/"))
-                return background.Replace("/storage/", "https://beijing.aliyun.reikohaku.fun/storage/");
+                return background.Replace("/storage/", web.ServerSite + "/storage/");
             return background;
         }
 
