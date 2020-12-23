@@ -311,7 +311,7 @@ public class DemoRecorder
             mods = (ulong)mods
         };
 
-        demoName = $"{chartId}_{diff:g}_{DateTime.Now.ToLongDateString()}_{DateTime.Now.ToLongTimeString()}.kirareplay".Replace(":", "-").Replace("/", "-").Replace("\\", "-");
+        demoName = $"{chartId}_{diff.Lower()}_{DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss")}.kirareplay";
     }
 
     public void Add(KirakiraTouchState[] kirakiraTouchStates)

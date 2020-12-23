@@ -154,7 +154,7 @@ namespace BanGround.Scripting.Lunar
 
         public void Init(int sid, Difficulty difficulty)
         {
-            var scriptPath = dataLoader.GetChartResource(sid, $"{difficulty:g}.lua");
+            var scriptPath = dataLoader.GetChartScriptPath(sid, difficulty);
             
             if(fs.FileExists(scriptPath))
             {

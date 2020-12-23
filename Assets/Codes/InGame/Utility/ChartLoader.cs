@@ -344,7 +344,7 @@ public class ChartLoader : IChartLoader
                 if (name == "cheader.bin")
                     return false;
 
-                if (name.EndsWith(".bin") && name != $"{difficulty:g}.bin".ToLower())
+                if (name.EndsWith(".bin") && name != $"{difficulty.Lower()}.bin")
                     return false;
 
                 return true;
