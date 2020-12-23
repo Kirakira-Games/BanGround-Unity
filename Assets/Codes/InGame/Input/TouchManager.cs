@@ -311,7 +311,13 @@ public class TouchManager : MonoBehaviour
         var dpi = Screen.dpi;
 
         if (dpi <= 10)
-            dpi = iDeviceDpiDatabase.FindDpi(SystemInfo.deviceModel);
+        {
+            try
+            {
+                dpi = iDeviceDpiDatabase.FindDpi(SystemInfo.deviceModel);
+            }
+            catch (KeyNotFoundException) { }
+        }
 
         return dpi;
 #endif
