@@ -11,7 +11,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout repo
+        if: ${{ github.head_ref }}
+        uses: actions/checkout@v2
+        with:
+          branch: ${{ github.head_ref }}
+        
+      - name: Checkout repo
+        if: ${{ !github.head_ref }}
+        uses: actions/checkout@v2
+        with:
+          branch: ${{ github.ref }}
 
       - name: Bump iOS build number
         uses: KCFindstr/Action-Unity-Bump-iOS-Build-Number@v0.1
