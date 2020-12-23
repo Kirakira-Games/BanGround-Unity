@@ -28,8 +28,16 @@ jobs:
           git config --local user.name "GitHub Action"
           git commit -m "Bump iOS build number to ${{ steps.bump.outputs.newBuildNumber }}" -a
           
-      - name: Push cahnges to github
+      - name: Push changes to github
         uses: ad-m/github-push-action@master
+        if: ${{ github.head_ref }}
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.head_ref }}
+          
+      - name: Push changes to github
+        uses: ad-m/github-push-action@master
+        if: ${{ !github.head_ref }}
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref }}
