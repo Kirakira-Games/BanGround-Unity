@@ -58,8 +58,6 @@ namespace BanGround.Game.Mods
 
     public class ModManager : IModManager
     {
-        public static IModManager Instance; // TODO: Remove
-
         private KVar r_notespeed;
 
         public List<ModBase> AttachedMods { get; private set; } = new List<ModBase>();
@@ -89,8 +87,6 @@ namespace BanGround.Game.Mods
                     Debug.LogError($"[ModManager] {mod.GetType().Name}");
                 }
             }
-            // TODO: Remove?
-            Instance = this;
         }
 
         private bool AddMod(ModBase mod)

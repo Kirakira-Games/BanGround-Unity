@@ -128,7 +128,6 @@ public class KirakiraTouch
     private PriorityQueue<float, KirakiraTouchState> timeline;
     public static int INVALID_DURATION => NoteUtility.SLIDE_TICK_JUDGE_RANGE << 1;
     public static Vector3 INVALID_POSITION => new Vector3(0, 0, -1e3f);
-    public static float dpi;
     public static float flickDistPixels;
 
     /// <summary>
@@ -312,14 +311,50 @@ public class TouchManager : MonoBehaviour
 #endif
     }
 
+    private float ComputeFlickDistance()
+    {
+        bool forceDpi = false;
+        bool forceHeight = false;
+        var height = Screen.height;
+        if (height < 360)
+        {
+            Debug.LogError($"[Flick dist] Screen.height = {Screen.height} seems wrong, falls back to Screen.dpi");
+            forceDpi = true;
+        }
+        var dpi = GetDPI();
+        if (dpi <= 10)
+        {
+            Debug.LogError($"[Flick dist] Screen.dpi = {dpi} seems wrong, falls back to Screen.height");
+            forceHeight = true;
+        }
+
+        if (forceDpi && forceHeight)
+        {
+            // ???
+            return 64;
+        }
+
+        if (forceDpi)
+        {
+            return NoteUtility.FLICK_JUDGE_DIST / 2.54f * dpi;
+        }
+        else if (forceHeight)
+        {
+            return height / 20;
+        }
+        else
+        {
+            return Mathf.Min(height / 20, NoteUtility.FLICK_JUDGE_DIST / 2.54f * dpi);
+        }
+    }
+         
     private void Awake()
     {
         instance = this;
         touchTable = new Dictionary<int, KirakiraTouch>();
         traceCache = new Dictionary<(KirakiraTracer, int), JudgeResult>();
         exchanged = new HashSet<KirakiraTouch>();
-        KirakiraTouch.dpi = GetDPI();
-        KirakiraTouch.flickDistPixels = Mathf.Min(Screen.height / 20, NoteUtility.FLICK_JUDGE_DIST / 2.54f * KirakiraTouch.dpi);
+        KirakiraTouch.flickDistPixels = ComputeFlickDistance();
 
         parameters = SceneLoader.GetParamsOrDefault<InGameParams>();
         if (parameters.saveRecord)

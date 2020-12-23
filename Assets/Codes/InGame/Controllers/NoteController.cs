@@ -400,7 +400,7 @@ public class NoteController : MonoBehaviour, INoteController
         cameraAnimation = GameObject.Find("Cameras").GetComponent<Animator>();
 
         // Init JudgeRange
-        NoteUtility.Init(mainForward);
+        NoteUtility.Init(mainForward, modManager.SpeedCompensationSum);
 
         // Init fuwafuwa lane
         numFuwafuwaNotes = 0;

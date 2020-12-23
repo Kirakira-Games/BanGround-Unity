@@ -39,12 +39,18 @@ namespace BanGround.Community
         public int Count => mStack.Count;
         public StoreViewState Peek() => Count > 0 ? mStack.Peek() : null;
 
+        private async UniTaskVoid DelaySetScroll(Vector2 pos)
+        {
+            await UniTask.DelayFrame(1);
+            mController.StoreRect.normalizedPosition = pos;
+        }
+
         public void RefreshState()
         {
             if (Count == 0)
                 return;
             var state = Peek();
-            mController.StoreRect.normalizedPosition = new Vector2(mController.StoreRect.normalizedPosition.x, state.NormalizedY);
+            DelaySetScroll(new Vector2(mController.StoreRect.normalizedPosition.x, state.NormalizedY)).Forget();
             mController.SearchBar.text = state.SearchText;
             mController.TitleText.text = state.Title;
         }
@@ -119,19 +125,28 @@ namespace BanGround.Community
 
         public async UniTaskVoid LoadCharts(SongItem song, int offset)
         {
+            if (isLoading)
+                return;
             StoreProvider.Cancel();
             isLoading = true;
-            var state = ViewStack.Create(StoreViewType.Chart);
-            state.SearchText = SearchBar.text;
-            state.Title = song.Title;
-            state.Song = song;
 
-            // Fetch from API
-            mLoadingDisplay.transform.SetAsLastSibling();
-            mLoadingDisplay.SetActive(true);
+
+            if (offset == 0)
+            {
+                var state = ViewStack.Create(StoreViewType.Chart);
+                state.SearchText = SearchBar.text;
+                state.Title = song.Title;
+                state.Song = song;
+                ViewStack.RefreshState();
+            }
 
             try
             {
+                var state = ViewStack.Peek();
+                state.Offset = offset;
+                // Fetch from API
+                mLoadingDisplay.transform.SetAsLastSibling();
+                mLoadingDisplay.SetActive(true);
                 var charts = await StoreProvider.GetCharts(song.Id, offset, LIMIT);
 
                 // Handle infinite scroll
@@ -152,7 +167,6 @@ namespace BanGround.Community
             {
                 // Finish
                 mLoadingDisplay.SetActive(false);
-                ViewStack.RefreshState();
                 isLoading = false;
             }
         }
