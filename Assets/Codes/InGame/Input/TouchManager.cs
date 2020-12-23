@@ -10,6 +10,7 @@ using System.Linq;
 using Zenject;
 using BanGround;
 using BanGround.Scene.Params;
+using BanGround.Utils;
 
 public interface IKirakiraTouchProvider
 {
@@ -307,7 +308,12 @@ public class TouchManager : MonoBehaviour
 
         return (metrics.Get<float>("xdpi") + metrics.Get<float>("ydpi")) * 0.5f;
 #else
-        return Screen.dpi;
+        var dpi = Screen.dpi;
+
+        if (dpi <= 10)
+            dpi = iDeviceDpiDatabase.FindDpi(SystemInfo.deviceModel);
+
+        return dpi;
 #endif
     }
 
