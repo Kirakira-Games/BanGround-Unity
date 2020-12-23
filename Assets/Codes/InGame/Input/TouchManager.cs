@@ -355,6 +355,7 @@ public class TouchManager : MonoBehaviour
         traceCache = new Dictionary<(KirakiraTracer, int), JudgeResult>();
         exchanged = new HashSet<KirakiraTouch>();
         KirakiraTouch.flickDistPixels = ComputeFlickDistance();
+        Debug.Log("Flick dist pixels = " + KirakiraTouch.flickDistPixels);
 
         parameters = SceneLoader.GetParamsOrDefault<InGameParams>();
         if (parameters.saveRecord)
