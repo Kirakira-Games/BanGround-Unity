@@ -100,8 +100,8 @@ public static class NoteUtility
     public static readonly int[] TAP_JUDGE_RANGE = new int[4];
     public static readonly int[] SLIDE_END_JUDGE_RANGE = new int[4];
     public static readonly int[] SLIDE_END_TILT_JUDGE_RANGE = new int[4];
-    public static int SLIDE_END_FLICK_JUDGE_RANGE => (int)(SLIDE_END_FLICK_JUDGE_RANGE_RAW * ModManager.Instance.SpeedCompensationSum);
-    public static int SLIDE_TICK_JUDGE_RANGE => (int)(SLIDE_TICK_JUDGE_RANGE_RAW * ModManager.Instance.SpeedCompensationSum);
+    public static int SLIDE_END_FLICK_JUDGE_RANGE { get; private set; }
+    public static int SLIDE_TICK_JUDGE_RANGE { get; private set; }
 
     public const float FLICK_JUDGE_DIST = 0.8f;
 
@@ -111,15 +111,17 @@ public static class NoteUtility
 
     private static float planeDeltaZ;
     private static float planeInitZ;
-    public static void Init(Vector3 planeNormal)
+    public static void Init(Vector3 planeNormal, float speedCompensationSum)
     {
         JudgePlane = new Plane(planeNormal.normalized, new Vector3(0, 0, NOTE_JUDGE_Z_POS));
         for (int i = 0; i < TAP_JUDGE_RANGE.Length; i++)
         {
-            TAP_JUDGE_RANGE[i] = (int)(TAP_JUDGE_RANGE_RAW[i] * ModManager.Instance.SpeedCompensationSum);
-            SLIDE_END_JUDGE_RANGE[i] = (int)(SLIDE_END_JUDGE_RANGE_RAW[i] * ModManager.Instance.SpeedCompensationSum);
-            SLIDE_END_TILT_JUDGE_RANGE[i] = (int)(SLIDE_END_TILT_JUDGE_RANGE_RAW[i] * ModManager.Instance.SpeedCompensationSum);
+            TAP_JUDGE_RANGE[i] = (int)(TAP_JUDGE_RANGE_RAW[i] * speedCompensationSum);
+            SLIDE_END_JUDGE_RANGE[i] = (int)(SLIDE_END_JUDGE_RANGE_RAW[i] * speedCompensationSum);
+            SLIDE_END_TILT_JUDGE_RANGE[i] = (int)(SLIDE_END_TILT_JUDGE_RANGE_RAW[i] * speedCompensationSum);
         }
+        SLIDE_END_FLICK_JUDGE_RANGE = Mathf.CeilToInt(SLIDE_END_FLICK_JUDGE_RANGE_RAW * speedCompensationSum);
+        SLIDE_TICK_JUDGE_RANGE = Mathf.CeilToInt(SLIDE_TICK_JUDGE_RANGE_RAW * speedCompensationSum);
         planeInitZ = ProjectVectorToParallelPlane(new Vector3(0, 0)).z;
         planeDeltaZ = ProjectVectorToParallelPlane(new Vector3(0, 1)).z - planeInitZ;
     }
