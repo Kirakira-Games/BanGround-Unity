@@ -1,0 +1,53 @@
+name: Bump iOS Build Number
+
+on:
+  pull_request:
+    branches:
+      - release
+  workflow_dispatch:
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        if: ${{ github.head_ref }}
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+        
+      - name: Checkout repo
+        if: ${{ !github.head_ref }}
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Bump iOS build number
+        uses: KCFindstr/Action-Unity-Bump-iOS-Build-Number@v0.1
+        id: bump
+        with:
+          ProjectSettingsPath: './ProjectSettings/ProjectSettings.asset'
+          
+      - name: Get the output build number
+        run: echo "The new iOS build number is ${{ steps.bump.outputs.newBuildNumber }}"
+
+      - name: Commit files
+        run: |
+          git config --local user.email "792491320@qq.com"
+          git config --local user.name "GitHub Action"
+          git commit -m "Bump iOS build number to ${{ steps.bump.outputs.newBuildNumber }}" -a
+          
+      - name: Push changes to github
+        uses: ad-m/github-push-action@master
+        if: ${{ github.head_ref }}
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.head_ref }}
+          
+      - name: Push changes to github
+        uses: ad-m/github-push-action@master
+        if: ${{ !github.head_ref }}
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}

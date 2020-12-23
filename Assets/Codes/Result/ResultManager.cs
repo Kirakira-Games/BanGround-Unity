@@ -330,7 +330,7 @@ public class ResultManager : MonoBehaviour
 
     private void ShowSongInfo()
     {
-        level_Text.text = Enum.GetName(typeof(Difficulty), parameters.difficulty).ToUpper() + " " +
+        level_Text.text = parameters.difficulty.ToString().ToUpper() + " " +
             cheader.difficultyLevel[(int)parameters.difficulty];
         songName_Text.text = mheader.title;
         acc_Text.text = parameters.mods.HasFlag(ModFlag.AutoPlay) ? "AUTOPLAY" : string.Format("{0:P2}", playResult.Acc);

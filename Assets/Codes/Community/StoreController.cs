@@ -39,12 +39,18 @@ namespace BanGround.Community
         public int Count => mStack.Count;
         public StoreViewState Peek() => Count > 0 ? mStack.Peek() : null;
 
+        private async UniTaskVoid DelaySetScroll(Vector2 pos)
+        {
+            await UniTask.DelayFrame(1);
+            mController.StoreRect.normalizedPosition = pos;
+        }
+
         public void RefreshState()
         {
             if (Count == 0)
                 return;
             var state = Peek();
-            mController.StoreRect.normalizedPosition = new Vector2(mController.StoreRect.normalizedPosition.x, state.NormalizedY);
+            DelaySetScroll(new Vector2(mController.StoreRect.normalizedPosition.x, state.NormalizedY)).Forget();
             mController.SearchBar.text = state.SearchText;
             mController.TitleText.text = state.Title;
         }
@@ -105,9 +111,7 @@ namespace BanGround.Community
 
         private void OnBackButtonClicked()
         {
-            if (isLoading)
-                return;
-
+            StoreProvider.Cancel();
             ViewStack.Pop();
             if (ViewStack.Count == 0)
             {
@@ -123,19 +127,26 @@ namespace BanGround.Community
         {
             if (isLoading)
                 return;
-            isLoading = true;
             StoreProvider.Cancel();
-            var state = ViewStack.Create(StoreViewType.Chart);
-            state.SearchText = SearchBar.text;
-            state.Title = song.Title;
-            state.Song = song;
+            isLoading = true;
 
-            // Fetch from API
-            mLoadingDisplay.transform.SetAsLastSibling();
-            mLoadingDisplay.SetActive(true);
+
+            if (offset == 0)
+            {
+                var state = ViewStack.Create(StoreViewType.Chart);
+                state.SearchText = SearchBar.text;
+                state.Title = song.Title;
+                state.Song = song;
+                ViewStack.RefreshState();
+            }
 
             try
             {
+                var state = ViewStack.Peek();
+                state.Offset = offset;
+                // Fetch from API
+                mLoadingDisplay.transform.SetAsLastSibling();
+                mLoadingDisplay.SetActive(true);
                 var charts = await StoreProvider.GetCharts(song.Id, offset, LIMIT);
 
                 // Handle infinite scroll
@@ -156,15 +167,14 @@ namespace BanGround.Community
             {
                 // Finish
                 mLoadingDisplay.SetActive(false);
-                ViewStack.RefreshState();
                 isLoading = false;
             }
         }
 
         public async UniTaskVoid Search(string text, int offset = 0)
         {
-            isLoading = true;
             StoreProvider.Cancel();
+            isLoading = true;
             if (offset == 0)
             {
                 ViewStack.Clear();
@@ -194,8 +204,11 @@ namespace BanGround.Community
                 }
             }
             catch (OperationCanceledException) { }
-            mLoadingDisplay.SetActive(false);
-            isLoading = false;
+            finally
+            {
+                mLoadingDisplay.SetActive(false);
+                isLoading = false;
+            }
         }
 
         void Start()

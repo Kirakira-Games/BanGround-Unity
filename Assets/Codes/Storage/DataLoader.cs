@@ -259,12 +259,12 @@ public class DataLoader : IDataLoader
 
     public string GetChartPath(int sid, Difficulty difficulty)
     {
-        return ChartDir + sid + "/" + difficulty.ToString("G").ToLower() + ".bin";
+        return ChartDir + sid + "/" + difficulty.Lower() + ".bin";
     }
 
     public string GetChartScriptPath(int sid, Difficulty difficulty)
     {
-        return GetChartPath(sid, difficulty).Replace(".bin", ".lua");
+        return ChartDir + sid + "/" + difficulty.Lower() + ".lua";
     }
 
     public cHeader GetChartHeader(int sid)

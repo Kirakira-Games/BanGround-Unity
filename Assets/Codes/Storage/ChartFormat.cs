@@ -7,11 +7,7 @@ using Newtonsoft.Json.Converters;
 using ProtoBuf;
 using System.Linq;
 using UnityEngine.Scripting;
-using ProtoBuf.Meta;
-using Zenject;
-using UnityEngine;
 using BanGround;
-using MessagePack;
 
 [JsonConverter(typeof(StringEnumConverter))]
 [ProtoContract()]
@@ -53,6 +49,14 @@ public enum Difficulty
     Hard = 2,
     Expert = 3,
     Special = 4,
+}
+
+public static class DifficultyUtil
+{
+    public static string Lower(this Difficulty difficulty)
+    {
+        return difficulty.ToString().ToLower();
+    }
 }
 
 [JsonConverter(typeof(StringEnumConverter))]
