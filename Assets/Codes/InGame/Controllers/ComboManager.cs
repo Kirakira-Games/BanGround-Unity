@@ -59,7 +59,6 @@ public class ComboManager : MonoBehaviour
         int intResult = (int)result;
         judgeCount[intResult]++;
         acc += accRate[intResult];
-        maxAcc += accRate[0];
         for (int i = 0; i < combo.Length; i++)
         {
             if (intResult <= i)
@@ -108,6 +107,7 @@ public class ComboManager : MonoBehaviour
         noteCount = numNotes;
 
         maxScore = noteCount * 10 * 10;
+        maxAcc = noteCount * accRate[0];
     }
 
     [Flags]
