@@ -330,13 +330,13 @@ public class TouchManager : MonoBehaviour
         var height = Screen.height;
         if (height < 360)
         {
-            Debug.LogError($"[Flick dist] Screen.height = {Screen.height} seems wrong, falls back to Screen.dpi");
+            Debug.LogWarning($"[Flick dist] Screen.height = {Screen.height} seems wrong, falls back to Screen.dpi");
             forceDpi = true;
         }
         var dpi = GetDPI();
         if (dpi <= 10)
         {
-            Debug.LogError($"[Flick dist] Screen.dpi = {dpi} seems wrong, falls back to Screen.height");
+            Debug.LogWarning($"[Flick dist] Screen.dpi = {dpi} seems wrong, falls back to Screen.height");
             forceHeight = true;
         }
 
