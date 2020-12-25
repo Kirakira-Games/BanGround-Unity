@@ -74,7 +74,7 @@ public class KirakiraTouchState
 
     public override string ToString()
     {
-        return string.Format("[{0}] At {1} / {2}, Phase = {3}", touchId, pos, screenPos, Enum.GetName(typeof(KirakiraTouchPhase), phase));
+        return string.Format("[{0}] At {1} / {2}, Phase = {3}", touchId, pos, screenPos, phase.ToString());
     }
 }
 
