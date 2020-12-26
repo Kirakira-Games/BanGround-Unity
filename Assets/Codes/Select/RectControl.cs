@@ -20,26 +20,23 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     private IChartListManager chartListManager;
     [Inject]
     private IMessageBannerController messageBannerController;
-    [Inject]
-    private IFileSystem fs;
 
-    RectTransform rt_m;
-    RectTransform rt_v;
-    RectTransform rt;
-    ScrollRect rt_s;
-    VerticalLayoutGroup vg;
-    DragHandler dh;
+    private RectTransform rt_m;
+    private RectTransform rt;
+    private ScrollRect rt_s;
+    private VerticalLayoutGroup vg;
+    private DragHandler dh;
 
     [SerializeField] 
     private Animator deleteAni;
 
-    SelectManager_old sm;
+    private SelectManager_old sm;
     public int index;
     //Button bt;
 
-    GameObject startImg;
-    Text title;
-    Image img;
+    private GameObject startImg;
+    private Text title;
+    private Image img;
 
     public Color SelectedColor = Color.white;
     public Color DisabledColor = Color.clear;
@@ -67,7 +64,6 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         rt_m = GameObject.Find("SongContent").GetComponent<RectTransform>();
         vg = GameObject.Find("SongContent").GetComponent<VerticalLayoutGroup>();
-        rt_v = GameObject.Find("Song Scroll View").GetComponent<RectTransform>();
         rt_s = GameObject.Find("Song Scroll View").GetComponent<ScrollRect>();
         sm = GameObject.Find("SelectManager").GetComponent<SelectManager_old>();
         startImg = transform.Find("StartImg").gameObject;
@@ -90,7 +86,7 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     void OnPressed()
     {
         if (SceneLoader.Loading) return;
-        if (!select && !SelectManager_old.instance.dh.isDragging)
+        if (!select && !SelectManager_old.instance.dragHandler.isDragging)
         {
             StopAllCoroutines();
             sm.SelectSong(index);
@@ -102,7 +98,9 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     }
 
     public void OnSelect()
-    { 
+    {
+        if (!gameObject.activeSelf)
+            gameObject.SetActive(true);
         startImg.SetActive(true);
         select = true;
         img.color = SelectedColor;
@@ -144,8 +142,6 @@ public class RectControl : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         }
         rt.sizeDelta = new Vector2(960, rt.sizeDelta.y);
     }
-
-    
 
     public void UnSelect()
     {

@@ -20,8 +20,6 @@ using BanGround.Game.Mods;
 public class SelectManager_old : MonoBehaviour
 {
     [Inject]
-    private DiContainer _container;
-    [Inject]
     private IAudioManager audioManager;
     [Inject]
     private IDataLoader dataLoader;
@@ -42,20 +40,18 @@ public class SelectManager_old : MonoBehaviour
     [Inject]
     private ICancellationTokenStore cancellationToken;
 
+    public RectControlGroup rectGroup;
+
     public const float scroll_Min_Speed = 50f;
 
-    private RectTransform rt;
-    private ScrollRect rt_s;
-    private VerticalLayoutGroup lg;
-    [HideInInspector] public DragHandler dh;
+    private RectTransform rect;
+    private ScrollRect scrollRect;
+    private VerticalLayoutGroup verticalLayoutGroup;
+    [HideInInspector] public DragHandler dragHandler;
 
     //sort
     private Text sort_Text;
     private Button sort_Button;
-
-    public GameObject songItemPrefab;
-
-    private Transform songContent;
 
     [SerializeField] 
     private TextAsset[] voices;
@@ -112,11 +108,10 @@ public class SelectManager_old : MonoBehaviour
         sort_Button.onClick.AddListener(SwitchSort);
 
         //Main Scroll View
-        rt = GameObject.Find("SongContent").GetComponent<RectTransform>();
-        rt_s = GameObject.Find("Song Scroll View").GetComponent<ScrollRect>();
-        dh = GameObject.Find("Song Scroll View").GetComponent<DragHandler>();
-        lg = GameObject.Find("SongContent").GetComponent<VerticalLayoutGroup>();
-        songContent = GameObject.Find("SongContent").transform;
+        rect = GameObject.Find("SongContent").GetComponent<RectTransform>();
+        scrollRect = GameObject.Find("Song Scroll View").GetComponent<ScrollRect>();
+        dragHandler = GameObject.Find("Song Scroll View").GetComponent<DragHandler>();
+        verticalLayoutGroup = GameObject.Find("SongContent").GetComponent<VerticalLayoutGroup>();
     }
 
     public void Return2Title()
@@ -159,21 +154,21 @@ public class SelectManager_old : MonoBehaviour
 
     public async void RefreshSongList()
     {
-        lg.enabled = true;
+        //verticalLayoutGroup.enabled = true;
 
         // Adjust chartList
         while (SelectButtons.Count < chartList.Count)
         {
-            var obj = _container.InstantiatePrefab(songItemPrefab, songContent);
-            SelectButtons.AddLast(obj);
-            rts.AddLast(obj.GetComponent<RectTransform>());
+            var obj = rectGroup.Create();
+            SelectButtons.AddLast(obj.gameObject);
+            rts.AddLast(obj);
             var control = obj.GetComponent<RectControl>();
             control.index = rcs.Count;
             rcs.Add(control);
         }
         while (SelectButtons.Count > chartList.Count)
         {
-            Destroy(SelectButtons.Last.Value);
+            rectGroup.Destroy(rts.Last.Value);
             SelectButtons.RemoveLast();
             rts.RemoveLast();
             rcs.RemoveAt(rcs.Count - 1);
@@ -196,10 +191,10 @@ public class SelectManager_old : MonoBehaviour
             curNode = curNode.Next;
         }
 
-        rt.sizeDelta = new Vector2(rt.sizeDelta.x, lg.padding.top * 2 + chartList.Count * (116) + (chartList.Count - 1) * lg.spacing + (800));
+        rect.sizeDelta = new Vector2(rect.sizeDelta.x, verticalLayoutGroup.padding.top * 2 + chartList.Count * (116) + (chartList.Count - 1) * verticalLayoutGroup.spacing + (800));
 
         await SelectDefault();
-        lg.enabled = false;
+        verticalLayoutGroup.enabled = false;
     }
 
     private async UniTask SelectDefault()
@@ -225,13 +220,13 @@ public class SelectManager_old : MonoBehaviour
         //yield return new WaitForSeconds(1);
 
         yield return 0;
-        while (Mathf.Abs(rt_s.velocity.y) > scroll_Min_Speed || dh.isDragging)
+        while (Mathf.Abs(scrollRect.velocity.y) > scroll_Min_Speed || dragHandler.isDragging)
         {
             yield return 0;
             //yield break;
         }
-        rt_s.StopMovement();
-        var destPos = 0 - rt.anchoredPosition.y - lg.padding.top - 100;
+        scrollRect.StopMovement();
+        var destPos = 0 - rect.anchoredPosition.y - verticalLayoutGroup.padding.top - 100;
         float nearestDistance = 9999f;
         int nearstIndex = 0;
         int curIndex = 0;
