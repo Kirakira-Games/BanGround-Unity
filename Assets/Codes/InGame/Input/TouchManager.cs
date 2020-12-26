@@ -10,6 +10,7 @@ using System.Linq;
 using Zenject;
 using BanGround;
 using BanGround.Scene.Params;
+using BanGround.Utils;
 
 public interface IKirakiraTouchProvider
 {
@@ -73,7 +74,7 @@ public class KirakiraTouchState
 
     public override string ToString()
     {
-        return string.Format("[{0}] At {1} / {2}, Phase = {3}", touchId, pos, screenPos, Enum.GetName(typeof(KirakiraTouchPhase), phase));
+        return string.Format("[{0}] At {1} / {2}, Phase = {3}", touchId, pos, screenPos, phase.ToString());
     }
 }
 
@@ -307,7 +308,18 @@ public class TouchManager : MonoBehaviour
 
         return (metrics.Get<float>("xdpi") + metrics.Get<float>("ydpi")) * 0.5f;
 #else
-        return Screen.dpi;
+        var dpi = Screen.dpi;
+
+        if (dpi <= 10)
+        {
+            try
+            {
+                dpi = iDeviceDpiDatabase.FindDpi(SystemInfo.deviceModel);
+            }
+            catch (KeyNotFoundException) { }
+        }
+
+        return dpi;
 #endif
     }
 
@@ -318,13 +330,13 @@ public class TouchManager : MonoBehaviour
         var height = Screen.height;
         if (height < 360)
         {
-            Debug.LogError($"[Flick dist] Screen.height = {Screen.height} seems wrong, falls back to Screen.dpi");
+            Debug.LogWarning($"[Flick dist] Screen.height = {Screen.height} seems wrong, falls back to Screen.dpi");
             forceDpi = true;
         }
         var dpi = GetDPI();
         if (dpi <= 10)
         {
-            Debug.LogError($"[Flick dist] Screen.dpi = {dpi} seems wrong, falls back to Screen.height");
+            Debug.LogWarning($"[Flick dist] Screen.dpi = {dpi} seems wrong, falls back to Screen.height");
             forceHeight = true;
         }
 
@@ -355,6 +367,7 @@ public class TouchManager : MonoBehaviour
         traceCache = new Dictionary<(KirakiraTracer, int), JudgeResult>();
         exchanged = new HashSet<KirakiraTouch>();
         KirakiraTouch.flickDistPixels = ComputeFlickDistance();
+        Debug.Log("Flick dist pixels = " + KirakiraTouch.flickDistPixels);
 
         parameters = SceneLoader.GetParamsOrDefault<InGameParams>();
         if (parameters.saveRecord)
