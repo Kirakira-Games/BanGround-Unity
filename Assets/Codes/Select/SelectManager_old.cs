@@ -22,7 +22,7 @@ public class SelectManager_old : MonoBehaviour
     [Inject]
     private IAudioManager audioManager;
     [Inject]
-    private IDataLoader dataLoader;
+    public IDataLoader dataLoader;
     [Inject]
     private IKVSystem kvSystem;
     [Inject]
@@ -44,22 +44,27 @@ public class SelectManager_old : MonoBehaviour
 
     public const float scroll_Min_Speed = 50f;
 
-    private RectTransform rect;
-    private ScrollRect scrollRect;
-    private VerticalLayoutGroup verticalLayoutGroup;
-    [HideInInspector] public DragHandler dragHandler;
+    //private RectTransform rt;
+    //private ScrollRect rt_s;
+    //private VerticalLayoutGroup lg;
+    //[HideInInspector] public DragHandler dh;
 
     //sort
     private Text sort_Text;
     private Button sort_Button;
 
+    //public GameObject songItemPrefab;
+    [SerializeField] KiraScrollView scrollView = default;
+
+    //private Transform songContent;
+
     [SerializeField] 
     private TextAsset[] voices;
 
     public List<cHeader> chartList => dataLoader.chartList;
-    private LinkedList<GameObject> SelectButtons = new LinkedList<GameObject>();
-    private LinkedList<RectTransform> rts = new LinkedList<RectTransform>();
-    private List<RectControl> rcs = new List<RectControl>();
+    //private LinkedList<GameObject> SelectButtons = new LinkedList<GameObject>();
+    //private LinkedList<RectTransform> rts = new LinkedList<RectTransform>();
+    //private List<RectControl> rcs = new List<RectControl>();
 
     public static SelectManager_old instance;
 
@@ -108,10 +113,11 @@ public class SelectManager_old : MonoBehaviour
         sort_Button.onClick.AddListener(SwitchSort);
 
         //Main Scroll View
-        rect = GameObject.Find("SongContent").GetComponent<RectTransform>();
-        scrollRect = GameObject.Find("Song Scroll View").GetComponent<ScrollRect>();
-        dragHandler = GameObject.Find("Song Scroll View").GetComponent<DragHandler>();
-        verticalLayoutGroup = GameObject.Find("SongContent").GetComponent<VerticalLayoutGroup>();
+        //rt = GameObject.Find("SongContent").GetComponent<RectTransform>();
+        //rt_s = GameObject.Find("Song Scroll View").GetComponent<ScrollRect>();
+        //dh = GameObject.Find("Song Scroll View").GetComponent<DragHandler>();
+        //lg = GameObject.Find("SongContent").GetComponent<VerticalLayoutGroup>();
+        //songContent = GameObject.Find("SongContent").transform;
     }
 
     public void Return2Title()
@@ -152,122 +158,124 @@ public class SelectManager_old : MonoBehaviour
         await PreviewFadeOut().WithCancellation(cancellationToken.sceneToken).SuppressCancellationThrow();
     }
 
-    public async void RefreshSongList()
+    public void RefreshSongList()
     {
-        //verticalLayoutGroup.enabled = true;
+        scrollView.UpdateData(chartList);
+        scrollView.SelectCell(chartListManager.current.index);
+        //lg.enabled = true;
 
-        // Adjust chartList
-        while (SelectButtons.Count < chartList.Count)
-        {
-            var obj = rectGroup.Create();
-            SelectButtons.AddLast(obj.gameObject);
-            rts.AddLast(obj);
-            var control = obj.GetComponent<RectControl>();
-            control.index = rcs.Count;
-            rcs.Add(control);
-        }
-        while (SelectButtons.Count > chartList.Count)
-        {
-            rectGroup.Destroy(rts.Last.Value);
-            SelectButtons.RemoveLast();
-            rts.RemoveLast();
-            rcs.RemoveAt(rcs.Count - 1);
-        }
+        //// Adjust chartList
+        //while (SelectButtons.Count < chartList.Count)
+        //{
+        //    var obj = _container.InstantiatePrefab(songItemPrefab, songContent);
+        //    SelectButtons.AddLast(obj);
+        //    rts.AddLast(obj.GetComponent<RectTransform>());
+        //    var control = obj.GetComponent<RectControl>();
+        //    control.index = rcs.Count;
+        //    rcs.Add(control);
+        //}
+        //while (SelectButtons.Count > chartList.Count)
+        //{
+        //    Destroy(SelectButtons.Last.Value);
+        //    SelectButtons.RemoveLast();
+        //    rts.RemoveLast();
+        //    rcs.RemoveAt(rcs.Count - 1);
+        //}
 
-        // Spawn New SongItem
-        var curNode = SelectButtons.First;
-        for (int i = 0; i < chartList.Count; i++)
-        {
-            var obj = curNode.Value;
-            obj.name = i.ToString();
-            Text[] txt = obj.GetComponentsInChildren<Text>();
+        //// Spawn New SongItem
+        //var curNode = SelectButtons.First;
+        //for (int i = 0; i < chartList.Count; i++)
+        //{
+        //    var obj = curNode.Value;
+        //    obj.name = i.ToString();
+        //    Text[] txt = obj.GetComponentsInChildren<Text>();
 
-            cHeader chart = chartList[i];
-            mHeader song = dataLoader.GetMusicHeader(chart.mid);
-            string author = chart.authorNick;
-            txt[0].text = song.title;
-            txt[1].text = song.artist + " / " + author;
+        //    cHeader chart = chartList[i];
+        //    mHeader song = dataLoader.GetMusicHeader(chart.mid);
+        //    string author = chart.authorNick;
+        //    txt[0].text = song.title;
+        //    txt[1].text = song.artist + " / " + author;
 
-            curNode = curNode.Next;
-        }
+        //    curNode = curNode.Next;
+        //}
 
-        rect.sizeDelta = new Vector2(rect.sizeDelta.x, verticalLayoutGroup.padding.top * 2 + chartList.Count * (116) + (chartList.Count - 1) * verticalLayoutGroup.spacing + (800));
+        //rt.sizeDelta = new Vector2(rt.sizeDelta.x, lg.padding.top * 2 + chartList.Count * (116) + (chartList.Count - 1) * lg.spacing + (800));
 
-        await SelectDefault();
-        verticalLayoutGroup.enabled = false;
+        //await SelectDefault();
+        //lg.enabled = false;
     }
 
-    private async UniTask SelectDefault()
-    {
-        var background = GameObject.Find("KirakiraBackground").GetComponent<FixBackground>();
-        var path = dataLoader.GetBackgroundPath(chartListManager.current.header.sid).Item1;
-        background.UpdateBackground(path);
+    //private async UniTask SelectDefault()
+    //{
+    //    var background = GameObject.Find("KirakiraBackground").GetComponent<FixBackground>();
+    //    var path = dataLoader.GetBackgroundPath(chartListManager.current.header.sid).Item1;
+    //    background.UpdateBackground(path);
 
-        await UniTask.DelayFrame(1);
+    //    await UniTask.DelayFrame(1);
 
-        try
-        {
-            SelectSong(chartListManager.current.index);
-        } 
-        catch
-        {
+    //    try
+    //    {
+    //        SelectSong(chartListManager.current.index);
+    //    } 
+    //    catch
+    //    {
 
-        }
-    }
+    //    }
+    //}
 
-    IEnumerator SelectNear()
-    {
-        //yield return new WaitForSeconds(1);
+    //IEnumerator SelectNear()
+    //{
+    //    //yield return new WaitForSeconds(1);
 
-        yield return 0;
-        while (Mathf.Abs(scrollRect.velocity.y) > scroll_Min_Speed || dragHandler.isDragging)
-        {
-            yield return 0;
-            //yield break;
-        }
-        scrollRect.StopMovement();
-        var destPos = 0 - rect.anchoredPosition.y - verticalLayoutGroup.padding.top - 100;
-        float nearestDistance = 9999f;
-        int nearstIndex = 0;
-        int curIndex = 0;
-        for (var node = rts.First; node != null; node = node.Next)
-        {
-            float distance = Mathf.Abs(node.Value.anchoredPosition.y - destPos);
-            if (distance < nearestDistance)
-            {
-                nearestDistance = distance;
-                nearstIndex = curIndex;
-            }
-            curIndex++;
-        }
-        SelectSong(nearstIndex);
-    }
+    //    yield return 0;
+    //    while (Mathf.Abs(rt_s.velocity.y) > scroll_Min_Speed || dh.isDragging)
+    //    {
+    //        yield return 0;
+    //        //yield break;
+    //    }
+    //    rt_s.StopMovement();
+    //    var destPos = 0 - rt.anchoredPosition.y - lg.padding.top - 100;
+    //    float nearestDistance = 9999f;
+    //    int nearstIndex = 0;
+    //    int curIndex = 0;
+    //    for (var node = rts.First; node != null; node = node.Next)
+    //    {
+    //        float distance = Mathf.Abs(node.Value.anchoredPosition.y - destPos);
+    //        if (distance < nearestDistance)
+    //        {
+    //            nearestDistance = distance;
+    //            nearstIndex = curIndex;
+    //        }
+    //        curIndex++;
+    //    }
+    //    SelectSong(nearstIndex);
+    //}
 
-    private RectControl last = null;
-    private Coroutine selectCoroutine = null;
-    public void SelectSong(int index)
-    {
-        if (index == -1)
-        {
-            if (selectCoroutine != null)
-                StopCoroutine(selectCoroutine);
-            selectCoroutine = StartCoroutine(SelectNear());
-            return;
-        }
+    //private RectControl last = null;
+    //private Coroutine selectCoroutine = null;
+    //public void SelectSong(int index)
+    //{
+    //    if (index == -1)
+    //    {
+    //        if (selectCoroutine != null)
+    //            StopCoroutine(selectCoroutine);
+    //        selectCoroutine = StartCoroutine(SelectNear());
+    //        return;
+    //    }
 
-        last?.UnSelect();
-        rcs[index].OnSelect();
-        last = rcs[index];
+    //    last?.UnSelect();
+    //    rcs[index].OnSelect();
+    //    last = rcs[index];
 
-        chartListManager.SelectChartByIndex(index);
+    //    chartListManager.SelectChartByIndex(index);
 
-        PlayPreview().WithCancellation(cancellationToken.sceneToken).SuppressCancellationThrow().Forget();
-    }
+    //    PlayPreview().WithCancellation(cancellationToken.sceneToken).SuppressCancellationThrow().Forget();
+    //}
 
-    public void UnselectSong()
-    {
-        last?.UnSelect();
-    }
+    //public void UnselectSong()
+    //{
+    //    last?.UnSelect();
+    //}
 
     private bool isFirstPlay = true;
     private int lastPreviewMid = -1;
