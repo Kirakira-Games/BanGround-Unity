@@ -26,11 +26,11 @@ public class SelectManager_old : MonoBehaviour
     [Inject]
     private IKVSystem kvSystem;
     [Inject]
-    private IChartListManager chartListManager;
+    public IChartListManager chartListManager;
     [Inject]
     private IChartLoader chartLoader;
     [Inject]
-    private IFileSystem fs;
+    public IFileSystem fs;
     [Inject(Id = "cl_cursorter")]
     private KVar cl_cursorter;
     [Inject(Id = "cl_modflag")]
@@ -40,9 +40,9 @@ public class SelectManager_old : MonoBehaviour
     [Inject]
     private ICancellationTokenStore cancellationToken;
 
-    public RectControlGroup rectGroup;
+    //public RectControlGroup rectGroup;
 
-    public const float scroll_Min_Speed = 50f;
+    //public const float scroll_Min_Speed = 50f;
 
     //private RectTransform rt;
     //private ScrollRect rt_s;
