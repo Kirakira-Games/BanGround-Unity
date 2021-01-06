@@ -28,7 +28,6 @@ public class KiraScrollView : FancyScrollView<cHeader, Context>
             return;
         }
 
-        SelectManager_old.instance.chartListManager.SelectChartByIndex(index);
         Context.SelectedIndex = index;
         Refresh();
     }
@@ -41,16 +40,8 @@ public class KiraScrollView : FancyScrollView<cHeader, Context>
 
     public void SelectCell(int index)
     {
-        if (index < 0 || index >= ItemsSource.Count)
+        if (index < 0 || index >= ItemsSource.Count || index == Context.SelectedIndex)
         {
-            Debug.LogWarning("Selection out of boundary!");
-            return;
-        }
-
-        if(index == Context.SelectedIndex)
-        {
-            Debug.Log("Enter Ingame Scene");
-            //SelectManager_old.instance.OnEnterPressed();
             return;
         }
 

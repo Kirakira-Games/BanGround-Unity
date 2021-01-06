@@ -20,17 +20,19 @@ using BanGround.Game.Mods;
 public class SelectManager_old : MonoBehaviour
 {
     [Inject]
+    private DiContainer _container;
+    [Inject]
     private IAudioManager audioManager;
     [Inject]
     public IDataLoader dataLoader;
     [Inject]
     private IKVSystem kvSystem;
     [Inject]
-    public IChartListManager chartListManager;
+    private IChartListManager chartListManager;
     [Inject]
     private IChartLoader chartLoader;
     [Inject]
-    public IFileSystem fs;
+    private IFileSystem fs;
     [Inject(Id = "cl_cursorter")]
     private KVar cl_cursorter;
     [Inject(Id = "cl_modflag")]
@@ -40,9 +42,7 @@ public class SelectManager_old : MonoBehaviour
     [Inject]
     private ICancellationTokenStore cancellationToken;
 
-    //public RectControlGroup rectGroup;
-
-    //public const float scroll_Min_Speed = 50f;
+    public const float scroll_Min_Speed = 50f;
 
     //private RectTransform rt;
     //private ScrollRect rt_s;
