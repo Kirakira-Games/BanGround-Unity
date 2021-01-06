@@ -36,7 +36,7 @@ public class KiraSongCell : FancyCell<cHeader, Context>
 
     public override void UpdateContent(cHeader chart)
     {
-        mHeader song = SelectManager_old.instance.dataLoader.GetMusicHeader(chart.mid);
+        mHeader song = dataLoader.GetMusicHeader(chart.mid);
 
         smallText.text = song.title;
     }
@@ -52,4 +52,6 @@ public class KiraSongCell : FancyCell<cHeader, Context>
 
         animator.speed = 0;
     }
+
+    public class Factory : PlaceholderFactory<KiraSongCell> {}
 }
