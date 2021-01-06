@@ -160,7 +160,12 @@ public class SelectManager_old : MonoBehaviour
 
     public void RefreshSongList()
     {
-        scrollView.UpdateData(chartList);
+        var newIndices = new int[chartList.Count];
+
+        for (int i = 0; i < chartList.Count; i++)
+            newIndices[i] = i;
+
+        scrollView.UpdateData(newIndices);
         scrollView.SelectCell(chartListManager.current.index);
         //lg.enabled = true;
 

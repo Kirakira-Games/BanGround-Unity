@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
-public class KiraScrollView : FancyScrollView<cHeader, Context>
+public class KiraScrollView : FancyScrollView<int, Context>
 {
     [SerializeField] Scroller scroller = default;
     [SerializeField] GameObject cellPrefab = default;
@@ -14,6 +14,8 @@ public class KiraScrollView : FancyScrollView<cHeader, Context>
     private KiraSongCell.Factory cellFactory;
 
     protected override GameObject CellPrefab => cellPrefab;
+
+    public int SelectedCellIndex => Context.SelectedIndex;
 
     protected override void Initialize()
     {
@@ -61,7 +63,7 @@ public class KiraScrollView : FancyScrollView<cHeader, Context>
         Refresh();
     }
 
-    public void UpdateData(IList<cHeader> items)
+    public void UpdateData(IList<int> items)
     {
         UpdateContents(items);
         scroller.SetTotalCount(items.Count);
