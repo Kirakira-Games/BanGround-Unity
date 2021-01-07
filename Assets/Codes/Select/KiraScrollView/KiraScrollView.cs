@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using EasingCore;
 using FancyScrollView;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,6 +19,9 @@ public class KiraScrollView : FancyScrollView<int, Context>
     [Inject]
     private SelectManager selectManager;
 
+    public bool Moved = false;
+    public Action OnMove;
+
     protected override GameObject CellPrefab => cellPrefab;
 
     public int SelectedCellIndex => Context.SelectedIndex;
@@ -30,6 +34,15 @@ public class KiraScrollView : FancyScrollView<int, Context>
 
         scroller.OnValueChanged(UpdatePosition);
         scroller.OnSelectionChanged(UpdateSelection);
+    }
+
+    private void Update()
+    {
+        if(Moved)
+        {
+            Moved = false;
+            OnMove?.Invoke();
+        }
     }
 
     protected override void ResizePool(float firstPosition)

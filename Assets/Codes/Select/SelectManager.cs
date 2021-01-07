@@ -33,6 +33,8 @@ public class SelectManager : MonoBehaviour
     private IChartLoader chartLoader;
     [Inject]
     private IFileSystem fs;
+    [Inject]
+    SettingAndMod settingAndMod;
     [Inject(Id = "cl_cursorter")]
     private KVar cl_cursorter;
     [Inject(Id = "cl_modflag")]
@@ -118,7 +120,7 @@ public class SelectManager : MonoBehaviour
 
     public async void OnEnterPressed()
     {
-        SettingAndMod.instance.SetLiveSetting();
+        settingAndMod.SetLiveSetting();
 
         kvSystem.SaveConfig();
 

@@ -9,8 +9,6 @@ using BanGround.Game.Mods;
 
 public class SettingAndMod : MonoBehaviour
 {
-    public static SettingAndMod instance;
-
     [Inject]
     LocalizedStrings localizedStrings;
     [Inject]
@@ -387,11 +385,6 @@ public class SettingAndMod : MonoBehaviour
             System.Console.WriteLine(e.Message);
             throw e;
         }
-    }
-
-    private void Awake()
-    {
-        instance = this;
     }
 
     void Start()

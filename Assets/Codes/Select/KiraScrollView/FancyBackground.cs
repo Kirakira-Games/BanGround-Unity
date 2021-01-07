@@ -14,12 +14,9 @@ public class FancyBackground : MonoBehaviour
     [Inject]
     IFileSystem fs;
 
-    [SerializeField]
-    RawImage background = default;
-    [SerializeField]
-    KiraScrollView scrollView = default;
-    [SerializeField]
-    Scroller scroller = default;
+    public RawImage background = default;
+    public KiraScrollView scrollView = default;
+    public Scroller scroller = default;
 
     Material material;
 

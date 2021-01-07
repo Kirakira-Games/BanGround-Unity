@@ -87,6 +87,8 @@ public class KiraSongCell : FancyCell<int, Context>
             background.MostCenterdCellButShiftedPosition = background.MostCenterdCellButShiftedPosition == -1 ? time : background.MostCenterdCellPosition;
             background.MostCenterdCellPosition = time;
         }
+
+        background.scrollView.Moved = true;
     }
 
     public class Factory : PlaceholderFactory<KiraSongCell> { }
