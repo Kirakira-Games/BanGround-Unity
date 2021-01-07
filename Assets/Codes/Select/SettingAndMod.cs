@@ -17,6 +17,8 @@ public class SettingAndMod : MonoBehaviour
     private IAudioManager audioManager;
     [Inject]
     private IKVSystem kvSystem;
+    [Inject]
+    SelectManager selectManager;
     [Inject(Id = "cl_modflag")]
     private KVar cl_modflag;
 
@@ -235,7 +237,7 @@ public class SettingAndMod : MonoBehaviour
         setting_Close_Btn.gameObject.SetActive(true);
         if (soundTog.isOn)
         {
-            SelectManager_old.instance.previewSound?.Pause();
+            selectManager.previewSound?.Pause();
         }
     }
     void CloseSetting()
@@ -244,7 +246,7 @@ public class SettingAndMod : MonoBehaviour
         SetLiveSetting();
         setting_Close_Btn.gameObject.SetActive(false);
         kvSystem.SaveConfig();
-        SelectManager_old.instance.previewSound?.Play();
+        selectManager.previewSound?.Play();
     }
     void OpenMod()
     {

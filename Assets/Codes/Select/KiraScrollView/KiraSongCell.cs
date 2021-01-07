@@ -12,6 +12,8 @@ public class KiraSongCell : FancyCell<int, Context>
     private IDataLoader dataLoader;
     [Inject]
     private IFileSystem fs;
+    [Inject]
+    private FancyBackground background;
 
     [SerializeField] 
     Animator animator = default;
@@ -27,12 +29,7 @@ public class KiraSongCell : FancyCell<int, Context>
 
     RectTransform rectTransform => transform as RectTransform;
 
-    private int myIndex = -1;
     private int lastSid = 0;
-
-    public static float MostCenterdCellButShiftedPosition = -1;
-    public static float MostCenterdCellPosition = -1;
-    public static int MostCenterdCellIndex = -1;
 
     // GameObject が非アクティブになると Animator がリセットされてしまうため
     // 現在位置を保持しておいて OnEnable のタイミングで現在位置を再設定します
@@ -52,7 +49,6 @@ public class KiraSongCell : FancyCell<int, Context>
 
     public override void UpdateContent(int index)
     {
-        myIndex = index;
         var chart = dataLoader.chartList[index];
 
         if (chart.sid == lastSid)
@@ -62,16 +58,14 @@ public class KiraSongCell : FancyCell<int, Context>
 
         mHeader song = dataLoader.GetMusicHeader(chart.mid);
         smallText.text = song.title;
+
+        UpdatePosition(currentPosition);
     }
 
     private void Update()
     {
-        if (Mathf.Abs(smallImage.rectTransform.anchorMin.y - 0.5f) <= Mathf.Abs(MostCenterdCellPosition - 0.5f))
-        {
-            MostCenterdCellIndex = myIndex;
-            MostCenterdCellButShiftedPosition = MostCenterdCellButShiftedPosition == -1 ? smallImage.rectTransform.anchorMin.y : MostCenterdCellPosition;
-            MostCenterdCellPosition = smallImage.rectTransform.anchorMin.y;
-        }
+        if (Index == background.MostCenterdCellIndex)
+            background.MostCenterdCellPosition = 1.0f - currentPosition;
     }
 
     public override void UpdatePosition(float position)
@@ -84,6 +78,15 @@ public class KiraSongCell : FancyCell<int, Context>
         }
 
         animator.speed = 0;
+
+        var time = 1.0f - currentPosition;
+
+        if (Mathf.Abs(time - 0.5f) <= Mathf.Abs(background.MostCenterdCellPosition - 0.5f))
+        {
+            background.MostCenterdCellIndex = Index;
+            background.MostCenterdCellButShiftedPosition = background.MostCenterdCellButShiftedPosition == -1 ? time : background.MostCenterdCellPosition;
+            background.MostCenterdCellPosition = time;
+        }
     }
 
     public class Factory : PlaceholderFactory<KiraSongCell> { }

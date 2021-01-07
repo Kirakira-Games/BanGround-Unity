@@ -1,4 +1,5 @@
-﻿using EasingCore;
+﻿using Cysharp.Threading.Tasks;
+using EasingCore;
 using FancyScrollView;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,7 +12,11 @@ public class KiraScrollView : FancyScrollView<int, Context>
     [SerializeField] GameObject cellPrefab = default;
 
     [Inject]
+    private IChartListManager chartListManager;
+    [Inject]
     private KiraSongCell.Factory cellFactory;
+    [Inject]
+    private SelectManager selectManager;
 
     protected override GameObject CellPrefab => cellPrefab;
 
@@ -60,13 +65,18 @@ public class KiraScrollView : FancyScrollView<int, Context>
         }
 
         Context.SelectedIndex = index;
+        selectManager.SelectSong(index);
         Refresh();
     }
 
-    public void UpdateData(IList<int> items)
+    public async void UpdateData(IList<int> items)
     {
         UpdateContents(items);
         scroller.SetTotalCount(items.Count);
+
+        // fix background not correct on first frame.
+        await UniTask.DelayFrame(1);
+        scroller.ScrollTo(chartListManager.current.index, 0);
     }
 
     public void SelectCell(int index)
