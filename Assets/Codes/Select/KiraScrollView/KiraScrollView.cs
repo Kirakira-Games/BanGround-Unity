@@ -81,7 +81,11 @@ public class KiraScrollView : FancyScrollView<int, Context>
 
     public void SelectCell(int index)
     {
-        if (index < 0 || index >= ItemsSource.Count || index == Context.SelectedIndex)
+        if(index == Context.SelectedIndex)
+        {
+            selectManager.OnEnterPressed();
+        }
+        else if (index < 0 || index >= ItemsSource.Count)
         {
             return;
         }
