@@ -23,6 +23,8 @@ public class RectControl : MonoBehaviour//, IPointerDownHandler, IPointerUpHandl
     //[Inject]
     //private IFileSystem fs;
 
+    //[SerializeField] 
+    //private Animator deleteAni;
     //RectTransform rt_m;
     //RectTransform rt_v;
     //RectTransform rt;
@@ -37,6 +39,8 @@ public class RectControl : MonoBehaviour//, IPointerDownHandler, IPointerUpHandl
     //public int index;
     ////Button bt;
 
+    //public Color SelectedColor = Color.white;
+    //public Color DisabledColor = Color.clear;
     //GameObject startImg;
     //Text title;
     //Image img;
@@ -101,6 +105,9 @@ public class RectControl : MonoBehaviour//, IPointerDownHandler, IPointerUpHandl
     //    }
     //}
 
+    //IEnumerator OnSelectAnimation1()
+    //{
+    //    yield return new WaitForEndOfFrame();
     //public void OnSelect()
     //{ 
     //    startImg.SetActive(true);
@@ -147,6 +154,17 @@ public class RectControl : MonoBehaviour//, IPointerDownHandler, IPointerUpHandl
 
     
 
+    //private void OnEnterPressed()
+    //{
+    //    if (!dataLoader.MusicExists(chartListManager.current.header.mid))
+    //    {
+    //        messageBannerController.ShowMsg(LogLevel.INFO, "Music missing. Please import it.");
+    //        return;
+    //    }
+    //    //bt.onClick.RemoveAllListeners();
+    //    //bt.interactable = false;
+    //    sm.OnEnterPressed();
+    //}
     //public void UnSelect()
     //{
     //    if (!select) return;
