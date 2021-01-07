@@ -32,6 +32,9 @@
             struct v2f {
                 float4 position : SV_POSITION;
                 float4 screenPosition : TEXCOORD0;
+                float2 texUv1 : TEXCOORD1;
+                float2 texUv2 : TEXCOORD2;
+                float2 texUv3 : TEXCOORD3;
             };
 
             sampler2D _Tex1;
@@ -44,11 +47,45 @@
             float3 _TexRatios;
             float _Progress;
 
+            float2 calcUv(float aspectRatio, float4 screenPos)
+            {
+                float2 textureCoordinate = screenPos.xy / screenPos.w;
+                float aspect = _ScreenParams.x / _ScreenParams.y;
+                if (aspectRatio < aspect)
+                {
+                    textureCoordinate.y = textureCoordinate.y / aspect;
+                    textureCoordinate = TRANSFORM_TEX(textureCoordinate, _Tex1);
+
+                    textureCoordinate.y = textureCoordinate.y * aspectRatio;
+
+                    float t = 1 / aspectRatio - 1 / aspect;
+                    textureCoordinate.y += t / 2;
+                }
+                else
+                {
+                    textureCoordinate.x = textureCoordinate.x * aspect;
+                    textureCoordinate = TRANSFORM_TEX(textureCoordinate, _Tex1);
+
+                    textureCoordinate.x = textureCoordinate.x / aspectRatio;
+
+                    float t = aspectRatio - aspect;
+                    textureCoordinate.x += t / 2;
+                }
+
+                return textureCoordinate;
+            }
+
             v2f vert(appdata v) 
             {
                 v2f o;
                 o.position = UnityObjectToClipPos(v.vertex);
-                o.screenPosition = ComputeScreenPos(o.position);
+                float4 screenPos = ComputeScreenPos(o.position);
+
+                o.texUv1 = calcUv(_TexRatios.x, screenPos);
+                o.texUv2 = calcUv(_TexRatios.y, screenPos);
+                o.texUv3 = calcUv(_TexRatios.z, screenPos);
+
+                o.screenPosition = screenPos;
                 return o;
             }
 
@@ -57,95 +94,11 @@
                 return a * (1 - p) + b * p;
             }
 
-            float4 SampleTexture1(v2f i)
-            {
-                float2 textureCoordinate = i.screenPosition.xy / i.screenPosition.w;
-                float aspect = _ScreenParams.x / _ScreenParams.y;
-                if (_TexRatios.x < aspect)
-                {
-                    textureCoordinate.y = textureCoordinate.y / aspect;
-                    textureCoordinate = TRANSFORM_TEX(textureCoordinate, _Tex1);
-
-                    textureCoordinate.y = textureCoordinate.y * _TexRatios.x;
-
-                    float t = 1 / _TexRatios.x - 1 / aspect;
-                    textureCoordinate.y += t / 2;
-                }
-                else
-                {
-                    textureCoordinate.x = textureCoordinate.x * aspect;
-                    textureCoordinate = TRANSFORM_TEX(textureCoordinate, _Tex1);
-
-                    textureCoordinate.x = textureCoordinate.x / _TexRatios.x;
-
-                    float t = _TexRatios.x - aspect;
-                    textureCoordinate.x += t / 2;
-                }
-
-                return tex2D(_Tex1, textureCoordinate);
-            }
-
-            float4 SampleTexture2(v2f i)
-            {
-                float2 textureCoordinate = i.screenPosition.xy / i.screenPosition.w;
-                float aspect = _ScreenParams.x / _ScreenParams.y;
-                if (_TexRatios.y < aspect)
-                {
-                    textureCoordinate.y = textureCoordinate.y / aspect;
-                    textureCoordinate = TRANSFORM_TEX(textureCoordinate, _Tex1);
-
-                    textureCoordinate.y = textureCoordinate.y * _TexRatios.y;
-
-                    float t = 1 / _TexRatios.y - 1 / aspect;
-                    textureCoordinate.y += t / 2;
-                }
-                else
-                {
-                    textureCoordinate.x = textureCoordinate.x * aspect;
-                    textureCoordinate = TRANSFORM_TEX(textureCoordinate, _Tex2);
-
-                    textureCoordinate.x = textureCoordinate.x / _TexRatios.y;
-
-                    float t = _TexRatios.y - aspect;
-                    textureCoordinate.x += t / 2;
-                }
-
-                return tex2D(_Tex2, textureCoordinate);
-            }
-
-            float4 SampleTexture3(v2f i)
-            {
-                float2 textureCoordinate = i.screenPosition.xy / i.screenPosition.w;
-                float aspect = _ScreenParams.x / _ScreenParams.y;
-                if (_TexRatios.z < aspect)
-                {
-                    textureCoordinate.y = textureCoordinate.y / aspect;
-                    textureCoordinate = TRANSFORM_TEX(textureCoordinate, _Tex3);
-
-                    textureCoordinate.y = textureCoordinate.y * _TexRatios.z;
-
-                    float t = 1 / _TexRatios.z - 1 / aspect;
-                    textureCoordinate.y += t / 2;
-                }
-                else
-                {
-                    textureCoordinate.x = textureCoordinate.x * aspect;
-                    textureCoordinate = TRANSFORM_TEX(textureCoordinate, _Tex1);
-
-                    textureCoordinate.x = textureCoordinate.x / _TexRatios.z;
-
-                    float t = _TexRatios.z - aspect;
-                    textureCoordinate.x += t / 2;
-                }
-
-                return tex2D(_Tex3, textureCoordinate);
-            }
-
             fixed4 frag(v2f i) : SV_TARGET
             {
-                float4 a = SampleTexture1(i);
-                float4 b = SampleTexture2(i);
-                float4 c = SampleTexture3(i);
+                float4 a = tex2D(_Tex1, i.texUv1);
+                float4 b = tex2D(_Tex2, i.texUv2);
+                float4 c = tex2D(_Tex3, i.texUv3);
 
                 float y = (i.screenPosition.y / i.screenPosition.w) / 2 + 0.25;
 
