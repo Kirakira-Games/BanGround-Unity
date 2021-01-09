@@ -34,6 +34,10 @@ public class SelectManager : MonoBehaviour
     [Inject]
     private IFileSystem fs;
     [Inject]
+    private IMessageBannerController messageBannerController;
+    [Inject]
+    private IMessageBox messageBox;
+    [Inject]
     SettingAndMod settingAndMod;
     [Inject(Id = "cl_cursorter")]
     private KVar cl_cursorter;
@@ -54,6 +58,8 @@ public class SelectManager : MonoBehaviour
     //sort
     private Text sort_Text;
     private Button sort_Button;
+
+    [SerializeField] private Button delete_Button;
 
     //public GameObject songItemPrefab;
     [SerializeField] KiraScrollView scrollView = default;
@@ -103,6 +109,14 @@ public class SelectManager : MonoBehaviour
         sort_Button = GameObject.Find("Sort_Button").GetComponent<Button>();
         sort_Text = GameObject.Find("Sort_Text").GetComponent<Text>();
         sort_Button.onClick.AddListener(SwitchSort);
+
+        delete_Button.onClick.AddListener(async () =>
+        {
+            if (await messageBox.ShowMessage("Select.Delete.Title", "Select.Delete.Content"))
+            {
+                OnDelete();
+            }
+        });
     }
 
     public void Return2Title()
@@ -254,6 +268,40 @@ public class SelectManager : MonoBehaviour
 
         faderWorking = false;
     }
+
+    private void OnDelete()
+    {
+        var header = chartListManager.current.header;
+        Difficulty difficulty = chartListManager.current.difficulty;
+        if (header.sid == OffsetGuide.OFFSET_GUIDE_SID)
+        {
+            messageBannerController.ShowMsg(LogLevel.INFO, "Nooooooooooooooo");
+            return;
+        }
+
+        bool hasOtherDifficulty = false;
+        for (int i = 0; i < header.difficultyLevel.Count; i++)
+        {
+            if (i == (int)difficulty)
+                continue;
+            if (header.difficultyLevel[i] != -1)
+            {
+                hasOtherDifficulty = true;
+                break;
+            }
+        }
+        if (hasOtherDifficulty)
+        {
+            dataLoader.DeleteDifficulty(header.sid, difficulty);
+        }
+        else
+        {
+            dataLoader.DeleteChart(header.sid);
+        }
+
+        SceneLoader.LoadSceneAsync("Select");
+    }
+
     #endregion
 
     #region ChartEditor
