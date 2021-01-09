@@ -22,15 +22,17 @@ namespace BanGround.Game.Mods
 
     public static class ModFlagUtil
     {
+        private const int BASE = 16;
+
         public static ModFlag From(KVar kvar)
         {
-            return (ModFlag)Convert.ToUInt64(kvar, 2);
+            return (ModFlag)Convert.ToUInt64(kvar, BASE);
         }
 
         public static void SetMod(this KVar kvar, ModFlag flag)
         {
-            // No override for ulong, but the bit pattern should be the same
-            kvar.Set(Convert.ToString((long)flag, 2));
+            // No override for ulong, but the hex pattern should be the same
+            kvar.Set(Convert.ToString((long)flag, BASE));
         }
 
         public static List<ModBase> Create(this ModFlag flag)

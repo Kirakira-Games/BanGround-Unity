@@ -29,8 +29,8 @@ public class ResultManager : MonoBehaviour
     [Inject]
     private IDatabaseAPI db;
 
-    [Inject(Id = "fs_iconpath")]
-    private KVar fs_iconpath;
+    [Inject(Id = "g_saveReplay")]
+    private KVar g_saveReplay;
 
     private Button button_back;
     private Button button_retry;
@@ -213,8 +213,6 @@ public class ResultManager : MonoBehaviour
     private void SetBtnObject()
     {
         var gameParams = SceneLoader.GetParamsOrDefault<ResultParams>().ToInGameParams();
-        gameParams.saveReplay = false;
-        gameParams.saveRecord = false;
 
         button_back = GameObject.Find("Button_back").GetComponent<Button>();
         button_retry = GameObject.Find("Button_retry").GetComponent<Button>();
@@ -236,6 +234,8 @@ public class ResultManager : MonoBehaviour
             //StartCoroutine("DelayLoadScene","InGame" ); 
             StartCoroutine(BgmFadeOut());
             RemoveListener();
+            gameParams.saveReplay = g_saveReplay;
+            gameParams.saveRecord = true;
             SceneLoader.LoadScene("InGame", pushStack: false, parameters: gameParams);
         });
 
@@ -246,6 +246,8 @@ public class ResultManager : MonoBehaviour
             if (string.IsNullOrEmpty(gameParams.replayPath))
                 return;
 
+            gameParams.saveReplay = false;
+            gameParams.saveRecord = false;
             StartCoroutine(BgmFadeOut());
             RemoveListener();
             SceneLoader.LoadScene("InGame", pushStack: false, parameters: gameParams);

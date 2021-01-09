@@ -285,6 +285,7 @@ public class ChartLoader : IChartLoader
         }
         try
         {
+            chart.Sanitize();
             if (convertToGameChart)
             {
                 gameChart = LoadChartInternal(
