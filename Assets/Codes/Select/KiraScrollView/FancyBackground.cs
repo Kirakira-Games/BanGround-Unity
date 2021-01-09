@@ -18,12 +18,12 @@ public class FancyBackground : MonoBehaviour
     public RawImage background = default;
     public KiraScrollView scrollView = default;
     public Scroller scroller = default;
+    public Text title = default;
+    public Text artist = default;
 
     Material material;
 
     RectTransform rectTransform;
-
-    public Action OnMoved = null;
 
     static Dictionary<string, Texture2D> _cachedBackgrounds = new Dictionary<string, Texture2D>();
 
@@ -60,8 +60,6 @@ public class FancyBackground : MonoBehaviour
         {
             while ((pos -= dataLoader.chartList.Count) >= dataLoader.chartList.Count) ;
         }
-
-        Debug.Log(pos);
 
         int current = Mathf.RoundToInt(pos);
 
@@ -111,11 +109,13 @@ public class FancyBackground : MonoBehaviour
             material.SetTexture(Uniform.Texture3, tex3);
 
             material.SetVector(Uniform.AspectRatios, new Vector4(tex1.width / (float)tex1.height, tex2.width / (float)tex2.height, tex3.width / (float)tex3.height, 0));
+
+            var mheader = dataLoader.GetMusicHeader(dataLoader.chartList[current].mid);
+            title.text = mheader.title;
+            artist.text = mheader.artist;
         }
 
         material.SetFloat(Uniform.Progress, position);
         background.material = material;
-
-        OnMoved?.Invoke();
     }
 }

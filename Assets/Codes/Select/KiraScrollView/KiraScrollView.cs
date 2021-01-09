@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Zenject;
 
 public class KiraScrollView : FancyScrollView<int, Context>
@@ -18,6 +19,8 @@ public class KiraScrollView : FancyScrollView<int, Context>
     private KiraSongCell.Factory cellFactory;
     [Inject]
     private SelectManager selectManager;
+    [Inject]
+    private IDataLoader dataLoader;
 
     public delegate void MoveHandler(float progress);
     public event MoveHandler OnMove;
@@ -77,6 +80,7 @@ public class KiraScrollView : FancyScrollView<int, Context>
 
         Context.SelectedIndex = index;
         selectManager.SelectSong(index);
+
         Refresh();
     }
 
