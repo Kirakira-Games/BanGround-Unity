@@ -143,10 +143,10 @@ namespace BanGround.Web
                 }
                 if (!webRequest.downloadHandler.text.IsNullOrEmpty())
                 {
+                    Debug.Log("[KWR] Response: " + webRequest.downloadHandler.text);
                     var result = JsonConvert.DeserializeObject<Result<Resp>>(webRequest.downloadHandler.text);
                     if (result.status == false)
                         throw new KiraWebException(webRequest.responseCode, new KiraErrorMessage(result.error));
-                    Debug.Log("[KWR] Response: " + JsonConvert.SerializeObject(result.data));
                     return result.data;
                 }
                 Debug.Log("[KWR] Success without response text.");
