@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using FancyScrollView;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,10 +13,9 @@ public class ContentAlphaController : MonoBehaviour
 
     private void Start()
     {
-        scrollView.OnMove = () =>
+        scrollView.OnMove += _ =>
         {
             canvasGroup.alpha = 1;
-            startCanvasGroup.alpha = 0;
         };
     }
 

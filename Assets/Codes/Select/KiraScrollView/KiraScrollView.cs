@@ -19,8 +19,8 @@ public class KiraScrollView : FancyScrollView<int, Context>
     [Inject]
     private SelectManager selectManager;
 
-    public bool Moved = false;
-    public Action OnMove;
+    public delegate void MoveHandler(float progress);
+    public event MoveHandler OnMove;
 
     protected override GameObject CellPrefab => cellPrefab;
 
@@ -32,17 +32,15 @@ public class KiraScrollView : FancyScrollView<int, Context>
 
         Context.OnCellClicked = SelectCell;
 
-        scroller.OnValueChanged(UpdatePosition);
+        scroller.OnValueChanged(UpdatePos);
         scroller.OnSelectionChanged(UpdateSelection);
     }
 
-    private void Update()
+    void UpdatePos(float pos)
     {
-        if(Moved)
-        {
-            Moved = false;
-            OnMove?.Invoke();
-        }
+        UpdatePosition(pos);
+
+        OnMove?.Invoke(pos);
     }
 
     protected override void ResizePool(float firstPosition)

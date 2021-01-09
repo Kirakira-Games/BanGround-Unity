@@ -62,12 +62,6 @@ public class KiraSongCell : FancyCell<int, Context>
         UpdatePosition(currentPosition);
     }
 
-    private void Update()
-    {
-        if (Index == background.MostCenterdCellIndex)
-            background.MostCenterdCellPosition = 1.0f - currentPosition;
-    }
-
     public override void UpdatePosition(float position)
     {
         currentPosition = position;
@@ -80,15 +74,6 @@ public class KiraSongCell : FancyCell<int, Context>
         animator.speed = 0;
 
         var time = 1.0f - currentPosition;
-
-        if (Mathf.Abs(time - 0.5f) <= Mathf.Abs(background.MostCenterdCellPosition - 0.5f))
-        {
-            background.MostCenterdCellIndex = Index;
-            background.MostCenterdCellButShiftedPosition = background.MostCenterdCellButShiftedPosition == -1 ? time : background.MostCenterdCellPosition;
-            background.MostCenterdCellPosition = time;
-        }
-
-        background.scrollView.Moved = true;
     }
 
     public class Factory : PlaceholderFactory<KiraSongCell> { }

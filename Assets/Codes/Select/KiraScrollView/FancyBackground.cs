@@ -1,5 +1,6 @@
 ﻿using BanGround;
 using FancyScrollView;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -22,13 +23,9 @@ public class FancyBackground : MonoBehaviour
 
     RectTransform rectTransform;
 
-    static Dictionary<string, Texture2D> _cachedBackgrounds = new Dictionary<string, Texture2D>();
+    public Action OnMoved = null;
 
-    public float MostCenterdCellButShiftedPosition = -1;
-    public float MostCenterdCellPosition = -1;
-    public int MostCenterdCellIndex = -1;
-    public int LastMostCenterdCellIndex = -1;
-    public float LastMostCenterdCellPosition = -1;
+    static Dictionary<string, Texture2D> _cachedBackgrounds = new Dictionary<string, Texture2D>();
 
     static class Uniform
     {
@@ -44,75 +41,81 @@ public class FancyBackground : MonoBehaviour
         rectTransform = transform as RectTransform;
 
         material = Instantiate(background.material);
+
+        scrollView.OnMove += UpdatePosition;
     }
 
     int cur_last = -1, cur_current = -1, cur_next = -1;
 
-    void LateUpdate()
+    void UpdatePosition(float pos)
     {
-        Debug.Assert(dataLoader.chartList.Count > 0);
+        if (dataLoader.chartList.Count == 0)
+            return;
 
-        if (LastMostCenterdCellPosition != MostCenterdCellButShiftedPosition || LastMostCenterdCellIndex != MostCenterdCellIndex)
+        if(pos < 0)
         {
-            int current = MostCenterdCellIndex;
-            int last = current - 1;
-            int next = current + 1;
-
-            var position = MostCenterdCellPosition;
-            var shiftedPosition = MostCenterdCellButShiftedPosition;
-
-            var len = Mathf.Abs(shiftedPosition - position) * 2;
-
-            position = (position - 0.5f) / len + 0.5f;
-
-            LastMostCenterdCellPosition = MostCenterdCellButShiftedPosition;
-            LastMostCenterdCellIndex = MostCenterdCellIndex;
-
-            if (last < 0)
-                last = dataLoader.chartList.Count - 1;
-
-            if (next >= dataLoader.chartList.Count)
-                next = 0;
-
-            if (cur_last != last || cur_current != current || cur_next != next)
-            {
-                cur_last = last;
-                cur_current = current;
-                cur_next = next;
-
-                var s1 = dataLoader.chartList[last];
-                var s2 = dataLoader.chartList[current];
-                var s3 = dataLoader.chartList[next];
-
-                var b1 = dataLoader.GetBackgroundPath(s1.sid, true).Item1;
-                var b2 = dataLoader.GetBackgroundPath(s2.sid, true).Item1;
-                var b3 = dataLoader.GetBackgroundPath(s3.sid, true).Item1;
-
-                if (!_cachedBackgrounds.ContainsKey(b1))
-                    _cachedBackgrounds.Add(b1, fs.GetFile(b1).ReadAsTexture());
-
-                if (!_cachedBackgrounds.ContainsKey(b2))
-                    _cachedBackgrounds.Add(b2, fs.GetFile(b2).ReadAsTexture());
-
-                if (!_cachedBackgrounds.ContainsKey(b3))
-                    _cachedBackgrounds.Add(b3, fs.GetFile(b3).ReadAsTexture());
-
-                var tex1 = _cachedBackgrounds[b1];
-                var tex2 = _cachedBackgrounds[b2];
-                var tex3 = _cachedBackgrounds[b3];
-
-                material.SetTexture(Uniform.Texture1, tex1);
-                material.SetTexture(Uniform.Texture2, tex2);
-                material.SetTexture(Uniform.Texture3, tex3);
-
-                material.SetVector(Uniform.AspectRatios, new Vector4(tex1.width / (float)tex1.height, tex2.width / (float)tex2.height, tex3.width / (float)tex3.height, 0));
-            }
-
-            material.SetFloat(Uniform.Progress, position);
-            background.material = material;
+            while ((pos += dataLoader.chartList.Count) < 0) ;
+        }
+        else if(pos >= dataLoader.chartList.Count)
+        {
+            while ((pos -= dataLoader.chartList.Count) >= dataLoader.chartList.Count) ;
         }
 
-        // have to reset this everytime
-        MostCenterdCellPosition = -1;
+        Debug.Log(pos);
+
+        int current = Mathf.RoundToInt(pos);
+
+        if (current >= dataLoader.chartList.Count)
+            current -= 1;
+
+        int last = current - 1;
+        int next = current + 1;
+
+        var position = (pos - current) / 2 + 0.5f;
+
+        if (last < 0)
+            last = dataLoader.chartList.Count - 1;
+
+        if (next >= dataLoader.chartList.Count)
+            next = 0;
+
+        if (cur_last != last || cur_current != current || cur_next != next)
+        {
+            cur_last = last;
+            cur_current = current;
+            cur_next = next;
+
+            var s1 = dataLoader.chartList[last];
+            var s2 = dataLoader.chartList[current];
+            var s3 = dataLoader.chartList[next];
+
+            var b1 = dataLoader.GetBackgroundPath(s1.sid, true).Item1;
+            var b2 = dataLoader.GetBackgroundPath(s2.sid, true).Item1;
+            var b3 = dataLoader.GetBackgroundPath(s3.sid, true).Item1;
+
+            if (!_cachedBackgrounds.ContainsKey(b1))
+                _cachedBackgrounds.Add(b1, fs.GetFile(b1).ReadAsTexture());
+
+            if (!_cachedBackgrounds.ContainsKey(b2))
+                _cachedBackgrounds.Add(b2, fs.GetFile(b2).ReadAsTexture());
+
+            if (!_cachedBackgrounds.ContainsKey(b3))
+                _cachedBackgrounds.Add(b3, fs.GetFile(b3).ReadAsTexture());
+
+            var tex1 = _cachedBackgrounds[b1];
+            var tex2 = _cachedBackgrounds[b2];
+            var tex3 = _cachedBackgrounds[b3];
+
+            material.SetTexture(Uniform.Texture1, tex1);
+            material.SetTexture(Uniform.Texture2, tex2);
+            material.SetTexture(Uniform.Texture3, tex3);
+
+            material.SetVector(Uniform.AspectRatios, new Vector4(tex1.width / (float)tex1.height, tex2.width / (float)tex2.height, tex3.width / (float)tex3.height, 0));
+        }
+
+        material.SetFloat(Uniform.Progress, position);
+        background.material = material;
+
+        OnMoved?.Invoke();
     }
 }
