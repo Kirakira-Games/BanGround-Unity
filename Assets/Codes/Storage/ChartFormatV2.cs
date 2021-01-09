@@ -207,6 +207,21 @@ namespace V2
         [ProtoMember(3)]
         public uint flags { get; set; }
 
+        public void Sanitize()
+        {
+            for (int i = 0; i < points.Count; i++)
+            {
+                points[i].beatf = ChartUtility.BeatToFloat(points[i].beat);
+                if (i == 0)
+                    continue;
+                if (Mathf.Approximately(points[i].beatf, Mathf.Max(0f, points[i-1].beatf)))
+                {
+                    // Remove duplicates
+                    points.RemoveAt(i--);
+                }
+            }
+        }
+
         public static TimingGroup From(List<V1Note> notes)
         {
             var ret = Default();
@@ -254,6 +269,7 @@ namespace V2
 
         [ProtoMember(7)]
         public float y { get; set; }
+        [JsonIgnore]
         public float yOrNaN => lane >= 0 ? float.NaN : y;
 
         [ProtoMember(8)]
@@ -328,6 +344,14 @@ namespace V2
             }
 
             throw new ArgumentOutOfRangeException(beat + " cannot be converted to time.");
+        }
+
+        public void Sanitize()
+        {
+            foreach (var group in groups)
+            {
+                group.Sanitize();
+            }
         }
 
         public float BeatToTime(int[] beat) { return BeatToTime(ChartUtility.BeatToFloat(beat)); }
