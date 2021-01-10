@@ -32,6 +32,9 @@ namespace BanGround.Scene.Params
         public ModFlag mods = ModFlag.None;
         public float seekPosition = 0f;
 
+        public bool ShouldSaveReplay => saveReplay && string.IsNullOrEmpty(replayPath);
+        public bool ShouldSaveRecord => saveRecord && !mods.HasFlag(ModFlag.AutoPlay) && string.IsNullOrEmpty(replayPath);
+
         public override string ToString()
         {
             return $"sid = {sid}\n" +
