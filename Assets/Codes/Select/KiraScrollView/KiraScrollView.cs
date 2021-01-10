@@ -89,6 +89,8 @@ public class KiraScrollView : FancyScrollView<int, Context>
         UpdateContents(items);
         scroller.SetTotalCount(items.Count);
 
+        scroller.ScrollTo(chartListManager.current.index, 0);
+
         // fix background not correct on first frame.
         await UniTask.DelayFrame(1);
         scroller.ScrollTo(chartListManager.current.index, 0);
