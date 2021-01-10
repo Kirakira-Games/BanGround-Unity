@@ -49,9 +49,10 @@ namespace MessagePack.Resolvers
 
         static GeneratedResolverGetFormatterHelper()
         {
-            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(1)
+            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(2)
             {
-                { typeof(global::BanGround.Database.Models.RankItem), 0 },
+                { typeof(global::BanGround.Database.Models.ChartSet), 0 },
+                { typeof(global::BanGround.Database.Models.RankItem), 1 },
             };
         }
 
@@ -65,7 +66,8 @@ namespace MessagePack.Resolvers
 
             switch (key)
             {
-                case 0: return new MessagePack.Formatters.BanGround.Database.Models.RankItemFormatter();
+                case 0: return new MessagePack.Formatters.BanGround.Database.Models.ChartSetFormatter();
+                case 1: return new MessagePack.Formatters.BanGround.Database.Models.RankItemFormatter();
                 default: return null;
             }
         }
