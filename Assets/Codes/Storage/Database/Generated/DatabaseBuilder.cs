@@ -15,6 +15,12 @@ namespace BanGround.Database.Generated
         public DatabaseBuilder() : this(null) { }
         public DatabaseBuilder(MessagePack.IFormatterResolver resolver) : base(resolver) { }
 
+        public DatabaseBuilder Append(System.Collections.Generic.IEnumerable<ChartSet> dataSource)
+        {
+            AppendCore(dataSource, x => x.Sid, System.Collections.Generic.Comparer<int>.Default);
+            return this;
+        }
+
         public DatabaseBuilder Append(System.Collections.Generic.IEnumerable<RankItem> dataSource)
         {
             AppendCore(dataSource, x => x.Id, System.Collections.Generic.Comparer<int>.Default);

@@ -10,7 +10,7 @@ namespace BanGround.Database.Models
         [PrimaryKey]
         public int Id { get; set; }
 
-        [SecondaryKey(0, keyOrder: 1), NonUnique]
+        [SecondaryKey(0, keyOrder: 0), NonUnique]
         public int ChartId { get; set; }
 
         [IgnoreMember]
@@ -67,10 +67,10 @@ namespace BanGround.Database.Models
             {
                 return ClearMarks.F;
             }
-            }
+        }
 
         [IgnoreMember]
-        public ClearMarks ClearMark => GetClearMark(Judge, Combo, Acc);
+        public ClearMarks ClearMark = ClearMarks.F;
 
         public static Ranks GetRank(double Acc)
         {

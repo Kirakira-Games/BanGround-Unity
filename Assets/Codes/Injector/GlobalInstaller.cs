@@ -2,10 +2,9 @@ using AudioProvider;
 using BanGround;
 using BanGround.Community;
 using BanGround.Database;
+using BanGround.Database.Migrations;
 using BanGround.Identity;
 using BanGround.Web;
-using BGEditor;
-using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEngine;
@@ -53,6 +52,9 @@ public class GlobalInstaller : MonoInstaller
 
         // Client-side database
         Container.Bind<IDatabaseAPI>().To<DatabaseAPI>().AsSingle().NonLazy();
+
+        // Migration manager
+        Container.Bind<IMigrationManager>().To<MigrationManager>().AsSingle().NonLazy();
 
         // KVar System
         Container.Bind<IKVSystem>().To<KVSystem>().AsSingle().OnInstantiated((_, obj) =>

@@ -7,7 +7,7 @@ using Zenject;
 
 namespace BanGround.Database.Migrations
 {
-    public class MigrationManager
+    public class MigrationManager : IMigrationManager
     {
         [Inject]
         private DiContainer diContainer;
