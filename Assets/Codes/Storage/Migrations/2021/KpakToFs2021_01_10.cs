@@ -25,59 +25,59 @@ namespace BanGround.Database.Migrations
             var kpaks = fs.GetSearchPatchs().Where(path => path.EndsWith(".kpak"));
             var kpakStep = 1.0f / kpaks.Count();
 
-            foreach(var kpak in kpaks)
+            foreach (var kpak in kpaks)
             {
                 fs.RemoveSearchPath(kpak);
 
-                using(var archive = ZipFile.OpenRead(kpak))
+                using (var archive = ZipFile.OpenRead(kpak))
                 {
-                    if(archive.Entries.Count == 0)
+                    if (archive.Entries.Count == 0)
                     {
-                        File.Delete(kpak);
                         Progress += kpakStep;
-                        continue;
                     }
-
-                    var fileStep = kpakStep / archive.Entries.Count;
-
-                    foreach(var entry in archive.Entries)
+                    else
                     {
-                        if(entry.FullName.EndsWith("/") || entry.Length == 0)
-                        {
-                            Progress += fileStep;
-                            continue;
-                        }
+                        var fileStep = kpakStep / archive.Entries.Count;
 
-                        var newPath = KiraPath.Combine(DataLoader.DataDir, entry.FullName);
-                        if (File.Exists(newPath))
+                        foreach (var entry in archive.Entries)
                         {
-                            var newTime = entry.LastWriteTime.UtcDateTime;
-                            var oldTime = File.GetLastWriteTimeUtc(newPath);
-
-                            if (oldTime > newTime)
+                            if (entry.FullName.EndsWith("/") || entry.Length == 0)
                             {
+                                Progress += fileStep;
                                 continue;
                             }
-                        }
 
-                        var newDirname = KiraPath.GetDirectoryName(newPath);
-
-                        if (!Directory.Exists(newDirname))
-                            Directory.CreateDirectory(newDirname);
-
-                        using (var fs = File.OpenWrite(newPath))
-                        {
-                            using (var stream = entry.Open())
+                            var newPath = KiraPath.Combine(DataLoader.DataDir, entry.FullName);
+                            if (File.Exists(newPath))
                             {
-                                await stream.CopyToAsync(fs);
-                                await fs.FlushAsync();
+                                var newTime = entry.LastWriteTime.UtcDateTime;
+                                var oldTime = File.GetLastWriteTimeUtc(newPath);
+
+                                if (oldTime > newTime)
+                                {
+                                    continue;
+                                }
                             }
+
+                            var newDirname = KiraPath.GetDirectoryName(newPath);
+
+                            if (!Directory.Exists(newDirname))
+                                Directory.CreateDirectory(newDirname);
+
+                            using (var fs = File.OpenWrite(newPath))
+                            {
+                                using (var stream = entry.Open())
+                                {
+                                    await stream.CopyToAsync(fs);
+                                    await fs.FlushAsync();
+                                }
+                            }
+
+                            File.SetLastWriteTimeUtc(newPath, entry.LastWriteTime.UtcDateTime);
+                            File.SetLastAccessTime(newPath, DateTime.Now);
+
+                            Progress += fileStep;
                         }
-
-                        File.SetLastWriteTimeUtc(newPath, entry.LastWriteTime.UtcDateTime);
-                        File.SetLastAccessTime(newPath, DateTime.Now);
-
-                        Progress += fileStep;
                     }
                 }
 
