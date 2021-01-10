@@ -175,6 +175,15 @@ public class SelectManager : MonoBehaviour
         PlayPreview().WithCancellation(cancellationToken.sceneToken).SuppressCancellationThrow().Forget();
     }
 
+    public void SelectRandom()
+    {
+        int N = chartListManager.chartList.Count;
+        if (N <= 1)
+            return;
+        int index = Random.Range(0, N);
+        scrollView.SelectCell(index);
+    }
+
     private bool isFirstPlay = true;
     private int lastPreviewMid = -1;
 
