@@ -696,5 +696,7 @@ namespace BanGround
                 return GetFile(path);
             return NewFile(path);
         }
+
+        public string[] GetSearchPatchs() => searchPaths.ToArray();
     }
 }

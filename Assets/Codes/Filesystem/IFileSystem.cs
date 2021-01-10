@@ -32,6 +32,7 @@ namespace BanGround
         IFile GetOrNewFile(string path);
         IFile GetFile(string path);
 
+        string[] GetSearchPatchs();
         void AddSearchPath(string path, bool removeEmptyDir = true);
         void RemoveSearchPath(string path);
         bool FileExists(string filename);
