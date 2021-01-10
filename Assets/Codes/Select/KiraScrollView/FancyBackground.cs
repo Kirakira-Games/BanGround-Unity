@@ -45,21 +45,15 @@ public class FancyBackground : MonoBehaviour
         scrollView.OnMove += UpdatePosition;
     }
 
-    int cur_last = -1, cur_current = -1, cur_next = -1;
+    int prevSid = -1, currentSid = -1, nextSid = -1;
 
     void UpdatePosition(float pos)
     {
         if (dataLoader.chartList.Count == 0)
             return;
 
-        if(pos < 0)
-        {
-            while ((pos += dataLoader.chartList.Count) < 0) ;
-        }
-        else if(pos >= dataLoader.chartList.Count)
-        {
-            while ((pos -= dataLoader.chartList.Count) >= dataLoader.chartList.Count) ;
-        }
+        float N = dataLoader.chartList.Count;
+        pos = (pos % N + N) % N;
 
         int current = Mathf.RoundToInt(pos);
 
@@ -77,15 +71,15 @@ public class FancyBackground : MonoBehaviour
         if (next >= dataLoader.chartList.Count)
             next = 0;
 
-        if (cur_last != last || cur_current != current || cur_next != next)
-        {
-            cur_last = last;
-            cur_current = current;
-            cur_next = next;
+        var s1 = dataLoader.chartList[last];
+        var s2 = dataLoader.chartList[current];
+        var s3 = dataLoader.chartList[next];
 
-            var s1 = dataLoader.chartList[last];
-            var s2 = dataLoader.chartList[current];
-            var s3 = dataLoader.chartList[next];
+        if (prevSid != s1.sid || currentSid != s2.sid || nextSid != s3.sid)
+        {
+            prevSid = s1.sid;
+            currentSid = s2.sid;
+            nextSid = s3.sid;
 
             var b1 = dataLoader.GetBackgroundPath(s1.sid, true).Item1;
             var b2 = dataLoader.GetBackgroundPath(s2.sid, true).Item1;
