@@ -8,6 +8,7 @@ using BanGround;
 using System.Linq;
 using BanGround.Identity;
 using System;
+using BanGround.Database.Migrations;
 
 public class TitleLoader : MonoBehaviour
 {
@@ -16,11 +17,15 @@ public class TitleLoader : MonoBehaviour
     [Inject]
     private IMessageBannerController messageBannerController;
     [Inject]
+    private ILoadingBlocker loadingBlocker;
+    [Inject]
     private IFileSystem fs;
     [Inject]
     private IAccountManager accountManager;
     [Inject]
-    LocalizedStrings localizedStrings;
+    private IMigrationManager migrationManager;
+    [Inject]
+    private LocalizedStrings localizedStrings;
 
     [Inject(Id = "cl_language")]
     KVar cl_language;
@@ -64,10 +69,28 @@ public class TitleLoader : MonoBehaviour
         }
     }
 
+    private async UniTask RunMigrations()
+    {
+        if (!migrationManager.Init())
+            return;
+
+        var task = migrationManager.Migrate();
+        loadingBlocker.Show($"Preparing migrations...");
+        while (task.Status == UniTaskStatus.Pending)
+        {
+            loadingBlocker.SetText($"Migrating: {migrationManager.CurrentMigrationIndex} / {migrationManager.TotalMigrations}", true);
+            loadingBlocker.SetProgress(migrationManager.CurrentMigrationProgress);
+            await UniTask.WaitForEndOfFrame();
+        }
+        loadingBlocker.Close();
+    }
+
     private async void Start()
     {
         userCanvas.GetUserInfo().Forget();
         PlayTitle().Forget();
+
+        await RunMigrations();
 
         await UniTask.Delay(500);
 

@@ -64,18 +64,20 @@ namespace BanGround.Database.Migrations
                 CurrentMigrationIndex = 0;
                 foreach (var migration in validMigrations)
                 {
+                    /*
                     if (!await migration.Commit())
                     {
                         return false;
                     }
-                    MigrationIdKey = migration.Id;
+                    MigrationIdKey = migration.Id;*/
+                    await UniTask.Delay(1000);
                     CurrentMigrationIndex++;
                 }
                 return true;
             }
             catch (Exception e)
             {
-                Debug.LogError(e.Message + "\n" + e.StackTrace);
+                Debug.LogException(e);
                 return false;
             }
         }

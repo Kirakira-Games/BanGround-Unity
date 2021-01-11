@@ -37,8 +37,6 @@ public class DataLoader : IDataLoader
     private IMessageBannerController messageBannerController;
     [Inject]
     private IFileSystem fs;
-    [Inject(Id = "cl_lastdiff")]
-    private KVar cl_lastdiff;
     [Inject(Id = "cl_lastsid")]
     private KVar cl_lastsid;
 
