@@ -2,11 +2,11 @@
 
 namespace BanGround.Database.Migrations
 {
-    public interface IMigrationManager
+    public interface IMigrationManager: ITaskWithProgress
     {
         int CurrentMigrationIndex { get; }
-        float CurrentMigrationProgress { get; }
         int TotalMigrations { get; }
+        string Description { get; }
 
         bool Init();
         UniTask<bool> Migrate();

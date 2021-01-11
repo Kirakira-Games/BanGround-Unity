@@ -31,7 +31,7 @@ namespace BanGround.Database.Migrations
 
         public int TotalMigrations => validMigrations?.Count ?? 0;
         public int CurrentMigrationIndex { get; private set; } = 0;
-        public float CurrentMigrationProgress
+        public float Progress
         {
             get
             {
@@ -41,10 +41,21 @@ namespace BanGround.Database.Migrations
                 return validMigrations[CurrentMigrationIndex].Progress;
             }
         }
+        public string Description
+        {
+            get
+            {
+                if (CurrentMigrationIndex >= TotalMigrations)
+                    return "Wrapping up...";
+
+                return validMigrations[CurrentMigrationIndex].Description;
+            }
+        }
 
         /// <returns>Whether any migration is available.</returns>
         public bool Init()
         {
+            //MigrationIdKey = 0;
             int currentId = MigrationIdKey;
             validMigrations = MIGRATIONS.Select(migration => diContainer.Instantiate(migration) as MigrationBase)
                 .Where(migration => migration.Id > currentId)
@@ -64,13 +75,11 @@ namespace BanGround.Database.Migrations
                 CurrentMigrationIndex = 0;
                 foreach (var migration in validMigrations)
                 {
-                    /*
                     if (!await migration.Commit())
                     {
                         return false;
                     }
-                    MigrationIdKey = migration.Id;*/
-                    await UniTask.Delay(1000);
+                    MigrationIdKey = migration.Id;
                     CurrentMigrationIndex++;
                 }
                 return true;

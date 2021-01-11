@@ -54,11 +54,11 @@ public class TitleLoader : MonoBehaviour
         instance = this;
         CheckUpdate();
 
-        var backgrounds = fs.Find(file => file.Name.EndsWith(".jpg") || file.Name.EndsWith(".png") || file.Name.EndsWith(".jpeg"));
+        var backgrounds = fs.Find(file => file.Name.EndsWith(".jpg") || file.Name.EndsWith(".png") || file.Name.EndsWith(".jpeg")).ToArray();
 
-        if (backgrounds.Count() != 0)
+        if (backgrounds.Length != 0)
         {
-            var tex = backgrounds.ElementAt(UnityEngine.Random.Range(0, backgrounds.Count())).ReadAsTexture();
+            var tex = backgrounds[UnityEngine.Random.Range(0, backgrounds.Count())].ReadAsTexture();
 
             var matCopy = Instantiate(backgroundMat);
 
@@ -76,10 +76,10 @@ public class TitleLoader : MonoBehaviour
 
         var task = migrationManager.Migrate();
         loadingBlocker.Show($"Preparing migrations...");
+        loadingBlocker.SetProgress(migrationManager);
         while (task.Status == UniTaskStatus.Pending)
         {
-            loadingBlocker.SetText($"Migrating: {migrationManager.CurrentMigrationIndex} / {migrationManager.TotalMigrations}", true);
-            loadingBlocker.SetProgress(migrationManager.CurrentMigrationProgress);
+            loadingBlocker.SetText($"{migrationManager.Description} ({migrationManager.CurrentMigrationIndex} / {migrationManager.TotalMigrations})", true);
             await UniTask.WaitForEndOfFrame();
         }
         loadingBlocker.Close();

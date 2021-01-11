@@ -55,7 +55,7 @@ public class KiraScrollView : FancyScrollView<int, Context>
         for (var i = 0; i < addCount; i++)
         {
             var cell = cellFactory.Create();
-            cell.transform.parent = cellContainer;
+            cell.transform.SetParent(cellContainer);
 
             if (cell == null)
             {

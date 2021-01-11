@@ -139,7 +139,7 @@ namespace BanGround.Database
             return DB.ChartSetTable.FindByMid(mid).ToArray();
         }
 
-        public void RegisterChartSet(int sid, int mid, int[] difficulties)
+        public void SaveChartSet(int sid, int mid, int[] difficulties)
         {
             if (difficulties == null ||
                 difficulties.Length != (int)Difficulty.Special + 1 ||

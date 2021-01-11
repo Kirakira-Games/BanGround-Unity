@@ -292,6 +292,145 @@ namespace BanGround
         }
     }
 
+    class LocalFilesystem : IFileSystem
+    {
+        private List<string> mSearchPaths = new List<string>()
+        {
+            KiraPath.Combine(Application.persistentDataPath, "data")
+        };
+
+        public void AddSearchPath(string path)
+        {
+            Debug.LogWarning("Adding search paths to local fs is not recommended.");
+            if (!mSearchPaths.Contains(path))
+                mSearchPaths.Add(path);
+        }
+
+        public void RemoveSearchPath(string path)
+        {
+            mSearchPaths.Remove(path);
+        }
+
+        public bool FileExists(string filename)
+        {
+            return mSearchPaths.Any(path => File.Exists(KiraPath.Combine(path, filename)));
+        }
+
+        public IEnumerable<IFile> Find(Func<IFile, bool> cmp)
+        {
+            foreach (var file in this)
+            {
+                if (cmp(file))
+                {
+                    yield return file;
+                }
+            }
+        }
+
+        private IEnumerable<IFile> GetFiles(string searchPath, DirectoryInfo directory)
+        {
+            if (!directory.Exists)
+                yield break;
+
+            foreach (var dir in directory.GetDirectories())
+            {
+                foreach (var file in GetFiles(searchPath, dir))
+                {
+                    yield return file;
+                }
+            }
+            foreach (var file in directory.GetFiles())
+            {
+                yield return new NormalFile(searchPath, file);
+            }
+        }
+
+        public IEnumerator<IFile> GetEnumerator()
+        {
+            foreach (var path in mSearchPaths)
+            {
+                foreach (var file in GetFiles(path, new DirectoryInfo(path)))
+                {
+                    yield return file;
+                }
+            }
+        }
+
+        public IFile GetFile(string path)
+        {
+            var result = new PreventDuplicateFileSet();
+            foreach (var searchPath in mSearchPaths)
+            {
+                var fi = new FileInfo(KiraPath.Combine(searchPath, path));
+
+                if (fi.Exists)
+                {
+                    result.Add(new NormalFile(searchPath, fi));
+                }
+            }
+
+            if (result.Count == 0)
+                throw new FileNotFoundException("Target file not found in any search path!");
+
+            result.DeleteDuplicateFile();
+
+            return result.ElementAt(0);
+        }
+
+        public IFile GetOrNewFile(string path)
+        {
+            if (FileExists(path))
+                return GetFile(path);
+            return NewFile(path);
+        }
+
+        public bool Init()
+        {
+            // pass
+            return true;
+        }
+
+        public IFile NewFile(string name, string searchPath = null)
+        {
+            if (searchPath == null)
+                searchPath = mSearchPaths[0];
+            var file = new FileInfo(KiraPath.Combine(searchPath, name));
+            if (file.Exists)
+                throw new InvalidDataException($"File {name} already exists under {searchPath}.");
+
+            var dir = file.Directory;
+            if (!dir.Exists)
+                dir.Create();
+
+            file.Create().Close();
+
+            return new NormalFile(searchPath, file);
+        }
+
+        public bool Shutdown()
+        {
+            // pass
+            return true;
+        }
+        
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public IEnumerable<IFile> ListDirectory(string directoryName)
+        {
+            foreach (var searchPath in mSearchPaths)
+            {
+                var dir = new DirectoryInfo(KiraPath.Combine(searchPath, directoryName));
+                foreach (var file in GetFiles(searchPath, dir))
+                {
+                    yield return file;
+                }
+            }
+        }
+    }
+
     class KiraFilesystem : IFileSystem
     {
         List<string> packPaths = new List<string>();
@@ -373,7 +512,7 @@ namespace BanGround
             }
         }
 
-        public void AddSearchPath(string path, bool removeEmptyDir = true)
+        public void AddSearchPath(string path)
         {
             if (Directory.Exists(path))
             {
@@ -386,6 +525,7 @@ namespace BanGround
                     if (fi.Extension == ".kpak")
                         AddSearchPath(fi.FullName);
                 }
+                /*
                 if (removeEmptyDir)
                 {
                     foreach (var d in di.GetDirectories())
@@ -393,7 +533,7 @@ namespace BanGround
                         RemoveEmptyDir(d);
                     }
                 }
-
+                */
                 return;
             }
 
@@ -458,23 +598,6 @@ namespace BanGround
             }
 
             return false;
-        }
-
-        private void KeepLastModifiedFile(ref IFile current, IFile newfile)
-        {
-            if (current == null || newfile == null)
-            {
-                current = current ?? newfile;
-            }
-            else if (current.LastModified < newfile.LastModified)
-            {
-                current.Delete();
-                current = newfile;
-            }
-            else
-            {
-                newfile.Delete();
-            }
         }
 
         public IFile GetFile(string path)
@@ -605,6 +728,7 @@ namespace BanGround
             }
         }
 
+        /*
         public int RemoveFolder(string path, string pakName = null)
         {
             IEnumerable<IFile> affectedFiles = null;
@@ -644,6 +768,7 @@ namespace BanGround
 
             return affectedFiles.Count();
         }
+        */
 
         public bool Shutdown()
         {
@@ -697,6 +822,11 @@ namespace BanGround
             return NewFile(path);
         }
 
-        public string[] GetSearchPatchs() => searchPaths.ToArray();
+        public string[] GetPackPaths() => packPaths.ToArray();
+
+        public IEnumerable<IFile> ListDirectory(string directoryName)
+        {
+            return Find(file => file.Name.StartsWith(directoryName));
+        }
     }
 }

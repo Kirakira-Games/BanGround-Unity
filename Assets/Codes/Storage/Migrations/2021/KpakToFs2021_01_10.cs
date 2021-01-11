@@ -13,79 +13,62 @@ namespace BanGround.Database.Migrations
     {
         [Inject]
         private IFileSystem fs;
+        [Inject]
+        private IDatabaseAPI db;
+        [Inject]
+        private IDataLoader dataLoader;
 
         public override int Id => 1;
         public override string Description => "Migrate kpak to local file system";
 
+#pragma warning disable CS0618
         public override async UniTask<bool> Commit()
         {
             Progress = 0;
-            Debug.Assert(fs != null);
 
-            var kpaks = fs.GetSearchPatchs().Where(path => path.EndsWith(".kpak"));
-            var kpakStep = 1.0f / kpaks.Count();
+            #region kpak
+            var legacyFs = new KiraFilesystem();
+            legacyFs.Init();
+            legacyFs.AddSearchPath(DataLoader.FSDir);
+            await UniTask.WaitForEndOfFrame();
+
+            var kpaks = legacyFs.GetPackPaths().Where(path => path.EndsWith(".kpak"));
+            var kpakStep = 0.8f / kpaks.Count();
+
+            await UniTask.WaitForEndOfFrame();
+            float tempProgress = 0;
 
             foreach (var kpak in kpaks)
             {
-                fs.RemoveSearchPath(kpak);
-
-                using (var archive = ZipFile.OpenRead(kpak))
+                legacyFs.RemoveSearchPath(kpak);
+                var task = new ExtractKirapackTask(kpak, fs, db, dataLoader);
+                var unitask = task.Run();
+                while (unitask.Status == UniTaskStatus.Pending)
                 {
-                    if (archive.Entries.Count == 0)
-                    {
-                        Progress += kpakStep;
-                    }
-                    else
-                    {
-                        var fileStep = kpakStep / archive.Entries.Count;
-
-                        foreach (var entry in archive.Entries)
-                        {
-                            if (entry.FullName.EndsWith("/") || entry.Length == 0)
-                            {
-                                Progress += fileStep;
-                                continue;
-                            }
-
-                            var newPath = KiraPath.Combine(DataLoader.DataDir, entry.FullName);
-                            if (File.Exists(newPath))
-                            {
-                                var newTime = entry.LastWriteTime.UtcDateTime;
-                                var oldTime = File.GetLastWriteTimeUtc(newPath);
-
-                                if (oldTime > newTime)
-                                {
-                                    continue;
-                                }
-                            }
-
-                            var newDirname = KiraPath.GetDirectoryName(newPath);
-
-                            if (!Directory.Exists(newDirname))
-                                Directory.CreateDirectory(newDirname);
-
-                            using (var fs = File.OpenWrite(newPath))
-                            {
-                                using (var stream = entry.Open())
-                                {
-                                    await stream.CopyToAsync(fs);
-                                    await fs.FlushAsync();
-                                }
-                            }
-
-                            File.SetLastWriteTimeUtc(newPath, entry.LastWriteTime.UtcDateTime);
-                            File.SetLastAccessTime(newPath, DateTime.Now);
-
-                            Progress += fileStep;
-                        }
-                    }
+                    Progress = tempProgress + task.Progress * kpakStep;
+                    await UniTask.WaitForEndOfFrame();
                 }
-
-                File.Delete(kpak);
+                tempProgress += kpakStep;
+                Progress = tempProgress;
             }
+            #endregion
+
+            #region database
+            var dbStep = 1 - Progress;
+            var prevProgress = Progress;
+            var dbTask = new HardRefreshSongListTask(db, dataLoader, fs);
+            var uniTask = dbTask.Run();
+
+            while (uniTask.Status == UniTaskStatus.Pending)
+            {
+                Progress = prevProgress + dbStep * dbTask.Progress;
+                await UniTask.WaitForEndOfFrame();
+            }
+            #endregion
 
             Progress = 1;
             return true;
         }
+#pragma warning restore CS0618
     }
 }

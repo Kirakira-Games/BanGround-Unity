@@ -336,27 +336,20 @@ public class ChartLoader : IChartLoader
 
     public Dictionary<string, byte[]> GetChartHash(int mid, int sid, Difficulty difficulty)
     {
-        var fileList = fs.Find(f =>
+        var chartPath = dataLoader.GetChartResource(sid, "");
+        var musicFile = dataLoader.GetMusicPath(mid);
+        var fileList = fs.ListDirectory(chartPath).Where(f =>
         {
-            if (f.Name.StartsWith(dataLoader.GetChartResource(sid, "")))
-            {
-                var name = f.Name.Replace(dataLoader.GetChartResource(sid, ""), "").ToLower();
+            var name = KiraPath.GetFileName(f.Name).ToLower();
 
-                if (name == "cheader.bin")
-                    return false;
+            if (name == "cheader.bin")
+                return false;
 
-                if (name.EndsWith(".bin") && name != $"{difficulty.Lower()}.bin")
-                    return false;
+            if (name.EndsWith(".bin") && name != $"{difficulty.Lower()}.bin")
+                return false;
 
-                return true;
-            }
-            else if (f.Name.ToLower() == dataLoader.GetMusicPath(mid))
-            {
-                return true;
-            }
-
-            return false;
-        }).ToArray();
+            return true;
+        }).Concat(fs.FileExists(musicFile) ? new IFile[] { fs.GetFile(musicFile) } : new IFile[0]).ToArray();
 
         var ret = new Dictionary<string, byte[]>();
         foreach (var file in fileList)

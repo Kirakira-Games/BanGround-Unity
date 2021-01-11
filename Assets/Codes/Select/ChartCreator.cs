@@ -350,13 +350,8 @@ public class ChartCreator : MonoBehaviour
             using (ITranscoder transcoder = new BassTranscoder(audioProvider) { Source = file })
             {
                 loadingBlocker.SetText("Converting audio file...", true);
-                var task = transcoder.DoAsync();
-                while (!task.Status.IsCompleted())
-                {
-                    loadingBlocker.SetProgress(transcoder.Progress);
-                    await UniTask.DelayFrame(1);
-                }
-                transcoded = await task;
+                loadingBlocker.SetProgress(transcoder);
+                transcoded = await transcoder.DoAsync();
             }
 
             // Create mheader

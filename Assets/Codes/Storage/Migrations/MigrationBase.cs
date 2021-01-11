@@ -3,7 +3,7 @@ using System;
 
 namespace BanGround.Database.Migrations
 {
-    public abstract class MigrationBase
+    public abstract class MigrationBase : ITaskWithProgress
     {
         public abstract int Id { get; }
         public abstract string Description { get; }

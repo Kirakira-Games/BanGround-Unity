@@ -34,7 +34,7 @@ public class GlobalInstaller : MonoInstaller
         SceneLoader.Init();
 
         // Filesystem
-        Container.Bind<IFileSystem>().To<KiraFilesystem>().AsSingle().OnInstantiated((_, obj) =>
+        Container.Bind<IFileSystem>().To<LocalFilesystem>().AsSingle().OnInstantiated((_, obj) =>
         {
             if (obj is ValidationMarker) return;
             fs = obj as IFileSystem;
@@ -198,6 +198,7 @@ public class GlobalInstaller : MonoInstaller
 
                 dataLoader.MoveChart(chartA, targetChart);
             }),
+            /*
             Kommand.C("fs_test", "Test Filesystem", _ =>
             {
                 const string testPath = "D:\\lol.zip";
@@ -217,6 +218,7 @@ public class GlobalInstaller : MonoInstaller
 
                 fs.RemoveSearchPath(testPath);
             }),
+            */
             Kommand.C("savecfg", "Save configs", _ => kvSystem.SaveConfig()),
             Kommand.C("exec", "Execute a config file", (string[] args) =>
             {
@@ -337,7 +339,7 @@ public class GlobalInstaller : MonoInstaller
         if (++fsUpdateFrameCounter > 3600)
         {
             fsUpdateFrameCounter = 0;
-            fs.OnUpdate();
+            //fs.OnUpdate();
         }
     }
 

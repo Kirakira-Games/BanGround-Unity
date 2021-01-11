@@ -29,19 +29,18 @@ namespace BanGround
         IFile NewFile(string name, string searchPath = null);
 
         IEnumerable<IFile> Find(Func<IFile, bool> cmp);
+        IEnumerable<IFile> ListDirectory(string directoryName);
         IFile GetOrNewFile(string path);
         IFile GetFile(string path);
 
-        string[] GetSearchPatchs();
-        void AddSearchPath(string path, bool removeEmptyDir = true);
+        //string[] GetSearchPaths();
+        void AddSearchPath(string path);
         void RemoveSearchPath(string path);
         bool FileExists(string filename);
 
-        void FlushPak(string pakName);
-
-        int RenameFolder(string from, string to, string pakName = null);
-        int RemoveFolder(string path, string pakName = null);
-
-        void OnUpdate();
+        //void FlushPak(string pakName);
+        //int RenameFolder(string from, string to, string pakName = null);
+        //int RemoveFolder(string path, string pakName = null);
+        //void OnUpdate();
     }
 }
