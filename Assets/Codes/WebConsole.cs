@@ -45,7 +45,7 @@ public class WebConsole : MonoBehaviour
     [Inject]
     private void Inject()
     {
-        flushKirapacksAction = async () =>
+        flushKirapacksAction = () =>
         {
             if (SceneManager.GetActiveScene().name == "Select")
             {
