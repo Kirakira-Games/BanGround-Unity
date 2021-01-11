@@ -9,14 +9,14 @@ using BanGround.Game.Mods;
 
 public class SettingAndMod : MonoBehaviour
 {
-    public static SettingAndMod instance;
-
     [Inject]
     LocalizedStrings localizedStrings;
     [Inject]
     private IAudioManager audioManager;
     [Inject]
     private IKVSystem kvSystem;
+    [Inject]
+    SelectManager selectManager;
     [Inject(Id = "cl_modflag")]
     private KVar cl_modflag;
 
@@ -235,7 +235,7 @@ public class SettingAndMod : MonoBehaviour
         setting_Close_Btn.gameObject.SetActive(true);
         if (soundTog.isOn)
         {
-            SelectManager_old.instance.previewSound?.Pause();
+            selectManager.previewSound?.Pause();
         }
     }
     void CloseSetting()
@@ -244,7 +244,7 @@ public class SettingAndMod : MonoBehaviour
         SetLiveSetting();
         setting_Close_Btn.gameObject.SetActive(false);
         kvSystem.SaveConfig();
-        SelectManager_old.instance.previewSound?.Play();
+        selectManager.previewSound?.Play();
     }
     void OpenMod()
     {
@@ -385,11 +385,6 @@ public class SettingAndMod : MonoBehaviour
             System.Console.WriteLine(e.Message);
             throw e;
         }
-    }
-
-    private void Awake()
-    {
-        instance = this;
     }
 
     void Start()

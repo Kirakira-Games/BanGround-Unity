@@ -1,10 +1,13 @@
-﻿Shader "Skybox/Background"
+﻿Shader "Skybox/FancyScrollBackground"
 {
     Properties
     {
-        _MainTex ("Texture", 2D) = "white" {}
+        _Tex1 ("Texture1", 2D) = "white" {}
+        _Tex2 ("Texture2", 2D) = "white" {}
+        _Tex3 ("Texture3", 2D) = "white" {}
         _Tint ("Tint", Color) = (1.0, 1.0, 1.0, 1.0)
-        _TexRatio ("Texture Aspect Ratio", Float) = 1.0
+        _TexRatios ("Texture Aspect Ratios", Vector) = (1.0, 1.0, 1.0)
+        _Progress ("Progress", Float) = 0.5
     }
     SubShader
     {
@@ -28,13 +31,21 @@
 
             struct v2f {
                 float4 position : SV_POSITION;
-                float2 uv : TEXCOORD0;
+                float4 screenPosition : TEXCOORD0;
+                float2 texUv1 : TEXCOORD1;
+                float2 texUv2 : TEXCOORD2;
+                float2 texUv3 : TEXCOORD3;
             };
 
-            sampler2D _MainTex;
+            sampler2D _Tex1;
+            sampler2D _Tex2;
+            sampler2D _Tex3;
             float4 _Tint;
-            float4 _MainTex_ST;
-            float _TexRatio;
+            float4 _Tex1_ST;
+            float4 _Tex2_ST;
+            float4 _Tex3_ST;
+            float3 _TexRatios;
+            float _Progress;
 
             float2 calcUv(float aspectRatio, float4 screenPos)
             {
@@ -43,7 +54,7 @@
                 if (aspectRatio < aspect)
                 {
                     textureCoordinate.y = textureCoordinate.y / aspect;
-                    textureCoordinate = TRANSFORM_TEX(textureCoordinate, _MainTex);
+                    textureCoordinate = TRANSFORM_TEX(textureCoordinate, _Tex1);
 
                     textureCoordinate.y = textureCoordinate.y * aspectRatio;
 
@@ -53,7 +64,7 @@
                 else
                 {
                     textureCoordinate.x = textureCoordinate.x * aspect;
-                    textureCoordinate = TRANSFORM_TEX(textureCoordinate, _MainTex);
+                    textureCoordinate = TRANSFORM_TEX(textureCoordinate, _Tex1);
 
                     textureCoordinate.x = textureCoordinate.x / aspectRatio;
 
@@ -69,15 +80,38 @@
                 v2f o;
                 o.position = UnityObjectToClipPos(v.vertex);
                 float4 screenPos = ComputeScreenPos(o.position);
-                o.uv = calcUv(_TexRatio, screenPos);
+
+                o.texUv1 = calcUv(_TexRatios.x, screenPos);
+                o.texUv2 = calcUv(_TexRatios.y, screenPos);
+                o.texUv3 = calcUv(_TexRatios.z, screenPos);
+
+                o.screenPosition = screenPos;
                 return o;
+            }
+
+            float4 mix(float4 a, float4 b, float p)
+            {
+                return a * (1 - p) + b * p;
             }
 
             fixed4 frag(v2f i) : SV_TARGET
             {
-                float2 uv = i.uv;
-                
-                return tex2D(_MainTex, uv) * _Tint;
+                float4 a = tex2D(_Tex1, i.texUv1);
+                float4 b = tex2D(_Tex2, i.texUv2);
+                float4 c = tex2D(_Tex3, i.texUv3);
+
+                float y = (i.screenPosition.y / i.screenPosition.w) / 2 + 0.25;
+
+                float4 col = mix(a,
+                    mix(
+                        b,
+                        c,
+                        step(y, _Progress - 0.25)
+                    ),
+                    step(y, _Progress + 0.25)
+                );
+
+                return col * _Tint;
             }
             ENDCG
         }

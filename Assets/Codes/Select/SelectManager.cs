@@ -1,9 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
-using System.IO;
 using System.Linq;
 using System;
 using AudioProvider;
@@ -11,18 +8,19 @@ using Random = UnityEngine.Random;
 using Cysharp.Threading.Tasks;
 using Zenject;
 using BanGround;
-using BanGround.Utils;
 using BanGround.Scene.Params;
 using BGEditor;
 using BanGround.Game.Mods;
 
 #pragma warning disable 0649
-public class SelectManager_old : MonoBehaviour
+public class SelectManager : MonoBehaviour
 {
+    [Inject]
+    private DiContainer _container;
     [Inject]
     private IAudioManager audioManager;
     [Inject]
-    private IDataLoader dataLoader;
+    public IDataLoader dataLoader;
     [Inject]
     private IKVSystem kvSystem;
     [Inject]
@@ -31,6 +29,12 @@ public class SelectManager_old : MonoBehaviour
     private IChartLoader chartLoader;
     [Inject]
     private IFileSystem fs;
+    [Inject]
+    private IMessageBannerController messageBannerController;
+    [Inject]
+    private IMessageBox messageBox;
+    [Inject]
+    SettingAndMod settingAndMod;
     [Inject(Id = "cl_cursorter")]
     private KVar cl_cursorter;
     [Inject(Id = "cl_modflag")]
@@ -40,36 +44,31 @@ public class SelectManager_old : MonoBehaviour
     [Inject]
     private ICancellationTokenStore cancellationToken;
 
-    public RectControlGroup rectGroup;
-
     public const float scroll_Min_Speed = 50f;
 
-    private RectTransform rect;
-    private ScrollRect scrollRect;
-    private VerticalLayoutGroup verticalLayoutGroup;
-    [HideInInspector] public DragHandler dragHandler;
+    //private RectTransform rt;
+    //private ScrollRect rt_s;
+    //private VerticalLayoutGroup lg;
+    //[HideInInspector] public DragHandler dh;
 
     //sort
     private Text sort_Text;
     private Button sort_Button;
 
+    [SerializeField] private Button delete_Button;
+
+    //public GameObject songItemPrefab;
+    [SerializeField] KiraScrollView scrollView = default;
+
+    //private Transform songContent;
+
     [SerializeField] 
     private TextAsset[] voices;
 
     public List<cHeader> chartList => dataLoader.chartList;
-    private LinkedList<GameObject> SelectButtons = new LinkedList<GameObject>();
-    private LinkedList<RectTransform> rts = new LinkedList<RectTransform>();
-    private List<RectControl> rcs = new List<RectControl>();
-
-    public static SelectManager_old instance;
 
     [HideInInspector] 
     public ISoundTrack previewSound;
-    
-    private void Awake()
-    {
-        instance = this;
-    }
 
     void Start()
     {
@@ -107,11 +106,13 @@ public class SelectManager_old : MonoBehaviour
         sort_Text = GameObject.Find("Sort_Text").GetComponent<Text>();
         sort_Button.onClick.AddListener(SwitchSort);
 
-        //Main Scroll View
-        rect = GameObject.Find("SongContent").GetComponent<RectTransform>();
-        scrollRect = GameObject.Find("Song Scroll View").GetComponent<ScrollRect>();
-        dragHandler = GameObject.Find("Song Scroll View").GetComponent<DragHandler>();
-        verticalLayoutGroup = GameObject.Find("SongContent").GetComponent<VerticalLayoutGroup>();
+        delete_Button.onClick.AddListener(async () =>
+        {
+            if (await messageBox.ShowMessage("Select.Delete.Title", "Select.Delete.Content"))
+            {
+                OnDelete();
+            }
+        });
     }
 
     public void Return2Title()
@@ -129,7 +130,7 @@ public class SelectManager_old : MonoBehaviour
 
     public async void OnEnterPressed()
     {
-        SettingAndMod.instance.SetLiveSetting();
+        settingAndMod.SetLiveSetting();
 
         kvSystem.SaveConfig();
 
@@ -152,121 +153,31 @@ public class SelectManager_old : MonoBehaviour
         await PreviewFadeOut().WithCancellation(cancellationToken.sceneToken).SuppressCancellationThrow();
     }
 
-    public async void RefreshSongList()
+    public void RefreshSongList()
     {
-        //verticalLayoutGroup.enabled = true;
+        var newIndices = new int[chartList.Count];
 
-        // Adjust chartList
-        while (SelectButtons.Count < chartList.Count)
-        {
-            var obj = rectGroup.Create();
-            SelectButtons.AddLast(obj.gameObject);
-            rts.AddLast(obj);
-            var control = obj.GetComponent<RectControl>();
-            control.index = rcs.Count;
-            rcs.Add(control);
-        }
-        while (SelectButtons.Count > chartList.Count)
-        {
-            rectGroup.Destroy(rts.Last.Value);
-            SelectButtons.RemoveLast();
-            rts.RemoveLast();
-            rcs.RemoveAt(rcs.Count - 1);
-        }
-
-        // Spawn New SongItem
-        var curNode = SelectButtons.First;
         for (int i = 0; i < chartList.Count; i++)
-        {
-            var obj = curNode.Value;
-            obj.name = i.ToString();
-            Text[] txt = obj.GetComponentsInChildren<Text>();
+            newIndices[i] = i;
 
-            cHeader chart = chartList[i];
-            mHeader song = dataLoader.GetMusicHeader(chart.mid);
-            string author = chart.authorNick;
-            txt[0].text = song.title;
-            txt[1].text = song.artist + " / " + author;
-
-            curNode = curNode.Next;
-        }
-
-        rect.sizeDelta = new Vector2(rect.sizeDelta.x, verticalLayoutGroup.padding.top * 2 + chartList.Count * (116) + (chartList.Count - 1) * verticalLayoutGroup.spacing + (800));
-
-        await SelectDefault();
-        verticalLayoutGroup.enabled = false;
+        scrollView.UpdateData(newIndices);
+        scrollView.SelectCell(chartListManager.current.index);
     }
 
-    private async UniTask SelectDefault()
-    {
-        var background = GameObject.Find("KirakiraBackground").GetComponent<FixBackground>();
-        var path = dataLoader.GetBackgroundPath(chartListManager.current.header.sid).Item1;
-        background.UpdateBackground(path);
-
-        await UniTask.DelayFrame(1);
-
-        try
-        {
-            SelectSong(chartListManager.current.index);
-        } 
-        catch
-        {
-
-        }
-    }
-
-    IEnumerator SelectNear()
-    {
-        //yield return new WaitForSeconds(1);
-
-        yield return 0;
-        while (Mathf.Abs(scrollRect.velocity.y) > scroll_Min_Speed || dragHandler.isDragging)
-        {
-            yield return 0;
-            //yield break;
-        }
-        scrollRect.StopMovement();
-        var destPos = 0 - rect.anchoredPosition.y - verticalLayoutGroup.padding.top - 100;
-        float nearestDistance = 9999f;
-        int nearstIndex = 0;
-        int curIndex = 0;
-        for (var node = rts.First; node != null; node = node.Next)
-        {
-            float distance = Mathf.Abs(node.Value.anchoredPosition.y - destPos);
-            if (distance < nearestDistance)
-            {
-                nearestDistance = distance;
-                nearstIndex = curIndex;
-            }
-            curIndex++;
-        }
-        SelectSong(nearstIndex);
-    }
-
-    private RectControl last = null;
-    private Coroutine selectCoroutine = null;
     public void SelectSong(int index)
     {
-        if (index == -1)
-        {
-            if (selectCoroutine != null)
-                StopCoroutine(selectCoroutine);
-            selectCoroutine = StartCoroutine(SelectNear());
-            return;
-        }
-
-        last?.UnSelect();
-        rcs[index].OnSelect();
-        last = rcs[index];
-
         chartListManager.SelectChartByIndex(index);
 
         PlayPreview().WithCancellation(cancellationToken.sceneToken).SuppressCancellationThrow().Forget();
     }
 
-    public void UnselectSong()
+    public void SelectRandom()
     {
-        last?.UnSelect();
+        int N = chartListManager.chartList.Count;
+        if (N <= 1)
+            return;
+        int index = Random.Range(0, N);
+        scrollView.SelectCell(index);
     }
 
     private bool isFirstPlay = true;
@@ -362,6 +273,40 @@ public class SelectManager_old : MonoBehaviour
 
         faderWorking = false;
     }
+
+    private void OnDelete()
+    {
+        var header = chartListManager.current.header;
+        Difficulty difficulty = chartListManager.current.difficulty;
+        if (header.sid == OffsetGuide.OFFSET_GUIDE_SID)
+        {
+            messageBannerController.ShowMsg(LogLevel.INFO, "Nooooooooooooooo");
+            return;
+        }
+
+        bool hasOtherDifficulty = false;
+        for (int i = 0; i < header.difficultyLevel.Count; i++)
+        {
+            if (i == (int)difficulty)
+                continue;
+            if (header.difficultyLevel[i] != -1)
+            {
+                hasOtherDifficulty = true;
+                break;
+            }
+        }
+        if (hasOtherDifficulty)
+        {
+            dataLoader.DeleteDifficulty(header.sid, difficulty);
+        }
+        else
+        {
+            dataLoader.DeleteChart(header.sid);
+        }
+
+        SceneLoader.LoadSceneAsync("Select");
+    }
+
     #endregion
 
     #region ChartEditor

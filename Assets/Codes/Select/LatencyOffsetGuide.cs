@@ -41,6 +41,8 @@ class LatencyOffsetGuide : MonoBehaviour
 
     [Inject]
     IAudioManager audioManager;
+    [Inject]
+    SelectManager selectManager;
 
     Stopwatch watch = new Stopwatch();
 
@@ -69,7 +71,7 @@ class LatencyOffsetGuide : MonoBehaviour
         bgm = await audioManager.PrecacheSE(bgmSound.bytes);
 #endif
 
-        SelectManager_old.instance.previewSound?.Pause();
+        selectManager.previewSound?.Pause();
 
         OnReset();
     }
@@ -121,7 +123,7 @@ class LatencyOffsetGuide : MonoBehaviour
     public void OnClose()
     {
         gameObject.SetActive(false);
-        SelectManager_old.instance.previewSound?.Play();
+        selectManager.previewSound?.Play();
 
 #if USE_SE
         kick.Dispose();

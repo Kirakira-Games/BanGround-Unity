@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
 using System.Diagnostics.Eventing.Reader;
+using Zenject;
 
 #pragma warning disable 0649
 [RequireComponent(typeof(Toggle))]
@@ -12,12 +13,15 @@ public class AudioPanelToggle : MonoBehaviour
     private Toggle toggle;
     private Animator animator;
 
+    [Inject]
+    SelectManager selectManager;
+
     private void OnToggle(bool active)
     {
         if (active)
-            SelectManager_old.instance.previewSound?.Pause();
+            selectManager.previewSound?.Pause();
         else
-            SelectManager_old.instance.previewSound?.Play();
+            selectManager.previewSound?.Play();
         if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Dropped"))
             return;
     }

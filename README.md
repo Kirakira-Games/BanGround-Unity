@@ -15,3 +15,6 @@ A pull request from `master` to `release` should be created for each build.
 An issue should be created to describe the purpose of the changes and to notify other developers that the scene is being modified to avoid merge conflicts.
 
 4. All pull requests must be reviewed and approved by at least one other developer before merging.
+
+## Note
+- Run ```submodule.bat``` before run unity editor to resolve submodules
