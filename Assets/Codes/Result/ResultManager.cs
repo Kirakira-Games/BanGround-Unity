@@ -231,23 +231,20 @@ public class ResultManager : MonoBehaviour
         button_retry.onClick.AddListener(() =>
         {
             //anim.SetBool("FadeToBlack", true);
-            //StartCoroutine("DelayLoadScene","InGame" ); 
+            //StartCoroutine("DelayLoadScene","InGame" );
+            gameParams.replayPath = null;
             StartCoroutine(BgmFadeOut());
             RemoveListener();
-            gameParams.saveReplay = g_saveReplay;
-            gameParams.saveRecord = true;
             SceneLoader.LoadScene("InGame", pushStack: false, parameters: gameParams);
         });
 
         button_replay.onClick.AddListener(() =>
         {
-            if (parameters.saveReplay)
+            if (parameters.ShouldSaveReplay)
                 gameParams.replayPath = "replay/" + ComboManager.recoder.demoName;
             if (string.IsNullOrEmpty(gameParams.replayPath))
                 return;
 
-            gameParams.saveReplay = false;
-            gameParams.saveRecord = false;
             StartCoroutine(BgmFadeOut());
             RemoveListener();
             SceneLoader.LoadScene("InGame", pushStack: false, parameters: gameParams);
@@ -352,7 +349,7 @@ public class ResultManager : MonoBehaviour
         playResult.ChartHash = JsonConvert.SerializeObject(chartLoader.GetChartHash(cheader.mid, cheader.sid, parameters.difficulty));
         playResult.Mods = (ulong)parameters.mods;
 
-        if (parameters.saveReplay)
+        if (parameters.ShouldSaveReplay)
         {
             playResult.ReplayFile = "replay/" + ComboManager.recoder.demoName;
         }
@@ -360,7 +357,7 @@ public class ResultManager : MonoBehaviour
         var oldBest = db.GetBestRank(cheader.sid, parameters.difficulty);
         lastScore = oldBest?.Score ?? 0;
 
-        if (!parameters.mods.HasFlag(ModFlag.AutoPlay) && parameters.saveRecord)
+        if (parameters.ShouldSaveRecord)
         {
             db.SaveRankItem(playResult);
             print("Record saved");

@@ -33,7 +33,13 @@ public class KiraScrollView : FancyScrollView<int, Context>
     {
         base.Initialize();
 
-        Context.OnCellClicked = SelectCell;
+        Context.OnCellClicked = (index) =>
+        {
+            if (index == SelectedCellIndex)
+                selectManager.OnEnterPressed();
+            else
+                SelectCell(index);
+        };
 
         scroller.OnValueChanged(UpdatePos);
         scroller.OnSelectionChanged(UpdateSelection);
@@ -98,11 +104,7 @@ public class KiraScrollView : FancyScrollView<int, Context>
 
     public void SelectCell(int index)
     {
-        if(index == Context.SelectedIndex)
-        {
-            selectManager.OnEnterPressed();
-        }
-        else if (index < 0 || index >= ItemsSource.Count)
+        if (index < 0 || index >= ItemsSource.Count)
         {
             return;
         }

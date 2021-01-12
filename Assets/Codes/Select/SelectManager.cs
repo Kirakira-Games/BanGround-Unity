@@ -1,9 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
-using System.IO;
 using System.Linq;
 using System;
 using AudioProvider;
@@ -11,7 +8,6 @@ using Random = UnityEngine.Random;
 using Cysharp.Threading.Tasks;
 using Zenject;
 using BanGround;
-using BanGround.Utils;
 using BanGround.Scene.Params;
 using BGEditor;
 using BanGround.Game.Mods;
@@ -173,6 +169,15 @@ public class SelectManager : MonoBehaviour
         chartListManager.SelectChartByIndex(index);
 
         PlayPreview().WithCancellation(cancellationToken.sceneToken).SuppressCancellationThrow().Forget();
+    }
+
+    public void SelectRandom()
+    {
+        int N = chartListManager.chartList.Count;
+        if (N <= 1)
+            return;
+        int index = Random.Range(0, N);
+        scrollView.SelectCell(index);
     }
 
     private bool isFirstPlay = true;

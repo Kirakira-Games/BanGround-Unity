@@ -10,10 +10,6 @@ public class KiraSongCell : FancyCell<int, Context>
 {
     [Inject]
     private IDataLoader dataLoader;
-    [Inject]
-    private IFileSystem fs;
-    [Inject]
-    private FancyBackground background;
 
     [SerializeField] 
     Animator animator = default;
@@ -26,8 +22,6 @@ public class KiraSongCell : FancyCell<int, Context>
     Text smallText;
     [SerializeField] 
     Image smallImage;
-
-    RectTransform rectTransform => transform as RectTransform;
 
     private int lastSid = 0;
 
@@ -72,8 +66,6 @@ public class KiraSongCell : FancyCell<int, Context>
         }
 
         animator.speed = 0;
-
-        var time = 1.0f - currentPosition;
     }
 
     public class Factory : PlaceholderFactory<KiraSongCell> { }
