@@ -70,7 +70,7 @@ public class SelectManager : MonoBehaviour
     [HideInInspector] 
     public ISoundTrack previewSound;
 
-    void Start()
+    async void Start()
     {
         Screen.orientation = ScreenOrientation.AutoRotation;
         Screen.autorotateToLandscapeLeft = true;
@@ -82,7 +82,7 @@ public class SelectManager : MonoBehaviour
         // Register callback
         chartListManager.onChartListUpdated.AddListener(RefreshSongList);
 
-        dataLoader.LoadAllKiraPackFromInbox();
+        await dataLoader.LoadAllKiraPackFromInbox();
         dataLoader.RefreshSongList();
 
         sort_Text.text = Enum.GetName(typeof(Sorter), (Sorter)cl_cursorter);
@@ -366,11 +366,11 @@ public class SelectManager : MonoBehaviour
     }
 
 #if UNITY_EDITOR
-    private void OnApplicationFocus(bool focus)
+    private async void OnApplicationFocus(bool focus)
     {
         if (focus)
         {
-            bool success = dataLoader.LoadAllKiraPackFromInbox();
+            bool success = await dataLoader.LoadAllKiraPackFromInbox();
             if (success) SceneLoader.LoadScene("Select");
         }
     }

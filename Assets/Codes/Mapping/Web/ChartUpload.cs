@@ -357,9 +357,9 @@ namespace BGEditor
 
         private async UniTask<List<FileInfo>> GenerateFileList(string prefix)
         {
-            var files = fs.Find((file) =>
+            var files = fs.ListDirectory(prefix).Where((file) =>
             {
-                return file.Name.StartsWith(prefix) && !file.Name.EndsWith("header.bin");
+                return !file.Name.EndsWith("header.bin");
             });
 
             var ret = new List<FileInfo>();

@@ -8,7 +8,6 @@ using BanGround.Web.Chart;
 using BanGround.Web.Auth;
 using BanGround.Web;
 using BanGround.Web.Music;
-using System;
 using BanGround.Web.File;
 
 namespace BanGround.Community
@@ -118,11 +117,6 @@ namespace BanGround.Community
                 }
             }
 
-            // Download chart header
-            task.AddTask(new BanGroundHeaderDownloadTask(web, dataLoader, chart.Id, true)
-            {
-                BackGround = backgroundFileName
-            });
             // Download chart resources
             foreach (var file in resources)
             {
@@ -133,6 +127,12 @@ namespace BanGround.Community
                 }
                 task.AddTask(new WebClientDownloadTask(url, dataLoader.GetChartResource(sid, file.Name), fs));
             }
+            // Download chart header
+            // Must be done at the end because the chart will be registered in the database
+            task.AddTask(new BanGroundHeaderDownloadTask(web, dataLoader, chart.Id, true)
+            {
+                BackGround = backgroundFileName
+            });
             
             // Finalize
             downloadManager.AddTask(task);

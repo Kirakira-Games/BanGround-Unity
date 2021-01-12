@@ -24,11 +24,47 @@ namespace BanGround.Database.Generated
             return memory;
         }
 
+        public void ReplaceAll(System.Collections.Generic.IList<ChartSet> data)
+        {
+            var newData = CloneAndSortBy(data, x => x.Sid, System.Collections.Generic.Comparer<int>.Default);
+            var table = new ChartSetTable(newData);
+            memory = new MemoryDatabase(
+                table,
+                memory.RankItemTable
+            
+            );
+        }
+
+        public void RemoveChartSet(int[] keys)
+        {
+            var data = RemoveCore(memory.ChartSetTable.GetRawDataUnsafe(), keys, x => x.Sid, System.Collections.Generic.Comparer<int>.Default);
+            var newData = CloneAndSortBy(data, x => x.Sid, System.Collections.Generic.Comparer<int>.Default);
+            var table = new ChartSetTable(newData);
+            memory = new MemoryDatabase(
+                table,
+                memory.RankItemTable
+            
+            );
+        }
+
+        public void Diff(ChartSet[] addOrReplaceData)
+        {
+            var data = DiffCore(memory.ChartSetTable.GetRawDataUnsafe(), addOrReplaceData, x => x.Sid, System.Collections.Generic.Comparer<int>.Default);
+            var newData = CloneAndSortBy(data, x => x.Sid, System.Collections.Generic.Comparer<int>.Default);
+            var table = new ChartSetTable(newData);
+            memory = new MemoryDatabase(
+                table,
+                memory.RankItemTable
+            
+            );
+        }
+
         public void ReplaceAll(System.Collections.Generic.IList<RankItem> data)
         {
             var newData = CloneAndSortBy(data, x => x.Id, System.Collections.Generic.Comparer<int>.Default);
             var table = new RankItemTable(newData);
             memory = new MemoryDatabase(
+                memory.ChartSetTable,
                 table
             
             );
@@ -40,6 +76,7 @@ namespace BanGround.Database.Generated
             var newData = CloneAndSortBy(data, x => x.Id, System.Collections.Generic.Comparer<int>.Default);
             var table = new RankItemTable(newData);
             memory = new MemoryDatabase(
+                memory.ChartSetTable,
                 table
             
             );
@@ -51,6 +88,7 @@ namespace BanGround.Database.Generated
             var newData = CloneAndSortBy(data, x => x.Id, System.Collections.Generic.Comparer<int>.Default);
             var table = new RankItemTable(newData);
             memory = new MemoryDatabase(
+                memory.ChartSetTable,
                 table
             
             );

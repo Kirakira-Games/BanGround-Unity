@@ -8,6 +8,7 @@ using BanGround;
 using System.Linq;
 using BanGround.Identity;
 using System;
+using BanGround.Database.Migrations;
 
 public class TitleLoader : MonoBehaviour
 {
@@ -16,11 +17,15 @@ public class TitleLoader : MonoBehaviour
     [Inject]
     private IMessageBannerController messageBannerController;
     [Inject]
+    private ILoadingBlocker loadingBlocker;
+    [Inject]
     private IFileSystem fs;
     [Inject]
     private IAccountManager accountManager;
     [Inject]
-    LocalizedStrings localizedStrings;
+    private IMigrationManager migrationManager;
+    [Inject]
+    private LocalizedStrings localizedStrings;
 
     [Inject(Id = "cl_language")]
     KVar cl_language;
@@ -49,11 +54,11 @@ public class TitleLoader : MonoBehaviour
         instance = this;
         CheckUpdate();
 
-        var backgrounds = fs.Find(file => file.Name.EndsWith(".jpg") || file.Name.EndsWith(".png") || file.Name.EndsWith(".jpeg"));
+        var backgrounds = fs.Find(file => file.Name.EndsWith(".jpg") || file.Name.EndsWith(".png") || file.Name.EndsWith(".jpeg")).ToArray();
 
-        if (backgrounds.Count() != 0)
+        if (backgrounds.Length != 0)
         {
-            var tex = backgrounds.ElementAt(UnityEngine.Random.Range(0, backgrounds.Count())).ReadAsTexture();
+            var tex = backgrounds[UnityEngine.Random.Range(0, backgrounds.Count())].ReadAsTexture();
 
             var matCopy = Instantiate(backgroundMat);
 
@@ -64,10 +69,28 @@ public class TitleLoader : MonoBehaviour
         }
     }
 
+    private async UniTask RunMigrations()
+    {
+        if (!migrationManager.Init())
+            return;
+
+        var task = migrationManager.Migrate();
+        loadingBlocker.Show($"Preparing migrations...");
+        loadingBlocker.SetProgress(migrationManager);
+        while (task.Status == UniTaskStatus.Pending)
+        {
+            loadingBlocker.SetText($"{migrationManager.Description} ({migrationManager.CurrentMigrationIndex} / {migrationManager.TotalMigrations})", true);
+            await UniTask.WaitForEndOfFrame();
+        }
+        loadingBlocker.Close();
+    }
+
     private async void Start()
     {
         userCanvas.GetUserInfo().Forget();
         PlayTitle().Forget();
+
+        await RunMigrations();
 
         await UniTask.Delay(500);
 

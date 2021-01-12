@@ -14,5 +14,10 @@ namespace BanGround
         {
             return Path.GetDirectoryName(path).Replace('\\', '/');
         }
+
+        public static string GetFileName(string path)
+        {
+            return Path.GetFileName(path).Replace('\\', '/');
+        }
     }
 }

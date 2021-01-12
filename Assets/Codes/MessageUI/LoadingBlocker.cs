@@ -15,6 +15,7 @@ public class LoadingBlocker : MonoBehaviour, ILoadingBlocker
 
     private Action action = null;
     private string message;
+    private ITaskWithProgress task;
 
     private void Start()
     {
@@ -27,6 +28,7 @@ public class LoadingBlocker : MonoBehaviour, ILoadingBlocker
     public void Show(string message, Action cancelAction = null, bool showProgress = false)
     {
         progress = 0;
+        task = null;
         SetText(message, showProgress);
 
         gameObject.SetActive(true);
@@ -59,6 +61,7 @@ public class LoadingBlocker : MonoBehaviour, ILoadingBlocker
     public void Close()
     {
         gameObject.SetActive(false);
+        task = null;
     }
 
     public void SetProgress(int current, int max) => SetProgress((float)current / Mathf.Max(1, max));
@@ -66,6 +69,23 @@ public class LoadingBlocker : MonoBehaviour, ILoadingBlocker
     public void SetProgress(float progress)
     {
         this.progress = progress;
+        showProgress = true;
         UpdateDisplay();
+    }
+
+    public void SetProgress(ITaskWithProgress task)
+    {
+        this.task = task;
+        SetProgress(task.Progress);
+    }
+
+    private void Update()
+    {
+        if (task == null || !showProgress)
+            return;
+        float taskProgress = task.Progress;
+        if (Mathf.Approximately(progress, taskProgress))
+            return;
+        SetProgress(taskProgress);
     }
 }

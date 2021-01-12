@@ -10,10 +10,10 @@ using Zenject;
 public class FancyBackground : MonoBehaviour
 {
     [Inject]
-    IDataLoader dataLoader;
+    private IDataLoader dataLoader;
 
     [Inject]
-    IFileSystem fs;
+    private IFileSystem fs;
 
     public RawImage background = default;
     public KiraScrollView scrollView = default;
@@ -21,9 +21,7 @@ public class FancyBackground : MonoBehaviour
     public Text title = default;
     public Text artist = default;
 
-    Material material;
-
-    RectTransform rectTransform;
+    private Material material;
 
     static Dictionary<string, Texture2D> _cachedBackgrounds = new Dictionary<string, Texture2D>();
 
@@ -38,8 +36,6 @@ public class FancyBackground : MonoBehaviour
 
     void Start()
     {
-        rectTransform = transform as RectTransform;
-
         material = Instantiate(background.material);
 
         scrollView.OnMove += UpdatePosition;
