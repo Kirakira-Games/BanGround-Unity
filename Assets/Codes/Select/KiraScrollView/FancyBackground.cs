@@ -81,18 +81,20 @@ public class FancyBackground : MonoBehaviour
             var b2 = dataLoader.GetBackgroundPath(s2.sid, true).Item1;
             var b3 = dataLoader.GetBackgroundPath(s3.sid, true).Item1;
 
-            if (!_cachedBackgrounds.ContainsKey(b1))
-                _cachedBackgrounds.Add(b1, fs.GetFile(b1).ReadAsTexture());
+            Texture2D GetCachedBackground(string path)
+            {
+                if (path == null)
+                    return null;
 
-            if (!_cachedBackgrounds.ContainsKey(b2))
-                _cachedBackgrounds.Add(b2, fs.GetFile(b2).ReadAsTexture());
+                if (!_cachedBackgrounds.ContainsKey(path))
+                    _cachedBackgrounds.Add(path, fs.GetFile(path).ReadAsTexture());
 
-            if (!_cachedBackgrounds.ContainsKey(b3))
-                _cachedBackgrounds.Add(b3, fs.GetFile(b3).ReadAsTexture());
+                return _cachedBackgrounds[path];
+            }
 
-            var tex1 = _cachedBackgrounds[b1];
-            var tex2 = _cachedBackgrounds[b2];
-            var tex3 = _cachedBackgrounds[b3];
+            var tex1 = GetCachedBackground(b1);
+            var tex2 = GetCachedBackground(b2);
+            var tex3 = GetCachedBackground(b3);
 
             material.SetTexture(Uniform.Texture1, tex1);
             material.SetTexture(Uniform.Texture2, tex2);
