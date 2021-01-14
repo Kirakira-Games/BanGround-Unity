@@ -314,7 +314,7 @@ public class DataLoader : IDataLoader
     public (string, int) GetBackgroundPath(int sid, bool forceImg = true)
     {
         var header = GetChartHeader(sid);
-        if (header != null)
+        if (header?.backgroundFile != null)
         {
             var type = 0;
 
