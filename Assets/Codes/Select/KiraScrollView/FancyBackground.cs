@@ -20,6 +20,7 @@ public class FancyBackground : MonoBehaviour
     public Scroller scroller = default;
     public Text title = default;
     public Text artist = default;
+    public Texture2D defaultTexture = default;
 
     private Material material;
 
@@ -84,7 +85,7 @@ public class FancyBackground : MonoBehaviour
             Texture2D GetCachedBackground(string path)
             {
                 if (path == null)
-                    return null;
+                    return defaultTexture;
 
                 if (!_cachedBackgrounds.ContainsKey(path))
                     _cachedBackgrounds.Add(path, fs.GetFile(path).ReadAsTexture());
