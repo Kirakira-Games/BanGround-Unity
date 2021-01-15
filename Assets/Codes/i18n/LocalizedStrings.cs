@@ -73,7 +73,7 @@ public class LocalizedStrings : MonoBehaviour
         if (fallbackDictionary.ContainsKey(str))
             return fallbackDictionary[str];
 
-        Debug.LogError($"Missing localized entry in fallback language (english): {str}");
+        Debug.LogWarning($"Missing localized entry in fallback language (english): {str}");
 
         return str;
     }
