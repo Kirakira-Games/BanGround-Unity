@@ -94,7 +94,7 @@ public static class StringExt
     /// <returns>Localized string</returns>
     public static string L(this string str)
     {
-        return str;
+        return LocalizedStrings.instance.GetLocalizedString(str);
     }
 
     /// <summary>
