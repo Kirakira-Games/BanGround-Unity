@@ -272,7 +272,7 @@ public class ChartLoader : IChartLoader
         header = dataLoader.GetChartHeader(sid);
         if (header == null)
         {
-            messageBanner.ShowMsg(LogLevel.ERROR, "Chart does not exist.");
+            messageBanner.ShowMsg(LogLevel.ERROR, "Loader.ChartNotExists".L());
             return false;
         }
 
@@ -280,7 +280,7 @@ public class ChartLoader : IChartLoader
         chart = await chartVersion.Process(header, difficulty);
         if (chart == null)
         {
-            messageBanner.ShowMsg(LogLevel.ERROR, "Chart data is corrupted or unsupported.");
+            messageBanner.ShowMsg(LogLevel.ERROR, "Loader.ChartIsBroken".L());
             return false;
         }
         try
@@ -297,7 +297,7 @@ public class ChartLoader : IChartLoader
         }
         catch (Exception e)
         {
-            messageBanner.ShowMsg(LogLevel.ERROR, e.Message);
+            messageBanner.ShowMsg(LogLevel.ERROR, "Exception.Unknown".L(e.Message));
             Debug.LogError(e.StackTrace);
             return false;
         }

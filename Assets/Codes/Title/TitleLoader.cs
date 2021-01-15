@@ -75,11 +75,11 @@ public class TitleLoader : MonoBehaviour
             return;
 
         var task = migrationManager.Migrate();
-        loadingBlocker.Show($"Preparing migrations...");
+        loadingBlocker.Show("Migration.Prompt.Prepare".L());
         loadingBlocker.SetProgress(migrationManager);
         while (task.Status == UniTaskStatus.Pending)
         {
-            loadingBlocker.SetText($"{migrationManager.Description} ({migrationManager.CurrentMigrationIndex} / {migrationManager.TotalMigrations})", true);
+            loadingBlocker.SetText("Migration.Prompt.Progress".L(migrationManager.Description, migrationManager.CurrentMigrationIndex, migrationManager.TotalMigrations), true);
             await UniTask.WaitForEndOfFrame();
         }
         loadingBlocker.Close();

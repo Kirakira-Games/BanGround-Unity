@@ -14,7 +14,7 @@ namespace BanGround.Scripting
 
         void Init(int sid, Difficulty difficulty);
         void OnUpdate(int audioTime);
-        void OnJudge(JudgeResult result);
+        void OnJudge(NoteBase notebase, JudgeResult result);
         void OnBeat(float beat);
     }
 }

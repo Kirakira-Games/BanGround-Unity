@@ -60,20 +60,20 @@ namespace BanGround.Identity
             isAuthing = true;
             try
             {
-                loadingBlocker.Show("Logging in...");
+                loadingBlocker.Show("LoginBlocker.Message".L());
                 LoadUserInfo(await web.DoLogin(UsernameField.text, PasswordField.text));
                 HideLoginPanel();
             }
             catch (KiraWebException e)
             {
                 if (e.isNetworkError)
-                    messageBannerController.ShowMsg(LogLevel.ERROR, "Unable to connect to the server! Check your network");
+                    messageBannerController.ShowMsg(LogLevel.ERROR, "Exception.Network.UnableToConnect".L());
                 else
-                    messageBannerController.ShowMsg(LogLevel.ERROR, e.Message);
+                    messageBannerController.ShowMsg(LogLevel.ERROR, "Exception.Network.Unknown".L(e.Message));
             }
             catch (Exception e)
             {
-                messageBannerController.ShowMsg(LogLevel.ERROR, e.Message);
+                messageBannerController.ShowMsg(LogLevel.ERROR, "Exception.Unknown".L(e.Message));
             }
             finally
             {
@@ -105,7 +105,7 @@ namespace BanGround.Identity
                 {
                     try
                     {
-                        loadingBlocker.Show("Logging in...");
+                        loadingBlocker.Show("Login.LoggingIn".L());
                         LoadUserInfo(await web.DoRefreshAccessToken());
                         return true;
                     }

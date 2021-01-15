@@ -81,18 +81,18 @@ namespace BGEditor
         {
             if (accountManager.isOfflineMode)
             {
-                messageBanner.ShowMsg(LogLevel.ERROR, "You're currently offline.");
+                messageBanner.ShowMsg(LogLevel.ERROR, "Network.YouAreOffline".L());
                 return;
             }
 
-            if (!await messageBox.ShowMessage("Upload Chart", "You need to save the chart before uploading. Continue?"))
+            if (!await messageBox.ShowMessage("Editor.Title.UploadChart".L(), "Editor.Prompt.SaveChartBeforeUpload".L()))
             {
                 return;
             }
 
             chartCore.Save();
 
-            loadingBlocker.Show("Uploading Chart...");
+            loadingBlocker.Show("Editor.UploadingChart".L());
 
             try
             {
@@ -100,11 +100,11 @@ namespace BGEditor
             }
             catch (KiraWebException e)
             {
-                messageBanner.ShowMsg(LogLevel.ERROR, $"[{e.RetCode}] {e.Message}");
+                messageBanner.ShowMsg(LogLevel.ERROR, "Exception.Network.KiraWebException".L(e.RetCode, e.Message));
             }
             catch (Exception e)
             {
-                messageBanner.ShowMsg(LogLevel.ERROR, e.Message);
+                messageBanner.ShowMsg(LogLevel.ERROR, "Exception.Unknown".L(e.Message));
                 Debug.LogError(e.StackTrace);
             }
 
@@ -150,13 +150,13 @@ namespace BGEditor
         {
             if (musicSource != ChartSource.Local && musicSource != ChartSource.BanGround)
             {
-                messageBanner.ShowMsg(LogLevel.ERROR, "Unsupported source: " + musicSource.ToString());
+                messageBanner.ShowMsg(LogLevel.ERROR, "Editor.UnsupportedMusicSource".L(musicSource.ToString()));
                 return false;
             }
             musicFiles = await GenerateFileList(DataLoader.MusicDir + chartHeader.mid);
             if (musicFiles.Count == 0)
             {
-                messageBanner.ShowMsg(LogLevel.ERROR, "Corrupted music data.");
+                messageBanner.ShowMsg(LogLevel.ERROR, "Editor.BrokenMusic".L());
                 return false;
             }
             // Find the main music file
@@ -171,9 +171,9 @@ namespace BGEditor
                 }
             }
             // Check if music already exists
-            loadingBlocker.SetText("Discussing with the server about this song...");
+            loadingBlocker.SetText("Editor.Upload.DiscussSong".L());
             int mid = await FindExistingSong(musicFiles[0]);
-            loadingBlocker.SetText("Updating local data...");
+            loadingBlocker.SetText("Editor.Upload.UploadData".L());
             if (mid >= 0)
             {
                 mid = IDRouterUtil.ToFileId(ChartSource.BanGround, mid);
@@ -193,14 +193,14 @@ namespace BGEditor
         {
             if (chartSource != ChartSource.Local && chartSource != ChartSource.BanGround)
             {
-                messageBanner.ShowMsg(LogLevel.ERROR, "Unsupported source.");
+                messageBanner.ShowMsg(LogLevel.ERROR, "Editor.UnsupportedChartSource".L());
                 return false;
             }
             if (chartSource == ChartSource.BanGround)
             {
-                loadingBlocker.SetText("Discussing with the server about this chart...");
+                loadingBlocker.SetText("Editor.Upload.DiscussChart".L());
                 int sid = await FindExistingChart(chartId);
-                loadingBlocker.SetText("Updating local data...");
+                loadingBlocker.SetText("Editor.Upload.UploadData".L());
                 if (sid < 0)
                 {
                     sid = dataLoader.GenerateSid();
@@ -221,7 +221,7 @@ namespace BGEditor
             if (musicSource != ChartSource.Local)
             {
                 // Update song data
-                loadingBlocker.SetText("Updating song...");
+                loadingBlocker.SetText("Editor.Upload.UpdateSong".L());
                 try
                 {
                     await web.EditSong(musicId, new EditSongRequest
@@ -237,7 +237,7 @@ namespace BGEditor
                 return true;
             }
             // Upload song
-            loadingBlocker.SetText("Uploading song");
+            loadingBlocker.SetText("Editor.Upload.UploadData".L());
             await BatchUpload(musicFiles);
             // Create song
             int mid = await web.CreateSong(new CreateSongRequest
@@ -249,7 +249,7 @@ namespace BGEditor
                 Hash = musicFiles[0].Info.Hash,
                 Preview = musicHeader.preview.ToList()
             }).Fetch();
-            loadingBlocker.SetText("Updating local data...");
+            loadingBlocker.SetText("Editor.Upload.UploadLocalData".L());
             mid = IDRouterUtil.ToFileId(ChartSource.BanGround, mid);
             dataLoader.MoveMusic(musicHeader.mid, mid);
             Refresh();
@@ -259,7 +259,7 @@ namespace BGEditor
         private async UniTask<bool> CreateChart()
         {
             // Upload files
-            loadingBlocker.SetText("Uploading files", true);
+            loadingBlocker.SetText("Editor.Upload.UploadFiles".L(), true);
             var uploads = await BatchUpload(chartFiles);
 
             // Find background file
@@ -267,7 +267,7 @@ namespace BGEditor
             if (bgFile == null)
             {
                 // TODO: provide a default image
-                messageBanner.ShowMsg(LogLevel.ERROR, "Background image is required.");
+                messageBanner.ShowMsg(LogLevel.ERROR, "Editor.RequireBackground".L());
                 return false;
             }
             var request = new CreateChartRequest
@@ -282,21 +282,21 @@ namespace BGEditor
             if (chartSource != ChartSource.Local)
             {
                 // Update chart data
-                loadingBlocker.SetText("Updating chart...");
+                loadingBlocker.SetText("Editor.Upload.UpdateChart".L());
                 await web.EditChartSet(chartId, request).Send();
             }
             else
             {
                 // Create chart set
-                loadingBlocker.SetText("Creating chart...");
+                loadingBlocker.SetText("Editor.Upload.CreateChartSet".L());
                 int sid = await web.CreateChartSet(request).Fetch();
-                loadingBlocker.SetText("Updating local data...");
+                loadingBlocker.SetText("Editor.Upload.UploadData".L());
                 sid = IDRouterUtil.ToFileId(ChartSource.BanGround, sid);
                 dataLoader.MoveChart(chartHeader.sid, sid);
                 Refresh();
             }
             // Update resources
-            loadingBlocker.SetText("Updating chart resources...");
+            loadingBlocker.SetText("Editor.Upload.UpdateChartRes".L());
             await web.UpdateChart(chartId, new UpdateChartRequest
             {
                 Difficulty = chartHeader.difficultyLevel,
@@ -306,7 +306,7 @@ namespace BGEditor
                 }).ToList()
             }).Send();
             // Update chart version
-            loadingBlocker.SetText("Updating chart version...");
+            loadingBlocker.SetText("Editor.Upload.UpdateChartVersion".L());
             chartHeader.version = (await web.GetChartById(chartId).Fetch()).Version;
             dataLoader.SaveHeader(chartHeader);
             return true;
@@ -321,19 +321,19 @@ namespace BGEditor
             musicFiles = null;
 
             // Prepare music
-            loadingBlocker.SetText("Preparing music files");
+            loadingBlocker.SetText("Editor.Upload.PrepareMusic".L());
             if (!await PrepareMusic())
                 return;
             await UniTask.DelayFrame(1);
 
             // Prepare chart
-            loadingBlocker.SetText("Preparing chart files");
+            loadingBlocker.SetText("Editor.Upload.PrepareChart".L());
             if (!await PrepareChart())
                 return;
             await UniTask.DelayFrame(1);
 
             // Calc cost
-            loadingBlocker.SetText("Calculating cost...");
+            loadingBlocker.SetText("Editor.Upload.CalcCost".L());
             allFiles = musicFiles == null ? chartFiles : musicFiles.Concat(chartFiles).ToList();
             if (!await CalcFish(allFiles))
                 return;
@@ -349,10 +349,10 @@ namespace BGEditor
                 return;
             await UniTask.DelayFrame(1);
 
-            loadingBlocker.SetText("Wrapping it up...");
+            loadingBlocker.SetText("Editor.Upload.WrappUp".L());
             await UniTask.Delay(5000);
 
-            messageBanner.ShowMsg(LogLevel.INFO, "Upload succeeds.");
+            messageBanner.ShowMsg(LogLevel.INFO, "Editor.Upload.Done".L());
         }
 
         private async UniTask<List<FileInfo>> GenerateFileList(string prefix)
@@ -382,10 +382,10 @@ namespace BGEditor
             var fishDelta = await web.CalcUploadCost(req).Fetch();
             if (fishDelta.Fish < 0)
             {
-                messageBanner.ShowMsg(LogLevel.INFO, $"Need {fishDelta.Required} fish, but you only have {fishDelta.Fish + fishDelta.Required}");
+                messageBanner.ShowMsg(LogLevel.INFO, "Editor.Upload.FishNotEnough".L(fishDelta.Required, fishDelta.Fish + fishDelta.Required));
                 return false;
             }
-            if (!await messageBox.ShowMessage("Fish Pay", $"Cost: {fishDelta.Required}. You have {fishDelta.Fish} fish after the payment.\nContinue?"))
+            if (!await messageBox.ShowMessage("Editor.Upload.Title.FishPay", $"Editor.Upload.Prompt.FishPay".L(fishDelta.Required, fishDelta.Fish)))
             {
                 return false;
             }

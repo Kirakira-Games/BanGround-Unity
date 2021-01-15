@@ -184,18 +184,6 @@ public class DataLoader : IDataLoader
     public async UniTaskVoid Init()
     {
         LastImportedSid = -1;
-        // Delete save files of old versions
-        if (PlayerPrefs.GetInt("GameVersion") != GameVersion)
-        {
-            Debug.Log("Remove old save files.");
-            var files = new DirectoryInfo(Application.persistentDataPath).GetFiles("*.*", SearchOption.AllDirectories);
-            foreach (var file in files)
-            {
-                if (file.Name == "LiveSettings.json")
-                    File.Delete(file.FullName);
-            }
-            PlayerPrefs.SetInt("GameVersion", GameVersion);
-        }
 
         // Check first launch after updating initial charts
         RefreshSongList();
@@ -679,7 +667,7 @@ public class DataLoader : IDataLoader
             //fs.AddSearchPath(path);
 
             // Load charts
-            loadingBlocker.Show("Loading " + KiraPath.GetFileName(file.Name) + "...", showProgress: true);
+            loadingBlocker.Show("DataLoader.LoadKirapack".L(KiraPath.GetFileName(file.Name)), showProgress: true);
 
             // Find sid
             string path = file.FullName;
@@ -706,7 +694,7 @@ public class DataLoader : IDataLoader
         }
         catch (Exception e)
         {
-            messageBannerController.ShowMsg(LogLevel.ERROR, $"Cannot Load {file.Name}: {e.Message}");
+            messageBannerController.ShowMsg(LogLevel.ERROR, "Excaption.DataLoader.CantLoadKirapack".L(file.Name, e.Message));
             Debug.LogException(e);
             return -1;
         }
@@ -745,7 +733,7 @@ public class DataLoader : IDataLoader
                     {
                         cl_lastsid.Set(tmp);
                         LoadSuccess = true;
-                        messageBannerController.ShowMsg(LogLevel.OK, localizedStrings.GetLocalizedString("Loaded kirapack: ") + file.Name);
+                        messageBannerController.ShowMsg(LogLevel.OK, "DataLoader.LoadedKiraPack".L(file.Name));
                     }
                     file.Delete();
                 }
@@ -753,7 +741,7 @@ public class DataLoader : IDataLoader
         }
         catch (Exception e)
         {
-            messageBannerController.ShowMsg(LogLevel.ERROR, e.Message, false);
+            messageBannerController.ShowMsg(LogLevel.ERROR, "Exception.Unknown".L(e.Message), false);
         }
         return LoadSuccess;
     }

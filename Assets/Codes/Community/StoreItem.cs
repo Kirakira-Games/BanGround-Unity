@@ -64,12 +64,12 @@ namespace BanGround.Community
                 return;
             }
             // User confirm
-            if (!await messageBox.ShowMessage("Download Chart", $"{song.ToDisplayString()}\n{ChartItem.ToDisplayString()}"))
+            if (!await messageBox.ShowMessage("Store.Title.DownloadChart".L(), "Store.Prompt.DownloadChart".L(song.ToDisplayString(), ChartItem.ToDisplayString())))
             {
                 return;
             }
             // Start download
-            loadingBlocker.Show("Creating download task...");
+            loadingBlocker.Show("Store.CreateDownloadTask".L());
             try
             {
                 var task = await controller.StoreProvider.AddToDownloadList(song, ChartItem);
@@ -80,12 +80,19 @@ namespace BanGround.Community
                     {
                         cl_lastsid.Set(id);
                     });
-                messageCenter.Show("Download", "Go");
+
+                /*
+                 * 【管理员】AeCw 2021/1/15 19:14:19
+                 * 这个能不能改改
+                 * 【管理员】AeCw 2021/1/15 19:14:32
+                 * 下载点下去别显示go了
+                 */
+                //messageCenter.Show("Store.CenterText.Download".L(), "Go");
             }
             catch (Exception e)
             {
                 Debug.LogError(e.Message + "\n" + e.StackTrace);
-                messageBanner.ShowMsg(LogLevel.ERROR, e.Message);
+                messageBanner.ShowMsg(LogLevel.ERROR, "Exception.Unknown".L(e.Message));
             }
             loadingBlocker.Close();
         }

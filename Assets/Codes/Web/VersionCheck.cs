@@ -3,11 +3,11 @@ using Cysharp.Threading.Tasks;
 
 public class VersionCheck
 {
-    public const string CheckUpdate = "正在检查更新";
-    public const string CheckError = "获取更新信息失败，你最好联网获取信息后再进行游戏。";
-    public const string UpdateForce = "获取到有新的版本：{0}，你需要更新到最新版才能进行游戏";
-    public const string UpdateNotForce = "建议更新到最新版{0}";
-    public const string NoUpdate = "当前客户端已经是最新版了";
+    public static string CheckUpdate => "VersionCheck.CheckingUpdate".L();
+    public static string CheckError => "VersionCheck.ErrorGettingInfo".L();
+    public static string UpdateForce => "VersionCheck.HasNewForceUpdate".L();
+    public static string UpdateNotForce => "VersionCheck.HasNewUpdate".L();
+    public static string NoUpdate => "VersionCheck.UpToDate".L();
 
     public VersionResponse response;
     public static VersionCheck Instance = new VersionCheck
