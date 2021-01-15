@@ -53,7 +53,7 @@ public class ChartVersion : IChartVersion
             {
                 return null;
             }
-            if (!await messageBox.ShowMessage("ChartVersion.Title.ConvertUnsupported", "ChartVersion.Prompt.ConvertUnsuppoted"))
+            if (!await messageBox.ShowMessage("ChartVersion.Title.ConvertUnsupported", "ChartVersion.Prompt.ConvertUnsupported"))
             {
                 return null;
             }
