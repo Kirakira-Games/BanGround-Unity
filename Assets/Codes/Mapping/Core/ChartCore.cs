@@ -333,9 +333,9 @@ namespace BGEditor
                 return;
             progress.Pause();
             int ret = await messageBox.ShowMessage("Editor.Title.PlayTest".L(), "Editor.Prompt.PlayTest".L(), new string[] {
-                "Cancel",
-                "Editor.PlayOption.FromStart",
-                "Editor.PlayOption.FromHere"
+                "Cancel".L(),
+                "Editor.PlayOption.FromStart".L(),
+                "Editor.PlayOption.FromHere".L()
             });
             if (ret == 0)
                 return;

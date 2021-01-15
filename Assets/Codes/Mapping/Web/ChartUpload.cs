@@ -249,7 +249,7 @@ namespace BGEditor
                 Hash = musicFiles[0].Info.Hash,
                 Preview = musicHeader.preview.ToList()
             }).Fetch();
-            loadingBlocker.SetText("Editor.Upload.UploadLocalData".L());
+            loadingBlocker.SetText("Editor.Upload.UploadData".L());
             mid = IDRouterUtil.ToFileId(ChartSource.BanGround, mid);
             dataLoader.MoveMusic(musicHeader.mid, mid);
             Refresh();

@@ -130,7 +130,7 @@ namespace BGEditor
         {
             if (save)
             {
-                if (!await messageBox.ShowMessage("Editor.Title.SaveMetaData".L(), "Save.Prompt.SaveMetaDataInfo".L()))
+                if (!await messageBox.ShowMessage("Editor.Title.SaveMetaData".L(), "Editor.Prompt.SaveMetaDataInfo".L()))
                     return;
                 Save();
             }

@@ -694,7 +694,7 @@ public class DataLoader : IDataLoader
         }
         catch (Exception e)
         {
-            messageBannerController.ShowMsg(LogLevel.ERROR, "Excaption.DataLoader.CantLoadKirapack".L(file.Name, e.Message));
+            messageBannerController.ShowMsg(LogLevel.ERROR, "Exception.DataLoader.CantLoadKirapack".L(file.Name, e.Message));
             Debug.LogException(e);
             return -1;
         }

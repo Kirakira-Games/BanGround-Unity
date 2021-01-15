@@ -60,7 +60,7 @@ namespace BanGround.Identity
             isAuthing = true;
             try
             {
-                loadingBlocker.Show("LoginBlocker.Message".L());
+                loadingBlocker.Show("Account.LogginIn".L());
                 LoadUserInfo(await web.DoLogin(UsernameField.text, PasswordField.text));
                 HideLoginPanel();
             }
@@ -105,7 +105,7 @@ namespace BanGround.Identity
                 {
                     try
                     {
-                        loadingBlocker.Show("Login.LoggingIn".L());
+                        loadingBlocker.Show("Account.LogginIn".L());
                         LoadUserInfo(await web.DoRefreshAccessToken());
                         return true;
                     }
