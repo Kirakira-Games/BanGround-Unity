@@ -53,7 +53,7 @@ public class ChartVersion : IChartVersion
             {
                 return null;
             }
-            if (!await messageBox.ShowMessage("ChartVersion.Title.ConvertUnsupported", "ChartVersion.Prompt.ConvertUnsupported"))
+            if (!await messageBox.ShowMessage("ChartVersion.Title.ConvertUnsupported".L(), "ChartVersion.Prompt.ConvertUnsupported".L()))
             {
                 return null;
             }
@@ -61,7 +61,7 @@ public class ChartVersion : IChartVersion
         }
         else if (CanConvert(chart.version))
         {
-            if (!await messageBox.ShowMessage("ChartVersion.Title.ConvertOutdated", "ChartVersion.Prompt.ConvertOutdated"))
+            if (!await messageBox.ShowMessage("ChartVersion.Title.ConvertOutdated".L(), "ChartVersion.Prompt.ConvertOutdated".L()))
             {
                 return dataLoader.LoadChart<V2.Chart>(header.sid, difficulty);
             }
