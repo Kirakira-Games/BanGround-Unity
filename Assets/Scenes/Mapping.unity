@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 1
+  m_UseShadowmask: 0
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -1138,7 +1138,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Mapping.MessageCanvaas.TimingWindows.offset.ms
+  m_Text: ms
 --- !u!222 &67110093
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2366,8 +2366,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 80, y: 25}
-  m_SizeDelta: {x: 160, y: 50}
+  m_AnchoredPosition: {x: 250, y: 25}
+  m_SizeDelta: {x: 500, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &114512239
 MonoBehaviour:
@@ -2378,7 +2378,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 114512237}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Script: {fileID: 11500000, guid: 73f8e0aac8ff8c74a8ddeb71d5e0f95c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
@@ -2397,7 +2397,7 @@ MonoBehaviour:
     m_MaxSize: 40
     m_Alignment: 0
     m_AlignByGeometry: 0
-    m_RichText: 1
+    m_RichText: 0
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
@@ -3577,9 +3577,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Mapping.MessageCanvaas.Meradara.Song.<color=red>Warning: </color>Any changes
-    to song meta will affect all chart sets referencing this song. It''s recommended
-    to keep this as it is unless really necessary.'
+  m_Text: Mapping.MessageCanvaas.Meradara.Song.Warning
 --- !u!222 &174656485
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3633,7 +3631,7 @@ PrefabInstance:
     - target: {fileID: 1653703709321562905, guid: 0f1b772f7e86b564a8da28ec9ca5b978,
         type: 3}
       propertyPath: m_Text
-      value: 'Mapping.MessageCanvaas.Meradara.Song.Separated by comma, e.g.
+      value: 'Separated by comma, e.g.
 
         yuri,op,multi'
       objectReference: {fileID: 0}
@@ -4642,6 +4640,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_SizeDelta.y
       value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 5963289790456093820, guid: 305b4bb95c39b2248862028edc0fb6d3,
+        type: 3}
+      propertyPath: m_Text
+      value: Mapping.MessageCanvaas.TimingInfoEdit.SlideTick
       objectReference: {fileID: 0}
     - target: {fileID: 6331875192402489063, guid: 305b4bb95c39b2248862028edc0fb6d3,
         type: 3}
@@ -10679,6 +10682,45 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 795995310}
   m_CullTransparentMesh: 0
+--- !u!1 &797788230 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8681626278157607646, guid: 0dfc9c9a0f7b54d34a1add92215393ce,
+    type: 3}
+  m_PrefabInstance: {fileID: 2018304467}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &797788231
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 797788230}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FontData:
+    m_Font: {fileID: 12800000, guid: 7edb87cc5a4194c8a89f1ee196f8cf1c, type: 3}
+    m_FontSize: 24
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 2
+    m_MaxSize: 40
+    m_Alignment: 4
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: 25%          50%          75%          100%
 --- !u!1 &799172700
 GameObject:
   m_ObjectHideFlags: 0
@@ -12243,7 +12285,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 851570003}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Script: {fileID: 11500000, guid: 73f8e0aac8ff8c74a8ddeb71d5e0f95c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
@@ -12255,11 +12297,11 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 7edb87cc5a4194c8a89f1ee196f8cf1c, type: 3}
-    m_FontSize: 30
+    m_FontSize: 36
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 3
-    m_MaxSize: 72
+    m_MaxSize: 40
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
@@ -13359,6 +13401,11 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 50
       objectReference: {fileID: 0}
+    - target: {fileID: 5963289790456093820, guid: 305b4bb95c39b2248862028edc0fb6d3,
+        type: 3}
+      propertyPath: m_Text
+      value: Mapping.MessageCanvaas.TimingInfoEdit.Flick
+      objectReference: {fileID: 0}
     - target: {fileID: 6331875192402489063, guid: 305b4bb95c39b2248862028edc0fb6d3,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -13648,6 +13695,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_SizeDelta.y
       value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 5963289790456093820, guid: 305b4bb95c39b2248862028edc0fb6d3,
+        type: 3}
+      propertyPath: m_Text
+      value: Mapping.MessageCanvaas.TimingInfoEdit.Slide
       objectReference: {fileID: 0}
     - target: {fileID: 6331875192402489063, guid: 305b4bb95c39b2248862028edc0fb6d3,
         type: 3}
@@ -16501,7 +16553,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1166046283}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Script: {fileID: 11500000, guid: 73f8e0aac8ff8c74a8ddeb71d5e0f95c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
@@ -16513,11 +16565,11 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 7edb87cc5a4194c8a89f1ee196f8cf1c, type: 3}
-    m_FontSize: 30
+    m_FontSize: 36
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 3
-    m_MaxSize: 72
+    m_MaxSize: 40
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
@@ -17073,6 +17125,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_SizeDelta.y
       value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 5963289790456093820, guid: 305b4bb95c39b2248862028edc0fb6d3,
+        type: 3}
+      propertyPath: m_Text
+      value: Mapping.MessageCanvaas.TimingInfoEdit.TapGreyColor
       objectReference: {fileID: 0}
     - target: {fileID: 6331875192402489063, guid: 305b4bb95c39b2248862028edc0fb6d3,
         type: 3}
@@ -18794,7 +18851,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1368474764}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Script: {fileID: 11500000, guid: 73f8e0aac8ff8c74a8ddeb71d5e0f95c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
@@ -18806,11 +18863,11 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 7edb87cc5a4194c8a89f1ee196f8cf1c, type: 3}
-    m_FontSize: 24
+    m_FontSize: 36
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 2
-    m_MaxSize: 48
+    m_MinSize: 3
+    m_MaxSize: 40
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
@@ -25041,7 +25098,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1844515113}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Script: {fileID: 11500000, guid: 73f8e0aac8ff8c74a8ddeb71d5e0f95c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
@@ -25053,11 +25110,11 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 7edb87cc5a4194c8a89f1ee196f8cf1c, type: 3}
-    m_FontSize: 24
+    m_FontSize: 36
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 2
-    m_MaxSize: 48
+    m_MinSize: 3
+    m_MaxSize: 40
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
@@ -26383,8 +26440,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1986830857}
   - component: {fileID: 1986830860}
-  - component: {fileID: 1986830859}
   - component: {fileID: 1986830858}
+  - component: {fileID: 1986830859}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -26435,7 +26492,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1986830856}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Script: {fileID: 11500000, guid: 73f8e0aac8ff8c74a8ddeb71d5e0f95c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
@@ -26447,11 +26504,11 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 7edb87cc5a4194c8a89f1ee196f8cf1c, type: 3}
-    m_FontSize: 30
+    m_FontSize: 36
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 3
-    m_MaxSize: 72
+    m_MaxSize: 40
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
@@ -27047,7 +27104,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: all text
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 8681626278157607640, guid: 0dfc9c9a0f7b54d34a1add92215393ce, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 0dfc9c9a0f7b54d34a1add92215393ce, type: 3}
 --- !u!1 &2047642326
 GameObject:
@@ -28923,6 +28981,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_SizeDelta.y
       value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 5963289790456093820, guid: 305b4bb95c39b2248862028edc0fb6d3,
+        type: 3}
+      propertyPath: m_Text
+      value: Mapping.MessageCanvaas.TimingInfoEdit.TapColor
       objectReference: {fileID: 0}
     - target: {fileID: 6331875192402489063, guid: 305b4bb95c39b2248862028edc0fb6d3,
         type: 3}
