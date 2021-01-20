@@ -43,8 +43,6 @@ public class TitleLoader : MonoBehaviour
     public InputField usernameField;
     public InputField passwordField;
 
-    public static TitleLoader instance;
-
     public ISoundTrack music;
     private ISoundEffect banGround;
 
@@ -53,7 +51,6 @@ public class TitleLoader : MonoBehaviour
     [Inject]
     private void Inject()
     {
-        instance = this;
         CheckUpdate();
 
         var backgrounds = fs.Find(file => file.Name.EndsWith(".jpg") || file.Name.EndsWith(".png") || file.Name.EndsWith(".jpeg")).ToArray();
@@ -115,26 +112,26 @@ public class TitleLoader : MonoBehaviour
         //MessageBoxController.ShowMsg(LogLevel.INFO, VersionCheck.CheckUpdate);
         TouchEvent te = GameObject.Find("TouchStart").GetComponent<TouchEvent>();
         var check = versionCheck;
-        await check.GetVersionInfo();
+        var response = await check.GetVersionInfo();
 
-        if (check == null || check.response == null || check.response.result == false) 
+        if (response == null || response.result == false) 
         {
             //网络错误
             messageBannerController.ShowMsg(LogLevel.ERROR, VersionCheck.CheckError, false);
             te.waitingUpdate = false; // 椰叶先别强制更新罢
         }
-        else if (Application.version != check.response.data.version)
+        else if (Application.version != response.data.version)
         {
             //有更新
-            if (check.response.data.force)
+            if (response.data.force)
             {
-                string result = string.Format(VersionCheck.UpdateForce, check.response.data.version);
+                string result = string.Format(VersionCheck.UpdateForce, response.data.version);
                 //强制更新
                 messageBannerController.ShowMsg(LogLevel.ERROR, result, false);
             }
             else
             {
-                string result = string.Format(VersionCheck.UpdateNotForce, check.response.data.version);
+                string result = string.Format(VersionCheck.UpdateNotForce, response.data.version);
                 //不强制更新
                 messageBannerController.ShowMsg(LogLevel.OK, result, true);
                 te.waitingUpdate = false;

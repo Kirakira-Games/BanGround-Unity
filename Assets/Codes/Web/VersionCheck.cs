@@ -37,12 +37,19 @@ public class VersionCheck
     {
         string FullAPI = Prefix + API;
 
-        var req = kiraWebRequest.New<VersionResponse>()
-                .SetTimeout(2000)
-                .SetIsFullAddress(true)
-                .Get(FullAPI);
+        try
+        {
+            var req = kiraWebRequest.New<VersionResponse>()
+                    .SetTimeout(2000)
+                    .SetIsFullAddress(true)
+                    .Get(FullAPI);
 
-        return await req.Fetch();
+            return await req.Fetch();
+        }
+        catch
+        {
+            return null;
+        }
     }
 }
 
