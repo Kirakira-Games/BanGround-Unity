@@ -100,6 +100,9 @@ public class GlobalInstaller : MonoInstaller
         // Kira Web Request
         Container.Bind<IKiraWebRequest>().To<KiraWebRequest>().AsSingle().NonLazy();
 
+        // Version Check
+        Container.Bind<VersionCheck>().AsSingle().NonLazy();
+
         // FPS Counter
         Container.Bind<IFPSCounter>().FromInstance(fpsCounter);
 

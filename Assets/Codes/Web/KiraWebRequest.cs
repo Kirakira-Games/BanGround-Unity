@@ -122,6 +122,7 @@ namespace BanGround.Web
             public string url { get; private set; }
             public string method { get; private set; }
             public int timeout { get; private set; } = 60;
+            public bool fullAddr { get; private set; } = false;
 
             private async UniTask<Resp> HandleResponse<Resp>()
             {
@@ -145,7 +146,7 @@ namespace BanGround.Web
                 {
                     Debug.Log("[KWR] Response: " + webRequest.downloadHandler.text);
                     var result = JsonConvert.DeserializeObject<Result<Resp>>(webRequest.downloadHandler.text);
-                    if (result.status == false)
+                    if (result.status == false && result.error != null)
                         throw new KiraWebException(webRequest.responseCode, new KiraErrorMessage(result.error));
                     return result.data;
                 }
@@ -155,10 +156,12 @@ namespace BanGround.Web
 
             private void Create()
             {
+                var addr = fullAddr ? url : context.ServerAddr + url;
+
                 if (form == null)
-                    webRequest = new UnityWebRequest(context.ServerAddr + url, method);
+                    webRequest = new UnityWebRequest(addr, method);
                 else
-                    webRequest = UnityWebRequest.Post(context.ServerAddr + url, form);
+                    webRequest = UnityWebRequest.Post(addr, form);
                 webRequest.timeout = timeout;
                 webRequest.downloadHandler = new DownloadHandlerBuffer();
                 webRequest.SetRequestHeader("User-Agent", context.UA);
@@ -200,6 +203,12 @@ namespace BanGround.Web
             public Builder<ResponseType> SetTimeout(int timeout)
             {
                 this.timeout = timeout;
+                return this;
+            }
+
+            public Builder<ResponseType> SetIsFullAddress(bool isFullAddr)
+            {
+                fullAddr = isFullAddr;
                 return this;
             }
 

@@ -1,8 +1,13 @@
 ﻿using UnityEngine;
+using BanGround.Web;
 using Cysharp.Threading.Tasks;
+using Zenject;
 
 public class VersionCheck
 {
+    [Inject]
+    IKiraWebRequest kiraWebRequest;
+    
     public static string CheckUpdate => "VersionCheck.CheckingUpdate".L();
     public static string CheckError => "VersionCheck.ErrorGettingInfo".L();
     public static string UpdateForce => "VersionCheck.HasNewForceUpdate".L();
@@ -10,7 +15,9 @@ public class VersionCheck
     public static string NoUpdate => "VersionCheck.UpToDate".L();
 
     public VersionResponse response;
-    public static VersionCheck Instance = new VersionCheck
+    
+    [Inject]
+    public void Inject()
     {
         response = new VersionResponse
         {
@@ -19,17 +26,23 @@ public class VersionCheck
             {
                 version = Application.version
             }
-        }
-    };
+        };
+    }
 
     private const string Prefix = "https://api.reikohaku.fun/api";
     private readonly string API = "/version/check?version=" + Application.version;
 
+    // TODO：鲨了就行
     public async UniTask<VersionResponse> GetVersionInfo()
     {
         string FullAPI = Prefix + API;
-        var req = new KirakiraWebRequest<VersionResponse>();
-        return await req.Get(FullAPI);
+
+        var req = kiraWebRequest.New<VersionResponse>()
+                .SetTimeout(2000)
+                .SetIsFullAddress(true)
+                .Get(FullAPI);
+
+        return await req.Fetch();
     }
 }
 

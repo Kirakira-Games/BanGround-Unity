@@ -26,6 +26,8 @@ public class TitleLoader : MonoBehaviour
     private IMigrationManager migrationManager;
     [Inject]
     private LocalizedStrings localizedStrings;
+    [Inject]
+    private VersionCheck versionCheck;
 
     [Inject(Id = "cl_language")]
     KVar cl_language;
@@ -112,7 +114,7 @@ public class TitleLoader : MonoBehaviour
     {
         //MessageBoxController.ShowMsg(LogLevel.INFO, VersionCheck.CheckUpdate);
         TouchEvent te = GameObject.Find("TouchStart").GetComponent<TouchEvent>();
-        var check = VersionCheck.Instance;
+        var check = versionCheck;
         await check.GetVersionInfo();
 
         if (check == null || check.response == null || check.response.result == false) 
