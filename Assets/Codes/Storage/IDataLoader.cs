@@ -13,7 +13,7 @@ public interface IDataLoader
     int LastImportedSid { get; set; }
 
     string BuildKiraPack(cHeader header);
-    void ConvertJsonToBin(DirectoryInfo dir);
+    //void ConvertJsonToBin(DirectoryInfo dir);
     void DuplicateKiraPack(cHeader header);
     int GenerateMid();
     int GenerateSid();
@@ -26,11 +26,12 @@ public interface IDataLoader
     int GetMidBySid(int sid);
     mHeader GetMusicHeader(int mid);
     string GetMusicPath(int mid);
+    string GetMusicResource(int mid, string filename);
     UniTaskVoid Init();
     void InitFileSystem();
-    bool LoadAllKiraPackFromInbox();
+    UniTask<bool> LoadAllKiraPackFromInbox();
     T LoadChart<T>(int sid, Difficulty difficulty) where T : IExtensible;
-    int LoadKiraPack(FileInfo file);
+    UniTask<int> LoadKiraPack(FileInfo file);
     bool MusicExists(int mid);
     void RefreshSongList();
     void SaveChart<T>(T chart, int sid, Difficulty difficulty) where T : IExtensible;
@@ -40,6 +41,7 @@ public interface IDataLoader
     void SaveHeader(mHeader header, byte[] oggFile);
     void MoveChart(int oldSid, int newSid, bool overwrite = true);
     void MoveMusic(int oldMid, int newMid, bool overwrite = true);
+    void DeleteChart(int[] sids);
     void DeleteChart(int sid);
     void DeleteDifficulty(int sid, Difficulty difficulty);
     void DeleteMusic(int mid);

@@ -43,16 +43,13 @@ public class WebConsole : MonoBehaviour
     Action flushKirapacksAction;
 
     [Inject]
-    private void Inject(IDataLoader dataLoader)
+    private void Inject()
     {
         flushKirapacksAction = () =>
         {
-            if (dataLoader.LoadAllKiraPackFromInbox())
+            if (SceneManager.GetActiveScene().name == "Select")
             {
-                if (SceneManager.GetActiveScene().name == "Select")
-                {
-                    SceneLoader.LoadScene("Select");
-                }
+                SceneLoader.LoadScene("Select");
             }
         };
     }

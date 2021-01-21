@@ -22,6 +22,19 @@ public class ChartIndexInfo
 
 public class ChartListManager : IChartListManager
 {
+    private static readonly List<cHeader> PLACEHOLDER_LIST = new List<cHeader>()
+    {
+        new cHeader
+        {
+            mid = -1,
+            sid = 0,
+            author = "meigong",
+            authorNick = "Rino",
+            difficultyLevel = new List<int>() {1, 2, 3, 4, 5},
+            preview = new float[]{0, 1}
+        }
+    };
+
     private IDataLoader dataLoader;
     private ISorterFactory sorterFactory;
 
@@ -30,7 +43,14 @@ public class ChartListManager : IChartListManager
     [Inject(Id = "cl_lastdiff")]
     private KVar cl_lastdiff;
 
-    public List<cHeader> chartList => dataLoader.chartList;
+    public List<cHeader> chartList {
+        get
+        {
+            if (dataLoader.chartList != null && dataLoader.chartList.Count > 0)
+                return dataLoader.chartList;
+            return PLACEHOLDER_LIST;
+        }
+    }
 
     public UnityEvent onDifficultyUpdated { get; } = new UnityEvent();
     public UnityEvent onChartListUpdated { get; } = new UnityEvent();
@@ -43,7 +63,11 @@ public class ChartListManager : IChartListManager
 
 
     // Currently selected chart.
-    private ChartIndexInfo selectedChart = new ChartIndexInfo();
+    private ChartIndexInfo selectedChart = new ChartIndexInfo {
+        header = PLACEHOLDER_LIST[0],
+        difficulty = Difficulty.Easy,
+        index = 0
+    };
 
     public ChartListManager(IDataLoader dataLoader, ISorterFactory sorterFactory)
     {
@@ -77,6 +101,8 @@ public class ChartListManager : IChartListManager
 
     public void SelectChartByIndex(int index)
     {
+        if (chartList.Count == 0)
+            return;
         index = Mathf.Clamp(index, 0, chartList.Count - 1);
         if (ReferenceEquals(selectedChart.header, chartList[index]) && selectedChart.index == index)
         {

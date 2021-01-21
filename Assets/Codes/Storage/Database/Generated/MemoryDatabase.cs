@@ -12,12 +12,15 @@ namespace BanGround.Database.Generated
 {
    public sealed class MemoryDatabase : MemoryDatabaseBase
    {
+        public ChartSetTable ChartSetTable { get; private set; }
         public RankItemTable RankItemTable { get; private set; }
 
         public MemoryDatabase(
+            ChartSetTable ChartSetTable,
             RankItemTable RankItemTable
         )
         {
+            this.ChartSetTable = ChartSetTable;
             this.RankItemTable = RankItemTable;
         }
 
@@ -28,6 +31,7 @@ namespace BanGround.Database.Generated
 
         protected override void Init(Dictionary<string, (int offset, int count)> header, System.ReadOnlyMemory<byte> databaseBinary, MessagePack.MessagePackSerializerOptions options)
         {
+            this.ChartSetTable = ExtractTableData<ChartSet, ChartSetTable>(header, databaseBinary, options, xs => new ChartSetTable(xs));
             this.RankItemTable = ExtractTableData<RankItem, RankItemTable>(header, databaseBinary, options, xs => new RankItemTable(xs));
         }
 
@@ -39,6 +43,7 @@ namespace BanGround.Database.Generated
         public DatabaseBuilder ToDatabaseBuilder()
         {
             var builder = new DatabaseBuilder();
+            builder.Append(this.ChartSetTable.GetRawDataUnsafe());
             builder.Append(this.RankItemTable.GetRawDataUnsafe());
             return builder;
         }
@@ -46,6 +51,7 @@ namespace BanGround.Database.Generated
         public DatabaseBuilder ToDatabaseBuilder(MessagePack.IFormatterResolver resolver)
         {
             var builder = new DatabaseBuilder(resolver);
+            builder.Append(this.ChartSetTable.GetRawDataUnsafe());
             builder.Append(this.RankItemTable.GetRawDataUnsafe());
             return builder;
         }
@@ -55,9 +61,12 @@ namespace BanGround.Database.Generated
             var result = new ValidateResult();
             var database = new ValidationDatabase(new object[]
             {
+                ChartSetTable,
                 RankItemTable,
             });
 
+            ((ITableUniqueValidate)ChartSetTable).ValidateUnique(result);
+            ValidateTable(ChartSetTable.All, database, "Sid", ChartSetTable.PrimaryKeySelector, result);
             ((ITableUniqueValidate)RankItemTable).ValidateUnique(result);
             ValidateTable(RankItemTable.All, database, "Id", RankItemTable.PrimaryKeySelector, result);
 
@@ -70,6 +79,8 @@ namespace BanGround.Database.Generated
         {
             switch (tableName)
             {
+                case "chart":
+                    return db.ChartSetTable;
                 case "rank":
                     return db.RankItemTable;
                 
@@ -83,6 +94,7 @@ namespace BanGround.Database.Generated
             if (metaTable != null) return metaTable;
 
             var dict = new Dictionary<string, MasterMemory.Meta.MetaTable>();
+            dict.Add("chart", BanGround.Database.Generated.Tables.ChartSetTable.CreateMetaTable());
             dict.Add("rank", BanGround.Database.Generated.Tables.RankItemTable.CreateMetaTable());
 
             metaTable = new MasterMemory.Meta.MetaDatabase(dict);

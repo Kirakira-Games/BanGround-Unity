@@ -41,6 +41,8 @@ class LatencyOffsetGuide : MonoBehaviour
 
     [Inject]
     IAudioManager audioManager;
+    [Inject]
+    SelectManager selectManager;
 
     Stopwatch watch = new Stopwatch();
 
@@ -69,7 +71,7 @@ class LatencyOffsetGuide : MonoBehaviour
         bgm = await audioManager.PrecacheSE(bgmSound.bytes);
 #endif
 
-        SelectManager_old.instance.previewSound?.Pause();
+        selectManager.previewSound?.Pause();
 
         OnReset();
     }
@@ -102,7 +104,7 @@ class LatencyOffsetGuide : MonoBehaviour
     {
         okButton.onClick.RemoveAllListeners();
         okButton.onClick.AddListener(OnStart);
-        okText.text = "offset.start.btn.text";
+        okText.text = "Select.Offset.Start".L();
         avgOffset.text = "";
 
         resetButton.interactable = false;
@@ -121,7 +123,7 @@ class LatencyOffsetGuide : MonoBehaviour
     public void OnClose()
     {
         gameObject.SetActive(false);
-        SelectManager_old.instance.previewSound?.Play();
+        selectManager.previewSound?.Play();
 
 #if USE_SE
         kick.Dispose();
@@ -161,7 +163,7 @@ class LatencyOffsetGuide : MonoBehaviour
 
         okButton.onClick.RemoveAllListeners();
         okButton.onClick.AddListener(OnOK);
-        okText.text = "offset.ok.btn.text";
+        okText.text = "Select.Offset.Fine".L();
     }
 
     public async Task PlayDrumSound()

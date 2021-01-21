@@ -53,8 +53,7 @@ public class ChartVersion : IChartVersion
             {
                 return null;
             }
-            if (!await messageBox.ShowMessage("Unsupported chart",
-                "This chart uses an unsupported standard.\nConvert? (animations and speed information will be lost)"))
+            if (!await messageBox.ShowMessage("ChartVersion.Title.ConvertUnsupported".L(), "ChartVersion.Prompt.ConvertUnsupported".L()))
             {
                 return null;
             }
@@ -62,8 +61,7 @@ public class ChartVersion : IChartVersion
         }
         else if (CanConvert(chart.version))
         {
-            if (!await messageBox.ShowMessage("Outdated chart",
-                "This chart uses a deprecated standard.\nBut you can still play it without conversion.\nConvert? (animations and speed information will be lost)"))
+            if (!await messageBox.ShowMessage("ChartVersion.Title.ConvertOutdated".L(), "ChartVersion.Prompt.ConvertOutdated".L()))
             {
                 return dataLoader.LoadChart<V2.Chart>(header.sid, difficulty);
             }

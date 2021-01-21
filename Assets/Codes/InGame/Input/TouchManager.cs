@@ -370,7 +370,7 @@ public class TouchManager : MonoBehaviour
         Debug.Log("Flick dist pixels = " + KirakiraTouch.flickDistPixels);
 
         parameters = SceneLoader.GetParamsOrDefault<InGameParams>();
-        if (parameters.saveRecord)
+        if (parameters.ShouldSaveReplay)
         {
             recorder = new DemoRecorder(
                 parameters.sid,

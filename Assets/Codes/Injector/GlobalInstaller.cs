@@ -2,10 +2,9 @@ using AudioProvider;
 using BanGround;
 using BanGround.Community;
 using BanGround.Database;
+using BanGround.Database.Migrations;
 using BanGround.Identity;
 using BanGround.Web;
-using BGEditor;
-using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEngine;
@@ -35,7 +34,7 @@ public class GlobalInstaller : MonoInstaller
         SceneLoader.Init();
 
         // Filesystem
-        Container.Bind<IFileSystem>().To<KiraFilesystem>().AsSingle().OnInstantiated((_, obj) =>
+        Container.Bind<IFileSystem>().To<LocalFilesystem>().AsSingle().OnInstantiated((_, obj) =>
         {
             if (obj is ValidationMarker) return;
             fs = obj as IFileSystem;
@@ -100,6 +99,9 @@ public class GlobalInstaller : MonoInstaller
 
         // Kira Web Request
         Container.Bind<IKiraWebRequest>().To<KiraWebRequest>().AsSingle().NonLazy();
+
+        // Version Check
+        Container.Bind<VersionCheck>().AsSingle().NonLazy();
 
         // FPS Counter
         Container.Bind<IFPSCounter>().FromInstance(fpsCounter);
@@ -181,7 +183,7 @@ public class GlobalInstaller : MonoInstaller
 
             KVar.C("cl_language", "-1", KVarFlags.Archive),
 
-            KVar.C("cl_modflag", "0", KVarFlags.StringOnly, "A binary string storing ModFlag. At most 64 bits."),
+            KVar.C("cl_modflag", "0", KVarFlags.StringOnly, "A hex string storing ModFlag. At most 64 bits."),
         };
 
         foreach (var info in varInfos)
@@ -199,6 +201,7 @@ public class GlobalInstaller : MonoInstaller
 
                 dataLoader.MoveChart(chartA, targetChart);
             }),
+            /*
             Kommand.C("fs_test", "Test Filesystem", _ =>
             {
                 const string testPath = "D:\\lol.zip";
@@ -218,6 +221,7 @@ public class GlobalInstaller : MonoInstaller
 
                 fs.RemoveSearchPath(testPath);
             }),
+            */
             Kommand.C("savecfg", "Save configs", _ => kvSystem.SaveConfig()),
             Kommand.C("exec", "Execute a config file", (string[] args) =>
             {
@@ -338,7 +342,7 @@ public class GlobalInstaller : MonoInstaller
         if (++fsUpdateFrameCounter > 3600)
         {
             fsUpdateFrameCounter = 0;
-            fs.OnUpdate();
+            //fs.OnUpdate();
         }
     }
 

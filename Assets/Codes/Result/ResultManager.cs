@@ -29,8 +29,8 @@ public class ResultManager : MonoBehaviour
     [Inject]
     private IDatabaseAPI db;
 
-    [Inject(Id = "fs_iconpath")]
-    private KVar fs_iconpath;
+    [Inject(Id = "g_saveReplay")]
+    private KVar g_saveReplay;
 
     private Button button_back;
     private Button button_retry;
@@ -213,8 +213,6 @@ public class ResultManager : MonoBehaviour
     private void SetBtnObject()
     {
         var gameParams = SceneLoader.GetParamsOrDefault<ResultParams>().ToInGameParams();
-        gameParams.saveReplay = false;
-        gameParams.saveRecord = false;
 
         button_back = GameObject.Find("Button_back").GetComponent<Button>();
         button_retry = GameObject.Find("Button_retry").GetComponent<Button>();
@@ -233,7 +231,8 @@ public class ResultManager : MonoBehaviour
         button_retry.onClick.AddListener(() =>
         {
             //anim.SetBool("FadeToBlack", true);
-            //StartCoroutine("DelayLoadScene","InGame" ); 
+            //StartCoroutine("DelayLoadScene","InGame" );
+            gameParams.replayPath = null;
             StartCoroutine(BgmFadeOut());
             RemoveListener();
             SceneLoader.LoadScene("InGame", pushStack: false, parameters: gameParams);
@@ -241,7 +240,7 @@ public class ResultManager : MonoBehaviour
 
         button_replay.onClick.AddListener(() =>
         {
-            if (parameters.saveReplay)
+            if (parameters.ShouldSaveReplay)
                 gameParams.replayPath = "replay/" + ComboManager.recoder.demoName;
             if (string.IsNullOrEmpty(gameParams.replayPath))
                 return;
@@ -350,7 +349,7 @@ public class ResultManager : MonoBehaviour
         playResult.ChartHash = JsonConvert.SerializeObject(chartLoader.GetChartHash(cheader.mid, cheader.sid, parameters.difficulty));
         playResult.Mods = (ulong)parameters.mods;
 
-        if (parameters.saveReplay)
+        if (parameters.ShouldSaveReplay)
         {
             playResult.ReplayFile = "replay/" + ComboManager.recoder.demoName;
         }
@@ -358,7 +357,7 @@ public class ResultManager : MonoBehaviour
         var oldBest = db.GetBestRank(cheader.sid, parameters.difficulty);
         lastScore = oldBest?.Score ?? 0;
 
-        if (!parameters.mods.HasFlag(ModFlag.AutoPlay) && parameters.saveRecord)
+        if (parameters.ShouldSaveRecord)
         {
             db.SaveRankItem(playResult);
             print("Record saved");

@@ -14,7 +14,7 @@ namespace BanGround.Community
         Downloading,
         Finished
     }
-    public interface IDownloadTask
+    public interface IDownloadTask : ITaskWithProgress
     {
         /// <summary>
         /// Image of the task. Nullable.
@@ -32,11 +32,6 @@ namespace BanGround.Community
         /// </summary>
         string Name { get; }
         IDownloadTask SetName(string name);
-
-        /// <summary>
-        /// Progress (between 0 and 1)
-        /// </summary>
-        float Progress { get; }
 
         /// <summary>
         /// Description for displaying to impatient user

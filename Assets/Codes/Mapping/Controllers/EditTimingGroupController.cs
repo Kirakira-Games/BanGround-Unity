@@ -26,10 +26,10 @@ namespace BGEditor
         {
             if (Core.chart.groups.Count <= 1)
             {
-                messageBannerController.ShowMsg(LogLevel.INFO, "You cannot remove the last timing group.");
+                messageBannerController.ShowMsg(LogLevel.INFO, "Editor.CantRemoveLastTimingGroup".L());
                 return;
             }
-            if (!await messageBox.ShowMessage("Remove Timing Group", "Confirm: Current timing group, notes, and speed information will be lost."))
+            if (!await messageBox.ShowMessage("Editor.Title.RemoveTimingGroup".L(), "Editor.Prompt.RemoveTimingConfirm".L()))
             {
                 return;
             }

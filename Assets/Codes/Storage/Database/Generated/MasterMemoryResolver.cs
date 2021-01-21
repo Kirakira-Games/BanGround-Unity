@@ -45,9 +45,10 @@ namespace BanGround.Database.Generated
 
         static MasterMemoryResolverGetFormatterHelper()
         {
-            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(1)
+            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(2)
             {
-                {typeof(RankItem[]), 0 },
+                {typeof(ChartSet[]), 0 },
+                {typeof(RankItem[]), 1 },
             };
         }
 
@@ -58,7 +59,8 @@ namespace BanGround.Database.Generated
 
             switch (key)
             {
-                case 0: return new MessagePack.Formatters.ArrayFormatter<RankItem>();
+                case 0: return new MessagePack.Formatters.ArrayFormatter<ChartSet>();
+                case 1: return new MessagePack.Formatters.ArrayFormatter<RankItem>();
                 default: return null;
             }
         }

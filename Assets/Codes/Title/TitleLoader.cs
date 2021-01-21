@@ -8,6 +8,8 @@ using BanGround;
 using System.Linq;
 using BanGround.Identity;
 using System;
+using BanGround.Database.Migrations;
+using System.Collections.Generic;
 
 public class TitleLoader : MonoBehaviour
 {
@@ -16,11 +18,17 @@ public class TitleLoader : MonoBehaviour
     [Inject]
     private IMessageBannerController messageBannerController;
     [Inject]
+    private ILoadingBlocker loadingBlocker;
+    [Inject]
     private IFileSystem fs;
     [Inject]
     private IAccountManager accountManager;
     [Inject]
-    LocalizedStrings localizedStrings;
+    private IMigrationManager migrationManager;
+    [Inject]
+    private LocalizedStrings localizedStrings;
+    [Inject]
+    private VersionCheck versionCheck;
 
     [Inject(Id = "cl_language")]
     KVar cl_language;
@@ -36,8 +44,6 @@ public class TitleLoader : MonoBehaviour
     public InputField usernameField;
     public InputField passwordField;
 
-    public static TitleLoader instance;
-
     public ISoundTrack music;
     private ISoundEffect banGround;
 
@@ -46,14 +52,13 @@ public class TitleLoader : MonoBehaviour
     [Inject]
     private void Inject()
     {
-        instance = this;
         CheckUpdate();
 
-        var backgrounds = fs.Find(file => file.Name.EndsWith(".jpg") || file.Name.EndsWith(".png") || file.Name.EndsWith(".jpeg"));
+        var backgrounds = fs.Find(file => file.Name.EndsWith(".jpg") || file.Name.EndsWith(".png") || file.Name.EndsWith(".jpeg")).ToArray();
 
-        if (backgrounds.Count() != 0)
+        if (backgrounds.Length != 0)
         {
-            var tex = backgrounds.ElementAt(UnityEngine.Random.Range(0, backgrounds.Count())).ReadAsTexture();
+            var tex = backgrounds[UnityEngine.Random.Range(0, backgrounds.Count())].ReadAsTexture();
 
             var matCopy = Instantiate(backgroundMat);
 
@@ -64,10 +69,28 @@ public class TitleLoader : MonoBehaviour
         }
     }
 
+    private async UniTask RunMigrations()
+    {
+        if (!migrationManager.Init())
+            return;
+
+        var task = migrationManager.Migrate();
+        loadingBlocker.Show("Migration.Prompt.Prepare".L());
+        loadingBlocker.SetProgress(migrationManager);
+        while (task.Status == UniTaskStatus.Pending)
+        {
+            loadingBlocker.SetText("Migration.Prompt.Progress".L(migrationManager.Description, migrationManager.CurrentMigrationIndex, migrationManager.TotalMigrations), true);
+            await UniTask.WaitForEndOfFrame();
+        }
+        loadingBlocker.Close();
+    }
+
     private async void Start()
     {
         userCanvas.GetUserInfo().Forget();
         PlayTitle().Forget();
+
+        await RunMigrations();
 
         await UniTask.Delay(500);
 
@@ -85,31 +108,58 @@ public class TitleLoader : MonoBehaviour
         banGround.PlayOneShot();
     }
 
+    static int[] ParseVersion(string v)
+    {
+        var v1 = v.Split('.');
+        var result = new List<int>();
+
+        foreach (var n in v1)
+            result.Add(int.Parse(n));
+
+        return result.ToArray();
+    }
+
+    static int CompareVersion(string a, string b)
+    {
+        var a1 = ParseVersion(a);
+        var b1 = ParseVersion(b);
+
+        for(int i = 0; i < 3; i++)
+        {
+            if (a1[i] > b1[i])
+                return 1;
+            else if (a1[i] < b1[i])
+                return -1;
+        }
+
+        return 0;
+    }
+
     async void CheckUpdate()
     {
         //MessageBoxController.ShowMsg(LogLevel.INFO, VersionCheck.CheckUpdate);
         TouchEvent te = GameObject.Find("TouchStart").GetComponent<TouchEvent>();
-        var check = VersionCheck.Instance;
-        await check.GetVersionInfo();
+        var check = versionCheck;
+        var data = await check.GetVersionInfo();
 
-        if (check == null || check.response == null || check.response.result == false) 
+        if (data == null) 
         {
             //网络错误
             messageBannerController.ShowMsg(LogLevel.ERROR, VersionCheck.CheckError, false);
             te.waitingUpdate = false; // 椰叶先别强制更新罢
         }
-        else if (Application.version != check.response.data.version)
+        else if (CompareVersion(Application.version, data.version) < 0)
         {
             //有更新
-            if (check.response.data.force)
+            if (data.force)
             {
-                string result = string.Format(VersionCheck.UpdateForce, check.response.data.version);
+                string result = string.Format(VersionCheck.UpdateForce, data.version);
                 //强制更新
                 messageBannerController.ShowMsg(LogLevel.ERROR, result, false);
             }
             else
             {
-                string result = string.Format(VersionCheck.UpdateNotForce, check.response.data.version);
+                string result = string.Format(VersionCheck.UpdateNotForce, data.version);
                 //不强制更新
                 messageBannerController.ShowMsg(LogLevel.OK, result, true);
                 te.waitingUpdate = false;

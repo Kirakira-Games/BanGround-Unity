@@ -213,9 +213,19 @@ namespace BanGround.Scripting.Lunar
             onBeat?.Call(beat);
         }
 
-        public void OnJudge(JudgeResult result)
+        public void OnJudge(NoteBase notebase, JudgeResult result)
         {
-            onJudge?.Call(result);
+            var table = luaEnv.NewTable();
+
+            table.SetInPath("Lane", notebase.lane);
+            table.SetInPath("Type", (int)notebase.type);
+            table.SetInPath("Time", notebase.time);
+            table.SetInPath("Beat", chartLoader.chart.TimeToBeat(notebase.time));
+            table.SetInPath("JudgeResult", result);
+            table.SetInPath("JudgeTime", notebase.judgeTime);
+            table.SetInPath("JudgeOffset", notebase.time - notebase.judgeTime);
+
+            onJudge?.Call(table);
         }
 
         public void OnUpdate(int audioTime)
