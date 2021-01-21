@@ -192,7 +192,7 @@ namespace BGEditor
                 multinote.Put(note);
             else if (!multinote.TryPut(note))
             {
-                messageBannerController.ShowMsg(LogLevel.INFO, "Cannot put multiple notes at the same position.");
+                messageBannerController.ShowMsg(LogLevel.INFO, "Editor.NoteAtSamePosition".L());
                 return false;
             }
 
@@ -324,7 +324,7 @@ namespace BGEditor
             if (!string.IsNullOrEmpty(scriptEditor.Code))
                 dataLoader.SaveChartScript(scriptEditor.Code, chartLoader.header.sid, parameters.difficulty);
 
-            messageBannerController.ShowMsg(LogLevel.OK, "Chart saved.");
+            messageBannerController.ShowMsg(LogLevel.OK, "Editor.ChartSaved".L());
         }
 
         public async void Play()
@@ -332,10 +332,10 @@ namespace BGEditor
             if (Blocker.gameObject.activeSelf || messageBox.isActive)
                 return;
             progress.Pause();
-            int ret = await messageBox.ShowMessage("Play", "Your chart will be saved before test play.\nContinue?", new string[] {
-                "Cancel",
-                "Play from start",
-                "Play from here"
+            int ret = await messageBox.ShowMessage("Editor.Title.PlayTest".L(), "Editor.Prompt.PlayTest".L(), new string[] {
+                "Cancel".L(),
+                "Editor.PlayOption.FromStart".L(),
+                "Editor.PlayOption.FromHere".L()
             });
             if (ret == 0)
                 return;
@@ -361,7 +361,7 @@ namespace BGEditor
             if (Blocker.gameObject.activeSelf || messageBox.isActive)
                 return;
             progress.Pause();
-            if (await messageBox.ShowMessage("Exit", "Save before exit?"))
+            if (await messageBox.ShowMessage("Editor.Title.Exit".L(), "Editor.Prompt.Exit".L()))
                 Save();
             SceneLoader.Back(null);
         }

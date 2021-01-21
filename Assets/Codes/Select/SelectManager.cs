@@ -108,7 +108,7 @@ public class SelectManager : MonoBehaviour
 
         delete_Button.onClick.AddListener(async () =>
         {
-            if (await messageBox.ShowMessage("Select.Delete.Title", "Select.Delete.Content"))
+            if (await messageBox.ShowMessage("Select.Title.Delete", "Select.Prompt.Delete"))
             {
                 OnDelete();
             }
@@ -280,7 +280,7 @@ public class SelectManager : MonoBehaviour
         Difficulty difficulty = chartListManager.current.difficulty;
         if (header.sid == OffsetGuide.OFFSET_GUIDE_SID)
         {
-            messageBannerController.ShowMsg(LogLevel.INFO, "Nooooooooooooooo");
+            messageBannerController.ShowMsg(LogLevel.INFO, "Select.DeleteOffsetGuideTip".L());
             return;
         }
 

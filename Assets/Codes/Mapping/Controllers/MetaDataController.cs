@@ -130,7 +130,7 @@ namespace BGEditor
         {
             if (save)
             {
-                if (!await messageBox.ShowMessage("Save Metadata", "To overwrite metadata, your chart will be saved. Continue?"))
+                if (!await messageBox.ShowMessage("Editor.Title.SaveMetaData".L(), "Editor.Prompt.SaveMetaDataInfo".L()))
                     return;
                 Save();
             }

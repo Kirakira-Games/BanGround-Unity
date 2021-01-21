@@ -17,7 +17,7 @@ public class MessageBannerController : MonoBehaviour, IMessageBannerController
     private Sprite[] msgSprite;
     private Button msgBtn;
     private Image msgImg;
-    private LocalizedText msgText;
+    private Text msgText;
     private Animator animator;
 
     //Resize
@@ -37,7 +37,7 @@ public class MessageBannerController : MonoBehaviour, IMessageBannerController
         animator = GetComponent<Animator>();
         msgBtn = GetComponent<Button>();
         msgImg = GetComponent<Image>();
-        msgText = GetComponentInChildren<LocalizedText>();
+        msgText = GetComponentInChildren<Text>();
         layout = GetComponent<LayoutElement>();
 
         msgBtn.onClick.AddListener(() =>
@@ -81,7 +81,6 @@ public class MessageBannerController : MonoBehaviour, IMessageBannerController
         //Set content
         msgImg.sprite = msgSprite[level];
         msgText.text = item.content;
-        msgText.Localizify(item.content);
 
         //Show Box
         animator.Play("MsgIn");

@@ -336,7 +336,7 @@ namespace BGEditor
                         if (Point.beat[0] >= 0)
                             Core.Commit(new RemoveTimingPointCmd(Point));
                         else
-                            messageBannerController.ShowMsg(LogLevel.INFO, "Cannot remove the very first timing point.");
+                            messageBannerController.ShowMsg(LogLevel.INFO, "Editor.CantRemoveFirstTimingPoint".L());
                     }
                     return;
                 }

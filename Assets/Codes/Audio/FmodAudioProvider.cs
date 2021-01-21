@@ -20,7 +20,7 @@ namespace AudioProvider
                 if (messageBannerController == null)
                     UnityEngine.Debug.LogError($"FMOD Error! Result code: {result}");
                 else
-                    messageBannerController.ShowMsg(LogLevel.ERROR, result.ToString(), false);
+                    messageBannerController.ShowMsg(LogLevel.ERROR, "Exception.Audio.FMODError".L(result), false);
             }
         }
     }

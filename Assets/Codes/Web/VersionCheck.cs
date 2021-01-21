@@ -1,43 +1,43 @@
 ﻿using UnityEngine;
+using BanGround.Web;
 using Cysharp.Threading.Tasks;
+using Zenject;
 
 public class VersionCheck
 {
-    public const string CheckUpdate = "正在检查更新";
-    public const string CheckError = "获取更新信息失败，你最好联网获取信息后再进行游戏。";
-    public const string UpdateForce = "获取到有新的版本：{0}，你需要更新到最新版才能进行游戏";
-    public const string UpdateNotForce = "建议更新到最新版{0}";
-    public const string NoUpdate = "当前客户端已经是最新版了";
-
-    public VersionResponse response;
-    public static VersionCheck Instance = new VersionCheck
-    {
-        response = new VersionResponse
-        {
-            result = true,
-            data = new VersionData
-            {
-                version = Application.version
-            }
-        }
-    };
+    [Inject]
+    IKiraWebRequest kiraWebRequest;
+    
+    public static string CheckUpdate => "VersionCheck.CheckingUpdate".L();
+    public static string CheckError => "VersionCheck.ErrorGettingInfo".L();
+    public static string UpdateForce => "VersionCheck.HasNewForceUpdate".L();
+    public static string UpdateNotForce => "VersionCheck.HasNewUpdate".L();
+    public static string NoUpdate => "VersionCheck.UpToDate".L();
 
     private const string Prefix = "https://api.reikohaku.fun/api";
     private readonly string API = "/version/check?version=" + Application.version;
 
-    public async UniTask<VersionResponse> GetVersionInfo()
+    // TODO：鲨了就行
+    public async UniTask<VersionData> GetVersionInfo()
     {
         string FullAPI = Prefix + API;
-        var req = new KirakiraWebRequest<VersionResponse>();
-        return await req.Get(FullAPI);
+
+        try
+        {
+            var req = kiraWebRequest.New<VersionData>()
+                    .SetTimeout(2000)
+                    .SetIsFullAddress(true)
+                    .Get(FullAPI);
+
+            return await req.Fetch();
+        }
+        catch
+        {
+            return null;
+        }
     }
 }
 
-public class VersionResponse
-{
-    public bool result;
-    public VersionData data;
-}
 public class VersionData
 {
     public int id;

@@ -13,6 +13,8 @@ public class TouchEvent : MonoBehaviour
     private IAccountManager accountManager;
     [Inject]
     private IMessageBannerController messageBanner;
+    [Inject]
+    private TitleLoader titleLoader;
 
     public bool waitingUpdate = true;
     public bool authing = false;
@@ -80,7 +82,7 @@ public class TouchEvent : MonoBehaviour
     {
         for (float a = 0.7f; a > 0; a -= 0.1f)
         {
-            TitleLoader.instance.music.SetVolume(a);
+            titleLoader.music.SetVolume(a);
             yield return new WaitForSeconds(0.1f);
         }
     }

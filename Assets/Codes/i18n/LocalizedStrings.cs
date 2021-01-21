@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using BanGround;
 using Newtonsoft.Json;
@@ -12,9 +13,14 @@ public class LocalizedStrings : MonoBehaviour
 
     public TextAsset[] languageFiles = new TextAsset[24];
     private Dictionary<string, string> dictionary = null;
+    private Dictionary<string, string> fallbackDictionary = null;
 
     [Inject(Id = "cl_language")]
     KVar cl_language;
+
+    private const int fallbackLanguage = 0;
+
+    internal static LocalizedStrings instance;
 
     [Inject]
     public void Inject()
@@ -43,6 +49,7 @@ public class LocalizedStrings : MonoBehaviour
         }
 
         ReloadLanguageFile(cl_language);
+        instance = this;
     }
 
     public string GetLocalizedString(string str)
@@ -57,14 +64,57 @@ public class LocalizedStrings : MonoBehaviour
 
         Debug.LogWarning($"Missing localized entry: {str}");
 
-        var file = fs.GetOrNewFile("missing_localized_entrys.csv");
-        file.WriteBytes(Encoding.UTF8.GetBytes(file.ReadAsString() + "\n" + str));
+        if (fallbackDictionary == null)
+        {
+            Debug.LogError("[LocalizedStrings] Fallback Dictionary not initialized yet!");
+            return str;
+        }
+
+        if (fallbackDictionary.ContainsKey(str))
+            return fallbackDictionary[str];
+
+        Debug.LogWarning($"Missing localized entry in fallback language (english): {str}");
 
         return str;
     }
 
     public void ReloadLanguageFile(int language)
     {
-        dictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(languageFiles[(int)language].text);
+        dictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(languageFiles[language].text);
+        fallbackDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(languageFiles[fallbackLanguage].text);
+    }
+}
+
+public static class StringExt
+{
+    /// <summary>
+    /// Convert this string to Localized string
+    /// </summary>
+    /// <param name="str">reference string</param>
+    /// <returns>Localized string</returns>
+    public static string L(this string str)
+    {
+        return LocalizedStrings.instance.GetLocalizedString(str);
+    }
+
+    /// <summary>
+    /// Convert this string to Localized string and format it
+    /// </summary>
+    /// <param name="str">reference format string</param>
+    /// <param name="args">objects to format</param>
+    /// <returns></returns>
+    public static string L(this string str, params object[] args)
+    {
+        string localized = str.L();
+
+        try
+        {
+            return string.Format(localized, args);
+        }
+        catch(Exception ex)
+        {
+            Debug.LogWarning($"{str} is a formatted string, but there's issue with it. Exception: {ex.Message}");
+            return localized;
+        }
     }
 }

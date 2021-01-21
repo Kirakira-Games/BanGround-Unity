@@ -147,7 +147,7 @@ public class NoteController : MonoBehaviour, INoteController
         JudgeResultController.instance.DisplayJudgeOffset(notebase, (int)result);
 
         if(chartScript.HasOnJudge)
-            chartScript.OnJudge(result);
+            chartScript.OnJudge(notebase, result);
     }
 
     private void UpdateLane(JudgeQueue Q)

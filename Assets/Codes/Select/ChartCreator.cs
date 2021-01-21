@@ -128,7 +128,7 @@ public class ChartCreator : MonoBehaviour
         int difficulty = SelectedDifficulty();
         if (difficulty == -1)
         {
-            messageBannerController.ShowMsg(LogLevel.INFO, "Please select a difficulty.");
+            messageBannerController.ShowMsg(LogLevel.INFO, "CreateChart.DiffNotSelected".L());
             return;
         }
         // Create header
@@ -152,12 +152,12 @@ public class ChartCreator : MonoBehaviour
         int difficulty = SelectedDifficulty();
         if (difficulty == -1)
         {
-            messageBannerController.ShowMsg(LogLevel.INFO, "Please select a difficulty.");
+            messageBannerController.ShowMsg(LogLevel.INFO, "CreateChart.DiffNotSelected".L());
             return;
         }
         if (cHeader.difficultyLevel[difficulty] != -1)
         {
-            messageBannerController.ShowMsg(LogLevel.INFO, "This difficulty already exists.");
+            messageBannerController.ShowMsg(LogLevel.INFO, "CreateChart.DiffExists".L());
             return;
         }
         // Create chart
@@ -180,7 +180,7 @@ public class ChartCreator : MonoBehaviour
         int difficulty = SelectedDifficulty();
         if (difficulty == -1)
         {
-            messageBannerController.ShowMsg(LogLevel.INFO, "Please select a difficulty.");
+            messageBannerController.ShowMsg(LogLevel.INFO, "CreateChart.DiffNotSelected".L());
             return;
         }
 
@@ -189,7 +189,7 @@ public class ChartCreator : MonoBehaviour
 
         var task = WaitForAirdrop(tokenSource.Token);
 
-        loadingBlocker.Show("Waiting for airdrop (ogg/mp3)...", tokenSource.Cancel);
+        loadingBlocker.Show("CreateChart.WaitForAudio".L(), tokenSource.Cancel);
 
         await task;
 
@@ -207,7 +207,7 @@ public class ChartCreator : MonoBehaviour
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
             var sfd = await new SelectFileDialog()
                 .SetFilter("Audio File\0*.ogg;*.mp3;*.aac\0")
-                .SetTitle("Select Audio file")
+                .SetTitle("CreateChart.SelectAudioFile".L())
                 .SetDefaultExt("ogg")
                 .ShowAsync();
 
@@ -254,9 +254,9 @@ public class ChartCreator : MonoBehaviour
             file = AirdroppedFile;
 #endif
 
-            var title = "New Song";
-            var artist = "Unknown Artist";
-            var len = -1.0f;
+            string title = null;
+            string artist = null;
+            float len = -1.0f;
 
             TagLib.File tagFile = null;
 
@@ -266,8 +266,7 @@ public class ChartCreator : MonoBehaviour
             }
             catch (UnsupportedFormatException)
             {
-                messageBannerController.ShowMsg(LogLevel.ERROR, "Unsupported file format!");
-                //throw new InvalidDataException("Unsupported file format!");
+                messageBannerController.ShowMsg(LogLevel.ERROR, "CreateChart.UnsupportedAudioFormat".L());
                 return;
             }
 
@@ -349,7 +348,7 @@ public class ChartCreator : MonoBehaviour
 
             using (ITranscoder transcoder = new BassTranscoder(audioProvider) { Source = file })
             {
-                loadingBlocker.SetText("Converting audio file...", true);
+                loadingBlocker.SetText("CreateChart.ConvertingAudio".L(), true);
                 loadingBlocker.SetProgress(transcoder);
                 transcoded = await transcoder.DoAsync();
             }
@@ -381,7 +380,7 @@ public class ChartCreator : MonoBehaviour
         }
         catch (System.OperationCanceledException)
         {
-            messageBannerController.ShowMsg(LogLevel.INFO, "Canceled");
+            messageBannerController.ShowMsg(LogLevel.INFO, "Canceled".L());
 
             RequestAirdrop = false;
             AirdroppedFile = null;
@@ -391,6 +390,6 @@ public class ChartCreator : MonoBehaviour
 
     public void 还没做好()
     {
-        messageBannerController.ShowMsg(LogLevel.INFO, "Coming soon!");
+        messageBannerController.ShowMsg(LogLevel.INFO, "Findstr.NotDoneYet".L());
     }
 }

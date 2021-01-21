@@ -84,7 +84,7 @@ public class FancyBackground : MonoBehaviour
 
             Texture2D GetCachedBackground(string path)
             {
-                if (path == null)
+                if (string.IsNullOrEmpty(path))
                     return defaultTexture;
 
                 if (!_cachedBackgrounds.ContainsKey(path))

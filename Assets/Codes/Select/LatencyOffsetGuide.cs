@@ -104,7 +104,7 @@ class LatencyOffsetGuide : MonoBehaviour
     {
         okButton.onClick.RemoveAllListeners();
         okButton.onClick.AddListener(OnStart);
-        okText.text = "offset.start.btn.text";
+        okText.text = "Select.Offset.Start".L();
         avgOffset.text = "";
 
         resetButton.interactable = false;
@@ -163,7 +163,7 @@ class LatencyOffsetGuide : MonoBehaviour
 
         okButton.onClick.RemoveAllListeners();
         okButton.onClick.AddListener(OnOK);
-        okText.text = "offset.ok.btn.text";
+        okText.text = "Select.Offset.Fine".L();
     }
 
     public async Task PlayDrumSound()
