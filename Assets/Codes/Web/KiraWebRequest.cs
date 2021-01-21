@@ -145,8 +145,17 @@ namespace BanGround.Web
                 if (!webRequest.downloadHandler.text.IsNullOrEmpty())
                 {
                     Debug.Log("[KWR] Response: " + webRequest.downloadHandler.text);
-                    var result = JsonConvert.DeserializeObject<Result<Resp>>(webRequest.downloadHandler.text);
-                    if (result.status == false && result.error != null)
+                    var text = webRequest.downloadHandler.text;
+
+                    // !! hack hack !! TODO: remove this in future
+                    if(!text.Contains("\"status\""))
+                    {
+                        text = text.Substring(0, text.Length - 1);
+                        text += ",\"status\":true,\"error\":\"\"}";
+                    }
+
+                    var result = JsonConvert.DeserializeObject<Result<Resp>>(text);
+                    if (result.status == false)
                         throw new KiraWebException(webRequest.responseCode, new KiraErrorMessage(result.error));
                     return result.data;
                 }

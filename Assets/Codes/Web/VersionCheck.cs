@@ -14,32 +14,17 @@ public class VersionCheck
     public static string UpdateNotForce => "VersionCheck.HasNewUpdate".L();
     public static string NoUpdate => "VersionCheck.UpToDate".L();
 
-    public VersionResponse response;
-    
-    [Inject]
-    public void Inject()
-    {
-        response = new VersionResponse
-        {
-            result = true,
-            data = new VersionData
-            {
-                version = Application.version
-            }
-        };
-    }
-
     private const string Prefix = "https://api.reikohaku.fun/api";
     private readonly string API = "/version/check?version=" + Application.version;
 
     // TODO：鲨了就行
-    public async UniTask<VersionResponse> GetVersionInfo()
+    public async UniTask<VersionData> GetVersionInfo()
     {
         string FullAPI = Prefix + API;
 
         try
         {
-            var req = kiraWebRequest.New<VersionResponse>()
+            var req = kiraWebRequest.New<VersionData>()
                     .SetTimeout(2000)
                     .SetIsFullAddress(true)
                     .Get(FullAPI);
@@ -53,11 +38,6 @@ public class VersionCheck
     }
 }
 
-public class VersionResponse
-{
-    public bool result;
-    public VersionData data;
-}
 public class VersionData
 {
     public int id;

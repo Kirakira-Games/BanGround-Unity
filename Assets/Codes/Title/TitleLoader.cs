@@ -9,6 +9,7 @@ using System.Linq;
 using BanGround.Identity;
 using System;
 using BanGround.Database.Migrations;
+using System.Collections.Generic;
 
 public class TitleLoader : MonoBehaviour
 {
@@ -107,31 +108,58 @@ public class TitleLoader : MonoBehaviour
         banGround.PlayOneShot();
     }
 
+    static int[] ParseVersion(string v)
+    {
+        var v1 = v.Split('.');
+        var result = new List<int>();
+
+        foreach (var n in v1)
+            result.Add(int.Parse(n));
+
+        return result.ToArray();
+    }
+
+    static int CompareVersion(string a, string b)
+    {
+        var a1 = ParseVersion(a);
+        var b1 = ParseVersion(b);
+
+        for(int i = 0; i < 3; i++)
+        {
+            if (a1[i] > b1[i])
+                return 1;
+            else if (a1[i] < b1[i])
+                return -1;
+        }
+
+        return 0;
+    }
+
     async void CheckUpdate()
     {
         //MessageBoxController.ShowMsg(LogLevel.INFO, VersionCheck.CheckUpdate);
         TouchEvent te = GameObject.Find("TouchStart").GetComponent<TouchEvent>();
         var check = versionCheck;
-        var response = await check.GetVersionInfo();
+        var data = await check.GetVersionInfo();
 
-        if (response == null || response.result == false) 
+        if (data == null) 
         {
             //网络错误
             messageBannerController.ShowMsg(LogLevel.ERROR, VersionCheck.CheckError, false);
             te.waitingUpdate = false; // 椰叶先别强制更新罢
         }
-        else if (Application.version != response.data.version)
+        else if (CompareVersion(Application.version, data.version) < 0)
         {
             //有更新
-            if (response.data.force)
+            if (data.force)
             {
-                string result = string.Format(VersionCheck.UpdateForce, response.data.version);
+                string result = string.Format(VersionCheck.UpdateForce, data.version);
                 //强制更新
                 messageBannerController.ShowMsg(LogLevel.ERROR, result, false);
             }
             else
             {
-                string result = string.Format(VersionCheck.UpdateNotForce, response.data.version);
+                string result = string.Format(VersionCheck.UpdateNotForce, data.version);
                 //不强制更新
                 messageBannerController.ShowMsg(LogLevel.OK, result, true);
                 te.waitingUpdate = false;
