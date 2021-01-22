@@ -88,8 +88,26 @@ public class FancyBackground : MonoBehaviour
                     return defaultTexture;
 
                 if (!_cachedBackgrounds.ContainsKey(path))
+                {
                     _cachedBackgrounds.Add(path, fs.GetFile(path).ReadAsTexture());
 
+                    if (_cachedBackgrounds.Count > 10)
+                    {
+                        string keyToRemove = null;
+
+                        foreach (var (key, value) in _cachedBackgrounds)
+                        {
+                            if (key != b1 && key != b2 && key != b3)
+                            {
+                                Destroy(value);
+                                keyToRemove = key;
+                            }
+                        }
+
+                        _cachedBackgrounds.Remove(keyToRemove);
+                    }
+                }
+                    
                 return _cachedBackgrounds[path];
             }
 
