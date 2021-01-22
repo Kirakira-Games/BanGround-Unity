@@ -101,6 +101,8 @@ public class FancyBackground : MonoBehaviour
                             {
                                 Destroy(value);
                                 keyToRemove = key;
+                                
+                                break;
                             }
                         }
 
