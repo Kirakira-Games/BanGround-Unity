@@ -99,9 +99,10 @@ public class FancyBackground : MonoBehaviour
                         {
                             if (key != b1 && key != b2 && key != b3)
                             {
-                                Destroy(value);
+                                if(value != null)
+                                    Destroy(value);
+                                    
                                 keyToRemove = key;
-                                
                                 break;
                             }
                         }
