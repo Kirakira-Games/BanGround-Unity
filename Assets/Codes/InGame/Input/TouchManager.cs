@@ -431,7 +431,7 @@ public class TouchManager : MonoBehaviour
 
     public void OnUpdate()
     {
-        if (SM.HasState(GameStateMachine.State.Finished)) return;
+        if (SM.HasState(GameStateMachine.State.Finished) || SM.isPaused || SM.isRewinding) return;
 
         var touchFrames = touchProvider.GetTouches();
 
