@@ -154,6 +154,7 @@ namespace BGEditor
                 if (coverfi.Extension == ".jpg" || coverfi.Extension == ".png")
                 {
                     cover = System.IO.File.ReadAllBytes(coverfi.FullName);
+                    coverExt = coverfi.Extension;
                 }
                 else
                 {
