@@ -3,6 +3,7 @@ using FancyScrollView;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -89,7 +90,17 @@ public class FancyBackground : MonoBehaviour
 
                 if (!_cachedBackgrounds.ContainsKey(path))
                 {
-                    _cachedBackgrounds.Add(path, fs.GetFile(path).ReadAsTexture());
+                    try
+                    {
+                        var tex = fs.GetFile(path).ReadAsTexture();
+                        _cachedBackgrounds.Add(path, tex);
+                    }
+                    catch(FileNotFoundException)
+                    {
+                        Debug.LogWarning($"{path} not exists! Your game file had some issue");
+
+                        return defaultTexture;
+                    }
 
                     if (_cachedBackgrounds.Count > 10)
                     {
