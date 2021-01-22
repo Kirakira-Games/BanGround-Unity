@@ -2,6 +2,7 @@
 {
     Properties
     {
+        _MainTex ("Dummy", 2D) = "white" {}
         _Tex1 ("Texture1", 2D) = "white" {}
         _Tex2 ("Texture2", 2D) = "white" {}
         _Tex3 ("Texture3", 2D) = "white" {}
