@@ -253,7 +253,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7323230081434384984}
   - component: {fileID: 7710279745930322479}
-  - component: {fileID: 1182500317901731497}
+  - component: {fileID: 2492019553544168639}
   m_Layer: 5
   m_Name: Song_art
   m_TagString: Untagged
@@ -288,7 +288,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2379828121824065869}
   m_CullTransparentMesh: 0
---- !u!114 &1182500317901731497
+--- !u!114 &2492019553544168639
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -297,12 +297,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 2379828121824065869}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 73f8e0aac8ff8c74a8ddeb71d5e0f95c, type: 3}
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.7019608}
-  m_RaycastTarget: 0
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -312,7 +312,7 @@ MonoBehaviour:
     m_FontSize: 24
     m_FontStyle: 0
     m_BestFit: 0
-    m_MinSize: 0
+    m_MinSize: 2
     m_MaxSize: 40
     m_Alignment: 6
     m_AlignByGeometry: 0
@@ -544,7 +544,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.4, g: 0.4, b: 0.4, a: 1}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1416,8 +1416,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dbbe6d73c30396c43b58be8b842eca51, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Title: {fileID: 6898046321753485611}
-  Artist: {fileID: 1182500317901731497}
+  Title: {fileID: 3541181044696451567}
+  Artist: {fileID: 2492019553544168639}
   Difficulty: {fileID: 4386113846834799524}
   DiffRange: {fileID: 8510001353130408775}
   Background: {fileID: 7072946512841452918}
@@ -1538,7 +1538,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7072946512689752965}
   - component: {fileID: 7072946512689752967}
-  - component: {fileID: 6898046321753485611}
+  - component: {fileID: 3541181044696451567}
   m_Layer: 5
   m_Name: Song_name
   m_TagString: Untagged
@@ -1574,7 +1574,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7072946512689752962}
   m_CullTransparentMesh: 0
---- !u!114 &6898046321753485611
+--- !u!114 &3541181044696451567
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1583,12 +1583,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 7072946512689752962}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 73f8e0aac8ff8c74a8ddeb71d5e0f95c, type: 3}
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 0
+  m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -1597,9 +1597,9 @@ MonoBehaviour:
     m_Font: {fileID: 12800000, guid: 7edb87cc5a4194c8a89f1ee196f8cf1c, type: 3}
     m_FontSize: 30
     m_FontStyle: 0
-    m_BestFit: 1
-    m_MinSize: 24
-    m_MaxSize: 30
+    m_BestFit: 0
+    m_MinSize: 3
+    m_MaxSize: 40
     m_Alignment: 6
     m_AlignByGeometry: 0
     m_RichText: 1
@@ -1874,7 +1874,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.447, g: 0.447, b: 0.447, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
