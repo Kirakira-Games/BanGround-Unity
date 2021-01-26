@@ -181,7 +181,7 @@ public class DataLoader : IDataLoader
         }
     }
 
-    public async UniTaskVoid Init()
+    public void Init()
     {
         LastImportedSid = -1;
 

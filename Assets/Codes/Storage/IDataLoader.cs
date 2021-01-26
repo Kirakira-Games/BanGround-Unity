@@ -28,7 +28,7 @@ public interface IDataLoader
     mHeader GetMusicHeader(int mid);
     string GetMusicPath(int mid);
     string GetMusicResource(int mid, string filename);
-    UniTaskVoid Init();
+    void Init();
     void InitFileSystem();
     UniTask<bool> LoadAllKiraPackFromInbox();
     T LoadChart<T>(int sid, Difficulty difficulty) where T : IExtensible;
