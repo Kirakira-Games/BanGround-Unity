@@ -13,6 +13,7 @@ public interface IDataLoader
     int LastImportedSid { get; set; }
 
     string BuildKiraPack(cHeader header);
+    UniTask CopyFileFromStreamingAssetsToPersistentDataPath(string relativePath);
     //void ConvertJsonToBin(DirectoryInfo dir);
     void DuplicateKiraPack(cHeader header);
     int GenerateMid();

@@ -70,6 +70,7 @@ public enum TapEffectType
     Good,
     Click,
     Flick,
+    Hold,
     None
 }
 

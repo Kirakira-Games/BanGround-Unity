@@ -32,6 +32,9 @@ namespace BanGround
 
         private async UniTask ConvertJsonToBin(string path)
         {
+            if (!path.StartsWith("chart") || !path.StartsWith("music"))
+                return;
+
             var file = fs.GetFile(path);
             var binPath = path.Replace(".json", ".bin");
             if (fs.FileExists(binPath))

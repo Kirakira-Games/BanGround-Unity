@@ -187,13 +187,6 @@ public class DataLoader : IDataLoader
 
         // Check first launch after updating initial charts
         RefreshSongList();
-        if (chartList.Count == 0 || PlayerPrefs.GetInt("InitialChartVersion") != InitialChartVersion)
-        {
-            Debug.Log("Load initial charts...");
-            await CopyFileFromStreamingAssetsToPersistentDataPath("/Initial.kirapack");
-            //LoadKiraPack(new FileInfo(Application.persistentDataPath + "/Initial.kirapack"));
-            PlayerPrefs.SetInt("InitialChartVersion", InitialChartVersion);
-        }
 
         // Register deep link
         Application.deepLinkActivated += (url) =>
@@ -746,7 +739,7 @@ public class DataLoader : IDataLoader
         return LoadSuccess;
     }
 
-    private async UniTask CopyFileFromStreamingAssetsToPersistentDataPath(string relativePath)
+    public async UniTask CopyFileFromStreamingAssetsToPersistentDataPath(string relativePath)
     {
         string streamingPath;
         if (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.WindowsPlayer || Application.platform == RuntimePlatform.Android)

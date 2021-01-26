@@ -184,6 +184,9 @@ public class GlobalInstaller : MonoInstaller
             KVar.C("cl_language", "-1", KVarFlags.Archive),
 
             KVar.C("cl_modflag", "0", KVarFlags.StringOnly, "A hex string storing ModFlag. At most 64 bits."),
+
+            // arcaea particles for now... TODO: make our own
+            KVar.C("skin_particle", "arc", KVarFlags.Archive | KVarFlags.StringOnly, "Particle name"),
         };
 
         foreach (var info in varInfos)
