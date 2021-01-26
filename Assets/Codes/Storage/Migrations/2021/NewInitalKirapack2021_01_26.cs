@@ -14,7 +14,7 @@ namespace BanGround.Database.Migrations
         [Inject]
         private IDataLoader dataLoader;
 
-        public override int Id => 1;
+        public override int Id => 2;
         public override string Description => "New initial kirapack ";
 
         public override async UniTask<bool> Commit()
