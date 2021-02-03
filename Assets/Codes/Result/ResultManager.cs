@@ -202,8 +202,9 @@ public class ResultManager : MonoBehaviour
         if (clearMarkVoice != null)
         {
             (await audioManager.PrecacheSE(clearMarkVoice.bytes)).PlayOneShot();
+            await UniTask.Delay((int)(lenth * 1000));
         }
-        await UniTask.Delay((int)(lenth * 1000));
+        
         if (commentVoice != null)
         {
             (await audioManager.PrecacheSE(commentVoice.bytes)).PlayOneShot();
@@ -312,13 +313,13 @@ public class ResultManager : MonoBehaviour
         switch (playResult.ClearMark)
         {
             case ClearMarks.AP:
-                markIcon.texture = resourceLoader.LoadIconResource<Texture2D>("AP") as Texture2D;
+                markIcon.texture = resourceLoader.LoadIconResource<Texture2D>("AP");
                 break;
             case ClearMarks.FC:
-                markIcon.texture = resourceLoader.LoadIconResource<Texture2D>("FC") as Texture2D;
+                markIcon.texture = resourceLoader.LoadIconResource<Texture2D>("FC");
                 break;
             case ClearMarks.CL:
-                markIcon.texture = resourceLoader.LoadIconResource<Texture2D>("CL") as Texture2D;
+                markIcon.texture = resourceLoader.LoadIconResource<Texture2D>("CL");
                 break;
             case ClearMarks.F:
                 markIcon.texture = null;
@@ -343,6 +344,7 @@ public class ResultManager : MonoBehaviour
         playResult.ChartId = cheader.sid;
         playResult.MusicId = cheader.mid;
         playResult.Difficulty = parameters.difficulty;
+        playResult.ClearMark = ResultsGetter.GetClearMark();
         playResult.CreatedAt = DateTime.Now;
         playResult.Combo = ResultsGetter.GetCombo();
         playResult.Judge = ResultsGetter.GetJudgeCount();
