@@ -6,6 +6,7 @@
         _Tex1 ("Texture1", 2D) = "white" {}
         _Tex2 ("Texture2", 2D) = "white" {}
         _Tex3 ("Texture3", 2D) = "white" {}
+        _Glitch ("Glitch Noise", 2D) = "black" {}
         _Tint ("Tint", Color) = (1.0, 1.0, 1.0, 1.0)
         _TexRatios ("Texture Aspect Ratios", Vector) = (1.0, 1.0, 1.0)
         _Progress ("Progress", Float) = 0.5
@@ -41,6 +42,7 @@
             sampler2D _Tex1;
             sampler2D _Tex2;
             sampler2D _Tex3;
+            sampler2D _Glitch;
             float4 _Tint;
             float4 _Tex1_ST;
             float4 _Tex2_ST;
@@ -90,27 +92,34 @@
                 return o;
             }
 
-            float4 mix(float4 a, float4 b, float p)
-            {
-                return a * (1 - p) + b * p;
-            }
-
             fixed4 frag(v2f i) : SV_TARGET
             {
-                float4 a = tex2D(_Tex1, i.texUv1);
-                float4 b = tex2D(_Tex2, i.texUv2);
-                float4 c = tex2D(_Tex3, i.texUv3);
+                fixed4 glitch = tex2D(_Glitch, i.texUv2);
 
-                float y = (i.screenPosition.y / i.screenPosition.w) / 2 + 0.25;
+                fixed4 a = fixed4(0,0,0,1);
+                fixed4 b = fixed4(0,0,0,1);
+                fixed4 c = fixed4(0,0,0,1);
 
-                float4 col = mix(a,
-                    mix(
-                        b,
-                        c,
-                        step(y, _Progress - 0.25)
-                    ),
-                    step(y, _Progress + 0.25)
-                );
+                fixed y = (i.screenPosition.y / i.screenPosition.w) / 2 + 0.25;
+
+                fixed p = (_Progress - 0.5) * 2;
+                fixed ap = max(0, -p);
+                fixed cp = max(0, p);
+                fixed bp = 1 - ap - cp;
+
+                a.r = tex2D(_Tex1, i.texUv1 + float2(glitch.x - 0.5, 0) * (1 - ap)).r;
+                a.g = tex2D(_Tex1, i.texUv1 + float2(glitch.y - 0.5, 0) * (1 - ap)).g;
+                a.b = tex2D(_Tex1, i.texUv1 + float2(glitch.z - 0.5, 0) * (1 - ap)).b;
+
+                b.r = tex2D(_Tex2, i.texUv2 + float2(glitch.x - 0.5, 0) * (1 - bp)).r;
+                b.g = tex2D(_Tex2, i.texUv2 + float2(glitch.y - 0.5, 0) * (1 - bp)).g;
+                b.b = tex2D(_Tex2, i.texUv2 + float2(glitch.z - 0.5, 0) * (1 - bp)).b;
+
+                c.r = tex2D(_Tex3, i.texUv3 + float2(glitch.x - 0.5, 0) * (1 - cp)).r;
+                c.g = tex2D(_Tex3, i.texUv3 + float2(glitch.y - 0.5, 0) * (1 - cp)).g;
+                c.b = tex2D(_Tex3, i.texUv3 + float2(glitch.z - 0.5, 0) * (1 - cp)).b;
+
+                fixed4 col = ap * a + bp * b + cp * c;
 
                 return col * _Tint;
             }

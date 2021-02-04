@@ -6,6 +6,7 @@ namespace BanGround.Identity
     public interface IAccountManager
     {
         UserLite ActiveUser { get; }
+        UserFull ActiveUserInfo { get; }
         bool isAuthing { get; }
         bool isOfflineMode { get; }
         bool isTokenSaved { get; }

@@ -10,20 +10,37 @@ public class UserInfo : MonoBehaviour
     [Inject]
     private IAccountManager accountManager;
 
+    public GameObject FishDisplay;
+    public GameObject LevelDisplay;
     public Text UsernameText;
+    public Text FishText;
+    public Text LevelText;
     public Image UserAvatar;
 
     public async UniTaskVoid GetUserInfo()
     {
         if (this == null)
             return;
+
         var user = accountManager.ActiveUser;
         UsernameText.text = user.Nickname;
 
-        if (string.IsNullOrEmpty(user.Avatar))
-            return;
+        var userInfo = accountManager.ActiveUserInfo;
 
-        using (UnityWebRequest ub = UnityWebRequestTexture.GetTexture(user.Avatar))
+        if (userInfo == null)
+        {
+            FishDisplay.SetActive(false);
+            LevelDisplay.SetActive(false);
+            return;
+        }
+
+        FishText.text = userInfo.Fish.ToString();
+
+        // ?
+        //LevelText.text = ?;
+
+
+        using (UnityWebRequest ub = UnityWebRequestTexture.GetTexture(userInfo.Avatar))
         {
             await ub.SendWebRequest();
             if (this == null)

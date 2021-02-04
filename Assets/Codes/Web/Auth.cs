@@ -18,6 +18,81 @@ namespace BanGround.Web.Auth
         public static string EncryptPassword(string raw) => ToHex(SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(raw + "@BanGround")));
     }
 
+    public class UserBadge
+    {
+        [JsonProperty("id")]
+        public int Id;
+
+        [JsonProperty("name")]
+        public string Name;
+
+        [JsonProperty("desc")]
+        public string Description;
+
+        [JsonProperty("image")]
+        public string ImageUrl;
+
+        [JsonProperty("on")]
+        public bool IsOn;
+    }
+
+    public class BandLite
+    {
+        [JsonProperty("id")]
+        public int Id;
+
+        [JsonProperty("name")]
+        public string Name;
+    }
+
+    public class UserFull
+    {
+        [JsonProperty("id")]
+        public int Id;
+
+        [JsonProperty("username")]
+        public string Username;
+
+        [JsonProperty("nickname")]
+        public string Nickname;
+
+        [JsonProperty("avatar")]
+        public string Avatar;
+
+        [JsonProperty("sign")]
+        public string Sign;
+
+        [JsonProperty("sex")]
+        public int Sex;
+
+        [JsonProperty("exp")]
+        public int Experience;
+
+        [JsonProperty("group")]
+        public string Group;
+
+        [JsonProperty("badge")]
+        public UserBadge[] Badge;
+
+        [JsonProperty("fish")]
+        private string _fish;
+
+        [JsonIgnore]
+        private long _fishCache = long.MinValue;
+
+        [JsonIgnore]
+        public long Fish => _fishCache == long.MinValue ? _fishCache = long.Parse(_fish) : _fishCache;
+
+        [JsonProperty("isLeader")]
+        public bool IsLeader;
+
+        [JsonProperty("band")]
+        public BandLite Band;
+
+        [JsonProperty("supporter")]
+        public int SupporterLevel;
+    }
+
     public class UserLite
     {
         [JsonProperty("id")]
