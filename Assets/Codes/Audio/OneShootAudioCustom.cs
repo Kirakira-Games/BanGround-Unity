@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
-#pragma warning disable 0649
 public class OneShootAudioCustom : MonoBehaviour
 {
     [Inject]
