@@ -55,6 +55,7 @@ public class FancyBackground : MonoBehaviour
     }
 
     int prevSid = -1, currentSid = -1, nextSid = -1;
+    bool firstSelect = true;
 
     void UpdatePosition(float pos)
     {
@@ -131,8 +132,10 @@ public class FancyBackground : MonoBehaviour
             title.text = mheader.title;
             artist.text = mheader.artist;
 
-            if (se != null)
+            if (se != null && !firstSelect)
                 se.PlayOneShot();
+
+            firstSelect = false;
         }
 
         selectManager.SetPreviewVolume(currentSid == selectManager.CurrentPlayingSid ? 1.0f - (Mathf.Abs(position - 0.5f) * 4) : 0);
