@@ -5,16 +5,18 @@ using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
-[RequireComponent(typeof(Button))]
-public class ButtonSoundEffect : MonoBehaviour
+[RequireComponent(typeof(Toggle))]
+public class ToggleSoundEffect : MonoBehaviour
 {
     [Inject]
     private IAudioManager audioManager;
 
     [SerializeField] 
-    private TextAsset sound;
-    private ISoundEffect se;
-    private Button button;
+    private TextAsset soundEnable;
+    private TextAsset soundDisable;
+    private ISoundEffect see;
+    private ISoundEffect sed;
+    private Toggle toggle;
 
     private static Dictionary<TextAsset, ISoundEffect> soundEffectCache = new Dictionary<TextAsset, ISoundEffect>();
 
@@ -31,12 +33,10 @@ public class ButtonSoundEffect : MonoBehaviour
 
     async void Start()
     {
-        se = await PrecacheOrGetSoundEffect(sound);
+        see = await PrecacheOrGetSoundEffect(soundEnable);
+        sed = await PrecacheOrGetSoundEffect(soundDisable);
 
-        button = GetComponent<Button>();
-        button.onClick.AddListener(() =>
-        {
-            se.PlayOneShot();
-        });
+        toggle = GetComponent<Toggle>();
+        toggle.onValueChanged.AddListener(v => (v ? see : sed).PlayOneShot());
     }
 }
