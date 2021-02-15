@@ -1,5 +1,6 @@
 ﻿using BanGround;
 using BanGround.Web.Auth;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,13 @@ using UnityEngine.SceneManagement;
 using WebSocketSharp;
 using WebSocketSharp.Server;
 using Zenject;
+
+public class CommandEntry
+{
+    public string value;
+    public string type;
+    public string help;
+}
 
 public class WebConsole : MonoBehaviour
 {
@@ -114,28 +122,19 @@ public class WebConsole : MonoBehaviour
             {
                 ctx.Response.ContentType = "application/json";
 
-                var json = new StringBuilder();
-                bool first = true;
-
-                json.Append("[");
+                var commands = new List<CommandEntry>();
 
                 foreach (var item in kvSystem)
                 {
-                    if (!first)
+                    commands.Add(new CommandEntry
                     {
-                        json.Append(",");
-                    }
-                    else
-                    {
-                        first = false;
-                    }
-
-                    json.Append($"{{\"value\":\"{item.Name}\",\"type\":\"{(item is KVar ? "KVar" : "Kommand")}\",\"help\":\"{item.Description}\"}}");
+                        value = item.Name,
+                        type = (item is KVar ? "KVar" : "Kommand") ,
+                        help = item.Description,
+                    });
                 }
 
-                json.Append("]");
-
-                content = Encoding.UTF8.GetBytes(json.ToString());
+                content = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(commands));
             }
             else
             {
