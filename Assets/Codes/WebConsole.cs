@@ -171,7 +171,7 @@ public class WebConsole : MonoBehaviour
                     bytes = br.ReadBytes((int)ctx.Request.ContentLength64);
                 }
 
-                if(ChartCreator.RequestAirdrop)
+                if (ChartCreator.RequestAirdrop)
                 {
                     ChartCreator.AirdroppedFile = bytes;
                 }
@@ -214,7 +214,7 @@ public class WebConsole : MonoBehaviour
                     var url = data["url"].ToString();
                     var query = data["query"].ToString();
 
-                    using(var wc = new WebClient())
+                    using (var wc = new WebClient())
                     {
                         wc.Encoding = Encoding.UTF8;
                         wc.Headers[HttpRequestHeader.ContentType] = "application/json";
@@ -223,7 +223,7 @@ public class WebConsole : MonoBehaviour
                         {
                             content = wc.UploadData(url, Encoding.UTF8.GetBytes(query));
                         }
-                        catch(WebException webex)
+                        catch (WebException webex)
                         {
                             var resp = (HttpWebResponse)webex.Response;
 
@@ -235,7 +235,7 @@ public class WebConsole : MonoBehaviour
                         }
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     ctx.Response.StatusCode = 500;
                     content = Encoding.UTF8.GetBytes(ex.Message);
@@ -272,7 +272,7 @@ public class WebConsole : MonoBehaviour
 
     void Update()
     {
-        while(actionQueue.Count > 0)
+        while (actionQueue.Count > 0)
             actionQueue.Dequeue()();
     }
 
@@ -288,7 +288,7 @@ public class WebConsole : MonoBehaviour
 
         var resources = WebConsoleResource.GetEnumerator();
 
-        while(resources.MoveNext())
+        while (resources.MoveNext())
         {
             resourceList.Add(resources.Current.Key, Resources.Load<TextAsset>(resources.Current.Value).bytes);
         }
@@ -302,14 +302,14 @@ public class WebConsole : MonoBehaviour
     {
         var len = condition.Length + stackTrace?.Length + 2;
 
-        if (logs.Count + 1 >    MAX_LOG_LINE)
+        if (logs.Count + 1 > MAX_LOG_LINE)
             logs.Clear();
 
         var log = new StringBuilder();
 
-       log.AppendLine(condition);
+        log.AppendLine(condition);
 
-        if(type == LogType.Exception)
+        if (type == LogType.Exception)
         {
             log.AppendLine(stackTrace);
         }
@@ -322,7 +322,7 @@ public class WebConsole : MonoBehaviour
         await Task.Run(() =>
             webSockets.All(ws =>
             {
-                if(ws.ConnectionState == WebSocketState.Open)
+                if (ws.ConnectionState == WebSocketState.Open)
                     ws.SendLog(log.ToString());
 
                 return true;
