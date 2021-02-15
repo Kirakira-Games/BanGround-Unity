@@ -20,15 +20,11 @@ public class WebConsole : MonoBehaviour
     [Inject]
     IKVSystem kvSystem;
 
-    StringBuilder fullLog = new StringBuilder(0x10000);
+    // StringBuilder fullLog = new StringBuilder(0x10000);
+    List<string> logs = new List<string>();
+    const int MAX_LOG_LINE = 5000;
 
-    public string FullLog
-    {
-        get
-        {
-            return fullLog.ToString();
-        }
-    }
+    public List<string> FullLog => logs;
 
     public Action Action
     {
@@ -67,7 +63,8 @@ public class WebConsole : MonoBehaviour
         {
             base.OnOpen();
 
-            Send(console.FullLog);
+            foreach (var log in console.FullLog)
+                Send(log);
         }
 
         protected override void OnMessage(MessageEventArgs e)
@@ -107,7 +104,7 @@ public class WebConsole : MonoBehaviour
 
             if (path == "/log")
             {
-                content = Encoding.UTF8.GetBytes(fullLog.ToString());
+                content = Encoding.UTF8.GetBytes(string.Join("\r\n", logs));
             }
             else if (path == "/airdrop")
             {
@@ -305,28 +302,28 @@ public class WebConsole : MonoBehaviour
     {
         var len = condition.Length + stackTrace?.Length + 2;
 
-        if (fullLog.Length + len >= fullLog.Capacity)
-            fullLog.Clear();
+        if (logs.Count + 1 >    MAX_LOG_LINE)
+            logs.Clear();
 
-        fullLog.AppendLine(condition);
+        var log = new StringBuilder();
+
+       log.AppendLine(condition);
 
         if(type == LogType.Exception)
         {
-            fullLog.AppendLine(stackTrace);
+            log.AppendLine(stackTrace);
         }
+
+        logs.Add(log.ToString());
 
         if (webSockets.Count == 0)
             return;
-
-        var str = condition + "\n";
-        if (type == LogType.Error)
-            str += stackTrace + "\n";
 
         await Task.Run(() =>
             webSockets.All(ws =>
             {
                 if(ws.ConnectionState == WebSocketState.Open)
-                    ws.SendLog(str);
+                    ws.SendLog(log.ToString());
 
                 return true;
             })
