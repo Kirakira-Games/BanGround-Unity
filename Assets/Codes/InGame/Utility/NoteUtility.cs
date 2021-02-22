@@ -68,6 +68,7 @@ public enum TapEffectType
     Perfect,
     Great,
     Good,
+    Bad,
     Click,
     Flick,
     Hold,

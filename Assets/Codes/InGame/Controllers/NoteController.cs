@@ -100,6 +100,8 @@ public class NoteController : MonoBehaviour, INoteController
             se = TapEffectType.Great;
         else if (result == JudgeResult.Good)
             se = TapEffectType.Good;
+        else if (result == JudgeResult.Bad)
+            se = TapEffectType.Bad;
 
         NotePool.Instance.PlayTapEffect(se, position);
 

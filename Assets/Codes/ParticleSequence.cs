@@ -71,6 +71,9 @@ public class ParticleSequence : MonoBehaviour
 
     public void Play(TapEffectType type, bool isLoop = false)
     {
+        if (!ParticleInfos.ContainsKey(type))
+            return;
+
         curParticle = ParticleInfos[type];
 
         isPlaying = true;
