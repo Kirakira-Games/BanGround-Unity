@@ -34,6 +34,9 @@ namespace XLua.CSObjectWrap
             translator.DelayWrapLoader(typeof(BanGround.Scripting.Lunar.ScriptSprite), BanGroundScriptingLunarScriptSpriteWrap.__Register);
         
         
+            translator.DelayWrapLoader(typeof(BanGround.Scripting.Lunar.JudgeResultObj), BanGroundScriptingLunarJudgeResultObjWrap.__Register);
+        
+        
         
         }
         

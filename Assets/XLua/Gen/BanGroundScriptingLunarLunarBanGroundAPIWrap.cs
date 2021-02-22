@@ -383,9 +383,9 @@ namespace XLua.CSObjectWrap
             
                 
                 {
-                    string _str = LuaAPI.lua_tostring(L, 2);
+                    object _obj = translator.GetObject(L, 2, typeof(object));
                     
-                    gen_to_be_invoked.Msg( _str );
+                    gen_to_be_invoked.Msg( _obj );
                     
                     
                     

@@ -111,9 +111,12 @@ namespace BanGround.Scripting.Lunar
             startBeat = beat;
         }
 
-        public void Msg(string str)
+        public void Msg(object obj)
         {
-            Debug.Log(str);
+            if (obj == null)
+                Debug.Log("Null");
+            else
+                Debug.Log(obj.ToString());
         }
 
         public void Dispose()
@@ -215,17 +218,16 @@ namespace BanGround.Scripting.Lunar
 
         public void OnJudge(NoteBase notebase, JudgeResult result)
         {
-            var table = luaEnv.NewTable();
-
-            table.SetInPath("Lane", notebase.lane);
-            table.SetInPath("Type", (int)notebase.type);
-            table.SetInPath("Time", notebase.time);
-            table.SetInPath("Beat", chartLoader.chart.TimeToBeat(notebase.time));
-            table.SetInPath("JudgeResult", result);
-            table.SetInPath("JudgeTime", notebase.judgeTime);
-            table.SetInPath("JudgeOffset", notebase.time - notebase.judgeTime);
-
-            onJudge?.Call(table);
+            onJudge?.Call(new JudgeResultObj
+            {
+                Lane = notebase.lane,
+                Type = (int)notebase.type,
+                Time = notebase.time,
+                Beat = chartLoader.chart.TimeToBeat(notebase.time / 1000.0f),
+                JudgeResult = (int)result,
+                JudgeTime = notebase.judgeTime,
+                JudgeOffset = notebase.time - notebase.judgeTime
+            });
         }
 
         public void OnUpdate(int audioTime)

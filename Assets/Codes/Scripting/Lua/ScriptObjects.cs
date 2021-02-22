@@ -135,4 +135,22 @@ namespace BanGround.Scripting.Lunar
             UnityEngine.Object.Destroy(spr);
         }
     }
+
+
+    [LuaCallCSharp]
+    public class JudgeResultObj
+    {
+        public int Lane;
+        public int Type;
+        public int Time;
+        public float Beat;
+        public int JudgeResult;
+        public int JudgeTime;
+        public int JudgeOffset;
+
+        public override string ToString()
+        {
+            return JsonUtility.ToJson(this, true);
+        }
+    }
 }
