@@ -158,43 +158,45 @@ namespace BanGround.Scripting.Lunar
         public void Init(int sid, Difficulty difficulty)
         {
             var scriptPath = dataLoader.GetChartScriptPath(sid, difficulty);
-            
-            if(fs.FileExists(scriptPath))
+
+            if (!fs.FileExists(scriptPath))
+                if (!fs.FileExists(scriptPath = dataLoader.GetChartResource(sid, "default.lua")))
+                    return;
+
+            this.sid = sid;
+            var scriptFile = fs.GetFile(scriptPath);
+
+            luaEnv = new LuaEnv();
+
+            luaEnv.AddLoader((ref string lib) =>
             {
-                this.sid = sid;
-                var scriptFile = fs.GetFile(scriptPath);
+                var modulepath = dataLoader.GetChartResource(sid, lib + ".lua");
 
-                luaEnv = new LuaEnv();
-
-                luaEnv.AddLoader((ref string lib) =>
+                if (fs.FileExists(modulepath))
                 {
-                    var modulepath = dataLoader.GetChartResource(sid, lib + ".lua");
+                    return fs.GetFile(modulepath).ReadToEnd();
+                }
 
-                    if (fs.FileExists(modulepath))
-                    {
-                        return fs.GetFile(modulepath).ReadToEnd();
-                    }
+                return null;
+            });
 
-                    return null;
-                });
+            var api = new LunarBanGroundAPI
+            {
+                fs = fs,
+                dl = dataLoader,
+                am = am,
+                sid = sid,
+                ls = this
+            };
 
-                var api = new LunarBanGroundAPI
-                {
-                    fs = fs,
-                    dl = dataLoader,
-                    am = am,
-                    sid = sid,
-                    ls = this
-                };
+            luaEnv.Global.Set("BanGround", api);
 
-                luaEnv.Global.Set("BanGround", api);
+            luaEnv.DoString(scriptFile.ReadAsString());
 
-                luaEnv.DoString(scriptFile.ReadAsString());
+            onUpdate = luaEnv.Global.Get<LuaFunction>("OnUpdate");
+            onJudge = luaEnv.Global.Get<LuaFunction>("OnJudge");
+            onBeat = luaEnv.Global.Get<LuaFunction>("OnBeat");
 
-                onUpdate = luaEnv.Global.Get<LuaFunction>("OnUpdate");
-                onJudge = luaEnv.Global.Get<LuaFunction>("OnJudge");
-                onBeat = luaEnv.Global.Get<LuaFunction>("OnBeat");
-            }
         }
 
         public void AddKeyframeByTime(float startTime, float time, LuaFunction callback)
