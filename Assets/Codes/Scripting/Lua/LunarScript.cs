@@ -29,7 +29,7 @@ namespace BanGround.Scripting.Lunar
         {
             var path = dl.GetChartResource(sid, tex);
 
-            if(fs.FileExists(path))
+            if (fs.FileExists(path))
             {
                 var t = fs.GetFile(path).ReadAsTexture();
                 loadedTextures.Add(t);
@@ -42,7 +42,7 @@ namespace BanGround.Scripting.Lunar
 
         public void SetBackground(int texId)
         {
-            if(inGameBackground == null)
+            if (inGameBackground == null)
                 inGameBackground = GameObject.Find("InGameBackground").GetComponent<InGameBackground>();
 
             inGameBackground.SetBackground(loadedTextures[texId]);
@@ -159,9 +159,9 @@ namespace BanGround.Scripting.Lunar
         {
             var scriptPath = dataLoader.GetChartScriptPath(sid, difficulty);
 
-            if (!fs.FileExists(scriptPath))
-                if (!fs.FileExists(scriptPath = dataLoader.GetChartResource(sid, "default.lua")))
-                    return;
+            if (!fs.FileExists(scriptPath) &&
+                !fs.FileExists(scriptPath = dataLoader.GetChartResource(sid, "default.lua")))
+                return;
 
             this.sid = sid;
             var scriptFile = fs.GetFile(scriptPath);
@@ -241,11 +241,11 @@ namespace BanGround.Scripting.Lunar
 
             float audioTimef = audioTime / 1000f;
 
-            for(int i = curKeyframe; i < keyframes.Count; i++)
+            for (int i = curKeyframe; i < keyframes.Count; i++)
             {
                 var keyframe = keyframes[i];
 
-                if(audioTimef > keyframe.Item1 && audioTimef < keyframe.Item1 + keyframe.Item2)
+                if (audioTimef > keyframe.Item1 && audioTimef < keyframe.Item1 + keyframe.Item2)
                 {
                     float progress = (audioTimef - keyframe.Item1) / keyframe.Item2;
                     keyframe.Item3.Call(progress);
@@ -258,12 +258,12 @@ namespace BanGround.Scripting.Lunar
 
         private void OnDestroy()
         {
-            if(luaEnv != null)
+            if (luaEnv != null)
             {
                 luaEnv.DoString("BanGround:Dispose()");
                 luaEnv.Dispose();
             }
-            
+
         }
     }
 }
