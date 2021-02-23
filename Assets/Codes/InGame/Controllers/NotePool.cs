@@ -46,10 +46,10 @@ public class NotePool : MonoBehaviour
 
     private Queue<NoteBase>[] noteQueue;
     private Queue<Slide> slideQueue;
-    private Queue<GameObject>[] teQueue;
+    private Queue<ParticleSequence> teQueue;
     private Queue<NoteSyncLine> syncLineQueue;
     private Queue<LineRenderer> partialSyncLineQueue;
-    private Object[] tapEffects;
+    private Object tapEffect;
 
     [Inject]
     private IResourceLoader resourceLoader;
@@ -164,11 +164,10 @@ public class NotePool : MonoBehaviour
     {
         for (int i = 0; i < count; i++)
         {
-            var fx = Instantiate(tapEffects[effect], Vector3.zero, Quaternion.identity) as GameObject;
+            var fx = Instantiate(tapEffect, Vector3.zero, Quaternion.identity) as GameObject;
             fx.transform.localScale = Vector3.one * r_notesize * NoteUtility.NOTE_SCALE;
-            //fx.SetActive(false);
             fx.transform.SetParent(transform);
-            teQueue[effect].Enqueue(fx);
+            teQueue.Enqueue(fx.GetComponent<ParticleSequence>());
         }
     }
     #endregion
@@ -228,19 +227,8 @@ public class NotePool : MonoBehaviour
         slideQueue = new Queue<Slide>();
 
         // Load Tap Effects
-        tapEffects = new Object[]
-        {
-            Resources.Load("Effects/effect_tap_perfect"),
-            Resources.Load("Effects/effect_tap_great"),
-            Resources.Load("Effects/effect_tap_good"),
-            Resources.Load("Effects/effect_tap"),
-            Resources.Load("Effects/effect_tap_swipe")
-        };
-        teQueue = new Queue<GameObject>[5];
-        for (int i = 0; i < teQueue.Length; i++)
-        {
-            teQueue[i] = new Queue<GameObject>();
-        }
+        tapEffect = Resources.Load("Effects/effect_spritesheet");
+        teQueue = new Queue<ParticleSequence>();
 
         // Sync lines
         syncLineQueue = new Queue<NoteSyncLine>();
@@ -298,7 +286,7 @@ public class NotePool : MonoBehaviour
         {
             total.Process(e.delta);
         }
-        for (int i = 0; i < teQueue.Length; i++)
+        for (int i = 0; i < 5; i++)
         {
             AddTapEffect(i, Math.Max(NoteUtility.LANE_COUNT << 1, total.Max) / (i == 0 ? 1 : 2));
         }
@@ -415,23 +403,23 @@ public class NotePool : MonoBehaviour
     {
         if (type == TapEffectType.None) return;
         int ty = (int)type;
-        if (teQueue[ty].Count == 0)
+        if (teQueue.Count == 0)
         {
             Debug.Log("Add TapEffect");
             AddTapEffect(ty);
         }
-        var te = teQueue[ty].Dequeue();
+        var te = teQueue.Dequeue();
         te.transform.position = pos;
-        te.GetComponent<ParticleSystem>().Play();
+        te.Play(type);
         //te.SetActive(true);
         StartCoroutine(KillFX(te, ty, 0.5f));
     }
 
-    private IEnumerator KillFX(GameObject fx, int type, float delaySeconds)
+    private IEnumerator KillFX(ParticleSequence fx, int type, float delaySeconds)
     {
         yield return new WaitForSeconds(delaySeconds);
-        fx.GetComponent<ParticleSystem>().Stop();
+        //fx.GetComponent<ParticleSystem>().Stop();
         //fx.SetActive(false);
-        teQueue[type].Enqueue(fx);
+        teQueue.Enqueue(fx);
     }
 }

@@ -5,7 +5,7 @@ using Zenject;
 
 public class SlideStart : SlideNoteBase
 {
-    public TapEffect tapEffect;
+    public ParticleSequence tapEffect;
 
     protected override JudgeResult TrySlideJudge(KirakiraTouch touch)
     {
@@ -26,8 +26,8 @@ public class SlideStart : SlideNoteBase
     public override void InitNote(IResourceLoader resourceLoader, INoteController noteController)
     {
         base.InitNote(resourceLoader, noteController);
-        var te = Instantiate(Resources.Load("Effects/effect_TapKeep"), transform) as GameObject;
-        tapEffect = te.AddComponent<TapEffect>();
+        var te = Instantiate(Resources.Load("Effects/effect_spritesheet"), transform) as GameObject;
+        tapEffect = te.GetComponent<ParticleSequence>();
     }
 
     public override void ResetNote(GameNoteData data)
