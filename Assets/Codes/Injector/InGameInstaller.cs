@@ -61,7 +61,7 @@ public class InGameInstaller : MonoInstaller
             touchProvider = new MouseTouchProvider();
 #else
             GameObject.Find("MouseCanvas").SetActive(false);
-            touchProvider = new InputManagerTouchProvider();
+            touchProvider = new InputSystemTouchProvider();
 #endif
         }
 
