@@ -46,6 +46,7 @@ public static class iOSBuilder
 
         plist.SetBoolean("LSSupportsOpeningDocumentsInPlace", true);
         plist.SetBoolean("UIFileSharingEnabled", true);
+        plist.SetBoolean("ITSAppUsesNonExemptEncryption", false);
 
         document.WriteToFile(Path.Combine(path, "info.plist"));
         Debug.Log("Write Plist Succeed!");
