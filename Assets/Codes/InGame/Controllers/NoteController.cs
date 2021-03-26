@@ -442,7 +442,7 @@ public class NoteController : MonoBehaviour, INoteController
         }
 
         // Sound effects
-        soundEffects = new ISoundEffect[5]
+        soundEffects = new ISoundEffect[]
         {
             await audioManager.PrecacheInGameSE(resourceLoader.LoadSEResource<TextAsset>("perfect.wav").bytes),
             await audioManager.PrecacheInGameSE(resourceLoader.LoadSEResource<TextAsset>("great.wav").bytes),
