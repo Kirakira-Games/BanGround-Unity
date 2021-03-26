@@ -448,6 +448,7 @@ public class NoteController : MonoBehaviour, INoteController
             await audioManager.PrecacheInGameSE(resourceLoader.LoadSEResource<TextAsset>("great.wav").bytes),
             await audioManager.PrecacheInGameSE(resourceLoader.LoadSEResource<TextAsset>("empty.wav").bytes),
             await audioManager.PrecacheInGameSE(resourceLoader.LoadSEResource<TextAsset>("empty.wav").bytes),
+            await audioManager.PrecacheInGameSE(resourceLoader.LoadSEResource<TextAsset>("empty.wav").bytes),
             await audioManager.PrecacheInGameSE(resourceLoader.LoadSEResource<TextAsset>("flick.wav").bytes)
         };
 
