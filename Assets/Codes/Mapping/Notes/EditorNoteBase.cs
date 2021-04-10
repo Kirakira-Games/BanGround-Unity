@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using Zenject;
 
@@ -107,7 +108,7 @@ namespace BGEditor
             if (isAdjustY)
                 return;
             isAdjustY = true;
-            holdStart = Input.mousePosition;
+            holdStart = Mouse.current.position.ReadValue();
             if (Editor.tool == EditorTool.Select)
             {
                 YSlider.wholeNumbers = false;
@@ -182,7 +183,7 @@ namespace BGEditor
             {
                 if (YSlider.interactable)
                 {
-                    float y = ((Vector2)Input.mousePosition - holdStart).y;
+                    float y = (Mouse.current.position.ReadValue() - holdStart).y;
                     y = y / SLIDER_HEIGHT + note.y;
                     y = Mathf.RoundToInt(Mathf.Lerp(0, YSlider.maxValue, y));
                     YSlider.value = y;

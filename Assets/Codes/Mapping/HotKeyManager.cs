@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
 using System.Linq;
 using Zenject;
+using UnityEngine.InputSystem.Controls;
 
 namespace BGEditor
 {
@@ -35,6 +37,8 @@ namespace BGEditor
         public static bool isCtrl { get; private set; }
         public static bool isShift { get; private set; }
 
+        private static Keyboard currentKeyboard;
+
         void Awake()
         {
             mHotKeys = new List<HotKeyCombo>(HotKeys);
@@ -42,6 +46,8 @@ namespace BGEditor
             var allBlockers = blockers.ToList();
             allBlockers.Add(loadingBlocker.gameObject);
             blockers = allBlockers.ToArray();
+
+            currentKeyboard = Keyboard.current;
         }
 
         private HotKeyCombo Find(string keys)
@@ -75,9 +81,10 @@ namespace BGEditor
                 }
                 else
                 {
-                    if (!Input.GetKey(str))
+                    KeyControl keyControl = (KeyControl)Keyboard.current[str];
+                    if (!keyControl.isPressed)
                         return false;
-                    hasDown |= Input.GetKeyDown(str);
+                    hasDown |= keyControl.wasPressedThisFrame;
                 }
             }
             if (!hasDown)
@@ -110,14 +117,29 @@ namespace BGEditor
             combo.OnCombo.RemoveListener(action);
         }
 
+        static bool GetKey(Key key)
+        {
+            return currentKeyboard[key].isPressed;
+        }
+
+        static bool GetKeyDown(Key key)
+        {
+            return currentKeyboard[key].wasPressedThisFrame;
+        }
+
+        static bool GetKeyUp(Key key)
+        {
+            return currentKeyboard[key].wasReleasedThisFrame;
+        }
+
         void Update()
         {
-            isCtrl = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
-            isShift = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
-            isCtrlDown = Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl);
-            isShiftDown = Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift);
-            isCtrlUp = Input.GetKeyUp(KeyCode.LeftControl) || Input.GetKeyUp(KeyCode.RightControl);
-            isShiftUp = Input.GetKeyUp(KeyCode.LeftShift) || Input.GetKeyUp(KeyCode.RightShift);
+            isCtrl = GetKey(Key.LeftCtrl) || GetKey(Key.RightCtrl);
+            isShift = GetKey(Key.LeftShift) || GetKey(Key.RightShift);
+            isCtrlDown = GetKeyDown(Key.LeftCtrl) || GetKeyDown(Key.RightCtrl);
+            isShiftDown = GetKeyDown(Key.LeftShift) || GetKeyDown(Key.RightShift);
+            isCtrlUp = GetKeyUp(Key.LeftCtrl) || GetKeyUp(Key.RightCtrl);
+            isShiftUp = GetKeyUp(Key.LeftShift) || GetKeyUp(Key.RightShift);
             if (blockers.Any(blocker => blocker.activeInHierarchy))
                 return;
 
@@ -126,7 +148,7 @@ namespace BGEditor
                 if (Activated(combo.Keys))
                     combo.OnCombo.Invoke();
             }
-            float scroll = Input.mouseScrollDelta.y;
+            float scroll = Mouse.current.scroll.ReadValue().y;
             if (!Mathf.Approximately(0, scroll))
             {
                 onScroll.Invoke(scroll);
