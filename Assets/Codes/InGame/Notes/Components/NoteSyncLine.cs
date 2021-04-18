@@ -21,7 +21,7 @@ public class NoteSyncLine : MonoBehaviour
     private List<NoteBase> syncNotes = new List<NoteBase>();
     private List<LineRenderer> syncLines = new List<LineRenderer>();
     private int totNotes;
-    private bool[] soundEffects = new bool[5];
+    private bool[] soundEffects = new bool[6];
 
     private static NoteBaseComparer comparer = new NoteBaseComparer();
     private static readonly Vector3 PARTIAL_POS = new Vector3(0, -0.05f, 0);
