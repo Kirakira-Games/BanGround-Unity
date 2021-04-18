@@ -1,4 +1,5 @@
-﻿using BanGround;
+﻿using AudioProvider;
+using BanGround;
 using FancyScrollView;
 using System;
 using System.Collections;
@@ -12,9 +13,12 @@ public class FancyBackground : MonoBehaviour
 {
     [Inject]
     private IDataLoader dataLoader;
-
     [Inject]
     private IFileSystem fs;
+    [Inject]
+    private IAudioManager audioManager;
+    [Inject]
+    private SelectManager selectManager;
 
     public RawImage background = default;
     public KiraScrollView scrollView = default;
@@ -22,10 +26,12 @@ public class FancyBackground : MonoBehaviour
     public Text title = default;
     public Text artist = default;
     public Texture2D defaultTexture = default;
+    public TextAsset changeSound = default;
 
+    private ISoundEffect se;
     private Material material;
 
-    static Dictionary<string, Texture2D> _cachedBackgrounds = new Dictionary<string, Texture2D>();
+    Dictionary<string, Texture2D> _cachedBackgrounds = new Dictionary<string, Texture2D>();
 
     static class Uniform
     {
@@ -36,14 +42,20 @@ public class FancyBackground : MonoBehaviour
         public static readonly int Progress = Shader.PropertyToID("_Progress");
     }
 
-    void Start()
+    async void Start()
     {
         material = Instantiate(background.material);
 
         scrollView.OnMove += UpdatePosition;
+
+        if(changeSound != null)
+        {
+            se = await audioManager.PrecacheSE(changeSound.bytes);
+        }
     }
 
     int prevSid = -1, currentSid = -1, nextSid = -1;
+    bool firstSelect = true;
 
     void UpdatePosition(float pos)
     {
@@ -101,25 +113,6 @@ public class FancyBackground : MonoBehaviour
 
                         return defaultTexture;
                     }
-
-                    if (_cachedBackgrounds.Count > 10)
-                    {
-                        string keyToRemove = null;
-
-                        foreach (var (key, value) in _cachedBackgrounds)
-                        {
-                            if (key != b1 && key != b2 && key != b3)
-                            {
-                                if(value != null)
-                                    Destroy(value);
-                                    
-                                keyToRemove = key;
-                                break;
-                            }
-                        }
-
-                        _cachedBackgrounds.Remove(keyToRemove);
-                    }
                 }
                     
                 return _cachedBackgrounds[path];
@@ -138,8 +131,14 @@ public class FancyBackground : MonoBehaviour
             var mheader = dataLoader.GetMusicHeader(dataLoader.chartList[current].mid);
             title.text = mheader.title;
             artist.text = mheader.artist;
+
+            if (se != null && !firstSelect)
+                se.PlayOneShot();
+
+            firstSelect = false;
         }
 
+        selectManager.SetPreviewVolume(currentSid == selectManager.CurrentPlayingSid ? 1.0f - (Mathf.Abs(position - 0.5f) * 4) : 0);
         material.SetFloat(Uniform.Progress, position);
         background.material = material;
     }

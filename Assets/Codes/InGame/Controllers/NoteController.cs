@@ -40,6 +40,8 @@ public class NoteController : MonoBehaviour, INoteController
     private KVar o_judge;
     [Inject(Id = "o_audio")]
     private KVar o_audio;
+    [Inject(Id = "skin_particle")]
+    private KVar skin_particle;
 
     public static Camera mainCamera;
     public static Vector3 mainForward = new Vector3(0, -0.518944f, 0.8548083f);
@@ -98,6 +100,8 @@ public class NoteController : MonoBehaviour, INoteController
             se = TapEffectType.Great;
         else if (result == JudgeResult.Good)
             se = TapEffectType.Good;
+        else if (result == JudgeResult.Bad)
+            se = TapEffectType.Bad;
 
         NotePool.Instance.PlayTapEffect(se, position);
 
@@ -399,6 +403,9 @@ public class NoteController : MonoBehaviour, INoteController
 
         cameraAnimation = GameObject.Find("Cameras").GetComponent<Animator>();
 
+        // Load particle
+        ParticleSequence.SetParticlePath("skin/particle/" + skin_particle, fs);
+
         // Init JudgeRange
         NoteUtility.Init(mainForward, modManager.SpeedCompensationSum);
 
@@ -435,10 +442,11 @@ public class NoteController : MonoBehaviour, INoteController
         }
 
         // Sound effects
-        soundEffects = new ISoundEffect[5]
+        soundEffects = new ISoundEffect[]
         {
             await audioManager.PrecacheInGameSE(resourceLoader.LoadSEResource<TextAsset>("perfect.wav").bytes),
             await audioManager.PrecacheInGameSE(resourceLoader.LoadSEResource<TextAsset>("great.wav").bytes),
+            await audioManager.PrecacheInGameSE(resourceLoader.LoadSEResource<TextAsset>("empty.wav").bytes),
             await audioManager.PrecacheInGameSE(resourceLoader.LoadSEResource<TextAsset>("empty.wav").bytes),
             await audioManager.PrecacheInGameSE(resourceLoader.LoadSEResource<TextAsset>("empty.wav").bytes),
             await audioManager.PrecacheInGameSE(resourceLoader.LoadSEResource<TextAsset>("flick.wav").bytes)

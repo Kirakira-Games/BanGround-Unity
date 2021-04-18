@@ -1,9 +1,10 @@
 ﻿using BanGround.Database;
-using Boo.Lang;
+//using Boo.Lang;
 using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -32,6 +33,9 @@ namespace BanGround
 
         private async UniTask ConvertJsonToBin(string path)
         {
+            if (!path.StartsWith("chart") || !path.StartsWith("music"))
+                return;
+
             var file = fs.GetFile(path);
             var binPath = path.Replace(".json", ".bin");
             if (fs.FileExists(binPath))

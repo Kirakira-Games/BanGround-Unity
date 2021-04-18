@@ -1,5 +1,6 @@
 ﻿using BanGround;
 using BanGround.Web.Auth;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -15,20 +16,23 @@ using WebSocketSharp;
 using WebSocketSharp.Server;
 using Zenject;
 
+public class CommandEntry
+{
+    public string value;
+    public string type;
+    public string help;
+}
+
 public class WebConsole : MonoBehaviour
 {
     [Inject]
     IKVSystem kvSystem;
 
-    StringBuilder fullLog = new StringBuilder(0x10000);
+    // StringBuilder fullLog = new StringBuilder(0x10000);
+    List<string> logs = new List<string>();
+    const int MAX_LOG_LINE = 5000;
 
-    public string FullLog
-    {
-        get
-        {
-            return fullLog.ToString();
-        }
-    }
+    public List<string> FullLog => logs;
 
     public Action Action
     {
@@ -67,7 +71,8 @@ public class WebConsole : MonoBehaviour
         {
             base.OnOpen();
 
-            Send(console.FullLog);
+            foreach (var log in console.FullLog)
+                Send(log);
         }
 
         protected override void OnMessage(MessageEventArgs e)
@@ -107,7 +112,7 @@ public class WebConsole : MonoBehaviour
 
             if (path == "/log")
             {
-                content = Encoding.UTF8.GetBytes(fullLog.ToString());
+                content = Encoding.UTF8.GetBytes(string.Join("\r\n", logs));
             }
             else if (path == "/airdrop")
             {
@@ -117,28 +122,19 @@ public class WebConsole : MonoBehaviour
             {
                 ctx.Response.ContentType = "application/json";
 
-                var json = new StringBuilder();
-                bool first = true;
-
-                json.Append("[");
+                var commands = new List<CommandEntry>();
 
                 foreach (var item in kvSystem)
                 {
-                    if (!first)
+                    commands.Add(new CommandEntry
                     {
-                        json.Append(",");
-                    }
-                    else
-                    {
-                        first = false;
-                    }
-
-                    json.Append($"{{\"value\":\"{item.Name}\",\"type\":\"{(item is KVar ? "KVar" : "Kommand")}\",\"help\":\"{item.Description}\"}}");
+                        value = item.Name,
+                        type = (item is KVar ? "KVar" : "Kommand") ,
+                        help = item.Description,
+                    });
                 }
 
-                json.Append("]");
-
-                content = Encoding.UTF8.GetBytes(json.ToString());
+                content = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(commands));
             }
             else
             {
@@ -174,7 +170,7 @@ public class WebConsole : MonoBehaviour
                     bytes = br.ReadBytes((int)ctx.Request.ContentLength64);
                 }
 
-                if(ChartCreator.RequestAirdrop)
+                if (ChartCreator.RequestAirdrop)
                 {
                     ChartCreator.AirdroppedFile = bytes;
                 }
@@ -217,7 +213,7 @@ public class WebConsole : MonoBehaviour
                     var url = data["url"].ToString();
                     var query = data["query"].ToString();
 
-                    using(var wc = new WebClient())
+                    using (var wc = new WebClient())
                     {
                         wc.Encoding = Encoding.UTF8;
                         wc.Headers[HttpRequestHeader.ContentType] = "application/json";
@@ -226,7 +222,7 @@ public class WebConsole : MonoBehaviour
                         {
                             content = wc.UploadData(url, Encoding.UTF8.GetBytes(query));
                         }
-                        catch(WebException webex)
+                        catch (WebException webex)
                         {
                             var resp = (HttpWebResponse)webex.Response;
 
@@ -238,7 +234,7 @@ public class WebConsole : MonoBehaviour
                         }
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     ctx.Response.StatusCode = 500;
                     content = Encoding.UTF8.GetBytes(ex.Message);
@@ -275,7 +271,7 @@ public class WebConsole : MonoBehaviour
 
     void Update()
     {
-        while(actionQueue.Count > 0)
+        while (actionQueue.Count > 0)
             actionQueue.Dequeue()();
     }
 
@@ -291,7 +287,7 @@ public class WebConsole : MonoBehaviour
 
         var resources = WebConsoleResource.GetEnumerator();
 
-        while(resources.MoveNext())
+        while (resources.MoveNext())
         {
             resourceList.Add(resources.Current.Key, Resources.Load<TextAsset>(resources.Current.Value).bytes);
         }
@@ -305,28 +301,28 @@ public class WebConsole : MonoBehaviour
     {
         var len = condition.Length + stackTrace?.Length + 2;
 
-        if (fullLog.Length + len >= fullLog.Capacity)
-            fullLog.Clear();
+        if (logs.Count + 1 > MAX_LOG_LINE)
+            logs.Clear();
 
-        fullLog.AppendLine(condition);
+        var log = new StringBuilder();
 
-        if(type == LogType.Exception)
+        log.AppendLine(condition);
+
+        if (type == LogType.Exception)
         {
-            fullLog.AppendLine(stackTrace);
+            log.AppendLine(stackTrace);
         }
+
+        logs.Add(log.ToString());
 
         if (webSockets.Count == 0)
             return;
 
-        var str = condition + "\n";
-        if (type == LogType.Error)
-            str += stackTrace + "\n";
-
         await Task.Run(() =>
             webSockets.All(ws =>
             {
-                if(ws.ConnectionState == WebSocketState.Open)
-                    ws.SendLog(str);
+                if (ws.ConnectionState == WebSocketState.Open)
+                    ws.SendLog(log.ToString());
 
                 return true;
             })

@@ -13,6 +13,7 @@ public interface IDataLoader
     int LastImportedSid { get; set; }
 
     string BuildKiraPack(cHeader header);
+    UniTask CopyFileFromStreamingAssetsToPersistentDataPath(string relativePath);
     //void ConvertJsonToBin(DirectoryInfo dir);
     void DuplicateKiraPack(cHeader header);
     int GenerateMid();
@@ -27,7 +28,7 @@ public interface IDataLoader
     mHeader GetMusicHeader(int mid);
     string GetMusicPath(int mid);
     string GetMusicResource(int mid, string filename);
-    UniTaskVoid Init();
+    void Init();
     void InitFileSystem();
     UniTask<bool> LoadAllKiraPackFromInbox();
     T LoadChart<T>(int sid, Difficulty difficulty) where T : IExtensible;

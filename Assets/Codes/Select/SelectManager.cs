@@ -44,6 +44,10 @@ public class SelectManager : MonoBehaviour
     [Inject]
     private ICancellationTokenStore cancellationToken;
 
+    public int CurrentPlayingSid { get; private set; }
+    private float bgmVolume = 0.0f;
+    public bool BGMIsMuted => bgmVolume == 0.0f;
+
     public const float scroll_Min_Speed = 50f;
 
     //private RectTransform rt;
@@ -204,9 +208,10 @@ public class SelectManager : MonoBehaviour
         await UniTask.WaitUntil(() => !faderWorking);
 
         if (chartListManager.current.header.mid == lastPreviewMid)
+        {
+            CurrentPlayingSid = chartListManager.current.header.sid;
             return;
-
-        await PreviewFadeOut(0.02f);
+        }
 
         lastPreviewMid = chartListManager.current.header.mid;
 
@@ -230,7 +235,7 @@ public class SelectManager : MonoBehaviour
                 isFirstPlay = false;
             }
 
-            await PreviewFadeIn();
+            CurrentPlayingSid = chartListManager.current.header.sid;
         }
     }
 
@@ -262,7 +267,7 @@ public class SelectManager : MonoBehaviour
 
         faderWorking = true;
 
-        for (float i = 0f; i < 0.7f; i += 0.02f)
+        for (float i = 0f; i < 0.7f; i += 0.005f)
         {
             if (previewSound == null)
                 return;
@@ -272,6 +277,12 @@ public class SelectManager : MonoBehaviour
         }
 
         faderWorking = false;
+    }
+
+    public void SetPreviewVolume(float volume)
+    {
+        //Debug.Log(volume);
+        previewSound?.SetVolume(volume * 0.7f);
     }
 
     private void OnDelete()

@@ -32,6 +32,7 @@ namespace BanGround.Identity
             Username = "Guest"
         };
         public UserLite ActiveUser => mActiveUser ?? OfflineUser;
+        public UserFull ActiveUserInfo { get; private set; } = null;
 
         /// <summary>
         /// Opens the login panel and wait for user to cancel or successfully login.
@@ -107,6 +108,7 @@ namespace BanGround.Identity
                     {
                         loadingBlocker.Show("Account.LogginIn".L());
                         LoadUserInfo(await web.DoRefreshAccessToken());
+                        ActiveUserInfo = await web.New<UserFull>().UseTokens().Get("user/me").Fetch();
                         return true;
                     }
                     catch (KiraWebException e)

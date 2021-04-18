@@ -3,6 +3,7 @@
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using System;
+    using System.Globalization;
 
     public class JsonWithTimeStamps
     {
@@ -57,13 +58,13 @@
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            serializer.Serialize(writer, ((DateTime)value).ToString("O"));
+            serializer.Serialize(writer, ((DateTime)value).ToString("O", CultureInfo.InvariantCulture));
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             JToken token = JToken.Load(reader);
-            return DateTime.Parse(token.ToObject<string>());
+            return DateTime.Parse(token.ToObject<string>(), CultureInfo.InvariantCulture);
         }
     }
 }

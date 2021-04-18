@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿//using UnityEngine;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 using TouchPhase = UnityEngine.InputSystem.TouchPhase;
 
@@ -7,12 +7,13 @@ public class MouseTouchProvider : IKirakiraTouchProvider
 {
     public static KirakiraTouchState[] SimulateMouseTouch(KirakiraTouchPhase phase)
     {
-        var ray = NoteController.mainCamera.ScreenPointToRay(Input.mousePosition);
+        var mousePos = UnityEngine.InputSystem.Mouse.current.position.ReadValue();
+        var ray = NoteController.mainCamera.ScreenPointToRay(mousePos);
         var pos = NoteUtility.JudgePlane.Raycast(ray, out float dist) ? ray.GetPoint(dist) : KirakiraTouch.INVALID_POSITION;
         KirakiraTouchState touch = new KirakiraTouchState
         {
             touchId = NoteUtility.MOUSE_TOUCH_ID,
-            screenPos = Input.mousePosition,
+            screenPos = mousePos,
             pos = pos,
             time = NoteController.judgeTime,
             phase = phase
@@ -24,15 +25,16 @@ public class MouseTouchProvider : IKirakiraTouchProvider
     {
         KirakiraTouchState[] ret;
 
-        if (Input.GetMouseButtonDown(0))
+        var mouse = UnityEngine.InputSystem.Mouse.current.leftButton;
+        if (mouse.wasPressedThisFrame)
         {
             ret = SimulateMouseTouch(KirakiraTouchPhase.Began);
         }
-        else if (Input.GetMouseButton(0))
+        else if (mouse.isPressed)
         {
             ret = SimulateMouseTouch(KirakiraTouchPhase.Ongoing);
         }
-        else if (Input.GetMouseButtonUp(0))
+        else if (mouse.wasReleasedThisFrame)
         {
             ret = SimulateMouseTouch(KirakiraTouchPhase.Ended);
         }

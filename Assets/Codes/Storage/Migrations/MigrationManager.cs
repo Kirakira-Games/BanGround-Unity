@@ -15,7 +15,8 @@ namespace BanGround.Database.Migrations
         private const string MIGRATION_ID_KEY = "MigrationId";
         private static readonly Type[] MIGRATIONS = new Type[]
         {
-            typeof(KpakToFs2021_01_10)
+            typeof(KpakToFs2021_01_10),
+            typeof(NewInitalKirapack2021_04_17),
         };
 
         private List<MigrationBase> validMigrations;

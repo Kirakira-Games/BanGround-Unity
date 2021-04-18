@@ -29,7 +29,7 @@ namespace BanGround.Scripting.Lunar
         {
             var path = dl.GetChartResource(sid, tex);
 
-            if(fs.FileExists(path))
+            if (fs.FileExists(path))
             {
                 var t = fs.GetFile(path).ReadAsTexture();
                 loadedTextures.Add(t);
@@ -42,7 +42,7 @@ namespace BanGround.Scripting.Lunar
 
         public void SetBackground(int texId)
         {
-            if(inGameBackground == null)
+            if (inGameBackground == null)
                 inGameBackground = GameObject.Find("InGameBackground").GetComponent<InGameBackground>();
 
             inGameBackground.SetBackground(loadedTextures[texId]);
@@ -111,9 +111,12 @@ namespace BanGround.Scripting.Lunar
             startBeat = beat;
         }
 
-        public void Msg(string str)
+        public void Msg(object obj)
         {
-            Debug.Log(str);
+            if (obj == null)
+                Debug.Log("Null");
+            else
+                Debug.Log(obj.ToString());
         }
 
         public void Dispose()
@@ -155,43 +158,45 @@ namespace BanGround.Scripting.Lunar
         public void Init(int sid, Difficulty difficulty)
         {
             var scriptPath = dataLoader.GetChartScriptPath(sid, difficulty);
-            
-            if(fs.FileExists(scriptPath))
+
+            if (!fs.FileExists(scriptPath) &&
+                !fs.FileExists(scriptPath = dataLoader.GetChartResource(sid, "default.lua")))
+                return;
+
+            this.sid = sid;
+            var scriptFile = fs.GetFile(scriptPath);
+
+            luaEnv = new LuaEnv();
+
+            luaEnv.AddLoader((ref string lib) =>
             {
-                this.sid = sid;
-                var scriptFile = fs.GetFile(scriptPath);
+                var modulepath = dataLoader.GetChartResource(sid, lib + ".lua");
 
-                luaEnv = new LuaEnv();
-
-                luaEnv.AddLoader((ref string lib) =>
+                if (fs.FileExists(modulepath))
                 {
-                    var modulepath = dataLoader.GetChartResource(sid, lib + ".lua");
+                    return fs.GetFile(modulepath).ReadToEnd();
+                }
 
-                    if (fs.FileExists(modulepath))
-                    {
-                        return fs.GetFile(modulepath).ReadToEnd();
-                    }
+                return null;
+            });
 
-                    return null;
-                });
+            var api = new LunarBanGroundAPI
+            {
+                fs = fs,
+                dl = dataLoader,
+                am = am,
+                sid = sid,
+                ls = this
+            };
 
-                var api = new LunarBanGroundAPI
-                {
-                    fs = fs,
-                    dl = dataLoader,
-                    am = am,
-                    sid = sid,
-                    ls = this
-                };
+            luaEnv.Global.Set("BanGround", api);
 
-                luaEnv.Global.Set("BanGround", api);
+            luaEnv.DoString(scriptFile.ReadAsString());
 
-                luaEnv.DoString(scriptFile.ReadAsString());
+            onUpdate = luaEnv.Global.Get<LuaFunction>("OnUpdate");
+            onJudge = luaEnv.Global.Get<LuaFunction>("OnJudge");
+            onBeat = luaEnv.Global.Get<LuaFunction>("OnBeat");
 
-                onUpdate = luaEnv.Global.Get<LuaFunction>("OnUpdate");
-                onJudge = luaEnv.Global.Get<LuaFunction>("OnJudge");
-                onBeat = luaEnv.Global.Get<LuaFunction>("OnBeat");
-            }
         }
 
         public void AddKeyframeByTime(float startTime, float time, LuaFunction callback)
@@ -215,17 +220,16 @@ namespace BanGround.Scripting.Lunar
 
         public void OnJudge(NoteBase notebase, JudgeResult result)
         {
-            var table = luaEnv.NewTable();
-
-            table.SetInPath("Lane", notebase.lane);
-            table.SetInPath("Type", (int)notebase.type);
-            table.SetInPath("Time", notebase.time);
-            table.SetInPath("Beat", chartLoader.chart.TimeToBeat(notebase.time));
-            table.SetInPath("JudgeResult", result);
-            table.SetInPath("JudgeTime", notebase.judgeTime);
-            table.SetInPath("JudgeOffset", notebase.time - notebase.judgeTime);
-
-            onJudge?.Call(table);
+            onJudge?.Call(new JudgeResultObj
+            {
+                Lane = notebase.lane,
+                Type = (int)notebase.type,
+                Time = notebase.time,
+                Beat = chartLoader.chart.TimeToBeat(notebase.time / 1000.0f),
+                JudgeResult = (int)result,
+                JudgeTime = notebase.judgeTime,
+                JudgeOffset = notebase.time - notebase.judgeTime
+            });
         }
 
         public void OnUpdate(int audioTime)
@@ -237,11 +241,11 @@ namespace BanGround.Scripting.Lunar
 
             float audioTimef = audioTime / 1000f;
 
-            for(int i = curKeyframe; i < keyframes.Count; i++)
+            for (int i = curKeyframe; i < keyframes.Count; i++)
             {
                 var keyframe = keyframes[i];
 
-                if(audioTimef > keyframe.Item1 && audioTimef < keyframe.Item1 + keyframe.Item2)
+                if (audioTimef > keyframe.Item1 && audioTimef < keyframe.Item1 + keyframe.Item2)
                 {
                     float progress = (audioTimef - keyframe.Item1) / keyframe.Item2;
                     keyframe.Item3.Call(progress);
@@ -254,12 +258,12 @@ namespace BanGround.Scripting.Lunar
 
         private void OnDestroy()
         {
-            if(luaEnv != null)
+            if (luaEnv != null)
             {
                 luaEnv.DoString("BanGround:Dispose()");
                 luaEnv.Dispose();
             }
-            
+
         }
     }
 }

@@ -19,7 +19,7 @@ public class AppPreLoader : MonoBehaviour
     void Awake()
     {
         Physics.autoSimulation = false;
-        Physics2D.autoSimulation = false;
+        Physics2D.simulationMode = SimulationMode2D.Script;
 
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
