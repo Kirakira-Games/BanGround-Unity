@@ -24,19 +24,19 @@ jobs:
           ref: ${{ github.ref }}
 
       - name: Bump iOS build number
-        uses: KCFindstr/Action-Unity-Bump-iOS-Build-Number@v0.1
+        uses: KCFindstr/Action-Unity-Bump-iOS-Build-Number@v0.4
         id: bump
         with:
           ProjectSettingsPath: './ProjectSettings/ProjectSettings.asset'
           
       - name: Get the output build number
-        run: echo "The new iOS build number is ${{ steps.bump.outputs.newBuildNumber }}"
+        run: echo "The iOS build number is bumped from ${{ steps.bump.outputs.oldBuildNumber }} to ${{ steps.bump.outputs.newBuildNumber }}"
 
       - name: Commit files
         run: |
           git config --local user.email "792491320@qq.com"
           git config --local user.name "GitHub Action"
-          git commit -m "Bump iOS build number to ${{ steps.bump.outputs.newBuildNumber }}" -a
+          git commit -m "Bump iOS build number from ${{ steps.bump.outputs.oldBuildNumber }} to ${{ steps.bump.outputs.newBuildNumber }}" -a
           
       - name: Push changes to github
         uses: ad-m/github-push-action@master
