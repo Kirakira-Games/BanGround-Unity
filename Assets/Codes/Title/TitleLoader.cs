@@ -7,7 +7,6 @@ using Zenject;
 using BanGround;
 using System.Linq;
 using BanGround.Identity;
-using System;
 using BanGround.Database.Migrations;
 using System.Collections.Generic;
 
@@ -50,11 +49,15 @@ public class TitleLoader : MonoBehaviour
     //const string BACKGROUND_PATH = "backgrounds";
 
     [Inject]
-    private void Inject()
+    private void Inject(IDataLoader dataLoader)
     {
         CheckUpdate();
 
-        var backgrounds = fs.Find(file => file.Name.EndsWith(".jpg") || file.Name.EndsWith(".png") || file.Name.EndsWith(".jpeg")).ToArray();
+        var backgrounds = dataLoader.chartList
+            .Select(chart => dataLoader.GetBackgroundPath(chart.sid).Item1)
+            .Where(path => path != null)
+            .Select(path => fs.GetFile(path))
+            .ToArray();
 
         if (backgrounds.Length != 0)
         {

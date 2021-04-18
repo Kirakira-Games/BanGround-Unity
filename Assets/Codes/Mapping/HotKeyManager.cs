@@ -115,7 +115,7 @@ namespace BGEditor
 
         void Update()
         {
-            if (blockers.Any(blocker => blocker.activeInHierarchy))
+            if (currentKeyboard == null || blockers.Any(blocker => blocker.activeInHierarchy))
                 return;
 
             foreach (var combo in mHotKeys)
