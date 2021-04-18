@@ -1,9 +1,9 @@
-﻿#if InputSystem
+﻿//#if InputSystem
 using UnityEngine;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 using TouchPhase = UnityEngine.InputSystem.TouchPhase;
 
-public class InputSystemTouchProvider : KirakiraTouchProvider
+public class InputSystemTouchProvider : IKirakiraTouchProvider
 {
     public static KirakiraTouchPhase Kirakira(TouchPhase phase)
     {
@@ -22,7 +22,7 @@ public class InputSystemTouchProvider : KirakiraTouchProvider
         }
     }
 
-    static KVarRef o_judge = new KVarRef("o_judge");
+    //static KVarRef o_judge = new KVarRef("o_judge");
 
     public KirakiraTouchState[][] GetTouches()
     {
@@ -37,8 +37,8 @@ public class InputSystemTouchProvider : KirakiraTouchProvider
             ret[i] = new KirakiraTouchState
             {
                 touchId = touch.touchId,
-                time = Mathf.RoundToInt(audioTimelineSync.TimeSinceStartupToBGMTime((float)touch.time) * 1000) - o_judge,
-                realtime = (float)touch.time,
+                time = NoteController.judgeTime,//Mathf.RoundToInt(audioTimelineSync.TimeSinceStartupToBGMTime((float)touch.time) * 1000) - o_judge,
+                //realtime = (float)touch.time,
                 screenPos = touch.screenPosition,
                 pos = pos,
                 phase = Kirakira(touch.phase)
@@ -47,4 +47,4 @@ public class InputSystemTouchProvider : KirakiraTouchProvider
         return new KirakiraTouchState[][] { ret };
     }
 }
-#endif
+//#endif

@@ -281,7 +281,7 @@ public class SelectManager : MonoBehaviour
 
     public void SetPreviewVolume(float volume)
     {
-        Debug.Log(volume);
+        //Debug.Log(volume);
         previewSound?.SetVolume(volume * 0.7f);
     }
 

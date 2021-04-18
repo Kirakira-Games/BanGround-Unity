@@ -9,12 +9,12 @@ using System;
 
 namespace BanGround.Database.Migrations
 {
-    public class NewInitalKirapack2021_01_26 : MigrationBase
+    public class NewInitalKirapack2021_04_17 : MigrationBase
     {
         [Inject]
         private IDataLoader dataLoader;
 
-        public override int Id => 2;
+        public override int Id => 3;
         public override string Description => "New initial kirapack ";
 
         public override async UniTask<bool> Commit()

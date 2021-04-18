@@ -117,6 +117,8 @@ public class GlobalInstaller : MonoInstaller
 
         // Account manager
         Container.Bind<IAccountManager>().FromInstance(accountManager);
+
+        UnityEngine.InputSystem.EnhancedTouch.EnhancedTouchSupport.Enable();
     }
 
     void RegisterKonCommands()

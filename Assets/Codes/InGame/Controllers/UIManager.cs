@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 using State = GameStateMachine.State;
+using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 
 public class UIManager : MonoBehaviour, IUIManager
 {
@@ -113,7 +114,7 @@ public class UIManager : MonoBehaviour, IUIManager
 
     public void OnPauseButtonClick()
     {
-        if (Input.touches.Length >= 2) return;
+        if (Touch.activeTouches.Count >= 2) return;
         GamePause();
     }
 
