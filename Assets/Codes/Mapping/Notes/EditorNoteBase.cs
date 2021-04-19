@@ -174,6 +174,7 @@ namespace BGEditor
 
         public async void OnPointerExit(PointerEventData eventData)
         {
+            // 等一帧 保证OnPointerUp先触发
             await UniTask.DelayFrame(1);
             isHover = false;
         }
