@@ -1,10 +1,31 @@
 ﻿//#if InputSystem
 using UnityEngine;
+using UnityEngine.InputSystem;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 using TouchPhase = UnityEngine.InputSystem.TouchPhase;
 
 public class InputSystemTouchProvider : IKirakiraTouchProvider
 {
+    public static Vector2 mouseOrTouchPosition
+    {
+        get
+        {
+            if (Touchscreen.current != null)
+            {
+                var touches = Touch.activeTouches;
+                if (touches.Count > 0)
+                {
+                    return touches[0].screenPosition;
+                }
+            }
+            if (Mouse.current != null)
+            {
+                return Mouse.current.position.ReadValue();
+            }
+            return Vector2.negativeInfinity;
+        }
+    }
+
     public static KirakiraTouchPhase Kirakira(TouchPhase phase)
     {
         switch (phase)
