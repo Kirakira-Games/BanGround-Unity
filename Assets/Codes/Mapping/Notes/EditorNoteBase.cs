@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
+using Cysharp.Threading.Tasks;
 using UnityEngine.UI;
 using Zenject;
 
@@ -172,8 +172,9 @@ namespace BGEditor
             Core.tooltip.Show(this);
         }
 
-        public void OnPointerExit(PointerEventData eventData)
+        public async void OnPointerExit(PointerEventData eventData)
         {
+            await UniTask.DelayFrame(1);
             isHover = false;
         }
 
