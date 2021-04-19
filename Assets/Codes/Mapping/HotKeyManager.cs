@@ -115,18 +115,25 @@ namespace BGEditor
 
         void Update()
         {
-            if (currentKeyboard == null || blockers.Any(blocker => blocker.activeInHierarchy))
+            if (blockers.Any(blocker => blocker.activeInHierarchy))
                 return;
 
-            foreach (var combo in mHotKeys)
+            if (currentKeyboard != null)
             {
-                if (Activated(combo.Combo))
-                    combo.OnCombo.Invoke();
+                foreach (var combo in mHotKeys)
+                {
+                    if (Activated(combo.Combo))
+                        combo.OnCombo.Invoke();
+                }
             }
-            float scroll = Mouse.current.scroll.ReadValue().y;
-            if (!Mathf.Approximately(0, scroll))
+
+            if (Mouse.current != null)
             {
-                onScroll.Invoke(scroll);
+                float scroll = Mouse.current.scroll.ReadValue().y;
+                if (!Mathf.Approximately(0, scroll))
+                {
+                    onScroll.Invoke(scroll);
+                }
             }
         }
     }

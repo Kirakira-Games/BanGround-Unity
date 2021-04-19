@@ -108,7 +108,7 @@ namespace BGEditor
             if (isAdjustY)
                 return;
             isAdjustY = true;
-            holdStart = Mouse.current.position.ReadValue();
+            holdStart = InputSystemTouchProvider.mouseOrTouchPosition;
             if (Editor.tool == EditorTool.Select)
             {
                 YSlider.wholeNumbers = false;
@@ -183,7 +183,7 @@ namespace BGEditor
             {
                 if (YSlider.interactable)
                 {
-                    float y = (Mouse.current.position.ReadValue() - holdStart).y;
+                    float y = (InputSystemTouchProvider.mouseOrTouchPosition - holdStart).y;
                     y = y / SLIDER_HEIGHT + note.y;
                     y = Mathf.RoundToInt(Mathf.Lerp(0, YSlider.maxValue, y));
                     YSlider.value = y;
