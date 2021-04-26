@@ -48,7 +48,14 @@ public class LocalizedText : Text
 
     public void Localizify()
     {
-        text = localizedStrings.GetLocalizedString(originalText);
+        if (localizedStrings != null)
+        {
+            text = localizedStrings.GetLocalizedString(originalText);
+        }
+        else
+        {
+            text = originalText;
+        }
         cachedText = text;
     }
 
