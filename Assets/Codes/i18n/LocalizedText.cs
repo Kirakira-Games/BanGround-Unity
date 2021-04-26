@@ -51,7 +51,8 @@ public class LocalizedText : Text
         if (localizedStrings != null)
         {
             text = localizedStrings.GetLocalizedString(originalText);
-        } else
+        }
+        else
         {
             text = originalText;
         }
