@@ -33,16 +33,11 @@ namespace BanGround
 
         private async UniTask ConvertJsonToBin(string path)
         {
-            if (!path.StartsWith("chart") || !path.StartsWith("music"))
+            if (!path.StartsWith("chart") && !path.StartsWith("music"))
                 return;
 
             var file = fs.GetFile(path);
             var binPath = path.Replace(".json", ".bin");
-            if (fs.FileExists(binPath))
-            {
-                file.Delete();
-                return;
-            }
             Type type = null;
             var name = KiraPath.GetFileName(path);
 
@@ -73,6 +68,7 @@ namespace BanGround
                 }
             }
 
+            Debug.Log("Convert " + path + " to " + binPath);
             var newFile = fs.GetOrNewFile(binPath);
             ProtobufHelper.Write(obj, newFile);
             file.Delete();
