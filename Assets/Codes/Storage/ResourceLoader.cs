@@ -81,6 +81,7 @@ public class ResourceLoader : IResourceLoader
             {
                 return tex;
             }
+            tex.name = path;
             mTextureCache.Add(path, tex);
             mTextureCacheInverse.Add(tex, path);
         }

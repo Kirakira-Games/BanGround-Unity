@@ -66,6 +66,7 @@ public class ParticleSequence : MonoBehaviour
         {
             var texFullPath = KiraPath.Combine(path, info.TextureName);
             info.Texture = resourceLoader.LoadTextureFromFs(texFullPath);
+            info.Texture.Compress(false);
         }
     }
 

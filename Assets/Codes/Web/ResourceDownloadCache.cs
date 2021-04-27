@@ -26,6 +26,8 @@ namespace BanGround.Web
 
         private async UniTaskVoid WaitReleaseTextures()
         {
+            // 等待TokenStore换token
+            await UniTask.DelayFrame(1);
             await cancellationTokenStore.sceneToken.WaitUntilCanceled();
             var keys = Keys.ToArray();
             foreach (var key in keys)
@@ -65,7 +67,13 @@ namespace BanGround.Web
                     Remove(url);
                     return null;
                 }
-                return ((DownloadHandlerTexture)request.downloadHandler).texture;
+                var tex = ((DownloadHandlerTexture)request.downloadHandler).texture;
+                if (string.IsNullOrEmpty(tex.name))
+                {
+                    tex.name = url;
+                    tex.Compress(false);
+                }
+                return tex;
             }
             catch (OperationCanceledException e)
             {
