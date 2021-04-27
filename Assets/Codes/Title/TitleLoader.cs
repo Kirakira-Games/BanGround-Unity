@@ -21,6 +21,8 @@ public class TitleLoader : MonoBehaviour
     [Inject]
     private IFileSystem fs;
     [Inject]
+    private IResourceLoader resourceLoader;
+    [Inject]
     private IAccountManager accountManager;
     [Inject]
     private IMigrationManager migrationManager;
@@ -55,13 +57,14 @@ public class TitleLoader : MonoBehaviour
 
         var backgrounds = dataLoader.chartList
             .Select(chart => dataLoader.GetBackgroundPath(chart.sid).Item1)
-            .Where(path => path != null)
-            .Select(path => fs.GetFile(path))
+            .Where(path => path != null && fs.GetFile(path) != null)
             .ToArray();
 
         if (backgrounds.Length != 0)
         {
-            var tex = backgrounds[UnityEngine.Random.Range(0, backgrounds.Count())].ReadAsTexture();
+            var tex = resourceLoader.LoadTextureFromFs(
+                backgrounds[Random.Range(0, backgrounds.Count())]
+            );
 
             var matCopy = Instantiate(backgroundMat);
 

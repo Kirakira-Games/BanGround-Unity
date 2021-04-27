@@ -56,7 +56,7 @@ public class ParticleSequence : MonoBehaviour
         meshRenderer.enabled = false;
     }
 
-    public static void SetParticlePath(string path, IFileSystem fs)
+    public static void SetParticlePath(string path, IFileSystem fs, IResourceLoader resourceLoader)
     {
         var json = KiraPath.Combine(path, "info.json");
 
@@ -65,7 +65,7 @@ public class ParticleSequence : MonoBehaviour
         foreach (var (_, info) in ParticleInfos)
         {
             var texFullPath = KiraPath.Combine(path, info.TextureName);
-            info.Texture = fs.GetFile(texFullPath).ReadAsTexture();
+            info.Texture = resourceLoader.LoadTextureFromFs(texFullPath);
         }
     }
 

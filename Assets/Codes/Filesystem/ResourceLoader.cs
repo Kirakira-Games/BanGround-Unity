@@ -14,6 +14,10 @@ namespace BanGround
             return Encoding.UTF8.GetString(file.ReadToEnd());
         }
 
+        /// <summary>
+        /// <para><b>Warning: </b>You are responsible for destroying the loaded texture to avoid memory leaks.</para>
+        /// You may want to use <see cref="ResourceLoader.ReadAsTexture(IFile)"/> instead.
+        /// </summary>
         public static Texture2D ReadAsTexture(this IFile file)
         {
             Texture2D tex = new Texture2D(2, 2);
