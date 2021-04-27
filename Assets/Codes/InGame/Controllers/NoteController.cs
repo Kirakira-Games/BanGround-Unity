@@ -6,7 +6,7 @@ using UnityEngine.Profiling;
 using UnityEngine.Events;
 using AudioProvider;
 using Cysharp.Threading.Tasks;
-using JudgeQueue = PriorityQueue<int, NoteBase>;
+using JudgeQueue = SortedList<int, NoteBase>;
 using Zenject;
 using BanGround;
 using BanGround.Scripting;
@@ -404,7 +404,7 @@ public class NoteController : MonoBehaviour, INoteController
         cameraAnimation = GameObject.Find("Cameras").GetComponent<Animator>();
 
         // Load particle
-        ParticleSequence.SetParticlePath("skin/particle/" + skin_particle, fs);
+        ParticleSequence.SetParticlePath(KiraPath.Combine("skin/particle/", skin_particle), fs, resourceLoader);
 
         // Init JudgeRange
         NoteUtility.Init(mainForward, modManager.SpeedCompensationSum);

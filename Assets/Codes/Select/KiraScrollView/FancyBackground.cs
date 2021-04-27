@@ -1,20 +1,19 @@
 ﻿using AudioProvider;
-using BanGround;
 using FancyScrollView;
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
 public class FancyBackground : MonoBehaviour
 {
+    private const int BACKGROUND_CACHE_SIZE = 10;
+
     [Inject]
     private IDataLoader dataLoader;
     [Inject]
-    private IFileSystem fs;
+    private IResourceLoader resourceLoader;
     [Inject]
     private IAudioManager audioManager;
     [Inject]
@@ -30,8 +29,8 @@ public class FancyBackground : MonoBehaviour
 
     private ISoundEffect se;
     private Material material;
-
-    Dictionary<string, Texture2D> _cachedBackgrounds = new Dictionary<string, Texture2D>();
+    private PriorityQueue<string> mLRUCache = new PriorityQueue<string>();
+    private int mLRUTimestamp = 0;
 
     static class Uniform
     {
@@ -54,15 +53,37 @@ public class FancyBackground : MonoBehaviour
         }
     }
 
-    int prevSid = -1, currentSid = -1, nextSid = -1;
-    bool firstSelect = true;
+    private int prevSid = -1, currentSid = -1, nextSid = -1;
+    private bool firstSelect = true;
+
+    private Texture2D GetBackground(string path)
+    {
+        if (string.IsNullOrEmpty(path))
+            return defaultTexture;
+
+        var tex = resourceLoader.LoadTextureFromFs(path);
+        if (tex == null)
+        {
+            Debug.LogWarning($"{path} not exists! Fallback to default texture.");
+            return defaultTexture;
+        }
+
+        mLRUCache.Push(path, mLRUTimestamp++);
+        while (mLRUCache.Count > BACKGROUND_CACHE_SIZE)
+        {
+            string toRemove = mLRUCache.Pop();
+            resourceLoader.UnloadTexture(toRemove);
+        }
+
+        return tex;
+    }
 
     void UpdatePosition(float pos)
     {
         if (dataLoader.chartList.Count == 0)
             return;
 
-        float N = dataLoader.chartList.Count;
+        int N = dataLoader.chartList.Count;
         pos = (pos % N + N) % N;
 
         int current = Mathf.RoundToInt(pos);
@@ -95,32 +116,9 @@ public class FancyBackground : MonoBehaviour
             var b2 = dataLoader.GetBackgroundPath(s2.sid, true).Item1;
             var b3 = dataLoader.GetBackgroundPath(s3.sid, true).Item1;
 
-            Texture2D GetCachedBackground(string path)
-            {
-                if (string.IsNullOrEmpty(path))
-                    return defaultTexture;
-
-                if (!_cachedBackgrounds.ContainsKey(path))
-                {
-                    try
-                    {
-                        var tex = fs.GetFile(path).ReadAsTexture();
-                        _cachedBackgrounds.Add(path, tex);
-                    }
-                    catch(FileNotFoundException)
-                    {
-                        Debug.LogWarning($"{path} not exists! Your game file had some issue");
-
-                        return defaultTexture;
-                    }
-                }
-                    
-                return _cachedBackgrounds[path];
-            }
-
-            var tex1 = GetCachedBackground(b1);
-            var tex2 = GetCachedBackground(b2);
-            var tex3 = GetCachedBackground(b3);
+            var tex1 = GetBackground(b1);
+            var tex2 = GetBackground(b2);
+            var tex3 = GetBackground(b3);
 
             material.SetTexture(Uniform.Texture1, tex1);
             material.SetTexture(Uniform.Texture2, tex2);

@@ -22,6 +22,7 @@ public class LoaderInfo : MonoBehaviour
     private mHeader musicHeader;
     private cHeader chartHeader;
     private InGameParams parameters;
+    private Texture2D backgroundTexture;
 
     [SerializeField] private Image songImg;
     [SerializeField] private Text songName;
@@ -60,8 +61,8 @@ public class LoaderInfo : MonoBehaviour
         var path = dataLoader.GetBackgroundPath(chartHeader.sid).Item1;
         if (path != null && fs.FileExists(path))
         {
-            var tex = fs.GetFile(path).ReadAsTexture();
-            songImg.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+            backgroundTexture = fs.GetFile(path).ReadAsTexture();
+            songImg.sprite = Sprite.Create(backgroundTexture, new Rect(0, 0, backgroundTexture.width, backgroundTexture.height), new Vector2(0.5f, 0.5f));
         }
 
         // Song name
@@ -84,5 +85,13 @@ public class LoaderInfo : MonoBehaviour
         var min = chartLoader.gameChart.bpm.Min(o => o.value);
         var max = chartLoader.gameChart.bpm.Max(o => o.value);
         return min == max ? $"BPM {min}" : $"BPM {min}-{max}";
+    }
+
+    private void OnDestroy()
+    {
+        if (backgroundTexture != null)
+        {
+            Destroy(backgroundTexture);
+        }
     }
 }

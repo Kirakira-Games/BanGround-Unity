@@ -24,6 +24,9 @@ public class InGameBackground : MonoBehaviour, IInGameBackground
     [Inject]
     private IFileSystem fs;
 
+    [Inject]
+    private IResourceLoader resourceLoader;
+
     private void Awake()
     {
         mesh = GetComponent<MeshRenderer>();
@@ -81,7 +84,7 @@ public class InGameBackground : MonoBehaviour, IInGameBackground
             if (type == 0)
             {
                 vp.enabled = false;
-                var tex = fs.GetFile(path).ReadAsTexture();
+                var tex = resourceLoader.LoadTextureFromFs(path);
 
 
                 float ratio = tex.width / (float)tex.height;
