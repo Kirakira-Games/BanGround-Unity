@@ -1,61 +1,51 @@
-﻿using System.Collections.Generic;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
-public class PriorityQueue<K, V> where K: IComparable
+public class PriorityQueue<V>
 {
-    private LinkedList<K> mKeys;
-    private LinkedList<V> mValues;
+    private SortedDictionary<int, V> mPriorityDict = new SortedDictionary<int, V>();
+    private Dictionary<V, int> mPriorityDictInverse = new Dictionary<V, int>();
 
-    public int Count => mKeys.Count;
-    public V Top => mValues.First.Value;
-    public bool Empty => Count == 0;
-    public LinkedListNode<V> FirstV => mValues.First;
-    public LinkedListNode<V> LastV => mValues.Last;
-    public LinkedListNode<K> FirstK => mKeys.First;
-    public LinkedListNode<K> LastK => mKeys.Last;
-
-    public PriorityQueue()
+    private void Add(V value, int priority)
     {
-        mKeys = new LinkedList<K>();
-        mValues = new LinkedList<V>();
+        mPriorityDict.Add(priority, value);
+        mPriorityDictInverse.Add(value, priority);
     }
 
-    public void Push(K key, V value)
+    public int Count => mPriorityDict.Count;
+
+    public void Remove(V value)
     {
-        var keyPtr = mKeys.Last;
-        var valPtr = mValues.Last;
-        while (keyPtr != null && keyPtr.Value.CompareTo(key) > 0)
+        if (!mPriorityDictInverse.TryGetValue(value, out int priority))
         {
-            keyPtr = keyPtr.Previous;
-            valPtr = valPtr.Previous;
+            return;
         }
-        if (keyPtr == null)
+        mPriorityDict.Remove(priority);
+        mPriorityDictInverse.Remove(value);
+    }
+
+    public void Push(V value, int priority)
+    {
+        if (mPriorityDict.ContainsKey(priority))
         {
-            mKeys.AddFirst(key);
-            mValues.AddFirst(value);
+            throw new InvalidDataException("Duplicate priority: " + priority);
         }
-        else
-        {
-            mKeys.AddAfter(keyPtr, key);
-            mValues.AddAfter(valPtr, value);
-        }
+        Remove(value);
+        Add(value, priority);
     }
 
-    public void RemoveFirst()
+    /// <returns>Item with smallest priority</returns>
+    public V Peek()
     {
-        mKeys.RemoveFirst();
-        mValues.RemoveFirst();
+        return mPriorityDict.First().Value;
     }
 
-    public void RemoveLast()
+    public V Pop()
     {
-        mKeys.RemoveLast();
-        mValues.RemoveLast();
-    }
-
-    public void Clear()
-    {
-        mKeys.Clear();
-        mValues.Clear();
+        var value = mPriorityDict.First();
+        Remove(value.Value);
+        return value.Value;
     }
 }

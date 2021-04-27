@@ -39,6 +39,8 @@ public class FixBackground : MonoBehaviour
 
     [Inject]
     IFileSystem fs;
+    [Inject]
+    IResourceLoader resourceLoader;
 
     public void UpdateBackground(string path)
     {
@@ -54,7 +56,7 @@ public class FixBackground : MonoBehaviour
 
     protected void GetAndSetBG(string path)
     {
-        var tex = fs.GetFile(path).ReadAsTexture();
+        var tex = resourceLoader.LoadTextureFromFs(path);
         render.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
         UpdateScale();
     }

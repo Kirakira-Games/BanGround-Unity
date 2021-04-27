@@ -126,7 +126,7 @@ public class KirakiraTouch
     public HashSet<int> exchangable;
 
     private IAudioTimelineSync audioTimelineSync;
-    private PriorityQueue<float, KirakiraTouchState> timeline;
+    private SortedList<float, KirakiraTouchState> timeline;
     public static int INVALID_DURATION => NoteUtility.SLIDE_TICK_JUDGE_RANGE << 1;
     public static Vector3 INVALID_POSITION => new Vector3(0, 0, -1e3f);
     public static float flickDistPixels;
@@ -142,7 +142,7 @@ public class KirakiraTouch
     public KirakiraTouch(IAudioTimelineSync audioTimelineSync)
     {
         this.audioTimelineSync = audioTimelineSync;
-        timeline = new PriorityQueue<float, KirakiraTouchState>();
+        timeline = new SortedList<float, KirakiraTouchState>();
         exchangable = new HashSet<int>();
         Reset();
     }

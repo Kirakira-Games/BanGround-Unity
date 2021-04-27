@@ -12,7 +12,7 @@ namespace BGEditor
         [Inject]
         private IDataLoader dataLoader;
         [Inject]
-        private IFileSystem fs;
+        private IResourceLoader resourceLoader;
         [Inject]
         private IChartLoader chartLoader;
 
@@ -22,7 +22,7 @@ namespace BGEditor
             var (path, _) = dataLoader.GetBackgroundPath(chartLoader.header.sid);
             if (string.IsNullOrEmpty(path))
                 return;
-            var tex = fs.GetFile(path)?.ReadAsTexture();
+            var tex = resourceLoader.LoadTextureFromFs(path);
             if (tex != null)
             {
                 image.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));

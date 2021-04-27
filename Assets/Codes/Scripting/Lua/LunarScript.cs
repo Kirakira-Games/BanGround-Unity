@@ -12,6 +12,7 @@ namespace BanGround.Scripting.Lunar
     [LuaCallCSharp]
     public class LunarBanGroundAPI : IDisposable
     {
+        internal IResourceLoader resourceLoader;
         internal IFileSystem fs;
         internal IDataLoader dl;
         internal IAudioManager am;
@@ -31,7 +32,7 @@ namespace BanGround.Scripting.Lunar
 
             if (fs.FileExists(path))
             {
-                var t = fs.GetFile(path).ReadAsTexture();
+                var t = resourceLoader.LoadTextureFromFs(path);
                 loadedTextures.Add(t);
 
                 return loadedTextures.Count - 1;
@@ -135,6 +136,8 @@ namespace BanGround.Scripting.Lunar
         [Inject]
         IDataLoader dataLoader;
         [Inject]
+        IResourceLoader resourceLoader;
+        [Inject]
         IFileSystem fs;
         [Inject]
         IAudioManager am;
@@ -182,6 +185,7 @@ namespace BanGround.Scripting.Lunar
 
             var api = new LunarBanGroundAPI
             {
+                resourceLoader = resourceLoader,
                 fs = fs,
                 dl = dataLoader,
                 am = am,
