@@ -371,8 +371,7 @@ namespace BanGround
 
             if (result.Count == 0)
             {
-                Debug.LogError("Target file not found in any search path!");
-                return null;
+                throw new FileNotFoundException("Target file not found in any search path: " + path);
             }
 
             result.DeleteDuplicateFile();

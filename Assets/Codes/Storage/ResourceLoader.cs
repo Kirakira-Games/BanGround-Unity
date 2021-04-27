@@ -76,10 +76,13 @@ public class ResourceLoader : IResourceLoader
     {
         if (!mTextureCache.TryGetValue(path, out var tex) || tex == null)
         {
-            tex = fs.GetFile(path)?.ReadAsTexture();
-            if (tex == null)
+            try
             {
-                return tex;
+                tex = fs.GetFile(path).ReadAsTexture();
+            }
+            catch (FileNotFoundException)
+            {
+                return null;
             }
             tex.name = path;
             mTextureCache.Add(path, tex);
