@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
 using Zenject;
@@ -14,8 +15,27 @@ namespace BanGround.Web
 
     public class TextureDownloadCache : Dictionary<string, UnityWebRequestAsyncOperation>, IResourceDownloadCache<Texture2D>
     {
-        [Inject]
         private ICancellationTokenStore cancellationTokenStore;
+
+        [Inject]
+        private void Inject(ICancellationTokenStore store)
+        {
+            cancellationTokenStore = store;
+            WaitReleaseTextures().Forget();
+        }
+
+        private async UniTaskVoid WaitReleaseTextures()
+        {
+            await cancellationTokenStore.sceneToken.WaitUntilCanceled();
+            var keys = Keys.ToArray();
+            foreach (var key in keys)
+            {
+                var promise = this[key];
+                Remove(key);
+                if (promise.isDone)
+                    GameObject.Destroy(((DownloadHandlerTexture)promise.webRequest.downloadHandler).texture);
+            }
+        }
 
         /// <summary>
         /// Fetch texture from cache or create a new <see cref="UnityWebRequest"/>
@@ -39,7 +59,7 @@ namespace BanGround.Web
                     Add(url, asyncOp);
                     await asyncOp.WithCancellation(cancellationTokenStore.sceneToken);
                 }
-                if (request.isHttpError || request.isNetworkError)
+                if (request.result == UnityWebRequest.Result.ProtocolError || request.result == UnityWebRequest.Result.ConnectionError)
                 {
                     request.Dispose();
                     Remove(url);
