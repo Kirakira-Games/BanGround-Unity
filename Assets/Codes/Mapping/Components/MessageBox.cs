@@ -22,7 +22,7 @@ public class MessageBox : MonoBehaviour, IMessageBox
         mYesNoButtons = Buttons.transform.GetComponentsInChildren<Button>();
         gameObject.SetActive(false);
         anim = GetComponent<Animator>();
-        BlockerAnim = GetComponent<Animator>();
+        BlockerAnim = Blocker.GetComponent<Animator>();
     }
 
     private void DestroyButtons()
