@@ -8,17 +8,21 @@ public class MessageBox : MonoBehaviour, IMessageBox
     public Text Title;
     public Text Content;
     public Button Blocker;
+    public Animator BlockerAnim;
     public GameObject Buttons;
     public GameObject ButtonPrefab;
 
     private Button[] mYesNoButtons;
     private Button[] mCustomButtons;
     private int result;
+    private Animator anim;
 
     private void Awake()
     {
         mYesNoButtons = Buttons.transform.GetComponentsInChildren<Button>();
         gameObject.SetActive(false);
+        anim = GetComponent<Animator>();
+        BlockerAnim = GetComponent<Animator>();
     }
 
     private void DestroyButtons()
@@ -33,6 +37,7 @@ public class MessageBox : MonoBehaviour, IMessageBox
     public async UniTask<bool> ShowMessage(string title, string content)
     {
         Show(title, content);
+        anim.Play("MessageIn");
         await UniTask.WaitUntil(() => result != -1);
         return result == 1;
     }
@@ -42,6 +47,7 @@ public class MessageBox : MonoBehaviour, IMessageBox
         Show(title, content, options);
         await UniTask.WaitUntil(() => result != -1);
         DestroyButtons();
+        anim.Play("MessageIn");
         return result;
     }
 
@@ -52,10 +58,12 @@ public class MessageBox : MonoBehaviour, IMessageBox
         if (gameObject.activeSelf)
             throw new InvalidOperationException("Message box is already shown!");
         Blocker.gameObject.SetActive(true);
+        BlockerAnim.Play("BlockerIn");
         gameObject.SetActive(true);
         Title.text = title;
         Content.text = content;
         result = -1;
+        anim.Play("MessageIn");
 
         // Use yes/no buttons or options
         foreach (var button in mYesNoButtons)
@@ -76,9 +84,12 @@ public class MessageBox : MonoBehaviour, IMessageBox
         }
     }
 
-    public void SetResult(int res)
+    public async void SetResult(int res)
     {
         result = res;
+        BlockerAnim.Play("BlockerOut");
+        anim.Play("MessageOut");
+        await UniTask.Delay((int)(0.4f * 1000));//从Loaderinfo拿的
         Blocker.gameObject.SetActive(false);
         gameObject.SetActive(false);
     }
