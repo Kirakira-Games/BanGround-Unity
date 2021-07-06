@@ -56,11 +56,7 @@ namespace BanGround.Web.Music
         public string Style = "";
     }
 
-    public class SongListResponse
-    {
-        [JsonProperty("music")]
-        public List<MusicInfo> Songs = new List<MusicInfo>();
-    }
+    public class SongListResponse : List<MusicInfo> { }
 
     public class EditSongRequest
     {

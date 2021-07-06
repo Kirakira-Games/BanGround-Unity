@@ -90,11 +90,13 @@ namespace BanGround.Web.Upload
         [JsonProperty("fish")]
         public FishDelta Fish;
     }
+
     public class FileHashSize
     {
         [JsonProperty("hash")]
         public string Hash;
 
+        [JsonConverter(typeof(LongToStringConverter))]
         [JsonProperty("size")]
         public long Size;
     }

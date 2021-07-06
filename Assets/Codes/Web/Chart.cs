@@ -53,11 +53,7 @@ namespace BanGround.Web.Chart
         public DateTime StatusAt;
     }
 
-    public class ChartListResponse
-    {
-        [JsonProperty("chart")]
-        public List<ChartInfo> Charts = new List<ChartInfo>();
-    }
+    public class ChartListResponse : List<ChartInfo> { }
 
     public class CreateChartRequest
     {

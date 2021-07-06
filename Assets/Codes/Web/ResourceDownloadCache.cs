@@ -34,7 +34,7 @@ namespace BanGround.Web
             {
                 var promise = this[key];
                 Remove(key);
-                if (promise.isDone)
+                if (promise.isDone && promise.webRequest.result == UnityWebRequest.Result.Success)
                     GameObject.Destroy(((DownloadHandlerTexture)promise.webRequest.downloadHandler).texture);
             }
         }

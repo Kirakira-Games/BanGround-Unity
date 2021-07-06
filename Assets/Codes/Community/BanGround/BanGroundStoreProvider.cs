@@ -148,7 +148,7 @@ namespace BanGround.Community
         public async UniTask<List<ChartItem>> GetCharts(int mid, int offset, int limit)
         {
             var charts = await web.GetChartsBySong(mid, offset, limit).Fetch().WithCancellation(mTokenSource.Token);
-            return charts.Charts.Select(chart => ToChartItem(chart)).ToList();
+            return charts.Select(chart => ToChartItem(chart)).ToList();
         }
 
         public async UniTask<List<SongItem>> Search(string keyword, int offset, int limit)
@@ -162,7 +162,7 @@ namespace BanGround.Community
             {
                 songs = await web.SearchForSong(keyword, offset, limit).Fetch().WithCancellation(mTokenSource.Token);
             }
-            return songs.Songs.Select(song => ToSongItem(song)).ToList();;
+            return songs.Select(song => ToSongItem(song)).ToList();;
         }
     }
 }
