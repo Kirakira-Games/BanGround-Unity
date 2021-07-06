@@ -1,11 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
-using System.Collections;
 using UnityEngine;
-using System.Linq;
 using Zenject;
-using System.IO.Compression;
-using System.IO;
-using System;
 
 namespace BanGround.Database.Migrations
 {
@@ -25,6 +20,14 @@ namespace BanGround.Database.Migrations
 
             Progress = 1;
             return true;
+        }
+
+        public override bool ShouldRun() {
+            if (dataLoader.GetChartHeader(OffsetGuide.OFFSET_GUIDE_SID) == null) {
+                Debug.LogWarning("Offset guide is lost, trying to reimport.");
+                return true;
+            }
+            return false;
         }
     }
 }

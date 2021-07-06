@@ -111,7 +111,7 @@ namespace BanGround
                         if (!Directory.Exists(newDirname))
                             Directory.CreateDirectory(newDirname);
 
-                        using (var fstream = File.OpenWrite(newPath))
+                        using (var fstream = File.Create(newPath))
                         {
                             using (var stream = entry.Open())
                             {

@@ -39,14 +39,14 @@ public class UserInfo : MonoBehaviour
         // ?
         //LevelText.text = ?;
 
-
-        using (UnityWebRequest ub = UnityWebRequestTexture.GetTexture(userInfo.Avatar))
-        {
-            await ub.SendWebRequest();
-            if (this == null)
-                return;
-            var tex = DownloadHandlerTexture.GetContent(ub);
-            UserAvatar.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+        if (userInfo.Avatar != null) {
+            using (UnityWebRequest ub = UnityWebRequestTexture.GetTexture(userInfo.Avatar)) {
+                await ub.SendWebRequest();
+                if (this == null)
+                    return;
+                var tex = DownloadHandlerTexture.GetContent(ub);
+                UserAvatar.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+            }
         }
     }
 }

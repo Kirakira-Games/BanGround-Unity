@@ -256,7 +256,7 @@ public class UIManager : MonoBehaviour, IUIManager
         else
         {
             gateCanvas.SetActive(true);
-            Image gateImg = GameObject.Find("GateImg").GetComponent<Image>();
+            Image gateImg = GameObject.Find("Ready").GetComponent<Image>();
             switch (ResultsGetter.GetClearMark())
             {
                 case ClearMarks.AP:

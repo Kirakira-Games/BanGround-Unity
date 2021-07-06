@@ -20,7 +20,7 @@ namespace BanGround.Database.Migrations
         };
 
         private List<MigrationBase> validMigrations;
-        private int MigrationIdKey
+        private int MigrationId
         {
             get => PlayerPrefs.GetInt(MIGRATION_ID_KEY);
             set
@@ -56,10 +56,10 @@ namespace BanGround.Database.Migrations
         /// <returns>Whether any migration is available.</returns>
         public bool Init()
         {
-            //MigrationIdKey = 0;
-            int currentId = MigrationIdKey;
+            //MigrationId = 0;
+            int currentId = MigrationId;
             validMigrations = MIGRATIONS.Select(migration => diContainer.Instantiate(migration) as MigrationBase)
-                .Where(migration => migration.Id > currentId)
+                .Where(migration => migration.Id > currentId || migration.ShouldRun())
                 .ToList();
             return validMigrations.Count > 0;
         }
@@ -80,7 +80,7 @@ namespace BanGround.Database.Migrations
                     {
                         return false;
                     }
-                    MigrationIdKey = migration.Id;
+                    MigrationId = Mathf.Max(migration.Id, MigrationId);
                     CurrentMigrationIndex++;
                 }
                 return true;

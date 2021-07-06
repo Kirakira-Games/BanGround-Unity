@@ -27,9 +27,8 @@ public class LoaderImg : MonoBehaviour
     IEnumerator DownloadImg()
     {
         var list = UnityWebRequest.Get(ListUri);
-        string listString = "";
         yield return list.SendWebRequest();
-        if (list.isNetworkError || list.isHttpError)
+        if (list.result != UnityWebRequest.Result.Success)
         {
             //没网的时候
             Debug.LogError("Get meme list failed : " + list.error);
@@ -42,7 +41,7 @@ public class LoaderImg : MonoBehaviour
                 var dht = new DownloadHandlerTexture(true);
                 imgReq.downloadHandler = dht;
                 yield return imgReq.SendWebRequest();
-                if (imgReq.isHttpError)
+                if (imgReq.result != UnityWebRequest.Result.Success)
                     Debug.LogError("Get Local meme img failed : " + list.error);
                 else
                 {
@@ -54,7 +53,7 @@ public class LoaderImg : MonoBehaviour
         else
         {
             //Debug.Log(list.downloadHandler.text);
-            listString = list.downloadHandler.text;
+            var listString = list.downloadHandler.text;
             string[] imgs = listString.Replace(" ","").Replace("\n", "").Split(',');
             var randomIndex = Random.Range(0, imgs.Length);
             var img = imgs[randomIndex];
@@ -64,7 +63,7 @@ public class LoaderImg : MonoBehaviour
                 var dht = new DownloadHandlerTexture(true);
                 imgReq.downloadHandler = dht;
                 yield return imgReq.SendWebRequest();
-                if (imgReq.isHttpError)
+                if (imgReq.result != UnityWebRequest.Result.Success)
                     Debug.LogError("Get meme img failed : " + list.error);
                 else
                 {
@@ -81,7 +80,7 @@ public class LoaderImg : MonoBehaviour
                 var dht = new DownloadHandlerTexture(true);
                 imgReq.downloadHandler = dht;
                 yield return imgReq.SendWebRequest();
-                if (imgReq.isHttpError)
+                if (imgReq.result != UnityWebRequest.Result.Success)
                     Debug.LogError("Get meme img failed : " + list.error);
                 else
                 {
