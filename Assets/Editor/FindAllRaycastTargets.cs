@@ -32,6 +32,7 @@ namespace Assets.Editor {
         void OnGUI() {
             // Title
             GUILayout.BeginHorizontal();
+            GUILayout.Label($"Total: {raycastTargets.Count}");
             if (GUILayout.Button("Refresh")) {
                 RefreshTargets();
             }
