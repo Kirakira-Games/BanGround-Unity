@@ -17,5 +17,8 @@ namespace BanGround.Database.Migrations
         {
             throw new NotImplementedException("This migration cannot be reverted.");
         }
+
+        /// <returns>Whether the operation should be applied when already applied previously.</returns>
+        public virtual bool ShouldRun() { return false; }
     }
 }

@@ -128,9 +128,11 @@ namespace BanGround.Web
             {
                 if (isAborted)
                     throw new KiraUserAbortedException();
-                if (webRequest.isNetworkError || webRequest.responseCode >= 500)
+                if (webRequest.result == UnityWebRequest.Result.ConnectionError ||
+                    webRequest.result == UnityWebRequest.Result.DataProcessingError ||
+                    webRequest.responseCode >= 500)
                     throw new KiraNetworkErrorException();
-                if (webRequest.isHttpError)
+                if (webRequest.result == UnityWebRequest.Result.ProtocolError)
                 {
                     if (webRequest.responseCode == 401 && autoRefresh && context.RefreshToken != null)
                     {

@@ -20,7 +20,7 @@ namespace BanGround.Database
 
         private void Save(DatabaseBuilder builder)
         {
-            using (var writeStream = File.OpenWrite(DBConnection))
+            using (var writeStream = File.Create(DBConnection))
             {
                 builder.WriteToStream(writeStream);
             }
