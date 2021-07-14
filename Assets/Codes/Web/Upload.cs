@@ -19,12 +19,12 @@ namespace BanGround.Web.Upload
     {
         public static string Hash(byte[] content)
         {
-            return Auth.Util.ToHex(HashToByte(content));
+            return Auth.Util.ToHex(MD5Hash(content));
         }
 
-        public static byte[] HashToByte(byte[] content)
+        public static byte[] MD5Hash(byte[] content)
         {
-            return SHA256.Create().ComputeHash(content);
+            return MD5.Create().ComputeHash(content);
         }
 
         public static (string, UploadType) GetType(string filename)
@@ -90,11 +90,13 @@ namespace BanGround.Web.Upload
         [JsonProperty("fish")]
         public FishDelta Fish;
     }
+
     public class FileHashSize
     {
         [JsonProperty("hash")]
         public string Hash;
 
+        [JsonConverter(typeof(LongToStringConverter))]
         [JsonProperty("size")]
         public long Size;
     }

@@ -52,9 +52,6 @@ public class DataLoader : IDataLoader
     public List<cHeader> chartList => songList.cHeaders;
     public bool loaded => songList != null;
 
-    private const int InitialChartVersion = 7;
-    private const int GameVersion = 4;
-
     private Dictionary<int, cHeader> chartDic = new Dictionary<int, cHeader>();
     private Dictionary<int, mHeader> musicDic = new Dictionary<int, mHeader>();
 
@@ -760,7 +757,7 @@ public class DataLoader : IDataLoader
             {
                 writer.Write(webRequest.downloadHandler.data, 0, webRequest.downloadHandler.data.Length);
             }
-            Debug.Log($"Copy File {relativePath} {!webRequest.isNetworkError}");
+            Debug.Log($"Copy File {relativePath} {webRequest.result}");
         }
     }
 
