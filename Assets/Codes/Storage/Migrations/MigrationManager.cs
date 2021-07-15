@@ -16,7 +16,7 @@ namespace BanGround.Database.Migrations
         private static readonly Type[] MIGRATIONS = new Type[]
         {
             typeof(KpakToFs2021_01_10),
-            typeof(NewInitalKirapack2021_04_26),
+            typeof(NewInitalKirapack2021_07_15),
         };
 
         private List<MigrationBase> validMigrations;
