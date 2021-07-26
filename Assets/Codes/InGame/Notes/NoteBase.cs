@@ -4,9 +4,9 @@ using Zenject;
 
 public abstract class NoteBase : MonoBehaviour, KirakiraTracer
 {
-    private KVar r_graynote;
-    private KVar r_notesize;
-    private KVar r_bang_perspect;
+    protected KVar r_graynote;
+    protected KVar r_notesize;
+    protected KVar r_bang_perspect;
 
     public int time;
     public int judgeWindowEnd;
