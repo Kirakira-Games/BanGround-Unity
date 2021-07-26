@@ -28,6 +28,7 @@ public class SlideStart : SlideNoteBase
         base.InitNote(resourceLoader, noteController);
         var te = Instantiate(Resources.Load("Effects/effect_spritesheet"), transform) as GameObject;
         tapEffect = te.GetComponent<ParticleSequence>();
+        tapEffect.transform.localScale = Vector3.one * r_notesize * NoteUtility.NOTE_SCALE;
     }
 
     public override void ResetNote(GameNoteData data)
