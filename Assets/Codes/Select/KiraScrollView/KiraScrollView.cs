@@ -19,8 +19,6 @@ public class KiraScrollView : FancyScrollView<int, Context>
     private KiraSongCell.Factory cellFactory;
     [Inject]
     private SelectManager selectManager;
-    [Inject]
-    private IDataLoader dataLoader;
 
     public delegate void MoveHandler(float progress);
     public event MoveHandler OnMove;
