@@ -36,7 +36,7 @@ public interface IDataLoader
     UniTask<int> LoadKiraPack(FileInfo file);
     bool MusicExists(int mid);
     void RefreshSongList();
-    void SaveChart<T>(T chart, int sid, Difficulty difficulty) where T : IExtensible;
+    void SaveChart(V2.Chart chart, int sid, Difficulty difficulty);
     void SaveChartScript(string script, int sid, Difficulty difficulty);
     void SaveHeader(cHeader header, string coverExt = null, byte[] cover = null);
     void SaveHeader(mHeader header);

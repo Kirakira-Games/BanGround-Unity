@@ -167,6 +167,7 @@ public class ChartCreator : MonoBehaviour
         int level = Random.Range(clamped * 5 + 5, clamped * 8 + 6);
         var chart = CreateChart((Difficulty)difficulty, level);
         dataLoader.SaveChart(chart, cHeader.sid, (Difficulty)difficulty);
+        
 
         // Reload scene
         cl_lastdiff.Set(difficulty);

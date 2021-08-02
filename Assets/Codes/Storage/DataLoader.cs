@@ -33,8 +33,6 @@ public class DataLoader : IDataLoader
     public int LastImportedSid { get; set; } = -1;
 
     [Inject]
-    LocalizedStrings localizedStrings;
-    [Inject]
     private IChartVersion chartVersion;
     [Inject]
     private IMessageBannerController messageBannerController;
@@ -332,12 +330,24 @@ public class DataLoader : IDataLoader
         return ProtobufHelper.Load<T>(fs.GetFile(GetChartPath(sid, difficulty)));
     }
 
-    public void SaveChart<T>(T chart, int sid, Difficulty difficulty) where T : IExtensible
+    public void SaveChart(V2.Chart chart, int sid, Difficulty difficulty)
     {
+        var header = GetChartHeader(sid);
+        if (header == null)
+        {
+            Debug.LogError($"Saving chart for {sid} which does not have cHeader");
+            return;
+        }
         string path = GetChartPath(sid, difficulty);
 
         var file = fs.GetOrNewFile(path);
         ProtobufHelper.Write(chart, file);
+
+        // Update difficulty
+        header.LoadDifficultyLevels(this);
+        header.difficultyLevel[(int)difficulty] = chart.level;
+        SaveHeader(header);
+
         //fs.FlushPak(file.RootPath);
     }
 
