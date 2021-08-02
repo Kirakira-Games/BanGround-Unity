@@ -31,7 +31,7 @@ namespace KiraPackOld
         public string backgroundFile { get; set; } = "";
 
         [ProtoMember(4)]
-        public Difficulty difficulty { get; set; }
+        public V2.Difficulty difficulty { get; set; }
 
         [ProtoMember(5)]
         [System.ComponentModel.DefaultValue("")]

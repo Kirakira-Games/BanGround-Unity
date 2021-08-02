@@ -16,6 +16,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.RegularExpressions;
 using System.Text;
 using BanGround.Database;
+using Difficulty = V2.Difficulty;
 
 public class DataLoader : IDataLoader
 {

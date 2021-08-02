@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
+using Difficulty = V2.Difficulty;
 
 public interface IChartLoader
 {

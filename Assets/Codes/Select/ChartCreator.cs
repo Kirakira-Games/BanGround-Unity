@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using System.IO;
@@ -11,9 +10,9 @@ using BanGround.Audio;
 using TagLib;
 using ModestTree;
 using BanGround.Utils;
-using System.Runtime.InteropServices;
 using AudioProvider;
 using BanGround.Identity;
+using Difficulty = V2.Difficulty;
 
 public class ChartCreator : MonoBehaviour
 {

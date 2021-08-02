@@ -1,17 +1,19 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using System;
 using System.IO;
 using Newtonsoft.Json;
-using Random = UnityEngine.Random;
 using Cysharp.Threading.Tasks;
 using Zenject;
 using BanGround.Scene.Params;
 using BanGround.Game.Mods;
 using BanGround;
 using System.Security.Cryptography;
+using Random = UnityEngine.Random;
+using Difficulty = V2.Difficulty;
+using NoteType = V2.NoteType;
+using Transition = V2.Transition;
 
 class GameNoteComparer : Comparer<GameNoteData>
 {
@@ -116,9 +118,13 @@ public class ChartLoader : IChartLoader
         note.y = Random.Range(0f, 1f);
     }
 
-    public static TransitionColor RandomColor()
+    public static V2.TransitionColor RandomColor()
     {
-        return new TransitionColor((byte)Random.Range(0, 255), (byte)Random.Range(0, 255), (byte)Random.Range(0, 255), 255, Transition.Linear);
+        return new V2.TransitionColor(
+            Random.Range(0, 255),
+            Random.Range(0, 255),
+            Random.Range(0, 255), 
+            255, Transition.Linear);
     }
 
     public static void RandomizeTimingGroup(V2.TimingGroup group)
@@ -139,7 +145,7 @@ public class ChartLoader : IChartLoader
             group.points.Add(new V2.TimingPoint
             {
                 beat = new int[3] { i * 3, 0, 1 },
-                speed = new TransitionProperty<float>(i % 2 == 0 ? 1 : 2),
+                speed = new V2.TransitionPropertyFloat(i % 2 == 0 ? 1 : 2),
                 tap = def.tap.Copy(),
                 flick = def.flick.Copy(),
                 tapGrey = def.tapGrey.Copy(),

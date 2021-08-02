@@ -25,7 +25,7 @@ public class ChartVersion : IChartVersion
         return version <= 1;
     }
 
-    public V2.Chart ConvertFromV1(cHeader header, Difficulty difficulty)
+    public V2.Chart ConvertFromV1(cHeader header, V2.Difficulty difficulty)
     {
         var chart = dataLoader.LoadChart<Chart>(header.sid, difficulty);
         V2.Chart newChart = V2.Chart.From(chart);
@@ -33,7 +33,7 @@ public class ChartVersion : IChartVersion
         return newChart;
     }
 
-    public async UniTask<V2.Chart> Process(cHeader header, Difficulty difficulty)
+    public async UniTask<V2.Chart> Process(cHeader header, V2.Difficulty difficulty)
     {
         if (header == null)
             return null;

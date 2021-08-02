@@ -11,6 +11,6 @@ public interface IChartListManager
 
     void SelectChartByIndex(int index);
     void SelectChartBySid(int sid);
-    void SelectDifficulty(Difficulty difficulty);
+    void SelectDifficulty(V2.Difficulty difficulty);
     void SortChart();
 }

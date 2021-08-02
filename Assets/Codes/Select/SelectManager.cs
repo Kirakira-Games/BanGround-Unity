@@ -288,7 +288,7 @@ public class SelectManager : MonoBehaviour
     private void OnDelete()
     {
         var header = chartListManager.current.header;
-        Difficulty difficulty = chartListManager.current.difficulty;
+        V2.Difficulty difficulty = chartListManager.current.difficulty;
         if (header.sid == OffsetGuide.OFFSET_GUIDE_SID)
         {
             messageBannerController.ShowMsg(LogLevel.INFO, "Select.DeleteOffsetGuideTip".L());

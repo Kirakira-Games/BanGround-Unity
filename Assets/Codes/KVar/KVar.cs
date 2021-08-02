@@ -246,7 +246,7 @@ public class KVar : KonCommandBase
     public static explicit operator SEStyle(KVar kVar) => (SEStyle)(int)kVar;
     public static explicit operator NoteStyle(KVar kVar) => (NoteStyle)(int)kVar;
     public static explicit operator Sorter(KVar kVar) => (Sorter)(int)kVar;
-    public static explicit operator Difficulty(KVar kVar) => (Difficulty)(int)kVar;
+    public static explicit operator V2.Difficulty(KVar kVar) => (V2.Difficulty)(int)kVar;
 }
 
 public class KVSystem : IKVSystem

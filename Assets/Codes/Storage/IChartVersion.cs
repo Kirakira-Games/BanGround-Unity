@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using Difficulty = V2.Difficulty;
 
 public interface IChartVersion
 {

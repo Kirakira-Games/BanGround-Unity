@@ -114,7 +114,7 @@ namespace BGEditor
         {
             if (note.tickStack > 0)
                 return 2;
-            return note.type == NoteType.Single ? 0 : 1;
+            return note.type == V2.NoteType.Single ? 0 : 1;
         }
 
         private void CreateNote(V2.Note note)

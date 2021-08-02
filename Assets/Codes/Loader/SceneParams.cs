@@ -1,6 +1,6 @@
 ﻿using BanGround.Game.Mods;
-using Newtonsoft.Json;
 using System;
+using Difficulty = V2.Difficulty;
 
 namespace BanGround.Scene.Params
 {

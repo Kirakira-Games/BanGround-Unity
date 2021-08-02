@@ -40,35 +40,12 @@ public enum Language
     AutoDetect = -1 
 }
 
-[JsonConverter(typeof(StringEnumConverter))]
-[ProtoContract()]
-public enum Difficulty
-{
-    Easy = 0,
-    Normal = 1,
-    Hard = 2,
-    Expert = 3,
-    Special = 4,
-}
-
 public static class DifficultyUtil
 {
-    public static string Lower(this Difficulty difficulty)
+    public static string Lower(this V2.Difficulty difficulty)
     {
         return difficulty.ToString().ToLower();
     }
-}
-
-[JsonConverter(typeof(StringEnumConverter))]
-[ProtoContract()]
-public enum NoteType
-{
-    [ProtoEnum(Name = @"BPM")]
-    BPM = 0,
-    Single = 1,
-    Flick = 2,
-    SlideTick = 3,
-    SlideTickEnd = 4,
 }
 
 [JsonConverter(typeof(StringEnumConverter))]
@@ -134,7 +111,7 @@ public partial class Note : IExtensible
         => Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
     [ProtoMember(1)]
-    public NoteType type { get; set; }
+    public V2.NoteType type { get; set; }
 
     [ProtoMember(2, IsPacked = true)]
     public int[] beat { get; set; }
@@ -188,7 +165,7 @@ public partial class Chart : IExtensible
         => Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
 
     [ProtoMember(1)]
-    public Difficulty Difficulty { get; set; }
+    public V2.Difficulty Difficulty { get; set; }
 
     [ProtoMember(2)]
     public int level { get; set; }
@@ -242,7 +219,7 @@ public partial class cHeader : IExtensible
         if (difficultyLevel != null)
             return;
         difficultyLevel = new List<int>();
-        for (var diff = Difficulty.Easy; diff <= Difficulty.Special; diff++)
+        for (var diff = V2.Difficulty.Easy; diff <= V2.Difficulty.Special; diff++)
         {
             var chart = dataLoader.GetChartPath(sid, diff);
             difficultyLevel.Add(dataLoader.GetChartLevel(chart));
