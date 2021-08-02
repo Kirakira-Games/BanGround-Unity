@@ -203,9 +203,25 @@ public class SelectManager : MonoBehaviour
         return ret;
     }
 
+    bool isWaiting = false;
+
     async UniTask PlayPreview()
     {
         await UniTask.WaitUntil(() => !faderWorking);
+
+        if (isWaiting)
+            return;
+
+        if(isFirstPlay)
+        {
+            isWaiting = true;
+
+            //给语音留个地方
+            await UniTask.Delay(2200);
+
+            isWaiting = false;
+            isFirstPlay = false;
+        }
 
         if (chartListManager.current.header.mid == lastPreviewMid)
         {
@@ -222,18 +238,12 @@ public class SelectManager : MonoBehaviour
         }
         if (dataLoader.MusicExists(lastPreviewMid))
         {
+            await UniTask.SwitchToMainThread();
+
             previewSound = await audioManager.PlayLoopMusic(fs.GetFile(dataLoader.GetMusicPath(lastPreviewMid)).ReadToEnd(), true,
                 GetPreviewPos(),
                 false
             );
-
-            if (isFirstPlay)
-            {
-                previewSound?.Pause();
-                await UniTask.Delay(2200);  //给语音留个地方
-                previewSound?.Play();
-                isFirstPlay = false;
-            }
 
             CurrentPlayingSid = chartListManager.current.header.sid;
         }
