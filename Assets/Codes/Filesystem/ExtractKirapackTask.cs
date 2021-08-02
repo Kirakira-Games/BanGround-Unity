@@ -42,9 +42,9 @@ namespace BanGround
             var name = KiraPath.GetFileName(path);
 
             if (name == "cheader.json")
-                type = typeof(cHeader);
+                type = typeof(V2.cHeader);
             else if (name == "mheader.json")
-                type = typeof(mHeader);
+                type = typeof(V2.mHeader);
 
             object obj;
             using (var sr = new StreamReader(file.Open(FileAccess.Read)))
@@ -153,7 +153,7 @@ namespace BanGround
             {
                 try
                 {
-                    var cheader = ProtobufHelper.Load<cHeader>(fs.GetFile(header));
+                    var cheader = ProtobufHelper.Load<V2.cHeader>(fs.GetFile(header));
                     cheader.LoadDifficultyLevels(dataLoader);
                     db.SaveChartSet(cheader.sid, cheader.mid, cheader.difficultyLevel.ToArray());
                 }

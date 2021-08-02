@@ -8,6 +8,7 @@ using System.Linq;
 using Zenject;
 using BanGround;
 using BanGround.Scene.Params;
+using V2;
 
 #pragma warning disable 0649
 public class LoaderInfo : MonoBehaviour

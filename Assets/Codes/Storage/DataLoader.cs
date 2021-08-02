@@ -16,7 +16,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.RegularExpressions;
 using System.Text;
 using BanGround.Database;
-using Difficulty = V2.Difficulty;
+using V2;
 
 public class DataLoader : IDataLoader
 {
@@ -109,9 +109,9 @@ public class DataLoader : IDataLoader
                 musicHeader.mid = id;
                 rewrite = true;
             }
-            if (musicHeader.BPM == null || musicHeader.BPM.Length == 0)
+            if (musicHeader.bpm == null || musicHeader.bpm.Length == 0)
             {
-                musicHeader.BPM = new float[] { 120, 120 };
+                musicHeader.bpm = new float[] { 120, 120 };
                 rewrite = true;
             }
             if (rewrite)

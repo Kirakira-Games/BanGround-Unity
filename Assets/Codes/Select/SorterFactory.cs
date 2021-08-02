@@ -3,7 +3,7 @@ using BanGround.Database;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Zenject;
-using Difficulty = V2.Difficulty;
+using V2;
 
 [JsonConverter(typeof(StringEnumConverter))]
 public enum Sorter

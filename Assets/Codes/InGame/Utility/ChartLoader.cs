@@ -11,9 +11,7 @@ using BanGround.Game.Mods;
 using BanGround;
 using System.Security.Cryptography;
 using Random = UnityEngine.Random;
-using Difficulty = V2.Difficulty;
-using NoteType = V2.NoteType;
-using Transition = V2.Transition;
+using V2;
 
 class GameNoteComparer : Comparer<GameNoteData>
 {

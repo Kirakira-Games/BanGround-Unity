@@ -9,8 +9,6 @@ using System.Linq;
 using UnityEngine.Scripting;
 using BanGround;
 
-[JsonConverter(typeof(StringEnumConverter))]
-[ProtoContract()]
 public enum Language
 {
     English = 0,
@@ -48,26 +46,17 @@ public static class DifficultyUtil
     }
 }
 
-[JsonConverter(typeof(StringEnumConverter))]
-[ProtoContract()]
 public enum ClearMarks
 {
-    [ProtoEnum(Name = @"AP")]
     AP = 0,
-    [ProtoEnum(Name = @"FC")]
     FC = 1,
-    [ProtoEnum(Name = @"CL")]
     CL = 2,
     F = 3,
 }
 
-[JsonConverter(typeof(StringEnumConverter))]
-[ProtoContract()]
 public enum Ranks
 {
-    [ProtoEnum(Name = @"SSS")]
     SSS = 0,
-    [ProtoEnum(Name = @"SS")]
     SS = 1,
     S = 2,
     A = 3,
@@ -77,6 +66,7 @@ public enum Ranks
     F = 7,
 }
 
+[Obsolete("BanGround has migrated to new file structure. These old protobufs are not used anymore.")]
 [Preserve]
 [ProtoContract()]
 public partial class NoteAnim : IExtensible
@@ -101,6 +91,7 @@ public partial class NoteAnim : IExtensible
     public float y { get; set; } = float.NaN;
 }
 
+[Obsolete("BanGround has migrated to new file structure. These old protobufs are not used anymore.")]
 [Preserve]
 [Serializable]
 [ProtoContract()]
@@ -138,24 +129,7 @@ public partial class Note : IExtensible
     public float y { get; set; } = 0;
 }
 
-[Preserve]
-[ProtoContract()]
-public partial class BackgroundFile : IExtensible
-{
-    private IExtension __pbn__extensionData;
-    IExtension IExtensible.GetExtensionObject(bool createIfMissing)
-        => Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
-
-    [ProtoMember(1)]
-    [global::System.ComponentModel.DefaultValue("")]
-    public string pic { get; set; } = "";
-
-    [ProtoMember(2)]
-    [global::System.ComponentModel.DefaultValue("")]
-    public string vid { get; set; } = "";
-
-}
-
+[Obsolete("BanGround has migrated to new file structure. These old protobufs are not used anymore.")]
 [Preserve]
 [ProtoContract()]
 public partial class Chart : IExtensible
@@ -178,126 +152,6 @@ public partial class Chart : IExtensible
     public List<Note> notes { get; set; } = new List<Note>();
 
 }
-
-[Preserve]
-[ProtoContract()]
-public partial class cHeader : IExtensible
-{
-    private IExtension __pbn__extensionData;
-    IExtension IExtensible.GetExtensionObject(bool createIfMissing)
-        => Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
-
-    [ProtoMember(1)]
-    public int version { get; set; }
-
-    [ProtoMember(2)]
-    public int sid { get; set; }
-
-    [ProtoMember(3)]
-    public int mid { get; set; }
-
-    [ProtoMember(4)]
-    [global::System.ComponentModel.DefaultValue("")]
-    public string author { get; set; } = "";
-
-    [ProtoMember(5)]
-    [global::System.ComponentModel.DefaultValue("")]
-    public string authorNick { get; set; } = "";
-
-    [ProtoMember(6)]
-    public BackgroundFile backgroundFile { get; set; }
-
-    [ProtoMember(7, IsPacked = true)]
-    public float[] preview { get; set; }
-
-    [ProtoMember(8)]
-    public List<string> tag { get; set; } = new List<string>();
-
-    public List<int> difficultyLevel;
-    public void LoadDifficultyLevels(IDataLoader dataLoader)
-    {
-        if (difficultyLevel != null)
-            return;
-        difficultyLevel = new List<int>();
-        for (var diff = V2.Difficulty.Easy; diff <= V2.Difficulty.Special; diff++)
-        {
-            var chart = dataLoader.GetChartPath(sid, diff);
-            difficultyLevel.Add(dataLoader.GetChartLevel(chart));
-        }
-    }
-
-    public void Sanitize(mHeader musicHeader)
-    {
-        if (preview == null || preview.Length == 0)
-            preview = musicHeader.preview.ToArray();
-        else if (preview.Length == 1)
-            preview = new float[] { preview[0], preview[0] };
-        else
-            preview = preview.Take(2).ToArray();
-    }
-}
-
-[Preserve]
-[ProtoContract()]
-public partial class mHeader : IExtensible
-{
-    private IExtension __pbn__extensionData;
-    IExtension IExtensible.GetExtensionObject(bool createIfMissing)
-        => Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
-
-    [ProtoMember(1)]
-    public int mid { get; set; }
-
-    [ProtoMember(2)]
-    [global::System.ComponentModel.DefaultValue("")]
-    public string title { get; set; } = "";
-
-    [ProtoMember(3)]
-    [global::System.ComponentModel.DefaultValue("")]
-    public string artist { get; set; } = "";
-
-    [ProtoMember(4, IsPacked = true)]
-    public float[] preview { get; set; }
-
-    [ProtoMember(5, IsPacked = true)]
-    public float[] BPM { get; set; }
-
-    [ProtoMember(6)]
-    public float length { get; set; }
-    
-    private float[] SanitizeArray(float[] arr, float[] defaultValue)
-    {
-        if (arr == null || arr.Length == 0)
-            return defaultValue;
-        else if (arr.Length == 1)
-            return new float[] { arr[0], arr[0] };
-        else
-            return arr.Take(2).ToArray();
-    }
-
-    public void Sanitize()
-    {
-        BPM = SanitizeArray(BPM, new float[] { 120, 120 });
-        preview = SanitizeArray(preview, new float[] { 0, length });
-    }
-}
-
-
-[Preserve]
-[ProtoContract()]
-public partial class SongList : IExtensible
-{
-    private IExtension __pbn__extensionData;
-    IExtension IExtensible.GetExtensionObject(bool createIfMissing)
-        => Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
-
-    [ProtoMember(1)]
-    public List<cHeader> cHeaders { get; set; } = new List<cHeader>();
-
-    [ProtoMember(2)]
-    public List<mHeader> mHeaders { get; set; } = new List<mHeader>();
-}
-
 [Preserve]
 public static class ProtobufHelper
 {

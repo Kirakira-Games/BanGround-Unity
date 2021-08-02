@@ -12,7 +12,7 @@ using ModestTree;
 using BanGround.Utils;
 using AudioProvider;
 using BanGround.Identity;
-using Difficulty = V2.Difficulty;
+using V2;
 
 public class ChartCreator : MonoBehaviour
 {
@@ -65,7 +65,7 @@ public class ChartCreator : MonoBehaviour
             title = title,
             artist = artist,
             length = len,
-            BPM = new float[] { 0.0f },
+            bpm = new float[] { 0.0f },
             preview = new float[] { 0.0f, 0.0f }
         };
 
@@ -75,7 +75,7 @@ public class ChartCreator : MonoBehaviour
     {
         bool copyInfo = mid == -1;
 
-        return new cHeader
+        var ret = new cHeader
         {
             version = ChartVersion,
 
@@ -90,9 +90,12 @@ public class ChartCreator : MonoBehaviour
                 pic = cover
             },
 
-            preview = (!copyInfo || cHeader.preview == null) ? new float[] { 0.0f, 0.0f } : cHeader.preview.ToArray(),
-            tag = (!copyInfo || cHeader.tag == null) ? new List<string>() : cHeader.tag.ToList()
+            preview = (!copyInfo || cHeader.preview == null) ? new float[] { 0.0f, 0.0f } : cHeader.preview.ToArray()
         };
+        if (copyInfo && cHeader.tag != null) {
+            ret.tag.AddRange(cHeader.tag);
+        }
+        return ret;
     }
 
     private V2.Chart CreateChart(Difficulty difficulty, int level)

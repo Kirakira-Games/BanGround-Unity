@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Cysharp.Threading.Tasks;
 using UnityEngine.Events;
-using Difficulty = V2.Difficulty;
+using V2;
 
 public interface IDataLoader
 {

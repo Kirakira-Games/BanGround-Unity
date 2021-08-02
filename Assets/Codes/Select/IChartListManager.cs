@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine.Events;
+using V2;
 
 public interface IChartListManager
 {

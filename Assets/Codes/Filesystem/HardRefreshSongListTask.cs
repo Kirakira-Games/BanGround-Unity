@@ -34,7 +34,7 @@ namespace BanGround
             {
                 try
                 {
-                    cHeader header = ProtobufHelper.Load<cHeader>(file);
+                    var header = ProtobufHelper.Load<V2.cHeader>(file);
                     header.LoadDifficultyLevels(dataLoader);
                     db.SaveChartSet(header.sid, header.mid, header.difficultyLevel.ToArray());
                     Progress += step;

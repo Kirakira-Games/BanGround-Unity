@@ -69,7 +69,7 @@ public class SelectManager : MonoBehaviour
     [SerializeField] 
     private TextAsset[] voices;
 
-    public List<cHeader> chartList => dataLoader.chartList;
+    public List<V2.cHeader> chartList => dataLoader.chartList;
 
     [HideInInspector] 
     public ISoundTrack previewSound;
@@ -193,7 +193,7 @@ public class SelectManager : MonoBehaviour
         var preview = chartListManager.current.header.preview;
         if (preview == null || preview.Length == 0)
         {
-            mHeader mheader = dataLoader.GetMusicHeader(chartListManager.current.header.mid);
+            var mheader = dataLoader.GetMusicHeader(chartListManager.current.header.mid);
             preview = mheader.preview;
         }
         ret[0] = (uint)(preview[0] * 1000);

@@ -1,10 +1,6 @@
-﻿using UnityEngine;
-using System.Collections;
-using Cysharp.Threading.Tasks;
-using System;
-using Newtonsoft.Json;
+﻿using Cysharp.Threading.Tasks;
 using Zenject;
-using BGEditor;
+using V2;
 
 public class ChartVersion : IChartVersion
 {

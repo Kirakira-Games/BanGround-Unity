@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Zenject;
 using UnityEngine.Events;
-using Difficulty = V2.Difficulty;
+using V2;
 
 public class ChartIndexInfo
 {
