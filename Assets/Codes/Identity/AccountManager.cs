@@ -63,7 +63,7 @@ namespace BanGround.Identity
             try
             {
                 loadingBlocker.Show("Account.LogginIn".L());
-                LoadUserInfo(await web.DoLogin(UsernameField.text, PasswordField.text));
+                await LoadUserInfo(await web.DoLogin(UsernameField.text, PasswordField.text));
                 HideLoginPanel();
             }
             catch (KiraWebException e)
@@ -90,7 +90,7 @@ namespace BanGround.Identity
             Application.OpenURL(web.ServerSite + "/user/reg");
         }
 
-        private async void LoadUserInfo(UserAuth user)
+        private async UniTask LoadUserInfo(UserAuth user)
         {
             mActiveUser = user.User;
             ActiveUserInfo = await web.New<UserFull>().UseTokens().Get("user/me").Fetch();
@@ -120,7 +120,7 @@ namespace BanGround.Identity
                     try
                     {
                         loadingBlocker.Show("Account.LogginIn".L());
-                        LoadUserInfo(await web.DoRefreshAccessToken());
+                        await LoadUserInfo(await web.DoRefreshAccessToken());
                         return true;
                     }
                     catch (KiraWebException e)

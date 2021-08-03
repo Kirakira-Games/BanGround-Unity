@@ -52,7 +52,7 @@ public class UserInfo : MonoBehaviour
             if (tex == null || this == null)
                 return;
 
-            UserAvatar.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+            UserAvatar.overrideSprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
         }
     }
 
@@ -66,5 +66,6 @@ public class UserInfo : MonoBehaviour
 
         accountManager.GoOffline();
         GetUserInfo().Forget();
+        UserAvatar.overrideSprite = null;
     }
 }
