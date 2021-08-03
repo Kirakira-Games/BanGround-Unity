@@ -14,5 +14,6 @@ namespace BanGround.Identity
 
         UniTask<bool> DoLogin();
         UniTask<bool> TryLogin();
+        void GoOffline();
     }
 }

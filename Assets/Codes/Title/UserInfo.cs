@@ -4,11 +4,14 @@ using UnityEngine.Networking;
 using Cysharp.Threading.Tasks;
 using Zenject;
 using BanGround.Identity;
+using BanGround.Web;
 
 public class UserInfo : MonoBehaviour
 {
     [Inject]
     private IAccountManager accountManager;
+    [Inject]
+    private IMessageBox messageBox;
 
     public GameObject FishDisplay;
     public GameObject LevelDisplay;
@@ -48,5 +51,17 @@ public class UserInfo : MonoBehaviour
                 UserAvatar.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
             }
         }
+    }
+
+    public async void OnClickedAvatar()
+    {
+        if (accountManager.isOfflineMode)
+            return;
+
+        if (!await messageBox.ShowMessage("Account.Title.Logout".L(), "Account.Prompt.Logout".L()))
+            return;
+
+        accountManager.GoOffline();
+        GetUserInfo();
     }
 }

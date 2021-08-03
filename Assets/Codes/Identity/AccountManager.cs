@@ -93,6 +93,15 @@ namespace BanGround.Identity
             mActiveUser = user.User;
         }
 
+        public void GoOffline()
+        {
+            mActiveUser = null;
+            ActiveUserInfo = null;
+
+            web.AccessToken = "";
+            web.RefreshToken = "";
+        }
+
         /// <summary>
         /// Prompts the user to login for the first time called. Otherwise returns !<see cref="isOfflineMode"/>.
         /// </summary>
