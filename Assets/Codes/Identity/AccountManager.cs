@@ -59,6 +59,7 @@ namespace BanGround.Identity
                 return;
 
             isAuthing = true;
+
             try
             {
                 loadingBlocker.Show("Account.LogginIn".L());
@@ -80,6 +81,7 @@ namespace BanGround.Identity
             {
                 loadingBlocker.Close();
             }
+
             isAuthing = false;
         }
 
@@ -88,9 +90,10 @@ namespace BanGround.Identity
             Application.OpenURL(web.ServerSite + "/user/reg");
         }
 
-        private void LoadUserInfo(UserAuth user)
+        private async void LoadUserInfo(UserAuth user)
         {
             mActiveUser = user.User;
+            ActiveUserInfo = await web.New<UserFull>().UseTokens().Get("user/me").Fetch();
         }
 
         public void GoOffline()
@@ -109,6 +112,7 @@ namespace BanGround.Identity
         {
             if (!isOfflineMode)
                 return true;
+
             if (LoginAttemptCount == 0)
             {
                 if (isTokenSaved)
@@ -117,7 +121,6 @@ namespace BanGround.Identity
                     {
                         loadingBlocker.Show("Account.LogginIn".L());
                         LoadUserInfo(await web.DoRefreshAccessToken());
-                        ActiveUserInfo = await web.New<UserFull>().UseTokens().Get("user/me").Fetch();
                         return true;
                     }
                     catch (KiraWebException e)
@@ -136,6 +139,7 @@ namespace BanGround.Identity
                 }
                 return await DoLogin();
             }
+
             return !isOfflineMode;
         }
     }

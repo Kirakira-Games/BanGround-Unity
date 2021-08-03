@@ -3,8 +3,9 @@ using UnityEngine.UI;
 using UnityEngine.Networking;
 using Cysharp.Threading.Tasks;
 using Zenject;
+using BanGround;
 using BanGround.Identity;
-using BanGround.Web;
+using System.Net;
 
 public class UserInfo : MonoBehaviour
 {
@@ -12,6 +13,8 @@ public class UserInfo : MonoBehaviour
     private IAccountManager accountManager;
     [Inject]
     private IMessageBox messageBox;
+    [Inject]
+    private IFileSystem fs;
 
     public GameObject FishDisplay;
     public GameObject LevelDisplay;
@@ -42,14 +45,14 @@ public class UserInfo : MonoBehaviour
         // ?
         //LevelText.text = ?;
 
-        if (userInfo.Avatar != null) {
-            using (UnityWebRequest ub = UnityWebRequestTexture.GetTexture(userInfo.Avatar)) {
-                await ub.SendWebRequest();
-                if (this == null)
-                    return;
-                var tex = DownloadHandlerTexture.GetContent(ub);
-                UserAvatar.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
-            }
+        if (userInfo.Avatar != null) 
+        {
+            var tex = await userInfo.GetAvatarTexure();
+
+            if (tex == null || this == null)
+                return;
+
+            UserAvatar.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
         }
     }
 
@@ -62,6 +65,6 @@ public class UserInfo : MonoBehaviour
             return;
 
         accountManager.GoOffline();
-        GetUserInfo();
+        GetUserInfo().Forget();
     }
 }
