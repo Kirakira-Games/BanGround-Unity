@@ -12,8 +12,6 @@ public class SettingAndMod : MonoBehaviour
     [Inject]
     LocalizedStrings localizedStrings;
     [Inject]
-    private IAudioManager audioManager;
-    [Inject]
     private IKVSystem kvSystem;
     [Inject]
     SelectManager selectManager;
@@ -144,7 +142,7 @@ public class SettingAndMod : MonoBehaviour
     /*
      * End
      */
-    void initCompoinents()
+    void InitCompoinents()
     {
 #if !(UNITY_STANDALONE || UNITY_WSA)
         GameObject.Find("Windows_Panel").SetActive(false);
@@ -389,9 +387,8 @@ public class SettingAndMod : MonoBehaviour
 
     void Start()
     {
-        initCompoinents();
+        InitCompoinents();
         GetLiveSetting();
         Open_LunarConsole.onClick.AddListener(() => { LunarConsolePlugin.LunarConsole.Show(); });
     }
 }
-   

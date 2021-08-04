@@ -12,6 +12,6 @@ namespace BanGround.Database.Models
         [SecondaryKey(0), NonUnique]
         public int Mid { get; set; }
 
-        public int[] Difficulties { get; set; } = new int[(int)Difficulty.Special + 1];
+        public int[] Difficulties { get; set; } = new int[(int)V2.Difficulty.Special + 1];
     }
 }

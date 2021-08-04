@@ -8,6 +8,7 @@ using System.Linq;
 using Zenject;
 using BanGround;
 using BanGround.Scene.Params;
+using V2;
 
 #pragma warning disable 0649
 public class LoaderInfo : MonoBehaviour
@@ -72,7 +73,7 @@ public class LoaderInfo : MonoBehaviour
         songBPM.text = "Loading...";
         
         // Difficulty and charter
-        Difficulty difficulty = parameters.difficulty;
+        var difficulty = parameters.difficulty;
         int level = chartHeader.difficultyLevel[(int)difficulty];
         songLevelAndCharter.text = string.Format(LevelAndCharterFormat, difficulty.ToString().ToUpper(), level, chartHeader.authorNick);
         

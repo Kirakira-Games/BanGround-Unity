@@ -1,5 +1,6 @@
 ﻿using BanGround.Database.Generated;
 using BanGround.Database.Models;
+using Difficulty = V2.Difficulty;
 
 namespace BanGround.Database
 {

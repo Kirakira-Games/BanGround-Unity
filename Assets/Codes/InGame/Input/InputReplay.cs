@@ -1,11 +1,7 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using BanGround;
-using System.Security.Cryptography;
-using SevenZip;
 
 using LZMAEncoder = SevenZip.Compression.LZMA.Encoder;
 using LZMADecoder = SevenZip.Compression.LZMA.Decoder;
@@ -32,7 +28,7 @@ public class DemoFile
 
     public uint uid;
     public int sid;
-    public Difficulty difficulty;
+    public V2.Difficulty difficulty;
     public ulong mods;
     public List<FileChecksum> checksums = new List<FileChecksum>();
     public List<ReplayFrame> frames = new List<ReplayFrame>();
@@ -204,7 +200,7 @@ public class DemoFile
 
                 result.uid = br.ReadUInt32();
                 result.sid = br.ReadInt32();
-                result.difficulty = (Difficulty)br.ReadUInt16();
+                result.difficulty = (V2.Difficulty)br.ReadUInt16();
                 result.mods = br.ReadUInt64();
 
                 // uint fileCount;
@@ -302,7 +298,7 @@ public class DemoRecorder
     public string demoName;
     public DemoFile demoFile;
 
-    public DemoRecorder(int chartId, Difficulty diff, ModFlag mods)
+    public DemoRecorder(int chartId, V2.Difficulty diff, ModFlag mods)
     {
         demoFile = new DemoFile
         {

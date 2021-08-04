@@ -1,11 +1,8 @@
 ﻿using Cysharp.Threading.Tasks;
 using EasingCore;
 using FancyScrollView;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using Zenject;
 
 public class KiraScrollView : FancyScrollView<int, Context>
@@ -19,8 +16,6 @@ public class KiraScrollView : FancyScrollView<int, Context>
     private KiraSongCell.Factory cellFactory;
     [Inject]
     private SelectManager selectManager;
-    [Inject]
-    private IDataLoader dataLoader;
 
     public delegate void MoveHandler(float progress);
     public event MoveHandler OnMove;
@@ -67,7 +62,7 @@ public class KiraScrollView : FancyScrollView<int, Context>
             {
                 throw new MissingComponentException(string.Format(
                     "FancyCell<{0}, {1}> component not found in {2}.",
-                    typeof(cHeader).FullName, typeof(Context).FullName, CellPrefab.name));
+                    typeof(V2.cHeader).FullName, typeof(Context).FullName, CellPrefab.name));
             }
 
             cell.SetContext(Context);

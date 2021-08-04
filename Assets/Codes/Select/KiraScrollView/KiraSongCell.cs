@@ -50,7 +50,7 @@ public class KiraSongCell : FancyCell<int, Context>
 
         lastSid = chart.sid;
 
-        mHeader song = dataLoader.GetMusicHeader(chart.mid);
+        var song = dataLoader.GetMusicHeader(chart.mid);
         smallText.text = song.title;
 
         UpdatePosition(currentPosition);

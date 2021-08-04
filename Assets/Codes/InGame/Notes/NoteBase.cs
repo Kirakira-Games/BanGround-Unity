@@ -98,7 +98,7 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
         {
             var next = anims[animsHead + 1];
             float ratio = Mathf.InverseLerp(anim.time, next.time, NoteController.audioTimef);
-            newpos = TransitionVector.LerpVector(anim.pos, next.pos, ratio);
+            newpos = V2.TransitionVector.LerpVector(anim.pos, next.pos, ratio);
         }
         if (r_bang_perspect)
         {

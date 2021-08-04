@@ -7,7 +7,7 @@ using Zenject;
 public class OffsetGuide : MonoBehaviour
 {
     public const int OFFSET_GUIDE_SID = 99901;
-    public const Difficulty OFFSET_GUIDE_DIFF = Difficulty.Easy;
+    public const V2.Difficulty OFFSET_GUIDE_DIFF = V2.Difficulty.Easy;
 
     [Inject]
     private IKVSystem kvSystem;

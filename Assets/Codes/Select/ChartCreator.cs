@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using System.IO;
@@ -11,9 +10,9 @@ using BanGround.Audio;
 using TagLib;
 using ModestTree;
 using BanGround.Utils;
-using System.Runtime.InteropServices;
 using AudioProvider;
 using BanGround.Identity;
+using V2;
 
 public class ChartCreator : MonoBehaviour
 {
@@ -66,7 +65,7 @@ public class ChartCreator : MonoBehaviour
             title = title,
             artist = artist,
             length = len,
-            BPM = new float[] { 0.0f },
+            bpm = new float[] { 0.0f },
             preview = new float[] { 0.0f, 0.0f }
         };
 
@@ -76,7 +75,7 @@ public class ChartCreator : MonoBehaviour
     {
         bool copyInfo = mid == -1;
 
-        return new cHeader
+        var ret = new cHeader
         {
             version = ChartVersion,
 
@@ -91,9 +90,12 @@ public class ChartCreator : MonoBehaviour
                 pic = cover
             },
 
-            preview = (!copyInfo || cHeader.preview == null) ? new float[] { 0.0f, 0.0f } : cHeader.preview.ToArray(),
-            tag = (!copyInfo || cHeader.tag == null) ? new List<string>() : cHeader.tag.ToList()
+            preview = (!copyInfo || cHeader.preview == null) ? new float[] { 0.0f, 0.0f } : cHeader.preview.ToArray()
         };
+        if (copyInfo && cHeader.tag != null) {
+            ret.tag.AddRange(cHeader.tag);
+        }
+        return ret;
     }
 
     private V2.Chart CreateChart(Difficulty difficulty, int level)
@@ -165,6 +167,7 @@ public class ChartCreator : MonoBehaviour
         int level = Random.Range(clamped * 5 + 5, clamped * 8 + 6);
         var chart = CreateChart((Difficulty)difficulty, level);
         dataLoader.SaveChart(chart, cHeader.sid, (Difficulty)difficulty);
+        
 
         // Reload scene
         cl_lastdiff.Set(difficulty);
