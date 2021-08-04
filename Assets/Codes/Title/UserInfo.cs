@@ -1,11 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Networking;
 using Cysharp.Threading.Tasks;
 using Zenject;
-using BanGround;
 using BanGround.Identity;
-using System.Net;
 
 public class UserInfo : MonoBehaviour
 {
@@ -13,8 +10,6 @@ public class UserInfo : MonoBehaviour
     private IAccountManager accountManager;
     [Inject]
     private IMessageBox messageBox;
-    [Inject]
-    private IFileSystem fs;
 
     public GameObject FishDisplay;
     public GameObject LevelDisplay;
@@ -37,6 +32,7 @@ public class UserInfo : MonoBehaviour
         {
             FishDisplay.SetActive(false);
             LevelDisplay.SetActive(false);
+            UserAvatar.overrideSprite = null;
             return;
         }
 
@@ -59,13 +55,18 @@ public class UserInfo : MonoBehaviour
     public async void OnClickedAvatar()
     {
         if (accountManager.isOfflineMode)
+        {
+            if (await accountManager.DoLogin())
+            {
+                GetUserInfo().Forget();
+            }
             return;
+        }
 
         if (!await messageBox.ShowMessage("Account.Title.Logout".L(), "Account.Prompt.Logout".L()))
             return;
 
         accountManager.GoOffline();
         GetUserInfo().Forget();
-        UserAvatar.overrideSprite = null;
     }
 }
