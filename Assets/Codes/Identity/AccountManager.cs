@@ -70,7 +70,7 @@ namespace BanGround.Identity
                 if (e.isNetworkError)
                     messageBannerController.ShowMsg(LogLevel.ERROR, "Exception.Network.UnableToConnect".L());
                 else
-                    messageBannerController.ShowMsg(LogLevel.ERROR, "Exception.Network.Unknown".L(e.Message));
+                    messageBannerController.ShowMsg(LogLevel.ERROR, "Exception.Network.Error".L(e.Message));
             }
             catch (Exception e)
             {
