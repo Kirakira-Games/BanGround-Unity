@@ -205,13 +205,6 @@ namespace BanGround.Web
                     Debug.Log("[KWR] Response: " + webRequest.downloadHandler.text);
                     var text = webRequest.downloadHandler.text;
 
-                    // !! hack hack !! TODO: remove this in future
-                    if(!text.Contains("\"status\""))
-                    {
-                        text = text.Substring(0, text.Length - 1);
-                        text += ",\"status\":true,\"error\":\"\"}";
-                    }
-
                     var result = JsonConvert.DeserializeObject<Result<Resp>>(text);
                     if (result.status == false)
                         throw new KiraWebException(webRequest.responseCode, new KiraErrorMessage(result.error));

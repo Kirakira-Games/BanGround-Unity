@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Networking;
 using Cysharp.Threading.Tasks;
 using Zenject;
 using BanGround.Identity;
@@ -9,6 +8,8 @@ public class UserInfo : MonoBehaviour
 {
     [Inject]
     private IAccountManager accountManager;
+    [Inject]
+    private IMessageBox messageBox;
 
     public GameObject FishDisplay;
     public GameObject LevelDisplay;
@@ -31,6 +32,7 @@ public class UserInfo : MonoBehaviour
         {
             FishDisplay.SetActive(false);
             LevelDisplay.SetActive(false);
+            UserAvatar.overrideSprite = null;
             return;
         }
 
@@ -39,14 +41,32 @@ public class UserInfo : MonoBehaviour
         // ?
         //LevelText.text = ?;
 
-        if (userInfo.Avatar != null) {
-            using (UnityWebRequest ub = UnityWebRequestTexture.GetTexture(userInfo.Avatar)) {
-                await ub.SendWebRequest();
-                if (this == null)
-                    return;
-                var tex = DownloadHandlerTexture.GetContent(ub);
-                UserAvatar.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
-            }
+        if (userInfo.Avatar != null) 
+        {
+            var tex = await userInfo.GetAvatarTexure();
+
+            if (tex == null || this == null)
+                return;
+
+            UserAvatar.overrideSprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
         }
+    }
+
+    public async void OnClickedAvatar()
+    {
+        if (accountManager.isOfflineMode)
+        {
+            if (await accountManager.DoLogin())
+            {
+                GetUserInfo().Forget();
+            }
+            return;
+        }
+
+        if (!await messageBox.ShowMessage("Account.Title.Logout".L(), "Account.Prompt.Logout".L()))
+            return;
+
+        accountManager.GoOffline();
+        GetUserInfo().Forget();
     }
 }

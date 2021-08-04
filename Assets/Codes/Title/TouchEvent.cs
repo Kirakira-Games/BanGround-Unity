@@ -1,10 +1,6 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using BanGround.Identity;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 using Zenject;
 
 public class TouchEvent : MonoBehaviour
