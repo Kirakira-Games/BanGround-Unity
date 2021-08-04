@@ -1,16 +1,14 @@
 ﻿using BanGround;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using Zenject;
 using BanGround.Scene.Params;
 using BanGround.Game.Mods;
+using NoteType = V2.NoteType;
 
 namespace BGEditor
 {
@@ -287,8 +285,8 @@ namespace BGEditor
                 difficulty = chart.difficulty,
                 level = chart.level,
                 offset = chart.offset,
-                bpm = chart.bpm
             };
+            ret.bpm.AddRange(chart.bpm);
             // Slides of length 1 must be excluded
             var cmds = new CmdGroup();
             for (int i = 0; i < chart.groups.Count; i++)
@@ -383,14 +381,13 @@ namespace BGEditor
                 difficulty = raw.difficulty,
                 level = raw.level,
                 offset = raw.offset,
-                bpm = raw.bpm,
-                groups = new List<V2.TimingGroup>()
             };
-            timing.BpmList = raw.bpm;
+            chart.bpm.AddRange(raw.bpm);
+            timing.BpmList = chart.bpm;
             for (int i = 0; i < raw.groups.Count; i++)
             {
                 var group = new V2.TimingGroup();
-                group.points = raw.groups[i].points;
+                group.points.AddRange(raw.groups[i].points);
                 chart.groups.Add(group);
             }
             for (int i = 0; i < raw.groups.Count; i++)

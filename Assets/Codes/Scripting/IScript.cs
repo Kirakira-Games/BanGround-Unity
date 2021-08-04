@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BanGround.Scripting
+﻿namespace BanGround.Scripting
 {
     public interface IScript
     {
@@ -12,7 +6,7 @@ namespace BanGround.Scripting
         bool HasOnJudge { get; }
         bool HasOnBeat { get; }
 
-        void Init(int sid, Difficulty difficulty);
+        void Init(int sid, V2.Difficulty difficulty);
         void OnUpdate(int audioTime);
         void OnJudge(NoteBase notebase, JudgeResult result);
         void OnBeat(float beat);

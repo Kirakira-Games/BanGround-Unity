@@ -2,6 +2,9 @@
 using System.Security.Cryptography;
 using System.Text;
 using Cysharp.Threading.Tasks;
+using UnityEngine;
+using UnityEngine.Networking;
+using System.Net;
 
 namespace BanGround.Web.Auth
 {
@@ -91,8 +94,29 @@ namespace BanGround.Web.Auth
 
         [JsonProperty("supporter")]
         public int SupporterLevel;
-    }
 
+        [JsonIgnore]
+        private Texture2D _avatarCache;
+
+        public async UniTask<Texture2D> GetAvatarTexure()
+        {
+            if (_avatarCache == null && Avatar != null)
+            {
+                using (WebClient wc = new WebClient())
+                {
+                    var data = await wc.DownloadDataTaskAsync(new System.Uri(Avatar));
+
+                    Texture2D tex = new Texture2D(2, 2);
+                    tex.LoadImage(data);
+                    tex.wrapMode = TextureWrapMode.Clamp;
+
+                    _avatarCache = tex;
+                }
+            }
+
+            return _avatarCache;
+        }
+    }
     public class UserLite
     {
         [JsonProperty("id")]

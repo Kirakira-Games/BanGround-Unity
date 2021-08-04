@@ -69,7 +69,7 @@ public class SelectManager : MonoBehaviour
     [SerializeField] 
     private TextAsset[] voices;
 
-    public List<cHeader> chartList => dataLoader.chartList;
+    public List<V2.cHeader> chartList => dataLoader.chartList;
 
     [HideInInspector] 
     public ISoundTrack previewSound;
@@ -193,7 +193,7 @@ public class SelectManager : MonoBehaviour
         var preview = chartListManager.current.header.preview;
         if (preview == null || preview.Length == 0)
         {
-            mHeader mheader = dataLoader.GetMusicHeader(chartListManager.current.header.mid);
+            var mheader = dataLoader.GetMusicHeader(chartListManager.current.header.mid);
             preview = mheader.preview;
         }
         ret[0] = (uint)(preview[0] * 1000);
@@ -203,9 +203,25 @@ public class SelectManager : MonoBehaviour
         return ret;
     }
 
+    bool isWaiting = false;
+
     async UniTask PlayPreview()
     {
         await UniTask.WaitUntil(() => !faderWorking);
+
+        if (isWaiting)
+            return;
+
+        if(isFirstPlay)
+        {
+            isWaiting = true;
+
+            //给语音留个地方
+            await UniTask.Delay(2200);
+
+            isWaiting = false;
+            isFirstPlay = false;
+        }
 
         if (chartListManager.current.header.mid == lastPreviewMid)
         {
@@ -222,18 +238,12 @@ public class SelectManager : MonoBehaviour
         }
         if (dataLoader.MusicExists(lastPreviewMid))
         {
+            await UniTask.SwitchToMainThread();
+
             previewSound = await audioManager.PlayLoopMusic(fs.GetFile(dataLoader.GetMusicPath(lastPreviewMid)).ReadToEnd(), true,
                 GetPreviewPos(),
                 false
             );
-
-            if (isFirstPlay)
-            {
-                previewSound?.Pause();
-                await UniTask.Delay(2200);  //给语音留个地方
-                previewSound?.Play();
-                isFirstPlay = false;
-            }
 
             CurrentPlayingSid = chartListManager.current.header.sid;
         }
@@ -288,7 +298,7 @@ public class SelectManager : MonoBehaviour
     private void OnDelete()
     {
         var header = chartListManager.current.header;
-        Difficulty difficulty = chartListManager.current.difficulty;
+        V2.Difficulty difficulty = chartListManager.current.difficulty;
         if (header.sid == OffsetGuide.OFFSET_GUIDE_SID)
         {
             messageBannerController.ShowMsg(LogLevel.INFO, "Select.DeleteOffsetGuideTip".L());

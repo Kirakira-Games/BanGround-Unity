@@ -4,6 +4,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
+using Difficulty = V2.Difficulty;
 
 #pragma warning disable 0649
 public class DifficultySelect : MonoBehaviour

@@ -1,17 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using Zenject;
-using UnityEngine.PlayerLoop;
 using UnityEngine.Events;
-using Cysharp.Threading.Tasks;
-using System;
-using Newtonsoft.Json;
-using System.Linq;
-using BanGround;
-using System.Security.Cryptography;
-using System.IO;
-using BanGround.Game.Mods;
-using BanGround.Scene.Params;
+using V2;
 
 public class ChartIndexInfo
 {

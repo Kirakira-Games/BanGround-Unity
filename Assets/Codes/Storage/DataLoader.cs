@@ -16,6 +16,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.RegularExpressions;
 using System.Text;
 using BanGround.Database;
+using V2;
 
 public class DataLoader : IDataLoader
 {
@@ -31,8 +32,6 @@ public class DataLoader : IDataLoader
     public static readonly string InboxDir = Application.persistentDataPath + "/Inbox/";
     public int LastImportedSid { get; set; } = -1;
 
-    [Inject]
-    LocalizedStrings localizedStrings;
     [Inject]
     private IChartVersion chartVersion;
     [Inject]
@@ -108,9 +107,9 @@ public class DataLoader : IDataLoader
                 musicHeader.mid = id;
                 rewrite = true;
             }
-            if (musicHeader.BPM == null || musicHeader.BPM.Length == 0)
+            if (musicHeader.bpm == null || musicHeader.bpm.Length == 0)
             {
-                musicHeader.BPM = new float[] { 120, 120 };
+                musicHeader.bpm = new float[] { 120, 120 };
                 rewrite = true;
             }
             if (rewrite)
@@ -331,12 +330,24 @@ public class DataLoader : IDataLoader
         return ProtobufHelper.Load<T>(fs.GetFile(GetChartPath(sid, difficulty)));
     }
 
-    public void SaveChart<T>(T chart, int sid, Difficulty difficulty) where T : IExtensible
+    public void SaveChart(V2.Chart chart, int sid, Difficulty difficulty)
     {
+        var header = GetChartHeader(sid);
+        if (header == null)
+        {
+            Debug.LogError($"Saving chart for {sid} which does not have cHeader");
+            return;
+        }
         string path = GetChartPath(sid, difficulty);
 
         var file = fs.GetOrNewFile(path);
         ProtobufHelper.Write(chart, file);
+
+        // Update difficulty
+        header.LoadDifficultyLevels(this);
+        header.difficultyLevel[(int)difficulty] = chart.level;
+        SaveHeader(header);
+
         //fs.FlushPak(file.RootPath);
     }
 

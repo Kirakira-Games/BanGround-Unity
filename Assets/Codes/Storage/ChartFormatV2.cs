@@ -20,22 +20,12 @@ namespace V2
     }
 
     [Preserve]
-    [ProtoContract()]
-    public class NoteAnim : IExtensible, IWithTiming
+    public partial class NoteAnim : IExtensible, IWithTiming
     {
-        private IExtension __pbn__extensionData;
-        IExtension IExtensible.GetExtensionObject(bool createIfMissing)
-            => Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
-
-        [ProtoMember(1, IsPacked = true)]
-        public int[] beat { get; set; }
         [JsonIgnore]
         public float time { get; set; }
         [JsonIgnore]
         public float beatf { get; set; }
-
-        [ProtoMember(2)]
-        public TransitionVector pos { get; set; }
 
         public static NoteAnim Lerp(NoteAnim a, NoteAnim b, float t)
         {
@@ -68,22 +58,12 @@ namespace V2
     }
 
     [Preserve]
-    [ProtoContract()]
-    public class ValuePoint : IExtensible, IWithTiming
+    public partial class ValuePoint : IExtensible, IWithTiming
     {
-        private IExtension __pbn__extensionData;
-        IExtension IExtensible.GetExtensionObject(bool createIfMissing)
-            => Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
-
-        [ProtoMember(1, IsPacked = true)]
-        public int[] beat { get; set; }
         [JsonIgnore]
         public float time { get; set; }
         [JsonIgnore]
         public float beatf { get; set; }
-
-        [ProtoMember(2)]
-        public float value { get; set; }
 
         public override string ToString()
         {
@@ -92,44 +72,19 @@ namespace V2
     }
 
     [Preserve]
-    [ProtoContract()]
-    public class TimingPoint : IExtensible, IWithTiming
+    public partial class TimingPoint : IExtensible, IWithTiming
     {
-        private IExtension __pbn__extensionData;
-        IExtension IExtensible.GetExtensionObject(bool createIfMissing)
-            => Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
-
-        [ProtoMember(1, IsPacked = true)]
-        public int[] beat { get; set; }
         [JsonIgnore]
         public float time { get; set; }
         [JsonIgnore]
         public float beatf { get; set; }
-
-        [ProtoMember(2)]
-        public TransitionProperty<float> speed { get; set; }
-
-        [ProtoMember(3, IsPacked = true)]
-        public TransitionColor tap { get; set; }
-
-        [ProtoMember(4, IsPacked = true)]
-        public TransitionColor tapGrey { get; set; }
-
-        [ProtoMember(5, IsPacked = true)]
-        public TransitionColor flick { get; set; }
-
-        [ProtoMember(6, IsPacked = true)]
-        public TransitionColor slideTick { get; set; }
-
-        [ProtoMember(7, IsPacked = true)]
-        public TransitionColor slide { get; set; }
 
         public static TimingPoint Default()
         {
             return new TimingPoint
             {
                 beat = new int[] { -100, 0, 1 },
-                speed = new TransitionProperty<float>(1f),
+                speed = new TransitionPropertyFloat(1f),
                 tap = new TransitionColor(113, 237, 255),
                 tapGrey = new TransitionColor(180, 180, 180),
                 flick = new TransitionColor(255, 59, 114),
@@ -149,7 +104,7 @@ namespace V2
             TimingPoint ret = new TimingPoint
             {
                 time = Mathf.Lerp(a.time, b.time, t),
-                speed = new TransitionProperty<float>(TransitionLib.LerpUnclamped(a.speed, b.speed, t, a.speed.transition), a.speed.transition),
+                speed = new TransitionPropertyFloat(TransitionLib.LerpUnclamped(a.speed, b.speed, t, a.speed.transition), a.speed.transition),
                 tap = TransitionColor.LerpUnclamped(a.tap, b.tap, t),
                 tapGrey = TransitionColor.LerpUnclamped(a.tapGrey, b.tapGrey, t),
                 flick = TransitionColor.LerpUnclamped(a.flick, b.flick, t),
@@ -191,22 +146,8 @@ namespace V2
     }
 
     [Preserve]
-    [ProtoContract()]
-    public class TimingGroup : IExtensible
+    public partial class TimingGroup : IExtensible
     {
-        private IExtension __pbn__extensionData;
-        IExtension IExtensible.GetExtensionObject(bool createIfMissing)
-            => Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
-
-        [ProtoMember(1)]
-        public List<Note> notes { get; set; } = new List<Note>();
-
-        [ProtoMember(2)]
-        public List<TimingPoint> points { get; set; } = new List<TimingPoint>();
-
-        [ProtoMember(3)]
-        public uint flags { get; set; }
-
         public void Sanitize()
         {
             for (int i = 0; i < points.Count; i++)
@@ -225,7 +166,10 @@ namespace V2
         public static TimingGroup From(List<V1Note> notes)
         {
             var ret = Default();
-            ret.notes = notes.Where(note => note.type != NoteType.BPM).Select(note => Note.From(note)).ToList();
+            ret.notes.Clear();
+            ret.notes.AddRange(notes
+                .Where(note => note.type != NoteType.BPM)
+                .Select(note => Note.From(note)));
             return ret;
         }
 
@@ -238,43 +182,14 @@ namespace V2
     }
 
     [Preserve]
-    [ProtoContract()]
     public partial class Note : IExtensible, IWithTiming
     {
-        private IExtension __pbn__extensionData;
-        IExtension IExtensible.GetExtensionObject(bool createIfMissing)
-            => Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
-
-        [ProtoMember(1)]
-        public NoteType type { get; set; }
-
-        [ProtoMember(2, IsPacked = true)]
-        public int[] beat { get; set; }
         [JsonIgnore]
         public float time { get; set; }
         [JsonIgnore]
         public float beatf { get; set; }
-
-        [ProtoMember(3)]
-        public int lane { get; set; }
-
-        [ProtoMember(4)]
-        public int tickStack { get; set; }
-
-        [ProtoMember(5)]
-        public List<NoteAnim> anims { get; set; } = new List<NoteAnim>();
-
-        [ProtoMember(6)]
-        public float x { get; set; }
-
-        [ProtoMember(7)]
-        public float y { get; set; }
         [JsonIgnore]
         public float yOrNaN => lane >= 0 ? float.NaN : y;
-
-        [ProtoMember(8)]
-        public uint flags { get; set; }
-
         [JsonIgnore]
         public int group { get; set; }
 
@@ -298,32 +213,14 @@ namespace V2
     }
 
     [Preserve]
-    [ProtoContract()]
     public partial class Chart : IExtensible
     {
         public const int VERSION = 2;
 
-        private IExtension __pbn__extensionData;
-        IExtension IExtensible.GetExtensionObject(bool createIfMissing)
-            => Extensible.GetExtensionObject(ref __pbn__extensionData, createIfMissing);
-
-        [ProtoMember(1)]
-        public Difficulty difficulty { get; set; }
-
-        [ProtoMember(2)]
-        public int level { get; set; }
-
-        [ProtoMember(3)]
-        public int offset { get; set; }
-
-        [ProtoMember(4)]
-        public List<TimingGroup> groups { get; set; } = new List<TimingGroup>();
-
-        [ProtoMember(5)]
-        public List<ValuePoint> bpm { get; set; } = new List<ValuePoint>();
-
-        [ProtoMember(6)]
-        public int version { get; set; } = VERSION;
+        public Chart()
+        {
+            version = VERSION;
+        }
 
         public float BeatToTime(float beat)
         {
@@ -383,19 +280,20 @@ namespace V2
 
         public static Chart From(V1Chart old)
         {
-            return new Chart
+            var ret = new Chart
             {
-                version = VERSION,
                 difficulty = old.Difficulty,
                 level = old.level,
                 offset = old.offset,
-                groups = new List<TimingGroup> { TimingGroup.From(old.notes) },
-                bpm = old.notes.Where(note => note.type == NoteType.BPM).Select(note => new ValuePoint
-                {
-                    beat = note.beat.ToArray(),
-                    value = note.value
-                }).ToList()
             };
+            ret.groups.Add(TimingGroup.From(old.notes));
+            ret.bpm.AddRange(old.notes
+                .Where(note => note.type == NoteType.BPM)
+                .Select(note => new ValuePoint {
+                beat = note.beat.ToArray(),
+                value = note.value
+            }));
+            return ret;
         }
     }
 }

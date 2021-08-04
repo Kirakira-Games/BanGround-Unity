@@ -58,13 +58,13 @@ namespace BGEditor
         private IAccountManager accountManager;
 
         // Chart related
-        private cHeader chartHeader;
+        private V2.cHeader chartHeader;
         private List<FileInfo> chartFiles;
         private ChartSource chartSource;
         private int chartId;
 
         // Music related
-        private mHeader musicHeader;
+        private V2.mHeader musicHeader;
         private List<FileInfo> musicFiles;
         private ChartSource musicSource;
         private int musicId;
@@ -229,7 +229,7 @@ namespace BGEditor
                         Title = musicHeader.title,
                         Artist = musicHeader.artist,
                         Length = musicHeader.length,
-                        Bpm = new List<float>(musicHeader.BPM),
+                        Bpm = new List<float>(musicHeader.bpm),
                         Preview = musicHeader.preview.ToList()
                     }).Send();
                 }
@@ -245,7 +245,7 @@ namespace BGEditor
                 Title = musicHeader.title,
                 Artist = musicHeader.artist,
                 Length = musicHeader.length,
-                Bpm = new List<float>(musicHeader.BPM),
+                Bpm = new List<float>(musicHeader.bpm),
                 Hash = musicFiles[0].Info.Hash,
                 Preview = musicHeader.preview.ToList()
             }).Fetch();

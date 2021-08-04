@@ -1,14 +1,10 @@
 ﻿using UnityEngine;
-using UnityEngine.SceneManagement;
 using Cysharp.Threading.Tasks;
 using Zenject;
 using Newtonsoft.Json;
 
 public class AppPreLoader : MonoBehaviour
 {
-    [Inject]
-    IKVSystem kvSystem;
-
     public static int sampleRate = -1;
     public static int bufferSize = -1;
     public static bool init = false;

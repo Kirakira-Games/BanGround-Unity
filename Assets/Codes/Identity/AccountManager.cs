@@ -59,10 +59,11 @@ namespace BanGround.Identity
                 return;
 
             isAuthing = true;
+
             try
             {
                 loadingBlocker.Show("Account.LogginIn".L());
-                LoadUserInfo(await web.DoLogin(UsernameField.text, PasswordField.text));
+                await LoadUserInfo(await web.DoLogin(UsernameField.text, PasswordField.text));
                 HideLoginPanel();
             }
             catch (KiraWebException e)
@@ -70,7 +71,7 @@ namespace BanGround.Identity
                 if (e.isNetworkError)
                     messageBannerController.ShowMsg(LogLevel.ERROR, "Exception.Network.UnableToConnect".L());
                 else
-                    messageBannerController.ShowMsg(LogLevel.ERROR, "Exception.Network.Unknown".L(e.Message));
+                    messageBannerController.ShowMsg(LogLevel.ERROR, "Exception.Network.Error".L(e.Message));
             }
             catch (Exception e)
             {
@@ -80,6 +81,7 @@ namespace BanGround.Identity
             {
                 loadingBlocker.Close();
             }
+
             isAuthing = false;
         }
 
@@ -88,9 +90,19 @@ namespace BanGround.Identity
             Application.OpenURL(web.ServerSite + "/user/reg");
         }
 
-        private void LoadUserInfo(UserAuth user)
+        private async UniTask LoadUserInfo(UserAuth user)
         {
             mActiveUser = user.User;
+            ActiveUserInfo = await web.New<UserFull>().UseTokens().Get("user/me").Fetch();
+        }
+
+        public void GoOffline()
+        {
+            mActiveUser = null;
+            ActiveUserInfo = null;
+
+            web.AccessToken = "";
+            web.RefreshToken = "";
         }
 
         /// <summary>
@@ -100,6 +112,7 @@ namespace BanGround.Identity
         {
             if (!isOfflineMode)
                 return true;
+
             if (LoginAttemptCount == 0)
             {
                 if (isTokenSaved)
@@ -107,8 +120,7 @@ namespace BanGround.Identity
                     try
                     {
                         loadingBlocker.Show("Account.LogginIn".L());
-                        LoadUserInfo(await web.DoRefreshAccessToken());
-                        ActiveUserInfo = await web.New<UserFull>().UseTokens().Get("user/me").Fetch();
+                        await LoadUserInfo(await web.DoRefreshAccessToken());
                         return true;
                     }
                     catch (KiraWebException e)
@@ -127,6 +139,7 @@ namespace BanGround.Identity
                 }
                 return await DoLogin();
             }
+
             return !isOfflineMode;
         }
     }

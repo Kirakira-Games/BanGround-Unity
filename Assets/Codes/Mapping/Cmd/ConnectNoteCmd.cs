@@ -1,4 +1,6 @@
-﻿namespace BGEditor
+﻿using NoteType = V2.NoteType;
+
+namespace BGEditor
 {
     class ConnectNoteCmdRaw : IEditorCmd
     {

@@ -5,6 +5,7 @@ using System;
 using Zenject;
 using System.IO;
 using BanGround;
+using NoteType = V2.NoteType;
 
 namespace BGEditor
 {
