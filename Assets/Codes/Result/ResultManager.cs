@@ -1,20 +1,17 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using System;
-using System.IO;
 using System.Linq;
 using AudioProvider;
 using Cysharp.Threading.Tasks;
 using Zenject;
 using BanGround.Database.Models;
-using UnityEngine.Rendering;
 using BanGround.Database;
 using Newtonsoft.Json;
 using BanGround.Scene.Params;
 using BanGround.Game.Mods;
+using V2;
 
 public class ResultManager : MonoBehaviour
 {

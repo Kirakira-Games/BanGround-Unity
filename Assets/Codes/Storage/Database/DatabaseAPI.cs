@@ -5,6 +5,7 @@ using UnityEngine;
 using System.Linq;
 using MessagePack;
 using System;
+using Difficulty = V2.Difficulty;
 
 namespace BanGround.Database
 {

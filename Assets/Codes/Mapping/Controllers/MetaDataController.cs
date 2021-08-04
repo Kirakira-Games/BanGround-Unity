@@ -6,6 +6,7 @@ using Zenject;
 using BanGround.Web;
 using Cysharp.Threading.Tasks;
 using BanGround.Utils;
+using V2;
 
 namespace BGEditor
 {
@@ -65,8 +66,8 @@ namespace BGEditor
             Title.text = mHeader.title;
             Artist.text = mHeader.artist;
 
-            BPM[0].SetValue(mHeader.BPM[0]);
-            BPM[1].SetValue(mHeader.BPM[1]);
+            BPM[0].SetValue(mHeader.bpm[0]);
+            BPM[1].SetValue(mHeader.bpm[1]);
 
             MusicPreview[0].MaxVal = duration;
             MusicPreview[1].MaxVal = duration;
@@ -92,7 +93,7 @@ namespace BGEditor
             mHeader.title = Title.text;
             mHeader.artist = Artist.text;
             int swap = BPM[0].value > BPM[1].value ? 1 : 0;
-            mHeader.BPM = new float[]
+            mHeader.bpm = new float[]
             {
                 BPM[0 ^ swap].value,
                 BPM[1 ^ swap].value
@@ -107,10 +108,10 @@ namespace BGEditor
             cHeader.authorNick = Designer.text;
             cHeader.difficultyLevel[(int)chartLoader.chart.difficulty] = Difficulty.value;
             Core.chart.level = Difficulty.value;
-            cHeader.tag = (from tag in Tags.text.Split(',')
+            cHeader.tag.Clear();
+            cHeader.tag.AddRange(from tag in Tags.text.Split(',')
                            where tag.Trim().Length > 0
-                           select tag.Trim())
-                          .ToList();
+                           select tag.Trim());
             swap = ChartPreview[0].value > ChartPreview[1].value ? 1 : 0;
             cHeader.preview = new float[]
             {

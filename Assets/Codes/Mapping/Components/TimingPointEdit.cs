@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
 using Zenject;
+using Transition = V2.Transition;
 
 namespace BGEditor
 {
@@ -19,7 +20,7 @@ namespace BGEditor
         public Button[] Buttons;
         public Dropdown[] Dropdowns;
 
-        private TransitionColor[] Colors;
+        private V2.TransitionColor[] Colors;
         public V2.TimingPoint Point;
 
         public static readonly Transition[] ColorTransitions = new Transition[]
@@ -30,7 +31,7 @@ namespace BGEditor
 
         private void Init()
         {
-            Colors = new TransitionColor[5];
+            Colors = new V2.TransitionColor[5];
             foreach (var button in Buttons)
             {
                 button.onClick.AddListener(() =>

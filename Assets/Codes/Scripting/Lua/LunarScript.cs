@@ -158,7 +158,7 @@ namespace BanGround.Scripting.Lunar
         public bool HasOnJudge => onJudge != null;
         public bool HasOnBeat => onBeat != null;
 
-        public void Init(int sid, Difficulty difficulty)
+        public void Init(int sid, V2.Difficulty difficulty)
         {
             var scriptPath = dataLoader.GetChartScriptPath(sid, difficulty);
 

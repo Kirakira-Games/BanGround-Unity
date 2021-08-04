@@ -14,7 +14,7 @@ namespace BanGround.Database.Models
         public int ChartId { get; set; }
 
         [IgnoreMember]
-        public Difficulty Difficulty { get => (Difficulty)_Difficulty; set => _Difficulty = (int)value; }
+        public V2.Difficulty Difficulty { get => (V2.Difficulty)_Difficulty; set => _Difficulty = (int)value; }
 
         [SecondaryKey(0, keyOrder: 1), NonUnique]
         public int _Difficulty { get; set; }

@@ -59,13 +59,13 @@ namespace BanGround.Community
             req = builder.webRequest;
             var song = await task;
             var id = IDRouterUtil.ToFileId(ChartSource.BanGround, Id);
-            var mHeader = new mHeader
+            var mHeader = new V2.mHeader
             {
                 mid = id,
                 title = song.Title,
                 artist = song.Artist,
                 preview = song.Preview.ToArray(),
-                BPM = song.Bpm.ToArray(),
+                bpm = song.Bpm.ToArray(),
                 length = song.Length
             };
             dataLoader.SaveHeader(mHeader);
@@ -78,20 +78,20 @@ namespace BanGround.Community
             req = builder.webRequest;
             var chart = await task;
             var id = IDRouterUtil.ToFileId(ChartSource.BanGround, Id);
-            var cHeader = new cHeader
+            var cHeader = new V2.cHeader
             {
                 version = chart.Version,
                 sid = id,
                 mid = IDRouterUtil.ToFileId(ChartSource.BanGround, chart.Music.Id),
                 author = chart.Uploader.Username,
                 authorNick = chart.Uploader.Nickname,
-                backgroundFile = new BackgroundFile
+                backgroundFile = new V2.BackgroundFile
                 {
                     pic = BackGround
                 },
                 preview = chart.Preview.ToArray(),
-                tag = chart.Tags
             };
+            cHeader.tag.AddRange(chart.Tags);
             dataLoader.SaveHeader(cHeader);
         }
 

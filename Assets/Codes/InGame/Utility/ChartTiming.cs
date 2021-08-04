@@ -85,12 +85,11 @@ public class ChartTiming
         return note.anims[0].time;
     }
 
-    public List<V2.NoteAnim> GenerateAnimation(List<V2.NoteAnim> raw, V2.Note note)
+    public IEnumerable<V2.NoteAnim> GenerateAnimation(List<V2.NoteAnim> raw, V2.Note note)
     {
-        var ret = new List<V2.NoteAnim>();
         if (raw == null)
         {
-            return ret;
+            yield break;
         }
         float totDist = 0;
         float curDist = 0;
@@ -108,8 +107,9 @@ public class ChartTiming
         raw.ForEach(anim => anim.pos.z = anim.pos.z + 1 - totDist);
         //Debug.Log("Tot dist=" + totDist);
         bool isStart = raw[0].pos.z <= 0 || raw[0].pos.z >= Z_MAX;
-        if (!isStart)
-            ret.Add(raw[0]);
+        if (!isStart) {
+            yield return raw[0];
+        }
         bool reverse = raw[0].pos.z >= Z_MAX;
         for (int i = 0; i < raw.Count - 1; i++)
         {
@@ -126,15 +126,14 @@ public class ChartTiming
                     isStart = false;
                     float ratio = Mathf.InverseLerp(cur.pos.z, nxt.pos.z, reverse ? Z_MAX : 0f);
                     var anim = V2.NoteAnim.LerpUnclamped(cur, nxt, ratio);
-                    ret.Add(anim);
+                    yield return anim;
                 }
             }
             if (!isStart)
             {
-                ret.Add(nxt);
+                yield return nxt;
             }
         }
-        return ret;
     }
 
     public void GenerateAnimationRawData(V2.NoteAnim S, V2.NoteAnim T, List<V2.NoteAnim> output)
@@ -221,7 +220,7 @@ public class ChartTiming
         PopulateTimingInfo(judgeAnim);
 
         // Add existing anims - do not allow animation after judge
-        data.anims = data.anims.Where(anim => anim.time < judgeAnim.time).ToList();
+        data.anims.RemoveAll(anim => anim.time >= judgeAnim.time);
         data.anims.Insert(0, initAnim);
         data.anims.Add(judgeAnim);
 
@@ -246,7 +245,9 @@ public class ChartTiming
             GenerateAnimationRawData(data.anims[i - 1], data.anims[i], tmpList);
         }
 
-        data.anims = GenerateAnimation(tmpList, data);
+        var tmpAnims = GenerateAnimation(tmpList, data).ToArray();
+        data.anims.Clear();
+        data.anims.AddRange(tmpAnims);
 
         // Check mirror
         if (isMirror)
