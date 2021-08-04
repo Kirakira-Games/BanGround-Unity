@@ -50,7 +50,7 @@ public class OffsetSettingController : MonoBehaviour
             sum -= recentQueue.Dequeue();
         int value = Mathf.RoundToInt((float)sum / recentQueue.Count);
         offsetText.text = value >= 0 ? "+" + value : value.ToString();
-        offsetText.color = value >= 0 ? Color.cyan : Color.red;
+        offsetText.color = value >= 0 ? Color.blue : Color.red;
     }
 
     public void UpdateValue()
