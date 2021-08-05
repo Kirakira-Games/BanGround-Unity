@@ -14,6 +14,7 @@ public enum Language
     English = 0,
     SimplifiedChinese,
     TraditionalChinese,
+    Mars,
     Japanese,
     Korean,
     Czech,

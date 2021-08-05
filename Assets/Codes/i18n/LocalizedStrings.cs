@@ -11,7 +11,7 @@ public class LocalizedStrings : MonoBehaviour
     [Inject]
     IFileSystem fs;
 
-    public TextAsset[] languageFiles = new TextAsset[24];
+    public TextAsset[] languageFiles = new TextAsset[25];
     private Dictionary<string, string> dictionary = null;
     private Dictionary<string, string> fallbackDictionary = null;
 
