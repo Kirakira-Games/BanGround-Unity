@@ -109,7 +109,7 @@ public static class NoteUtility
 
     public const int MOUSE_TOUCH_ID = -16;
 
-    public const float EPS = 1e-4f;
+    public const float EPS = 1e-5f;
 
     private static float planeDeltaZ;
     private static float planeInitZ;
@@ -234,5 +234,9 @@ public static class NoteUtility
         if (inS == inT) return outS;
         float ratio = (inP - inS) / (inT - inS);
         return Mathf.Lerp(outS, outT, ratio);
+    }
+
+    public static bool Approximately(float lhs, float rhs, float eps = EPS) {
+        return Mathf.Abs(lhs - rhs) <= eps;
     }
 }

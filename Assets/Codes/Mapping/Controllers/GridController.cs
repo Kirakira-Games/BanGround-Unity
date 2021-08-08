@@ -313,7 +313,7 @@ namespace BGEditor
             foreach (var point in Core.group.points)
             {
                 point.beatf = ChartUtility.BeatToFloat(point.beat);
-                if (Mathf.Approximately(beatf, Mathf.Max(0, point.beatf)))
+                if (NoteUtility.Approximately(beatf, Mathf.Max(0, point.beatf)))
                 {
                     return point;
                 }

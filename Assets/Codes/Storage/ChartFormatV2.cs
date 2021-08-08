@@ -155,7 +155,7 @@ namespace V2
                 points[i].beatf = ChartUtility.BeatToFloat(points[i].beat);
                 if (i == 0)
                     continue;
-                if (Mathf.Approximately(points[i].beatf, Mathf.Max(0f, points[i-1].beatf)))
+                if (NoteUtility.Approximately(points[i].beatf, Mathf.Max(0f, points[i-1].beatf)))
                 {
                     // Remove duplicates
                     points.RemoveAt(i--);

@@ -269,7 +269,7 @@ namespace BGEditor
 
         public void SetY(float y)
         {
-            if (Mathf.Approximately(y, editor.yPos))
+            if (NoteUtility.Approximately(y, editor.yPos))
                 return;
             editor.yPos = y;
             onYPosModified.Invoke();
