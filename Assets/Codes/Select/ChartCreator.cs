@@ -136,13 +136,13 @@ public class ChartCreator : MonoBehaviour
             return;
         }
         // Create header
+        int clamped = Mathf.Clamp(difficulty, 0, 3);
+        int level = Random.Range(clamped * 5 + 5, clamped * 8 + 6);
         var header = CreateHeader();
-        header.difficultyLevel[difficulty] = 0;
+        header.difficultyLevel[difficulty] = level;
         dataLoader.SaveHeader(header);
 
         // Create chart
-        int clamped = Mathf.Clamp(difficulty, 0, 3);
-        int level = Random.Range(clamped * 5 + 5, clamped * 8 + 6);
         var chart = CreateChart((Difficulty)difficulty, level);
         dataLoader.SaveChart(chart, header.sid, (Difficulty)difficulty);
 
