@@ -2,11 +2,9 @@ using AudioProvider;
 using BanGround;
 using BanGround.Community;
 using BanGround.Database;
-using BanGround.Database.Migrations;
 using BanGround.Identity;
 using BanGround.Web;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 using Zenject;
 
@@ -145,7 +143,41 @@ public class GlobalInstaller : MonoInstaller
 
             KVar.C("r_lowresolution", "0", KVarFlags.Archive, "Low Resolution(0.7x)"),
 
-            KVar.C("cl_showms", "0", KVarFlags.Archive),
+#if UNITY_STANDALONE_WIN
+            KVar.C("win_width", "-1", KVarFlags.Archive, "Window width"),
+            KVar.C("win_height", "-1", KVarFlags.Archive, "Window height"),
+
+            KVar.C("r_fullscreen", "1", KVarFlags.Archive, "Fullscreen (windows only)", async (_, kvSystem) =>
+            {
+#if !UNITY_EDITOR
+                var r_fullscreen = kvSystem.Find("r_fullscreen");
+                var win_width = kvSystem.Find("win_width");
+                var win_height = kvSystem.Find("win_height");
+
+                if(r_fullscreen)
+                {
+                    var r = Screen.resolutions[Screen.resolutions.Length - 1];
+                    Screen.SetResolution(r.width, r.height, FullScreenMode.FullScreenWindow);
+                    Screen.fullScreen = true;
+                }
+                else
+                {
+                    Screen.SetResolution(win_width, win_height, FullScreenMode.Windowed);
+                }
+#endif
+            }),
+
+            KVar.C("r_vsync", "0", KVarFlags.Archive, "Enable VSync", (_, kvSystem) =>
+            {
+#if !UNITY_EDITOR
+                var r_vsync = kvSystem.Find("r_vsync");
+
+                QualitySettings.vSyncCount = r_vsync ? 1 : 0;
+#endif
+            }),
+#endif
+
+                KVar.C("cl_showms", "0", KVarFlags.Archive),
             KVar.C("cl_elp", "0", KVarFlags.Archive),
             KVar.C("cl_offset_transform", "1", KVarFlags.Archive),
 
@@ -162,11 +194,11 @@ public class GlobalInstaller : MonoInstaller
             KVar.C("cl_accesstoken", "", KVarFlags.Archive | KVarFlags.StringOnly, "Saved access token", (_, kvSystem) => kvSystem.SaveConfig()),
             KVar.C("cl_refreshtoken", "", KVarFlags.Archive | KVarFlags.StringOnly, "Saved refresh token", (_, kvSystem) => kvSystem.SaveConfig()),
 
-            KVar.C("snd_bgm_volume", "0.7", KVarFlags.Archive, "BGM volume", _ => 
+            KVar.C("snd_bgm_volume", "0.7", KVarFlags.Archive, "BGM volume", _ =>
             {
                 audioProvider?.SetSoundTrackVolume(kvSystem.Find("snd_bgm_volume"));
             }),
-            KVar.C("snd_se_volume", "0.7", KVarFlags.Archive, "Sound effect volume",_ => 
+            KVar.C("snd_se_volume", "0.7", KVarFlags.Archive, "Sound effect volume",_ =>
             {
                 audioProvider?.SetSoundEffectVolume(kvSystem.Find("snd_se_volume"), SEType.Common);
             }),
@@ -340,6 +372,12 @@ public class GlobalInstaller : MonoInstaller
     }
 
     int fsUpdateFrameCounter = 0;
+#if UNITY_STANDALONE_WIN && !UNITY_EDITOR
+    int lastRes = -1;
+    KVar r_fullscreen;
+    KVar win_width;
+    KVar win_height;
+#endif
 
     private void Update()
     {
@@ -348,10 +386,33 @@ public class GlobalInstaller : MonoInstaller
             fsUpdateFrameCounter = 0;
             //fs.OnUpdate();
         }
+
+#if UNITY_STANDALONE_WIN  && !UNITY_EDITOR
+        if(lastRes == -1)
+        {
+            r_fullscreen = kvSystem.Find("r_fullscreen");
+            win_width = kvSystem.Find("win_width");
+            win_height = kvSystem.Find("win_height");
+
+            lastRes = Screen.width * Screen.height;
+        }
+        else if(!r_fullscreen)
+        {
+            var curRes = Screen.width * Screen.height;
+
+            if(curRes != lastRes)
+            {
+                lastRes = curRes;
+                win_width.Set(Screen.width);
+                win_height.Set(Screen.height);
+            }
+        }
+#endif
     }
 
     private void OnDestroy()
     {
         fs.Shutdown();
+        kvSystem.SaveConfig();
     }
 }
