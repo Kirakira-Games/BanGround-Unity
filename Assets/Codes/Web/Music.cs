@@ -2,6 +2,7 @@
 using BanGround.Web.File;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using UnityEngine.Networking;
 
 namespace BanGround.Web.Music
 {
@@ -135,6 +136,7 @@ namespace BanGround.Web.Music
 
         public static KiraWebRequest.Builder<SongListResponse> SearchForSong(this IKiraWebRequest web, string keyword, int offset = 0, int limit = 20)
         {
+            keyword = UnityWebRequest.EscapeURL(keyword);
             return web.New<SongListResponse>().Get($"music/search?offset={offset}&limit={limit}&keyword={keyword}");
         }
 
