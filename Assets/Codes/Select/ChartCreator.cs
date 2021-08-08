@@ -90,7 +90,9 @@ public class ChartCreator : MonoBehaviour
                 pic = cover
             },
 
-            preview = (!copyInfo || cHeader.preview == null) ? new float[] { 0.0f, 0.0f } : cHeader.preview.ToArray()
+            preview = (!copyInfo || cHeader.preview == null) ? new float[] { 0.0f, 0.0f } : cHeader.preview.ToArray(),
+
+            difficultyLevel = new List<int> { -1, -1, -1, -1, -1 },
         };
         if (copyInfo && cHeader.tag != null) {
             ret.tag.AddRange(cHeader.tag);
@@ -134,12 +136,13 @@ public class ChartCreator : MonoBehaviour
             return;
         }
         // Create header
+        int clamped = Mathf.Clamp(difficulty, 0, 3);
+        int level = Random.Range(clamped * 5 + 5, clamped * 8 + 6);
         var header = CreateHeader();
+        header.difficultyLevel[difficulty] = level;
         dataLoader.SaveHeader(header);
 
         // Create chart
-        int clamped = Mathf.Clamp(difficulty, 0, 3);
-        int level = Random.Range(clamped * 5 + 5, clamped * 8 + 6);
         var chart = CreateChart((Difficulty)difficulty, level);
         dataLoader.SaveChart(chart, header.sid, (Difficulty)difficulty);
 
