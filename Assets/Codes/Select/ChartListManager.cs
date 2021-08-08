@@ -110,14 +110,11 @@ public class ChartListManager : IChartListManager
     public void SelectChartBySid(int sid)
     {
         int index = chartList.FindIndex((header) => header.sid == sid);
-        if (index != -1)
+        if (index == -1)
         {
-            SelectChartByIndex(index);
+            index = Mathf.Min(chartList.Count - 1, current.index);
         }
-        else
-        {
-            SelectChartByIndex(chartList.Count - 1);
-        }
+        SelectChartByIndex(index);
     }
 
     public void SelectDifficulty(Difficulty difficulty)
