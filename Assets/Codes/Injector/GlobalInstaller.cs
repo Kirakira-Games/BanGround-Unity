@@ -147,7 +147,7 @@ public class GlobalInstaller : MonoInstaller
             KVar.C("win_width", "-1", KVarFlags.Archive, "Window width"),
             KVar.C("win_height", "-1", KVarFlags.Archive, "Window height"),
 
-            KVar.C("r_fullscreen", "1", KVarFlags.Archive, "Fullscreen (windows only)", async (_, kvSystem) =>
+            KVar.C("r_fullscreen", "1", KVarFlags.Archive, "Fullscreen (windows only)", (_, kvSystem) =>
             {
 #if !UNITY_EDITOR
                 var r_fullscreen = kvSystem.Find("r_fullscreen");
