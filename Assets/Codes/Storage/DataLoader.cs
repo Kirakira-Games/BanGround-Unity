@@ -282,17 +282,7 @@ public class DataLoader : IDataLoader
 
     public cHeader GetChartHeader(int sid)
     {
-        if (chartDic.ContainsKey(sid))
-            return chartDic[sid];
-
-        var file = fs.GetFile(KiraPath.Combine(ChartDir, sid.ToString(), "cheader.bin"));
-
-        if (file == null)
-            return null;
-
-        var cheader = ProtobufHelper.Load<cHeader>(file);
-        chartDic.Add(sid, cheader);
-        return cheader;
+        return chartDic.ContainsKey(sid) ? chartDic[sid] : null;
     }
 
     [Inject(Id = "r_usevideo")]
@@ -388,6 +378,7 @@ public class DataLoader : IDataLoader
 
         header.LoadDifficultyLevels(this);
         db.SaveChartSet(header.sid, header.mid, header.difficultyLevel.ToArray());
+        chartDic[header.sid] = header;
         //fs.FlushPak(file.RootPath);
     }
 
@@ -397,6 +388,7 @@ public class DataLoader : IDataLoader
 
         var file = fs.GetOrNewFile(path);
         ProtobufHelper.Write(header, file);
+        musicDic[header.mid] = header;
         //fs.FlushPak(file.RootPath);
     }
 
