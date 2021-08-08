@@ -282,7 +282,17 @@ public class DataLoader : IDataLoader
 
     public cHeader GetChartHeader(int sid)
     {
-        return chartDic.ContainsKey(sid) ? chartDic[sid] : null;
+        if (chartDic.ContainsKey(sid))
+            return chartDic[sid];
+
+        var file = fs.GetFile(KiraPath.Combine(ChartDir, sid.ToString(), "cheader.bin"));
+
+        if (file == null)
+            return null;
+
+        var cheader = ProtobufHelper.Load<cHeader>(file);
+        chartDic.Add(sid, cheader);
+        return cheader;
     }
 
     [Inject(Id = "r_usevideo")]

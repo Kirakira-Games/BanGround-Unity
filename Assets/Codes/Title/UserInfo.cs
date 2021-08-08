@@ -23,6 +23,8 @@ public class UserInfo : MonoBehaviour
         if (this == null)
             return;
 
+        await UniTask.SwitchToMainThread();
+
         var user = accountManager.ActiveUser;
         UsernameText.text = user.Nickname;
 
