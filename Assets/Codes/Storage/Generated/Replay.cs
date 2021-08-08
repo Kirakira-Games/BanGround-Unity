@@ -77,7 +77,7 @@ namespace V2
         public int judgeTime { get; set; }
 
         [global::ProtoBuf.ProtoMember(2)]
-        public ReplayTouchState events { get; set; }
+        public global::System.Collections.Generic.List<ReplayTouchState> events { get; } = new global::System.Collections.Generic.List<ReplayTouchState>();
 
     }
 
