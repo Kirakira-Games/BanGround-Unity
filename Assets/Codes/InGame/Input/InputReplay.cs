@@ -8,6 +8,7 @@ using LZMADecoder = SevenZip.Compression.LZMA.Decoder;
 using System.Text;
 using UnityEngine;
 using BanGround.Game.Mods;
+using System.Linq;
 
 public class ReplayFrame
 {
@@ -296,11 +297,11 @@ public class DemoFile
 public class DemoRecorder
 {
     public string demoName;
-    public DemoFile demoFile;
+    public V2.ReplayFile demoFile;
 
     public DemoRecorder(int chartId, V2.Difficulty diff, ModFlag mods)
     {
-        demoFile = new DemoFile
+        demoFile = new V2.ReplayFile
         {
             sid = chartId,
             difficulty = diff,
@@ -312,8 +313,34 @@ public class DemoRecorder
 
     public void Add(KirakiraTouchState[] kirakiraTouchStates)
     {
-        demoFile.Add(kirakiraTouchStates);
+        var frame = new V2.ReplayFrame
+        {
+            judgeTime = NoteController.judgeTime,
+        };
+
+        for (int i = 0; i < kirakiraTouchStates.Length; i++)
+        {
+            frame.events.Add(new V2.ReplayTouchState
+            {
+                touchId = kirakiraTouchStates[i].touchId,
+                phase = (int)kirakiraTouchStates[i].phase,
+                pos = kirakiraTouchStates[i].pos.ToProto(),
+                time = kirakiraTouchStates[i].time
+            });
+        }
+
+        demoFile.frames.Add(frame);
     }
 
-    public void Save(IFile demofile, Dictionary<string, byte[]> chartHash) => demoFile.Save(demofile, chartHash);
+    public void Save(IFile demofile, Dictionary<string, byte[]> chartHash)
+    {
+        demoFile.checksums.AddRange(
+            chartHash.Select(kv => new V2.FileChecksum { 
+                file = kv.Key, 
+                checksum = kv.Value 
+            })
+        );
+
+        ProtobufHelper.Write(demoFile, demofile);
+    }
 }
