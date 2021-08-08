@@ -18,6 +18,7 @@ namespace BanGround.Database.Migrations
             typeof(KpakToFs2021_01_10),
             typeof(NewInitalKirapack2021_07_15),
             typeof(ConvertReplayFiles2021_08_08),
+            // Next migration ID: 7
         };
 
         private List<MigrationBase> validMigrations;
