@@ -12,11 +12,11 @@ namespace Assets.Codes.InGame.Input
 {
     class DemoReplayTouchProvider : IKirakiraTouchProvider
     {
-        private DemoFile demoFile;
+        private V2.ReplayFile demoFile;
 
         int currentIndex;
 
-        public DemoReplayTouchProvider(DemoFile demoFile)
+        public DemoReplayTouchProvider(V2.ReplayFile demoFile)
         {
             this.demoFile = demoFile;
 
@@ -28,16 +28,28 @@ namespace Assets.Codes.InGame.Input
             var frames = new List<KirakiraTouchState[]>();
             while (currentIndex < demoFile.frames.Count && demoFile.frames[currentIndex].judgeTime <= NoteController.judgeTime)
             {
-                for(int i = 0; i < demoFile.frames[currentIndex].events.Length; i ++)
+                var events = new List<KirakiraTouchState>();
+
+                for(int i = 0; i < demoFile.frames[currentIndex].events.Count; i ++)
                 {
                     var touchEvent = demoFile.frames[currentIndex].events[i];
-                    var ray = new Ray(touchEvent.pos, Vector3.forward);
+
+                    var ray = new Ray(touchEvent.pos.ToUnity(), Vector3.forward);
                     var worldPoint = NoteUtility.JudgePlane.Raycast(ray, out float dist) ? ray.GetPoint(dist) : KirakiraTouch.INVALID_POSITION;
 
-                    touchEvent.screenPos = NoteController.mainCamera.WorldToScreenPoint(worldPoint);
+                    var e = new KirakiraTouchState
+                    {
+                        time = touchEvent.time,
+                        touchId = touchEvent.touchId,
+                        screenPos = NoteController.mainCamera.WorldToScreenPoint(worldPoint),
+                        pos = touchEvent.pos.ToUnity(),
+                        phase = (KirakiraTouchPhase)touchEvent.phase
+                    };
+
+                    events.Add(e);
                 }
 
-                frames.Add(demoFile.frames[currentIndex].events);
+                frames.Add(events.ToArray());
 
                 currentIndex++;
             }
