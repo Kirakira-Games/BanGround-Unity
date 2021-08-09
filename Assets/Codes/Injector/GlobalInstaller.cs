@@ -144,8 +144,8 @@ public class GlobalInstaller : MonoInstaller
             KVar.C("r_lowresolution", "0", KVarFlags.Archive, "Low Resolution(0.7x)"),
 
 #if UNITY_STANDALONE_WIN
-            KVar.C("win_width", "-1", KVarFlags.Archive, "Window width"),
-            KVar.C("win_height", "-1", KVarFlags.Archive, "Window height"),
+            KVar.C("win_width", "1280", KVarFlags.Archive, "Window width"),
+            KVar.C("win_height", "720", KVarFlags.Archive, "Window height"),
 
             KVar.C("r_fullscreen", "1", KVarFlags.Archive, "Fullscreen (windows only)", (_, kvSystem) =>
             {
