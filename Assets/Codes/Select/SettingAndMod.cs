@@ -123,10 +123,12 @@ public class SettingAndMod : MonoBehaviour
     [Inject(Id = "r_lowresolution")]
     KVar r_lowresolution;
 
+#if UNITY_STANDALONE_WIN
     [Inject(Id = "r_fullscreen")]
     KVar r_fullscreen;
     [Inject(Id = "r_vsync")]
     KVar r_vsync;
+#endif
 
     // cl for Client
     [Inject(Id = "cl_showms")]
