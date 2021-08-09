@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using Cysharp.Threading.Tasks;
 using UnityEngine.Networking;
 using Newtonsoft.Json;

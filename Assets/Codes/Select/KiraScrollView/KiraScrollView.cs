@@ -1,4 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using EasingCore;
 using FancyScrollView;
 using System.Collections.Generic;

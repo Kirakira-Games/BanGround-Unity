@@ -1,4 +1,4 @@
-﻿using AOT;
+using AOT;
 using AudioProvider;
 using Cysharp.Threading.Tasks;
 using System;

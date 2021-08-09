@@ -1,4 +1,4 @@
-﻿namespace BanGround.Scripting
+namespace BanGround.Scripting
 {
     public interface IScript
     {

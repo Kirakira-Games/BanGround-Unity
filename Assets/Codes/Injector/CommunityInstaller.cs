@@ -1,4 +1,4 @@
-﻿using BanGround.Community;
+using BanGround.Community;
 using BanGround.Web;
 using UnityEngine;
 using Zenject;

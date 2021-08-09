@@ -1,4 +1,4 @@
-﻿//#if InputSystem
+//#if InputSystem
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Touch = UnityEngine.InputSystem.EnhancedTouch.Touch;

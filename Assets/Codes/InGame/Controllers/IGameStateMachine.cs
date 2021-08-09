@@ -1,4 +1,4 @@
-﻿public interface IGameStateMachine
+public interface IGameStateMachine
 {
     GameStateMachine.State Base { get; }
     int Count { get; }

@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using BanGround.Web;
 using Cysharp.Threading.Tasks;
 using Zenject;

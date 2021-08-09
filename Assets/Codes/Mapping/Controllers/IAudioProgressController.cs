@@ -1,4 +1,4 @@
-﻿namespace BGEditor
+namespace BGEditor
 {
     public interface IAudioProgressController : IInitable
     {

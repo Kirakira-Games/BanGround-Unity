@@ -1,4 +1,4 @@
-﻿using AudioProvider;
+using AudioProvider;
 using FancyScrollView;
 using System.Collections.Generic;
 using System.Linq;

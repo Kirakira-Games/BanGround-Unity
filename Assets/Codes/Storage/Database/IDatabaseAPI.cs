@@ -1,4 +1,4 @@
-﻿using BanGround.Database.Generated;
+using BanGround.Database.Generated;
 using BanGround.Database.Models;
 using Difficulty = V2.Difficulty;
 
