@@ -33,6 +33,7 @@ public class LocalizedStrings : MonoBehaviour
                 case SystemLanguage.ChineseSimplified:
                     cl_language.Set((int)Language.SimplifiedChinese);
                     break;
+                /*
                 case SystemLanguage.ChineseTraditional:
                     cl_language.Set((int)Language.TraditionalChinese);
                     break;
@@ -42,6 +43,7 @@ public class LocalizedStrings : MonoBehaviour
                 case SystemLanguage.Korean:
                     cl_language.Set((int)Language.Korean);
                     break;
+                */
                 default:
                     cl_language.Set((int)Language.English);
                     break;

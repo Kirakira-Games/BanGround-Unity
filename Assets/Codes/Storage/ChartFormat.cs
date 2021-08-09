@@ -13,8 +13,8 @@ public enum Language
 {
     English = 0,
     SimplifiedChinese,
-    TraditionalChinese,
     Mars,
+    TraditionalChinese,
     Japanese,
     Korean,
     Czech,
