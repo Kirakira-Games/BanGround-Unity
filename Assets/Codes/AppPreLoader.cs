@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using Cysharp.Threading.Tasks;
 using Zenject;
 using Newtonsoft.Json;

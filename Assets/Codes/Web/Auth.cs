@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System.Security.Cryptography;
 using System.Text;
 using Cysharp.Threading.Tasks;

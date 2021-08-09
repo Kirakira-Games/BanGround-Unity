@@ -1,4 +1,4 @@
-﻿using BanGround.Web.Auth;
+using BanGround.Web.Auth;
 using Newtonsoft.Json;
 
 namespace BanGround.Web.File

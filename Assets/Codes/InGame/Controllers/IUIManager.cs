@@ -1,4 +1,4 @@
-﻿public interface IUIManager
+public interface IUIManager
 {
     void GameRetire();
     void GameRetry();

@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using AudioProvider;
@@ -122,6 +122,11 @@ public class SettingAndMod : MonoBehaviour
     KVar r_brightness_long;
     [Inject(Id = "r_lowresolution")]
     KVar r_lowresolution;
+
+    [Inject(Id = "r_fullscreen")]
+    KVar r_fullscreen;
+    [Inject(Id = "r_vsync")]
+    KVar r_vsync;
 
     // cl for Client
     [Inject(Id = "cl_showms")]
@@ -284,8 +289,8 @@ public class SettingAndMod : MonoBehaviour
         seSelector.SetSE((SEStyle)cl_sestyle);
         language_Dropdown.value = cl_language;
 #if (UNITY_STANDALONE || UNITY_WSA)
-        FS_Tog.isOn = Screen.fullScreen;
-        VSync_Tog.isOn = QualitySettings.vSyncCount == 1;
+        FS_Tog.isOn = r_fullscreen;
+        VSync_Tog.isOn = r_vsync;
 #endif
         GetModStatus();
     }
@@ -329,27 +334,8 @@ public class SettingAndMod : MonoBehaviour
             r_usevideo.Set(Video_Tog.isOn);
             r_lowresolution.Set(Resolution_Tog.isOn);
 #if (UNITY_STANDALONE || UNITY_WSA)
-            if (FS_Tog.isOn)
-            {
-                var r = Screen.resolutions[Screen.resolutions.Length - 1];
-                Screen.SetResolution(r.width, r.height, FullScreenMode.FullScreenWindow);
-                Screen.fullScreen = true;
-            }
-            else
-            {
-                var r = Screen.resolutions[Screen.resolutions.Length - 2];
-                Screen.SetResolution(r.width, r.height, FullScreenMode.Windowed);
-                Screen.fullScreen = false;
-            }
-
-            if(VSync_Tog.isOn)
-            {
-                QualitySettings.vSyncCount = 1;
-            }
-            else
-            {
-                QualitySettings.vSyncCount = 0;
-            }
+            r_fullscreen.Set(FS_Tog.isOn);
+            r_vsync.Set(VSync_Tog.isOn);
 #endif
             cl_offset_transform.Set(judgeOffsetTransform.value);
             r_farclip.Set(far_Clip.value);

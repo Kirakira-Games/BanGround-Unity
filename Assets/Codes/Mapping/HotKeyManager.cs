@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections.Generic;
 using System;
 using UnityEngine.Events;
@@ -130,7 +130,7 @@ namespace BGEditor
             if (Mouse.current != null)
             {
                 float scroll = Mouse.current.scroll.ReadValue().y;
-                if (!Mathf.Approximately(0, scroll))
+                if (!NoteUtility.Approximately(0, scroll))
                 {
                     onScroll.Invoke(scroll);
                 }

@@ -1183,7 +1183,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Community.TItle
+  m_Text: Community.Title
 --- !u!222 &710359014
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1822,7 +1822,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Download List
+  m_Text: Community.DownloadList
 --- !u!222 &1639388504
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3094,7 +3094,8 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 6465458638746954661, guid: b5851ab05e7894c18a6e2bda1c6926c9, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: b5851ab05e7894c18a6e2bda1c6926c9, type: 3}
 --- !u!224 &5987794886007221695 stripped
 RectTransform:
@@ -3121,3 +3122,43 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sound: {fileID: 4900000, guid: 9c3104f94d36cc744bc2ba4def167af4, type: 3}
+--- !u!1 &5987794886007221698 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2063254294633990378, guid: b5851ab05e7894c18a6e2bda1c6926c9,
+    type: 3}
+  m_PrefabInstance: {fileID: 5987794886007221694}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5987794886007221699
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5987794886007221698}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FontData:
+    m_Font: {fileID: 12800000, guid: 7edb87cc5a4194c8a89f1ee196f8cf1c, type: 3}
+    m_FontSize: 36
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 3
+    m_MaxSize: 40
+    m_Alignment: 4
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: 0

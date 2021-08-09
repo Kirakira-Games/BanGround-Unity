@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using AudioProvider;
 using System;
@@ -58,7 +58,7 @@ namespace BGEditor
             audioLength = bgm.GetLength();
             float expectedLength = audioLength / 1000f;
             var mHeader = dataLoader.GetMusicHeader(chartLoader.header.mid);
-            if (!Mathf.Approximately(mHeader.length, expectedLength))
+            if (!NoteUtility.Approximately(mHeader.length, expectedLength))
             {
                 mHeader.length = expectedLength;
                 dataLoader.SaveHeader(mHeader);
@@ -169,7 +169,7 @@ namespace BGEditor
             if (bgm.GetStatus() == PlaybackStatus.Playing)
             {
                 float time = bgm.GetPlaybackTime() / 1000f;
-                if (Mathf.Approximately(time, lastTime))
+                if (NoteUtility.Approximately(time, lastTime))
                 {
                     time += Time.realtimeSinceStartup - lastTimeRecorded;
                 }

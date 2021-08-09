@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,15 +12,42 @@ namespace Assets.Codes.InGame.Input
 {
     class DemoReplayTouchProvider : IKirakiraTouchProvider
     {
-        private DemoFile demoFile;
+        private V2.ReplayFile demoFile;
 
         int currentIndex;
 
-        public DemoReplayTouchProvider(DemoFile demoFile)
+        List<KirakiraTouchState[]> convertedFrames = new List<KirakiraTouchState[]>();
+
+        public DemoReplayTouchProvider(V2.ReplayFile demoFile)
         {
             this.demoFile = demoFile;
 
             currentIndex = 0;
+
+            foreach (var frame in demoFile.frames)
+            {
+                var events = new List<KirakiraTouchState>();
+
+                for (int i = 0; i < frame.events.Count; i++)
+                {
+                    var touchEvent = frame.events[i];
+
+                    var ray = new Ray(touchEvent.pos.ToUnity(), Vector3.forward);
+                    var worldPoint = NoteUtility.JudgePlane.Raycast(ray, out float dist) ? ray.GetPoint(dist) : KirakiraTouch.INVALID_POSITION;
+
+                    var e = new KirakiraTouchState
+                    {
+                        time = touchEvent.time,
+                        touchId = touchEvent.touchId,
+                        pos = touchEvent.pos.ToUnity(),
+                        phase = (KirakiraTouchPhase)touchEvent.phase
+                    };
+
+                    events.Add(e);
+                }
+
+                convertedFrames.Add(events.ToArray());
+            }
         }
 
         public KirakiraTouchState[][] GetTouches()
@@ -28,17 +55,14 @@ namespace Assets.Codes.InGame.Input
             var frames = new List<KirakiraTouchState[]>();
             while (currentIndex < demoFile.frames.Count && demoFile.frames[currentIndex].judgeTime <= NoteController.judgeTime)
             {
-                for(int i = 0; i < demoFile.frames[currentIndex].events.Length; i ++)
+                foreach(var e in convertedFrames[currentIndex])
                 {
-                    var touchEvent = demoFile.frames[currentIndex].events[i];
-                    var ray = new Ray(touchEvent.pos, Vector3.forward);
+                    var ray = new Ray(e.pos, Vector3.forward);
                     var worldPoint = NoteUtility.JudgePlane.Raycast(ray, out float dist) ? ray.GetPoint(dist) : KirakiraTouch.INVALID_POSITION;
-
-                    touchEvent.screenPos = NoteController.mainCamera.WorldToScreenPoint(worldPoint);
+                    e.screenPos = NoteController.mainCamera.WorldToScreenPoint(worldPoint);
                 }
 
-                frames.Add(demoFile.frames[currentIndex].events);
-
+                frames.Add(convertedFrames[currentIndex]);
                 currentIndex++;
             }
 

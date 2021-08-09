@@ -1,4 +1,4 @@
-﻿using AudioProvider;
+using AudioProvider;
 using BanGround.Game.Mods;
 using BanGround.Scene.Params;
 using Cysharp.Threading.Tasks;

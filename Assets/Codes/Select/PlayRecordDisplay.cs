@@ -1,4 +1,4 @@
-﻿using BanGround.Database;
+using BanGround.Database;
 using BanGround.Database.Models;
 using System.Collections;
 using System.Collections.Generic;

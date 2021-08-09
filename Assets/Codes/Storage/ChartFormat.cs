@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS1591, CS0612, CS3021, IDE1006
+#pragma warning disable CS1591, CS0612, CS3021, IDE1006
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,6 +13,7 @@ public enum Language
 {
     English = 0,
     SimplifiedChinese,
+    Mars,
     TraditionalChinese,
     Japanese,
     Korean,

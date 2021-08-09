@@ -1,0 +1,24 @@
+name: Checks
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  check:
+    name: Run checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v1
+
+      - name: Check for CRLF endings
+        uses: erclu/check-crlf@v1.2.0
+        with:
+          path: ./Assets/Codes

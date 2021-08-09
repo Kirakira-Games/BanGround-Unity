@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -84,7 +84,7 @@ public class LoadingBlocker : MonoBehaviour, ILoadingBlocker
         if (task == null || !showProgress)
             return;
         float taskProgress = task.Progress;
-        if (Mathf.Approximately(progress, taskProgress))
+        if (NoteUtility.Approximately(progress, taskProgress))
             return;
         SetProgress(taskProgress);
     }

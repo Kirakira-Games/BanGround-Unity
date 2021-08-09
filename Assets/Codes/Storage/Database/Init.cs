@@ -1,4 +1,4 @@
-﻿using MessagePack;
+using MessagePack;
 using MessagePack.Resolvers;
 using UnityEngine;
 using BanGround.Database.Generated;

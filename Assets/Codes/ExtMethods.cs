@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-
+using UnityEngine;
 
 public static class ExtMethods
 {
@@ -43,5 +43,43 @@ public static class ExtMethods
             objs.Add(result.ToString());
 
         return objs.ToArray();
+    }
+
+    public static V2.PVector3 ToProto(this Vector3 vector3)
+    {
+        return new V2.PVector3
+        {
+            x = vector3.x,
+            y = vector3.y,
+            z = vector3.z
+        };
+    }
+
+    public static V2.PVector2 ToProto(this Vector2 vector2)
+    {
+        return new V2.PVector2
+        {
+            x = vector2.x,
+            y = vector2.y
+        };
+    }
+
+    public static Vector3 ToUnity(this V2.PVector3 vector3)
+    {
+        return new Vector3
+        {
+            x = vector3.x,
+            y = vector3.y,
+            z = vector3.z
+        };
+    }
+
+    public static Vector3 ToUnity(this V2.PVector2 vector2)
+    {
+        return new Vector2
+        {
+            x = vector2.x,
+            y = vector2.y
+        };
     }
 }

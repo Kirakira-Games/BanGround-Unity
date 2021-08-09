@@ -1,4 +1,4 @@
-﻿using FMOD;
+using FMOD;
 using System;
 using System.Linq;
 using UnityEngine;

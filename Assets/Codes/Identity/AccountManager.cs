@@ -1,4 +1,4 @@
-﻿using BanGround.Web;
+using BanGround.Web;
 using BanGround.Web.Auth;
 using Cysharp.Threading.Tasks;
 using System;

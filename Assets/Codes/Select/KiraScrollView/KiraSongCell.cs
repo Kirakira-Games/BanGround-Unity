@@ -1,4 +1,4 @@
-﻿using BanGround;
+using BanGround;
 using FancyScrollView;
 using System.Collections;
 using System.Collections.Generic;

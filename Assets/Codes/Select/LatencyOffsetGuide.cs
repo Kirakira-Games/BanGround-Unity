@@ -1,4 +1,4 @@
-﻿using AudioProvider;
+using AudioProvider;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

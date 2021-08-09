@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections.Generic;
 using V2;
 using System.Runtime.CompilerServices;
@@ -101,7 +101,7 @@ public class ChartTiming
             if (!isEnd)
                 totDist = anim.pos.z;
             //Debug.Log("Raw anim: " + AnimToString(anim));
-            if (Mathf.Approximately(anim.time, note.time))
+            if (NoteUtility.Approximately(anim.time, note.time))
                 isEnd = true;
         }
         raw.ForEach(anim => anim.pos.z = anim.pos.z + 1 - totDist);

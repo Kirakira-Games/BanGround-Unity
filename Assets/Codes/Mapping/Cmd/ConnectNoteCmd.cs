@@ -1,4 +1,4 @@
-﻿using NoteType = V2.NoteType;
+using NoteType = V2.NoteType;
 
 namespace BGEditor
 {

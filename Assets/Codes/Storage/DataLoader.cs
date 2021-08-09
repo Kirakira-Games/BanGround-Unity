@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -378,6 +378,7 @@ public class DataLoader : IDataLoader
 
         header.LoadDifficultyLevels(this);
         db.SaveChartSet(header.sid, header.mid, header.difficultyLevel.ToArray());
+        chartDic[header.sid] = header;
         //fs.FlushPak(file.RootPath);
     }
 
@@ -387,6 +388,7 @@ public class DataLoader : IDataLoader
 
         var file = fs.GetOrNewFile(path);
         ProtobufHelper.Write(header, file);
+        musicDic[header.mid] = header;
         //fs.FlushPak(file.RootPath);
     }
 

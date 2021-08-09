@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
 using Zenject;
@@ -34,7 +34,7 @@ namespace BGEditor
             if (Editor.yDivision == 0)
                 return;
             float target = newY / Editor.yDivision;
-            if (Mathf.Approximately(Editor.yPos, target))
+            if (NoteUtility.Approximately(Editor.yPos, target))
                 return;
             Core.Commit(new ChangeYLayerCmd(Notes, Editor, target));
         }
@@ -42,7 +42,7 @@ namespace BGEditor
         private void RefreshText()
         {
             // Refresh slider
-            if (!Mathf.Approximately(Editor.yPos, YPosSlider.value / Editor.yDivision))
+            if (!NoteUtility.Approximately(Editor.yPos, YPosSlider.value / Editor.yDivision))
             {
                 YPosSlider.SetValueWithoutNotify(Editor.yPos * Editor.yDivision);
             }

@@ -1,4 +1,4 @@
-﻿using BanGround.Web;
+using BanGround.Web;
 using BanGround.Web.Chart;
 using BanGround.Web.File;
 using BanGround.Web.Music;

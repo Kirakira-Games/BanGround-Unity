@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS1591, CS0612, CS3021, IDE1006
+#pragma warning disable CS1591, CS0612, CS3021, IDE1006
 using Newtonsoft.Json;
 using ProtoBuf;
 using System;
@@ -155,7 +155,7 @@ namespace V2
                 points[i].beatf = ChartUtility.BeatToFloat(points[i].beat);
                 if (i == 0)
                     continue;
-                if (Mathf.Approximately(points[i].beatf, Mathf.Max(0f, points[i-1].beatf)))
+                if (NoteUtility.Approximately(points[i].beatf, Mathf.Max(0f, points[i-1].beatf)))
                 {
                     // Remove duplicates
                     points.RemoveAt(i--);

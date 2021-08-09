@@ -1,4 +1,4 @@
-﻿using BanGround.Database;
+using BanGround.Database;
 //using Boo.Lang;
 using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;

@@ -1,4 +1,4 @@
-﻿using BanGround.Game.Mods;
+using BanGround.Game.Mods;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;

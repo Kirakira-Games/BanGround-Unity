@@ -1,4 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -180,7 +180,7 @@ namespace BanGround.Community
                 ViewStack.Clear();
                 var state = ViewStack.Create(StoreViewType.Song);
                 state.SearchText = text;
-                state.Title = text.IsNullOrEmpty() ? "Community" : $"Search: {text}";
+                state.Title = text.IsNullOrEmpty() ? "Community.Title" : "Community.SearchResult".L(text);
                 ViewStack.RefreshState();
             }
             try

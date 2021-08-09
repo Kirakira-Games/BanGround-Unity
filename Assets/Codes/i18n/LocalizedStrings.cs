@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using BanGround;
@@ -11,7 +11,7 @@ public class LocalizedStrings : MonoBehaviour
     [Inject]
     IFileSystem fs;
 
-    public TextAsset[] languageFiles = new TextAsset[24];
+    public TextAsset[] languageFiles = new TextAsset[25];
     private Dictionary<string, string> dictionary = null;
     private Dictionary<string, string> fallbackDictionary = null;
 
@@ -33,6 +33,7 @@ public class LocalizedStrings : MonoBehaviour
                 case SystemLanguage.ChineseSimplified:
                     cl_language.Set((int)Language.SimplifiedChinese);
                     break;
+                /*
                 case SystemLanguage.ChineseTraditional:
                     cl_language.Set((int)Language.TraditionalChinese);
                     break;
@@ -42,6 +43,7 @@ public class LocalizedStrings : MonoBehaviour
                 case SystemLanguage.Korean:
                     cl_language.Set((int)Language.Korean);
                     break;
+                */
                 default:
                     cl_language.Set((int)Language.English);
                     break;

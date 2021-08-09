@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using Cysharp.Threading.Tasks;
 using UnityEngine.UI;
@@ -31,7 +31,7 @@ namespace BGEditor
                 if (!Editor.yFilter)
                     return true;
                 if (note.lane == -1)
-                    return Mathf.Approximately(note.y, Editor.yPos);
+                    return NoteUtility.Approximately(note.y, Editor.yPos);
                 return Editor.yDivision == 0;
             }
         }
@@ -147,7 +147,7 @@ namespace BGEditor
                     else
                     {
                         float val = YSlider.value / YSlider.maxValue;
-                        if (note.lane >= 0 || !Mathf.Approximately(note.y, val))
+                        if (note.lane >= 0 || !NoteUtility.Approximately(note.y, val))
                         {
                             Core.Commit(new ChangeNoteYCmd(Notes, note, val));
                         }
