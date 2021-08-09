@@ -1,4 +1,4 @@
-﻿public interface IAudioTimelineSync
+public interface IAudioTimelineSync
 {
     float SmoothAudioDiff { get; }
     float Time { get; set; }

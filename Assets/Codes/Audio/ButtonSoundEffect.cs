@@ -1,4 +1,4 @@
-﻿using AudioProvider;
+using AudioProvider;
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using UnityEngine;

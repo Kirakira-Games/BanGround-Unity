@@ -1,4 +1,4 @@
-﻿using BanGround;
+using BanGround;
 using BanGround.Web.Auth;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;

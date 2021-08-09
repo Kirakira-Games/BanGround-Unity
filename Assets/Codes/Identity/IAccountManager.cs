@@ -1,4 +1,4 @@
-﻿using BanGround.Web.Auth;
+using BanGround.Web.Auth;
 using Cysharp.Threading.Tasks;
 
 namespace BanGround.Identity

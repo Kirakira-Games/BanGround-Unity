@@ -1,4 +1,4 @@
-﻿using BanGround.Database;
+using BanGround.Database;
 using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;

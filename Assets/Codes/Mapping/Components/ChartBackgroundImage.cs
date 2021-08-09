@@ -1,4 +1,4 @@
-﻿using BanGround;
+using BanGround;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;

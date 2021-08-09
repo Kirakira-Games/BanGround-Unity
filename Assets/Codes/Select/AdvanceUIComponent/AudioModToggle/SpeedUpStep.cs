@@ -1,4 +1,4 @@
-﻿using BanGround.Game.Mods;
+using BanGround.Game.Mods;
 using System;
 using System.Collections.Generic;
 using System.Linq;

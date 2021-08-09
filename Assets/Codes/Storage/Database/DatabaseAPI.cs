@@ -1,4 +1,4 @@
-﻿using BanGround.Database.Models;
+using BanGround.Database.Models;
 using BanGround.Database.Generated;
 using System.IO;
 using UnityEngine;

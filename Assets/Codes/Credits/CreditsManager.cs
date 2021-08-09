@@ -1,4 +1,4 @@
-﻿using AudioProvider;
+using AudioProvider;
 using UnityEngine;
 using Zenject;
 

@@ -1,4 +1,4 @@
-﻿
+
 namespace BGEditor
 {
     class ChangeYLayerCmd : IEditorCmd

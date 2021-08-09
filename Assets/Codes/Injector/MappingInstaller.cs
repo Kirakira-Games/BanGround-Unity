@@ -1,4 +1,4 @@
-﻿using BanGround.Scene.Params;
+using BanGround.Scene.Params;
 using BGEditor;
 using UnityEngine;
 using UnityEngine.UI;

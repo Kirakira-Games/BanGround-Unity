@@ -1,4 +1,4 @@
-﻿using Assets.Codes.InGame.Input;
+using Assets.Codes.InGame.Input;
 using BanGround;
 using BanGround.Game.Mods;
 using BanGround.Scene.Params;

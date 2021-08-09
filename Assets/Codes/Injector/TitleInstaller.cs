@@ -1,4 +1,4 @@
-﻿using BanGround.Database.Migrations;
+using BanGround.Database.Migrations;
 using UnityEngine;
 using Zenject;
 
