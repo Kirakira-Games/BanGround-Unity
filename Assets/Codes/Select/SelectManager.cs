@@ -223,6 +223,9 @@ public class SelectManager : MonoBehaviour
             isFirstPlay = false;
         }
 
+        if (this == null)
+            return;
+
         if (chartListManager.current.header.mid == lastPreviewMid)
         {
             CurrentPlayingSid = chartListManager.current.header.sid;
