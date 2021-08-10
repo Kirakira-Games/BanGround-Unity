@@ -364,15 +364,15 @@ public class ChartCreator : MonoBehaviour
             dataLoader.SaveHeader(mheader, transcoded);
 
             // Create header
-            var header = CreateHeader(mheader.mid, cover == null ? default : "bg" + coverExt);
-
-            // Create chart
             int clamped = Mathf.Clamp(difficulty, 0, 3);
             int level = Random.Range(clamped * 5 + 5, clamped * 8 + 6);
+            var header = CreateHeader(mheader.mid, cover == null ? default : "bg" + coverExt);
+            header.difficultyLevel[difficulty] = level;
+            dataLoader.SaveHeader(header, coverExt, cover);
+
+            // Create chart
             var chart = CreateChart((Difficulty)difficulty, level);
             dataLoader.SaveChart(chart, header.sid, (Difficulty)difficulty);
-
-            dataLoader.SaveHeader(header, coverExt, cover);
 
             // Reload scene
             cl_lastdiff.Set(difficulty);
