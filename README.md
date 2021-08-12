@@ -21,12 +21,12 @@ An issue should be created to describe the purpose of the changes and to notify 
 - Bass library layout
     - Assets/Plugins/Bass
         - Android
-        - Bass.Net.Android.dll
-        - arm64-v8a / armebi-v7a / x86
-            - libbass.so
-            - libbass_fx.so
-            - libbassenc.so
-            - libbassenc_ogg.so
+            - Bass.Net.Android.dll
+            - arm64-v8a / armebi-v7a / x86
+                - libbass.so
+                - libbass_fx.so
+                - libbassenc.so
+                - libbassenc_ogg.so
         - iOS
             - Bass.Net.iOS.dll
             - libbass.a
