@@ -16,3 +16,35 @@ An issue should be created to describe the purpose of the changes and to notify 
 
 ## Note
 - Run ```submodule.bat``` before run unity editor to resolve submodules.
+- Fmod version: 2.01.111
+
+- Bass library layout
+    - Assets/Plugins/Bass
+        - Android
+        - Bass.Net.Android.dll
+        - arm64-v8a / armebi-v7a / x86
+            - libbass.so
+            - libbass_fx.so
+            - libbassenc.so
+            - libbassenc_ogg.so
+        - iOS
+            - Bass.Net.iOS.dll
+            - libbass.a
+            - libbass_fx.a
+            - libbassenc.a
+            - libbassenc_ogg.a
+        - macOS (If you need to use editor in macOS)
+            - Bass.Net.OSX.dll
+            - libbass.dylib
+            - libbass_fx.dylib
+            - libbassenc.dylib
+            - libbassenc_ogg.dylib
+        - Windows
+            - Bass.Net.dll
+            - x86 / x86_64
+                - bass.dll
+                - bass_fx.dll
+                - bassenc.dll
+                - bassenc_ogg.dll
+
+    (All files can be downloaded from [un4seen.com](https://www.un4seen.com/))
