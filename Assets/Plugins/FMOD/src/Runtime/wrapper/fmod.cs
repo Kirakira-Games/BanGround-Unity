@@ -19,7 +19,7 @@ namespace FMOD
     */
     public partial class VERSION
     {
-        public const int    number = 0x00020103;
+        public const int    number = 0x00020104;
 #if !UNITY_2017_4_OR_NEWER
         public const string dll    = "fmod";
 #endif
@@ -732,6 +732,7 @@ namespace FMOD
         public int                 DSPBufferPoolSize;          /* [r/w] Optional. Specify 0 to ignore. Number of buffers in DSP buffer pool.  Each buffer will be DSPBlockSize * sizeof(float) * SpeakerModeChannelCount.  ie 7.1 @ 1024 DSP block size = 8 * 1024 * 4 = 32kb.  Default = 8. */
         public DSP_RESAMPLER       resamplerMethod;            /* [r/w] Optional. Specify 0 to ignore. Resampling method used with fmod's software mixer.  See FMOD_DSP_RESAMPLER for details on methods. */
         public uint                randomSeed;                 /* [r/w] Optional. Specify 0 to ignore. Seed value that FMOD will use to initialize its internal random number generators. */
+        public int                 maxConvolutionThreads;      /* [r/w] Optional. Specify 0 to ignore. Maximum number of CPU threads to use for convolution reverb effect.   Default = 2. */
     }
 
     [Flags]
@@ -767,7 +768,10 @@ namespace FMOD
         PROFILER            = MEDIUM,
         STUDIO_UPDATE       = MEDIUM,
         STUDIO_LOAD_BANK    = MEDIUM,
-        STUDIO_LOAD_SAMPLE  = MEDIUM
+        STUDIO_LOAD_SAMPLE  = MEDIUM,
+        CONVOLUTION1        = VERY_HIGH,
+        CONVOLUTION2        = VERY_HIGH
+
     }
 
     public enum THREAD_STACK_SIZE : uint
@@ -783,7 +787,9 @@ namespace FMOD
         PROFILER            = 128 * 1024,
         STUDIO_UPDATE       = 96  * 1024,
         STUDIO_LOAD_BANK    = 96  * 1024,
-        STUDIO_LOAD_SAMPLE  = 96  * 1024
+        STUDIO_LOAD_SAMPLE  = 96  * 1024,
+        CONVOLUTION1        = 16  * 1024,
+        CONVOLUTION2        = 16  * 1024
     }
 
     [Flags]
@@ -807,6 +813,8 @@ namespace FMOD
         STUDIO_UPDATE       = GROUP_B,
         STUDIO_LOAD_BANK    = GROUP_C,
         STUDIO_LOAD_SAMPLE  = GROUP_C,
+        CONVOLUTION1        = GROUP_C,
+        CONVOLUTION2        = GROUP_C,
                 
         /* Core mask, valid up to 1 << 62 */
         CORE_ALL            = 0,
@@ -841,6 +849,8 @@ namespace FMOD
         STUDIO_UPDATE,
         STUDIO_LOAD_BANK,
         STUDIO_LOAD_SAMPLE,
+        CONVOLUTION1,
+        CONVOLUTION2,
 
         MAX
     }
@@ -1192,6 +1202,10 @@ namespace FMOD
         {
             return FMOD5_System_GetCPUUsage(this.handle, out dsp, out stream, out geometry, out update, out total);
         }
+        public RESULT getCPUUsageEx(out float convolutionThread1, out float convolutionThread2)
+        {
+            return FMOD5_System_GetCPUUsageEx(this.handle, out convolutionThread1, out convolutionThread2);
+        }
         public RESULT getFileUsage(out Int64 sampleBytesRead, out Int64 streamBytesRead, out Int64 otherBytesRead)
         {
             return FMOD5_System_GetFileUsage(this.handle, out sampleBytesRead, out streamBytesRead, out otherBytesRead);
@@ -1538,6 +1552,8 @@ namespace FMOD
         private static extern RESULT FMOD5_System_GetChannelsPlaying        (IntPtr system, out int channels, out int realchannels);
         [DllImport(VERSION.dll)]
         private static extern RESULT FMOD5_System_GetCPUUsage               (IntPtr system, out float dsp, out float stream, out float geometry, out float update, out float total);
+        [DllImport(VERSION.dll)]
+        private static extern RESULT FMOD5_System_GetCPUUsageEx             (IntPtr system, out float convolutionThread1, out float convolutionThread2);
         [DllImport(VERSION.dll)]
         private static extern RESULT FMOD5_System_GetFileUsage              (IntPtr system, out Int64 sampleBytesRead, out Int64 streamBytesRead, out Int64 otherBytesRead);
         [DllImport(VERSION.dll)]

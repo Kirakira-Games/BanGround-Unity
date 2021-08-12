@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using System;
 using System.IO;
 using System.Linq;
 using Zenject;
@@ -63,10 +64,10 @@ namespace BanGround.Database.Migrations
                     ProtobufHelper.Write(replay, file);
                     Progress += p;
                 }
-                catch (InvalidDataException)
+                catch (Exception)
                 {
                     // already converted?
-                    break;
+                    continue;
                 }
             }
 
