@@ -1,7 +1,5 @@
 # BanGround-Unity
 
-These rules must be enforced after open-source.
-
 ## Gitflow
 1. No direct push to `master` or `release` branch.
 All work must be done on a separate branch and a pull request should be created to merge the changes to `master` branch.
@@ -17,4 +15,4 @@ An issue should be created to describe the purpose of the changes and to notify 
 4. All pull requests must be reviewed and approved by at least one other developer before merging.
 
 ## Note
-- Run ```submodule.bat``` before run unity editor to resolve submodules
+- Run ```submodule.bat``` before run unity editor to resolve submodules.
