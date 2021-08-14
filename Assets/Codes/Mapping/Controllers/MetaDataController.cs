@@ -22,6 +22,8 @@ namespace BGEditor
         private IAudioProgressController Progress;
         [Inject]
         private IMessageBox messageBox;
+        [Inject]
+        private IAudioProgressController progress;
         [Inject(Id = "Blocker")]
         private Button Blocker;
 
@@ -125,6 +127,7 @@ namespace BGEditor
             dataLoader.SaveHeader(mHeader);
             dataLoader.SaveHeader(cHeader, coverExt, cover);
             Core.Save();
+            progress.Pause();
             SceneLoader.LoadSceneAsync("Mapping");
         }
 
