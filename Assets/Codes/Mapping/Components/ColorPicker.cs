@@ -7,18 +7,25 @@ public class ColorPicker : MonoBehaviour
 {
     public GameObject Blocker;
     public Slider R;
+    public Text Rvalue;
     public Slider G;
+    public Text Gvalue;
     public Slider B;
+    public Text Bvalue;
     public Slider A;
+    public Text Avalue;
     public Image Preview;
     [HideInInspector]
     public Color Initial;
     [HideInInspector]
     public bool IsShowing;
     public Color color => new Color(R.value, G.value, B.value, A.value);
-
     private void UpdatePreview(float _)
     {
+        Rvalue.text = (Mathf.RoundToInt(color.r * 255)).ToString();
+        Gvalue.text = (Mathf.RoundToInt(color.g * 255)).ToString();
+        Bvalue.text = (Mathf.RoundToInt(color.b * 255)).ToString();
+        Avalue.text = (Mathf.RoundToInt(color.a * 255)).ToString();
         Preview.color = color;
     }
 
