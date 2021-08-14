@@ -106,7 +106,7 @@ public class ColorPicker : MonoBehaviour
 
     private void ParseHexPreview(string _)
     {
-        var regex = new Regex("^#(\\w{1,2})(\\w{1,2})(\\w{1,2})(\\w{1,2})?$");
+        var regex = new Regex("^#(\\w{1,2})(\\w{1,2})(\\w{1,2})(\\w{1,2})?$", RegexOptions.RightToLeft);
 
         var m = regex.Match(HexValue.text);
 
