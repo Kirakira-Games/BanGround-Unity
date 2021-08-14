@@ -333,10 +333,30 @@ namespace BGEditor
             int ret = await messageBox.ShowMessage("Editor.Title.PlayTest".L(), "Editor.Prompt.PlayTest".L(), new string[] {
                 "Cancel".L(),
                 "Editor.PlayOption.FromStart".L(),
-                "Editor.PlayOption.FromHere".L()
+                "Editor.PlayOption.FromHere".L(),
+                "Editor.PlayOption.FromStartAuto".L(),
+                "Editor.PlayOption,FromHereAuto".L()
             });
-            if (ret == 0)
-                return;
+            switch (ret)
+            {
+                case 0:
+                    break;
+                case 1:
+                    PlayNone(ret);
+                    break;
+                case 2:
+                    PlayNone(ret);
+                    break;
+                case 3:
+                    PlayAuto(ret);
+                    break;
+                case 4:
+                    PlayAuto(ret);
+                    break;
+            }
+        }
+        public void PlayNone(int ret)
+        {
             Save();
             float seekTime = ret == 1 ? 0 : audioManager.gameBGM.GetPlaybackTime() / 1000f;
             var param = new InGameParams
@@ -344,6 +364,24 @@ namespace BGEditor
                 sid = parameters.sid,
                 difficulty = parameters.difficulty,
                 mods = ModFlag.None,
+                seekPosition = seekTime,
+                saveRecord = false,
+                saveReplay = false,
+            };
+            SceneLoader.LoadScene("InGame",
+                () => chartLoader.LoadChart(parameters.sid, parameters.difficulty, true),
+                pushStack: true,
+                parameters: param);
+        }
+        public void PlayAuto(int ret)
+        {
+            Save();
+            float seekTime = ret == 2 ? 0 : audioManager.gameBGM.GetPlaybackTime() / 1000f;
+            var param = new InGameParams
+            {
+                sid = parameters.sid,
+                difficulty = parameters.difficulty,
+                mods = ModFlag.AutoPlay,
                 seekPosition = seekTime,
                 saveRecord = false,
                 saveReplay = false,
@@ -361,7 +399,9 @@ namespace BGEditor
             progress.Pause();
             if (await messageBox.ShowMessage("Editor.Title.Exit".L(), "Editor.Prompt.Exit".L()))
                 Save();
-            SceneLoader.Back(null);
+            else
+                return;
+             SceneLoader.Back(null);
         }
 
         public void AssignTimingGroups(V2.Chart chart)

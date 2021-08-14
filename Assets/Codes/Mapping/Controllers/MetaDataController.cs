@@ -125,6 +125,7 @@ namespace BGEditor
             dataLoader.SaveHeader(mHeader);
             dataLoader.SaveHeader(cHeader, coverExt, cover);
             Core.Save();
+            SceneLoader.LoadSceneAsync("Mapping");
         }
 
         public async void Hide(bool save)

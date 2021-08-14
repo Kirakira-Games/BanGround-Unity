@@ -11,6 +11,7 @@ using BanGround;
 using BanGround.Scene.Params;
 using BGEditor;
 using BanGround.Game.Mods;
+using BanGround.Identity;
 
 #pragma warning disable 0649
 public class SelectManager : MonoBehaviour
@@ -43,12 +44,16 @@ public class SelectManager : MonoBehaviour
     private KVar g_saveReplay;
     [Inject]
     private ICancellationTokenStore cancellationToken;
+    [Inject]
+    private IAccountManager accountManager;
 
     public int CurrentPlayingSid { get; private set; }
     private float bgmVolume = 0.0f;
     public bool BGMIsMuted => bgmVolume == 0.0f;
 
     public const float scroll_Min_Speed = 50f;
+
+    public bool authing = false;
 
     //private RectTransform rt;
     //private ScrollRect rt_s;
@@ -406,6 +411,19 @@ public class SelectManager : MonoBehaviour
         previewSound?.Dispose();
         SlideMesh.cacheMat = null;
         chartListManager.onChartListUpdated.RemoveListener(RefreshSongList);
+    }
+
+    public async void OpenCommunitySence()
+    {
+        if (authing)
+            return;
+
+        //必须要在线状态才能进社区
+        if (accountManager.isOfflineMode && !await accountManager.DoLogin())
+        {
+            return;
+        }
+        SceneLoader.LoadScene("Community", pushStack: true);
     }
 }
 
