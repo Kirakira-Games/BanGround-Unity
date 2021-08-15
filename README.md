@@ -1,5 +1,7 @@
 # BanGround-Unity
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/305eb5f7ded4481ba6c6320c3e5cddf4)](https://app.codacy.com/gh/Kirakira-Games/BanGround-Unity?utm_source=github.com&utm_medium=referral&utm_content=Kirakira-Games/BanGround-Unity&utm_campaign=Badge_Grade_Settings)
+
 ## Gitflow
 1. No direct push to `master` or `release` branch.
 All work must be done on a separate branch and a pull request should be created to merge the changes to `master` branch.
