@@ -5,6 +5,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 using Difficulty = V2.Difficulty;
+using Cysharp.Threading.Tasks;
+using System.Threading;
 
 #pragma warning disable 0649
 public class DifficultySelect : MonoBehaviour
@@ -86,6 +88,8 @@ public class DifficultySelect : MonoBehaviour
         UpdateView();
     }
 
+    CancellationTokenSource changeLevelCancelSource = new CancellationTokenSource();
+
     //This Called both change button clicked and song changed
     public void UpdateView()
     {
@@ -100,8 +104,47 @@ public class DifficultySelect : MonoBehaviour
         }
         cardImg[selected].color = Color.white;
         difficultyText.text = Enum.GetName(typeof(Difficulty), selected).ToUpper();
-        levelText.text = levels[selected].ToString();
+        //levelText.text = levels[selected].ToString();
+        async UniTask LevelText()
+        {
+            int counter = 0;
+            //int start = int.Parse(levelText.text);
 
+            int start = string.IsNullOrEmpty(levelText.text) ? 0 : Convert.ToInt32(levelText.text);
+            // 路程 = 目标 - 起始
+            int s = 0 - start;
+            // 时间
+            int t = 12;
+            // 速度
+            int v = s / t;
+            
+            while (true)
+            {
+                await UniTask.DelayFrame(1);
+                if (++counter > t)
+                    break;
+                // 速度 = 每单位时间的行进路程
+                start += v;//
+                levelText.text = start.ToString();
+            }
+            s = levels[selected];
+            v = s / t;
+            counter = 0;
+            while (true)
+            {
+                await UniTask.DelayFrame(1);
+                if (++counter > t)
+                    break;
+                start += v;
+                levelText.text = start.ToString();
+            }
+
+            levelText.text = levels[selected].ToString();
+        }
+
+        changeLevelCancelSource?.Cancel();
+        changeLevelCancelSource = new CancellationTokenSource();
+        LevelText().WithCancellation(changeLevelCancelSource.Token);
         recordDisplayer.DisplayRecord();
         string path = dataLoader.GetBackgroundPath(chartListManager.current.header.sid).Item1;
     }
