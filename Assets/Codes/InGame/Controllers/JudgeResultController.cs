@@ -84,9 +84,9 @@ public class JudgeResultController : MonoBehaviour
                 milisecTxt.color = Color.red;
             }
         }
+        ComboManager.JudgeOffsetResult.Add(deltaTime);
         if (result >= (cl_elp == 0 ? 1 : 0) && result <= 3 && Mathf.Abs(deltaTime) >= cl_elp)
         {
-            ComboManager.JudgeOffsetResult.Add(deltaTime);
             OffsetResult offset = deltaTime > 0 ? OffsetResult.Early : OffsetResult.Late;
             switch (offset)
             {

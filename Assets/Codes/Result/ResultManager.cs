@@ -29,6 +29,9 @@ public class ResultManager : MonoBehaviour
     [Inject(Id = "g_saveReplay")]
     private KVar g_saveReplay;
 
+    [Inject(Id = "cl_elp")]
+    KVar cl_elp;
+
     private Button button_back;
     private Button button_retry;
     private Button button_replay;
@@ -92,8 +95,8 @@ public class ResultManager : MonoBehaviour
     private void ShowOffset()
     {
         //OffsetList
-        var early = ComboManager.JudgeOffsetResult.Where(x => x > 0 && x != int.MinValue);
-        var late = ComboManager.JudgeOffsetResult.Where(x => x < 0 && x != int.MaxValue);
+        var early = ComboManager.JudgeOffsetResult.Where(x => x > cl_elp && x != int.MaxValue);
+        var late = ComboManager.JudgeOffsetResult.Where(x => x < -cl_elp && x != int.MinValue);
         int earlyCount = early.Count();
         int lateCount = late.Count();
         int earlyAverage = earlyCount == 0 ? 0 : Mathf.RoundToInt((float)early.Average());
