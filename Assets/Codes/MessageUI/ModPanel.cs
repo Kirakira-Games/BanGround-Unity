@@ -33,7 +33,7 @@ public class ModPanel : MonoBehaviour
         Mirror.isOn = flag.HasFlag(ModFlag.Mirror);
     }
 
-    public ModFlag GetToggleFlag()
+    public ModFlag GetCurrentFlag()
     {
         ModFlag flag = ModFlag.None;
         flag |= SpeedUp.GetStep();
@@ -56,6 +56,6 @@ public class ModPanel : MonoBehaviour
 
     public void Save()
     {
-        cl_modflag.SetMod(GetToggleFlag());
+        cl_modflag.SetMod(GetCurrentFlag());
     }
 }
