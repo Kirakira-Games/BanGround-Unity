@@ -1,11 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using AudioProvider;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
-using BanGround.Game.Mods;
 
 public class SettingAndMod : MonoBehaviour
 {
@@ -15,8 +10,6 @@ public class SettingAndMod : MonoBehaviour
     private IKVSystem kvSystem;
     [Inject]
     SelectManager selectManager;
-    [Inject(Id = "cl_modflag")]
-    private KVar cl_modflag;
 
     private Button setting_Open_Btn;
     private Button setting_Close_Btn;
@@ -39,24 +32,7 @@ public class SettingAndMod : MonoBehaviour
     private SESelector seSelector;
 
     public Toggle soundTog;
-
-    /* Mods     */
-
-    [Header("Mod toggles")]
-    // Auto
-    public Toggle autoToggle;
-    // Double
-    public StepToggle speedUpToggle;
-    // Half
-    public StepToggle speedDownToggle;
-    // Sudden Death
-    public Toggle suddenDeathToggle;
-    // Perfect
-    public Toggle perfectToggle;
-    // Mirror
-    public Toggle mirrorToggle;
-
-    /* Mods End */
+    public ModPanel modPanel;
 
     private InputField speed_Input;
     private InputField judge_Input;
@@ -254,11 +230,12 @@ public class SettingAndMod : MonoBehaviour
     void OpenMod()
     {
         GameObject.Find("Setting_Canvas").GetComponent<Animator>().SetTrigger("SwitchMod");
+        modPanel.Refresh();
     }
     void CloseMod()
     {
         GameObject.Find("Setting_Canvas").GetComponent<Animator>().SetTrigger("SwitchMod");
-        SetLiveSetting();
+        modPanel.Save();
     }
     void GetLiveSetting()
     {
@@ -294,18 +271,6 @@ public class SettingAndMod : MonoBehaviour
         FS_Tog.isOn = r_fullscreen;
         VSync_Tog.isOn = r_vsync;
 #endif
-        GetModStatus();
-    }
-    void GetModStatus()
-    {
-        var flag = ModFlagUtil.From(cl_modflag);
-
-        autoToggle.isOn = flag.HasFlag(ModFlag.AutoPlay);
-        speedDownToggle.SetStep(flag);
-        speedUpToggle.SetStep(flag);
-        suddenDeathToggle.isOn = flag.HasFlag(ModFlag.SuddenDeath);
-        perfectToggle.isOn = flag.HasFlag(ModFlag.Perfect);
-        mirrorToggle.isOn = flag.HasFlag(ModFlag.Mirror);
     }
 
     public void OnLanuageChanged(int value)
@@ -347,24 +312,6 @@ public class SettingAndMod : MonoBehaviour
 
             cl_notestyle.Set((int)noteToggles.GetStyle());
             cl_sestyle.Set((int)seSelector.GetSE());
-
-            ModFlag flag = ModFlag.None;
-            flag |= speedUpToggle.GetStep();
-            flag |= speedDownToggle.GetStep();
-
-            if (suddenDeathToggle.isOn)
-                flag |= ModFlag.SuddenDeath;
-
-            if (perfectToggle.isOn)
-                flag |= ModFlag.Perfect;
-
-            if (autoToggle.isOn)
-                flag |= ModFlag.AutoPlay;
-
-            if (mirrorToggle.isOn)
-                flag |= ModFlag.Mirror;
-
-            cl_modflag.SetMod(flag);
         }
         catch (System.Exception e)
         {

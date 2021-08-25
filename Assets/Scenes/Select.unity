@@ -2195,6 +2195,7 @@ GameObject:
   - component: {fileID: 99092092}
   - component: {fileID: 99092091}
   - component: {fileID: 99092093}
+  - component: {fileID: 99092094}
   m_Layer: 5
   m_Name: Mod_Panel
   m_TagString: Untagged
@@ -2275,6 +2276,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ShowMaskGraphic: 1
+--- !u!114 &99092094
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 99092089}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 363a604f868b43d4ab95001869917665, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AutoPlay: {fileID: 1540654420}
+  SpeedDown: {fileID: 2057498174}
+  SpeedUp: {fileID: 2023882263}
+  SuddenDeath: {fileID: 1362401802}
+  Perfect: {fileID: 1463734429}
+  Mirror: {fileID: 1743964790}
 --- !u!1001 &116120288
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2562,7 +2581,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 402058848}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.10765159
+  m_Size: 0.11743186
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -3597,6 +3616,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_MoveRepeatDelay: 0.5
   m_MoveRepeatRate: 0.1
+  m_XRTrackingOrigin: {fileID: 0}
   m_ActionsAsset: {fileID: -944628639613478452, guid: ca9f5fa95ffab41fb9a615ab714db018,
     type: 3}
   m_PointAction: {fileID: 1054132383583890850, guid: ca9f5fa95ffab41fb9a615ab714db018,
@@ -4294,7 +4314,7 @@ Canvas:
   m_GameObject: {fileID: 218056352}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 1
+  m_RenderMode: 0
   m_Camera: {fileID: 0}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
@@ -4346,12 +4366,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   soundTog: {fileID: 285984990}
-  autoToggle: {fileID: 1540654420}
-  speedUpToggle: {fileID: 2023882263}
-  speedDownToggle: {fileID: 2057498174}
-  suddenDeathToggle: {fileID: 1362401802}
-  perfectToggle: {fileID: 1463734429}
-  mirrorToggle: {fileID: 1743964790}
+  modPanel: {fileID: 99092094}
 --- !u!225 &218056359
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -8282,19 +8297,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 405033725}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &405033725
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -57010,8 +57013,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 241983207}
   m_HandleRect: {fileID: 241983206}
   m_Direction: 2
-  m_Value: 0.9999998
-  m_Size: 0.57212174
+  m_Value: 0.99999976
+  m_Size: 0.6372647
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
