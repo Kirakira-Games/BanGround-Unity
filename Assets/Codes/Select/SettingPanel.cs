@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
-public class SettingAndMod : MonoBehaviour
+public class SettingPanel : MonoBehaviour
 {
     [Inject]
     LocalizedStrings localizedStrings;

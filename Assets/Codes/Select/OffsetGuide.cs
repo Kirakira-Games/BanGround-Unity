@@ -14,7 +14,7 @@ public class OffsetGuide : MonoBehaviour
     [Inject]
     private IChartLoader chartLoader;
     [Inject]
-    SettingAndMod settingAndMod;
+    SettingPanel settingAndMod;
 
     void Start()
     {

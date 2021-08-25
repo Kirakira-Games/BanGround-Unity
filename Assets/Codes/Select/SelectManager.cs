@@ -35,7 +35,7 @@ public class SelectManager : MonoBehaviour
     [Inject]
     private IMessageBox messageBox;
     [Inject]
-    SettingAndMod settingAndMod;
+    private SettingPanel settingAndMod;
     [Inject(Id = "cl_cursorter")]
     private KVar cl_cursorter;
     [Inject(Id = "cl_modflag")]
