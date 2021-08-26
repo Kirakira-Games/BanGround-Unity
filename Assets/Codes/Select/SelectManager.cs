@@ -409,7 +409,7 @@ public class SelectManager : MonoBehaviour
         chartListManager.onChartListUpdated.RemoveListener(RefreshSongList);
     }
 
-    public async void OpenCommunitySence()
+    public async void OpenCommunityScene()
     {
         //必须要在线状态才能进社区
         if (accountManager.isOfflineMode && !await accountManager.DoLogin())
