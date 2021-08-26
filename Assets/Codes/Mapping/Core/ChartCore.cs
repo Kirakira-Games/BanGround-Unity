@@ -330,11 +330,21 @@ namespace BGEditor
             if (Blocker.gameObject.activeSelf || messageBox.isActive)
                 return;
             progress.Pause();
-            if (await messageBox.ShowMessage("Editor.Title.Exit".L(), "Editor.Prompt.Exit".L()))
+            int choice = await messageBox.ShowMessage(
+                "Editor.Title.Exit".L(),
+                "Editor.Prompt.Exit".L(),
+                "Cancel",
+                "Editor.ExitOption.ExitNoSave",
+                "Editor.ExitOption.ExitSave");
+            if (choice == 0)
+            {
+                return;
+            }
+            if (choice == 2)
             {
                 Save();
-                SceneLoader.Back(null);
             }
+            SceneLoader.Back(null);
         }
 
         public void AssignTimingGroups(V2.Chart chart)
