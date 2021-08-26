@@ -18,6 +18,10 @@ namespace BGEditor
 
         private void Start()
         {
+            ReloadImage();
+        }
+        public void ReloadImage()
+        {
             var image = GetComponent<Image>();
             var (path, _) = dataLoader.GetBackgroundPath(chartLoader.header.sid);
             if (string.IsNullOrEmpty(path))

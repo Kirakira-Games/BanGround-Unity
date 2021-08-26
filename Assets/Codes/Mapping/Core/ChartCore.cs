@@ -331,10 +331,10 @@ namespace BGEditor
                 return;
             progress.Pause();
             if (await messageBox.ShowMessage("Editor.Title.Exit".L(), "Editor.Prompt.Exit".L()))
+            {
                 Save();
-            else
-                return;
-             SceneLoader.Back(null);
+                SceneLoader.Back(null);
+            }
         }
 
         public void AssignTimingGroups(V2.Chart chart)
