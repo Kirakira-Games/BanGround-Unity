@@ -7,7 +7,7 @@ public class SelectInstaller : MonoInstaller
     public Transform cellParent;
 
     public SelectManager selectManager;
-    public SettingPanel settingAndMod;
+    public SettingPanel settingPanel;
     public FancyBackground fancyBackground;
 
     public override void InstallBindings()
@@ -15,7 +15,7 @@ public class SelectInstaller : MonoInstaller
         Container.BindFactory<KiraSongCell, KiraSongCell.Factory>().FromComponentInNewPrefab(cellPrefab).UnderTransform(cellParent);
 
         Container.Bind<SelectManager>().FromInstance(selectManager);
-        Container.Bind<SettingPanel>().FromInstance(settingAndMod);
+        Container.Bind<SettingPanel>().FromInstance(settingPanel);
         Container.Bind<FancyBackground>().FromInstance(fancyBackground);
     }
 }

@@ -14,7 +14,7 @@ public class OffsetGuide : MonoBehaviour
     [Inject]
     private IChartLoader chartLoader;
     [Inject]
-    SettingPanel settingAndMod;
+    SettingPanel settingPanel;
 
     void Start()
     {
@@ -23,7 +23,7 @@ public class OffsetGuide : MonoBehaviour
 
     void StartOffsetGuide()
     {
-        settingAndMod.SetLiveSetting();
+        settingPanel.SetLiveSetting();
         kvSystem.SaveConfig();
         SceneLoader.LoadScene("InGame", () => chartLoader.LoadChart(OFFSET_GUIDE_SID, OFFSET_GUIDE_DIFF, true),
             true, parameters: new InGameParams

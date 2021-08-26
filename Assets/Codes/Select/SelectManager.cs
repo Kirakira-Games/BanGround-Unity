@@ -35,7 +35,7 @@ public class SelectManager : MonoBehaviour
     [Inject]
     private IMessageBox messageBox;
     [Inject]
-    private SettingPanel settingAndMod;
+    private SettingPanel settingPanel;
     [Inject(Id = "cl_cursorter")]
     private KVar cl_cursorter;
     [Inject(Id = "cl_modflag")]
@@ -139,7 +139,7 @@ public class SelectManager : MonoBehaviour
 
     public async void OnEnterPressed()
     {
-        settingAndMod.SetLiveSetting();
+        settingPanel.SetLiveSetting();
 
         kvSystem.SaveConfig();
 
