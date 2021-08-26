@@ -333,9 +333,9 @@ namespace BGEditor
             int choice = await messageBox.ShowMessage(
                 "Editor.Title.Exit".L(),
                 "Editor.Prompt.Exit".L(),
-                "Cancel",
-                "Editor.ExitOption.ExitNoSave",
-                "Editor.ExitOption.ExitSave");
+                "Cancel".L(),
+                "Editor.ExitOption.ExitNoSave".L(),
+                "Editor.ExitOption.ExitSave".L());
             if (choice == 0)
             {
                 return;
