@@ -22,8 +22,6 @@ namespace BGEditor
         private IAudioProgressController Progress;
         [Inject]
         private IMessageBox messageBox;
-        [Inject]
-        private IAudioProgressController progress;
         [Inject(Id = "Blocker")]
         private Button Blocker;
 
@@ -129,7 +127,7 @@ namespace BGEditor
             dataLoader.SaveHeader(cHeader, coverExt, cover);
             Core.Save();
             
-            ChartBackgroundImage.ReloadImage();
+            ChartBackgroundImage.ReloadImage(true);
         }
 
         public async void Hide(bool save)
