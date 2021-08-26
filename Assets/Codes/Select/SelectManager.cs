@@ -17,8 +17,6 @@ using BanGround.Identity;
 public class SelectManager : MonoBehaviour
 {
     [Inject]
-    private DiContainer _container;
-    [Inject]
     private IAudioManager audioManager;
     [Inject]
     public IDataLoader dataLoader;
@@ -52,8 +50,6 @@ public class SelectManager : MonoBehaviour
     public bool BGMIsMuted => bgmVolume == 0.0f;
 
     public const float scroll_Min_Speed = 50f;
-
-    public bool authing = false;
 
     //private RectTransform rt;
     //private ScrollRect rt_s;
@@ -415,9 +411,6 @@ public class SelectManager : MonoBehaviour
 
     public async void OpenCommunitySence()
     {
-        if (authing)
-            return;
-
         //必须要在线状态才能进社区
         if (accountManager.isOfflineMode && !await accountManager.DoLogin())
         {
