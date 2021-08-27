@@ -1,4 +1,5 @@
-﻿using BanGround.Scene.Params;
+﻿using BanGround.Game.Mods;
+using BanGround.Scene.Params;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -19,13 +20,16 @@ namespace BGEditor
         [Inject]
         private IAudioProgressController audioProgress;
 
+        [Inject(Id = "cl_mappingmodflag")]
+        private KVar cl_mappingmodflag;
+
         public void Open()
         {
             if (modPanel.gameObject.activeSelf)
             {
                 return;
             }
-            modPanel.Refresh();
+            modPanel.Refresh(ModFlagUtil.From(cl_mappingmodflag));
             audioProgress.Pause();
             Blocker.gameObject.SetActive(true);
             modPanel.gameObject.SetActive(true);
@@ -44,7 +48,7 @@ namespace BGEditor
         public void Play(bool fromStart)
         {
             var flag = modPanel.GetCurrentFlag();
-            modPanel.Save();
+            modPanel.Save(cl_mappingmodflag);
             Close();
 
             float seekTime = fromStart ? 0 : audioManager.gameBGM.GetPlaybackTime() / 1000f;

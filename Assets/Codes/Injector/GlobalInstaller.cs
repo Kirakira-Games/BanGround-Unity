@@ -218,6 +218,8 @@ public class GlobalInstaller : MonoInstaller
             KVar.C("cl_language", "-1", KVarFlags.Archive),
 
             KVar.C("cl_modflag", "0", KVarFlags.StringOnly, "A hex string storing ModFlag. At most 64 bits."),
+            KVar.C("cl_mappingmodflag", "0", KVarFlags.StringOnly,
+            "A hex string storing ModFlag specifically for mapping. At most 64 bits."),
 
             KVar.C("skin_particle", "meigong", KVarFlags.Archive | KVarFlags.StringOnly, "Particle name"),
         };

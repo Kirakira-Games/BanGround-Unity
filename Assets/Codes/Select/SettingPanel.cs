@@ -1,3 +1,4 @@
+using BanGround.Game.Mods;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -122,6 +123,10 @@ public class SettingPanel : MonoBehaviour
     [Inject(Id = "cl_language")]
     KVar cl_language;
 
+    // mod flags
+    [Inject(Id = "cl_modflag")]
+    private KVar cl_modflag;
+
     /*
      * End
      */
@@ -230,12 +235,12 @@ public class SettingPanel : MonoBehaviour
     void OpenMod()
     {
         GameObject.Find("Setting_Canvas").GetComponent<Animator>().SetTrigger("SwitchMod");
-        modPanel.Refresh();
+        modPanel.Refresh(ModFlagUtil.From(cl_modflag));
     }
     void CloseMod()
     {
         GameObject.Find("Setting_Canvas").GetComponent<Animator>().SetTrigger("SwitchMod");
-        modPanel.Save();
+        modPanel.Save(cl_modflag);
     }
     void GetLiveSetting()
     {

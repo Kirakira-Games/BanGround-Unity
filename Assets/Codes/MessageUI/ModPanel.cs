@@ -13,18 +13,8 @@ public class ModPanel : MonoBehaviour
     public Toggle Perfect;
     public Toggle Mirror;
 
-    [Inject(Id = "cl_modflag")]
-    private KVar cl_modflag;
-
-    private void Awake()
+    public void Refresh(ModFlag flag)
     {
-        Refresh();
-    }
-
-    public void Refresh()
-    {
-        var flag = ModFlagUtil.From(cl_modflag);
-
         AutoPlay.isOn = flag.HasFlag(ModFlag.AutoPlay);
         SpeedDown.SetStep(flag);
         SpeedUp.SetStep(flag);
@@ -54,8 +44,8 @@ public class ModPanel : MonoBehaviour
         return flag;
     }
 
-    public void Save()
+    public void Save(KVar kModFlag)
     {
-        cl_modflag.SetMod(GetCurrentFlag());
+        kModFlag.SetMod(GetCurrentFlag());
     }
 }
