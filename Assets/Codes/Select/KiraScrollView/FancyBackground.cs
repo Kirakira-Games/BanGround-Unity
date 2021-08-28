@@ -24,6 +24,7 @@ public class FancyBackground : MonoBehaviour
     public Scroller scroller = default;
     public Text title = default;
     public Text artist = default;
+    public Text charter = default;
     public Texture2D defaultTexture = default;
     public TextAsset changeSound = default;
 
@@ -127,8 +128,10 @@ public class FancyBackground : MonoBehaviour
             material.SetVector(Uniform.AspectRatios, new Vector4(tex1.width / (float)tex1.height, tex2.width / (float)tex2.height, tex3.width / (float)tex3.height, 0));
 
             var mheader = dataLoader.GetMusicHeader(dataLoader.chartList[current].mid);
+            var cheader = dataLoader.GetChartHeader(dataLoader.chartList[current].sid);
             title.text = mheader.title;
             artist.text = mheader.artist;
+            charter.text = cheader.authorNick;
 
             if (se != null && !firstSelect)
                 se.PlayOneShot();
