@@ -9,6 +9,7 @@ public class SelectInstaller : MonoInstaller
     public SelectManager selectManager;
     public SettingPanel settingPanel;
     public FancyBackground fancyBackground;
+    public RankTable rankTable;
 
     public override void InstallBindings()
     {
@@ -17,5 +18,6 @@ public class SelectInstaller : MonoInstaller
         Container.Bind<SelectManager>().FromInstance(selectManager);
         Container.Bind<SettingPanel>().FromInstance(settingPanel);
         Container.Bind<FancyBackground>().FromInstance(fancyBackground);
+        Container.Bind<RankTable>().FromInstance(rankTable);
     }
 }

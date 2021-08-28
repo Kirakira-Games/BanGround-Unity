@@ -15,6 +15,8 @@ public class DifficultySelect : MonoBehaviour
     private IDataLoader dataLoader;
     [Inject]
     private IChartListManager chartListManager;
+    [Inject]
+    private RankTable rankTable;
 
     [Inject(Id = "cl_cursorter")]
     private KVar cl_cursorter;
@@ -102,8 +104,8 @@ public class DifficultySelect : MonoBehaviour
         difficultyText.text = Enum.GetName(typeof(Difficulty), selected).ToUpper();
         levelText.text = levels[selected].ToString();
 
+        rankTable.UpdateCurrentChart(chartListManager.current.header.sid, chartListManager.current.difficulty);
         recordDisplayer.DisplayRecord();
-        string path = dataLoader.GetBackgroundPath(chartListManager.current.header.sid).Item1;
     }
     #endregion
 
