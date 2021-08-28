@@ -59,6 +59,7 @@ namespace BGEditor
                 difficulty = parameters.difficulty,
                 mods = flag,
                 seekPosition = seekTime,
+                skipEntranceAnim = !fromStart,
                 saveRecord = false,
                 saveReplay = false,
             };
