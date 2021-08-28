@@ -113,7 +113,7 @@ public class SelectManager : MonoBehaviour
 
         delete_Button.onClick.AddListener(async () =>
         {
-            if (await messageBox.ShowMessage("Select.Title.Delete", "Select.Prompt.Delete"))
+            if (await messageBox.ShowMessage("Select.Title.Delete".L(), "Select.Prompt.Delete".L()))
             {
                 OnDelete();
             }
