@@ -106,7 +106,6 @@ public class DifficultySelect : MonoBehaviour
 
         rankTable.UpdateCurrentChart(chartListManager.current.header.sid, chartListManager.current.difficulty);
         recordDisplayer.DisplayRecord();
-        string path = dataLoader.GetBackgroundPath(chartListManager.current.header.sid).Item1;
     }
     #endregion
 

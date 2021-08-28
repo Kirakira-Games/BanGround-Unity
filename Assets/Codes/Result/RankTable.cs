@@ -1,7 +1,5 @@
 using BanGround.Database;
 using BanGround.Identity;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,7 +13,7 @@ public class RankTable : MonoBehaviour
     [Inject]
     private IDatabaseAPI db;
     [Inject]
-    private IChartLoader chartLoader;
+    private DiContainer diContainer;
 
     public Transform Content;
     public GameObject RankCellPrefab;
@@ -43,10 +41,9 @@ public class RankTable : MonoBehaviour
 
         for (int i = 0; i < ranks.Length; i++)
         {
-            var rankCellObj = Instantiate(RankCellPrefab, Content);
+            var rankCellObj = diContainer.InstantiatePrefab(RankCellPrefab, Content);
             var rankCell = rankCellObj.GetComponent<RankCell>();
 
-            rankCell.Inject(chartLoader);
             rankCell.UpdateLocalRankItem(ranks[i], i + 1, name);
         }
     }

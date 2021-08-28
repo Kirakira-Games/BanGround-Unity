@@ -1,8 +1,6 @@
+using BanGround;
 using BanGround.Database.Models;
-using BanGround.Identity;
 using BanGround.Scene.Params;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -19,15 +17,12 @@ public class RankCell : MonoBehaviour
     public Sprite[] ClearMarkIcons;
     public Sprite[] RankIcons;
 
-    RankItem rankItem;
+    private RankItem rankItem;
 
     [Inject]
     private IChartLoader chartLoader;
-
-    public void Inject(IChartLoader _chartLoader)
-    {
-        chartLoader = _chartLoader;
-    }
+    [Inject]
+    private IFileSystem fs;
 
     public void UpdateLocalRankItem(RankItem item, int rank, string name)
     {
@@ -44,17 +39,20 @@ public class RankCell : MonoBehaviour
 
     public void OnClicked()
     {
-        if (rankItem.ReplayFile != null)
+        if (rankItem.ReplayFile != null && fs.FileExists(rankItem.ReplayFile))
         {
-            var gameParams = SceneLoader.GetParamsOrDefault<InGameParams>();
-            gameParams.difficulty = rankItem.Difficulty;
-            gameParams.sid = rankItem.ChartId;
-            gameParams.saveRecord = false;
-            gameParams.saveReplay = false;
-            gameParams.replayPath = rankItem.ReplayFile;
-            gameParams.mods = (BanGround.Game.Mods.ModFlag)rankItem.Mods;
-            gameParams.isOffsetGuide = false;
+            var gameParams = new InGameParams
+            {
+                difficulty = rankItem.Difficulty,
+                sid = rankItem.ChartId,
+                saveRecord = false,
+                saveReplay = false,
+                replayPath = rankItem.ReplayFile,
+                mods = (BanGround.Game.Mods.ModFlag)rankItem.Mods,
+                isOffsetGuide = false
+            };
 
+            // TODO: Do not push stack when loading from result scene
             SceneLoader.LoadScene(
                 "InGame", 
                 () => chartLoader.LoadChart(
