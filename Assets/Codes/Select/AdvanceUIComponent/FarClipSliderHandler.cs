@@ -1,40 +1,29 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-#pragma warning disable 0649
 public class FarClipSliderHandler : MonoBehaviour, IBeginDragHandler, IEndDragHandler, IDragHandler
 {
-    private Slider farClipSlider;
-    private Transform oldParent;
-    private Vector3 pos;
-
-    [SerializeField] private Canvas settingCanvas;
-    [SerializeField] private Canvas mainCanvas;
-
-    [SerializeField] private Transform laneTransform;
     [SerializeField] private Camera previewCam;
-    [SerializeField] private Transform newParent;
+    [SerializeField] private Camera mainCam;
+    [SerializeField] private Transform laneTransform;
     [SerializeField] private GameObject previewObj;
+    [SerializeField] private Canvas settingCanvas;
+
+    private Slider farClipSlider;
+    private int cullingMask;
 
     private void Start()
     {
         farClipSlider = GetComponent<Slider>();
-        oldParent = transform.parent;
+        cullingMask = mainCam.cullingMask;
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        //var rect = GetComponent<RectTransform>();
-        //pos = rect.anchoredPosition;
-
+        mainCam.cullingMask = 0;
+        settingCanvas.worldCamera = previewCam;
         previewObj.SetActive(true);
-        transform.SetParent(newParent);
-        //rect.anchoredPosition = pos;
-        settingCanvas.enabled = false;
-        mainCanvas.enabled = false;
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -46,13 +35,8 @@ public class FarClipSliderHandler : MonoBehaviour, IBeginDragHandler, IEndDragHa
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        //var rect = GetComponent<RectTransform>();
-        //pos = rect.anchoredPosition;
-
-        transform.SetParent(oldParent);
-        //rect.anchoredPosition = pos;
+        mainCam.cullingMask = cullingMask;
+        settingCanvas.worldCamera = mainCam;
         previewObj.SetActive(false);
-        settingCanvas.enabled = true;
-        mainCanvas.enabled = true;
     }
 }
