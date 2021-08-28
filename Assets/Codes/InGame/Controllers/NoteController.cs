@@ -457,14 +457,13 @@ public class NoteController : MonoBehaviour, INoteController
         // Game BGM
         float startTime = parameters.seekPosition - audioTimelineSync.RealTimeToBGMTime(
             parameters.skipEntranceAnim ? 1f : WARM_UP_SECOND);
-        audioManager.StreamGameBGMTrack(fs.GetFile(dataLoader.GetMusicPath(chartLoader.header.mid)).ReadToEnd())
+        var audioLoadTask = audioManager.StreamGameBGMTrack(fs.GetFile(dataLoader.GetMusicPath(chartLoader.header.mid)).ReadToEnd())
             .ContinueWith((bgm) =>
             {
                 modManager.AttachedMods.ForEach(mod => (mod as AudioMod)?.ApplyMod(bgm));
                 audioTimelineSync.AudioSeekPos = parameters.seekPosition;
                 audioTimelineSync.Time = startTime;
-                audioTimelineSync.Play();
-            }).Forget();
+            });
 
         // Background
         var background = GameObject.Find("InGameBackground").GetComponent<InGameBackground>();
@@ -505,6 +504,7 @@ public class NoteController : MonoBehaviour, INoteController
         foreach (var mod in modManager.AttachedMods)
         {
             if (mod is SuddenDeathMod)
+            {
                 onJudge += ((JudgeResult result) =>
                 {
                     if (result != JudgeResult.Perfect && result != JudgeResult.Great)
@@ -514,8 +514,9 @@ public class NoteController : MonoBehaviour, INoteController
                         UI.OnAudioFinish(true);
                     }
                 });
-
+            }
             else if (mod is PerfectMod)
+            {
                 onJudge += ((JudgeResult result) =>
                 {
                     if (result != JudgeResult.Perfect)
@@ -525,7 +526,12 @@ public class NoteController : MonoBehaviour, INoteController
                         GameObject.Find("UIManager").GetComponent<UIManager>().OnAudioFinish(true);
                     }
                 });
+            }
         }
+
+        // Start playing BGM
+        await audioLoadTask;
+        audioTimelineSync.Play();
     }
 
     void Update()
