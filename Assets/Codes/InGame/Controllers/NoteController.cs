@@ -452,16 +452,19 @@ public class NoteController : MonoBehaviour, INoteController
             await audioManager.PrecacheInGameSE(resourceLoader.LoadSEResource<TextAsset>("flick.wav").bytes)
         };
 
-       
+
 
         // Game BGM
-        _ = audioManager.StreamGameBGMTrack(fs.GetFile(dataLoader.GetMusicPath(chartLoader.header.mid)).ReadToEnd())
-            .ContinueWith((bgm) => {
+        float startTime = parameters.seekPosition - audioTimelineSync.RealTimeToBGMTime(
+            parameters.skipEntranceAnim ? 1f : WARM_UP_SECOND);
+        audioManager.StreamGameBGMTrack(fs.GetFile(dataLoader.GetMusicPath(chartLoader.header.mid)).ReadToEnd())
+            .ContinueWith((bgm) =>
+            {
                 modManager.AttachedMods.ForEach(mod => (mod as AudioMod)?.ApplyMod(bgm));
                 audioTimelineSync.AudioSeekPos = parameters.seekPosition;
-                audioTimelineSync.Time = parameters.seekPosition - audioTimelineSync.RealTimeToBGMTime(WARM_UP_SECOND);
+                audioTimelineSync.Time = startTime;
                 audioTimelineSync.Play();
-            });
+            }).Forget();
 
         // Background
         var background = GameObject.Find("InGameBackground").GetComponent<InGameBackground>();

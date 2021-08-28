@@ -11,12 +11,11 @@ using BanGround;
 using BanGround.Scene.Params;
 using BGEditor;
 using BanGround.Game.Mods;
+using BanGround.Identity;
 
 #pragma warning disable 0649
 public class SelectManager : MonoBehaviour
 {
-    [Inject]
-    private DiContainer _container;
     [Inject]
     private IAudioManager audioManager;
     [Inject]
@@ -34,7 +33,7 @@ public class SelectManager : MonoBehaviour
     [Inject]
     private IMessageBox messageBox;
     [Inject]
-    SettingAndMod settingAndMod;
+    private SettingPanel settingPanel;
     [Inject(Id = "cl_cursorter")]
     private KVar cl_cursorter;
     [Inject(Id = "cl_modflag")]
@@ -43,6 +42,8 @@ public class SelectManager : MonoBehaviour
     private KVar g_saveReplay;
     [Inject]
     private ICancellationTokenStore cancellationToken;
+    [Inject]
+    private IAccountManager accountManager;
 
     public int CurrentPlayingSid { get; private set; }
     private float bgmVolume = 0.0f;
@@ -112,7 +113,7 @@ public class SelectManager : MonoBehaviour
 
         delete_Button.onClick.AddListener(async () =>
         {
-            if (await messageBox.ShowMessage("Select.Title.Delete", "Select.Prompt.Delete"))
+            if (await messageBox.ShowMessage("Select.Title.Delete".L(), "Select.Prompt.Delete".L()))
             {
                 OnDelete();
             }
@@ -134,7 +135,7 @@ public class SelectManager : MonoBehaviour
 
     public async void OnEnterPressed()
     {
-        settingAndMod.SetLiveSetting();
+        settingPanel.SetLiveSetting();
 
         kvSystem.SaveConfig();
 
@@ -406,6 +407,16 @@ public class SelectManager : MonoBehaviour
         previewSound?.Dispose();
         SlideMesh.cacheMat = null;
         chartListManager.onChartListUpdated.RemoveListener(RefreshSongList);
+    }
+
+    public async void OpenCommunityScene()
+    {
+        //必须要在线状态才能进社区
+        if (accountManager.isOfflineMode && !await accountManager.DoLogin())
+        {
+            return;
+        }
+        SceneLoader.LoadScene("Community", pushStack: true);
     }
 }
 

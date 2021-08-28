@@ -72,10 +72,14 @@ public class ResourceLoader : IResourceLoader
         return Resources.Load<T>(iconpath + "/" + path);
     }
 
-    public Texture2D LoadTextureFromFs(string path)
+    public Texture2D LoadTextureFromFs(string path, bool forceReload = false)
     {
-        if (!mTextureCache.TryGetValue(path, out var tex) || tex == null)
+        if (!mTextureCache.TryGetValue(path, out var tex) || tex == null || forceReload)
         {
+            if (tex != null)
+            {
+                Object.Destroy(tex);
+            }
             try
             {
                 tex = fs.GetFile(path).ReadAsTexture();
@@ -85,8 +89,8 @@ public class ResourceLoader : IResourceLoader
                 return null;
             }
             tex.name = path;
-            mTextureCache.Add(path, tex);
-            mTextureCacheInverse.Add(tex, path);
+            mTextureCache[path] = tex;
+            mTextureCacheInverse[tex] = path;
         }
         return tex;
     }

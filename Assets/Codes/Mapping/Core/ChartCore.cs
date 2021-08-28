@@ -325,42 +325,25 @@ namespace BGEditor
             messageBannerController.ShowMsg(LogLevel.OK, "Editor.ChartSaved".L());
         }
 
-        public async void Play()
-        {
-            if (Blocker.gameObject.activeSelf || messageBox.isActive)
-                return;
-            progress.Pause();
-            int ret = await messageBox.ShowMessage("Editor.Title.PlayTest".L(), "Editor.Prompt.PlayTest".L(), new string[] {
-                "Cancel".L(),
-                "Editor.PlayOption.FromStart".L(),
-                "Editor.PlayOption.FromHere".L()
-            });
-            if (ret == 0)
-                return;
-            Save();
-            float seekTime = ret == 1 ? 0 : audioManager.gameBGM.GetPlaybackTime() / 1000f;
-            var param = new InGameParams
-            {
-                sid = parameters.sid,
-                difficulty = parameters.difficulty,
-                mods = ModFlag.None,
-                seekPosition = seekTime,
-                saveRecord = false,
-                saveReplay = false,
-            };
-            SceneLoader.LoadScene("InGame",
-                () => chartLoader.LoadChart(parameters.sid, parameters.difficulty, true),
-                pushStack: true,
-                parameters: param);
-        }
-
         public async void Exit()
         {
             if (Blocker.gameObject.activeSelf || messageBox.isActive)
                 return;
             progress.Pause();
-            if (await messageBox.ShowMessage("Editor.Title.Exit".L(), "Editor.Prompt.Exit".L()))
+            int choice = await messageBox.ShowMessage(
+                "Editor.Title.Exit".L(),
+                "Editor.Prompt.Exit".L(),
+                "Cancel".L(),
+                "Editor.ExitOption.ExitNoSave".L(),
+                "Editor.ExitOption.ExitSave".L());
+            if (choice == 0)
+            {
+                return;
+            }
+            if (choice == 2)
+            {
                 Save();
+            }
             SceneLoader.Back(null);
         }
 
