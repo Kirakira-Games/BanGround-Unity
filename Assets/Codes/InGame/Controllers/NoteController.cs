@@ -148,7 +148,7 @@ public class NoteController : MonoBehaviour, INoteController
         ComboManager.manager.UpdateComboCountAndScore(result);
 
         // Update EL
-        JudgeResultController.instance.DisplayJudgeOffset(notebase, (int)result);
+        JudgeResultController.instance.DisplayJudgeOffset(notebase, result);
 
         if(chartScript.HasOnJudge)
             chartScript.OnJudge(notebase, result);

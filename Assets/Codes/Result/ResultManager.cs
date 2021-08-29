@@ -95,8 +95,8 @@ public class ResultManager : MonoBehaviour
     private void ShowOffset()
     {
         //OffsetList
-        var early = ComboManager.JudgeOffsetResult.Where(x => x > cl_elp && x != int.MaxValue);
-        var late = ComboManager.JudgeOffsetResult.Where(x => x < -cl_elp && x != int.MinValue);
+        var early = ComboManager.JudgeOffsetResult.Where(x => x > cl_elp);
+        var late = ComboManager.JudgeOffsetResult.Where(x => x < -cl_elp);
         int earlyCount = early.Count();
         int lateCount = late.Count();
         int earlyAverage = earlyCount == 0 ? 0 : Mathf.RoundToInt((float)early.Average());

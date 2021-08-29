@@ -8,47 +8,38 @@ public class DeplayDetail : MonoBehaviour
 {
     [SerializeField]
     public Image[] bars;
+    [SerializeField]
+    public float maxHeight = 500;
+
     void Start()
     {
-        ComboManager.JudgeOffsetResult.Sort();
-        
-        const int min = -224;
-        const int max =  224;
-        
-        int range = (max - min) / bars.Length;
-        int curIdx = 0;
-        int curOffset = min;
+        int range = NoteUtility.TAP_JUDGE_RANGE[3] * 2 / bars.Length;
 
-        float[] heights = new float[bars.Length];
-        float maxHeight = 0;
-        
-        for(int i = 0; i < ComboManager.JudgeOffsetResult.Count; ++i)
-        {
-            int offset = ComboManager.JudgeOffsetResult[i];
+        var ranges = Enumerable.Range(1, bars.Length - 1)
+            .Select(x => -NoteUtility.TAP_JUDGE_RANGE[3] + x * range)
+            .Append(int.MaxValue);
 
-            if(offset > max) 
-            {
-                heights[bars.Length - 1]++; 
-            }
-            else if(offset > curOffset + range)
-            {
-                --i;
-                curIdx++;
-                curOffset += range;
-            }
-            else
-            {
-                heights[curIdx]++;
-            }
+        // make sure at least every range have 1 element so
+        // the counts.Count() will equals to bars.Length
+        var result = ComboManager.JudgeOffsetResult.AsEnumerable();
+        ranges.All(r => (result = result.Append(r)) != null);
 
-            if(heights[curIdx] > maxHeight) 
-                maxHeight = heights[curIdx];
-        }
+        var counts = result    
+            .GroupBy(x => ranges.First(r => r >= x))
+            .Select(g => g.Count() - 1);
 
+        Debug.Assert(counts.Count() == bars.Length);
+
+        float maxCount = counts.Max();
+
+        float[] heights = counts
+            .Select(c => c / maxCount * maxHeight)
+            .ToArray();
+      
         for(int i = 0; i < bars.Length; ++i) 
         {
             var size = bars[i].rectTransform.sizeDelta;
-            size.y = heights[i] / maxHeight * 500;
+            size.y = heights[bars.Length - i];
 
             bars[i].rectTransform.sizeDelta = size;
         }
