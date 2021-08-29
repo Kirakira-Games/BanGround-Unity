@@ -31,10 +31,10 @@ public class ELDisplayDetail : MonoBehaviour
 
         Debug.Assert(counts.Count() == bars.Length);
 
-        float maxCount = counts.Max();
+        int maxCount = counts.Max();
 
         float[] heights = counts
-            .Select(c => c / maxCount * maxHeight)
+            .Select(c => maxHeight * c / maxCount)
             .ToArray();
       
         for(int i = 0; i < bars.Length; ++i) 
