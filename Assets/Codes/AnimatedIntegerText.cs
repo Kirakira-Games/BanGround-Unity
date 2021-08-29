@@ -61,7 +61,7 @@ namespace BanGround.Compoments
                     current = target;
                     previous = target;
 
-                    if (target == 0)
+                    if (target == 0 && next != 0)
                     {
                         target = next;
                         startTime = Time.time;
