@@ -4,9 +4,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class DeplayDetail : MonoBehaviour
+public class ELDisplayDetail : MonoBehaviour
 {
     [SerializeField]
+
     public Image[] bars;
     [SerializeField]
     public float maxHeight = 500;
