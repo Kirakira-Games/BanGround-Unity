@@ -54,18 +54,13 @@ namespace BanGround.Compoments
         {
             if (previous != target)
             {
-                float progress = (Time.time - startTime) / m_TransitionTime;
+                float progress = m_TransitionTime <= NoteUtility.EPS
+                    ? 1.0f : (Time.time - startTime) / m_TransitionTime;
 
                 if (progress >= 1.0f)
                 {
                     current = target;
                     previous = target;
-
-                    if (target == 0)
-                    {
-                        target = next;
-                        startTime = Time.time;
-                    }
                 }
                 else
                 {
@@ -73,6 +68,11 @@ namespace BanGround.Compoments
                 }
 
                 base.text = current.ToString();
+            }
+            if (previous == target && target == 0 && next != 0)
+            {
+                target = next;
+                startTime = Time.time;
             }
         }
     }
