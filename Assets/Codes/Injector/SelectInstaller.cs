@@ -7,15 +7,17 @@ public class SelectInstaller : MonoInstaller
     public Transform cellParent;
 
     public SelectManager selectManager;
-    public SettingAndMod settingAndMod;
+    public SettingPanel settingPanel;
     public FancyBackground fancyBackground;
+    public RankTable rankTable;
 
     public override void InstallBindings()
     {
         Container.BindFactory<KiraSongCell, KiraSongCell.Factory>().FromComponentInNewPrefab(cellPrefab).UnderTransform(cellParent);
 
         Container.Bind<SelectManager>().FromInstance(selectManager);
-        Container.Bind<SettingAndMod>().FromInstance(settingAndMod);
+        Container.Bind<SettingPanel>().FromInstance(settingPanel);
         Container.Bind<FancyBackground>().FromInstance(fancyBackground);
+        Container.Bind<RankTable>().FromInstance(rankTable);
     }
 }

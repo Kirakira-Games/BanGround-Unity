@@ -36,6 +36,7 @@ namespace BGEditor
         public FloatInput[] ChartPreview;
         public Text MidTxt;
         public Text SidTxt;
+        public ChartBackgroundImage ChartBackgroundImage;
 
         private mHeader mHeader;
         private cHeader cHeader;
@@ -125,6 +126,8 @@ namespace BGEditor
             dataLoader.SaveHeader(mHeader);
             dataLoader.SaveHeader(cHeader, coverExt, cover);
             Core.Save();
+            
+            ChartBackgroundImage.ReloadImage(true);
         }
 
         public async void Hide(bool save)

@@ -32,6 +32,8 @@ public class UIManager : MonoBehaviour, IUIManager
     private KVar r_brightness_lane;
 
     private const float BiteTime = 2;
+    private static readonly int Closed = Animator.StringToHash("Closed");
+    private static readonly int idle = Animator.StringToHash("idle");
 
     private MeshRenderer lan_MR;
 
@@ -46,6 +48,8 @@ public class UIManager : MonoBehaviour, IUIManager
     public TextAsset FCvoice;
     public TextAsset CLvoice;
     public TextAsset Fvoice;
+
+    public Animator camerasAnimator;
     private GameObject gateCanvas;
 
     private ISoundEffect resultVoice;
@@ -240,7 +244,16 @@ public class UIManager : MonoBehaviour, IUIManager
 
     private IEnumerator DelayDisableGate()
     {
-        yield return new WaitForSeconds(3f);
+        if (parameters.skipEntranceAnim)
+        {
+            var animator = gateCanvas.GetComponent<Animator>();
+            animator.Play(Closed, 0);
+            camerasAnimator.Play(idle, 0);
+        }
+        else
+        {
+            yield return new WaitForSeconds(3f);
+        }
         gateCanvas.SetActive(false);
     }
 

@@ -29,6 +29,7 @@ namespace BanGround.Scene.Params
         public bool saveReplay = true;
         public bool saveRecord = true;
         public bool isOffsetGuide = false;
+        public bool skipEntranceAnim = false;
         public ModFlag mods = ModFlag.None;
         public float seekPosition = 0f;
 
@@ -43,6 +44,7 @@ namespace BanGround.Scene.Params
                 $"saveReplay = {saveReplay}\n" +
                 $"saveRecord = {saveRecord}\n" +
                 $"isOffsetGuide = {isOffsetGuide}\n" +
+                $"skipEntranceAnim = {skipEntranceAnim}\n" +
                 $"mods = {Convert.ToString((long)mods, 2)}\n" +
                 $"seekPosition = {seekPosition}\n";
         }
@@ -62,6 +64,7 @@ namespace BanGround.Scene.Params
             saveRecord = game.saveRecord;
             saveReplay = game.saveReplay;
             isOffsetGuide = game.isOffsetGuide;
+            skipEntranceAnim = game.skipEntranceAnim;
             mods = game.mods;
             seekPosition = game.seekPosition;
         }
@@ -76,6 +79,7 @@ namespace BanGround.Scene.Params
                 saveRecord = saveRecord,
                 saveReplay = saveReplay,
                 isOffsetGuide = isOffsetGuide,
+                skipEntranceAnim = skipEntranceAnim,
                 mods = mods,
                 seekPosition = seekPosition
             };

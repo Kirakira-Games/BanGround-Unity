@@ -205,5 +205,15 @@ namespace BGEditor
                 Pause();
             }
         }
+
+        private void OnDestroy()
+        {
+            singleSE?.Dispose();
+            singleSE = null;
+            flickSE?.Dispose();
+            flickSE = null;
+            audioManager.gameBGM?.Dispose();
+            audioManager.gameBGM = null;
+        }
     }
 }
