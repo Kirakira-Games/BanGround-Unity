@@ -26,11 +26,8 @@ public class ResultManager : MonoBehaviour
     [Inject]
     private IDatabaseAPI db;
 
-    [Inject(Id = "g_saveReplay")]
-    private KVar g_saveReplay;
-
     [Inject(Id = "cl_elp")]
-    KVar cl_elp;
+    private KVar cl_elp;
 
     private Button button_back;
     private Button button_retry;

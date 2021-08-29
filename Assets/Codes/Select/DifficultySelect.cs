@@ -5,8 +5,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 using Difficulty = V2.Difficulty;
-using Cysharp.Threading.Tasks;
-using System.Threading;
 using BanGround.Compoments;
 
 #pragma warning disable 0649
@@ -89,8 +87,6 @@ public class DifficultySelect : MonoBehaviour
         }
         UpdateView();
     }
-
-    CancellationTokenSource changeLevelCancelSource = new CancellationTokenSource();
 
     //This Called both change button clicked and song changed
     public void UpdateView()
