@@ -1,11 +1,8 @@
-﻿namespace BanGround.Web.Profile
+﻿using System.Collections.Generic;
+
+namespace BanGround.Web.Profile
 {
-    public class RemoteKVarData
-    {
-        public int rm_data_version;
-        public string rm_ver_stable;
-        public string rm_ver_min;
-    }
+    using RemoteKVarData = Dictionary<string, object>;
 
     public static class Extension
     {

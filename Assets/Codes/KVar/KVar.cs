@@ -2,12 +2,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using BanGround;
+using System.Linq;
 using System.Runtime.CompilerServices;
-//using UnityEditor.UIElements;
+using System.Threading.Tasks;
+using BanGround;
+using BanGround.Web;
+using BanGround.Web.Profile;
 using UnityEngine;
 using Zenject;
-using System.Linq;
 
 [Flags]
 public enum KVarFlags
@@ -254,7 +256,11 @@ public class KVSystem : IKVSystem
     [Inject]
     IFileSystem fs;
 
+    [Inject]
+    private IKiraWebRequest webRequest;
+
     private bool isConfigReady = false;
+    private Queue<Action> configDoneCallbacks = new Queue<Action>();
 
     // All commands
     private Dictionary<string, KonCommandBase> m_allCmds = new Dictionary<string, KonCommandBase>();
@@ -343,6 +349,16 @@ public class KVSystem : IKVSystem
 
             if (cmd is KVar kVar)
             {
+                if (kVar.IsFlagSet(KVarFlags.Hidden)
+#if !DEBUG
+             || kVar.IsFlagSet(KVarFlags.DevelopmentOnly)
+#endif
+                )
+                {
+                    // Shhhh! looks like it's hidden, just skip it.
+                    return;
+                }
+
                 if (string.IsNullOrWhiteSpace(value) || string.IsNullOrEmpty(value))
                 {
                     if (userInput)
@@ -353,16 +369,6 @@ public class KVSystem : IKVSystem
                             Debug.Log(kVar.Description);
                     }
 
-                    return;
-                }
-
-                if (kVar.IsFlagSet(KVarFlags.Hidden)
-#if !DEBUG
-             || kVar.IsFlagSet(KVarFlags.DevelopmentOnly)
-#endif
-                )
-                {
-                    // Shhhh! looks like it's hidden, just skip it.
                     return;
                 }
 
@@ -386,10 +392,24 @@ public class KVSystem : IKVSystem
         }
     }
 
-    public void ReloadConfig() 
+    public async Task ReloadConfig() 
     {
         isConfigReady = false;
         ExecuteFile("config.cfg");
+
+        var rmConfig = await webRequest.GetRemoteKVars().Fetch();
+        foreach(var (name, value) in rmConfig)
+        {
+            KonCommandBase cmd;
+            if(m_allCmds.TryGetValue(name, out cmd) && cmd is KVar kVar)
+            {
+                kVar.Set(value.ToString());
+            }
+        }
+
+        while (configDoneCallbacks.Count > 0)
+            configDoneCallbacks.Dequeue()?.Invoke();
+
         isConfigReady = true;
     }
 
@@ -469,5 +489,13 @@ public class KVSystem : IKVSystem
                 return true;
             });
         }
+    }
+
+    public void OnConfigDone(Action callback)
+    {
+        if(isConfigReady) 
+            callback?.Invoke();
+        else
+            configDoneCallbacks.Enqueue(callback);
     }
 }
