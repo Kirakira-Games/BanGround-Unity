@@ -261,7 +261,7 @@ public class KVSystem : IKVSystem
 
     private bool isConfigReady = false;
     private bool isRemoteConfigReady = false;
-    private Queue<Action> configDoneCallbacks = new Queue<Action>();
+    private readonly Queue<Action> configDoneCallbacks = new Queue<Action>();
 
     // All commands
     private Dictionary<string, KonCommandBase> m_allCmds = new Dictionary<string, KonCommandBase>();
