@@ -51,6 +51,9 @@ public class TouchEvent : MonoBehaviour
 
     public async void OnCommunityButtonClick()
     {
+        if (waitingUpdate)
+            return;
+
         //必须要在线状态才能进社区
         if (accountManager.isOfflineMode && !await accountManager.DoLogin()) 
         {

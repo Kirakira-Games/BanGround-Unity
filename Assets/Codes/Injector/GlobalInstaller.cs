@@ -52,12 +52,12 @@ public class GlobalInstaller : MonoInstaller
         Container.Bind<IDatabaseAPI>().To<DatabaseAPI>().AsSingle().NonLazy();
 
         // KVar System
-        Container.Bind<IKVSystem>().To<KVSystem>().AsSingle().OnInstantiated(async (_, obj) =>
+        Container.Bind<IKVSystem>().To<KVSystem>().AsSingle().OnInstantiated((_, obj) =>
         {
             if (obj is ValidationMarker) return;
             kvSystem = obj as IKVSystem;
 
-            await kvSystem.ReloadConfig();
+            kvSystem.ReloadConfig();
         }).NonLazy();
 
         RegisterKonCommands();
@@ -97,9 +97,6 @@ public class GlobalInstaller : MonoInstaller
 
         // Kira Web Request
         Container.Bind<IKiraWebRequest>().To<KiraWebRequest>().AsSingle().NonLazy();
-
-        // Version Check
-        Container.Bind<VersionCheck>().AsSingle().NonLazy();
 
         // FPS Counter
         Container.Bind<IFPSCounter>().FromInstance(fpsCounter);
@@ -224,8 +221,8 @@ public class GlobalInstaller : MonoInstaller
             KVar.C("skin_particle", "meigong", KVarFlags.Archive | KVarFlags.StringOnly, "Particle name"),
 
             KVar.C("rm_data_version", "-1", KVarFlags.Hidden),
-            KVar.C("rm_ver_stable", "PENDING", KVarFlags.Hidden),
-            KVar.C("rm_ver_min", "PENDING", KVarFlags.Hidden),
+            KVar.C("rm_ver_stable", Application.version, KVarFlags.Hidden),
+            KVar.C("rm_ver_min", Application.version, KVarFlags.Hidden),
         };
 
         foreach (var info in varInfos)

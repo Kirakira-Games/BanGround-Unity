@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using BanGround;
 using BanGround.Web;
 using BanGround.Web.Profile;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Zenject;
 
@@ -260,6 +260,7 @@ public class KVSystem : IKVSystem
     private IKiraWebRequest webRequest;
 
     private bool isConfigReady = false;
+    private bool isRemoteConfigReady = false;
     private Queue<Action> configDoneCallbacks = new Queue<Action>();
 
     // All commands
@@ -392,23 +393,36 @@ public class KVSystem : IKVSystem
         }
     }
 
-    public async Task ReloadConfig() 
+    private async UniTaskVoid LoadRemoteKVars()
+    {
+        try
+        {
+            var rmConfig = await webRequest.GetRemoteKVars().Fetch();
+            foreach (var (name, value) in rmConfig)
+            {
+                KonCommandBase cmd;
+                if (m_allCmds.TryGetValue(name, out cmd) && cmd is KVar kVar)
+                {
+                    kVar.Set(value.ToString());
+                }
+            }
+        }
+        catch (KiraWebException e)
+        {
+            Debug.Log(e);
+        }
+
+        isRemoteConfigReady = true;
+        while (configDoneCallbacks.Count > 0)
+            configDoneCallbacks.Dequeue()?.Invoke();
+    }
+
+    public void ReloadConfig() 
     {
         isConfigReady = false;
         ExecuteFile("config.cfg");
 
-        var rmConfig = await webRequest.GetRemoteKVars().Fetch();
-        foreach(var (name, value) in rmConfig)
-        {
-            KonCommandBase cmd;
-            if(m_allCmds.TryGetValue(name, out cmd) && cmd is KVar kVar)
-            {
-                kVar.Set(value.ToString());
-            }
-        }
-
-        while (configDoneCallbacks.Count > 0)
-            configDoneCallbacks.Dequeue()?.Invoke();
+        LoadRemoteKVars().Forget();
 
         isConfigReady = true;
     }
@@ -491,9 +505,9 @@ public class KVSystem : IKVSystem
         }
     }
 
-    public void OnConfigDone(Action callback)
+    public void WhenRemoteConfigLoaded(Action callback)
     {
-        if(isConfigReady) 
+        if (isRemoteConfigReady) 
             callback?.Invoke();
         else
             configDoneCallbacks.Enqueue(callback);

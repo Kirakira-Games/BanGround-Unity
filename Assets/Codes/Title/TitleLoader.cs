@@ -30,8 +30,6 @@ public class TitleLoader : MonoBehaviour
     private IKVSystem kvSystem;
     [Inject]
     private LocalizedStrings localizedStrings;
-    [Inject]
-    private VersionCheck versionCheck;
 
     [Inject(Id = "cl_language")]
     KVar cl_language;
@@ -147,19 +145,19 @@ public class TitleLoader : MonoBehaviour
         return 0;
     }
 
-    void CheckUpdate() => kvSystem.OnConfigDone(() =>
+    void CheckUpdate() => kvSystem.WhenRemoteConfigLoaded(() =>
     {
         TouchEvent te = GameObject.Find("TouchStart").GetComponent<TouchEvent>();
 
         if (CompareVersion(Application.version, rm_ver_min) < 0)
         {
-            string result = string.Format(VersionCheck.UpdateForce, (string)rm_ver_stable);
+            string result = VersionCheck.UpdateForce.L((string)rm_ver_stable);
             messageBannerController.ShowMsg(LogLevel.ERROR, result, false);
         }
         else if (CompareVersion(Application.version, rm_ver_stable) < 0)
         {
-            string result = string.Format(VersionCheck.UpdateNotForce, (string)rm_ver_stable);
-            messageBannerController.ShowMsg(LogLevel.OK, result, true);
+            string result = VersionCheck.UpdateNotForce.L((string)rm_ver_stable);
+            messageBannerController.ShowMsg(LogLevel.INFO, result, true);
             te.waitingUpdate = false;
         }
         else
@@ -168,11 +166,6 @@ public class TitleLoader : MonoBehaviour
             te.waitingUpdate = false;
         }
     });
-
-    public void ShowCredits()
-    {
-        SceneLoader.LoadScene("Credits", pushStack: true);
-    }
 
     private void OnDestroy()
     {
