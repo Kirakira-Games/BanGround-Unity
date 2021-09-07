@@ -10,18 +10,18 @@ using Zenject;
 
 public class GlobalInstaller : MonoInstaller
 {
-    public MessageBannerController messageBannerController;
-    public MessageBox messageBox;
+    public AccountManager accountManager;
     public FPSCounter fpsCounter;
     public LoadingBlocker loadingBlocker;
-    public MessageCenter messageCenter;
-    public AccountManager accountManager;
     public LocalizedStrings localizedStrings;
+    public MessageBannerController messageBannerController;
+    public MessageBox messageBox;
+    public MessageCenter messageCenter;
 
-    private IKVSystem kvSystem;
+    private IAudioProvider audioProvider;
     private IDataLoader dataLoader;
     private IFileSystem fs;
-    private IAudioProvider audioProvider;
+    private IKVSystem kvSystem;
 
     public override void InstallBindings()
     {
@@ -97,9 +97,6 @@ public class GlobalInstaller : MonoInstaller
 
         // Kira Web Request
         Container.Bind<IKiraWebRequest>().To<KiraWebRequest>().AsSingle().NonLazy();
-
-        // Version Check
-        Container.Bind<VersionCheck>().AsSingle().NonLazy();
 
         // FPS Counter
         Container.Bind<IFPSCounter>().FromInstance(fpsCounter);
@@ -222,6 +219,10 @@ public class GlobalInstaller : MonoInstaller
             "A hex string storing ModFlag specifically for mapping. At most 64 bits."),
 
             KVar.C("skin_particle", "meigong", KVarFlags.Archive | KVarFlags.StringOnly, "Particle name"),
+
+            KVar.C("rm_data_version", "-1", KVarFlags.Hidden),
+            KVar.C("rm_ver_stable", Application.version, KVarFlags.Hidden),
+            KVar.C("rm_ver_min", Application.version, KVarFlags.Hidden),
         };
 
         foreach (var info in varInfos)
@@ -239,27 +240,6 @@ public class GlobalInstaller : MonoInstaller
 
                 dataLoader.MoveChart(chartA, targetChart);
             }),
-            /*
-            Kommand.C("fs_test", "Test Filesystem", _ =>
-            {
-                const string testPath = "D:\\lol.zip";
-
-                fs.AddSearchPath(testPath);
-                var file = fs.NewFile("wtf.txt", testPath);
-                Debug.Log("Created file size:" + file.Size);
-
-                file.WriteBytes(Encoding.UTF8.GetBytes("What the fuck!!?"));
-                Debug.Log("File size after write:" + file.Size);
-
-                var origName = file.Name;
-                file.Name = "whatthefuck.txt";
-                Debug.Log(origName + " moved to " + file.Name);
-
-                Debug.Log(file.ReadAsString());
-
-                fs.RemoveSearchPath(testPath);
-            }),
-            */
             Kommand.C("savecfg", "Save configs", _ => kvSystem.SaveConfig()),
             Kommand.C("exec", "Execute a config file", (string[] args) =>
             {
@@ -311,62 +291,6 @@ public class GlobalInstaller : MonoInstaller
                 table += "</table>";
                 Debug.Log(table);
             }),
-            /* TODO(GEEKiDoS)
-            Kommand.C("demo_play", "Play a demo file", args =>
-            {
-                if (args.Length > 0)
-                {
-                    if (SceneManager.GetActiveScene().name == "Select")
-                    {
-                        var path = args[0];
-
-                        if (!File.Exists(path))
-                        {
-                            if (KiraFilesystem.Instance.Exists(path))
-                            {
-                                path = KiraPath.Combine(DataLoader.DataDir, path);
-                            }
-                            else
-                            {
-                                Debug.Log("[Demo Player] File not exists");
-                                return;
-                            }
-                        }
-
-                        var file = DemoFile.LoadFrom(path);
-
-                        var targetHeader = dataLoader.chartList.First(x => x.sid == file.sid);
-
-                        if (targetHeader == null)
-                        {
-                            Debug.Log("[Demo Player] Target chartset not installed.");
-                            return;
-                        }
-
-                        if (targetHeader.difficultyLevel[(int)file.difficulty] == -1)
-                        {
-                            Debug.Log("[Demo Player] Target chart not installed.");
-                            return;
-                        }
-
-                        LiveSetting.Instance.currentChart = dataLoader.chartList.IndexOf(dataLoader.chartList.First(x => x.sid == file.sid));
-                        LiveSetting.Instance.actualDifficulty = (int)file.difficulty;
-                        LiveSetting.Instance.cl_lastdiff_temp.Set((int)file.difficulty);
-
-                        LiveSetting.Instance.DemoFile = file;
-
-                        SceneLoader.LoadScene("Select", "InGame", () => LiveSetting.Instance.LoadChart(true));
-                    }
-                    else
-                    {
-                        Debug.Log("[Demo Player] Must use in select page!");
-                    }
-                }
-                else
-                {
-                    Debug.Log("demo_play: Play a demo file<br />Usage: demo_play <demo file>");
-                }
-            }),*/
         };
 
         foreach (var info in cmdInfos)

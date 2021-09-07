@@ -27,12 +27,16 @@ public class TitleLoader : MonoBehaviour
     [Inject]
     private IMigrationManager migrationManager;
     [Inject]
-    private LocalizedStrings localizedStrings;
+    private IKVSystem kvSystem;
     [Inject]
-    private VersionCheck versionCheck;
+    private LocalizedStrings localizedStrings;
 
     [Inject(Id = "cl_language")]
     KVar cl_language;
+    [Inject(Id = "rm_ver_stable")]
+    KVar rm_ver_stable;
+    [Inject(Id = "rm_ver_min")]
+    KVar rm_ver_min;
 
     public TextAsset titleMusic;
     public TextAsset[] voice;
@@ -110,7 +114,7 @@ public class TitleLoader : MonoBehaviour
         music.SetVolume(0.7f);
         await UniTask.Delay(2000); //yield return new WaitForSeconds(3f);
 
-        banGround = await audioManager.PrecacheSE(voice[UnityEngine.Random.Range(0,voice.Length)].bytes);
+        banGround = await audioManager.PrecacheSE(voice[UnityEngine.Random.Range(0, voice.Length)].bytes);
         banGround.PlayOneShot();
     }
 
@@ -130,7 +134,7 @@ public class TitleLoader : MonoBehaviour
         var a1 = ParseVersion(a);
         var b1 = ParseVersion(b);
 
-        for(int i = 0; i < 3; i++)
+        for (int i = 0; i < 3; i++)
         {
             if (a1[i] > b1[i])
                 return 1;
@@ -141,48 +145,27 @@ public class TitleLoader : MonoBehaviour
         return 0;
     }
 
-    async void CheckUpdate()
+    void CheckUpdate() => kvSystem.WhenRemoteConfigLoaded(() =>
     {
-        //MessageBoxController.ShowMsg(LogLevel.INFO, VersionCheck.CheckUpdate);
         TouchEvent te = GameObject.Find("TouchStart").GetComponent<TouchEvent>();
-        var check = versionCheck;
-        var data = await check.GetVersionInfo();
 
-        if (data == null) 
+        if (CompareVersion(Application.version, rm_ver_min) < 0)
         {
-            //网络错误
-            messageBannerController.ShowMsg(LogLevel.ERROR, VersionCheck.CheckError, false);
-            te.waitingUpdate = false; // 椰叶先别强制更新罢
+            string result = VersionCheck.UpdateForce.L((string)rm_ver_stable);
+            messageBannerController.ShowMsg(LogLevel.ERROR, result, false);
         }
-        else if (CompareVersion(Application.version, data.version) < 0)
+        else if (CompareVersion(Application.version, rm_ver_stable) < 0)
         {
-            //有更新
-            if (data.force)
-            {
-                string result = string.Format(VersionCheck.UpdateForce, data.version);
-                //强制更新
-                messageBannerController.ShowMsg(LogLevel.ERROR, result, false);
-            }
-            else
-            {
-                string result = string.Format(VersionCheck.UpdateNotForce, data.version);
-                //不强制更新
-                messageBannerController.ShowMsg(LogLevel.OK, result, true);
-                te.waitingUpdate = false;
-            }
+            string result = VersionCheck.UpdateNotForce.L((string)rm_ver_stable);
+            messageBannerController.ShowMsg(LogLevel.INFO, result, true);
+            te.waitingUpdate = false;
         }
         else
         {
-            //无更新
             messageBannerController.ShowMsg(LogLevel.OK, VersionCheck.NoUpdate, true);
             te.waitingUpdate = false;
         }
-    }
-
-    public void ShowCredits()
-    {
-        SceneLoader.LoadScene("Credits", pushStack: true);
-    }
+    });
 
     private void OnDestroy()
     {
@@ -194,7 +177,9 @@ public class TitleLoader : MonoBehaviour
 
     private void OnApplicationPause(bool pause)
     {
-        if (!pause) music?.Play();
-        else music?.Pause();
+        if (!pause)
+            music?.Play();
+        else
+            music?.Pause();
     }
 }
