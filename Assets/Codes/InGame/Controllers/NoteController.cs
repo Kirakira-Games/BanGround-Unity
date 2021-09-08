@@ -42,6 +42,8 @@ public class NoteController : MonoBehaviour, INoteController
     private KVar o_audio;
     [Inject(Id = "skin_particle")]
     private KVar skin_particle;
+    [Inject(Id = "r_tap_effect")]
+    private KVar r_tap_effect;
 
     public static Camera mainCamera;
     public static Vector3 mainForward = new Vector3(0, -0.518944f, 0.8548083f);
@@ -103,7 +105,10 @@ public class NoteController : MonoBehaviour, INoteController
         else if (result == JudgeResult.Bad)
             se = TapEffectType.Bad;
 
-        NotePool.Instance.PlayTapEffect(se, position);
+        if (r_tap_effect)
+        {
+            NotePool.Instance.PlayTapEffect(se, position);
+        }
 
         return se;
     }
@@ -148,7 +153,7 @@ public class NoteController : MonoBehaviour, INoteController
         ComboManager.manager.UpdateComboCountAndScore(result);
 
         // Update EL
-        JudgeResultController.instance.DisplayJudgeOffset(notebase, (int)result);
+        JudgeResultController.instance.DisplayJudgeOffset(notebase, result);
 
         if(chartScript.HasOnJudge)
             chartScript.OnJudge(notebase, result);
@@ -296,8 +301,11 @@ public class NoteController : MonoBehaviour, INoteController
         {
             if (touch.current.phase == KirakiraTouchPhase.Began && lanes.Length > 0)
             {
-                int se = (int)EmitEffect(NoteUtility.GetJudgePos(lanes[0]), JudgeResult.None, GameNoteType.Single);
-                soundEffects[se].PlayOneShot();
+                var se = EmitEffect(NoteUtility.GetJudgePos(lanes[0]), JudgeResult.None, GameNoteType.Single);
+                if (se != TapEffectType.None)
+                {
+                    soundEffects[(int)se].PlayOneShot();
+                }
                 LightControl.instance.TriggerLight(lanes[0]);
             }
         }
@@ -452,15 +460,17 @@ public class NoteController : MonoBehaviour, INoteController
             await audioManager.PrecacheInGameSE(resourceLoader.LoadSEResource<TextAsset>("flick.wav").bytes)
         };
 
-       
+
 
         // Game BGM
-        _ = audioManager.StreamGameBGMTrack(fs.GetFile(dataLoader.GetMusicPath(chartLoader.header.mid)).ReadToEnd())
-            .ContinueWith((bgm) => {
+        float startTime = parameters.seekPosition - audioTimelineSync.RealTimeToBGMTime(
+            parameters.skipEntranceAnim ? 1f : WARM_UP_SECOND);
+        var audioLoadTask = audioManager.StreamGameBGMTrack(fs.GetFile(dataLoader.GetMusicPath(chartLoader.header.mid)).ReadToEnd())
+            .ContinueWith((bgm) =>
+            {
                 modManager.AttachedMods.ForEach(mod => (mod as AudioMod)?.ApplyMod(bgm));
                 audioTimelineSync.AudioSeekPos = parameters.seekPosition;
-                audioTimelineSync.Time = parameters.seekPosition - audioTimelineSync.RealTimeToBGMTime(WARM_UP_SECOND);
-                audioTimelineSync.Play();
+                audioTimelineSync.Time = startTime;
             });
 
         // Background
@@ -502,6 +512,7 @@ public class NoteController : MonoBehaviour, INoteController
         foreach (var mod in modManager.AttachedMods)
         {
             if (mod is SuddenDeathMod)
+            {
                 onJudge += ((JudgeResult result) =>
                 {
                     if (result != JudgeResult.Perfect && result != JudgeResult.Great)
@@ -511,8 +522,9 @@ public class NoteController : MonoBehaviour, INoteController
                         UI.OnAudioFinish(true);
                     }
                 });
-
+            }
             else if (mod is PerfectMod)
+            {
                 onJudge += ((JudgeResult result) =>
                 {
                     if (result != JudgeResult.Perfect)
@@ -522,7 +534,12 @@ public class NoteController : MonoBehaviour, INoteController
                         GameObject.Find("UIManager").GetComponent<UIManager>().OnAudioFinish(true);
                     }
                 });
+            }
         }
+
+        // Start playing BGM
+        await audioLoadTask;
+        audioTimelineSync.Play();
     }
 
     void Update()

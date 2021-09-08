@@ -385,7 +385,7 @@ namespace BGEditor
                 messageBanner.ShowMsg(LogLevel.INFO, "Editor.Upload.FishNotEnough".L(fishDelta.Required, fishDelta.Fish + fishDelta.Required));
                 return false;
             }
-            if (!await messageBox.ShowMessage("Editor.Upload.Title.FishPay", $"Editor.Upload.Prompt.FishPay".L(fishDelta.Required, fishDelta.Fish)))
+            if (!await messageBox.ShowMessage("Editor.Upload.Title.FishPay".L(), $"Editor.Upload.Prompt.FishPay".L(fishDelta.Required, fishDelta.Fish)))
             {
                 return false;
             }

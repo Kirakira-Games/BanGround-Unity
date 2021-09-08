@@ -28,7 +28,7 @@ public interface IResourceLoader
     /// <summary>
     /// Load a texture for local filesystem. Automatically unloads on scene unload.
     /// </summary>
-    Texture2D LoadTextureFromFs(string path);
+    Texture2D LoadTextureFromFs(string path, bool forceReload = false);
     void UnloadTexture(string path);
     void UnloadTexture(Texture2D texture);
     void UnloadAllTexture();

@@ -8,12 +8,9 @@ public class TouchEvent : MonoBehaviour
     [Inject]
     private IAccountManager accountManager;
     [Inject]
-    private IMessageBannerController messageBanner;
-    [Inject]
     private TitleLoader titleLoader;
 
     public bool waitingUpdate = true;
-    public bool authing = false;
 
     public UserInfo userCanvas;
     public GameObject warnCanvas;
@@ -54,7 +51,7 @@ public class TouchEvent : MonoBehaviour
 
     public async void OnCommunityButtonClick()
     {
-        if (authing)
+        if (waitingUpdate)
             return;
 
         //必须要在线状态才能进社区

@@ -5,8 +5,8 @@ using UnityEngine.UI;
 
 public class MessageBox : MonoBehaviour, IMessageBox
 {
-    public LocalizedText Title;
-    public LocalizedText Content;
+    public Text Title;
+    public Text Content;
     public Button Blocker;
     public GameObject Buttons;
     public GameObject ButtonPrefab;

@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 using Difficulty = V2.Difficulty;
+using BanGround.Compoments;
 
 #pragma warning disable 0649
 public class DifficultySelect : MonoBehaviour
@@ -15,6 +16,8 @@ public class DifficultySelect : MonoBehaviour
     private IDataLoader dataLoader;
     [Inject]
     private IChartListManager chartListManager;
+    [Inject]
+    private RankTable rankTable;
 
     [Inject(Id = "cl_cursorter")]
     private KVar cl_cursorter;
@@ -37,14 +40,13 @@ public class DifficultySelect : MonoBehaviour
     private List<int> enabledCards = new List<int>();
     private int selected => enabledCards[0];
     private Text difficultyText;
-    private Text levelText;
+    private AnimatedIntegerText levelText;
     private PlayRecordDisplay recordDisplayer;
 
     async void Start()
     {
         //levels = new int[]{ 1,1,18,26,28 };
-        levelText = GameObject.Find("Text_SelectedLevel").GetComponent<Text>();
-        levelText.text = "";
+        levelText = GameObject.Find("Text_SelectedLevel").GetComponent<AnimatedIntegerText>();
         difficultyText = GameObject.Find("Text_SelectedDifficulty").GetComponent<Text>();
         recordDisplayer = GameObject.Find("Left_Panel").GetComponent<PlayRecordDisplay>();
 
@@ -100,10 +102,10 @@ public class DifficultySelect : MonoBehaviour
         }
         cardImg[selected].color = Color.white;
         difficultyText.text = Enum.GetName(typeof(Difficulty), selected).ToUpper();
-        levelText.text = levels[selected].ToString();
+        levelText.number = levels[selected];
 
+        rankTable.UpdateCurrentChart(chartListManager.current.header.sid, chartListManager.current.difficulty);
         recordDisplayer.DisplayRecord();
-        string path = dataLoader.GetBackgroundPath(chartListManager.current.header.sid).Item1;
     }
     #endregion
 
