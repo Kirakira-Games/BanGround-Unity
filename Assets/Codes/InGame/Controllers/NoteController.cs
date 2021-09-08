@@ -87,7 +87,7 @@ public class NoteController : MonoBehaviour, INoteController
     #region Judge
     private TapEffectType EmitEffect(Vector3 position, JudgeResult result, GameNoteType type)
     {
-        if (!r_tap_effect || result == JudgeResult.Miss) return TapEffectType.None;
+        if (result == JudgeResult.Miss) return TapEffectType.None;
 
         TapEffectType se = TapEffectType.Click;
 
@@ -105,7 +105,10 @@ public class NoteController : MonoBehaviour, INoteController
         else if (result == JudgeResult.Bad)
             se = TapEffectType.Bad;
 
-        NotePool.Instance.PlayTapEffect(se, position);
+        if (r_tap_effect)
+        {
+            NotePool.Instance.PlayTapEffect(se, position);
+        }
 
         return se;
     }
