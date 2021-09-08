@@ -42,6 +42,8 @@ public class NoteController : MonoBehaviour, INoteController
     private KVar o_audio;
     [Inject(Id = "skin_particle")]
     private KVar skin_particle;
+    [Inject(Id = "r_tap_effect")]
+    private KVar r_tap_effect;
 
     public static Camera mainCamera;
     public static Vector3 mainForward = new Vector3(0, -0.518944f, 0.8548083f);
@@ -103,7 +105,10 @@ public class NoteController : MonoBehaviour, INoteController
         else if (result == JudgeResult.Bad)
             se = TapEffectType.Bad;
 
-        NotePool.Instance.PlayTapEffect(se, position);
+        if (r_tap_effect)
+        {
+            NotePool.Instance.PlayTapEffect(se, position);
+        }
 
         return se;
     }
@@ -296,8 +301,11 @@ public class NoteController : MonoBehaviour, INoteController
         {
             if (touch.current.phase == KirakiraTouchPhase.Began && lanes.Length > 0)
             {
-                int se = (int)EmitEffect(NoteUtility.GetJudgePos(lanes[0]), JudgeResult.None, GameNoteType.Single);
-                soundEffects[se].PlayOneShot();
+                var se = EmitEffect(NoteUtility.GetJudgePos(lanes[0]), JudgeResult.None, GameNoteType.Single);
+                if (se != TapEffectType.None)
+                {
+                    soundEffects[(int)se].PlayOneShot();
+                }
                 LightControl.instance.TriggerLight(lanes[0]);
             }
         }

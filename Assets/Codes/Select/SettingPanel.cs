@@ -29,6 +29,7 @@ public class SettingPanel : MonoBehaviour
     private Toggle milisec_Tog;
     private Toggle Video_Tog;
     private Toggle Resolution_Tog;
+    private Toggle tapEffect_Tog;
     private NoteStyleToggleGroup noteToggles;
     private SESelector seSelector;
 
@@ -85,6 +86,8 @@ public class SettingPanel : MonoBehaviour
     KVar r_bang_perspect;
     [Inject(Id = "r_shake_flick")]
     KVar r_shake_flick;
+    [Inject(Id = "r_tap_effect")]
+    KVar r_tap_effect;
 
     [Inject(Id = "r_usevideo")]
     KVar r_usevideo;
@@ -171,6 +174,7 @@ public class SettingPanel : MonoBehaviour
         milisec_Tog = GameObject.Find("Milisec_Toggle").GetComponent<Toggle>();
         laneLight_Tog = GameObject.Find("LaneLight_Toggle").GetComponent<Toggle>();
         shake_Tog = GameObject.Find("Shake_Toggle").GetComponent<Toggle>();
+        tapEffect_Tog = GameObject.Find("TapEffect_Toggle").GetComponent<Toggle>();
 
         language_Dropdown = GameObject.Find("Language_Dropdown").GetComponent<Dropdown>();
         language_Dropdown.onValueChanged.AddListener(OnLanuageChanged);
@@ -251,6 +255,7 @@ public class SettingPanel : MonoBehaviour
         syncLine_Tog.isOn = r_syncline;
         offBeat_Tog.isOn = r_graynote;
         persp_Tog.isOn = r_bang_perspect;
+        tapEffect_Tog.isOn = r_tap_effect;
         ELP_Slider.value = cl_elp;
 
         laneLight_Tog.isOn = r_lanefx;
@@ -299,6 +304,7 @@ public class SettingPanel : MonoBehaviour
             r_syncline.Set(syncLine_Tog.isOn);
             r_graynote.Set(offBeat_Tog.isOn);
             r_bang_perspect.Set(persp_Tog.isOn);
+            r_tap_effect.Set(tapEffect_Tog.isOn);
             cl_elp.Set(ELP_Slider.value);
             r_lanefx.Set(laneLight_Tog.isOn);
             r_shake_flick.Set(shake_Tog.isOn);
