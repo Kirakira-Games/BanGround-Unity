@@ -162,7 +162,7 @@ public class TitleLoader : MonoBehaviour
         }
         else
         {
-            messageBannerController.ShowMsg(LogLevel.OK, VersionCheck.NoUpdate, true);
+            messageBannerController.ShowMsg(LogLevel.OK, VersionCheck.NoUpdate.L(), true);
             te.waitingUpdate = false;
         }
     });
