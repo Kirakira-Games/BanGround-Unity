@@ -129,6 +129,7 @@ public class GlobalInstaller : MonoInstaller
             KVar.C("r_lanefx", "1", KVarFlags.Archive, "Show lane effects while clicking on lanes"),
             KVar.C("r_graynote", "1", KVarFlags.Archive, "Enables the \"Off-beat coloring\" aka grey notes"),
             KVar.C("r_bang_perspect", "1", KVarFlags.Archive, "Use BanG Dream style perspect instead of real 3d perspect"),
+            KVar.C("r_tap_effect", "1", KVarFlags.Archive, "Play special effect on note hit"),
 
             KVar.C("r_shake_flick", "1", KVarFlags.Archive, "Shake the screen while flicker note judged"),
             KVar.C("r_usevideo", "1", KVarFlags.Archive, "Use video for background (If present)"),
