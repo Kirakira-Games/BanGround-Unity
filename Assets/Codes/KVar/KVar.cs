@@ -398,12 +398,15 @@ public class KVSystem : IKVSystem
         try
         {
             var rmConfig = await webRequest.GetRemoteKVars().Fetch();
-            foreach (var (name, value) in rmConfig)
+            if (rmConfig != null)
             {
-                KonCommandBase cmd;
-                if (m_allCmds.TryGetValue(name, out cmd) && cmd is KVar kVar)
+                foreach (var (name, value) in rmConfig)
                 {
-                    kVar.Set(value.ToString());
+                    KonCommandBase cmd;
+                    if (m_allCmds.TryGetValue(name, out cmd) && cmd is KVar kVar)
+                    {
+                        kVar.Set(value.ToString());
+                    }
                 }
             }
         }
