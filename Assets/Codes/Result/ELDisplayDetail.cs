@@ -40,7 +40,7 @@ public class ELDisplayDetail : MonoBehaviour
         for(int i = 0; i < bars.Length; ++i) 
         {
             var size = bars[i].rectTransform.sizeDelta;
-            size.y = heights[bars.Length - i];
+            size.y = heights[bars.Length - i - 1];
 
             bars[i].rectTransform.sizeDelta = size;
         }
