@@ -1,16 +1,10 @@
 using UnityEngine;
-using System;
 using System.Collections.Generic;
-using Assets.Codes.InGame.Input;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.IO.Compression;
-using Newtonsoft.Json;
-using System.Linq;
 using Zenject;
 using BanGround;
 using BanGround.Scene.Params;
 using BanGround.Utils;
+using System.Linq;
 
 public interface IKirakiraTouchProvider
 {
@@ -225,6 +219,9 @@ public class TouchManager : MonoBehaviour
     private HashSet<KirakiraTouch> exchanged;
     private DemoRecorder recorder = null;
     private InGameParams parameters;
+
+    public bool SafeToPause => touchProvider is AutoPlayTouchProvider
+        || touchTable.All((pair) => pair.Value.owner == null);
 
     public static int EvalResult(JudgeResult result)
     {
