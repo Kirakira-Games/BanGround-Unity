@@ -3,6 +3,7 @@ using BanGround.Game.Mods;
 using BanGround.Scene.Params;
 using Cysharp.Threading.Tasks;
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -118,7 +119,7 @@ public class UIManager : MonoBehaviour, IUIManager
 
     public void OnPauseButtonClick()
     {
-        if (Touch.activeTouches.Count >= 2) return;
+        if (!TouchManager.instance.SafeToPause) return;
         GamePause();
     }
 
