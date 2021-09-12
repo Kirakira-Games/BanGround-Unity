@@ -221,6 +221,7 @@ public class TouchManager : MonoBehaviour
     private InGameParams parameters;
 
     public bool SafeToPause => touchProvider is AutoPlayTouchProvider
+        || touchProvider is DemoReplayTouchProvider
         || touchTable.All((pair) => pair.Value.owner == null);
 
     public static int EvalResult(JudgeResult result)
