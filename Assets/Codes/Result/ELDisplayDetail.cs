@@ -1,6 +1,4 @@
 using System.Linq;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -27,6 +25,7 @@ public class ELDisplayDetail : MonoBehaviour
 
         var counts = result    
             .GroupBy(x => ranges.First(r => r >= x))
+            .OrderBy(g => g.Key)
             .Select(g => g.Count() - 1);
 
         Debug.Assert(counts.Count() == bars.Length);
