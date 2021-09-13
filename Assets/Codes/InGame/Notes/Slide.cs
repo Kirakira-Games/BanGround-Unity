@@ -49,7 +49,7 @@ public class Slide : MonoBehaviour, KirakiraTracer
             }
         }
         noteHead.isTilt = isTilt;
-        noteHead.tapEffect.Stop();
+        noteHead.StopEffect();
         notes[notes.Count - 1].isTilt = isTilt;
         // GameNoteType.None for slide body which does not have a note type
         var material = noteHead.timingGroup.GetMaterial(GameNoteType.None, notes[0].slideMesh.meshRenderer.material);
@@ -222,7 +222,7 @@ public class Slide : MonoBehaviour, KirakiraTracer
         }
         if (judgeHead == 0)
         {
-            noteHead.tapEffect.Play(TapEffectType.Hold, true);
+            noteHead.PlayEffect();
         }
         else
         {

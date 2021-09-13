@@ -7,6 +7,7 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
     protected KVar r_graynote;
     protected KVar r_notesize;
     protected KVar r_bang_perspect;
+    protected KVar r_tap_effect;
 
     public int time;
     public int judgeWindowEnd;
@@ -33,11 +34,12 @@ public abstract class NoteBase : MonoBehaviour, KirakiraTracer
     public Vector3 judgePos;
     public virtual Color color => noteMesh.meshRenderer.sharedMaterial.GetColor("_Tint");
 
-    public void Inject(KVar r_graynote, KVar r_notesize, KVar r_bang_perspect)
+    public void Inject(KVar r_graynote, KVar r_notesize, KVar r_bang_perspect, KVar r_tap_effect)
     {
         this.r_graynote = r_graynote;
         this.r_notesize = r_notesize;
         this.r_bang_perspect = r_bang_perspect;
+        this.r_tap_effect = r_tap_effect;
     }
 
     public virtual void InitNote(IResourceLoader resourceLoader, INoteController noteController)

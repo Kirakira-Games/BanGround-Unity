@@ -63,6 +63,8 @@ public class NotePool : MonoBehaviour
     private KVar r_graynote;
     [Inject(Id = "r_bang_perspect")]
     private KVar r_bang_perspect;
+    [Inject(Id = "r_tap_effect")]
+    private KVar r_tap_effect;
     [Inject(Id = "r_syncline")]
     KVar r_syncline;
 
@@ -97,7 +99,7 @@ public class NotePool : MonoBehaviour
                     note = obj.AddComponent<SlideEndFlick>();
                     break;
             }
-            note.Inject(r_graynote, r_notesize, r_bang_perspect);
+            note.Inject(r_graynote, r_notesize, r_bang_perspect, r_tap_effect);
             note.isDestroyed = true;
 
             if (NoteUtility.IsSlide(type))
