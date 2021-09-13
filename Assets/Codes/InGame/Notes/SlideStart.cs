@@ -5,7 +5,20 @@ using Zenject;
 
 public class SlideStart : SlideNoteBase
 {
-    public ParticleSequence tapEffect;
+    private ParticleSequence tapEffect;
+
+    public void PlayEffect()
+    {
+        if (r_tap_effect)
+        {
+            tapEffect.Play(TapEffectType.Hold, true);
+        }
+    }
+
+    public void StopEffect()
+    {
+        tapEffect.Stop();
+    }
 
     protected override JudgeResult TrySlideJudge(KirakiraTouch touch)
     {
