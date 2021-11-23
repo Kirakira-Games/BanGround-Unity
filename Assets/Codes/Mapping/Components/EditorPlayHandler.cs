@@ -12,6 +12,9 @@ namespace BGEditor
         public Button Blocker;
 
         [Inject]
+        private IChartCore chartCore;
+
+        [Inject]
         private IAudioManager audioManager;
 
         [Inject]
@@ -50,6 +53,7 @@ namespace BGEditor
             var flag = modPanel.GetCurrentFlag();
             modPanel.Save(cl_mappingmodflag);
             Close();
+            chartCore.Save();
 
             float seekTime = fromStart ? 0 : audioManager.gameBGM.GetPlaybackTime() / 1000f;
             var parameters = SceneLoader.GetParamsOrDefault<MappingParams>();
