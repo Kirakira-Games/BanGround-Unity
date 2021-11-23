@@ -12,6 +12,7 @@ public class CommunityInstaller : MonoInstaller
         // Store
         Container.Bind<IStoreProvider>().WithId("BanGround").To<BanGroundStoreProvider>().AsSingle().NonLazy();
         Container.Bind<IStoreController>().FromInstance(storeController);
+        Container.Bind<BestdoriWebRequest>().FromNew().AsSingle();
 
         // Cache
         Container.Bind<IResourceDownloadCache<Texture2D>>().To<TextureDownloadCache>().AsSingle().NonLazy();
