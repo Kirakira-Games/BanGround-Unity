@@ -8,6 +8,13 @@ using Zenject;
 
 namespace BanGround.Community
 {
+    public enum StoreServerType
+    {
+        BanGround,
+        Burrito,
+        Mugzone
+    }
+
     public enum StoreViewType
     {
         Song,
@@ -91,6 +98,8 @@ namespace BanGround.Community
         private IStoreProvider bgStore;
         [Inject]
         private DiContainer container;
+        [Inject]
+        private IMessageBannerController msgBanner;
 
         public Button BackBtn;
         public Button SearchBtn;
@@ -98,6 +107,7 @@ namespace BanGround.Community
         public GameObject SongPrefab;
         public ScrollRect StoreRect;
         public Text TitleText;
+        public Dropdown StoreSwitcher;
 
         public const int LIMIT = 9;
 
@@ -226,7 +236,24 @@ namespace BanGround.Community
 
             // Back button
             BackBtn.onClick.AddListener(OnBackButtonClicked);
+
+            // Switch store
+            StoreSwitcher.onValueChanged.AddListener(SwitchStore);
         }
+
+        public void SwitchStore(StoreServerType storeType)
+        {
+            switch (storeType)
+            {
+                case StoreServerType.BanGround:
+                    break;
+                default:
+                    msgBanner.ShowMsg(LogLevel.INFO, "Coming soon!");
+                    StoreSwitcher.SetValueWithoutNotify(0);
+                    break;
+            }
+        }
+        public void SwitchStore(int storeType) => SwitchStore((StoreServerType) storeType);
 
         private void Update()
         {
