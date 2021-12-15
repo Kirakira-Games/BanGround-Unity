@@ -14,6 +14,12 @@ namespace BanGround.Community
         {
             return JsonConvert.SerializeObject(this);
         }
+
+        public static UserItem Anonymous => new UserItem
+        {
+            Username = "unknown",
+            Nickname = "Anonymous"
+        };
     }
 
     public class SongItem
@@ -39,6 +45,9 @@ namespace BanGround.Community
     public class ChartItem
     {
         public ChartSource Source;
+        /// <summary>
+        /// Original ID in source. Will be converted by <see cref="IDRouterUtil"/>.
+        /// </summary>
         public int Id;
         public UserItem Uploader;
         public List<int> Difficulty;

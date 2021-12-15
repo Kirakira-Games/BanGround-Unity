@@ -37,10 +37,12 @@ public class TouchEvent : MonoBehaviour
         if (waitingUpdate)
             return;
 
+        /*
         if (accountManager.isOfflineMode && !accountManager.isTokenSaved && !await accountManager.DoLogin())
         {
             return;
         }
+        */
 
         if (!touched)
         {

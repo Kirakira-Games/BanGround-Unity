@@ -10,7 +10,6 @@ using UnityEngine.Events;
 namespace BanGround.Web
 {
     using Auth;
-    using System.Net;
     using WebSocketSharp;
 
     enum KiraHttpCode
@@ -132,15 +131,15 @@ namespace BanGround.Web
         + "); ApiRequest";
 #if false
         // Use local server
-        public string ServerAddr => "http://localhost:8080/api/";
+        public virtual string ServerAddr => "http://localhost:8080/api/";
 #elif UNITY_EDITOR
-        public string ServerAddr => "https://banground.reikohaku.fun/api/";
+        public virtual string ServerAddr => "https://banground.reikohaku.fun/api/";
 #else
-        public string ServerAddr => "https://banground.live/api/";
+        public virtual string ServerAddr => "https://banground.live/api/";
 #endif
-        public string ServerSite => ServerAddr.Substring(0, ServerAddr.Length - 5);
-        public string Language => "zh-CN";
-        public string AccessToken
+        public virtual string ServerSite => ServerAddr.Substring(0, ServerAddr.Length - 5);
+        public virtual string Language => "zh-CN";
+        public virtual string AccessToken
         {
             get => cl_accesstoken;
             set => cl_accesstoken.Set(value);
@@ -177,7 +176,7 @@ namespace BanGround.Web
             public int timeout { get; private set; } = 60;
             public bool fullAddr { get; private set; } = false;
 
-            private async UniTask<Resp> HandleResponse<Resp>()
+            protected virtual async UniTask<Resp> HandleResponse<Resp>()
             {
                 if (isAborted)
                     throw new KiraUserAbortedException();

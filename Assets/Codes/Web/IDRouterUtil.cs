@@ -5,6 +5,7 @@ namespace BanGround.Web
         Local,
         BanGround,
         Burrito,
+        Mugzone,
         None
     }
 
