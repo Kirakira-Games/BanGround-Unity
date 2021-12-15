@@ -6,44 +6,99 @@ using UnityEditor.Callbacks;
 using UnityEditor.iOS.Xcode;
 #endif
 
-public class NSPostProcessBuild 
+namespace NativeShareNamespace
 {
-	private const bool ENABLED = true;
-	private const string PHOTO_LIBRARY_USAGE_DESCRIPTION = "Save media to Photos";
-
-	[InitializeOnLoadMethod]
-	public static void ValidatePlugin()
+	[System.Serializable]
+	public class Settings
 	{
-		string jarPath = "Assets/Plugins/NativeShare/Android/NativeShare.jar";
-		if( File.Exists( jarPath ) )
+		private const string SAVE_PATH = "ProjectSettings/NativeShare.json";
+
+		public bool AutomatedSetup = true;
+		public string PhotoLibraryUsageDescription = "The app requires access to Photos to save media to it.";
+
+		private static Settings m_instance = null;
+		public static Settings Instance
 		{
-			Debug.Log( "Deleting obsolete " + jarPath );
-			AssetDatabase.DeleteAsset( jarPath );
+			get
+			{
+				if( m_instance == null )
+				{
+					try
+					{
+						if( File.Exists( SAVE_PATH ) )
+							m_instance = JsonUtility.FromJson<Settings>( File.ReadAllText( SAVE_PATH ) );
+						else
+							m_instance = new Settings();
+					}
+					catch( System.Exception e )
+					{
+						Debug.LogException( e );
+						m_instance = new Settings();
+					}
+				}
+
+				return m_instance;
+			}
 		}
-	}
 
-#if UNITY_IOS
-#pragma warning disable 0162
-	[PostProcessBuild]
-	public static void OnPostprocessBuild( BuildTarget target, string buildPath )
-	{
-		if( !ENABLED )
-			return;
-
-		if( target == BuildTarget.iOS )
+		public void Save()
 		{
-			string plistPath = Path.Combine( buildPath, "Info.plist" );
-
-			PlistDocument plist = new PlistDocument();
-			plist.ReadFromString( File.ReadAllText( plistPath ) );
-
-			PlistElementDict rootDict = plist.root;
-			rootDict.SetString( "NSPhotoLibraryUsageDescription", PHOTO_LIBRARY_USAGE_DESCRIPTION );
-			rootDict.SetString( "NSPhotoLibraryAddUsageDescription", PHOTO_LIBRARY_USAGE_DESCRIPTION );
-
-			File.WriteAllText( plistPath, plist.WriteToString() );
+			File.WriteAllText( SAVE_PATH, JsonUtility.ToJson( this, true ) );
 		}
-	}
-#pragma warning restore 0162
+
+#if UNITY_2018_3_OR_NEWER
+		[SettingsProvider]
+		public static SettingsProvider CreatePreferencesGUI()
+		{
+			return new SettingsProvider( "Project/yasirkula/Native Share", SettingsScope.Project )
+			{
+				guiHandler = ( searchContext ) => PreferencesGUI(),
+				keywords = new System.Collections.Generic.HashSet<string>() { "Native", "Share", "Android", "iOS" }
+			};
+		}
 #endif
+
+#if !UNITY_2018_3_OR_NEWER
+		[PreferenceItem( "Native Share" )]
+#endif
+		public static void PreferencesGUI()
+		{
+			EditorGUI.BeginChangeCheck();
+
+			Instance.AutomatedSetup = EditorGUILayout.Toggle( "Automated Setup", Instance.AutomatedSetup );
+
+			EditorGUI.BeginDisabledGroup( !Instance.AutomatedSetup );
+			Instance.PhotoLibraryUsageDescription = EditorGUILayout.DelayedTextField( new GUIContent( "Photo Library Usage Description", "Shown to user when they select the 'Save to Photos' option in share sheet" ), Instance.PhotoLibraryUsageDescription );
+			EditorGUI.EndDisabledGroup();
+
+			if( EditorGUI.EndChangeCheck() )
+				Instance.Save();
+		}
+	}
+
+	public class NSPostProcessBuild
+	{
+#if UNITY_IOS
+		[PostProcessBuild]
+		public static void OnPostprocessBuild( BuildTarget target, string buildPath )
+		{
+			if( !Settings.Instance.AutomatedSetup )
+				return;
+
+			if( target == BuildTarget.iOS )
+			{
+				string plistPath = Path.Combine( buildPath, "Info.plist" );
+
+				PlistDocument plist = new PlistDocument();
+				plist.ReadFromString( File.ReadAllText( plistPath ) );
+
+				PlistElementDict rootDict = plist.root;
+				rootDict.SetString( "NSPhotoLibraryUsageDescription", Settings.Instance.PhotoLibraryUsageDescription );
+				rootDict.SetString( "NSPhotoLibraryAddUsageDescription", Settings.Instance.PhotoLibraryUsageDescription );
+
+				File.WriteAllText( plistPath, plist.WriteToString() );
+			}
+		}
+#endif
+	}
 }
