@@ -41,7 +41,7 @@ An issue should be created to describe the purpose of the changes and to notify 
 4.  All pull requests must be reviewed and approved by at least one other developer before merging.
 
 ## Note
--   Run ```submodule.bat``` before run unity editor to resolve submodules.
+-   Run `submodule.bat` before run unity editor to resolve submodules.
 
 -   Fmod version: 2.01.111
 
