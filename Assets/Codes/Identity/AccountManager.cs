@@ -137,7 +137,8 @@ namespace BanGround.Identity
                         loadingBlocker.Close();
                     }
                 }
-                return await DoLogin();
+                // return await DoLogin();
+                return false;
             }
 
             return !isOfflineMode;
